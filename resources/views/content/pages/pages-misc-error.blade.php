@@ -1,5 +1,4 @@
 @php
-$customizerHidden = 'customizer-hide';
 $configData = Helper::appClasses();
 @endphp
 
@@ -28,4 +27,5 @@ $configData = Helper::appClasses();
 <div class="container-fluid misc-bg-wrapper">
   <img src="{{ asset('assets/img/illustrations/bg-shape-image-'.$configData['style'].'.png') }}" alt="page-misc-error" data-app-light-img="illustrations/bg-shape-image-light.png" data-app-dark-img="illustrations/bg-shape-image-dark.png">
 </div>
-<!-- /Error -->@endsection
+<!-- /Error -->
+@endsection
