@@ -1,0 +1,22 @@
+{
+  "menu": [
+    {
+      "url": "/admin",
+      "name": "Home",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "pages-home"
+    },
+    {
+      "name": "Roles & Permissions",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "admin.roles",
+      "submenu": [
+        {
+          "url": "/admin/roles",
+          "name": "Roles",
+          "slug": "admin.roles.index"
+        }
+      ]
+    }
+  ]
+}
