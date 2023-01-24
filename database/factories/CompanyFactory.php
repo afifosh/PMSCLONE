@@ -21,7 +21,7 @@ class CompanyFactory extends Factory
             'added_by' => Admin::inRandomOrder()->first()->id,
             'name' => $this->faker->company(),
             'email' => $this->faker->safeEmail(),
-            'status' => 'active'
+            'status' => 'active',
         ];
     }
 }

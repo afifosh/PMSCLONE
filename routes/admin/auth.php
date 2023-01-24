@@ -25,8 +25,7 @@ Route::prefix('admin')->group(function () {
     // Route::get('/dashboard', [PagesController::class, 'admin_dashboard'])->middleware(['auth:admin', 'adminVerified']);
 
     Route::name('admin.')->group(function () {
-
-        Route::view('login', 'auth.login', [ 'pageConfigs' => ['myLayout' => 'blank']])->middleware(['guest:admin'])->name('login');
+        Route::view('login', 'auth.login', ['pageConfigs' => ['myLayout' => 'blank']])->middleware(['guest:admin'])->name('login');
 
         Route::post('/login', [AuthenticatedSessionController::class, 'store'])
             ->middleware(['guest:admin']);
@@ -58,37 +57,37 @@ Route::prefix('admin')->group(function () {
 
         // Email Verification...
         Route::get('/email/verify', [EmailVerificationPromptController::class, '__invoke'])
-            ->middleware([config('fortify.auth_middleware', 'auth') . ':admin'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
             ->name('verification.notice');
 
         Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
-            ->middleware([config('fortify.auth_middleware', 'auth') . ':admin', 'signed'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin', 'signed'])
             ->name('verification.verify');
 
         Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-            ->middleware([config('fortify.auth_middleware', 'auth') . ':admin'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
             ->name('verification.send');
 
         // Profile Information...
         Route::put('/user/profile-information', [ProfileInformationController::class, 'update'])
-            ->middleware([config('fortify.auth_middleware', 'auth') . ':admin'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
             ->name('user-profile-information.update');
 
         // Passwords...
         Route::put('/user/password', [PasswordController::class, 'update'])
-            ->middleware([config('fortify.auth_middleware', 'auth') . ':admin'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
             ->name('user-password.update');
 
         // Password Confirmation...
         Route::get('/user/confirm-password', [ConfirmablePasswordController::class, 'show'])
-            ->middleware([config('fortify.auth_middleware', 'auth') . ':admin']);
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin']);
 
         Route::get('/user/confirmed-password-status', [ConfirmedPasswordStatusController::class, 'show'])
-            ->middleware([config('fortify.auth_middleware', 'auth') . ':admin'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
             ->name('password.confirmation');
 
         Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store'])
-            ->middleware([config('fortify.auth_middleware', 'auth') . ':admin'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
             ->name('password.confirm');
 
         // Two Factor Authentication...

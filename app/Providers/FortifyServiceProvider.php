@@ -19,10 +19,10 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-      if (request()->is('admin/*')) {
-        config(['fortify.guard' => 'admin']);
-        config(['fortify.home' => RouteServiceProvider::ADMIN_HOME]);
-    }
+        if (request()->is('admin/*')) {
+            config(['fortify.guard' => 'admin']);
+            config(['fortify.home' => RouteServiceProvider::ADMIN_HOME]);
+        }
     }
 
     /**
@@ -46,8 +46,9 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::loginView(function () {
-          $pageConfigs = ['myLayout' => 'blank'];
-          return view('auth.login', ['pageConfigs' => $pageConfigs]);
-      });
+            $pageConfigs = ['myLayout' => 'blank'];
+
+            return view('auth.login', ['pageConfigs' => $pageConfigs]);
+        });
     }
 }

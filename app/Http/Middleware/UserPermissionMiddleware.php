@@ -17,32 +17,30 @@ class UserPermissionMiddleware
      */
     public function handle(Request $request, Closure $next, $permission = null, $guard = null)
     {
-      $authGuard = app('auth')->guard($guard);
+        $authGuard = app('auth')->guard($guard);
 
-      if ($authGuard->guest()) {
-          throw UnauthorizedException::notLoggedIn();
-      }
+        if ($authGuard->guest()) {
+            throw UnauthorizedException::notLoggedIn();
+        }
 
-      if (! is_null($permission)) {
-          $permissions = is_array($permission)
-              ? $permission
-              : explode('|', $permission);
-      }
+        if (! is_null($permission)) {
+            $permissions = is_array($permission)
+                ? $permission
+                : explode('|', $permission);
+        }
 
-      if ( is_null($permission) ) {
-          $permission = $request->route()->getName();
+        if (is_null($permission)) {
+            $permission = $request->route()->getName();
 
-          $permissions = array($permission);
-      }
+            $permissions = [$permission];
+        }
 
+        foreach ($permissions as $permission) {
+            if ($authGuard->user()->can($permission)) {
+                return $next($request);
+            }
+        }
 
-      foreach ($permissions as $permission) {
-          if ($authGuard->user()->can($permission)) {
-              return $next($request);
-          }
-      }
-
-      throw UnauthorizedException::forPermissions($permissions);
-
+        throw UnauthorizedException::forPermissions($permissions);
     }
 }
