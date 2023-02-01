@@ -179,7 +179,7 @@ return [
         App\Providers\MenuServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
-
+        Yajra\DataTables\DataTablesServiceProvider::class,
     ],
 
     /*
@@ -196,6 +196,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // ...
         'Helper' => App\Helpers\Helpers::class,
+        'DataTables' => Yajra\DataTables\Facades\DataTables::class,
     ])->toArray(),
 
 ];

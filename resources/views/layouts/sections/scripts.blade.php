@@ -12,6 +12,50 @@
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
+<script>
+  $(document).ready(function () {
+    @if(session()->has('success'))
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title:"{{session('success')}}",
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+              confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+          });
+    @endif
+    @if(session()->has('error'))
+        Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title:"{{session('error')}}",
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+              confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+          });
+    @endif
+    @if(session()->has('status'))
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title:"{{ucwords(str_replace('-', ' ', session('status')))}}",
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+              confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+          });
+    @endif
+    console.log('{!!json_encode(session()->all())!!}');
+  });
+ </script>
 
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->

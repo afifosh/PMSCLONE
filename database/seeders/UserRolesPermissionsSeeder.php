@@ -55,7 +55,7 @@ class UserRolesPermissionsSeeder extends Seeder
         ];
 
         $insertPermissions = fn ($role) => collect($permissionsByRole[$role])
-          ->map(fn ($name) => Permission::firstOrCreate(['name' => $name])->id)
+          ->map(fn ($name) => Permission::where('name', $name)->where('guard_name', 'web')->first()->id)
           ->toArray();
 
         $permissionIdsByRole = [];
@@ -65,7 +65,7 @@ class UserRolesPermissionsSeeder extends Seeder
         }
 
         foreach ($permissionIdsByRole as $role => $permissionIds) {
-            $role = Role::whereName($role)->firstOrCreate(['name' => $role]);
+            $role = Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
 
             DB::table('role_has_permissions')
               ->insert(

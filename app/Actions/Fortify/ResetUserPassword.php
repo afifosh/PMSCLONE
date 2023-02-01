@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +17,28 @@ class ResetUserPassword implements ResetsUserPasswords
      *
      * @param  array<string, string>  $input
      */
-    public function reset(User $user, array $input): void
+    public function reset($user, array $input)
+    {
+      if(config('fortify.guard') == 'admin'){
+        $this->resetAdmin($user, $input);
+      }
+      else{
+        $this->resetUser($user, $input);
+      }
+    }
+
+    public function resetUser(User $user, array $input): void
+    {
+        Validator::make($input, [
+            'password' => $this->passwordRules(),
+        ])->validate();
+
+        $user->forceFill([
+            'password' => Hash::make($input['password']),
+        ])->save();
+    }
+
+    public function resetAdmin(Admin $user, array $input): void
     {
         Validator::make($input, [
             'password' => $this->passwordRules(),

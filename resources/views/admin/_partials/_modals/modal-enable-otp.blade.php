@@ -5,16 +5,22 @@
       <div class="modal-body">
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         <div class="text-center mb-4">
-          <h3 class="mb-2">Enable One Time Password</h3>
-          <p>Verify Your Mobile Number for SMS</p>
+          <h3 class="mb-2">Enable 2FA Auth</h3>
+          <div class="pb-5">
+            @if (auth()->user()->two_factor_secret)
+                {!! auth()->user()->twoFactorQrCodeSvg() !!}
+            @endif
+
         </div>
-        <p>Enter your mobile phone number with country code and we will send you a verification code.</p>
-        <form id="enableOTPForm" class="row g-3" onsubmit="return false">
+          <p>Please Scan The above code to get the Confirmation Code</p>
+        </div>
+        <form class="row g-3" action="{{route('admin.two-factor.confirm')}}" method="POST">
+          @csrf
           <div class="col-12">
-            <label class="form-label" for="modalEnableOTPPhone">Phone Number</label>
+            <label class="form-label" for="modalEnableOTPPhone">Confirmation Code</label>
             <div class="input-group">
-              <span class="input-group-text">US (+1)</span>
-              <input type="text" id="modalEnableOTPPhone" name="modalEnableOTPPhone" class="form-control phone-number-otp-mask" placeholder="202 555 0111" />
+              <input id="code" placeholder="{{ __('Authentication code') }}" type="text"
+                  class="form-control @error('code') is-invalid @enderror" name="code" required>
             </div>
           </div>
           <div class="col-12">

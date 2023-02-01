@@ -25,7 +25,7 @@ Route::prefix('admin')->group(function () {
     // Route::get('/dashboard', [PagesController::class, 'admin_dashboard'])->middleware(['auth:admin', 'adminVerified']);
 
     Route::name('admin.')->group(function () {
-        Route::view('login', 'auth.login', ['pageConfigs' => ['myLayout' => 'blank']])->middleware(['guest:admin'])->name('login');
+        Route::view('login', 'admin.auth.login', ['pageConfigs' => ['myLayout' => 'blank']])->middleware(['guest:admin'])->name('login');
 
         Route::post('/login', [AuthenticatedSessionController::class, 'store'])
             ->middleware(['guest:admin']);

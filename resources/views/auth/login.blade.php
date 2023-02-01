@@ -4,7 +4,7 @@
 
 @extends('layouts/layoutMaster')
 
-@section('title', 'Login Basic - Pages')
+@section('title', 'Login')
 
 @section('vendor-style')
     <!-- Vendor -->
@@ -44,14 +44,15 @@
                         <!-- /Logo -->
                         <h4 class="mb-1 pt-2">Welcome to {{ config('variables.templateName') }}! 👋</h4>
                         <p class="mb-4">Please sign-in to your account and start the adventure</p>
-
+                        @if (session('status'))
+                            <p class="text-success mb-3">{{ session('status') }}</p>
+                        @endif
                         <form id="formAuthentication" class="mb-3" action="" method="POST">
+                            @csrf
                             @if ($errors->any())
                                 <div class="alert alert-danger alert-dismissible">
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    <strong>
-                                        {!! implode('<br/>', $errors->all('<span>:message</span>')) !!}
-                                    </strong>
+                                    {!! implode('<br/>', $errors->all('<span>:message</span>')) !!}
                                 </div>
                             @endif
                             <div class="mb-3">
@@ -62,7 +63,7 @@
                             <div class="mb-3 form-password-toggle">
                                 <div class="d-flex justify-content-between">
                                     <label class="form-label" for="password">Password</label>
-                                    <a href="javascript:void(0);">
+                                    <a href="{{ route('password.request') }}">
                                         <small>Forgot Password?</small>
                                     </a>
                                 </div>
@@ -85,14 +86,6 @@
                                 <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
                             </div>
                         </form>
-
-                        <p class="text-center">
-                            <span>New on our platform?</span>
-                            <a href="{{ url('auth/register-basic') }}">
-                                <span>Create an account</span>
-                            </a>
-                        </p>
-
                         <div class="divider my-4">
                             <div class="divider-text">or</div>
                         </div>

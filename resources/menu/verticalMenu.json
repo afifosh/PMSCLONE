@@ -5,6 +5,17 @@
       "name": "Home",
       "icon": "menu-icon tf-icons ti ti-smart-home",
       "slug": "pages-home"
+    },{
+      "name": "User Management",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "company-users",
+      "submenu": [
+        {
+          "url": "/company-users",
+          "name": "Users",
+          "slug": "company-users.index"
+        }
+      ]
     }
   ]
 }
