@@ -12,12 +12,17 @@
     "barryvdh/laravel-debugbar": "^3.7",
     "fruitcake/laravel-cors": "^2.0.5",
     "guzzlehttp/guzzle": "^7.2",
+    "lab404/laravel-impersonate": "^1.7",
     "laravel/fortify": "^1.16",
     "laravel/framework": "^9.0",
     "laravel/pint": "^1.4",
     "laravel/sanctum": "^2.14",
     "laravel/tinker": "^2.7",
     "spatie/laravel-permission": "^5.8",
+    "yajra/laravel-datatables": "^9.0",
+    "yajra/laravel-datatables-buttons": "^9.1",
+    "yajra/laravel-datatables-editor": "^1.25",
+    "yajra/laravel-datatables-fractal": "^9.1",
     "yajra/laravel-datatables-oracle": "^10.2"
   },
   "require-dev": {

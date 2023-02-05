@@ -7,16 +7,31 @@
       "slug": "pages-home"
     },
     {
-      "name": "Roles & Permissions",
+      "name": "Roles",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": "admin.roles",
+      "slug": ["admin.roles", "admin.company-roles"],
+      "permission" : ["read role", "read company role", "read user"],
       "submenu": [
         {
           "url": "/admin/roles",
-          "name": "Roles",
-          "slug": "admin.roles.index"
+          "name": "Admin Roles",
+          "slug": "admin.roles.index",
+          "permission" : ["read role", "read user"]
+        },
+        {
+          "url": "/admin/company-roles",
+          "name": "Company Roles",
+          "slug": "admin.company-roles.index",
+          "permission": "read company role"
         }
       ]
+    },
+    {
+      "url": "/admin/companies",
+      "name": "Companies",
+      "icon": "menu-icon fas fa-building",
+      "slug": "admin.companies.index",
+      "permission": "read company"
     }
   ]
 }

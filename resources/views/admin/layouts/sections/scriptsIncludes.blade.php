@@ -9,6 +9,7 @@
 
   <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
   <script src="{{ asset('assets/js/config.js') }}"></script>
+  <script src="{{asset('assets/vendor/libs/sweetalert2/sweetalert2.js')}}"></script>
 
 @if ($configData['hasCustomizer'])
   <script>

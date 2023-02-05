@@ -1,10 +1,11 @@
 @php
     $customizerHidden = 'customizer-hide';
+    $pageConfigs = ['myLayout' => 'blank'];
 @endphp
 
-@extends('layouts/layoutMaster')
+@extends('admin.layouts/layoutMaster')
 
-@section('title', '2FA ChallengeA')
+@section('title', '2FA Challenge')
 
 @section('vendor-style')
     <!-- Vendor -->

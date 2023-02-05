@@ -1,4 +1,4 @@
-@push('pricing-script')
+{{-- @push('pricing-script')
 <script src="{{asset('assets/js/pages-pricing.js')}}"></script>
 @endpush
 
@@ -7,7 +7,7 @@
   <div class="modal-dialog modal-xl modal-simple modal-pricing">
     <div class="modal-content p-2 p-md-5">
       <div class="modal-body">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
         <!-- Pricing Plans -->
         <div class="pb-sm-5 pb-2 rounded-top">
           <h2 class="text-center mb-2">Pricing Plans</h2>
@@ -123,8 +123,8 @@
           </div>
         </div>
         <!--/ Pricing Plans -->
-      </div>
+      {{-- </div>
     </div>
   </div>
-</div>
+</div> --}}
 <!--/ Pricing Modal -->

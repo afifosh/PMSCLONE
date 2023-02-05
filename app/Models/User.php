@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\HasEnum;
+use App\Traits\Tenantable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,17 +14,21 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Tenantable, HasEnum;
 
+    public const DT_ID = 'users_dataTable';
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'phone',
         'email',
         'password',
+        'status'
     ];
 
     /**
@@ -45,6 +51,18 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getAvatarAttribute($value)
+    {
+      if(!$value)
+      return asset('assets/img/avatars/'.substr($this->id, -1).'.png');
+      return $value;
+    }
+
+    public function getFullNameAttribute()
+    {
+      return ucwords($this->first_name. ' ' . $this->last_name);
+    }
 
     public function company()
     {

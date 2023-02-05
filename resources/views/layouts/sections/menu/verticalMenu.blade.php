@@ -28,7 +28,7 @@ $configData = Helper::appClasses();
     @foreach ($menuData[0]->menu as $menu)
 
     {{-- adding active and open class if child is active --}}
-
+    @canany($menu->permission ?? true)
     {{-- menu headers --}}
     @if (isset($menu->menuHeader))
     <li class="menu-header small text-uppercase">
@@ -81,6 +81,7 @@ $configData = Helper::appClasses();
       @endisset
     </li>
     @endif
+    @endcan
     @endforeach
   </ul>
 

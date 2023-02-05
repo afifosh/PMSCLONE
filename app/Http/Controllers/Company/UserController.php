@@ -2,48 +2,146 @@
 
 namespace App\Http\Controllers\Company;
 
+use App\DataTables\Company\UsersDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\Module;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
-    {
-        if ($request->ajax()) {
-            $query = User::where('company_id', auth()->user()->company_id)
-              ->select('id', 'name', 'email', 'email_verified_at')
-              ->with('roles');
+  /**
+   * Display a listing of the resource.
+   *
+   * @return \Illuminate\Http\Response
+   */
+  public function index(UsersDataTable $dataTable)
+  {
+    $data['roles'] = Role::where('guard_name', 'web')->withCount('users')->get();
+    return $dataTable->render('pages.users.index', $data);
+    // view('pages.users.index');
+  }
 
-            return Datatables::of($query)
-              ->addIndexColumn()
-              ->addColumn('action', function ($row) {
-                  $btn = <<<'BTN'
-                        <div class="d-inline-block text-nowrap">
-                          <button class="btn btn-sm btn-icon edit-record" data-id="115" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser"><i class="ti ti-edit"></i></button>
-                          <button class="btn btn-sm btn-icon delete-record" data-id="115"><i class="ti ti-trash"></i></button>
-                          <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
-                          <div class="dropdown-menu dropdown-menu-end m-0">
-                            <a href="#" class="dropdown-item">View</a>
-                            <a href="javascript:;" class="dropdown-item">Suspend</a>
-                          </div>
-                        </div>
-                        BTN;
-                  return $btn;
-              })
-              ->editColumn('roles', function ($row) {
-                  return $row->roles->pluck('name')->implode(', ');
-              })
-              ->addColumn('status', function ($row) {
-                  return $row->email_verified_at
-                    ? '<i class="ti fs-4 ti-shield-check text-success"></i>'
-                    : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
-              })
-              ->rawColumns(['action', 'status'])
-              ->make(true);
-        }
+  /**
+   * Show the form for creating a new resource.
+   *
+   * @return \Illuminate\Http\Response
+   */
+  public function create()
+  {
+    $data['user'] = new User();
+    $data['roles'] = Role::where('guard_name', 'web')->pluck('name', 'id');
+    return $this->sendRes('success', ['view_data' => view('pages.users.edit', $data)->render()]);
+  }
 
-        return view('pages.company-users');
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\Response
+   */
+  public function store(Request $request)
+  {
+    $att = $request->validate([
+      'first_name' => 'required|string|max:255',
+      'last_name' => 'required|string|max:255',
+      'phone' => 'required|string|max:255',
+      'email' => ['required', 'string', 'max:255', 'unique:users,email'],
+      'password' => 'required|confirmed',
+      'status' => 'required',
+      'roles' => 'required|array',
+      'roles.*' => 'exists:roles,id',
+    ]);
+    unset($att['roles']);
+    if($request->password){
+      $att['password'] = Hash::make($att['password']);
+    }else{
+      unset($att['password']);
     }
+    $user = User::create($att);
+    $user->syncRoles($request->roles);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalOffCanvas']);
+  }
+
+  /**
+   * Display the specified resource.
+   *
+   * @param  \App\Models\User  $user
+   * @return \Illuminate\Http\Response
+   */
+  public function show(User $user)
+  {
+    //
+  }
+
+  /**
+   * Show the form for editing the specified resource.
+   *
+   * @param  \App\Models\User  $user
+   * @return \Illuminate\Http\Response
+   */
+  public function edit(User $user)
+  {
+    $data['user'] = $user;
+    $data['roles'] = Role::where('guard_name', 'web')->pluck('name', 'id');
+    return $this->sendRes('success', ['view_data' => view('pages.users.edit', $data)->render()]);
+  }
+
+  /**
+   * Update the specified resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @param  \App\Models\User  $user
+   * @return \Illuminate\Http\Response
+   */
+  public function update(Request $request, User $user)
+  {
+    $att = $request->validate([
+      'first_name' => 'required|string|max:255',
+      'last_name' => 'required|string|max:255',
+      'phone' => 'required|string|max:255',
+      'email' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id),],
+      'status' => 'required',
+      'password' => 'sometimes|confirmed',
+      'roles' => 'required|array',
+      'roles.*' => 'exists:roles,id',
+    ]);
+    unset($att['roles']);
+    if($request->password){
+      $att['password'] = Hash::make($att['password']);
+    }else{
+      unset($att['password']);
+    }
+    $user->syncRoles($request->roles);
+    if ($user->update($att)) {
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalOffCanvas']);
+    }
+  }
+
+  /**
+   * Remove the specified resource from storage.
+   *
+   * @param  \App\Models\User  $user
+   * @return \Illuminate\Http\Response
+   */
+  public function destroy(User $user)
+  {
+    if ($user->delete()) {
+      return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID]);
+    }
+  }
+
+  public function showRole($role)
+  {
+    $data['role'] = Role::where('guard_name', 'web')->where('id', $role)->firstOrFail();
+      $data['allowed_permissions'] = $data['role']->permissions()->pluck('id')->toArray();
+      $data['modules'] = Module::whereHas('permissions', function($q){
+        $q->where('guard_name', 'web');
+      })->with('permissions')->get();
+      $data['true_all'] = $data['role']->name == Role::COMPANY_ADMIN_ROLE;
+      return view('pages.users.role-details', $data)->render();
+  }
 }

@@ -53,7 +53,7 @@ class AdminRolesPermissionsSeeder extends Seeder
   public function rolesPermissions()
   {
     $permissionsByRole = [
-      'Super Admin' => [],
+      'Admin' => [...$this->prepPermissions(['user', 'company'])],
       'Additional Admin' => [...$this->prepPermissions(['user', 'company'])],
       'Users Manager' => [...$this->prepPermissions(['user'])],
     ];

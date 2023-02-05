@@ -11,7 +11,7 @@ $(function () {
     var role = $(this).data('role')
     axios.get(`roles/${role}/edit`).then(function(response){
       $('#editRoleModal').find('.edit-role-data').html(response.data);
-      $("#myform").attr('action', '/roles/' + role);
+      $("#editRoleForm").attr('action', 'roles/' + role);
       $('#editRoleModal').modal('show');
       });
   });

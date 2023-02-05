@@ -18,7 +18,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}" />
 
-  
+
 
   <!-- Include Styles -->
   @include('layouts/sections/styles')
@@ -28,16 +28,19 @@
 </head>
 
 <body>
-  
+
 
   <!-- Layout Content -->
   @yield('layoutContent')
   <!--/ Layout Content -->
 
-  
-
+  <!-- Global Model -->
+  @include('_partials._modals.global-modal')
+  @include('_partials._offcanvas.offcanvas-global')
+  <!-- Global Model -->
   <!-- Include Scripts -->
   @include('layouts/sections/scripts')
+  @stack('scripts')
 
 </body>
 

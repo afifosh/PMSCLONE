@@ -1,8 +1,9 @@
 @php
 $customizerHidden = 'customizer-hide';
+$pageConfigs = ['myLayout' => 'blank'];
 @endphp
 
-@extends('layouts/layoutMaster')
+@extends('admin.layouts/layoutMaster')
 
 @section('title', 'Two Steps Verifications')
 

@@ -1,5 +1,6 @@
 @php
     $customizerHidden = 'customizer-hide';
+    $pageConfigs = ['myLayout' => 'blank'];
 @endphp
 
 @extends('layouts/layoutMaster')
@@ -36,7 +37,7 @@
                         <!-- Logo -->
                         <div class="app-brand justify-content-center mb-4 mt-2">
                             <a href="{{ url('/') }}" class="app-brand-link gap-2">
-                                <span class="app-brand-logo demo">@include('admin._partials.macros', ['height' => 20, 'withbg' => 'fill: #fff;'])</span>
+                                <span class="app-brand-logo demo">@include('_partials.macros', ['height' => 20, 'withbg' => 'fill: #fff;'])</span>
                                 <span
                                     class="app-brand-text demo text-body fw-bold ms-1">{{ config('variables.templateName') }}</span>
                             </a>
@@ -47,7 +48,7 @@
                             <p class="text-success mb-3">{{ session('status') }}</p>
                         @endif
                       </form>
-                        <form id="formAuthentication" action="{{ route('admin.password.confirm') }}" method="POST">
+                        <form id="formAuthentication" action="{{ route('password.confirm') }}" method="POST">
                             @csrf
                             <div class="mb-3 form-password-toggle">
                                 <label class="form-label" for="password">Password</label>
@@ -67,7 +68,7 @@
                                 Confirm
                             </button>
                             <div class="text-center">
-                                <a href="{{ route('admin.login') }}">
+                                <a href="{{ route('login') }}">
                                     <i class="ti ti-chevron-left scaleX-n1-rtl"></i>
                                     Cancel
                                 </a>

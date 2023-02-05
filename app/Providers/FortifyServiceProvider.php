@@ -46,42 +46,21 @@ class FortifyServiceProvider extends ServiceProvider
       return Limit::perMinute(5)->by($request->session()->get('login.id'));
     });
 
-    Fortify::loginView(function () {
-      if (request()->is('admin/*'))
-        return view('admin.auth.login', ['pageConfigs' => ['myLayout' => 'blank']]);
-      return view('auth.login', ['pageConfigs' => ['myLayout' => 'blank']]);
-    });
-    Fortify::requestPasswordResetLinkView(function () {
-      if (request()->is('admin/*'))
-        return view('admin.auth.forgot-password', ['pageConfigs' => ['myLayout' => 'blank']]);
-      return view('auth.forgot-password', ['pageConfigs' => ['myLayout' => 'blank']]);
-    });
-    Fortify::ResetPasswordView(function () {
-      if (request()->is('admin/*'))
-        return view('admin.auth.reset-password', ['pageConfigs' => ['myLayout' => 'blank']]);
-      return view('auth.reset-password', ['pageConfigs' => ['myLayout' => 'blank']]);
-    });
-    Fortify::verifyEmailView(function () {
-      if (request()->is('admin/*'))
-        return view('admin.auth.verify-email', ['pageConfigs' => ['myLayout' => 'blank']]);
-      return view('auth.verify-email', ['pageConfigs' => ['myLayout' => 'blank']]);
-    });
-
-    Fortify::confirmPasswordView(function () {
-      if (request()->is('admin/*'))
-        return view('admin.auth.password-confirm', ['pageConfigs' => ['myLayout' => 'blank']]);
-      return view('auth.password-confirm', ['pageConfigs' => ['myLayout' => 'blank']]);
-    });
+    if(config('fortify.guard' == 'admin')){
+      Fortify::viewPrefix('admin.auth.');
+    }else{
+      Fortify::viewPrefix('auth.');
+    }
 
     Fortify::twoFactorChallengeView(function (Request $request) {
       if (str_contains(session('url.intended'), 'admin')){
         if($request->type != 'recovery-code')
-          return view('admin.auth.two-factor-challenge', ['pageConfigs' => ['myLayout' => 'blank']]);
-        return view('admin.auth.two-factor-challenge-recovery', ['pageConfigs' => ['myLayout' => 'blank']]);
+          return view('admin.auth.two-factor-challenge');
+        return view('admin.auth.two-factor-challenge-recovery');
       }
       if($request->type != 'recovery-code')
-        return view('auth.two-factor-challenge', ['pageConfigs' => ['myLayout' => 'blank']]);
-      return view('auth.two-factor-challenge-recovery', ['pageConfigs' => ['myLayout' => 'blank']]);
+        return view('auth.two-factor-challenge');
+      return view('auth.two-factor-challenge-recovery');
     });
   }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role as ModelsRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
@@ -50,7 +51,8 @@ class UserRolesPermissionsSeeder extends Seeder
     public function rolesPermissions()
     {
         $permissionsByRole = [
-            'Admin' => [...$this->prepPermissions(['user', 'company'])],
+            ModelsRole::COMPANY_ADMIN_ROLE => [],
+            'Additional Admin' => [...$this->prepPermissions(['user', 'company'])],
             'Manager' => [...$this->prepPermissions(['user'])],
         ];
 

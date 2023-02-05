@@ -16,10 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth', 'verified')->group(function () {
+Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('pages-home');
     Route::resource('user-account', UserAccountController::class);
-    Route::resource('company-users', UserController::class);
+
+    Route::get('users/roles/{role}', [UserController::class, 'showRole']);
+    Route::resource('users', UserController::class);
 });
 
 require __DIR__.'/admin/admin.php';

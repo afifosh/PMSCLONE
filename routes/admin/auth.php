@@ -49,11 +49,11 @@ Route::prefix('admin')->group(function () {
             ->middleware(['guest:admin'])
             ->name('password.update');
 
-        Route::get('/register', [RegisteredUserController::class, 'create'])
-            ->middleware(['guest:admin'])
-            ->name('register');
-        Route::post('/register', [RegisteredUserController::class, 'store'])
-            ->middleware(['guest:admin']);
+        // Route::get('/register', [RegisteredUserController::class, 'create'])
+        //     ->middleware(['guest:admin'])
+        //     ->name('register');
+        // Route::post('/register', [RegisteredUserController::class, 'store'])
+        //     ->middleware(['guest:admin']);
 
         // Email Verification...
         Route::get('/email/verify', [EmailVerificationPromptController::class, '__invoke'])

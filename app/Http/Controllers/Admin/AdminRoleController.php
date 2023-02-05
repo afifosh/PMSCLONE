@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DataTables\Admin\AdminsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Module;
 use Illuminate\Http\Request;
@@ -10,11 +11,19 @@ use Throwable;
 
 class AdminRoleController extends Controller
 {
-    public function index()
+    function __construct()
     {
-        $data['roles'] = Role::where('guard_name', 'admin')->withCount('users')->get();
+      $this->middleware('permission:read role|create role|update role|delete role|read user', ['only' => ['index', 'show']]);
+      $this->middleware('permission:create role', ['only' => ['create', 'store']]);
+      $this->middleware('permission:update role', ['only' => ['edit', 'update']]);
+      $this->middleware('permission:delete role', ['only' => ['destroy']]);
+    }
 
-        return view('admin.roles', $data);
+    public function index(AdminsDataTable $dataTable)
+    {
+        $data['roles'] = Role::where('guard_name', 'admin')->with('users')->withCount('users')->get();
+        return $dataTable->render('admin.pages.roles.index', $data);
+        // return view('admin.pages.roles.index', $data);
     }
 
     public function create()
@@ -22,9 +31,7 @@ class AdminRoleController extends Controller
       $modules = Module::whereHas('permissions', function($q){
         $q->where('guard_name', 'admin');
       })->with('permissions')->get();
-      $view = view('admin._partials.sections.add-role', compact('modules'))->render();
-
-      return $view;
+      return view('admin._partials.sections.add-role', compact('modules'))->render();
     }
 
     public function store(Request $request)
@@ -47,12 +54,19 @@ class AdminRoleController extends Controller
 
     public function edit($role)
     {
-      $role = Role::where('guard_name', 'admin')->where('id', $role)->with('permissions')->firstOrFail();
-      $modules = Module::whereHas('permissions', function($q){
+      $data['role'] = Role::where('guard_name', 'admin')->where('id', $role)->firstOrFail();
+      $data['allowed_permissions'] = $data['role']->permissions()->pluck('id')->toArray();
+      $data['modules'] = Module::whereHas('permissions', function($q){
         $q->where('guard_name', 'admin');
       })->with('permissions')->get();
-      $view = view('admin._partials.sections.edit-role', compact('modules', 'role'))->render();
 
-      return $view;
+      return view('admin._partials.sections.edit-role', $data)->render();
+    }
+
+    public function update(Role $role, Request $request)
+    {
+      $role->update(['name' => $request->role]);
+      $role->syncPermissions($request->permissions);
+      return back()->with('success', 'Role Updated Successfully');
     }
 }

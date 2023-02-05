@@ -8,6 +8,9 @@
 <script src="{{ asset(mix('assets/vendor/libs/i18n/i18n.js')) }}"></script>
 <script src="{{ asset(mix('assets/vendor/libs/typeahead-js/typeahead.js')) }}"></script>
 <script src="{{ asset(mix('assets/vendor/js/menu.js')) }}"></script>
+<script src="{{ asset(mix('assets/vendor/libs/toastr/toastr.js')) }}"></script>
+<script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
+<script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
@@ -20,3 +23,48 @@
 <!-- BEGIN: Page JS-->
 @yield('page-script')
 <!-- END: Page JS-->
+
+<script>
+  $(document).ready(function () {
+    @if(session()->has('success'))
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title:"{{session('success')}}",
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+              confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+          });
+    @endif
+    @if(session()->has('error'))
+        Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title:"{{session('error')}}",
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+              confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+          });
+    @endif
+    @if(session()->has('status'))
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title:"{{ucwords(str_replace('-', ' ', session('status')))}}",
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+              confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+          });
+    @endif
+    console.log('{!!json_encode(session()->all())!!}');
+  });
+ </script>

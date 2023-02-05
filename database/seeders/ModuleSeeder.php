@@ -36,12 +36,14 @@ class ModuleSeeder extends Seeder
   {
     return [
       'admin' => [
-        ['module' => 'User Management', 'permissions' => ['read user', 'create user', 'update user', 'delete user']],
+        ['module' => 'User Management', 'permissions' => ['read user', 'create user', 'update user', 'delete user', 'impersonate user']],
         ['module' => 'Roles Management', 'permissions' => ['read role', 'create role', 'update role', 'delete role']],
+        ['module' => 'Company Roles', 'permissions' => ['read company role', 'create company role', 'update company role', 'delete company role']],
         ['module' => 'Company Management', 'permissions' => ['read company', 'create company', 'update company', 'delete company']],
       ],
       'web' => [
         ['module' => 'User Management', 'permissions' => ['read user', 'create user', 'update user', 'delete user']],
+        ['module' => 'Roles', 'permissions' => ['read role']],
         ['module' => 'Company Management', 'permissions' => ['read company', 'create company', 'update company', 'delete company']],
       ],
     ];
