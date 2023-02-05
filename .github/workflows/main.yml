@@ -23,7 +23,8 @@ jobs:
         with:
             host: ${{ secrets.HOST }}
             username: ${{ secrets.USERNAME }}
-            password: ${{ secrets.PASSWORD }}
+            passphrase: ${{ secrets.PASSPHRASE }}
+            key: ${{ KEY }}
             port: ${{ secrets.PORT }}
             script: |
               whoami
