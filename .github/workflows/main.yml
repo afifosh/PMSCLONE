@@ -11,31 +11,21 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  SSH_PRIVATE_KEY: ${{ secrets.KEY }}
-  PASSPHRASE: ${{ secrets.PASSPHRASE }}
-
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  deploy:
+  Deploy-Script:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up SSH key
-      uses: webfactory/ssh-agent@v0.4.0
-      with:
-        ssh-private-key: ${{ env.SSH_PRIVATE_KEY }}
-        passphrase: ${{ env.PASSPHRASE }}
-
-    - name: Run script on remote server
-      uses: webfactory/ssh-actions@v0.4.0
-      with:
-        ssh-user: ${{ secrets.USERNAME }}
-        ssh-host: ${{ secrets.HOST }}
-        ssh-key: ${{ env.SSH_PRIVATE_KEY }}
-        script: |
-          pwd
-          whoami
-          echo "Running script on remote server"
+      - name: executing script
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            passphrase: ${{ secrets.PASSPHRASE }}
+            key: ${{ secrets.KEY }}
+            port: ${{ secrets.PORT }}
+            script: |
+              whoami
+              pwd
