@@ -27,6 +27,14 @@ jobs:
             key: ${{ secrets.KEY }}
             port: ${{ secrets.PORT }}
             script: |
-              echo test > test.txt
-              whoami
-              pwd
+              cd /home/afifosh/public_html/pms.afifosh.com
+              git checkout master
+              git reset --hard origin/master
+              git pull origin master
+              rm .env -f
+              cp .env.server .env 
+              composer update
+              php artisan key:generate
+              php artisan migrate:fresh --seed
+
+              
