@@ -1,0 +1,22 @@
+name: CD
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+jobs:
+  Deploy-Script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing script
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            passphrase: ${{ secrets.PASSPHRASE }}
+            key: ${{ KEY }}
+            port: ${{ secrets.PORT }}
+            script: |
+              whoami
+              pwd
