@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminUsersController;
+use App\Http\Controllers\Admin\Company\ContactPersonController;
+use App\Http\Controllers\Admin\Company\InvitationController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::resource('users', AdminUsersController::class);
 
     Route::resource('companies', CompanyController::class);
+    Route::resource('companies.contact-persons', ContactPersonController::class);
+    // Route::resource('companies.invitations', InvitationController::class);
 });
 
 require __DIR__.'/auth.php';

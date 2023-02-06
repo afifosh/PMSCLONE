@@ -9,9 +9,10 @@
     <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i
             class="ti ti-dots-vertical"></i></button>
     <div class="dropdown-menu dropdown-menu-end m-0">
-        <a href="javascript:;" class="dropdown-item">View</a>
-        @can('update user')
-            <a href="javascript:;" class="dropdown-item">Suspend</a>
+        <a href="javascript:;" class="dropdown-item">{{__('View')}}</a>
+        @can('update company')
+            <a href="javascript:;" class="dropdown-item">{{__('Suspend')}}</a>
+            <a href="javascript:;" data-toggle="ajax-offcanvas" data-title="{{__('Create Contact Person')}}" data-href="{{route('admin.companies.contact-persons.create', $company)}}" class="dropdown-item">{{__('Create Contact Person')}}</a>
         @endcan
     </div>
 </div>

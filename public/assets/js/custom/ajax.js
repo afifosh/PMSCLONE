@@ -345,6 +345,7 @@ $(document).on('click', '[data-toggle="ajax-offcanvas"]', function () {
     window.globalOffCanvas = new bootstrap.Offcanvas($('#globalOffcanvas'))
     globalOffCanvas.show();
     OffcanvasSelect2();
+    initFlatPickr();
     },
   });
 });

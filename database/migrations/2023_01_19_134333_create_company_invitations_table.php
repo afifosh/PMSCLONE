@@ -17,7 +17,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('invited_person_id')->constrained('company_contact_persons')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('token');
-            $table->date('expiry_date');
+            $table->string('role_id');
+            $table->timestamp('valid_till')->useCurrent();
+            $table->enum('status', ['pending', 'sent', 'seen', 'accepted','revoked'])->default('sent');
             $table->timestamps();
         });
     }

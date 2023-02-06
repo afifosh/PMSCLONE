@@ -2,7 +2,7 @@
 $configData = Helper::appClasses();
 @endphp
 
-@extends('layouts/layoutMaster')
+@extends('admin/layouts/layoutMaster')
 
 @section('title', 'Account settings - Security')
 

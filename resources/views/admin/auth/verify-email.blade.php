@@ -30,7 +30,7 @@
                     @if (session('status') === 'verification-link-sent')
                         <div class="alert alert-success alert-dismissible">
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+                            {{ __('A new verification link has been sent to your registered email address.') }}
                         </div>
                     @endif
                     <h4 class="mb-1 pt-2">Verify your email ✉️</h4>
