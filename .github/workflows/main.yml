@@ -32,9 +32,9 @@ jobs:
               git reset --hard origin/master
               git pull origin master
               rm .env -f
-              cp .env.server .env 
-              composer update
+              cp .env.server .env
+              composer install
               php artisan key:generate
               php artisan migrate:fresh --seed
 
-              
+
