@@ -63,20 +63,22 @@ class AdminsDataTable extends DataTable
   {
     $buttons = [];
     if (auth('admin')->user()->can('create user'))
-      $buttons[] = ['text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New User</span>',
-      'className' =>  'btn btn-primary mx-3',
-      'attr' => [
-        'data-toggle'=>"ajax-offcanvas",
-        'data-title' => 'Add User',
-        'data-href' => route('admin.users.create')
-      ]
+      $buttons[] = [
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New User</span>',
+        'className' =>  'btn btn-primary mx-3',
+        'attr' => [
+          'data-toggle' => "ajax-offcanvas",
+          'data-title' => 'Add User',
+          'data-href' => route('admin.users.create')
+        ]
       ];
 
     return $this->builder()
       ->setTableId('admins-table')
       ->columns($this->getColumns())
       ->minifiedAjax()
-      ->dom('
+      ->dom(
+        '
       <"row mx-2"<"col-md-2"<"me-3"l>>
       <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
       >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
@@ -87,9 +89,9 @@ class AdminsDataTable extends DataTable
         'buttons' => $buttons,
         "scrollX" => true
       ]);
-      // ->language(['sLengthMenu' => '_MENU_',
-      // 'search' => '',
-      // 'searchPlaceholder' => 'Search..']);
+    // ->language(['sLengthMenu' => '_MENU_',
+    // 'search' => '',
+    // 'searchPlaceholder' => 'Search..']);
     //   ->parameters([
     //     'buttons'      => ['export', 'print', 'reset', 'reload'],
     // ]);

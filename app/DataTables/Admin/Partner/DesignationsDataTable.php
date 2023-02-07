@@ -1,15 +1,15 @@
 <?php
 
-namespace App\DataTables\Admin;
+namespace App\DataTables\Admin\Partner;
 
-use App\Models\Company;
+use App\Models\CompanyDesignation;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class CompaniesDataTable extends DataTable
+class DesignationsDataTable extends DataTable
 {
   /**
    * Build DataTable class.
@@ -20,25 +20,28 @@ class CompaniesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('added_by', function ($company) {
-        return $company->addedBy->email ?? '-';
-      })
-      ->addColumn('action', function (Company $company) {
-        return view('admin.pages.company.action', compact('company'));
-      })
-      ->setRowId('id')
-      ->rawColumns(['action']);
+    ->addColumn('action', function (CompanyDesignation $designation) {
+      return view('admin.pages.partner.designations.action', compact('designation'));
+    })
+    ->addColumn('department', function(CompanyDesignation $designation){
+      return $designation->department->name;
+    })
+    ->addColumn('company', function(CompanyDesignation $designation){
+      return $designation->company->name;
+    })
+    ->setRowId('id')
+    ->rawColumns(['action']);
   }
 
   /**
    * Get query source of dataTable.
    *
-   * @param \App\Models\Company $model
+   * @param \App\Models\CompanyDesignation $model
    * @return \Illuminate\Database\Eloquent\Builder
    */
-  public function query(Company $model): QueryBuilder
+  public function query(CompanyDesignation $model): QueryBuilder
   {
-    return $model->with('addedBy');
+    return $model->newQuery();
   }
 
   /**
@@ -49,18 +52,18 @@ class CompaniesDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    if (auth('admin')->user()->can('create company'))
+    if (auth('admin')->user()->can(true))
       $buttons[] = [
-        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create New Company</span>',
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New Designation</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
           'data-toggle' => "ajax-offcanvas",
-          'data-title' => 'Create New Company',
-          'data-href' => route('admin.companies.create')
+          'data-title' => 'Add Designation',
+          'data-href' => route('admin.partner.designations.create')
         ]
       ];
     return $this->builder()
-      ->setTableId(Company::DT_ID)
+      ->setTableId(CompanyDesignation::DT_ID)
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
@@ -87,9 +90,8 @@ class CompaniesDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('name'),
-      Column::make('email'),
-      Column::make('added_by'),
-      Column::make('status'),
+      Column::make('department'),
+      Column::make('company'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];
@@ -102,6 +104,6 @@ class CompaniesDataTable extends DataTable
    */
   protected function filename(): string
   {
-    return 'Companies_' . date('YmdHis');
+    return 'Designations_' . date('YmdHis');
   }
 }

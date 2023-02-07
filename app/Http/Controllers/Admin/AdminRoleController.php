@@ -40,8 +40,6 @@ class AdminRoleController extends Controller
         'role' => 'required|string|max:255',
         'permissions' => 'array',
       ]);
-
-
       try{
         $role = Role::create(['name' => $request->role, 'guard_name' => 'admin']);
         $role->syncPermissions($request->permissions);

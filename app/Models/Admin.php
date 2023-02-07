@@ -83,4 +83,9 @@ class Admin extends Authenticatable implements MustVerifyEmail
         return $this->id != 1;
     }
 
+    public function programs()
+    {
+      return $this->belongsToMany(Program::class)->using(ProgramsUser::class);;
+    }
+
 }

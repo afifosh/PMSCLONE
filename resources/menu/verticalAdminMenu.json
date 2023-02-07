@@ -27,11 +27,44 @@
       ]
     },
     {
+      "name": "HR",
+      "icon": "menu-icon tf-icons ti ti-components",
+      "slug": ["admin.partner."],
+      "submenu": [
+        {
+          "url": "/admin/partner/employees",
+          "name": "Employees",
+          "slug": "admin.company-roles.index"
+        },
+        {
+          "url": "/admin/partner/companies",
+          "name": "Partner Companies",
+          "slug": "admin.partner.companies.index"
+        },
+        {
+          "url": "/admin/partner/departments",
+          "name": "Departments",
+          "slug": "admin.partner.departments.index"
+        },
+        {
+          "url": "/admin/partner/designations",
+          "name": "Designations",
+          "slug": "admin.partner.designations.index"
+        }
+      ]
+    },
+    {
       "url": "/admin/companies",
       "name": "Companies",
       "icon": "menu-icon fas fa-building",
       "slug": "admin.companies.index",
       "permission": "read company"
+    },
+    {
+      "url": "/admin/programs",
+      "name": "Programs",
+      "icon": "menu-icon tf-icons ti ti-color-swatch",
+      "slug": "admin.programs.index"
     }
   ]
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DataTables\Admin;
+namespace App\DataTables\Admin\Partner;
 
-use App\Models\Company;
+use App\Models\PartnerCompany;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -20,25 +20,22 @@ class CompaniesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('added_by', function ($company) {
-        return $company->addedBy->email ?? '-';
-      })
-      ->addColumn('action', function (Company $company) {
-        return view('admin.pages.company.action', compact('company'));
-      })
-      ->setRowId('id')
-      ->rawColumns(['action']);
+    ->addColumn('action', function (PartnerCompany $company) {
+      return view('admin.pages.partner.companies.action', compact('company'));
+    })
+    ->setRowId('id')
+    ->rawColumns(['action']);
   }
 
   /**
    * Get query source of dataTable.
    *
-   * @param \App\Models\Company $model
+   * @param \App\Models\PartnerCompany $model
    * @return \Illuminate\Database\Eloquent\Builder
    */
-  public function query(Company $model): QueryBuilder
+  public function query(PartnerCompany $model): QueryBuilder
   {
-    return $model->with('addedBy');
+    return $model->newQuery();
   }
 
   /**
@@ -49,18 +46,19 @@ class CompaniesDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    if (auth('admin')->user()->can('create company'))
+    if (auth('admin')->user()->can(true))
       $buttons[] = [
-        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create New Company</span>',
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Company</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
           'data-toggle' => "ajax-offcanvas",
-          'data-title' => 'Create New Company',
-          'data-href' => route('admin.companies.create')
+          'data-title' => 'Add Company',
+          'data-href' => route('admin.partner.companies.create')
         ]
       ];
+
     return $this->builder()
-      ->setTableId(Company::DT_ID)
+      ->setTableId(PartnerCompany::DT_ID)
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
@@ -87,9 +85,8 @@ class CompaniesDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('name'),
-      Column::make('email'),
-      Column::make('added_by'),
-      Column::make('status'),
+      Column::make('website'),
+      Column::make('phone'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

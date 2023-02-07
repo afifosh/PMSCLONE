@@ -2,14 +2,15 @@
 
 namespace App\DataTables\Admin;
 
-use App\Models\Company;
+use App\Models\Program;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
+use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class CompaniesDataTable extends DataTable
+class ProgramsDataTable extends DataTable
 {
   /**
    * Build DataTable class.
@@ -20,25 +21,31 @@ class CompaniesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('added_by', function ($company) {
-        return $company->addedBy->email ?? '-';
+      ->editColumn('name', function ($row) {
+        return '<a href="'.route('admin.programs.show', $row).'">'.substr($row->name, 0, 15).'</a>';
       })
-      ->addColumn('action', function (Company $company) {
-        return view('admin.pages.company.action', compact('company'));
+      ->addColumn('parent', function (Program $program) {
+        return @$program->parent->name ?? '-';
+      })
+      ->editColumn('description', function ($program) {
+        return substr($program->description, 0, 15);
+      })
+      ->addColumn('action', function (Program $program) {
+        return view('admin.pages.programs.action', compact('program'));
       })
       ->setRowId('id')
-      ->rawColumns(['action']);
+      ->rawColumns(['name','action']);
   }
 
   /**
    * Get query source of dataTable.
    *
-   * @param \App\Models\Company $model
+   * @param \App\Models\Program $model
    * @return \Illuminate\Database\Eloquent\Builder
    */
-  public function query(Company $model): QueryBuilder
+  public function query(Program $model): QueryBuilder
   {
-    return $model->with('addedBy');
+    return $model->newQuery();
   }
 
   /**
@@ -49,25 +56,25 @@ class CompaniesDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    if (auth('admin')->user()->can('create company'))
+    if (auth('admin')->user()->can(true))
       $buttons[] = [
-        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create New Company</span>',
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Program</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
           'data-toggle' => "ajax-offcanvas",
-          'data-title' => 'Create New Company',
-          'data-href' => route('admin.companies.create')
+          'data-title' => 'Create New Program',
+          'data-href' => route('admin.programs.create')
         ]
       ];
     return $this->builder()
-      ->setTableId(Company::DT_ID)
+      ->setTableId(Program::DT_ID)
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
         '
-      <"row mx-2"<"col-md-2"<"me-3"l>>
-      <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
-      >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
+        <"row mx-2"<"col-md-2"<"me-3"l>>
+        <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
+        >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->addAction(['width' => '80px'])
       ->orderBy(0, 'DESC')
@@ -87,9 +94,9 @@ class CompaniesDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('name'),
-      Column::make('email'),
-      Column::make('added_by'),
-      Column::make('status'),
+      Column::make('parent'),
+      Column::make('program_code'),
+      Column::make('description'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];
@@ -102,6 +109,6 @@ class CompaniesDataTable extends DataTable
    */
   protected function filename(): string
   {
-    return 'Companies_' . date('YmdHis');
+    return 'Programs_' . date('YmdHis');
   }
 }
