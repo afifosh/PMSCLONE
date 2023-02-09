@@ -17,15 +17,14 @@ class ProgramController extends Controller
   public function create()
   {
     $data['program'] = new Program();
-    $data['programs'] = Program::pluck('name', 'id')->prepend('Select Program', '');
+    $data['programs'] = Program::where('parent_id', null)->pluck('name', 'id')->prepend('Select Program', '');
     return $this->sendRes('success', ['view_data' => view('admin.pages.programs.edit', $data)->render()]);
   }
 
   public function store(Request $request)
   {
-    // dd($request->all());
     $att = $request->validate([
-      'name' => 'required|string|max:255',
+      'name' => 'required|string|max:255|unique:programs,name',
       'program_code' => 'required|unique:programs,program_code|string|max:255',
       'parent_id' => 'nullable|exists:programs,id',
       'description' => 'required',
@@ -42,16 +41,16 @@ class ProgramController extends Controller
   public function edit(Program $program)
   {
     $data['program'] = $program;
-    $data['programs'] = Program::where('id', '!=', $program->id)->pluck('name', 'id');
+    $data['programs'] = Program::where([['id', '!=', $program->id], ['parent_id', null]])->pluck('name', 'id')->prepend(__('Select Program'), '');
     return $this->sendRes('success', ['view_data' => view('admin.pages.programs.edit', $data)->render()]);
   }
 
   public function update(Request $request, Program $program)
   {
     $att = $request->validate([
-      'name' => 'required|string|max:255',
-      'program_code' => 'required|unique:programs,program_code,'.$program->id.',id|string|max:255',
-      'parent_id' => 'sometimes|exists:programs,id',
+      'name' => 'required|string|max:255|unique:programs,name,'.$program->id.',id',
+      'program_code' => 'required|string|max:255|unique:programs,program_code,'.$program->id.',id',
+      'parent_id' => 'nullable|exists:programs,id',
       'description' => 'required',
     ]);
     if ($program->update($att)) {

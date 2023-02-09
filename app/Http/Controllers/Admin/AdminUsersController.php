@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DataTables\Admin\AdminsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\CompanyDepartment;
+use App\Models\CompanyDesignation;
+use App\Models\PartnerCompany;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -25,9 +29,11 @@ class AdminUsersController extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function index()
+  public function index(AdminsDataTable $dataTable)
   {
-    //
+    $data['roles'] = Role::where('guard_name', 'admin')->with('users')->withCount('users')->get();
+    return $dataTable->render('admin.pages.partner.employees.index', $data);
+        // return view('admin.pages.partner.employees.index', $data);
   }
 
   /**
@@ -39,6 +45,9 @@ class AdminUsersController extends Controller
   {
     $data['user'] = new Admin();
     $data['roles'] = Role::where('guard_name', 'admin')->pluck('name', 'id');
+    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend(__('Select Company'), '');
+    $data['departments'] = ['' => 'Select Department'];
+    $data['designations'] = ['' => 'Select Designation'];
     return $this->sendRes('success', ['view_data' => view('admin.pages.roles.admins.edit', $data)->render()]);
   }
 
@@ -54,16 +63,23 @@ class AdminUsersController extends Controller
       'first_name' => 'required|string|max:255',
       'last_name' => 'required|string|max:255',
       'phone' => 'required|string|max:255',
-      'email' => ['required', 'string', 'max:255','unique:admins,email'],
+      'email' => ['required', 'string', 'max:255', 'unique:admins,email'],
       'password' => 'sometimes|confirmed',
       'status' => 'required',
       'roles' => 'required|array',
       'roles.*' => 'exists:roles,id',
+      'company_id' => 'required|exists:partner_companies,id',
+      'department_id' => 'required|exists:company_departments,id',
+      'designation_id' => 'required|exists:company_designations,id'
+    ],[
+      'company_id.required' => __('Company field is required'),
+      'department_id.required' => __('Department field is required'),
+      'designation_id.required' => __('Designation field is required'),
     ]);
     unset($att['roles']);
-    if($request->password){
+    if ($request->password) {
       $att['password'] = Hash::make($att['password']);
-    }else{
+    } else {
       unset($att['password']);
     }
     $user = Admin::create($att);
@@ -92,6 +108,9 @@ class AdminUsersController extends Controller
   {
     $data['user'] = $user;
     $data['roles'] = Role::where('guard_name', 'admin')->pluck('name', 'id');
+    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend('Select Company', '');
+    $data['departments'] = CompanyDepartment::where('id', @$user->designation->department_id)->pluck('name', 'id')->prepend('Select Department', '');
+    $data['designations'] = CompanyDesignation::where('id', $user->designation_id)->pluck('name', 'id')->prepend('Select Designation', '');
     return $this->sendRes('success', ['view_data' => view('admin.pages.roles.admins.edit', $data)->render()]);
   }
 
@@ -108,21 +127,23 @@ class AdminUsersController extends Controller
       'first_name' => 'required|string|max:255',
       'last_name' => 'required|string|max:255',
       'phone' => 'required|string|max:255',
-      'email' => ['required', 'string', 'max:255',Rule::unique('admins')->ignore($user->id),],
+      'email' => ['required', 'string', 'max:255', Rule::unique('admins')->ignore($user->id),],
       'password' => 'sometimes|confirmed',
       'status' => 'required',
       'roles' => 'required|array',
       'roles.*' => 'exists:roles,id',
+      'company_id' => 'required|exists:partner_companies,id',
+      'department_id' => 'required|exists:company_departments,id',
+      'designation_id' => 'required|exists:company_designations,id'
     ]);
     unset($att['roles']);
-    if($request->password){
+    if ($request->password) {
       $att['password'] = Hash::make($att['password']);
-    }else{
+    } else {
       unset($att['password']);
     }
     $user->syncRoles($request->roles);
-    if($user->update($att))
-    {
+    if ($user->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalOffCanvas']);
     }
   }
@@ -135,10 +156,10 @@ class AdminUsersController extends Controller
    */
   public function destroy(Admin $user)
   {
-    if($user->id == 1)
-      $this->sendError('This User Cannot be deleted');
+    if ($user->id == 1)
+      return $this->sendError('This User Cannot be deleted');
     if ($user->delete()) {
-      $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table']);
+      return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table']);
     }
   }
 

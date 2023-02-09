@@ -12,7 +12,14 @@
 
     <div class="form-group">
       {{ Form::label('company', __('Company'), ['class' => 'col-form-label']) }}
-      {!! Form::select('company', $companies, $department->company_id, ['class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('company', $companies, $department->company_id, [
+        'class' => 'form-select globalOfSelect2',
+        ]) !!}
+    </div>
+
+    <div class="form-group">
+      {{ Form::label('parent_department', __('Parent Department'), ['class' => 'col-form-label']) }}
+      {!! Form::select('parent_department', $departments, $department->parent_id, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
 
     <div class="form-group">
@@ -21,7 +28,7 @@
     </div>
 </div>
 
-<div class="modal-footer">
+<div class="mt-3">
     <div class="btn-flt float-end">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">{{ __('Close') }}</button>
         <button type="submit" data-form="ajax-form" class="btn btn-primary">{{ __('Save') }}</button>

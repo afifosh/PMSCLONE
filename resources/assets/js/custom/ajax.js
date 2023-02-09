@@ -246,10 +246,22 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
     error: function (error) {
       // toast_danger(error.statusText);
       if(error.responseJSON && error.responseJSON.errors)
-      $.each(error.responseJSON.errors, function (ind, val) {
-        current.closest('form').find('[name="'+ind+'"]').addClass('invalid');
-        toast_danger(val[0]);
-      });
+      {
+        current.closest('form').find('.invalid').removeClass('invalid');
+        current.closest('form').find('.validation-error').remove();
+        $.each(error.responseJSON.errors, function (ind, val) {
+          const error = '<div class="text-danger validation-error">'+ val[0] +'</div>'
+          const target = $(current.closest('form').find('[name="'+ind+'"]'));
+          target.addClass('invalid');
+          if(target.hasClass('globalOfSelect2') && target.next('.select2-container').length) {
+              $(error).insertAfter(target.next('.select2-container'));
+          }else{
+            target.after(error);
+          }
+        });
+      }
+
+        // toast_danger(val[0]);
       current.removeClass('disabled');
     },
     cache: false,
@@ -291,14 +303,7 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
         url: url,
         success: function (response) {
           if (response.success) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Deleted!',
-              text: 'The user has been deleted!',
-              customClass: {
-                confirmButton: 'btn btn-success'
-              }
-            });
+            toast_danger(response.message)
             if (response.data.event == 'table_reload') {
               if (response.data.table_id != undefined && response.data.table_id != null && response.data.table_id != '') {
                 $('#' + response.data.table_id).DataTable().ajax.reload();
@@ -315,14 +320,14 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
         }
       });
     } else if (result.dismiss === Swal.DismissReason.cancel) {
-      Swal.fire({
-        title: 'Cancelled',
-        text: 'The User is not deleted!',
-        icon: 'error',
-        customClass: {
-          confirmButton: 'btn btn-success'
-        }
-      });
+      // Swal.fire({
+      //   title: 'Cancelled',
+      //   text: 'The User is not deleted!',
+      //   icon: 'error',
+      //   customClass: {
+      //     confirmButton: 'btn btn-success'
+      //   }
+      // });
     }
   });
 });
@@ -345,7 +350,49 @@ $(document).on('click', '[data-toggle="ajax-offcanvas"]', function () {
     window.globalOffCanvas = new bootstrap.Offcanvas($('#globalOffcanvas'))
     globalOffCanvas.show();
     OffcanvasSelect2();
-    initFlatPickr();
+    if(typeof initFlatPickr != 'undefined'){
+      initFlatPickr();
+    }
+    },
+  });
+});
+
+$(document).on('change', '[data-updateOptions="ajax-options"]', function () {
+  var url = $(this).data('href');
+  var id = $(this).val();
+  var target = $(this).data('target');
+  if(id == 'NaN' || id == '')
+  {
+    // $(target).empty();
+    return true;
+  }
+  $.ajax({
+    type: 'get',
+    url: url,
+    data: {
+      'id' : id
+    },
+    success: function (response) {
+      $(target).empty();
+      const map = new Map(Object.entries(response.data.data));
+      for (const [key, value] of map) {
+        if(key == ''){
+          $(target).prepend($('<option>', {
+              value: key,
+              text: value
+          })).val('');
+        }else{
+          $(target).append($('<option>', {
+              value: key,
+              text: value
+          }));
+        }
+
+      }
+      OffcanvasSelect2();
+      if(typeof initFlatPickr != 'undefined'){
+        initFlatPickr();
+      }
     },
   });
 });

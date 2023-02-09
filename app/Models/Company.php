@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Avatar;
 
 class Company extends Model
 {
@@ -18,6 +19,13 @@ class Company extends Model
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
+
+  public function getAvatarAttribute($value)
+  {
+    if(!$value)
+      return Avatar::create($this->name)->toBase64();
+    return $value;
+  }
 
   public function addedBy()
   {

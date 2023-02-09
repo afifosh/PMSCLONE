@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('company_departments', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->foreignId('parent_id')->nullable()->constrained('company_departments')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('company_id')->constrained('partner_companies')->cascadeOnUpdate()->cascadeOnDelete();
             $table->unsignedBigInteger('head_id')->nullable();
+            $table->string('name');
             $table->timestamps();
         });
     }

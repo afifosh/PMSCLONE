@@ -4,6 +4,7 @@ namespace App\DataTables\Admin;
 
 use App\Models\Admin;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -23,8 +24,8 @@ class AdminsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->addColumn('full_name', function ($row) {
-        return $row->full_name;
+      ->editColumn('full_name', function ($row) {
+        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8')."</span>";
       })
       ->addColumn('roles', function ($row) {
         return $row->roles->pluck('name')->implode(', ');
@@ -38,8 +39,12 @@ class AdminsDataTable extends DataTable
       ->editColumn('email_verified_at', function ($row) {
         return $row->email_verified_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
+      ->filterColumn('full_name', function($query, $keyword) {
+        $sql = "CONCAT(admins.first_name,' ',admins.last_name)  like ?";
+        $query->whereRaw($sql, ["%{$keyword}%"]);
+    })
       ->setRowId('id')
-      ->rawColumns(['2f-auth', 'email', 'action', 'email_verified_at']);
+      ->rawColumns(['full_name','2f-auth', 'action', 'email_verified_at']);
   }
 
   /**
@@ -50,7 +55,7 @@ class AdminsDataTable extends DataTable
    */
   public function query(Admin $model): QueryBuilder
   {
-    return $model->with('roles');
+    return $model->select(['admins.*', DB::raw("CONCAT(admins.first_name,' ',admins.last_name) as full_name")])->with('roles');
   }
 
   /**
@@ -119,8 +124,8 @@ class AdminsDataTable extends DataTable
       //       ->width(60)
       //       ->addClass('text-center'),
       Column::make('id'),
-      Column::make('first_name'),
-      Column::make('last_name'),
+      Column::make('full_name'),
+      // Column::make('last_name'),
       Column::make('email'),
       Column::make('phone'),
       // Column::make('roles'),

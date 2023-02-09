@@ -66,4 +66,10 @@ class DesignationController extends Controller
       return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID]);
     }
   }
+
+  public function getByDepartmentId(Request $request)
+  {
+    $data = CompanyDesignation::where('department_id', $request->id)->pluck('name', 'id')->prepend('Select Designation', '');
+    return $this->sendRes(__('Designations List'), ['data' => $data]);
+  }
 }

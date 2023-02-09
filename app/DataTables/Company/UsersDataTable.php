@@ -39,7 +39,7 @@ class UsersDataTable extends DataTable
         return $row->email_verified_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
       ->setRowId('id')
-      ->rawColumns(['2f-auth', 'email', 'action', 'email_verified_at']);
+      ->rawColumns(['2f-auth', 'action', 'email_verified_at']);
   }
 
   /**

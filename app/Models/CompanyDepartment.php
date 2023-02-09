@@ -18,6 +18,11 @@ class CompanyDepartment extends Model
       'updated_at' => 'datetime:d M, Y',
     ];
 
+    public function head()
+    {
+      return $this->belongsTo(Admin::class, 'head_id', 'id');
+    }
+
     public function designations()
     {
       return $this->hasMany(CompanyDesignation::class, 'department_id', 'id');

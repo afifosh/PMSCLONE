@@ -32,7 +32,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
     Route::prefix('partner')->name('partner.')->group(function() {
       Route::resource('companies', PatnerCompanyController::class);
+      Route::get('departments/get-by-company', [DepartmentController::class, 'getByComapnyId'])->name('departments.getByCompany');
       Route::resource('departments', DepartmentController::class);
+      Route::get('designations/get-by-department', [DesignationController::class, 'getByDepartmentId'])->name('designations.getByDepartment');
       Route::resource('designations', DesignationController::class);
     });
 

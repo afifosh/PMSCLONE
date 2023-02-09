@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Notifications\VerifyEmail;
-use App\Notifications\ResetPassword;
+use App\Notifications\Admin\VerifyEmail;
+use App\Notifications\Admin\ResetPassword;
 use App\Traits\HasEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +13,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Lab404\Impersonate\Models\Impersonate;
-
+use Avatar;
 class Admin extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum;
@@ -29,7 +29,8 @@ class Admin extends Authenticatable implements MustVerifyEmail
         'phone',
         'email',
         'password',
-        'status'
+        'status',
+        'designation_id'
     ];
 
     /**
@@ -59,7 +60,7 @@ class Admin extends Authenticatable implements MustVerifyEmail
     public function getAvatarAttribute($value)
     {
       if(!$value)
-      return asset('assets/img/avatars/'.substr($this->id, -1).'.png');
+      return Avatar::create($this->full_name)->toBase64();
       return $value;
     }
 
@@ -86,6 +87,11 @@ class Admin extends Authenticatable implements MustVerifyEmail
     public function programs()
     {
       return $this->belongsToMany(Program::class)->using(ProgramsUser::class);;
+    }
+
+    public function designation()
+    {
+      return $this->belongsTo(CompanyDesignation::class, 'designation_id', 'id');
     }
 
 }

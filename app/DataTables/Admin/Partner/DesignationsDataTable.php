@@ -27,7 +27,7 @@ class DesignationsDataTable extends DataTable
       return $designation->department->name;
     })
     ->addColumn('company', function(CompanyDesignation $designation){
-      return $designation->company->name;
+      return $designation->department->company->name;
     })
     ->setRowId('id')
     ->rawColumns(['action']);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Company;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\Admin\InvitationMailJob;
 use App\Mail\CompanyInvitationMail;
 use App\Models\Company;
 use App\Models\CompanyContactPerson;
@@ -49,8 +50,8 @@ class ContactPersonController extends Controller
 
     $contPerson = $company->contactPersons()->create($request->only('email'));
     $contPerson->invitations()->update(['status' => 'revoked']);
-    $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role]);
-    \Mail::to($request->email)->send(new CompanyInvitationMail($data));
+    $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role, 'status' => 'pending']);
+    dispatch(new InvitationMailJob($data));
 
     return $this->sendRes('Added Successfully', ['close' => 'globalOffCanvas']);
   }

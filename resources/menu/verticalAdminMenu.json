@@ -4,41 +4,35 @@
       "url": "/admin",
       "name": "Home",
       "icon": "menu-icon tf-icons ti ti-smart-home",
-      "slug": "pages-home"
+      "slug": "admin.dashboard"
     },
     {
       "name": "Roles",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": ["admin.roles", "admin.company-roles"],
-      "permission" : ["read role", "read company role", "read user"],
+      "slug": ["admin.roles"],
+      "permission" : ["read role","read user"],
       "submenu": [
         {
           "url": "/admin/roles",
           "name": "Admin Roles",
           "slug": "admin.roles.index",
           "permission" : ["read role", "read user"]
-        },
-        {
-          "url": "/admin/company-roles",
-          "name": "Company Roles",
-          "slug": "admin.company-roles.index",
-          "permission": "read company role"
         }
       ]
     },
     {
       "name": "HR",
       "icon": "menu-icon tf-icons ti ti-components",
-      "slug": ["admin.partner."],
+      "slug": ["admin.partner.", "admin.users."],
       "submenu": [
         {
-          "url": "/admin/partner/employees",
+          "url": "/admin/users",
           "name": "Employees",
-          "slug": "admin.company-roles.index"
+          "slug": "admin.users.index"
         },
         {
           "url": "/admin/partner/companies",
-          "name": "Partner Companies",
+          "name": "Organization",
           "slug": "admin.partner.companies.index"
         },
         {
@@ -54,11 +48,24 @@
       ]
     },
     {
-      "url": "/admin/companies",
       "name": "Companies",
       "icon": "menu-icon fas fa-building",
-      "slug": "admin.companies.index",
-      "permission": "read company"
+      "slug": ["admin.companies.", "admin.company-roles"],
+      "permission" : ["read company role"],
+      "submenu": [
+        {
+          "url": "/admin/companies",
+          "name": "Companies",
+          "slug": "admin.companies.index",
+          "permission" : "read company"
+        },
+        {
+          "url": "/admin/company-roles",
+          "name": "Company Roles",
+          "slug": "admin.company-roles.index",
+          "permission": "read company role"
+        }
+      ]
     },
     {
       "url": "/admin/programs",

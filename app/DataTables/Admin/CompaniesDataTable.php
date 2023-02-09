@@ -20,6 +20,10 @@ class CompaniesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
+      ->editColumn('name', function ($row){
+        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".$row->name."</span>";
+        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8')."</span>";
+      })
       ->editColumn('added_by', function ($company) {
         return $company->addedBy->email ?? '-';
       })
@@ -27,7 +31,7 @@ class CompaniesDataTable extends DataTable
         return view('admin.pages.company.action', compact('company'));
       })
       ->setRowId('id')
-      ->rawColumns(['action']);
+      ->rawColumns(['name', 'action']);
   }
 
   /**

@@ -204,11 +204,11 @@ html:not([dir=rtl]) .fc .fc-view-harness .fc-scrollgrid-section-header > * {
   background-color: rgba(75, 70, 92, 0.16);
 }
 .light-style .fc-event-primary:not(.fc-list-event) {
-  background-color: #eae8fd !important;
-  color: #7367f0 !important;
+  background-color: #f8e5e6 !important;
+  color: #cd545b !important;
 }
 .light-style .fc-event-primary.fc-list-event .fc-list-event-dot {
-  border-color: #7367f0 !important;
+  border-color: #cd545b !important;
 }
 .light-style .fc-event-secondary:not(.fc-list-event) {
   background-color: #f2f2f3 !important;
@@ -340,14 +340,14 @@ html:not([dir=rtl]) .fc .fc-view-harness .fc-scrollgrid-section-header > * {
   background-color: rgba(134, 146, 208, 0.16);
 }
 .dark-style .fc-event-primary:not(.fc-list-event) {
-  background-color: #3a3b64 !important;
-  color: #7367f0 !important;
+  background-color: #48384c !important;
+  color: #cd545b !important;
 }
 .dark-style .fc-event-primary:not(.fc-list-event) {
   box-shadow: none;
 }
 .dark-style .fc-event-primary.fc-list-event .fc-list-event-dot {
-  border-color: #7367f0 !important;
+  border-color: #cd545b !important;
 }
 .dark-style .fc-event-secondary:not(.fc-list-event) {
   background-color: #424659 !important;
