@@ -23,8 +23,8 @@ class PatnerCompanyController extends Controller
   public function store(Request $request)
   {
     $att = $request->validate([
-      'name' => 'required|string|max:255',
-      'website' => 'required|string|max:255',
+      'name' => 'required|string|max:255|unique:partner_companies,name',
+      'website' => 'required|string|max:255|unique:partner_companies,website',
       'phone' => 'required|string|max:255',
     ]);
     PartnerCompany::create($att);

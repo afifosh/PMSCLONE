@@ -9,7 +9,7 @@ class CompanyInvitation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['token', 'valid_till', 'role_id'];
+    protected $fillable = ['token', 'valid_till', 'role_id', 'status'];
 
     public function contactPerson()
     {

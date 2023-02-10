@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
             $table->string('name');
+            $table->string('avatar')->nullable();
             $table->string('email')->nullable();
             $table->enum('status', ['active', 'disabled', 'pending']);
             $table->timestamps();

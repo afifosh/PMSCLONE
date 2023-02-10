@@ -182,6 +182,7 @@ return [
         App\Providers\FortifyServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
+        Laravolt\Avatar\ServiceProvider::class,
     ],
 
     /*
@@ -199,6 +200,7 @@ return [
         // ...
         'Helper' => App\Helpers\Helpers::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
+        'Avatar'    => Laravolt\Avatar\Facade::class,
     ])->toArray(),
 
 ];

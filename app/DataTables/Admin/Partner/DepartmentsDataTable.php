@@ -11,6 +11,8 @@ use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
+// use Laravolt\Avatar\Avatar;
+use Avatar;
 
 class DepartmentsDataTable extends DataTable
 {
@@ -23,14 +25,20 @@ class DepartmentsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-    ->addColumn('action', function (CompanyDepartment $department) {
-      return view('admin.pages.partner.departments.action', compact('department'));
-    })
-    ->addColumn('company', function(CompanyDepartment $department){
-      return $department->company->name;
-    })
-    ->setRowId('id')
-    ->rawColumns(['action']);
+      ->addColumn('action', function (CompanyDepartment $department) {
+        return view('admin.pages.partner.departments.action', compact('department'));
+      })
+      ->addColumn('company', function (CompanyDepartment $department) {
+        return $department->company->name;
+      })
+      ->addColumn('head', function (CompanyDepartment $department) {
+        $img = $department->head->avatar;
+        $fname = $department->head->full_name;
+        $name = "<img class='avatar avatar-sm pull-up rounded-circle' src='$img' alt='Avatar'><span class='mx-2'>".htmlspecialchars($fname, ENT_QUOTES, 'UTF-8')."</span>";
+        return $name;
+      })
+      ->setRowId('id')
+      ->rawColumns(['head' ,'action']);
   }
 
   /**
@@ -90,6 +98,7 @@ class DepartmentsDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('name'),
+      Column::make('head'),
       Column::make('company'),
       Column::make('created_at'),
       Column::make('updated_at'),

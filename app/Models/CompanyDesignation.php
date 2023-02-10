@@ -11,7 +11,7 @@ class CompanyDesignation extends Model
 
     public const DT_ID = 'partner-com-designations-dataTable';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'department_id'];
 
     protected $casts = [
       'created_at' => 'datetime:d M, Y',

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Avatar;
 
 class PartnerCompany extends Model
 {
@@ -17,6 +18,13 @@ class PartnerCompany extends Model
       'created_at' => 'datetime:d M, Y',
       'updated_at' => 'datetime:d M, Y',
     ];
+
+    public function getAvatarAttribute($value)
+    {
+      if(!$value)
+        return Avatar::create($this->name)->toBase64();
+      return $value;
+    }
 
     public function departments()
     {

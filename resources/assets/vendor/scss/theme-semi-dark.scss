@@ -4,7 +4,7 @@
 @import './_theme/pages';
 @import './_theme/_theme';
 
-$primary-color: #7367f0;
+// $primary-color: #7367f0;
 $body-bg: #f8f7fa;
 
 body {
@@ -44,7 +44,8 @@ body {
 // ---------------------------------------------------------------------------
 @include template-menu-style(
   '.bg-menu-theme',
-  #242745,
+  // #242745,
+  #000000,
   $color: rgba-to-hex($gray-300, $rgba-to-hex-bg),
   $active-color: rgba-to-hex($gray-200, $rgba-to-hex-bg),
   $active-bg: $primary-color

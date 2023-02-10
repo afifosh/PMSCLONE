@@ -27,44 +27,13 @@
 <script>
   $(document).ready(function () {
     @if(session()->has('success'))
-        Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title:"{{session('success')}}",
-            showConfirmButton: false,
-            timer: 1500,
-            customClass: {
-              confirmButton: 'btn btn-primary'
-            },
-            buttonsStyling: false
-          });
+    toast_success("{{session('success')}}")
     @endif
     @if(session()->has('error'))
-        Swal.fire({
-            position: 'top-end',
-            icon: 'error',
-            title:"{{session('error')}}",
-            showConfirmButton: false,
-            timer: 1500,
-            customClass: {
-              confirmButton: 'btn btn-primary'
-            },
-            buttonsStyling: false
-          });
+    toast_danger("{{session('error')}}");
     @endif
     @if(session()->has('status'))
-        Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title:"{{ucwords(str_replace('-', ' ', session('status')))}}",
-            showConfirmButton: false,
-            timer: 1500,
-            customClass: {
-              confirmButton: 'btn btn-primary'
-            },
-            buttonsStyling: false
-          });
+    toast_success("{{ucwords(str_replace('-', ' ', session('status')))}}");
     @endif
-    console.log('{!!json_encode(session()->all())!!}');
   });
  </script>

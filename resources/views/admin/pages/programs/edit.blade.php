@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<div class="modal-footer">
+<div class="mt-3">
     <div class="btn-flt float-end">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">{{ __('Close') }}</button>
         <button type="submit" data-form="ajax-form" class="btn btn-primary">{{ __('Save') }}</button>
