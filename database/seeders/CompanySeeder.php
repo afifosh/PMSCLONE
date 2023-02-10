@@ -17,8 +17,8 @@ class CompanySeeder extends Seeder
      */
     public function run()
     {
-      Company::factory()->count(15)->create()->each(function ($company) {
-        User::factory()->count(20)->sequence(fn ($sequence) => [
+      Company::factory()->count(12)->create()->each(function ($company) {
+        User::factory()->count(7)->sequence(fn ($sequence) => [
             'email' => 'user'.$sequence->index + 1 .'@comp'.$company->id.'.com',
             'company_id' => $company->id])->create()->each(function ($user) {
               if (substr($user->email, 4, 2) == '1@') {
