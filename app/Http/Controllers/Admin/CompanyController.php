@@ -52,7 +52,8 @@ class CompanyController extends Controller
   public function store(Request $request)
   {
     $att = $request->validate([
-      'name' => 'required|string|max:255',
+      'name' => ['required', 'string', 'max:255', 'unique:companies,name'],
+      'website' => ['required', 'string', 'max:255', 'unique:companies,website'],
       'email' => ['required', 'string', 'max:255', 'unique:companies,email'],
       'status' => 'required',
     ]);
@@ -62,41 +63,31 @@ class CompanyController extends Controller
     }
   }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  \App\Models\Company  $company
-   * @return \Illuminate\Http\Response
-   */
-  public function show(Company $company, InvitationsDataTable $dataTable)
+  public function show(Company $company, Request $request)
   {
-    return $dataTable->render('admin.pages.company.view', compact('company'));
-    return view('admin.pages.company.view', compact('company'));
+    if(!$request->tab || $request->tab == 'profile'){
+      $dataTable = new InvitationsDataTable();
+      return $dataTable->render('admin.pages.company.show-profile', compact('company'));
+    }elseif($request->tab == 'users'){
+      $company->load('users');
+      return view('admin.pages.company.show-users', compact('company'));
+    }elseif($request->tab == 'invitations'){
+      $dataTable = new InvitationsDataTable();
+      return $dataTable->render('admin.pages.company.show-invitations', compact('company'));
+    }
   }
 
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  \App\Models\Company  $company
-   * @return \Illuminate\Http\Response
-   */
   public function edit(Company $company)
   {
     return $this->sendRes('success', ['view_data' => view('admin.pages.company.edit', compact('company'))->render()]);
   }
 
-  /**
-   * Update the specified resource in storage.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  \App\Models\Company  $company
-   * @return \Illuminate\Http\Response
-   */
   public function update(Request $request, Company $company)
   {
     $att = $request->validate([
-      'name' => 'required|string|max:255',
-      'email' => ['required', 'string', 'max:255',Rule::unique('admins')->ignore($company->id),],
+      'name' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
+      'website' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
+      'email' => ['required', 'string', 'max:255',Rule::unique('companies')->ignore($company->id),],
       'status' => 'required',
     ]);
     if($company->update($att))
@@ -105,12 +96,6 @@ class CompanyController extends Controller
     }
   }
 
-  /**
-   * Remove the specified resource from storage.
-   *
-   * @param  \App\Models\Company  $company
-   * @return \Illuminate\Http\Response
-   */
   public function destroy(Company $company)
   {
     try {

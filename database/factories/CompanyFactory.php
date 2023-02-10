@@ -20,6 +20,7 @@ class CompanyFactory extends Factory
         return [
             'added_by' => Admin::inRandomOrder()->first()->id,
             'name' => $this->faker->company(),
+            'website' => $this->faker->unique()->domainName(),
             'email' => $this->faker->safeEmail(),
             'status' => 'active',
         ];

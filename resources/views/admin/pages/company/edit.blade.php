@@ -3,22 +3,20 @@
 @else
     {!! Form::model($company, ['route' => ['admin.companies.store'], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
 @endif
-
 <div class="row">
     <div class="form-group">
         {{ Form::label('name', __('Company Name'), ['class' => 'col-form-label']) }}
-
-
         {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Company Name')]) !!}
     </div>
     <div class="form-group">
-
+        {{ Form::label('website', __('Website'), ['class' => 'col-form-label']) }}
+        {!! Form::text('website', null, ['class' => 'form-control', 'placeholder' => __('Website')]) !!}
+    </div>
+    <div class="form-group">
         {{ Form::label('email', __('Email'), ['class' => 'col-form-label']) }}
-
         {!! Form::text('email', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Enter Email Address')]) !!}
     </div>
     <div class="form-group">
-
     {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}
     @php
       $enum = $company::getPossibleEnumValues('status');

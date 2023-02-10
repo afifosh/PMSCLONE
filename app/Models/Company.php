@@ -13,7 +13,7 @@ class Company extends Model
 
   public const DT_ID = 'companies_datatable';
 
-  protected $fillable = ['name', 'email', 'status', 'added_by'];
+  protected $fillable = ['name', 'email', 'status', 'added_by', 'website'];
 
   protected $casts = [
     'created_at' => 'datetime:d M, Y',

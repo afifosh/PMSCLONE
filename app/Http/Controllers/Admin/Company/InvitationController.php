@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Company;
 
+use App\DataTables\Admin\Company\InvitationsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\CompanyInvitation;
 use Illuminate\Http\Request;
@@ -13,9 +14,10 @@ class InvitationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(InvitationsDataTable $dataTable)
     {
-        //
+      return $dataTable->render('admin.pages.company.invitations.index');
+      return view('admin.pages.company.invitations.index');
     }
 
     /**

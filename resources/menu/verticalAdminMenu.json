@@ -50,7 +50,7 @@
     {
       "name": "Companies",
       "icon": "menu-icon fas fa-building",
-      "slug": ["admin.companies.", "admin.company-roles"],
+      "slug": ["admin.companies.", "admin.company-roles", "admin.company-invitations."],
       "permission" : ["read company role"],
       "submenu": [
         {
@@ -64,6 +64,12 @@
           "name": "Company Roles",
           "slug": "admin.company-roles.index",
           "permission": "read company role"
+        },
+        {
+          "url": "/admin/company-invitations",
+          "name": "Invitations",
+          "slug": "admin.company-invitations.index",
+          "permission": "read company"
         }
       ]
     },

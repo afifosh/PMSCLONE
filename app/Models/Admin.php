@@ -52,11 +52,6 @@ class Admin extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * Send the email verification notification.
-     *
-     * @return void
-     */
     public function getAvatarAttribute($value)
     {
       if(!$value)
@@ -86,7 +81,7 @@ class Admin extends Authenticatable implements MustVerifyEmail
 
     public function programs()
     {
-      return $this->belongsToMany(Program::class)->using(ProgramsUser::class);;
+      return $this->belongsToMany(Program::class, ProgramUser::class, 'admin_id', 'program_id')->withTimestamps();
     }
 
     public function designation()

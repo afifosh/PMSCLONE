@@ -18,9 +18,9 @@ class Program extends Model
       'updated_at' => 'datetime:d M, Y',
     ];
 
-    public function admins()
+    public function users()
     {
-      return $this->belongsToMany(Admin::class);
+      return $this->belongsToMany(Admin::class, ProgramUser::class, 'program_id', 'admin_id')->withTimestamps();
     }
 
     public function parent()

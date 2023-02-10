@@ -2,14 +2,17 @@
 
 namespace App\DataTables\Admin;
 
-use App\Models\Company;
+use App\Models\ProgramUser;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
+use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
+use Yajra\DataTables\Html\Editor\Editor;
+use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class CompaniesDataTable extends DataTable
+class ProgramUsersDataTable extends DataTable
 {
   /**
    * Build DataTable class.
@@ -20,29 +23,35 @@ class CompaniesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('name', function ($row){
-        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'><a href=".route('admin.companies.show', $row).">".$row->name."</a></span>";
-        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8')."</span>";
+      ->addColumn('user', function ($row) {
+        return "<img class='avatar avatar-sm pull-up rounded-circle' src='".$row->user->avatar."' alt='Avatar'><span class='mx-2'>" . htmlspecialchars($row->user->full_name, ENT_QUOTES, 'UTF-8') . "</span>";
       })
-      ->editColumn('added_by', function ($company) {
-        return $company->addedBy->email ?? '-';
+      ->editColumn('added_by', function($row){
+        return $row->addedBy->full_name ?? '-';
       })
-      ->addColumn('action', function (Company $company) {
-        return view('admin.pages.company.action', compact('company'));
+      ->addColumn('user_organization', function($row){
+        return $row->user->company->name ?? '-';
+      })
+      ->addColumn('action', function (ProgramUser $programUser) {
+        return view('admin.pages.programs.users.action', compact('programUser'));
       })
       ->setRowId('id')
-      ->rawColumns(['name', 'action']);
+      ->rawColumns(['user', 'action']);
   }
 
   /**
    * Get query source of dataTable.
    *
-   * @param \App\Models\Company $model
+   * @param \App\Models\ProgramUser $model
    * @return \Illuminate\Database\Eloquent\Builder
    */
-  public function query(Company $model): QueryBuilder
+  public function query(ProgramUser $model): QueryBuilder
   {
-    return $model->with('addedBy');
+    $query = $model->query();
+    $query->when(request()->program, function($query){
+      return $query->where('program_id', request()->program->id)->orWhere('program_id', request()->program->parent_id);
+    });
+    return $query;
   }
 
   /**
@@ -53,18 +62,19 @@ class CompaniesDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    if (auth('admin')->user()->can('create company'))
+    if (auth('admin')->user()->can(true))
       $buttons[] = [
-        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create New Company</span>',
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add User</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
           'data-toggle' => "ajax-offcanvas",
-          'data-title' => 'Create New Company',
-          'data-href' => route('admin.companies.create')
+          'data-title' => 'Add User',
+          'data-href' => route('admin.programs.users.create', ['program' => request()->program])
         ]
       ];
+
     return $this->builder()
-      ->setTableId(Company::DT_ID)
+      ->setTableId(ProgramUser::DT_ID)
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
@@ -89,13 +99,11 @@ class CompaniesDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      // Column::make('id'),
-      Column::make('name')->title(__('Bussines Legal Name')),
-      Column::make('website'),
-      Column::make('email'),
+      Column::make('id'),
+      Column::make('user'),
       Column::make('added_by'),
-      Column::make('status'),
-      // Column::make('created_at'),
+      Column::make('user_organization')->title('User Organization'),
+      Column::make('created_at'),
       Column::make('updated_at'),
     ];
   }
@@ -107,6 +115,6 @@ class CompaniesDataTable extends DataTable
    */
   protected function filename(): string
   {
-    return 'Companies_' . date('YmdHis');
+    return 'ProgramUsers_' . date('YmdHis');
   }
 }

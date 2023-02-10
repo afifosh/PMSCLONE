@@ -36,14 +36,19 @@ class AdminsDataTable extends DataTable
       ->addColumn('2f-auth', function ($row) {
         return $row->two_factor_confirmed_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
+      ->addColumn('organization', function ($row) {
+        return @$row->designation->department->company->name;
+      })
+      ->addColumn('roles', function ($row) {
+        return $row->roles->pluck('name')->implode(', ');
+      })
       ->editColumn('email_verified_at', function ($row) {
         return $row->email_verified_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
       ->filterColumn('full_name', function($query, $keyword) {
         $sql = "CONCAT(admins.first_name,' ',admins.last_name)  like ?";
         $query->whereRaw($sql, ["%{$keyword}%"]);
-    })
-      ->setRowId('id')
+      })
       ->rawColumns(['full_name','2f-auth', 'action', 'email_verified_at']);
   }
 
@@ -123,11 +128,13 @@ class AdminsDataTable extends DataTable
       //       ->printable(true)
       //       ->width(60)
       //       ->addClass('text-center'),
-      Column::make('id'),
+      // Column::make('id'),
       Column::make('full_name'),
       // Column::make('last_name'),
       Column::make('email'),
       Column::make('phone'),
+      Column::make('organization'),
+      Column::make('roles'),
       // Column::make('roles'),
       Column::make('email_verified_at')->title(__('Verified')),
       Column::make('2f-auth')

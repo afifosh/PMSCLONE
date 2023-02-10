@@ -13,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Avatar;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -57,7 +58,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAvatarAttribute($value)
     {
       if(!$value)
-      return asset('assets/img/avatars/'.substr($this->id, -1).'.png');
+      return Avatar::create($this->full_name)->toBase64();
       return $value;
     }
 

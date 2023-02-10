@@ -23,9 +23,9 @@
 @endsection
 
 @section('content')
-<h4 class="fw-bold py-3 mb-4">
+{{-- <h4 class="fw-bold py-3 mb-4">
   <span class="text-muted fw-light">User Profile /</span> Profile
-</h4>
+</h4> --}}
 
 
 <!-- Header -->
@@ -70,9 +70,9 @@
   <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
       <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class='ti-xs ti ti-user-check me-1'></i> Profile</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/profile-teams')}}"><i class='ti-xs ti ti-users me-1'></i> Teams</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/profile-projects')}}"><i class='ti-xs ti ti-layout-grid me-1'></i> Projects</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/profile-connections')}}"><i class='ti-xs ti ti-link me-1'></i> Connections</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('admin.companies.show', ['company' => $company, 'tab' => 'users']) }}"><i class='ti-xs ti ti-users me-1'></i> Users</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('admin.companies.show', ['company' => $company, 'tab' => 'invitations']) }}"><i class='ti ti-link ti-xs me-1'></i> Invitations</a></li>
+      <li class="nav-item"><a class="nav-link" href="javascript:void(0);"><i class='ti ti-layout-grid ti-xs me-1'></i> Connections</a></li>
     </ul>
   </div>
 </div>

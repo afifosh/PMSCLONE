@@ -303,7 +303,7 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
         url: url,
         success: function (response) {
           if (response.success) {
-            toast_danger(response.message)
+            toast_success(response.message)
             if (response.data.event == 'table_reload') {
               if (response.data.table_id != undefined && response.data.table_id != null && response.data.table_id != '') {
                 $('#' + response.data.table_id).DataTable().ajax.reload();
