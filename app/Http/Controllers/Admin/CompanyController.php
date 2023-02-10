@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\DataTables\Admin\CompaniesDataTable;
+use App\DataTables\Admin\Company\InvitationsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Role;
@@ -67,9 +68,10 @@ class CompanyController extends Controller
    * @param  \App\Models\Company  $company
    * @return \Illuminate\Http\Response
    */
-  public function show(Company $company)
+  public function show(Company $company, InvitationsDataTable $dataTable)
   {
-    //
+    return $dataTable->render('admin.pages.company.view', compact('company'));
+    return view('admin.pages.company.view', compact('company'));
   }
 
   /**

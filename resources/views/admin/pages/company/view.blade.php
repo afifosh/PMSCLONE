@@ -42,11 +42,7 @@
         <div class="flex-grow-1 mt-3 mt-sm-5">
           <div class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between justify-content-start mx-4 flex-md-row flex-column gap-4">
             <div class="user-profile-info">
-              <h4>{{ $program->name }}
-                @if ($program->parent)
-                  ({{$program->parent->name}})
-                @endif
-              </h4>
+              <h4>{{ $company->name}}</h4>
               <ul class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
                 <li class="list-inline-item">
                   <i class='ti ti-color-swatch'></i> UX Designer
@@ -433,23 +429,23 @@
     <!-- Projects table -->
     {{-- <div class="card mb-4">
       <div class="card-datatable table-responsive">
-        <table class="datatables-projects table border-top">
-          <thead>
-            <tr>
-              <th></th>
-              <th></th>
-              <th>Name</th>
-              <th>Leader</th>
-              <th>Team</th>
-              <th class="w-px-200">Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-        </table>
+        {{$dataTable->table()}}
       </div>
     </div> --}}
+    <div class="card  mb-4">
+      <div class="card-header">
+        <h4>Comapny Invitations </h4>
+      </div>
+      <div class="card-body">
+        {{$dataTable->table()}}
+      </div>
+    </div>
     <!--/ Projects table -->
   </div>
 </div>
 <!--/ User Profile Content -->
 @endsection
+@push('scripts')
+    {{$dataTable->scripts()}}
+    <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+@endpush

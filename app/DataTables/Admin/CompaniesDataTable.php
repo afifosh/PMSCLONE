@@ -21,7 +21,7 @@ class CompaniesDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('name', function ($row){
-        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".$row->name."</span>";
+        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'><a href=".route('admin.companies.show', $row).">".$row->name."</a></span>";
         return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8')."</span>";
       })
       ->editColumn('added_by', function ($company) {
@@ -90,7 +90,7 @@ class CompaniesDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('name'),
+      Column::make('name')->title(__('Bussines Legal Name')),
       Column::make('email'),
       Column::make('added_by'),
       Column::make('status'),
