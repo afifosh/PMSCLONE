@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Auth\User;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
@@ -28,7 +28,7 @@ class PasswordExpiredRequest extends FormRequest
             'current_password' => 'required',
             'password' => [
                 'required', 'confirmed',
-                Password::min(6)->letters()->numbers()->mixedCase()->uncompromised(),
+                // Password::min(6)->letters()->numbers()->mixedCase()->uncompromised(),
             ],
         ];
     }

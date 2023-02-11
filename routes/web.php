@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\User\ExpiredPasswordController;
+use App\Http\Controllers\Auth\ExpiredPasswordController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
@@ -21,12 +21,12 @@ Route::get('/invitations/{token}/accept', [InvitationController::class, 'accept'
 Route::post('/invitations/{token}/confirm', [InvitationController::class, 'acceptConfirm'])->name('invitation.confirm');
 Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
     
-    Route::prefix('password')->name('password.expired')->group(function () {
-        Route::get('/expired', [ExpiredPasswordController::class, 'index']);
-        Route::post('/expired', [ExpiredPasswordController::class, 'resetPassword'])->name('.reset');
+    Route::prefix('password')->name('password.expired.')->group(function () {
+        Route::view('expired', 'auth.expired-password');
+        Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
     });
 
-    Route::middleware('passwordMustNotBeExpired')->group(function () {
+    Route::middleware('passwordMustNotBeExpired:user')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('pages-home');
         Route::resource('user-account', UserAccountController::class);
 

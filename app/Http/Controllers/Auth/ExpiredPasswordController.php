@@ -1,26 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Auth\User;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\User\PasswordExpiredRequest;
+use App\Http\Requests\Auth\PasswordExpiredRequest;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
 
 class ExpiredPasswordController extends Controller
 {
-    /**
-     * Returns password expired view
-     * 
-     * @return View
-     */
-    public function index()
-    {
-        return view('auth.expired-password');
-    }
-
     /**
      * Reset password after password is expired
      * 
@@ -29,7 +19,7 @@ class ExpiredPasswordController extends Controller
      */
     public function resetPassword(PasswordExpiredRequest $request)
     {
-        if (! Hash::check($request->current_password, $request->user()->password)) {
+        if (!Hash::check($request->current_password, $request->user()->password)) {
             return redirect()->back()->withErrors(['current_password' => __('Current password is not correct')]);
         }
 
@@ -38,6 +28,10 @@ class ExpiredPasswordController extends Controller
             'password_changed_at' => Carbon::now()->toDateTimeString()
         ]);
 
-        return redirect()->intended()->with(['status' => __('Password changed successfully')]);
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard')->with(['status' => __('Password changed successfully')]);
+        }
+
+        return redirect()->route('pages-home')->with(['status' => __('Password changed successfully')]);
     }
 }
