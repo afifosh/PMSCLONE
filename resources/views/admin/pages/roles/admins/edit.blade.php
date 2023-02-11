@@ -36,7 +36,7 @@
 </div> --}}
 </div>
   <div class="form-group">
-      {{ Form::label('company_id', __('Company'), ['class' => 'col-form-label']) }}
+      {{ Form::label('company_id', __('Organization'), ['class' => 'col-form-label']) }}
       {!! Form::select('company_id', $companies, @$user->designation->department->company_id, [
         'class' => 'form-select globalOfSelect2',
         'data-updateOptions' => 'ajax-options',

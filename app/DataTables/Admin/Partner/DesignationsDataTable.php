@@ -26,7 +26,7 @@ class DesignationsDataTable extends DataTable
     ->addColumn('department', function(CompanyDesignation $designation){
       return $designation->department->name;
     })
-    ->addColumn('company', function(CompanyDesignation $designation){
+    ->addColumn('organization', function(CompanyDesignation $designation){
       return $designation->department->company->name;
     })
     ->setRowId('id')
@@ -91,7 +91,7 @@ class DesignationsDataTable extends DataTable
       Column::make('id'),
       Column::make('name'),
       Column::make('department'),
-      Column::make('company'),
+      Column::make('organization'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

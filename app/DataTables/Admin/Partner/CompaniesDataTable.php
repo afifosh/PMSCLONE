@@ -51,11 +51,11 @@ class CompaniesDataTable extends DataTable
     $buttons = [];
     if (auth('admin')->user()->can(true))
       $buttons[] = [
-        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Company</span>',
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Organization</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
           'data-toggle' => "ajax-offcanvas",
-          'data-title' => 'Add Company',
+          'data-title' => 'Add Organization',
           'data-href' => route('admin.partner.companies.create')
         ]
       ];

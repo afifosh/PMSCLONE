@@ -45,7 +45,7 @@ class AdminUsersController extends Controller
   {
     $data['user'] = new Admin();
     $data['roles'] = Role::where('guard_name', 'admin')->pluck('name', 'id');
-    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend(__('Select Company'), '');
+    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend(__('Select Organization'), '');
     $data['departments'] = ['' => 'Select Department'];
     $data['designations'] = ['' => 'Select Designation'];
     return $this->sendRes('success', ['view_data' => view('admin.pages.roles.admins.edit', $data)->render()]);
@@ -108,7 +108,7 @@ class AdminUsersController extends Controller
   {
     $data['user'] = $user;
     $data['roles'] = Role::where('guard_name', 'admin')->pluck('name', 'id');
-    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend('Select Company', '');
+    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend('Select Organization', '');
     $data['departments'] = CompanyDepartment::where('id', @$user->designation->department_id)->pluck('name', 'id')->prepend('Select Department', '');
     $data['designations'] = CompanyDesignation::where('id', $user->designation_id)->pluck('name', 'id')->prepend('Select Designation', '');
     return $this->sendRes('success', ['view_data' => view('admin.pages.roles.admins.edit', $data)->render()]);

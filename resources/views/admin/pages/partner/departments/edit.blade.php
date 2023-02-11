@@ -11,7 +11,7 @@
     </div>
 
     <div class="form-group">
-      {{ Form::label('company', __('Company'), ['class' => 'col-form-label']) }}
+      {{ Form::label('company', __('Organization'), ['class' => 'col-form-label']) }}
       {!! Form::select('company', $companies, $department->company_id, [
         'class' => 'form-select globalOfSelect2',
         ]) !!}

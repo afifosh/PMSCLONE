@@ -21,8 +21,11 @@ class InvitationsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->addColumn('person', function ($row) {
+      ->addColumn('email', function ($row) {
         return $row->contactPerson->email;
+      })
+      ->addColumn('name', function ($row) {
+        return $row->contactPerson->first_name.' '.$row->contactPerson->last_name;
       })
       ->addColumn('company', function ($row) {
         return $row->contactPerson->company->name ?? '-';
@@ -110,7 +113,8 @@ class InvitationsDataTable extends DataTable
     if (!$this->company_id) {
       return [
         Column::make('id'),
-        Column::make('person'),
+        Column::make('name'),
+        Column::make('email'),
         Column::make('company'),
         Column::make('role'),
         Column::make('status'),
@@ -120,7 +124,8 @@ class InvitationsDataTable extends DataTable
     }
     return [
       Column::make('id'),
-      Column::make('person'),
+      Column::make('name'),
+      Column::make('email'),
       Column::make('role'),
       Column::make('status'),
       Column::make('created_at'),

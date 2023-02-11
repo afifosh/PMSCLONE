@@ -28,10 +28,13 @@ class DepartmentsDataTable extends DataTable
       ->addColumn('action', function (CompanyDepartment $department) {
         return view('admin.pages.partner.departments.action', compact('department'));
       })
-      ->addColumn('company', function (CompanyDepartment $department) {
+      ->addColumn('organization', function (CompanyDepartment $department) {
         return $department->company->name;
       })
       ->addColumn('head', function (CompanyDepartment $department) {
+        if(!$department->head){
+          return '-';
+        }
         $img = $department->head->avatar;
         $fname = $department->head->full_name;
         $name = "<img class='avatar avatar-sm pull-up rounded-circle' src='$img' alt='Avatar'><span class='mx-2'>".htmlspecialchars($fname, ENT_QUOTES, 'UTF-8')."</span>";
@@ -99,7 +102,7 @@ class DepartmentsDataTable extends DataTable
       Column::make('id'),
       Column::make('name'),
       Column::make('head'),
-      Column::make('company'),
+      Column::make('organization'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

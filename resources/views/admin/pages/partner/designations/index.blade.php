@@ -27,6 +27,13 @@ $configData = Helper::appClasses();
 
 @section('content')
 @can(true)
+<style>
+  .dt-bootstrap5 .dropdown-menu {
+    position: relative;
+    float: none;
+    width: 160px;
+}
+</style>
   <div class="mt-3  col-12">
     <div class="card">
       <div class="card-body">

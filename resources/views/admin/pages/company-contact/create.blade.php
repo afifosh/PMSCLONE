@@ -6,6 +6,14 @@
 
 <div class="row">
     <div class="form-group">
+        {{ Form::label('first_name', __('First Name'), ['class' => 'col-form-label']) }}
+        {!! Form::text('first_name', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('First Name')]) !!}
+    </div>
+    <div class="form-group">
+      {{ Form::label('last_name', __('Last Name'), ['class' => 'col-form-label']) }}
+      {!! Form::text('last_name', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Last Name')]) !!}
+    </div>
+    <div class="form-group">
         {{ Form::label('email', __('User Email'), ['class' => 'col-form-label']) }}
         {!! Form::text('email', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Enter Email Address')]) !!}
     </div>

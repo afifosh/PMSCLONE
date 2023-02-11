@@ -19,7 +19,7 @@ class DesignationController extends Controller
   public function create()
   {
     $data['designation'] = new CompanyDesignation();
-    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend(__('Select Company'), '');
+    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend(__('Select Organization'), '');
     $data['departments'] = ['' => __('Select Department')];
     return $this->sendRes('success', ['view_data' => view('admin.pages.partner.designations.edit', $data)->render()]);
   }
@@ -53,7 +53,7 @@ class DesignationController extends Controller
     $att = $request->validate([
       'name' => 'required|string|max:255',
       'company' => 'required|exists:partner_companies,id',
-      'department' => 'nullable|exists:company_departments,id',
+      'department' => 'exists:company_departments,id',
     ]);
     if ($designation->update(['name' => $att['name'], 'department_id' => $att['department']])) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalOffCanvas']);
