@@ -4,7 +4,6 @@ namespace App\Http\Requests\Auth\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
-use Infinitypaul\LaravelPasswordHistoryValidation\Rules\NotFromPasswordHistory;
 
 class PasswordExpiredRequest extends FormRequest
 {
@@ -29,8 +28,7 @@ class PasswordExpiredRequest extends FormRequest
             'current_password' => 'required',
             'password' => [
                 'required', 'confirmed',
-                Password::min(6)->uncompromised()->letters()->numbers()->mixedCase(),
-                new NotFromPasswordHistory(request()->user())
+                Password::min(6)->letters()->numbers()->mixedCase()->uncompromised(),
             ],
         ];
     }
