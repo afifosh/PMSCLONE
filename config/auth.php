@@ -121,5 +121,10 @@ return [
     */
 
     'password_timeout' => 10800,
+    
     'password_expire_days' => 30,
+
+    'web_lock_key' => 'web-lock-key',
+    
+    'admin_lock_key' => 'admin-lock-key'
 ];

@@ -13,10 +13,14 @@ use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
 use App\Http\Controllers\Admin\Program\ProgramController;
 use App\Http\Controllers\Auth\ExpiredPasswordController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\LockModeController;
+use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified', CheckForLockMode::class)->group(function () {
+
+  Route::get('auth/lock', LockModeController::class . '@lock')->name('auth.lock');
+  Route::post('auth/unlock', LockModeController::class . '@unlock')->name('auth.unlock');
 
   Route::prefix('password')->name('password.expired.')->group(function () {
     Route::view('expired', 'admin.auth.expired-password');

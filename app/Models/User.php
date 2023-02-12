@@ -55,6 +55,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Get web guard key
+     * 
+     * @return string
+     */
+    public static function GET_LOCK_KEY() {
+      return 'VUEXY_WEB_LOCK_KEY';
+    }
+
     public function getAvatarAttribute($value)
     {
       if(!$value)

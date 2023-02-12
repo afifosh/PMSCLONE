@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Auth\ExpiredPasswordController;
+use App\Http\Controllers\Auth\LockModeController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
+use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -20,7 +22,10 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitation.accept');
 Route::post('/invitations/{token}/confirm', [InvitationController::class, 'acceptConfirm'])->name('invitation.confirm');
-Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
+Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->group(function () {
+
+    Route::get('auth/lock', LockModeController::class.'@lock')->name('auth.lock');
+    Route::post('auth/unlock', LockModeController::class.'@unlock')->name('auth.unlock');
 
     Route::prefix('password')->name('password.expired.')->group(function () {
         Route::view('expired', 'auth.expired-password');
