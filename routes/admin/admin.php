@@ -40,6 +40,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
     Route::resource('programs', ProgramController::class);
     // Route::resource('companies.invitations', InvitationController::class);
+    Route::view('settings', 'admin.app-setting')->name('settings.index');
 });
 
 require __DIR__.'/auth.php';

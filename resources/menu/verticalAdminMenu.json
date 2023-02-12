@@ -72,6 +72,12 @@
       "name": "Programs",
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "slug": "admin.programs.index"
+    },
+    {
+      "url": "/admin/settings",
+      "name": "Settings",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "admin.settings.index"
     }
   ]
 }
