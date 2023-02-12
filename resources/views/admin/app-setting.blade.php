@@ -83,7 +83,7 @@ $configData = Helper::appClasses();
                             </div>
                         </div>
 
-                        <div class="setting-item" data-email="true" data-bs-toggle="sidebar">
+                        <div class="setting-item d-none" data-email="true" data-bs-toggle="sidebar">
                             <!-- Supported mail services -->
                             <div class="col-md-6 mb-4">
                                 <label for="supportedMailServices" class="form-label fs-6 mb-2 fw-semibold">

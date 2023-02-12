@@ -25,17 +25,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 Helpers._removeClass('active', settingList);
                 // Add active class to selected folder filters
                 currentTarget.classList.add('active');
-                settingItems.forEach(emailListItem => {
+                settingItems.forEach(settingItem => {
                     // If folder filter is Inbox
                     if (currentTargetData == 'inbox') {
-                        emailListItem.classList.add('d-block');
-                        emailListItem.classList.remove('d-none');
-                    } else if (emailListItem.hasAttribute('data-' + currentTargetData)) {
-                        emailListItem.classList.add('d-block');
-                        emailListItem.classList.remove('d-none');
+                        settingItem.classList.add('d-block');
+                        settingItem.classList.remove('d-none');
+                    } else if (settingItem.hasAttribute('data-' + currentTargetData)) {
+                        settingItem.classList.add('d-block');
+                        settingItem.classList.remove('d-none');
                     } else {
-                        emailListItem.classList.add('d-none');
-                        emailListItem.classList.remove('d-block');
+                        settingItem.classList.add('d-none');
+                        settingItem.classList.remove('d-block');
                     }
                 });
             });
