@@ -23,7 +23,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
   });
 
-  Route::middleware('passwordMustNotBeExpired:' . Auth::getDefaultDriver())->group(function () {
+  Route::middleware('passwordMustNotBeExpired')->group(function () {
     Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::resource('admin-account', AdminAccountController::class)->only('edit');

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('app_settings', function (Blueprint $table) {
             $table->id();
-            $table->tinyInteger('reset_password_days')->default(30);
+            $table->tinyInteger('password_expire_days')->default(30)->nullable();
             $table->timestamps();
         });
     }

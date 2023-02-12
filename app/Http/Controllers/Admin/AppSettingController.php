@@ -10,13 +10,13 @@ class AppSettingController extends Controller
 {
     public function storeGeneralSettings(Request $request) {
         $request->validate([
-            'reset_password_days' => 'required',
+            'password_expire_days' => 'required|number|gt:1',
         ]);
 
         AppSetting::updateOrCreate([
             'id' => 1,
         ], [
-            'reset_password_days' => $request->reset_password_days
+            'password_expire_days' => $request->password_expire_days
         ]);
 
         return redirect()->back()->with(['status' => __('Settings updated successfully')]);

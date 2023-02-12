@@ -79,8 +79,8 @@ $configData = Helper::appClasses();
                                     <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                         @lang('Password expires after')
                                     </label>
-                                    <input name="reset_password_days" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
-                                    @error('reset_password_days')
+                                    <input name="password_expire_days" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
+                                    @error('password_expire_days')
                                     <div class="alert alert-danger alert-dismissible my-2">
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                         {{ $message }}

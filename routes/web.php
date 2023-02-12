@@ -27,7 +27,7 @@ Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
         Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
     });
 
-    Route::middleware('passwordMustNotBeExpired:' . Auth::getDefaultDriver())->group(function () {
+    Route::middleware('passwordMustNotBeExpired')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('pages-home');
         Route::resource('user-account', UserAccountController::class);
 
