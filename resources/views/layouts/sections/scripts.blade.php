@@ -11,6 +11,10 @@
 <script src="{{ asset(mix('assets/vendor/libs/toastr/toastr.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
+@auth
+  <!-- Session Timeout -->
+  <script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
+@endauth
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
@@ -26,6 +30,20 @@
     @if(session()->has('status'))
     toast_success("{{ucwords(str_replace('-', ' ', session('status')))}}");
     @endif
+
+    @auth
+      $.sessionTimeout({
+        keepAliveUrl: '/keep-alive',
+        logoutUrl: '/logout',
+        redirUrl: '/auth/locked',
+        warnAfter: 3000,
+        redirAfter: 1000000,
+        countdownBar: true,
+        countdownMessage: 'Redirecting in {timer} seconds.',
+        useLocalStorageSynchronization: true,
+        clearWarningOnUserActivity: false,
+      });
+    @endauth
   });
  </script>
 

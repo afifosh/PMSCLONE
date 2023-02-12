@@ -24,6 +24,8 @@ Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
 
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
+
+    Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]));
 });
 
 require __DIR__.'/admin/admin.php';
