@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitation.accept');
 Route::post('/invitations/{token}/confirm', [InvitationController::class, 'acceptConfirm'])->name('invitation.confirm');
 Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
-    
+
     Route::prefix('password')->name('password.expired.')->group(function () {
         Route::view('expired', 'auth.expired-password');
         Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
@@ -30,9 +30,11 @@ Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('pages-home');
         Route::resource('user-account', UserAccountController::class);
 
-        Route::get('users/roles/{role}', [UserController::class, 'showRole']);
-        Route::resource('users', UserController::class);
-    });
+    Route::get('users/roles/{role}', [UserController::class, 'showRole']);
+    Route::resource('users', UserController::class);
+
+    Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]));
+  });
 });
 
 require __DIR__.'/admin/admin.php';
