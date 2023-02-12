@@ -36,7 +36,7 @@
         keepAliveUrl: '/keep-alive',
         logoutUrl: '/logout',
         redirUrl: '/auth/locked',
-        warnAfter: 3000,
+        warnAfter: 300000,
         redirAfter: 1000000,
         countdownBar: true,
         countdownMessage: 'Redirecting in {timer} seconds.',

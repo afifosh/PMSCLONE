@@ -71,16 +71,29 @@ $configData = Helper::appClasses();
 
                     <div class="setting pt-0 px-5">
                         <div class="setting-item" data-general="true" data-bs-toggle="sidebar">
-                            <!-- Password expires after -->
-                            <div class="col-md-6 mb-4">
-                                <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold">
-                                    @lang('Password expires after')
-                                </label>
-                                <input name="password_expiry_days" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
-                                <div id="defaultFormControlHelp" class="form-text">
-                                    @lang('Please input the days after which the password will be expired')
+                            <form method="POST" action="{{ route('admin.setting.store') }}">
+                                @csrf
+                            
+                                <!-- Password expires after -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
+                                        @lang('Password expires after')
+                                    </label>
+                                    <input name="reset_password_days" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
+                                    @error('reset_password_days')
+                                    <div class="alert alert-danger alert-dismissible my-2">
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        {{ $message }}
+                                    </div>
+
+                                    @enderror
+                                    <div id="defaultFormControlHelp" class="form-text">
+                                        @lang('Please input the days after which the password will be expired')
+                                    </div>
                                 </div>
-                            </div>
+
+                                <button type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                            </form>
                         </div>
 
                         <div class="setting-item" data-email="true" data-bs-toggle="sidebar">
