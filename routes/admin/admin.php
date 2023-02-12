@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
 use App\Http\Controllers\Admin\Program\ProgramController;
 use App\Http\Controllers\Auth\ExpiredPasswordController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified')->group(function () {
@@ -22,7 +23,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
   });
 
-  Route::middleware('passwordMustNotBeExpired:admin')->group(function () {
+  Route::middleware('passwordMustNotBeExpired:' . Auth::getDefaultDriver())->group(function () {
     Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::resource('admin-account', AdminAccountController::class)->only('edit');

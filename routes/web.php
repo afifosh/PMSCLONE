@@ -5,6 +5,7 @@ use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,7 +27,7 @@ Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
         Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
     });
 
-    Route::middleware('passwordMustNotBeExpired:user')->group(function () {
+    Route::middleware('passwordMustNotBeExpired:' . Auth::getDefaultDriver())->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('pages-home');
         Route::resource('user-account', UserAccountController::class);
 
