@@ -3,10 +3,15 @@
 @else
     {!! Form::model($program, ['route' => ['admin.programs.users.store', $program->id], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
 @endif
+@php
+  $optionParameters = collect($users)->mapWithKeys(function ($item) {
+      return [$item['id'] => ['data-full_name' => $item['full_name'], 'data-avatar' => $item['avatar']]];
+  })->all();
+@endphp
 
 <div class="form-group">
   {{ Form::label('users[]', __('User'), ['class' => 'col-form-label']) }}
-  {!! Form::select('users[]', $users, '', ['class' => 'form-select globalOfSelect2', 'multiple' => 'multiple']) !!}
+  {!! Form::select('users[]', $users->pluck('email', 'id'), '', ['class' => 'form-select globalOfSelect2User', 'data-placeholder' => 'Select Users', 'multiple' => 'multiple'], $optionParameters) !!}
 </div>
 
 <div class="mt-3">

@@ -60,7 +60,21 @@ class AdminsDataTable extends DataTable
    */
   public function query(Admin $model): QueryBuilder
   {
-    return $model->select(['admins.*', DB::raw("CONCAT(admins.first_name,' ',admins.last_name) as full_name")])->with('roles');
+    $query = $model->query();
+    $query->when(request('filter_status'), function ($query) {
+      return $query->whereIn('status', request('filter_status'));
+    });
+    $query->when(request('filer_roles'), function ($query) {
+      return $query->whereHas('roles', function ($whas) {
+        return $whas->whereIn('name', request('filer_roles'));
+      });
+    });
+    $query->when(request('filter_companies'), function($q){
+      return $q->whereHas('designation.department', function($dep){
+          return $dep->whereIn('company_id', request('filter_companies'));
+      });
+    });
+    return $query->select(['admins.*', DB::raw("CONCAT(admins.first_name,' ',admins.last_name) as full_name")])->with('roles');
   }
 
   /**

@@ -29,7 +29,6 @@
   <span class="text-muted fw-light">User Profile /</span> Profile
 </h4> --}}
 
-
 <!-- Header -->
 <div class="row">
   <div class="col-12">

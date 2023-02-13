@@ -334,7 +334,27 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
 window.initModalSelect2 = function(){
   $('.globalOfSelect2').select2({
     dropdownParent: $('#globalModal')
-});
+  });
+
+  var UsersSelect2 = $('.globalOfSelect2User');
+
+  if (UsersSelect2.length) {
+    // custom template to render icons
+    function renderIcons(option) {
+      if (!option.id) {
+        return option.text;
+      }
+      return '<div class="d-flex justify-content-start align-items-center user-name"><div class="avatar-wrapper"><div class="avatar avatar-sm me-3"><img src="'+$(option.element).data('avatar')+'"></div></div><div class="d-flex flex-column"><span class="text-body text-truncate"><span class="fw-semibold">'+$(option.element).data('full_name')+'</span></span><small class="text-muted">'+option.text+'</small></div></div>';
+    }
+    UsersSelect2.select2({
+      templateResult: renderIcons,
+      escapeMarkup: function (es) {
+        return es;
+      },
+      dropdownParent: $('#globalModal'),
+      placeholder: 'test'
+    });
+  }
 }
 // ajax OffCanvax
 $(document).on('click', '[data-toggle="ajax-modal"]', function () {

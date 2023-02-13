@@ -20,7 +20,7 @@ class DepartmentController extends Controller
   public function create()
   {
     $data['department'] = new CompanyDepartment();
-    $data['admins'] = Admin::pluck('email', 'id')->prepend('Select Head', '');
+    $data['admins'] = Admin::get();
     $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend('Select Organization', '');
     $data['departments'] = ['' => 'Select Department'];
     return $this->sendRes('success', ['view_data' => view('admin.pages.partner.departments.edit', $data)->render()]);

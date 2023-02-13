@@ -21,7 +21,7 @@ class ProgramUserController extends Controller
     $data['program'] = $program;
     $data['programUser'] = new ProgramUser();
     $ids = ProgramUser::where('program_id', $program->id)->orWhere('program_id', $program->parent_id)->pluck('admin_id');
-    $data['users'] = Admin::whereNotIn('id', $ids)->pluck('email', 'id');
+    $data['users'] = Admin::whereNotIn('id', $ids)->get();
     return $this->sendRes('success', ['view_data' => view('admin.pages.programs.users.edit', $data)->render()]);
   }
 

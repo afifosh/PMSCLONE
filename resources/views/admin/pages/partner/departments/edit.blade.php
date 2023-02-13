@@ -21,10 +21,15 @@
       {{ Form::label('parent_department', __('Parent Department'), ['class' => 'col-form-label']) }}
       {!! Form::select('parent_department', $departments, $department->parent_id, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
+    @php
+        $optionParameters = collect($admins)->mapWithKeys(function ($item) {
+            return [$item['id'] => ['data-full_name' => $item['full_name'], 'data-avatar' => $item['avatar']]];
+        })->all();
+    @endphp
 
     <div class="form-group  col-6">
       {{ Form::label('head', __('Department Head'), ['class' => 'col-form-label']) }}
-      {!! Form::select('head', $admins, $department->head_id, ['class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('head', $admins->pluck('email', 'id')->prepend('Select Head', ''), $department->head_id, ['class' => 'form-select globalOfSelect2User'], $optionParameters) !!}
     </div>
 </div>
 

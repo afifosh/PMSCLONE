@@ -60,6 +60,22 @@ class InvitationsDataTable extends DataTable
       });
     });
 
+    $query->when(request('filter_status'), function($q){
+      return $q->whereIn('status', request('filter_status'));
+    });
+
+    $query->when(request('filer_roles'), function($q){
+      return $q->whereHas('contactPerson', function($cPerson){
+        return $cPerson->whereIn('role_id', request('filer_roles'));
+      });
+    });
+
+    $query->when(request('filter_companies'), function($q){
+      return $q->whereHas('contactPerson', function($cPerson){
+        return $cPerson->whereIn('company_id', request('filter_companies'));
+      });
+    });
+
     return $query->with('contactPerson');
   }
 

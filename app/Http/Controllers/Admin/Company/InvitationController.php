@@ -20,7 +20,12 @@ class InvitationController extends Controller
      */
     public function index(InvitationsDataTable $dataTable)
     {
-      return $dataTable->render('admin.pages.company.invitations.index');
+      $data['companies'] = Company::has('contactPersons.invitations')->pluck('name', 'id');
+      $data['statuses'] = CompanyInvitation::distinct()->pluck('status');
+      $roles = CompanyInvitation::distinct()->pluck('role_id');
+      $data['roles'] = Role::whereIn('id', $roles)->pluck('name', 'id');
+      // dd($data);
+      return $dataTable->render('admin.pages.company.invitations.index', $data);
       return view('admin.pages.company.invitations.index');
     }
 

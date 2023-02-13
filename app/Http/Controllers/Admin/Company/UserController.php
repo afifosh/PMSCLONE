@@ -4,13 +4,20 @@ namespace App\Http\Controllers\Admin\Company;
 
 use App\DataTables\Admin\Company\UsersDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\PartnerCompany;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
   public function index(UsersDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.company.users.index');
+    $data['companies'] = Company::distinct()->pluck('name', 'id');
+    $data['statuses'] = User::distinct()->pluck('status', 'status');
+    $data['roles'] = Role::where('guard_name', 'web')->distinct()->pluck('name');
+    return $dataTable->render('admin.pages.company.users.index', $data);
     // return view('admin.pages.company.users.index');
   }
   public function create()

@@ -31,7 +31,10 @@ class AdminUsersController extends Controller
    */
   public function index(AdminsDataTable $dataTable)
   {
-    $data['roles'] = Role::where('guard_name', 'admin')->with('users')->withCount('users')->get();
+    // $data['roles'] = Role::where('guard_name', 'admin')->with('users')->withCount('users')->get();
+    $data['partners'] = PartnerCompany::distinct()->pluck('name', 'id');
+    $data['roles'] = Role::where('guard_name', 'admin')->distinct()->pluck('name');
+    $data['statuses'] = Admin::distinct()->pluck('status');
     return $dataTable->render('admin.pages.partner.employees.index', $data);
         // return view('admin.pages.partner.employees.index', $data);
   }

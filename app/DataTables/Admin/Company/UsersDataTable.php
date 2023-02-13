@@ -50,7 +50,20 @@ class UsersDataTable extends DataTable
    */
   public function query(User $model): QueryBuilder
   {
-    return $model->with('roles');
+    $query = $model->query();
+    $query->when(request('filter_status'), function ($query) {
+      return $query->whereIn('status', request('filter_status'));
+    });
+    $query->when(request('filer_roles'), function ($query) {
+      return $query->whereHas('roles', function ($whas) {
+        return $whas->whereIn('name', request('filer_roles'));
+      });
+    });
+    $query->when(request('filter_companies'), function($q){
+      $q->whereIn('company_id', request('filter_companies'));
+    });
+    return $query;
+    // return $model->with('roles');
   }
 
   /**
@@ -72,11 +85,11 @@ class UsersDataTable extends DataTable
     //       'data-href' => route('users.create')
     //     ]
     //   ];
-
+    $script = "data.companies = $('input[name=filter_companies]'); data.status = $('input[name=filter_status]').val(); data.roles = $('input[name=filer_roles]').val();";
     return $this->builder()
       ->setTableId(User::DT_ID)
       ->columns($this->getColumns())
-      ->minifiedAjax()
+      ->minifiedAjax('', $script = '', $data = [])
       ->dom(
         '
       <"row mx-2"<"col-md-2"<"me-3"l>>
