@@ -3,6 +3,8 @@
 namespace App\DataTables\Admin;
 
 use App\Models\Admin;
+use App\Models\AppSetting;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
@@ -36,6 +38,19 @@ class AdminsDataTable extends DataTable
       ->addColumn('2f-auth', function ($row) {
         return $row->two_factor_confirmed_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
+      ->addColumn('pwd_expires', function ($row) {
+        $app_settings = AppSetting::first();
+        $password_changed_at = new Carbon(($row->password_changed_at) ? $row->password_changed_at : $row->created_at);
+        
+        $password_expire_days_setting =
+            isset($app_settings->password_expire_days) && ! is_null($app_settings->password_expire_days)
+            ? $app_settings->password_expire_days
+            : config('auth.password_expire_days');
+
+        $days = $password_expire_days_setting - Carbon::now()->diffInDays($password_changed_at);
+
+        return $days > 0 ? "{$days} days" : __('Expired');
+      })
       ->editColumn('email_verified_at', function ($row) {
         return $row->email_verified_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
@@ -44,7 +59,7 @@ class AdminsDataTable extends DataTable
         $query->whereRaw($sql, ["%{$keyword}%"]);
     })
       ->setRowId('id')
-      ->rawColumns(['full_name','2f-auth', 'action', 'email_verified_at']);
+      ->rawColumns(['full_name','2f-auth', 'pwd_expires', 'action', 'email_verified_at']);
   }
 
   /**
@@ -130,7 +145,8 @@ class AdminsDataTable extends DataTable
       Column::make('phone'),
       // Column::make('roles'),
       Column::make('email_verified_at')->title(__('Verified')),
-      Column::make('2f-auth')
+      Column::make('2f-auth'),
+      Column::make('pwd_expires')
     ];
   }
 
