@@ -8,6 +8,7 @@ use App\Traits\HasEnum;
 use App\Traits\Tenantable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -88,5 +89,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new UserResetPassword($token));
+    }
+
+    /**
+     * User has many morph fields of password history
+     * 
+     * @return MorphMany
+     */
+    public function passwordHistories() 
+    {
+      return $this->morphMany(PasswordHistory::class, 'authable');
     }
 }
