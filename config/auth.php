@@ -124,7 +124,9 @@ return [
     
     'password_expire_days' => 30,
 
+    'password_history_count' => 3,
+
     'timeout_warning_seconds' => 30000,
 
-    'timeout_after_seconds' => 200000,    
+    'timeout_after_seconds' => 200000,
 ];

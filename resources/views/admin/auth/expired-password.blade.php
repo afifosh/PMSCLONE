@@ -50,6 +50,12 @@
                         <!-- id="formAuthentication"  -->
                         <form class="mb-3" action="{{ route('admin.password.expired.reset') }}" method="POST">
                             @csrf
+                            @if ($errors->any())
+                                <div class="alert alert-danger alert-dismissible">
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    {!! implode('<br/>', $errors->all('<span>:message</span>')) !!}
+                                </div>
+                            @endif
                             <div class="mb-3">
                                 <label for="current_password" class="form-label">@lang('Current Password')</label>
                                 <input id="current_password" type="password" class="form-control" name="current_password" 
