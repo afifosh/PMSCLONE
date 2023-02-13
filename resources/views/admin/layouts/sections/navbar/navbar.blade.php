@@ -1,6 +1,12 @@
 @php
 $containerNav = $containerNav ?? 'container-fluid';
 $navbarDetached = ($navbarDetached ?? '');
+
+$user = auth()->user();
+$notifications_count = \DB::table('notifications')->where('notifiable_type', 'App\Models\Admin')
+            ->where('notifiable_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
 @endphp
 
 <!-- Navbar -->
@@ -49,7 +55,9 @@ $navbarDetached = ($navbarDetached ?? '');
           <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
               <i class="ti ti-bell ti-md"></i>
-              <span class="badge bg-danger rounded-pill badge-notifications">1</span>
+              @if($notifications_count > 0)
+                <span class="badge bg-danger rounded-pill badge-notifications notification-bell">{{ $notifications_count }}</span>
+              @endif
             </a>
             <ul class="dropdown-menu dropdown-menu-end py-0">
               <li class="dropdown-menu-header border-bottom">
@@ -59,28 +67,10 @@ $navbarDetached = ($navbarDetached ?? '');
                 </div>
               </li>
               <li class="dropdown-notifications-list scrollable-container">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                    <div class="d-flex">
-                      <div class="flex-shrink-0 me-3">
-                        <div class="avatar">
-                          <span class="avatar-initial rounded-circle bg-label-warning"><i class="ti ti-alert-triangle"></i></span>
-                        </div>
-                      </div>
-                      <div class="flex-grow-1">
-                        <h6 class="mb-1">CPU is running high</h6>
-                        <p class="mb-0">CPU Utilization Percent is currently at 88.63%,</p>
-                        <small class="text-muted">5 days ago</small>
-                      </div>
-                      <div class="flex-shrink-0 dropdown-notifications-actions">
-                        <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                        <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ti ti-x"></span></a>
-                      </div>
-                    </div>
-                  </li>
+                <ul class="dropdown-notifications-ul-list list-group list-group-flush">
                 </ul>
               </li>
-              <li class="dropdown-menu-footer border-top">
+              <li class="dropdown-menu-footer border-top view-more-li load-more">
                 <a href="javascript:void(0);" class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center">
                   @lang('View more')
                 </a>

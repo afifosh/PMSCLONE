@@ -4,6 +4,7 @@ use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,6 +27,10 @@ Route::middleware('auth', 'verified', 'mustBeActive')->group(function () {
     Route::resource('users', UserController::class);
 
     Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]));
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
+    Route::post('update-notification-count', [NotificationController::class, 'updateNotificationCount'])->name('update.notification.count');
+
 });
 
 require __DIR__.'/admin/admin.php';

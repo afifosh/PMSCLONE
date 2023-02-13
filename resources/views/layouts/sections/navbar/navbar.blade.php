@@ -1,6 +1,11 @@
 @php
 $containerNav = $containerNav ?? 'container-fluid';
 $navbarDetached = ($navbarDetached ?? '');
+$user = auth()->user();
+$notifications_count = \DB::table('notifications')->where('notifiable_type', 'App\Models\User')
+            ->where('notifiable_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
 @endphp
 
 <!-- Navbar -->
@@ -48,7 +53,9 @@ $navbarDetached = ($navbarDetached ?? '');
           <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
               <i class="ti ti-bell ti-md"></i>
-              <span class="badge bg-danger rounded-pill badge-notifications">1</span>
+              @if($notifications_count > 0)
+                <span class="badge bg-danger rounded-pill badge-notifications notification-bell">{{ $notifications_count }}</span>
+              @endif
             </a>
             <ul class="dropdown-menu dropdown-menu-end py-0">
               <li class="dropdown-menu-header border-bottom">
@@ -58,28 +65,10 @@ $navbarDetached = ($navbarDetached ?? '');
                 </div>
               </li>
               <li class="dropdown-notifications-list scrollable-container">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                    <div class="d-flex">
-                      <div class="flex-shrink-0 me-3">
-                        <div class="avatar">
-                          <span class="avatar-initial rounded-circle bg-label-warning"><i class="ti ti-alert-triangle"></i></span>
-                        </div>
-                      </div>
-                      <div class="flex-grow-1">
-                        <h6 class="mb-1">CPU is running high</h6>
-                        <p class="mb-0">CPU Utilization Percent is currently at 88.63%,</p>
-                        <small class="text-muted">5 days ago</small>
-                      </div>
-                      <div class="flex-shrink-0 dropdown-notifications-actions">
-                        <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-                        <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ti ti-x"></span></a>
-                      </div>
-                    </div>
-                  </li>
+                <ul class="dropdown-notifications-ul-list list-group list-group-flush">
                 </ul>
               </li>
-              <li class="dropdown-menu-footer border-top">
+              <li class="dropdown-menu-footer border-top view-more-li load-more">
                 <a href="javascript:void(0);" class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center">
                   @lang('View more')
                 </a>
@@ -113,7 +102,7 @@ $navbarDetached = ($navbarDetached ?? '');
                         @endif
                       </span>
                       @forelse (auth('web')->user()->roles as $temp)
-                        <small class="text-muted">{{ $temp->name }}</small><br>
+                      <small class="text-muted">{{ $temp->name }}</small><br>
                       @empty
                       @endforelse
 
@@ -133,21 +122,21 @@ $navbarDetached = ($navbarDetached ?? '');
               {{-- @if (Auth::check() && Laravel\Jetstream\Jetstream::hasApiFeatures())
               <li>
                 <a class="dropdown-item" href="{{ route('api-tokens.index') }}">
-                  <i class='ti ti-key me-2 ti-sm'></i>
-                  <span class="align-middle">API Tokens</span>
-                </a>
-              </li>
-              @endif --}}
-              <li>
-                <a class="dropdown-item" href="javascript:void(0);">
-                  <span class="d-flex align-items-center align-middle">
-                    <i class="flex-shrink-0 ti ti-credit-card me-2 ti-sm"></i>
-                    <span class="flex-grow-1 align-middle">Billing</span>
-                    <span class="flex-shrink-0 badge badge-center rounded-pill bg-label-danger w-px-20 h-px-20">2</span>
-                  </span>
-                </a>
-              </li>
-              {{-- @if (Auth::User() && Laravel\Jetstream\Jetstream::hasTeamFeatures())
+              <i class='ti ti-key me-2 ti-sm'></i>
+              <span class="align-middle">API Tokens</span>
+              </a>
+          </li>
+          @endif --}}
+          <li>
+            <a class="dropdown-item" href="javascript:void(0);">
+              <span class="d-flex align-items-center align-middle">
+                <i class="flex-shrink-0 ti ti-credit-card me-2 ti-sm"></i>
+                <span class="flex-grow-1 align-middle">Billing</span>
+                <span class="flex-shrink-0 badge badge-center rounded-pill bg-label-danger w-px-20 h-px-20">2</span>
+              </span>
+            </a>
+          </li>
+          {{-- @if (Auth::User() && Laravel\Jetstream\Jetstream::hasTeamFeatures())
               <li>
                 <div class="dropdown-divider"></div>
               </li>
@@ -159,59 +148,59 @@ $navbarDetached = ($navbarDetached ?? '');
               </li>
               <li>
                 <a class="dropdown-item" href="{{ Auth::user() ? route('teams.show', Auth::user()->currentTeam->id) : 'javascript:void(0)' }}">
-                  <i class='ti ti-settings me-2'></i>
-                  <span class="align-middle">Team Settings</span>
-                </a>
-              </li>
-              @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-              <li>
-                <a class="dropdown-item" href="{{ route('teams.create') }}">
-                  <i class='ti ti-user me-2'></i>
-                  <span class="align-middle">Create New Team</span>
-                </a>
-              </li>
-              @endcan
-              <li>
-                <div class="dropdown-divider"></div>
-              </li>
-              <lI>
-                <h6 class="dropdown-header">Switch Teams</h6>
-              </lI>
-              <li>
-                <div class="dropdown-divider"></div>
-              </li>
-              @if (Auth::user())
-              @foreach (Auth::user()->allTeams() as $team) --}}
-              {{-- Below commented code read by artisan command while installing jetstream. !! Do not remove if you want to use jetstream. --}}
+          <i class='ti ti-settings me-2'></i>
+          <span class="align-middle">Team Settings</span>
+          </a>
+          </li>
+          @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
+          <li>
+            <a class="dropdown-item" href="{{ route('teams.create') }}">
+              <i class='ti ti-user me-2'></i>
+              <span class="align-middle">Create New Team</span>
+            </a>
+          </li>
+          @endcan
+          <li>
+            <div class="dropdown-divider"></div>
+          </li>
+          <lI>
+            <h6 class="dropdown-header">Switch Teams</h6>
+          </lI>
+          <li>
+            <div class="dropdown-divider"></div>
+          </li>
+          @if (Auth::user())
+          @foreach (Auth::user()->allTeams() as $team) --}}
+          {{-- Below commented code read by artisan command while installing jetstream. !! Do not remove if you want to use jetstream. --}}
 
-              {{-- <x-jet-switchable-team :team="$team" /> --}}
-              {{-- @endforeach
+          {{-- <x-jet-switchable-team :team="$team" /> --}}
+          {{-- @endforeach
               @endif
               @endif --}}
-              <li>
-                <div class="dropdown-divider"></div>
-              </li>
-              @if (Auth::check())
-              <li>
-                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                  <i class='ti ti-logout me-2'></i>
-                  <span class="align-middle">Logout</span>
-                </a>
-              </li>
-              <form method="POST" id="logout-form" action="{{ route('logout') }}">
-                @csrf
-              </form>
-              @else
-              <li>
-                <a class="dropdown-item" href="{{ Route::has('login') ? route('login') : 'javascript:void(0)' }}">
-                  <i class='ti ti-login me-2'></i>
-                  <span class="align-middle">Login</span>
-                </a>
-              </li>
-              @endif
-            </ul>
+          <li>
+            <div class="dropdown-divider"></div>
           </li>
-          <!--/ User -->
+          @if (Auth::check())
+          <li>
+            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <i class='ti ti-logout me-2'></i>
+              <span class="align-middle">Logout</span>
+            </a>
+          </li>
+          <form method="POST" id="logout-form" action="{{ route('logout') }}">
+            @csrf
+          </form>
+          @else
+          <li>
+            <a class="dropdown-item" href="{{ Route::has('login') ? route('login') : 'javascript:void(0)' }}">
+              <i class='ti ti-login me-2'></i>
+              <span class="align-middle">Login</span>
+            </a>
+          </li>
+          @endif
+        </ul>
+        </li>
+        <!--/ User -->
         </ul>
       </div>
 

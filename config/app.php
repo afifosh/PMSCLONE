@@ -165,7 +165,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-
+        Jenssegers\Agent\AgentServiceProvider::class,
         /*
          * Package Service Providers...
          */
@@ -201,6 +201,7 @@ return [
         'Helper' => App\Helpers\Helpers::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
         'Avatar'    => Laravolt\Avatar\Facade::class,
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
     ])->toArray(),
 
 ];

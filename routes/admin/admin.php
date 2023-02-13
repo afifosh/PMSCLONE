@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
 use App\Http\Controllers\Admin\Program\ProgramController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified')->group(function () {
@@ -43,6 +44,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::view('settings', 'admin.app-setting')->name('settings.index');
 
     Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]));
+
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications');
+    Route::post('update-notification-count', [NotificationController::class, 'updateNotificationCount'])->name('update.notification.count');
 });
 
 require __DIR__.'/auth.php';

@@ -12,15 +12,15 @@
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
 @auth
-  <!-- Session Timeout -->
-  <script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
+<!-- Session Timeout -->
+<script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
 @endauth
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
     @if(session()->has('success'))
     toast_success("{{session('success')}}")
     @endif
@@ -32,20 +32,61 @@
     @endif
 
     @auth
-      $.sessionTimeout({
-        keepAliveUrl: '/keep-alive',
-        logoutUrl: '/logout',
-        redirUrl: '/auth/locked',
-        warnAfter: 3000,
-        redirAfter: 1000000,
-        countdownBar: true,
-        countdownMessage: 'Redirecting in {timer} seconds.',
-        useLocalStorageSynchronization: true,
-        clearWarningOnUserActivity: false,
+    $.sessionTimeout({
+      keepAliveUrl: '/keep-alive'
+      , logoutUrl: '/logout'
+      , redirUrl: '/auth/locked'
+      , warnAfter: 300000
+      , redirAfter: 1000000
+      , countdownBar: true
+      , countdownMessage: 'Redirecting in {timer} seconds.'
+      , useLocalStorageSynchronization: true
+      , clearWarningOnUserActivity: false
+    , });
+
+    var site_url = "{{ url('/') }}";
+    var page = 1;
+
+    notifications(page);
+
+    $(document).ready(function() {
+      $('.view-more-li.load-more').click(function() {
+        page++;
+        notifications(page);
       });
+
+      $('.notification-bell').click(function() {
+        $.ajax({
+            type: 'post'
+            , url: "{{ route('update.notification.count') }}"
+          })
+          .done(function(response) {
+            console.log('done');
+            $('.notification-bell').hide();
+          })
+
+      })
+    });
+
+
+    function notifications(page) {
+      $.ajax({
+          type: 'get'
+          , url: site_url + '/notifications?' + 'page=' + page
+        })
+        .done(function(response) {
+          $('.dropdown-notifications-ul-list').append(response.data)
+        })
+        .fail(function(jqXHR, ajaxOptions, thrownError) {
+          // alert('No response from server');
+        });
+    }
+
+
     @endauth
   });
- </script>
+
+</script>
 
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->
