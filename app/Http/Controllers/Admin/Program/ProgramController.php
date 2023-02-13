@@ -35,11 +35,13 @@ class ProgramController extends Controller
 
   public function show(Program $program)
   {
-    $program = $program->where('id', $program->id)->whereHas('users', function($q){
-      return $q->where('admins.id', auth()->id());
-    })->orWhereHas('parent.users', function($q){
-      return $q->where('admins.id', auth()->id());
-    })->firstOrFail();
+    if (auth('admin')->id() != 1) {
+      $program = $program->where('id', $program->id)->whereHas('users', function($q){
+        return $q->where('admins.id', auth()->id());
+      })->orWhereHas('parent.users', function($q){
+        return $q->where('admins.id', auth()->id());
+      })->firstOrFail();
+    }
 
     return view('admin.pages.programs.view', compact('program'));
   }

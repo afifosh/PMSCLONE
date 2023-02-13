@@ -13,11 +13,13 @@ class ProgramUserController extends Controller
 {
   public function index(Program $program, ProgramUsersDataTable $dataTable)
   {
-    $program = $program->where('id', $program->id)->whereHas('users', function($q){
-      return $q->where('admins.id', auth()->id());
-    })->orWhereHas('parent.users', function($q){
-      return $q->where('admins.id', auth()->id());
-    })->firstOrFail();
+    if (auth('admin')->id() != 1) {
+      $program = $program->where('id', $program->id)->whereHas('users', function ($q) {
+        return $q->where('admins.id', auth()->id());
+      })->orWhereHas('parent.users', function ($q) {
+        return $q->where('admins.id', auth()->id());
+      })->firstOrFail();
+    }
 
     return $dataTable->render('admin.pages.programs.users.index', compact('program'));
     // return view('admin.pages.programs.users.index');
@@ -31,7 +33,7 @@ class ProgramUserController extends Controller
     return $this->sendRes('success', ['view_data' => view('admin.pages.programs.users.edit', $data)->render()]);
   }
 
-  public function store(Program $program ,Request $request)
+  public function store(Program $program, Request $request)
   {
     $att = $request->validate([
       'users' => 'required|array',
