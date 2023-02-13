@@ -45,7 +45,16 @@ class ProgramsDataTable extends DataTable
    */
   public function query(Program $model): QueryBuilder
   {
-    return $model->newQuery();
+    $query = $model->query();
+    if(auth('admin')->check() && auth('admin')->id() != 1)
+    {
+      $query->whereHas('users', function($q){
+        return $q->where('admins.id', auth()->id());
+      })->orWhereHas('parent.users', function($q){
+        return $q->where('admins.id', auth()->id());
+      });
+    }
+    return $query;
   }
 
   /**
