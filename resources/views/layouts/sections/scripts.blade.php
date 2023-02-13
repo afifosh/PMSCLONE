@@ -22,7 +22,7 @@
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
     @if(session()->has('success'))
     toast_success("{{session('success')}}")
     @endif
@@ -48,9 +48,42 @@
           clearWarningOnUserActivity: false,
         });
       @endif
+
+      var site_url = "{{ url('/') }}";
+          var page = 1;
+
+          notifications(page);
+
+          $(document).ready(function() {
+            $('.view-more-li.load-more').click(function() {
+              page++;
+              notifications(page);
+            });
+
+            $('.notification-bell').click(function() {
+              console.log('workig');
+
+
+            })
+          });
+
+
+          function notifications(page) {
+            $.ajax({
+                type: 'get'
+                , url: site_url + '/notifications?' + 'page=' + page
+              })
+              .done(function(response) {
+                $('.dropdown-notifications-ul-list').append(response.data)
+              })
+              .fail(function(jqXHR, ajaxOptions, thrownError) {
+                // alert('No response from server');
+              });
+          }
     @endauth
   });
- </script>
+
+</script>
 
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->

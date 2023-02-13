@@ -51,6 +51,47 @@
         useLocalStorageSynchronization: true,
         clearWarningOnUserActivity: false,
       });
+    
+    var site_url = "{{ url('/') }}";
+    var page = 1;
+
+    notifications(page);
+
+    $(document).ready(function() {
+      $('.view-more-li.load-more').click(function() {
+        page++;
+        notifications(page);
+      });
+
+      $('.notification-bell').click(function() {
+        $.ajax({
+            type: 'post'
+            , url: "{{ route('admin.update.notification.count') }}"
+          })
+          .done(function(response) {
+            console.log('done');
+            $('.notification-bell').hide();
+          })
+
+      })
+    });
+
+
+    function notifications(page) {
+      $.ajax({
+          type: 'get'
+          , url: site_url + '/admin/notifications?' + 'page=' + page
+        })
+        .done(function(response) {
+          $('.dropdown-notifications-ul-list').append(response.data)
+        })
+        .fail(function(jqXHR, ajaxOptions, thrownError) {
+          // alert('No response from server');
+        });
+    }
+
     @endauth
+
+
   });
  </script>

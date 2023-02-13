@@ -24,6 +24,11 @@ class FortifyServiceProvider extends ServiceProvider
       config(['fortify.passwords' => 'admins']);
       config(['fortify.home' => RouteServiceProvider::ADMIN_HOME]);
     }
+
+    $this->app->singleton(
+      \Laravel\Fortify\Contracts\LoginResponse::class,
+      \App\Http\Responses\LoginResponse::class,
+    );
   }
 
   /**
