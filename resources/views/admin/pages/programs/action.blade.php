@@ -1,6 +1,6 @@
 <div class="d-inline-block text-nowrap">
     @can(true)
-        <button class="btn btn-sm btn-icon" data-toggle="ajax-offcanvas" data-title="Edit Program" data-href="{{route('admin.programs.edit', $program)}}"><i class="ti ti-edit"></i></button>
+        <button class="btn btn-sm btn-icon" data-toggle="ajax-modal" data-title="Edit Program" data-href="{{route('admin.programs.edit', $program)}}"><i class="ti ti-edit"></i></button>
     @endcan
     @can(true)
         <button class="btn btn-sm btn-icon delete-record" data-toggle="ajax-delete"

@@ -10,7 +10,7 @@
         {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
     </div>
 
-    <div class="form-group">
+    <div class="form-group col-6">
       {{ Form::label('company', __('Organization'), ['class' => 'col-form-label']) }}
       {!! Form::select('company', $companies, @$designation->company->id ?? null, [
         'class' => 'form-select globalOfSelect2',
@@ -19,7 +19,7 @@
         'data-target' => '#desgination-departments']) !!}
     </div>
 
-    <div class="form-group">
+    <div class="form-group col-6">
       {{ Form::label('department', __('Department'), ['class' => 'col-form-label']) }}
       {!! Form::select('department', $departments, $designation->department_id, ['class' => 'form-select globalOfSelect2', 'id' => 'desgination-departments']) !!}
     </div>
@@ -27,7 +27,7 @@
 
 <div class="mt-3">
     <div class="btn-flt float-end">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">{{ __('Close') }}</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
         <button type="submit" data-form="ajax-form" class="btn btn-primary">{{ __('Save') }}</button>
     </div>
 </div>

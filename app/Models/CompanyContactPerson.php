@@ -9,7 +9,7 @@ class CompanyContactPerson extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['first_name', 'last_name', 'email'];
+    protected $fillable = ['first_name', 'last_name', 'email', 'company_id'];
 
     protected $table = 'company_contact_persons';
 

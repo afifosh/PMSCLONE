@@ -59,7 +59,7 @@ class CompanyController extends Controller
     ]);
     if(Company::create($att + ['added_by' => auth()->id()]))
     {
-      return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);
     }
   }
 
@@ -92,7 +92,7 @@ class CompanyController extends Controller
     ]);
     if($company->update($att))
     {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);
     }
   }
 

@@ -32,7 +32,7 @@ class DesignationController extends Controller
       'department' => 'required|exists:company_departments,id',
     ]);
     CompanyDesignation::create(['name' => $att['name'], 'department_id' => $att['department']]);
-    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalOffCanvas']);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalModal']);
   }
 
   public function show(CompanyDesignation $designation)
@@ -56,7 +56,7 @@ class DesignationController extends Controller
       'department' => 'exists:company_departments,id',
     ]);
     if ($designation->update(['name' => $att['name'], 'department_id' => $att['department']])) {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalModal']);
     }
   }
 

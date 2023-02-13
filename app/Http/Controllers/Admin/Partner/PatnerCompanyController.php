@@ -28,7 +28,7 @@ class PatnerCompanyController extends Controller
       'phone' => 'required|string|max:255',
     ]);
     PartnerCompany::create($att);
-    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => PartnerCompany::DT_ID, 'close' => 'globalOffCanvas']);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => PartnerCompany::DT_ID, 'close' => 'globalModal']);
   }
 
   public function show(PartnerCompany $company)
@@ -49,7 +49,7 @@ class PatnerCompanyController extends Controller
       'phone' => 'required|string|max:255',
     ]);
     if ($company->update($att)) {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => PartnerCompany::DT_ID, 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => PartnerCompany::DT_ID, 'close' => 'globalModal']);
     }
   }
 

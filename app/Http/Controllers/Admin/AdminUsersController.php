@@ -84,7 +84,7 @@ class AdminUsersController extends Controller
     }
     $user = Admin::create($att);
     $user->syncRoles($request->roles);
-    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalOffCanvas']);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
   }
 
   /**
@@ -144,7 +144,7 @@ class AdminUsersController extends Controller
     }
     $user->syncRoles($request->roles);
     if ($user->update($att)) {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
     }
   }
 

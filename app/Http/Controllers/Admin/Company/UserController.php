@@ -1,21 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Partner;
+namespace App\Http\Controllers\Admin\Company;
 
-use App\DataTables\Admin\Partner\DepartmentsDataTable;
+use App\DataTables\Admin\Company\UsersDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
-use App\Models\CompanyDepartment;
-use App\Models\PartnerCompany;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
-class DepartmentController extends Controller
+class UserController extends Controller
 {
-  public function index(DepartmentsDataTable $dataTable)
+  public function index(UsersDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.partner.departments.index');
-    // return view('admin.pages.partner.departments.index');
+    return $dataTable->render('admin.pages.company.users.index');
+    // return view('admin.pages.company.users.index');
   }
   public function create()
   {
@@ -30,7 +26,7 @@ class DepartmentController extends Controller
   {
     $att = $request->validate([
       'name' => ['required', 'string', 'max:255', Rule::unique('company_departments')->where(function ($query) use ($request) {
-        return $query->whereName($request->name)->where('company_id',$request->company);
+        return $query->whereName($request->name)->where('company_id', $request->company);
       }),],
       'company' => ['required', 'exists:partner_companies,id'],
       'head' => 'nullable|exists:admins,id',
@@ -55,8 +51,9 @@ class DepartmentController extends Controller
 
   public function update(Request $request, CompanyDepartment $department)
   {
-    $att = $request->validate(['name' => ['required', 'string', 'max:255', Rule::unique('company_departments')->where(function ($query) use ($request) {
-        return $query->whereName($request->name)->where('company_id',$request->company);
+    $att = $request->validate([
+      'name' => ['required', 'string', 'max:255', Rule::unique('company_departments')->where(function ($query) use ($request) {
+        return $query->whereName($request->name)->where('company_id', $request->company);
       })->ignore($department->id),],
       'company' => 'required|exists:partner_companies,id',
       'head' => 'nullable|exists:admins,id',
@@ -75,7 +72,7 @@ class DepartmentController extends Controller
 
   public function getByComapnyId(Request $request)
   {
-    $data = CompanyDepartment::where('company_id', $request->id)->pluck('name', 'id')->prepend('Select Department' , '');
+    $data = CompanyDepartment::where('company_id', $request->id)->pluck('name', 'id')->prepend('Select Department', '');
     return $this->sendRes('Departments list', ['data' => $data]);
   }
 }

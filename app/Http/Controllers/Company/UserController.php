@@ -63,7 +63,7 @@ class UserController extends Controller
     }
     $user = User::create($att);
     $user->syncRoles($request->roles);
-    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalOffCanvas']);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalModal']);
   }
 
   /**
@@ -117,7 +117,7 @@ class UserController extends Controller
     }
     $user->syncRoles($request->roles);
     if ($user->update($att)) {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalModal']);
     }
   }
 

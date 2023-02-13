@@ -30,7 +30,7 @@ class ProgramController extends Controller
       'description' => 'required',
     ]);
     Program::create($att);
-    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Program::DT_ID, 'close' => 'globalOffCanvas']);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Program::DT_ID, 'close' => 'globalModal']);
   }
 
   public function show(Program $program)
@@ -54,7 +54,7 @@ class ProgramController extends Controller
       'description' => 'required',
     ]);
     if ($program->update($att)) {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Program::DT_ID, 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Program::DT_ID, 'close' => 'globalModal']);
     }
   }
 

@@ -55,7 +55,7 @@ class ContactPersonController extends Controller
     $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role, 'status' => 'pending']);
     dispatch(new InvitationMailJob($data));
 
-    return $this->sendRes('Added Successfully', ['close' => 'globalOffCanvas']);
+    return $this->sendRes('Added Successfully', ['close' => 'globalModal']);
   }
 
   /**

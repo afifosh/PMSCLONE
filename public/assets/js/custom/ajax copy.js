@@ -228,8 +228,8 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
           }
           //console.log(current.closest('.modal').modal("hide"));
           current.removeClass('disabled');
-          if(data.data.close == 'globalOffCanvas'){
-            globalOffCanvas.hide();
+          if(data.data.close == 'globalModal'){
+            globalModal.hide();
           }else if(data.data.close == 'modal'){
             current.closest('.modal').modal('hide');
           }
@@ -331,13 +331,13 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
     }
   });
 });
-window.OffcanvasSelect2 = function(){
+window.initModalSelect2 = function(){
   $('.globalOfSelect2').select2({
-    dropdownParent: $('#globalOffcanvas')
+    dropdownParent: $('#globalModal')
 });
 }
 // ajax OffCanvax
-$(document).on('click', '[data-toggle="ajax-offcanvas"]', function () {
+$(document).on('click', '[data-toggle="ajax-modal"]', function () {
   var title = $(this).data('title');
   var url = $(this).data('href');
   $.ajax({
@@ -345,11 +345,11 @@ $(document).on('click', '[data-toggle="ajax-offcanvas"]', function () {
     url: url,
     success: function (response) {
       console.log(response);
-    $('#globalOffcanvasTitle').html(title);
-    $('#globalOffcanvasBody').html(response.data.view_data);
-    window.globalOffCanvas = new bootstrap.Offcanvas($('#globalOffcanvas'))
-    globalOffCanvas.show();
-    OffcanvasSelect2();
+    $('#globalModalTitle').html(title);
+    $('#globalModalBody').html(response.data.view_data);
+    window.globalModal = new bootstrap.Offcanvas($('#globalModal'))
+    globalModal.show();
+    initModalSelect2();
     if(typeof initFlatPickr != 'undefined'){
       initFlatPickr();
     }
@@ -389,7 +389,7 @@ $(document).on('change', '[data-updateOptions="ajax-options"]', function () {
         }
 
       }
-      OffcanvasSelect2();
+      initModalSelect2();
       if(typeof initFlatPickr != 'undefined'){
         initFlatPickr();
       }

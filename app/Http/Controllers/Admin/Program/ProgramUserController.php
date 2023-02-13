@@ -32,7 +32,7 @@ class ProgramUserController extends Controller
       'users.*' => 'exists:admins,id',
     ]);
     $program->users()->attach($request->users, ['added_by' => auth()->id()]);
-    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => ProgramUser::DT_ID, 'close' => 'globalOffCanvas']);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => ProgramUser::DT_ID, 'close' => 'globalModal']);
   }
 
   public function destroy(Program $program, Admin $user)

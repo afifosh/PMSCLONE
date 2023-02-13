@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
+use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
@@ -32,6 +33,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::resource('companies', CompanyController::class);
     Route::resource('companies.contact-persons', ContactPersonController::class);
     Route::resource('company-invitations', InvitationController::class);
+    Route::resource('company-users', UserController::class);
 
     Route::prefix('partner')->name('partner.')->group(function() {
       Route::resource('companies', PatnerCompanyController::class);

@@ -25,7 +25,7 @@ class InvitationsDataTable extends DataTable
         return $row->contactPerson->email;
       })
       ->addColumn('name', function ($row) {
-        return $row->contactPerson->first_name.' '.$row->contactPerson->last_name;
+        return $row->contactPerson->first_name . ' ' . $row->contactPerson->last_name;
       })
       ->addColumn('company', function ($row) {
         return $row->contactPerson->company->name ?? '-';
@@ -34,13 +34,13 @@ class InvitationsDataTable extends DataTable
         return $row->role->name;
       })
       ->editColumn('status', function ($row) {
-        return ucwords($row->status);
+        return $this->makeStatus($row->status);
       })
       // ->addColumn('action', function (PartnerCompany $company) {
       //   return view('admin.pages.partner.companies.action', compact('company'));
       // })
-      ->setRowId('id');
-    // ->rawColumns(['action']);
+      ->setRowId('id')
+      ->rawColumns(['status']);
   }
 
   /**
@@ -63,6 +63,29 @@ class InvitationsDataTable extends DataTable
     return $query->with('contactPerson');
   }
 
+  protected function makeStatus($status)
+  {
+    $b_status = htmlspecialchars(ucwords($status), ENT_QUOTES, 'UTF-8');
+    switch ($status) {
+      case 'pending':
+        return '<span class="badge bg-label-warning">'.$b_status.'</span>';
+        break;
+      case 'accepted':
+        return '<span class="badge bg-label-success">'.$b_status.'</span>';
+        break;
+      case 'revoked':
+        return '<span class="badge bg-label-secondary">'.$b_status.'</span>';
+        break;
+      case 'failed':
+        return '<span class="badge bg-label-danger">'.$b_status.'</span>';
+        break;
+
+      default:
+        return '<span class="badge bg-label-warning">' . $b_status . '</span>';
+        break;
+    }
+  }
+
   /**
    * Optional method if you want to use html builder.
    *
@@ -72,16 +95,16 @@ class InvitationsDataTable extends DataTable
   {
     $this->company_id = @request()->company->id;
     $buttons = [];
-    // if (auth('admin')->user()->can(true))
-    // $buttons[] = [
-    //   'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Company</span>',
-    //   'className' =>  'btn btn-primary mx-3',
-    //   'attr' => [
-    //     'data-toggle' => "ajax-offcanvas",
-    //     'data-title' => 'Add Company',
-    //     'data-href' => route('admin.partner.companies.create')
-    //   ]
-    // ];
+    if (auth('admin')->user()->can(true))
+    $buttons[] = [
+      'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Invitation</span>',
+      'className' =>  'btn btn-primary mx-3',
+      'attr' => [
+        'data-toggle' => "ajax-modal",
+        'data-title' => 'Create Invitation',
+        'data-href' => route('admin.company-invitations.create')
+      ]
+    ];
 
     // $script = "data.name = 'test'; data.email = $('input[name=email]').val(); data.filter = $('#custom-filter').val();";
 
