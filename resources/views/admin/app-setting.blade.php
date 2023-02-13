@@ -73,7 +73,7 @@ $configData = Helper::appClasses();
                         <div class="setting-item" data-general="true" data-bs-toggle="sidebar">
                             <form method="POST" action="{{ route('admin.setting.store') }}">
                                 @csrf
-                            
+
                                 <!-- Password expires after -->
                                 <div class="col-md-6 mb-3">
                                     <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
@@ -97,128 +97,152 @@ $configData = Helper::appClasses();
                         </div>
 
                         <div class="setting-item d-none" data-email="true" data-bs-toggle="sidebar">
-                            <!-- Supported mail services -->
-                            <div class="col-md-6 mb-4">
-                                <label for="supportedMailServices" class="form-label fs-6 mb-2 fw-semibold">
-                                    @lang('Supported mail services')
-                                </label>
-                                <select name="supported_mail_services" id="supportedMailServices" class="selectpicker w-100" data-style="btn-default">
-                                    <option value="amazon" data-tokens="amazon">@lang('Amazon SES')</option>
-                                    <option value="mailgun" data-tokens="mailgun">@lang('Mailgun')</option>
-                                    <option value="smtp" data-tokens="smtp">@lang('SMTP')</option>
-                                    <option value="sendmail" data-tokens="sendmail">@lang('Sendmail')</option>
-                                    <option value="mailtrap" data-tokens="mailtrap">@lang('Mailtrap')</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6 mb-4">
-                                <label for="emailSentFromName" class="form-label fs-6 mb-2 fw-semibold">
-                                    @lang('Email sent from name')
-                                </label>
-                                <input name="email_sent_from_name" type="text" class="form-control" id="emailSentFromName" placeholder="John Doe" aria-describedby="emailSentFromName" />
-                            </div>
-
-                            <div class="col-md-6 mb-4">
-                                <label for="emailSentFromEmail" class="form-label fs-6 mb-2 fw-semibold">
-                                    @lang('Email sent from email')
-                                </label>
-                                <input name="email_sent_from_email" type="email" class="form-control" id="emailSentFromEmail" placeholder="@lang('Type email from address')" aria-describedby="emailSentFromEmail" />
-                            </div>
-
-                            <!-- Amazon email service fields -->
-                            <div id="amazonEmailService" class="email-service d-none">
+                            <form method="POST" action="{{ route('admin.setting.email.upsert') }}">
+                                @csrf
+                                @if ($errors->any())
+                                    <div class="alert alert-danger alert-dismissible">
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        {!! implode('<br />', $errors->all('<span>:message</span>')) !!}
+                                    </div>
+                                @endif
+                                <!-- Supported mail services -->
                                 <div class="col-md-6 mb-4">
-                                    <label for="amazonHostName" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Host name')
+                                    <label for="supportedMailServices" class="form-label fs-6 mb-2 fw-semibold">
+                                        @lang('Supported mail services')
                                     </label>
-                                    <input name="amazon_host_name" type="text" class="form-control" id="amazonHostName" placeholder="@lang('Type host name')" aria-describedby="amazonHostName" />
-                                </div>
+                                    <select name="service" id="supportedMailServices" value="" class="selectpicker w-100" data-style="btn-default">
+                                        @php
+                                            $active_email_service = 'ses';
+                                        @endphp
 
-                                <div class="col-md-6 mb-4">
-                                    <label for="amazonAccessKeyId" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Access key id')
-                                    </label>
-                                    <input name="amazon_access_key_id" type="text" class="form-control" id="amazonAccessKeyId" placeholder="@lang('Type access key id')" aria-describedby="amazonAccessKeyId" />
-                                </div>
-
-                                <div class="col-md-6 mb-4">
-                                    <label for="amazonSecretAccessKey" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Secret access key')
-                                    </label>
-                                    <input name="amazon_secret_access_key" type="text" class="form-control" id="amazonSecretAccessKey" placeholder="@lang('Type secret access key')" aria-describedby="amazonSecretAccessKey" />
-                                </div>
-
-                                <div class="col-md-6 mb-4">
-                                    <label for="amazonRegion" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Region')
-                                    </label>
-                                    <input name="amazon_region" type="text" class="form-control" id="amazonRegion" placeholder="@lang('Type region')" aria-describedby="amazonRegion" />
-                                </div>
-                            </div>
-
-                            <!-- Mailgun email service fields -->
-                            <div id="mailgunEmailService" class="email-service d-none">
-                                <div class="col-md-6 mb-4">
-                                    <label for="mailgunDomainName" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Domain name')
-                                    </label>
-                                    <input name="mailgun_domain_name" type="text" class="form-control" id="mailgunDomainName" placeholder="@lang('Type domain name')" aria-describedby="mailgunDomainName" />
-                                </div>
-
-                                <div class="col-md-6 mb-4">
-                                    <label for="mailgunApiKey" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Api key')
-                                    </label>
-                                    <input name="mailgun_api_key" type="text" class="form-control" id="mailgunApiKey" placeholder="@lang('Type api key')" aria-describedby="mailgunApiKey" />
-                                </div>
-                            </div>
-
-                            <!-- Mailgun email service fields -->
-                            <div id="smtpEmailService" class="email-service d-none">
-                                <div class="col-md-6 mb-4">
-                                    <label for="smtpUsername" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Username')
-                                    </label>
-                                    <input name="smtp_username" type="text" class="form-control" id="smtpUsername" placeholder="@lang('Type username')" aria-describedby="smtpUsername" />
-                                </div>
-
-                                <div class="col-md-6 mb-4">
-                                    <label for="smtpHost" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('SMTP host')
-                                    </label>
-                                    <input name="smtp_host" type="text" class="form-control" id="smtpHost" placeholder="@lang('Type SMTP host')" aria-describedby="smtpHost" />
-                                </div>
-
-                                <div class="col-md-6 mb-4">
-                                    <label for="smtpPort" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Port')
-                                    </label>
-                                    <input name="smtp_port" type="text" class="form-control" id="smtpPort" placeholder="@lang('Type SMTP port')" aria-describedby="smtpPort" />
-                                </div>
-                                
-                                <div class="col-md-6 mb-4">
-                                    <label for="smtpPasswordToAccess" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Password to access')
-                                    </label>
-                                    <input name="smtp_password" type="password" class="form-control" id="smtpPasswordToAccess" placeholder="@lang('Type password to access')" aria-describedby="smtpPasswordToAccess" />
-                                </div>
-                                
-                                <div class="col-md-6 mb-4">
-                                    <label for="smtpEncryptionKey" class="form-label fs-6 mb-2 fw-semibold">
-                                        @lang('Encryption type')
-                                    </label>
-                                    <select name="smtp_encryption_key" id="smtpEncryptionKey" class="selectpicker w-100" data-style="btn-default">
-                                        <option value="">@lang('Choose one')</option>
-                                        <option value="TLS">@lang('TLS')</option>
-                                        <option value="SSL">@lang('SSL')</option>
+                                        @foreach($email_services as $service)
+                                            @php
+                                                if($service->is_active) $active_email_service = $service->service;
+                                                ${$service->service} = $service->emailServiceFields()->pluck('field_value', 'field_name')->toArray();
+                                            @endphp
+                                        <option value="{{ $service->service }}" data-tokens="{{ $service->service }}" {{ $service->is_active ? 'selected' : '' }}>
+                                            {{ __($service->service_label) }}
+                                        </option>
+                                        @endforeach
                                     </select>
                                 </div>
-                            </div>
 
-                            <!-- Sendmail email service fields -->
-                            <div id="sendmailEmailService" class="email-service d-none">
+                                <div class="col-md-6 mb-4">
+                                    <label for="emailSentFromName" class="form-label fs-6 mb-2 fw-semibold">
+                                        @lang('Email sent from name')
+                                    </label>
+                                    <input name="email_sent_from_name" value="{{ $$active_email_service['email_sent_from_name'] ?? '' }}" type="text" class="form-control" id="emailSentFromName" placeholder="John Doe" aria-describedby="emailSentFromName" />
+                                </div>
 
-                            </div>
+                                <div class="col-md-6 mb-4">
+                                    <label for="emailSentFromEmail" class="form-label fs-6 mb-2 fw-semibold">
+                                        @lang('Email sent from email')
+                                    </label>
+                                    <input name="email_sent_from_email" value="{{ $$active_email_service['email_sent_from_email'] ?? '' }}" type="email" class="form-control" id="emailSentFromEmail" placeholder="@lang('Type email from address')" aria-describedby="emailSentFromEmail" />
+                                </div>
+
+                                <!-- ses email service fields -->
+                                <div id="sesEmailService" class="email-service {{ $active_email_service === 'ses' ? '' : 'd-none' }}">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="sesHostName" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Host name')
+                                        </label>
+                                        <input name="ses_host" value="{{ $ses['ses_host'] ?? '' }}" type="text" class="form-control" id="sesHostName" placeholder="@lang('Type host name')" aria-describedby="sesHostName" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="sesAccessKeyId" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Access key id')
+                                        </label>
+                                        <input name="access_key_id" value="{{ $ses['access_key_id'] ?? '' }}" type="text" class="form-control" id="sesAccessKeyId" placeholder="@lang('Type access key id')" aria-describedby="sesAccessKeyId" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="sesSecretAccessKey" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Secret access key')
+                                        </label>
+                                        <input name="secret_access_key" value="{{ $ses['secret_access_key'] ?? '' }}" type="text" class="form-control" id="sesSecretAccessKey" placeholder="@lang('Type secret access key')" aria-describedby="sesSecretAccessKey" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="sesRegion" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Region')
+                                        </label>
+                                        <input name="region" value="{{ $ses['region'] ?? '' }}" type="text" class="form-control" id="sesRegion" placeholder="@lang('Type region')" aria-describedby="sesRegion" />
+                                    </div>
+                                </div>
+
+                                <!-- Mailgun email service fields -->
+                                <div id="mailgunEmailService" class="email-service {{ $active_email_service === 'mailgun' ? 'd-block' : 'd-none' }}">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="mailgunDomainName" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Domain name')
+                                        </label>
+                                        <input name="domain_name" value="{{ $mailgun['domain_name'] ?? '' }}" type="text" class="form-control" id="mailgunDomainName" placeholder="@lang('Type domain name')" aria-describedby="mailgunDomainName" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="mailgunApiKey" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Api key')
+                                        </label>
+                                        <input name="api_key" value="{{ $mailgun['api_key'] ?? '' }}" type="text" class="form-control" id="mailgunApiKey" placeholder="@lang('Type api key')" aria-describedby="mailgunApiKey" />
+                                    </div>
+                                </div>
+
+                                <!-- Mailgun email service fields -->
+                                <div id="smtpEmailService" class="email-service {{ $active_email_service === 'smtp' ? '' : 'd-none' }}">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="smtpUsername" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Username')
+                                        </label>
+                                        <input name="username" value="{{ $smtp['username'] ?? '' }}" type="text" class="form-control" id="smtpUsername" placeholder="@lang('Type username')" aria-describedby="smtpUsername" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="smtpHost" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('SMTP host')
+                                        </label>
+                                        <input name="smtp_host" value="{{ $smtp['smtp_host'] ?? '' }}" type="text" class="form-control" id="smtpHost" placeholder="@lang('Type SMTP host')" aria-describedby="smtpHost" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="smtpPort" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Port')
+                                        </label>
+                                        <input name="port" value="{{ $smtp['port'] ?? '' }}" type="text" class="form-control" id="smtpPort" placeholder="@lang('Type SMTP port')" aria-describedby="smtpPort" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="smtpPasswordToAccess" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Password to access')
+                                        </label>
+                                        <input name="password" value="{{ $smtp['password'] ?? '' }}" type="password" class="form-control" id="smtpPasswordToAccess" placeholder="@lang('Type password to access')" aria-describedby="smtpPasswordToAccess" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label for="smtpEncryptionKey" class="form-label fs-6 mb-2 fw-semibold">
+                                            @lang('Encryption type')
+                                        </label>
+                                        <select name="encryption_key" value="{{ $smtp['encryption_key'] ?? '' }}" id="smtpEncryptionKey" class="selectpicker w-100" data-style="btn-default">
+                                            <option value="">@lang('Choose one')</option>
+                                            <option value="TLS">@lang('TLS')</option>
+                                            <option value="SSL">@lang('SSL')</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Sendmail email service fields -->
+                                <div id="sendmailEmailService" class="email-service {{ $active_email_service === 'sendmail' ? '' : 'd-none' }}">
+
+                                </div>
+
+                                <!-- Sendmail email service fields -->
+                                <div id="mailtrapEmailService" class="email-service {{ $active_email_service === 'mailtrap' ? '' : 'd-none' }}">
+
+                                </div>
+
+                                <button type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                            </form>
                         </div>
                     </div>
 

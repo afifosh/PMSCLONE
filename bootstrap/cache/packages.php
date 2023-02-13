@@ -17,13 +17,6 @@
       0 => 'Fruitcake\\Cors\\CorsServiceProvider',
     ),
   ),
-  'infinitypaul/laravel-password-history-validation' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Infinitypaul\\LaravelPasswordHistoryValidation\\LaravelPasswordHistoryValidationServiceProvider',
-    ),
-  ),
   'intervention/image' => 
   array (
     'providers' => 

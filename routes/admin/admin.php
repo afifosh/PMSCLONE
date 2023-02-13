@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AppSettingController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
+use App\Http\Controllers\Admin\EmailServiceController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
@@ -50,8 +51,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::resource('programs', ProgramController::class);
     // Route::resource('companies.invitations', InvitationController::class);
     Route::prefix('settings')->name('setting.')->group(function () {
-      Route::view('/', 'admin.app-setting')->name('index');
+      Route::get('/', [AppSettingController::class, 'index'])->name('index');
       Route::post('general', [AppSettingController::class, 'storeGeneralSettings'])->name('store');
+      Route::post('email', [EmailServiceController::class, 'upsert'])->name('email.upsert');
     });
 
     Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]));
