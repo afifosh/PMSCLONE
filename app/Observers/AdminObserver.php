@@ -28,6 +28,10 @@ class AdminObserver
      */
     public function updated(Admin $admin)
     {
+        if(! $admin->isDirty('password')) {
+            return;
+        }
+        
         // if threshold reached, delete one record
         if ($admin->passwordHistories()->count() === config('auth.password_history_count')) {
             $admin->passwordHistories()->first()->delete();

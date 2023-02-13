@@ -27,6 +27,10 @@ class UserObserver
      */
     public function updated(User $user)
     {
+        if(! $user->isDirty('password')) {
+            return;
+        }
+
         // if threshold reached, delete one record
         if ($user->passwordHistories()->count() === config('auth.password_history_count')) {
             $user->passwordHistories()->first()->delete();
