@@ -12,8 +12,10 @@
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
 @auth
-<!-- Session Timeout -->
-<script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
+  @if(Route::currentRouteName() !== 'auth.lock' && Route::currentRouteName() !== 'admin.auth.lock')
+  <!-- Session Timeout -->
+  <script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
+  @endif
 @endauth
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
@@ -31,52 +33,53 @@
     toast_success("{{ucwords(str_replace('-', ' ', session('status')))}}");
     @endif
 
+    let guard = "{{ config('fortify.guard') }}"
     @auth
-$.sessionTimeout({
-        keepAliveUrl: '/keep-alive',
-        logoutUrl: '/logout',
-        redirUrl: '/auth/lock',
-        warnAfter: +"{{ cache('timeout_warning_seconds') }}",
-        redirAfter: +"{{ cache('timeout_after_seconds') }}",
-        countdownBar: true,
-        countdownMessage: 'Redirecting in {timer} seconds.',
-        useLocalStorageSynchronization: true,
-        clearWarningOnUserActivity: false,
-      });
-
-    var site_url = "{{ url('/') }}";
-    var page = 1;
-
-    notifications(page);
-
-    $(document).ready(function() {
-      $('.view-more-li.load-more').click(function() {
-        page++;
-        notifications(page);
-      });
-
-      $('.notification-bell').click(function() {
-        console.log('workig');
-        
-
-      })
-    });
-
-
-    function notifications(page) {
-      $.ajax({
-          type: 'get'
-          , url: site_url + '/notifications?' + 'page=' + page
-        })
-        .done(function(response) {
-          $('.dropdown-notifications-ul-list').append(response.data)
-        })
-        .fail(function(jqXHR, ajaxOptions, thrownError) {
-          // alert('No response from server');
+      @if(Route::currentRouteName() !== 'auth.lock' && Route::currentRouteName() !== 'admin.auth.lock')
+        $.sessionTimeout({
+          keepAliveUrl: '/keep-alive',
+          logoutUrl: guard === 'web' ? '/logout' : '/admin/logout',
+          redirUrl: guard === 'web' ? '/auth/lock' : '/admin/auth/locked',
+          warnAfter: +"{{ cache('timeout_warning_seconds') }}",
+          redirAfter: +"{{ cache('timeout_after_seconds') }}",
+          countdownBar: true,
+          countdownMessage: 'Redirecting in {timer} seconds.',
+          useLocalStorageSynchronization: true,
+          clearWarningOnUserActivity: false,
         });
-    }
+      @endif
+
+      var site_url = "{{ url('/') }}";
+          var page = 1;
+
+          notifications(page);
+
+          $(document).ready(function() {
+            $('.view-more-li.load-more').click(function() {
+              page++;
+              notifications(page);
+            });
+
+            $('.notification-bell').click(function() {
+              console.log('workig');
 
 
+            })
+          });
+
+
+          function notifications(page) {
+            $.ajax({
+                type: 'get'
+                , url: site_url + '/notifications?' + 'page=' + page
+              })
+              .done(function(response) {
+                $('.dropdown-notifications-ul-list').append(response.data)
+              })
+              .fail(function(jqXHR, ajaxOptions, thrownError) {
+                // alert('No response from server');
+              });
+          }
     @endauth
   });
 

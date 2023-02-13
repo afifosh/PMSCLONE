@@ -9,6 +9,7 @@ use App\Traits\HasEnum;
 use App\Traits\Tenantable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -38,30 +39,30 @@ class User extends Authenticatable implements MustVerifyEmail
         'password_changed_at',
     ];
 
-  /**
-   * The attributes that should be hidden for serialization.
-   *
-   * @var array<int, string>
-   */
-  protected $hidden = [
-    'password',
-    'remember_token',
-    'two_factor_recovery_codes',
-    'two_factor_secret',
-  ];
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
+    ];
 
-  /**
-   * The attributes that should be cast.
-   *
-   * @var array<string, string>
-   */
-  protected $casts = [
-    'email_verified_at' => 'datetime',
-  ];
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 
     /**
      * Get web guard key
-     * 
+     *
      * @return string
      */
     public static function GET_LOCK_KEY() {
@@ -75,22 +76,32 @@ class User extends Authenticatable implements MustVerifyEmail
       return $value;
     }
 
-  public function getFullNameAttribute()
-  {
-    return ucwords($this->first_name . ' ' . $this->last_name);
-  }
+    public function getFullNameAttribute()
+    {
+      return ucwords($this->first_name. ' ' . $this->last_name);
+    }
 
-  public function company()
-  {
-    return $this->belongsTo(Company::class);
-  }
+    public function company()
+    {
+      return $this->belongsTo(Company::class);
+    }
 
-  public function sendEmailVerificationNotification()
-  {
-    $this->notify(new UserVerifyEmailQueued);
-  }
-  public function sendPasswordResetNotification($token)
-  {
-    $this->notify(new UserResetPassword($token));
-  }
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new UserVerifyEmailQueued);
+    }
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new UserResetPassword($token));
+    }
+
+    /**
+     * User has many morph fields of password history
+     *
+     * @return MorphMany
+     */
+    public function passwordHistories()
+    {
+      return $this->morphMany(PasswordHistory::class, 'authable');
+    }
 }
