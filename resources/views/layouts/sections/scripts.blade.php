@@ -35,7 +35,7 @@
       $.sessionTimeout({
         keepAliveUrl: '/keep-alive',
         logoutUrl: '/logout',
-        redirUrl: '/auth/locked',
+        redirUrl: '/auth/lock',
         warnAfter: +"{{ cache('timeout_warning_seconds') }}",
         redirAfter: +"{{ cache('timeout_after_seconds') }}",
         countdownBar: true,

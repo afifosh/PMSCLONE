@@ -18,11 +18,13 @@ class AppSettingController extends Controller
      */
     public function index()
     {
+        $general_settings = AppSetting::first();
         $email_services = EmailService::with('emailServiceFields')->get();
+
 
         return view(
             'admin.app-setting',
-            compact('email_services')
+            compact('email_services', 'general_settings')
         );
     }
 
