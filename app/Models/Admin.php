@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\Admin\VerifyEmail;
 use App\Notifications\Admin\ResetPassword;
+use App\Traits\AuthLogs;
 use App\Traits\HasEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,9 +15,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Lab404\Impersonate\Models\Impersonate;
 use Avatar;
+use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
+
 class Admin extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs;
 
     /**
      * The attributes that are mass assignable.

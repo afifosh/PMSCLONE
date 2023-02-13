@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
 use App\Http\Controllers\Admin\Program\ProgramController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\ExpiredPasswordController;
 use App\Http\Controllers\Auth\LockModeController;
 use App\Http\Middleware\CheckForLockMode;
@@ -60,6 +61,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
       Route::post('email', [EmailServiceController::class, 'upsert'])->name('email.upsert');
     });
 
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications');
+    Route::post('update-notification-count', [NotificationController::class, 'updateNotificationCount'])->name('update.notification.count');
     Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]));
   });
 });

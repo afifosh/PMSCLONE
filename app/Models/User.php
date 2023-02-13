@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\User\UserResetPassword;
 use App\Notifications\User\UserVerifyEmailQueued;
+use App\Traits\AuthLogs;
 use App\Traits\HasEnum;
 use App\Traits\Tenantable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -13,11 +14,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 use Spatie\Permission\Traits\HasRoles;
+use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
+use Jenssegers\Agent\Agent;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Tenantable, HasEnum;
+  use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Tenantable, HasEnum, AuthenticationLoggable, AuthLogs;
 
     public const DT_ID = 'users_dataTable';
     /**
@@ -58,7 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get web guard key
-     * 
+     *
      * @return string
      */
     public static function GET_LOCK_KEY() {
@@ -93,10 +97,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * User has many morph fields of password history
-     * 
+     *
      * @return MorphMany
      */
-    public function passwordHistories() 
+    public function passwordHistories()
     {
       return $this->morphMany(PasswordHistory::class, 'authable');
     }
