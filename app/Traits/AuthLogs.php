@@ -17,10 +17,10 @@ trait AuthLogs
 
 
     $previous_login_city = $this->previousLoginLocation()['city'] ?? null;
-    $last_login_city = $this->LastLoginLocation()['city'] ?? null;
+    $last_login_city = $this->lastLoginLocation()['city'] ?? null;
 
     $previous_login_country = $this->previousLoginLocation()['country'] ?? null;
-    $last_login_country = $this->LastLoginLocation()['country'] ?? null;
+    $last_login_country = $this->lastLoginLocation()['country'] ?? null;
 
     $agent_previous = new Agent();
     $agent_last = new Agent();
@@ -32,30 +32,38 @@ trait AuthLogs
     $last_login_device = $agent_last->device();
 
 
+    if ($previous_login_city == null || $previous_login_city == '') {
+      return false;
+    }
+    if ($previous_login_country == null || $previous_login_country == '') {
+      return false;
+    }
+
+    if ($previous_login_device == null || $previous_login_device == "") {
+      return false;
+    }
+
+    // \Log::debug("previous_login_city: " . $previous_login_city);
+    // \Log::debug("previous_login_country: " . $previous_login_country);
+    // \Log::debug("previous_login_device: " . $previous_login_device);
+
+    // \Log::debug("last_login_city: " . $last_login_city);
+    // \Log::debug("last_login_country: " . $last_login_country);
+    // \Log::debug("last_login_device: " . $last_login_device);
+
+
+    if ($previous_login_city != $last_login_city) {
+      return true;
+    }
+
+    if ($previous_login_country != $last_login_country) {
+      return true;
+    }
+
     if ($previous_login_device != $last_login_device) {
       return true;
     }
 
-    // if ($previous_login_agent == null || $previous_login_ip == null || $previous_login_city == null || $previous_login_country == null) {
-    //   return false;
-    // }
-
-    // if ($previous_login_agent !=  $lastLoginAgent) {
-    //   return true;
-    // }
-
-    // if ($previous_login_ip !=  $last_login_ip) {
-
-    //   return true;
-    // }
-
-    // if ($previous_login_city != $last_login_city) {
-    //   return true;
-    // }
-
-    // if ($previous_login_country != $last_login_country) {
-    //   return true;
-    // }
     return false;
   }
 
@@ -70,7 +78,7 @@ trait AuthLogs
     return optional($this->authentications()->skip(1)->first())->user_agent;
   }
 
-  public function LastLoginLocation()
+  public function lastLoginLocation()
   {
     return optional($this->authentications()->first())->location;
   }

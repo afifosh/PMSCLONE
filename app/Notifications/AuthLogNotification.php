@@ -13,15 +13,17 @@ class AuthLogNotification extends Notification
     use Queueable;
     public $auth_log;
     public $auth_device;
+    public $location;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($auth_log, $auth_agent)
+    public function __construct($auth_log, $auth_agent, $location)
     {
         $this->auth_log = $auth_log;
+        $this->location = $location;
         $agent = new Agent();
     
         $agent->setUserAgent($auth_agent);
@@ -61,6 +63,8 @@ class AuthLogNotification extends Notification
     {
         return [
             'auth_device' => $this->auth_device,
+            'city' => $this->location['city'],
+            'country' => $this->location['country'],
         ];
     }
 }

@@ -8,7 +8,11 @@
     </div>
     <div class="flex-grow-1">
       <h6 class="mb-1">Alert!</h6>
-      <p class="mb-0">You have logged in from a different device.<br> Device: {{ $notification->data['auth_device'] }}</p>
+      <p class="mb-0">You have logged in from a different device.
+        <br> <b>Device:</b> {{ $notification->data['auth_device'] }}
+        <br> <b>City:</b> {{ $notification->data['city'] }}
+        <br> <b>Country:</b> {{ $notification->data['country'] }}
+      </p>
       {{-- <small class="text-muted">5 days ago</small> --}}
     </div>
     <div class="flex-shrink-0 dropdown-notifications-actions">

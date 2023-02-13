@@ -56,14 +56,8 @@ $.sessionTimeout({
       });
 
       $('.notification-bell').click(function() {
-        $.ajax({
-            type: 'post'
-            , url: "{{ route('update.notification.count') }}"
-          })
-          .done(function(response) {
-            console.log('done');
-            $('.notification-bell').hide();
-          })
+        console.log('workig');
+        
 
       })
     });
