@@ -10,6 +10,8 @@ class AppSetting extends Model
     use HasFactory;
 
     protected $fillable = [
-        'password_expire_days'
+        'password_expire_days',
+        'timeout_warning_seconds',
+        'timeout_after_seconds',
     ];
 }
