@@ -12,8 +12,10 @@
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
 @auth
+  @if(Route::currentRouteName() !== 'auth.lock' && Route::currentRouteName() !== 'admin.auth.lock')
   <!-- Session Timeout -->
   <script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
+  @endif
 @endauth
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
@@ -31,18 +33,21 @@
     toast_success("{{ucwords(str_replace('-', ' ', session('status')))}}");
     @endif
 
+    let guard = "{{ config('fortify.guard') }}"
     @auth
-      $.sessionTimeout({
-        keepAliveUrl: '/keep-alive',
-        logoutUrl: '/logout',
-        redirUrl: '/auth/lock',
-        warnAfter: +"{{ cache('timeout_warning_seconds') }}",
-        redirAfter: +"{{ cache('timeout_after_seconds') }}",
-        countdownBar: true,
-        countdownMessage: 'Redirecting in {timer} seconds.',
-        useLocalStorageSynchronization: true,
-        clearWarningOnUserActivity: false,
-      });
+      @if(Route::currentRouteName() !== 'auth.lock' && Route::currentRouteName() !== 'admin.auth.lock')
+        $.sessionTimeout({
+          keepAliveUrl: '/keep-alive',
+          logoutUrl: guard === 'web' ? '/logout' : '/admin/logout',
+          redirUrl: guard === 'web' ? '/auth/lock' : '/admin/auth/locked',
+          warnAfter: +"{{ cache('timeout_warning_seconds') }}",
+          redirAfter: +"{{ cache('timeout_after_seconds') }}",
+          countdownBar: true,
+          countdownMessage: 'Redirecting in {timer} seconds.',
+          useLocalStorageSynchronization: true,
+          clearWarningOnUserActivity: false,
+        });
+      @endif
     @endauth
   });
  </script>
