@@ -54,6 +54,15 @@ class Admin extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * Get admin guard key
+     * 
+     * @return string
+     */
+    public static function GET_LOCK_KEY() {
+      return 'VUEXY_ADMIN_LOCK_KEY';
+    }
+
+    /**
      * Send the email verification notification.
      *
      * @return void

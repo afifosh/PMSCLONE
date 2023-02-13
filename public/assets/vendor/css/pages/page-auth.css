@@ -107,3 +107,7 @@
 .dark-style .auth-cover-bg-color {
   background-color: #25293c;
 }
+
+.lock-screen-avatar {
+  width: 85px!important;
+}

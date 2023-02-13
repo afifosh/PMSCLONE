@@ -130,6 +130,14 @@ $navbarDetached = ($navbarDetached ?? '');
                   <span class="align-middle">My Profile</span>
                 </a>
               </li>
+              <li>
+                <a class="dropdown-item" href="{{ route('auth.lock') }}">
+                  <span class="d-flex align-items-center align-middle">
+                    <i class="flex-shrink-0 ti ti-lock me-2 ti-sm"></i>
+                    <span class="flex-grow-1 align-middle">{{ __('Lock Account') }}</span>
+                  </span>
+                </a>
+              </li>
               {{-- @if (Auth::check() && Laravel\Jetstream\Jetstream::hasApiFeatures())
               <li>
                 <a class="dropdown-item" href="{{ route('api-tokens.index') }}">
