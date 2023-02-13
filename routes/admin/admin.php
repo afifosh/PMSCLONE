@@ -4,18 +4,32 @@ use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminUsersController;
+use App\Http\Controllers\Admin\AppSettingController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
+use App\Http\Controllers\Admin\EmailServiceController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
 use App\Http\Controllers\Admin\Program\ProgramController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Auth\ExpiredPasswordController;
+use App\Http\Controllers\Auth\LockModeController;
+use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified', CheckForLockMode::class)->group(function () {
 
+  Route::get('auth/lock', LockModeController::class . '@lock')->name('auth.lock');
+  Route::post('auth/unlock', LockModeController::class . '@unlock')->name('auth.unlock');
+
+  Route::prefix('password')->name('password.expired.')->group(function () {
+    Route::view('expired', 'admin.auth.expired-password');
+    Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
+  });
+
+  Route::middleware('passwordMustNotBeExpired')->group(function () {
     Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::resource('admin-account', AdminAccountController::class)->only('edit');
@@ -31,7 +45,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::resource('companies', CompanyController::class);
     Route::resource('companies.contact-persons', ContactPersonController::class);
 
-    Route::prefix('partner')->name('partner.')->group(function() {
+    Route::prefix('partner')->name('partner.')->group(function () {
       Route::resource('companies', PatnerCompanyController::class);
       Route::get('departments/get-by-company', [DepartmentController::class, 'getByComapnyId'])->name('departments.getByCompany');
       Route::resource('departments', DepartmentController::class);
@@ -41,13 +55,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
     Route::resource('programs', ProgramController::class);
     // Route::resource('companies.invitations', InvitationController::class);
-    Route::view('settings', 'admin.app-setting')->name('settings.index');
-
-    Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]));
+    Route::prefix('settings')->name('setting.')->group(function () {
+      Route::get('/', [AppSettingController::class, 'index'])->name('index');
+      Route::post('general', [AppSettingController::class, 'storeGeneralSettings'])->name('store');
+      Route::post('email', [EmailServiceController::class, 'upsert'])->name('email.upsert');
+    });
 
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications');
     Route::post('update-notification-count', [NotificationController::class, 'updateNotificationCount'])->name('update.notification.count');
+    Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]));
+  });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

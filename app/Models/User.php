@@ -22,20 +22,21 @@ class User extends Authenticatable implements MustVerifyEmail
 {
   use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Tenantable, HasEnum, AuthenticationLoggable, AuthLogs;
 
-  public const DT_ID = 'users_dataTable';
-  /**
-   * The attributes that are mass assignable.
-   *
-   * @var array<int, string>
-   */
-  protected $fillable = [
-    'first_name',
-    'last_name',
-    'phone',
-    'email',
-    'password',
-    'status'
-  ];
+    public const DT_ID = 'users_dataTable';
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'phone',
+        'email',
+        'password',
+        'status',
+        'password_changed_at',
+    ];
 
   /**
    * The attributes that should be hidden for serialization.
@@ -58,12 +59,21 @@ class User extends Authenticatable implements MustVerifyEmail
     'email_verified_at' => 'datetime',
   ];
 
-  public function getAvatarAttribute($value)
-  {
-    if (!$value)
-      return asset('assets/img/avatars/' . substr($this->id, -1) . '.png');
-    return $value;
-  }
+    /**
+     * Get web guard key
+     * 
+     * @return string
+     */
+    public static function GET_LOCK_KEY() {
+      return 'VUEXY_WEB_LOCK_KEY';
+    }
+
+    public function getAvatarAttribute($value)
+    {
+      if(!$value)
+      return asset('assets/img/avatars/'.substr($this->id, -1).'.png');
+      return $value;
+    }
 
   public function getFullNameAttribute()
   {

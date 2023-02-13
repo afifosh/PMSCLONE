@@ -43,9 +43,9 @@
       $.sessionTimeout({
         keepAliveUrl: '/admin/keep-alive',
         logoutUrl: '/admin/logout',
-        redirUrl: '/admin/auth/locked',
-        warnAfter: 300000,
-        redirAfter: 1000000,
+        redirUrl: '/admin/auth/lock',
+        warnAfter: +"{{ cache('timeout_warning_seconds') }}",
+        redirAfter: +"{{ cache('timeout_after_seconds') }}",
         countdownBar: true,
         countdownMessage: 'Redirecting in {timer} seconds.',
         useLocalStorageSynchronization: true,

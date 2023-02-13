@@ -32,17 +32,17 @@
     @endif
 
     @auth
-    $.sessionTimeout({
-      keepAliveUrl: '/keep-alive'
-      , logoutUrl: '/logout'
-      , redirUrl: '/auth/locked'
-      , warnAfter: 300000
-      , redirAfter: 1000000
-      , countdownBar: true
-      , countdownMessage: 'Redirecting in {timer} seconds.'
-      , useLocalStorageSynchronization: true
-      , clearWarningOnUserActivity: false
-    , });
+$.sessionTimeout({
+        keepAliveUrl: '/keep-alive',
+        logoutUrl: '/logout',
+        redirUrl: '/auth/lock',
+        warnAfter: +"{{ cache('timeout_warning_seconds') }}",
+        redirAfter: +"{{ cache('timeout_after_seconds') }}",
+        countdownBar: true,
+        countdownMessage: 'Redirecting in {timer} seconds.',
+        useLocalStorageSynchronization: true,
+        clearWarningOnUserActivity: false,
+      });
 
     var site_url = "{{ url('/') }}";
     var page = 1;

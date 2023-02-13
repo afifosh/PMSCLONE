@@ -33,7 +33,8 @@ class Admin extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'status',
-        'designation_id'
+        'designation_id',
+        'password_changed_at',
     ];
 
     /**
@@ -54,6 +55,15 @@ class Admin extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get admin guard key
+     * 
+     * @return string
+     */
+    public static function GET_LOCK_KEY() {
+      return 'VUEXY_ADMIN_LOCK_KEY';
+    }
 
     /**
      * Send the email verification notification.
