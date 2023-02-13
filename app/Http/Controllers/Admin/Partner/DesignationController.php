@@ -13,7 +13,9 @@ class DesignationController extends Controller
 {
   public function index(DesignationsDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.partner.designations.index');
+    $data['organizations'] = PartnerCompany::has('departments.designations')->distinct()->pluck('name', 'id');
+    $data['departments'] = CompanyDepartment::has('designations')->distinct()->pluck('name', 'id');
+    return $dataTable->render('admin.pages.partner.designations.index', $data);
     // return view('admin.pages.partner.designations.index');
   }
   public function create()

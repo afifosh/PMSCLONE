@@ -96,9 +96,9 @@ class AdminUsersController extends Controller
    * @param  \App\Models\Admin  $admin
    * @return \Illuminate\Http\Response
    */
-  public function show(Admin $admin)
+  public function show(Admin $user)
   {
-    //
+    return view('admin.pages.roles.admins.show', compact('user'));
   }
 
   /**

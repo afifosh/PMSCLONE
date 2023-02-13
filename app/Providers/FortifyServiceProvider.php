@@ -23,6 +23,7 @@ class FortifyServiceProvider extends ServiceProvider
       config(['fortify.guard' => 'admin']);
       config(['fortify.passwords' => 'admins']);
       config(['fortify.home' => RouteServiceProvider::ADMIN_HOME]);
+      config(['fortify.redirects.logout' => 'admin/login']);
     }
   }
 

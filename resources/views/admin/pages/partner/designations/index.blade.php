@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Departments')
+@section('title', 'Designations')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -36,6 +36,28 @@ $configData = Helper::appClasses();
 </style>
   <div class="mt-3  col-12">
     <div class="card">
+      <h5 class="card-header">Search Filter</h5>
+      <form class="js-datatable-filter-form">
+        <div class="row pb-2 gap-3 mx-3 gap-md-0">
+          <div class="col-md-4 user_role">
+            <select name="filter_organizations[]" class="form-select select2" multiple data-placeholder="Select Organization">
+              @forelse ($organizations as $id => $organization)
+                <option value="{{$id}}"> {{$organization}} </option>
+              @empty
+              @endforelse
+
+            </select>
+          </div>
+          <div class="col-md-4 user_status">
+            <select name="filer_departments[]" class="form-select select2" multiple data-placeholder="User Role">
+              @forelse ($departments as $id => $department)
+                <option value="{{$id}}">{{$department}}</option>
+              @empty
+              @endforelse
+            </select>
+          </div>
+        </div>
+      </form>
       <div class="card-body">
         {{$dataTable->table()}}
       </div>
@@ -47,4 +69,17 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    <script>
+      $(document).ready(function () {
+          $('.js-datatable-filter-form :input').on('change', function (e) {
+              window.LaravelDataTables["{{App\Models\CompanyDesignation::DT_ID}}"].draw();
+          });
+
+          $('#{{App\Models\CompanyDesignation::DT_ID}}').on('preXhr.dt', function ( e, settings, data ) {
+              $('.js-datatable-filter-form :input').each(function () {
+                  data[$(this).prop('name')] = $(this).val();
+              });
+          });
+      });
+    </script>
 @endpush

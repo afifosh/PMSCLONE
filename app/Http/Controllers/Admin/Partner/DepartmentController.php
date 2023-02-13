@@ -14,7 +14,9 @@ class DepartmentController extends Controller
 {
   public function index(DepartmentsDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.partner.departments.index');
+    $data['organizations'] = PartnerCompany::has('departments')->pluck('name', 'id');
+    $data['heads'] = Admin::has('leadingDepartments')->distinct()->pluck('email', 'id');
+    return $dataTable->render('admin.pages.partner.departments.index', $data);
     // return view('admin.pages.partner.departments.index');
   }
   public function create()

@@ -20,17 +20,28 @@ class UsersDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->addColumn('full_name', function ($row) {
-        return $row->full_name;
+      ->addColumn('user', function ($row) {
+        return '<div class="d-flex justify-content-start align-items-center">
+                  <div class="avatar-wrapper">
+                    <div class="avatar avatar-sm me-3"><img src="'.$row->avatar.'" alt="Avatar" class="rounded-circle">
+                    </div>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <span class="text-body text-truncate">
+                      <span class="fw-semibold">'.htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8').'</span>
+                    </span>
+                    <small class="text-muted">'.htmlspecialchars($row->email, ENT_QUOTES, 'UTF-8').'</small>
+                  </div>
+                </div>';
       })
       ->addColumn('company', function (User $user) {
         return $user->company->name ?? '-';
       })
+      ->editColumn('status', function($row){
+        return $this->makeStatus($row->status);
+      })
       ->addColumn('roles', function ($row) {
         return $row->roles->pluck('name')->implode(', ');
-      })
-      ->addColumn('action', function (User $user) {
-        return view('pages.users.action', compact('user'));
       })
       ->addColumn('2f-auth', function ($row) {
         return $row->two_factor_confirmed_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
@@ -38,8 +49,42 @@ class UsersDataTable extends DataTable
       ->editColumn('email_verified_at', function ($row) {
         return $row->email_verified_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
+      ->addColumn('action', function (User $user) {
+        return view('pages.users.action', compact('user'));
+      })
+      ->filterColumn('user', function($query, $keyword) {
+        $sql = "CONCAT(users.first_name,' ',users.last_name, ' ',users.email)  like ?";
+        $query->whereRaw($sql, ["%{$keyword}%"]);
+      })
+      ->filterColumn('company', function($query, $keyword) {
+        $query->whereHas('company', function($q) use ($keyword){
+          return $q->where('name', 'like', '%'.$keyword.'%');
+        });
+      })
+      ->filterColumn('roles', function($query, $keyword) {
+        $query->whereHas('roles', function($q) use ($keyword){
+          return $q->where('name', 'like', '%'.$keyword.'%');
+        });
+      })
       ->setRowId('id')
-      ->rawColumns(['2f-auth', 'action', 'email_verified_at']);
+      ->rawColumns(['user', 'status', '2f-auth', 'action', 'email_verified_at']);
+  }
+
+  protected function makeStatus($status)
+  {
+    $b_status = htmlspecialchars(ucwords($status), ENT_QUOTES, 'UTF-8');
+    switch ($status) {
+      case 'active':
+        return '<span class="badge bg-label-success">'.$b_status.'</span>';
+        break;
+      case 'suspended':
+        return '<span class="badge bg-label-secondary">'.$b_status.'</span>';
+        break;
+
+      default:
+        return '<span class="badge bg-label-warning">' . $b_status . '</span>';
+        break;
+    }
   }
 
   /**
@@ -126,17 +171,11 @@ class UsersDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      // Column::computed('action')
-      //       ->exportable(true)
-      //       ->printable(true)
-      //       ->width(60)
-      //       ->addClass('text-center'),
-      Column::make('id'),
-      Column::make('first_name'),
-      Column::make('last_name'),
-      Column::make('email'),
+      Column::make('user'),
+      Column::make('phone'),
       Column::make('company'),
       Column::make('roles'),
+      Column::make('status'),
       Column::make('email_verified_at')->title(__('Verified')),
       Column::make('2f-auth')
     ];

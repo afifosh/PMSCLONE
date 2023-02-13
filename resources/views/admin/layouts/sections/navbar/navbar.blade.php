@@ -150,12 +150,12 @@ $navbarDetached = ($navbarDetached ?? '');
               </li>
               @if (auth('admin')->check())
               <li>
-                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <a class="dropdown-item" href="{{ route('admin.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                   <i class='ti ti-logout me-2'></i>
                   <span class="align-middle">Logout</span>
                 </a>
               </li>
-              <form method="POST" id="logout-form" action="{{ route('logout') }}">
+              <form method="POST" id="logout-form" action="{{ route('admin.logout') }}">
                 @csrf
               </form>
               @else

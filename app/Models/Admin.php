@@ -89,4 +89,9 @@ class Admin extends Authenticatable implements MustVerifyEmail
       return $this->belongsTo(CompanyDesignation::class, 'designation_id', 'id');
     }
 
+    public function leadingDepartments()
+    {
+      return $this->hasMany(CompanyDepartment::class, 'head_id', 'id');
+    }
+
 }

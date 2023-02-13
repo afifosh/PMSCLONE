@@ -33,6 +33,11 @@ class CompaniesDataTable extends DataTable
       ->addColumn('action', function (Company $company) {
         return view('admin.pages.company.action', compact('company'));
       })
+      ->filterColumn('added_by', function($query, $keyword){
+        return $query->whereHas('addedBy', function($q) use ($keyword){
+          return $q->where('email', 'like', '%'.$keyword.'%');
+        });
+      })
       ->setRowId('id')
       ->rawColumns(['name', 'action', 'status']);
   }

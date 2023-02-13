@@ -5,24 +5,28 @@
 @endif
 
 <div class="row">
-    <div class="form-group">
+    <div class="form-group col-6">
         {{ Form::label('first_name', __('First Name'), ['class' => 'col-form-label']) }}
         {!! Form::text('first_name', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('First Name')]) !!}
     </div>
-    <div class="form-group">
+    <div class="form-group col-6">
       {{ Form::label('last_name', __('Last Name'), ['class' => 'col-form-label']) }}
       {!! Form::text('last_name', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Last Name')]) !!}
     </div>
-    <div class="form-group">
+    <div class="form-group col-6">
         {{ Form::label('email', __('User Email'), ['class' => 'col-form-label']) }}
         {!! Form::text('email', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Enter Email Address')]) !!}
     </div>
-    <div class="form-group">
+    <div class="form-group col-6">
       {{ Form::label('expiry_time', __('Invitation Expiry'), ['class' => 'col-form-label']) }}
       {!! Form::text('expiry_time', null, ['class' => 'form-control flatpickr', 'data-flatpickr' => '{"enableTime":true, "dateFormat": "Y-m-d H:i"}', 'required'=> 'true']) !!}
   </div>
+  <div class="form-group col-6">
+      {{ Form::label('company_id', __('Company'), ['class' => 'col-form-label']) }}
+      {!! Form::text('company_id', $company->name, ['class' => 'form-control', 'disabled' => 'true'])!!}
+  </div>
 
-  <div class="form-group">
+  <div class="form-group col-6">
     {{ Form::label('role', __('Role'), ['class' => 'col-form-label']) }}
     {!! Form::select('role', $roles, '', ['class' => 'form-select globalOfSelect2']) !!}
   </div>

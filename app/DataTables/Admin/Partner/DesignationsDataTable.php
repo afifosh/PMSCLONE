@@ -20,17 +20,27 @@ class DesignationsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-    ->addColumn('action', function (CompanyDesignation $designation) {
-      return view('admin.pages.partner.designations.action', compact('designation'));
-    })
-    ->addColumn('department', function(CompanyDesignation $designation){
-      return $designation->department->name;
-    })
-    ->addColumn('organization', function(CompanyDesignation $designation){
-      return $designation->department->company->name;
-    })
-    ->setRowId('id')
-    ->rawColumns(['action']);
+      ->addColumn('action', function (CompanyDesignation $designation) {
+        return view('admin.pages.partner.designations.action', compact('designation'));
+      })
+      ->addColumn('department', function (CompanyDesignation $designation) {
+        return $designation->department->name;
+      })
+      ->addColumn('organization', function (CompanyDesignation $designation) {
+        return $designation->department->company->name;
+      })
+      ->filterColumn('organization', function ($query, $keyword) {
+        $query->whereHas('department.company', function ($q) use ($keyword) {
+          return $q->where('name', 'like', "%{$keyword}%");
+        });
+      })
+      ->filterColumn('department', function ($query, $keyword) {
+        $query->whereHas('department', function ($q) use ($keyword) {
+          return $q->where('name', 'like', "%{$keyword}%");
+        });
+      })
+      ->setRowId('id')
+      ->rawColumns(['action']);
   }
 
   /**
@@ -41,7 +51,19 @@ class DesignationsDataTable extends DataTable
    */
   public function query(CompanyDesignation $model): QueryBuilder
   {
-    return $model->newQuery();
+    $query = $model->query();
+
+    $query->when(request('filer_departments'), function ($q) {
+      return $q->whereIn('department_id', request('filer_departments'));
+    });
+
+    $query->when(request('filter_organizations'), function ($q) {
+      $q->whereHas('department', function ($dep) {
+        return $dep->whereIn('company_id', request('filter_organizations'));
+      });
+    });
+
+    return $query;
   }
 
   /**
