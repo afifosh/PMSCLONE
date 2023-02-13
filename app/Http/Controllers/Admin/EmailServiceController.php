@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\EmailServiceRequest;
 use App\Models\EmailService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 
 class EmailServiceController extends Controller
 {
@@ -25,10 +26,15 @@ class EmailServiceController extends Controller
         try {
             DB::beginTransaction();
 
+            $universal_keys = ['username', 'host', 'port', 'password', 'encryption'];
+
             foreach ($request->except(['service', '_token']) as $field_name => $input) {
                 if (is_null($input)) {
                     continue;
                 }
+
+                $field_name = in_array(Str::after($field_name, '_'), $universal_keys) ?
+                    Str::after($field_name, '_') : $field_name;
 
                 $service->emailServiceFields()->updateOrCreate([
                     'field_name' => $field_name

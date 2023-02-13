@@ -27,17 +27,26 @@ class EmailServiceRequest extends FormRequest
             'service' => 'required|in:ses,mailgun,smtp,sendmail,mailtrap|exists:email_services,service',
             'email_sent_from_name' => 'required',
             'email_sent_from_email' => 'required|email',
+            // ses
             'ses_host' => 'required_if:service,ses',
-            'access_key_id' => 'required_if:service,ses',
-            'secret_access_key' => 'required_if:service,ses',
-            'region' => 'required_if:service,ses',
-            'domain_name' => 'required_if:service,mailgun',
-            'api_key' => 'required_if:service,mailgun',
-            'username' => 'required_if:service,smtp',
-            'host' => 'required_if:service,smtp',
-            'port' => 'required_if:service,smtp',
-            'password' => 'required_if:service,smtp',
-            'encryption_key' => 'required_if:service,smtp',
+            'ses_access_key_id' => 'required_if:service,ses',
+            'ses_secret_access_key' => 'required_if:service,ses',
+            'ses_region' => 'required_if:service,ses',
+            // mailgun
+            'mailgun_domain_name' => 'required_if:service,mailgun',
+            'mailgun_api_key' => 'required_if:service,mailgun',
+            // smtp
+            'smtp_username' => 'required_if:service,smtp',
+            'smtp_host' => 'required_if:service,smtp',
+            'smtp_port' => 'required_if:service,smtp',
+            'smtp_password' => 'required_if:service,smtp',
+            'smtp_encryption' => 'required_if:service,smtp',
+            // mailtrap
+            'mailtrap_username' => 'required_if:service,mailtrap',
+            'mailtrap_host' => 'required_if:service,mailtrap',
+            'mailtrap_port' => 'required_if:service,mailtrap',
+            'mailtrap_password' => 'required_if:service,mailtrap',
+            'mailtrap_encryption' => 'required_if:service,mailtrap',
         ];
     }
 }
