@@ -47,7 +47,7 @@ class FortifyServiceProvider extends ServiceProvider
       return Limit::perMinute(5)->by($request->session()->get('login.id'));
     });
 
-    if(config('fortify.guard' == 'admin')){
+    if(config('fortify.guard') == 'admin'){
       Fortify::viewPrefix('admin.auth.');
     }else{
       Fortify::viewPrefix('auth.');
