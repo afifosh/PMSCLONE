@@ -87,7 +87,7 @@ class CompaniesDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('name'),
+      Column::make('name')->title('Organization Name'),
       Column::make('website'),
       Column::make('phone'),
       Column::make('created_at'),

@@ -21,11 +21,19 @@ class InvitationsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->addColumn('email', function ($row) {
-        return $row->contactPerson->email;
-      })
-      ->addColumn('name', function ($row) {
-        return $row->contactPerson->first_name . ' ' . $row->contactPerson->last_name;
+      ->addColumn('user', function ($row) {
+        return '<div class="d-flex justify-content-start align-items-center">
+                  <div class="avatar-wrapper">
+                    <div class="avatar avatar-sm me-3"><img src="' . $row->contactPerson->avatar . '" alt="Avatar" class="rounded-circle">
+                    </div>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <span class="text-body text-truncate">
+                      <span class="fw-semibold">' . htmlspecialchars($row->contactPerson->full_name, ENT_QUOTES, 'UTF-8') . '</span>
+                    </span>
+                    <small class="text-muted">' . htmlspecialchars($row->contactPerson->email, ENT_QUOTES, 'UTF-8') . '</small>
+                  </div>
+                </div>';
       })
       ->addColumn('company', function ($row) {
         return $row->contactPerson->company->name ?? '-';
@@ -36,11 +44,22 @@ class InvitationsDataTable extends DataTable
       ->editColumn('status', function ($row) {
         return $this->makeStatus($row->status);
       })
-      // ->addColumn('action', function (PartnerCompany $company) {
-      //   return view('admin.pages.partner.companies.action', compact('company'));
-      // })
-      ->setRowId('id')
-      ->rawColumns(['status']);
+      ->addColumn('action', function ($invitation) {
+        return view('admin.pages.company.invitations.action', compact('invitation'));
+      })
+      // Search columns
+      ->filterColumn('user', function ($query, $keyword) {
+        return $query->whereHas('contactPerson', function ($q) use ($keyword) {
+          $sql = "CONCAT(company_contact_persons.first_name,' ',company_contact_persons.last_name, ' ',company_contact_persons.email)  like ?";
+          return $q->whereRaw($sql, ["%{$keyword}%"]);
+        });
+      })
+      ->filterColumn('role', function ($query, $keyword) {
+        $query->whereHas('role', function ($q) use ($keyword) {
+          return $q->where('name', 'like',"%{$keyword}%");
+        });
+      })
+      ->rawColumns(['user', 'status']);
   }
 
   /**
@@ -51,7 +70,6 @@ class InvitationsDataTable extends DataTable
    */
   public function query(CompanyInvitation $model): QueryBuilder
   {
-    // dd(request()->company);
     $query = $model->newQuery();
 
     $query->when(request()->company, function ($query) {
@@ -60,23 +78,23 @@ class InvitationsDataTable extends DataTable
       });
     });
 
-    $query->when(request('filter_status'), function($q){
+    $query->when(request('filter_status'), function ($q) {
       return $q->whereIn('status', request('filter_status'));
     });
 
-    $query->when(request('filer_roles'), function($q){
-      return $q->whereHas('contactPerson', function($cPerson){
+    $query->when(request('filer_roles'), function ($q) {
+      return $q->whereHas('contactPerson', function ($cPerson) {
         return $cPerson->whereIn('role_id', request('filer_roles'));
       });
     });
 
-    $query->when(request('filter_companies'), function($q){
-      return $q->whereHas('contactPerson', function($cPerson){
+    $query->when(request('filter_companies'), function ($q) {
+      return $q->whereHas('contactPerson', function ($cPerson) {
         return $cPerson->whereIn('company_id', request('filter_companies'));
       });
     });
 
-    return $query->with('contactPerson');
+    return $query->with('contactPerson')->orderBy('id', 'DESC');
   }
 
   protected function makeStatus($status)
@@ -84,16 +102,16 @@ class InvitationsDataTable extends DataTable
     $b_status = htmlspecialchars(ucwords($status), ENT_QUOTES, 'UTF-8');
     switch ($status) {
       case 'pending':
-        return '<span class="badge bg-label-warning">'.$b_status.'</span>';
+        return '<span class="badge bg-label-warning">' . $b_status . '</span>';
         break;
       case 'accepted':
-        return '<span class="badge bg-label-success">'.$b_status.'</span>';
+        return '<span class="badge bg-label-success">' . $b_status . '</span>';
         break;
       case 'revoked':
-        return '<span class="badge bg-label-secondary">'.$b_status.'</span>';
+        return '<span class="badge bg-label-secondary">' . $b_status . '</span>';
         break;
       case 'failed':
-        return '<span class="badge bg-label-danger">'.$b_status.'</span>';
+        return '<span class="badge bg-label-danger">' . $b_status . '</span>';
         break;
 
       default:
@@ -112,15 +130,15 @@ class InvitationsDataTable extends DataTable
     $this->company_id = @request()->company->id;
     $buttons = [];
     if (auth('admin')->user()->can(true))
-    $buttons[] = [
-      'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Invitation</span>',
-      'className' =>  'btn btn-primary mx-3',
-      'attr' => [
-        'data-toggle' => "ajax-modal",
-        'data-title' => 'Create Invitation',
-        'data-href' => route('admin.company-invitations.create')
-      ]
-    ];
+      $buttons[] = [
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Invitation</span>',
+        'className' =>  'btn btn-primary mx-3',
+        'attr' => [
+          'data-toggle' => "ajax-modal",
+          'data-title' => 'Create Invitation',
+          'data-href' => route('admin.company-invitations.create', ['company' => request()->company])
+        ]
+      ];
 
     // $script = "data.name = 'test'; data.email = $('input[name=email]').val(); data.filter = $('#custom-filter').val();";
 
@@ -134,7 +152,7 @@ class InvitationsDataTable extends DataTable
         <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
         >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
-      // ->addAction(['width' => '80px'])
+      ->addAction(['width' => '80px'])
       ->orderBy(0, 'DESC')
       ->parameters([
         'buttons' => $buttons,
@@ -151,9 +169,7 @@ class InvitationsDataTable extends DataTable
   {
     if (!$this->company_id) {
       return [
-        Column::make('id'),
-        Column::make('name'),
-        Column::make('email'),
+        Column::make('user'),
         Column::make('company'),
         Column::make('role'),
         Column::make('status'),
@@ -162,9 +178,7 @@ class InvitationsDataTable extends DataTable
       ];
     }
     return [
-      Column::make('id'),
-      Column::make('name'),
-      Column::make('email'),
+      Column::make('user'),
       Column::make('role'),
       Column::make('status'),
       Column::make('created_at'),

@@ -8,6 +8,7 @@ use App\Models\Admin;
 use App\Models\CompanyDepartment;
 use App\Models\PartnerCompany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
@@ -15,7 +16,7 @@ class DepartmentController extends Controller
   public function index(DepartmentsDataTable $dataTable)
   {
     $data['organizations'] = PartnerCompany::has('departments')->pluck('name', 'id');
-    $data['heads'] = Admin::has('leadingDepartments')->distinct()->pluck('email', 'id');
+    $data['heads'] = Admin::has('leadingDepartments')->distinct('email')->get();
     return $dataTable->render('admin.pages.partner.departments.index', $data);
     // return view('admin.pages.partner.departments.index');
   }

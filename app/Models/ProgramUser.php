@@ -18,6 +18,16 @@ class ProgramUser extends Model
       'updated_at' => 'datetime:d M, Y',
     ];
 
+    public function scopeOfProgram($query, $program)
+    {
+      if(!($program instanceof Program))
+      {
+        $program = Program::find($program);
+      }
+
+      return $query->where('program_id', $program->id)->orWhere('program_id', $program->parent_id);
+    }
+
     public function user()
     {
       return $this->belongsTo(Admin::class, 'admin_id', 'id');

@@ -21,7 +21,7 @@
     @php
       $enum = $company::getPossibleEnumValues('status');
     @endphp
-        {!! Form::select('status', array_combine($enum, $enum), $company->status, ['class' => 'form-select globalOfSelect2']) !!}
+        {!! Form::select('status', array_combine($enum, array_map('ucwords',$enum)), $company->status, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
   {{-- <div class="form-group">
 

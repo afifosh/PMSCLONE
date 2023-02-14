@@ -84,6 +84,12 @@
       "name": "Programs",
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "slug": "admin.programs.index"
+    },
+    {
+      "url": "/admin/draft-rfps",
+      "name": "Draft RFPs",
+      "icon": "menu-icon tf-icons ti ti-color-swatch",
+      "slug": "admin.draft-rfps.index"
     }
   ]
 }

@@ -46,7 +46,7 @@ $configData = Helper::appClasses();
               </li>
               @else
                 <div class="avatar">
-                  <span class="avatar-initial rounded-circle pull-up" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{count($role->users)-$loop->iteration+1}}">+{{count($role->users)-$loop->iteration+1}}</span>
+                  <span class="avatar-initial bg-dark text-light rounded-circle pull-up" data-bs-toggle="tooltip" data-bs-placement="top" title="+{{count($role->users)-$loop->iteration+1}}">+{{count($role->users)-$loop->iteration+1}}</span>
                 </div>
               @break
               @endif

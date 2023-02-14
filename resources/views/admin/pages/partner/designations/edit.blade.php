@@ -6,8 +6,8 @@
 
 <div class="row">
     <div class="form-group">
-        {{ Form::label('name', __('Name'), ['class' => 'col-form-label']) }}
-        {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
+        {{ Form::label('name', __('Designation Name'), ['class' => 'col-form-label']) }}
+        {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Designation Name')]) !!}
     </div>
 
     <div class="form-group col-6">

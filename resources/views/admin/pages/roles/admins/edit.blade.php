@@ -66,7 +66,7 @@
 @php
 $enum = $user::getPossibleEnumValues('status');
 @endphp
-  {!! Form::select('status', array_combine($enum, $enum), $user->status, ['class' => 'form-select globalOfSelect2']) !!}
+  {!! Form::select('status', array_combine($enum, array_map('ucwords',$enum)), $user->status, ['class' => 'form-select globalOfSelect2']) !!}
 </div>
 </div>
 

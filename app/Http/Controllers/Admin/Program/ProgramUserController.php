@@ -13,13 +13,7 @@ class ProgramUserController extends Controller
 {
   public function index(Program $program, ProgramUsersDataTable $dataTable)
   {
-    if (auth('admin')->id() != 1) {
-      $program = $program->where('id', $program->id)->whereHas('users', function ($q) {
-        return $q->where('admins.id', auth()->id());
-      })->orWhereHas('parent.users', function ($q) {
-        return $q->where('admins.id', auth()->id());
-      })->firstOrFail();
-    }
+    $program = $program->where('id', $program->id)->mine()->firstOrFail();
 
     return $dataTable->render('admin.pages.programs.users.index', compact('program'));
     // return view('admin.pages.programs.users.index');

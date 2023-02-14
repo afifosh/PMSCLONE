@@ -111,7 +111,7 @@ class DesignationsDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('name'),
+      Column::make('name')->title('Designation Name'),
       Column::make('department'),
       Column::make('organization'),
       Column::make('created_at'),

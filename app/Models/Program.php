@@ -18,6 +18,17 @@ class Program extends Model
       'updated_at' => 'datetime:d M, Y',
     ];
 
+    public function scopeMine($query){
+      if(auth('admin')->check() && auth('admin')->id() == 1){
+        return $query;
+      }
+      return $query->whereHas('users', function($q){
+        return $q->where('admins.id', auth()->id());
+      })->orWhereHas('parent.users', function($q){
+        return $q->where('admins.id', auth()->id());
+      });
+    }
+
     public function users()
     {
       return $this->belongsToMany(Admin::class, ProgramUser::class, 'program_id', 'admin_id')->withTimestamps();

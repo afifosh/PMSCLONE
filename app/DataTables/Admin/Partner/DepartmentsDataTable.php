@@ -36,7 +36,7 @@ class DepartmentsDataTable extends DataTable
                 </div>
                 <div class="d-flex flex-column">
                   <span class="text-body text-truncate">
-                    <span class="fw-semibold">' . htmlspecialchars($department->head->full_name, ENT_QUOTES, 'UTF-8') . '</span>
+                    <span class="fw-semibold"><a href="'.route('admin.users.show', $department->head->id).'" class="fw-semibold">' . htmlspecialchars($department->head->full_name, ENT_QUOTES, 'UTF-8') . '</a></span>
                   </span>
                   <small class="text-muted">' . htmlspecialchars($department->head->email, ENT_QUOTES, 'UTF-8') . '</small>
                 </div>
@@ -81,7 +81,7 @@ class DepartmentsDataTable extends DataTable
       return $q->whereIn('company_id', request('filter_organizations'));
     });
 
-    return $query;
+    return $query->with('head');
   }
 
   /**
@@ -129,7 +129,7 @@ class DepartmentsDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('name'),
+      Column::make('name')->title('Department Name'),
       Column::make('head'),
       Column::make('organization'),
       Column::make('created_at'),

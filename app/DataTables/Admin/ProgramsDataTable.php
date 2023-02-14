@@ -43,18 +43,9 @@ class ProgramsDataTable extends DataTable
    * @param \App\Models\Program $model
    * @return \Illuminate\Database\Eloquent\Builder
    */
-  public function query(Program $model): QueryBuilder
+  public function query(Program $programs): QueryBuilder
   {
-    $query = $model->query();
-    if(auth('admin')->check() && auth('admin')->id() != 1)
-    {
-      $query->whereHas('users', function($q){
-        return $q->where('admins.id', auth()->id());
-      })->orWhereHas('parent.users', function($q){
-        return $q->where('admins.id', auth()->id());
-      });
-    }
-    return $query;
+    return $programs->mine();
   }
 
   /**
@@ -102,7 +93,7 @@ class ProgramsDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('name'),
+      Column::make('name')->title('Program Name'),
       Column::make('parent'),
       Column::make('program_code'),
       Column::make('description'),

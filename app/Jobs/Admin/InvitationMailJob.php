@@ -40,8 +40,6 @@ class InvitationMailJob implements ShouldQueue
     }
     public function fail($exception = null)
     {
-      dump($exception);
-      dump($this->data);
       $this->data->update(['status' => 'failed']);
     }
 }

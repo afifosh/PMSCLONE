@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
 use App\Http\Controllers\Admin\Program\ProgramController;
 use App\Http\Controllers\Admin\Program\ProgramUserController;
+use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified')->group(function () {
@@ -34,6 +35,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::resource('companies.contact-persons', ContactPersonController::class);
     Route::resource('company-invitations', InvitationController::class);
     Route::resource('company-users', UserController::class);
+    Route::resource('draft-rfps', RFPDraftController::class);
 
     Route::prefix('partner')->name('partner.')->group(function() {
       Route::resource('companies', PatnerCompanyController::class);

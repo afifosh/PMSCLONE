@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin;
 
+use App\Models\Program;
 use App\Models\ProgramUser;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -81,7 +82,7 @@ class ProgramUsersDataTable extends DataTable
   {
     $query = $model->query();
     $query->when(request()->program, function ($query) {
-      return $query->where('program_id', request()->program->id)->orWhere('program_id', request()->program->parent_id);
+      return $query->ofProgram(request()->program);
     });
     return $query;
   }

@@ -42,9 +42,9 @@ $configData = Helper::appClasses();
             </select>
           </div>
           <div class="col-md-4 user_status">
-            <select name="filer_heads[]" class="form-select select2" multiple data-placeholder="Department Head">
-              @forelse ($heads as $id => $head)
-                <option value="{{$id}}">{{$head}}</option>
+            <select name="filer_heads[]" class="form-select select2User" multiple data-placeholder="Department Head">
+              @forelse ($heads as $head)
+                <option value="{{$head->id}}" data-full_name="{{$head->full_name}}" data-avatar="{{$head->avatar}}">{{$head->email}}</option>
               @empty
               @endforelse
             </select>

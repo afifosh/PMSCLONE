@@ -49,7 +49,7 @@ $configData = Helper::appClasses();
             </select>
           </div>
           <div class="col-md-4 user_status">
-            <select name="filer_departments[]" class="form-select select2" multiple data-placeholder="User Role">
+            <select name="filer_departments[]" class="form-select select2" multiple data-placeholder="Select Department">
               @forelse ($departments as $id => $department)
                 <option value="{{$id}}">{{$department}}</option>
               @empty
