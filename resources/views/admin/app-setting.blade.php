@@ -80,7 +80,7 @@ $configData = Helper::appClasses();
                                         <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                             @lang('Password expires after')
                                         </label>
-                                        <input name="password_expire_days" value="{{ $general_settings->password_expire_days ?? config('auth.password_expire_days') }}" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
+                                        <input name="password_expire_days" value="{{ $generalSettings->password_expire_days ?? config('auth.password_expire_days') }}" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
                                         @error('password_expire_days')
                                         <div class="alert alert-danger alert-dismissible my-2">
                                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -100,7 +100,7 @@ $configData = Helper::appClasses();
                                         <label for="timeoutWarningIn" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                             @lang('Timeout warning in')
                                         </label>
-                                        <input name="timeout_warning_seconds" value="{{ $general_settings->timeout_warning_seconds ?? config('auth.timeout_warning_seconds') }}" type="text" class="form-control" id="timeoutWarningIn" placeholder="{{ __('Timeout warning after x seconds') }}" aria-describedby="timeoutWarningIn" />
+                                        <input name="timeout_warning_seconds" value="{{ $generalSettings->timeout_warning_seconds ?? config('auth.timeout_warning_seconds') }}" type="text" class="form-control" id="timeoutWarningIn" placeholder="{{ __('Timeout warning after x seconds') }}" aria-describedby="timeoutWarningIn" />
                                         @error('timeout_warning_seconds')
                                         <div class="alert alert-danger alert-dismissible my-2">
                                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -116,7 +116,7 @@ $configData = Helper::appClasses();
                                         <label for="timeoutAfter" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                             @lang('Timeout after')
                                         </label>
-                                        <input name="timeout_after_seconds" value="{{ $general_settings->timeout_after_seconds ?? config('auth.timeout_after_seconds') }}" type="text" class="form-control" id="timeoutAfter" placeholder="{{ __('Timeout after x amount of seconds') }}" aria-describedby="timeoutAfter" />
+                                        <input name="timeout_after_seconds" value="{{ $generalSettings->timeout_after_seconds ?? config('auth.timeout_after_seconds') }}" type="text" class="form-control" id="timeoutAfter" placeholder="{{ __('Timeout after x amount of seconds') }}" aria-describedby="timeoutAfter" />
                                         @error('timeout_after_seconds')
                                         <div class="alert alert-danger alert-dismissible my-2">
                                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -155,7 +155,7 @@ $configData = Helper::appClasses();
                                             $active_email_service = 'ses';
                                             @endphp
 
-                                            @foreach($email_services as $service)
+                                            @foreach($emailServices as $service)
                                             @php
                                             if($service->is_active) $active_email_service = $service->service;
                                             ${$service->service} = $service->emailServiceFields()->pluck('field_value', 'field_name')->toArray();
