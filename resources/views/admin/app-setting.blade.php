@@ -173,14 +173,14 @@ $configData = Helper::appClasses();
                                         <label for="emailSentFromName" class="form-label fs-6 mb-2 fw-semibold">
                                             @lang('Email sent from name')
                                         </label>
-                                        <input name="email_sent_from_name" value="{{ $$active_email_service['email_sent_from_name'] ?? '' }}" type="text" class="form-control" id="emailSentFromName" placeholder="John Doe" aria-describedby="emailSentFromName" />
+                                        <input name="email_sent_from_name" value="{{ $$active_email_service['sent_from_name'] ?? '' }}" type="text" class="form-control" id="emailSentFromName" placeholder="John Doe" aria-describedby="emailSentFromName" />
                                     </div>
 
                                     <div class="col-md-6 mb-4">
                                         <label for="emailSentFromEmail" class="form-label fs-6 mb-2 fw-semibold">
                                             @lang('Email sent from email')
                                         </label>
-                                        <input name="email_sent_from_email" value="{{ $$active_email_service['email_sent_from_email'] ?? '' }}" type="email" class="form-control" id="emailSentFromEmail" placeholder="@lang('Type email from address')" aria-describedby="emailSentFromEmail" />
+                                        <input name="email_sent_from_email" value="{{ $$active_email_service['sent_from_email'] ?? '' }}" type="email" class="form-control" id="emailSentFromEmail" placeholder="@lang('Type email from address')" aria-describedby="emailSentFromEmail" />
                                     </div>
                                 </div>
 

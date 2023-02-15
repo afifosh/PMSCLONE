@@ -25,25 +25,27 @@ class EmailServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (Schema::hasTable('email_services')) {
-            $service = EmailService::where('is_active', true)->first();
-        }
+        $configurations = cache()->store(config('cache.default'))->get('project_email_configurations');
 
-        if (! isset($service) || ! $service) {
+        // if configurations are not present, return & use default ones in app .env
+        if (is_null($configurations)) {
             return;
         }
 
-        $fields = $service->emailServiceFields()->pluck('field_value', 'field_name')->toArray();
+        $configurations = json_decode($configurations);
 
-        config([
-            'mail.default' => $service->service ?? config('mail.default'),
-            'mail.mailers.smtp.host' => $fields->host ?? config('mail.mailers.smtp.host'),
-            'mail.mailers.smtp.port' => $fields->port ?? config('mail.mailers.smtp.port'),
-            'mail.mailers.smtp.username' => $fields->username ?? config('mail.mailers.smtp.username'),
-            'mail.mailers.smtp.password' => $fields->password ?? config('mail.mailers.smtp.password'),
-            'mail.mailers.smtp.encryption' => $fields->encryption_key ?? config('mail.mailers.smtp.encryption'),
-            'mail.from.address' => $fields->email_sent_from_email ?? config('mail.from.address'),
-            'mail.from.name' => $fields->email_sent_from_name ?? config('mail.from.name'),
-        ]);
+        $config = array(
+            'transport'  => $configurations->transport ?? config('mail.mailers.smtp.transport'),
+            'host'       => $configurations->host ?? config('mail.mailers.smtp.host'),
+            'port'       => $configurations->port ?? config('mail.mailers.smtp.port'),
+            'encryption' => $configurations->encryption ?? config('mail.mailers.smtp.encryption'),
+            'username'   => $configurations->username ?? config('mail.mailers.smtp.username'),
+            'password'   => $configurations->password ?? config('mail.mailers.smtp.password'),
+            'timeout'    => $configurations->timeout ?? config('mail.mailers.smtp.timeout'),
+        );
+
+        config()->set('mail.mailers.smtp', $config);
+        config()->set('mail.from.address', $configurations->sent_from_email ?? config('mail.from.address'));
+        config()->set('mail.from.name', $configurations->sent_from_name ?? config('mail.from.name'));
     }
 }

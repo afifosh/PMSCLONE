@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\EmailServiceRequest;
 use App\Models\EmailService;
+use App\Traits\EmailService as TraitsEmailService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Str;
 
 class EmailServiceController extends Controller
 {
+    use TraitsEmailService;
+
     /**
      * Stores email request
      * 
@@ -19,34 +21,13 @@ class EmailServiceController extends Controller
      */
     public function upsert(EmailServiceRequest $request)
     {
-        $service = EmailService::where('service', $request->service)->first();
-
-        $request->except(['service']);
-
         try {
             DB::beginTransaction();
 
-            $universal_keys = ['username', 'host', 'port', 'password', 'encryption'];
-
-            foreach ($request->except(['service', '_token']) as $field_name => $input) {
-                if (is_null($input)) {
-                    continue;
-                }
-
-                $field_name = in_array(Str::after($field_name, '_'), $universal_keys) ?
-                    Str::after($field_name, '_') : $field_name;
-
-                $service->emailServiceFields()->updateOrCreate([
-                    'field_name' => $field_name
-                ], [
-                    'field_name' => $field_name,
-                    'field_value' => $input,
-                ]);
-            }
-
-            EmailService::query()->update(['is_active' => false]);
-
-            $service->update(['is_active' => 1]);
+            $this->updateEmailService(
+                EmailService::where('service', $request->service)->first(),
+                $request->except(['service', '_token'])
+            );
 
             DB::commit();
 

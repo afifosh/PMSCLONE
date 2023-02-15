@@ -26,20 +26,21 @@ class AppSettingServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        
+
         if (Schema::hasTable('app_settings')) {
             $app_setting = AppSetting::first();
         }
 
-        $timeout_warning_seconds = isset($app_setting) && ! is_null($app_setting) &&
-            ! is_null($app_setting->timeout_warning_seconds) ? $app_setting->timeout_warning_seconds
+        $timeout_warning_seconds = isset($app_setting) && !is_null($app_setting) &&
+            !is_null($app_setting->timeout_warning_seconds) ? $app_setting->timeout_warning_seconds
             : config('auth.timeout_warning_seconds');
 
-        $timeout_after_seconds = isset($app_setting) && ! is_null($app_setting) &&
-            ! is_null($app_setting->timeout_after_seconds) ? $app_setting->timeout_after_seconds
+        $timeout_after_seconds = isset($app_setting) && !is_null($app_setting) &&
+            !is_null($app_setting->timeout_after_seconds) ? $app_setting->timeout_after_seconds
             : config('auth.timeout_after_seconds');
-            
-        Cache::put('timeout_warning_seconds', $timeout_warning_seconds);
-        Cache::put('timeout_after_seconds', $timeout_after_seconds);
+
+        cache()->store(config('cache.default'))->put('timeout_warning_seconds', $timeout_warning_seconds);
+
+        cache()->store(config('cache.default'))->put('timeout_after_seconds', $timeout_after_seconds);
     }
 }
