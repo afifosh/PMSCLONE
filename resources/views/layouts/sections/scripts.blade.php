@@ -39,12 +39,13 @@
         $.sessionTimeout({
           keepAliveUrl: '/keep-alive',
           logoutUrl: guard === 'web' ? '/logout' : '/admin/logout',
-          redirUrl: guard === 'web' ? '/auth/lock' : '/admin/auth/locked',
+          redirUrl: guard === 'web' ? '/auth/lock' : '/admin/auth/lock',
           warnAfter: +"{{ cache('timeout_warning_seconds') }}",
           redirAfter: +"{{ cache('timeout_after_seconds') }}",
           countdownBar: true,
           countdownMessage: 'Redirecting in {timer} seconds.',
           useLocalStorageSynchronization: true,
+          ignoreUserActivity: true,
           clearWarningOnUserActivity: false,
         });
       @endif
