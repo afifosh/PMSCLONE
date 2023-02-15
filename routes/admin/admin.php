@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminAccountController;
@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\Program\ProgramController;
 use App\Http\Controllers\Admin\Program\ProgramUserController;
 use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use Illuminate\Support\Facades\Route;
+
+
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified')->group(function () {
 
@@ -44,6 +46,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
       Route::get('designations/get-by-department', [DesignationController::class, 'getByDepartmentId'])->name('designations.getByDepartment');
       Route::resource('designations', DesignationController::class);
     });
+
+
+
+    Route::get('file-manager', [AppsController::class, 'file_manager'])->name('app-file-manager');
 
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
