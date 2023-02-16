@@ -184,6 +184,7 @@ return [
         Yajra\DataTables\DataTablesServiceProvider::class,
         Laravolt\Avatar\ServiceProvider::class,
 
+        App\Providers\AppSettingServiceProvider::class,
         App\Providers\EmailServiceProvider::class
     ],
 

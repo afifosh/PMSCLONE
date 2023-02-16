@@ -56,7 +56,8 @@
     52 => 'Spatie\\Permission\\PermissionServiceProvider',
     53 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     54 => 'Laravolt\\Avatar\\ServiceProvider',
-    55 => 'App\\Providers\\EmailServiceProvider',
+    55 => 'App\\Providers\\AppSettingServiceProvider',
+    56 => 'App\\Providers\\EmailServiceProvider',
   ),
   'eager' => 
   array (
@@ -100,7 +101,8 @@
     37 => 'Spatie\\Permission\\PermissionServiceProvider',
     38 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     39 => 'Laravolt\\Avatar\\ServiceProvider',
-    40 => 'App\\Providers\\EmailServiceProvider',
+    40 => 'App\\Providers\\AppSettingServiceProvider',
+    41 => 'App\\Providers\\EmailServiceProvider',
   ),
   'deferred' => 
   array (

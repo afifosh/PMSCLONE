@@ -43,13 +43,10 @@ class AppSettingController extends Controller
         ]);
 
         cache()->store(config('cache.default'))->put(
-            'timeout_warning_seconds',
-            $request->timeout_warning_seconds
-        );
-
-        cache()->store(config('cache.default'))->put(
-            'timeout_after_seconds',
-            $request->timeout_after_seconds
+            'idle_timeout_settings',
+            json_encode(
+                $request->only(['timeout_warning_seconds', 'timeout_after_seconds'])
+            ),
         );
 
         return redirect()->back()->with(['status' => __('Settings updated successfully')]);
