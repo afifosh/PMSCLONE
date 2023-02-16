@@ -91,6 +91,23 @@ $configData = Helper::appClasses();
                                             @lang('Please input the days after which the password will be expired')
                                         </div>
                                     </div>
+
+                                    <!-- Password history count -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
+                                            @lang('Password history count')
+                                        </label>
+                                        <input name="password_history_count" value="{{ $generalSettings->password_history_count ?? config('auth.password_history_count') }}" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
+                                        @error('password_history_count')
+                                        <div class="alert alert-danger alert-dismissible my-2">
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                            {{ $message }}
+                                        </div>
+                                        @enderror
+                                        <div id="defaultFormControlHelp" class="form-text">
+                                            @lang('Please input the number of password history count')
+                                        </div>
+                                    </div>
                                 </div>
                                 <!-- Password expires after -->
 

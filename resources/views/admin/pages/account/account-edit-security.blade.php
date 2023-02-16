@@ -50,6 +50,12 @@ $configData = Helper::appClasses();
         <form method="POST" action="{{route('admin.user-password.update')}}">
           @method('PUT')
           @csrf
+          @if ($errors->updatePassword->any())
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {!! implode('<br/>', $errors->updatePassword->all('<span>:message</span>')) !!}
+            </div>
+          @endif
           <div class="row">
             <div class="mb-3 col-md-6 form-password-toggle">
               <label class="form-label" for="currentPassword">Current Password</label>
