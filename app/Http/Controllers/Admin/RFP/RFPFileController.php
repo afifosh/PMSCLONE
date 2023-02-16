@@ -57,7 +57,7 @@ class RFPFileController extends Controller
     $json = [
       "created" => date("Y-m-d H:i:s"),
       "id" => auth()->id(),
-      "name" => auth()->user()->name,
+      "name" => auth()->user()->full_name,
     ];
 
     // write the encoded file information to the createdInfo.json file
@@ -149,7 +149,7 @@ $data['ext'] = pathinfo(Storage::path($file->file), PATHINFO_EXTENSION);
               "user": {
                   "group": "Group1",
                   "id": "' . auth()->id() . '",
-                  "name": "' . auth()->user()->name . '"
+                  "name": "' . auth()->user()->full_name . '"
               },
               "customization": {
                   "review": {

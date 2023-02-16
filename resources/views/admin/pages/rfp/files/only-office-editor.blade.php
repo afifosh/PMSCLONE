@@ -115,7 +115,7 @@ $configData = Helper::appClasses();
                     "user": {
                         "group": "Group1",
                         "id": "{{ auth()->id() }}",
-                        "name": "{{ auth()->user()->name }}"
+                        "name": "{{ auth()->user()->full_name }}"
                     },
                     "customization": {
                         "review": {
