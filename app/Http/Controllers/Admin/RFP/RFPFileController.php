@@ -142,7 +142,6 @@ $data['ext'] = pathinfo(Storage::path($file->file), PATHINFO_EXTENSION);
                   "reviewGroups": ["Group1", "Group2", ""]
               }
           },
-          "documentType": "word",
           "editorConfig": {
               "callbackUrl": "' . route('update-file', $file) . '",
               "mode": "edit",
@@ -158,6 +157,7 @@ $data['ext'] = pathinfo(Storage::path($file->file), PATHINFO_EXTENSION);
               }
           }
       }';
+      // "documentType": "word",
     // env('APP_URL').'/only-office.php?file='.$file->file
     $payload = json_decode($data['payload'], true);
     // dd($payload);

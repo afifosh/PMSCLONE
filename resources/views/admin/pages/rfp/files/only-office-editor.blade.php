@@ -108,7 +108,6 @@ $configData = Helper::appClasses();
                         "reviewGroups": ["Group1", "Group2", ""]
                     },
                 },
-                "documentType": "word",
                 "editorConfig": {
                     "callbackUrl": "{{ route('update-file', $file) }}",
                     "mode": "edit",
@@ -124,6 +123,7 @@ $configData = Helper::appClasses();
                     }
                 }
             };
+            // "documentType": "word",
             // var сonnectEditor = function() {
 
             // config = <?php echo json_encode(@$config); ?>;
