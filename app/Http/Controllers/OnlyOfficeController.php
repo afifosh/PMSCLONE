@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
+use App\Models\RFPFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class OnlyOfficeController extends Controller
 {
-    public function updateFile(Request $request, File $file)
+    public function updateFile(Request $request, RFPFile $file)
     {
         $result["error"] = 0;
 
