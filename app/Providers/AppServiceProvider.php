@@ -14,9 +14,9 @@ class AppServiceProvider extends ServiceProvider
    */
   public function register()
   {
-    if (config('app.force_https')) {
-      $this->app['request']->server->set('HTTPS', true);
-    }
+    // if (config('app.force_https')) {
+    //   $this->app['request']->server->set('HTTPS', true);
+    // }
   }
 
   /**
@@ -26,9 +26,9 @@ class AppServiceProvider extends ServiceProvider
    */
   public function boot(UrlGenerator $url)
   {
-    if (config('app.force_https')) {
-      \URL::forceScheme('https');
-      $url->formatScheme('https');
-    }
+    // if (config('app.force_https')) {
+    //   \URL::forceScheme('https');
+    //   $url->formatScheme('https');
+    // }
   }
 }
