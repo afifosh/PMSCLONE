@@ -18,7 +18,7 @@
           <div class="mb-0">
             <i data-feather="folder" class="me-25"></i>
             <span class="align-middle">Folder</span>
-          </div>
+          </div>px
         </div>
         <div class="dropdown-item">
           <div class="mb-0" for="file-upload">
@@ -57,7 +57,7 @@
         </a>
       </div>
       <div class="list-group list-group-labels">
-        <h6 class="section-label px-2 mb-1">Labels</h6>
+        <h6 class="section-label px-4 mb-1">Labels</h6>
         <a href="#" class="list-group-item list-group-item-action">
           <i data-feather="file-text" class="me-50 font-medium-3"></i>
           <span class="align-middle">Documents</span>
@@ -82,7 +82,7 @@
       <!-- links for file manager sidebar ends -->
 
       <!-- storage status of file manager starts-->
-      <div class="storage-status mb-1 px-2">
+      <div class="storage-status mb-1 px-4">
         <h6 class="section-label mb-1">Storage Status</h6>
         <div class="d-flex align-items-center cursor-pointer">
           <i data-feather="server" class="font-large-1"></i>
