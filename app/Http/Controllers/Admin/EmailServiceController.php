@@ -25,8 +25,8 @@ class EmailServiceController extends Controller
             DB::beginTransaction();
 
             $this->updateEmailService(
-                EmailService::where('service', $request->service)->first(),
-                $request->except(['service', '_token'])
+                EmailService::where('name', $request->name)->first(),
+                $request->except(['_token'])
             );
 
             DB::commit();

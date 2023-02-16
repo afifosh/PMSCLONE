@@ -45,6 +45,9 @@ trait PasswordHistory
         $model->passwordHistories()->create([
             'password' => $model->password
         ]);
+
+        // also added password changed at history on the model
+        $model->update(['password_changed_at' => now()]);
     }
 
     /**

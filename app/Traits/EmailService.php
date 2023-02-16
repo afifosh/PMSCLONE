@@ -3,29 +3,40 @@
 namespace App\Traits;
 
 use App\Models\EmailService as ModelsEmailService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 trait EmailService
 {
+    /**
+     * Fields of email configuration
+     * 
+     * @var array
+     */
     private $emailConfig = [];
 
+    /**
+     * Update email service
+     * 
+     * @param ModelsEmailService $service
+     * @param array $filteredRequest
+     */
     public function updateEmailService(ModelsEmailService $service, array $filteredRequest): void
     {
-        collect($filteredRequest)->each(function ($fieldValue, $fieldName) use ($service) {
-            if (is_null($fieldValue)) {
+        $excludedKeys = ['sent_from_name', 'sent_from_address'];
+
+        collect($filteredRequest)->each(function ($columnValue, $columnName) use ($service, $excludedKeys) {
+            if (is_null($columnValue)) {
                 return true;
             }
 
             $DELIMETER = '_';
-            $fieldName = Str::after($fieldName, $DELIMETER);
+            $columnName = in_array($columnName, $excludedKeys) ? $columnName : Str::after($columnName, $DELIMETER);
 
-            $this->emailConfig[$fieldName] = $fieldValue;
-
-            $service->emailServiceFields()->updateOrCreate(['field_name' => $fieldName], [
-                'field_name' => $fieldName,
-                'field_value' => $fieldValue,
-            ]);
+            $this->emailConfig[$columnName] = $columnValue;
         });
+
+        ModelsEmailService::query()->updateOrCreate(['name' => $service->name], [...$this->emailConfig]);
 
         // update all services to false (not used)
         ModelsEmailService::query()->update(['is_active' => false]);
@@ -44,10 +55,6 @@ trait EmailService
      */
     private function putEmailConfigInCache(array $filteredRequest): void
     {
-        // figure out extra email configs here and put them in cache to be used later
-        $this->emailConfig['address'] = $filteredRequest['email_sent_from_email'];
-        $this->emailConfig['name'] = $filteredRequest['email_sent_from_name'];
-
         // store in cache
         cache()->store(config('cache.default'))->put(
             'project_email_configurations',
