@@ -33,4 +33,9 @@ class RFPDraft extends Model
   {
     return $this->belongsTo(Program::class);
   }
+
+  public function files()
+  {
+    return $this->hasMany(RFPFile::class, 'rfp_id', 'id');
+  }
 }

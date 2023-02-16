@@ -226,6 +226,11 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
               .DataTable()
               .ajax.reload();
           }
+          if(data.data.event == 'page_reload'){
+            setTimeout(function() { // wait for 1 second
+              location.reload(); // then reload the page
+            }, 1000);
+          }
           //console.log(current.closest('.modal').modal("hide"));
           current.removeClass('disabled');
           if(data.data.close == 'globalModal'){

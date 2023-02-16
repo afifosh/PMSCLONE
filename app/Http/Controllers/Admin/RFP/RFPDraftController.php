@@ -41,7 +41,7 @@ class RFPDraftController extends Controller
     if($request->tab == 'program-users'){
       return $this->programUsers($request, $draft_rfp);
     }elseif($request->tab == 'files'){
-      return $this->rfpFiles();
+      return $this->rfpFiles($request, $draft_rfp);
     }
 
     return view('admin.pages.rfp.show', compact('draft_rfp'));
@@ -81,8 +81,9 @@ class RFPDraftController extends Controller
     // return view('admin.pages.rfp.show-users');
   }
 
-  protected function rfpFiles()
+  protected function rfpFiles(Request $request, $draft_rfp)
   {
-    return view('admin.pages.rfp.file-manager');
+    $data['draft_rfp'] = $draft_rfp->load('files');
+    return view('admin.pages.rfp.file-manager', compact('draft_rfp'));
   }
 }
