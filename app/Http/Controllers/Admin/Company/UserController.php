@@ -42,9 +42,10 @@ class UserController extends Controller
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => CompanyDepartment::DT_ID, 'close' => 'globalModal']);
   }
 
-  public function show(CompanyDepartment $department)
+  public function show(User $company_user)
   {
-    //
+    $user = $company_user;
+    return view('admin.pages.roles.admins.show', compact('user'));
   }
 
   public function edit(CompanyDepartment $department)

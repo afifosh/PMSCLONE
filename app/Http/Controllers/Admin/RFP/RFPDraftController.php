@@ -40,11 +40,18 @@ class RFPDraftController extends Controller
 
     if($request->tab == 'program-users'){
       return $this->programUsers($request, $draft_rfp);
-    }elseif($request->tab == 'files'){
-      return $this->rfpFiles($request, $draft_rfp);
     }
 
     return view('admin.pages.rfp.show', compact('draft_rfp'));
+  }
+
+  public function draft_users_tab($draft_rfp, Request $request)
+  {
+    $draft_rfp = RFPDraft::where('id', $draft_rfp)->mine()->with('program')->firstOrFail();
+
+    request()->program = $draft_rfp->program;
+    $dataTable = new ProgramUsersDataTable();
+    return $dataTable->render('admin.pages.rfp.show-users', compact('draft_rfp'));
   }
 
   public function edit(RFPDraft $draft_rfp)
@@ -70,20 +77,5 @@ class RFPDraftController extends Controller
     if ($draft_rfp->delete()) {
       return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => RFPDraft::DT_ID]);
     }
-  }
-
-  // Extra functions
-  protected function programUsers(Request $request, $draft_rfp)
-  {
-    request()->program = Program::mine()->findOrFail(request('program'));
-    $dataTable = new ProgramUsersDataTable();
-    return $dataTable->render('admin.pages.rfp.show-users', compact('draft_rfp'));
-    // return view('admin.pages.rfp.show-users');
-  }
-
-  protected function rfpFiles(Request $request, $draft_rfp)
-  {
-    $data['draft_rfp'] = $draft_rfp->load('files');
-    return view('admin.pages.rfp.file-manager', compact('draft_rfp'));
   }
 }

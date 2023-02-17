@@ -18,13 +18,13 @@
           <div class="mb-0">
             <i data-feather="folder" class="me-25"></i>
             <span class="align-middle">Folder</span>
-          </div>px
+          </div>
         </div>
         <div class="dropdown-item">
           <div class="mb-0" for="file-upload">
             <i data-feather="upload-cloud" class="me-25"></i>
-            <span class="align-middle">File Upload</span>
-            <input type="file" id="file-upload" hidden />
+            <span class="align-middle upload-file-modal">File Upload</span>
+            {{-- <input type="file" id="file-upload" hidden /> --}}
           </div>
         </div>
         <div class="dropdown-item">
@@ -43,38 +43,38 @@
       <!-- links for file manager sidebar -->
       <div class="list-group">
         <div class="my-drive"></div>
-        <a href="#" class="list-group-item list-group-item-action active">
-          <i data-feather="star" class="me-50 font-medium-3"></i>
-          <span class="align-middle">Important</span>
-        </a>
-        <a href="#" class="list-group-item list-group-item-action">
+        <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp])}}" class="list-group-item list-group-item-action {{request('filter') == '' ? 'active' : ''}}">
           <i data-feather="clock" class="me-50 font-medium-3"></i>
           <span class="align-middle">Recents</span>
         </a>
-        <a href="#" class="list-group-item list-group-item-action">
+        <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp, 'filter' => 'important'])}}" class="list-group-item list-group-item-action {{request('filter') == 'important' ? 'active' : ''}}">
+          <i data-feather="star" class="me-50 font-medium-3"></i>
+          <span class="align-middle">Important</span>
+        </a>
+        <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp, 'filter' => 'trash'])}}" class="list-group-item list-group-item-action {{request('filter') == 'trash' ? 'active' : ''}}">
           <i data-feather="trash" class="me-50 font-medium-3"></i>
           <span class="align-middle">Deleted Files</span>
         </a>
       </div>
       <div class="list-group list-group-labels">
         <h6 class="section-label px-4 mb-1">Labels</h6>
-        <a href="#" class="list-group-item list-group-item-action">
+        <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp, 'filter' => 'documents'])}}" class="list-group-item list-group-item-action {{request('filter') == 'documents' ? 'active' : ''}}">
           <i data-feather="file-text" class="me-50 font-medium-3"></i>
           <span class="align-middle">Documents</span>
         </a>
-        <a href="#" class="list-group-item list-group-item-action">
+        <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp, 'filter' => 'images'])}}" class="list-group-item list-group-item-action {{request('filter') == 'images' ? 'active' : ''}}">
           <i data-feather="image" class="me-50 font-medium-3"></i>
           <span class="align-middle">Images</span>
         </a>
-        <a href="#" class="list-group-item list-group-item-action">
+        <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp, 'filter' => 'videos'])}}" class="list-group-item list-group-item-action {{request('filter') == 'videos' ? 'active' : ''}}">
           <i data-feather="video" class="me-50 font-medium-3"></i>
           <span class="align-middle">Videos</span>
         </a>
-        <a href="#" class="list-group-item list-group-item-action">
+        <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp, 'filter' => 'audios'])}}" class="list-group-item list-group-item-action {{request('filter') == 'audios' ? 'active' : ''}}">
           <i data-feather="music" class="me-50 font-medium-3"></i>
           <span class="align-middle">Audio</span>
         </a>
-        <a href="#" class="list-group-item list-group-item-action">
+        <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp, 'filter' => 'archives'])}}" class="list-group-item list-group-item-action {{request('filter') == 'archives' ? 'active' : ''}}">
           <i data-feather="layers" class="me-50 font-medium-3"></i>
           <span class="align-middle">Archives</span>
         </a>

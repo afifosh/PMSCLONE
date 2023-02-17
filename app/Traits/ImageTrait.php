@@ -50,7 +50,7 @@ trait ImageTrait
             if (! empty($file)) {
                 $extension = $file->getClientOriginalExtension(); // getting image extension
                 if (! in_array(strtolower($extension), ['jpg', 'gif', 'png', 'jpeg'])) {
-                    throw  new OperationFailedException('invalid image', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+                    // throw  new OperationFailedException('invalid image', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
                 }
                 $originalName = $file->getClientOriginalName();
                 $date = \Illuminate\Support\Carbon::now()->format('Y-m-d');
@@ -107,7 +107,7 @@ trait ImageTrait
                 $path = $input['path'].DIRECTORY_SEPARATOR.'thumbnails';
                 $extension = $file->getClientOriginalExtension(); // getting image extension
                 if (! in_array(strtolower($extension), ['jpg', 'gif', 'png', 'jpeg'])) {
-                    throw  new OperationFailedException('invalid image', Response::HTTP_BAD_REQUEST);
+                    // throw  new OperationFailedException('invalid image', Response::HTTP_BAD_REQUEST);
                 }
                 if (empty($fileName)) {
                     $originalName = $file->getClientOriginalName();
@@ -160,7 +160,7 @@ trait ImageTrait
             if (! empty($file)) {
                 $extension = $file->getClientOriginalExtension(); // getting image extension
                 if (! in_array(strtolower($extension), ['mp4', 'mov', 'ogg', 'qt', 'mp4', 'webm', '3gp', 'mov', 'flv', 'avi', 'wmv', 'ts', 'qt', 'pdf'])) {
-                    throw  new OperationFailedException('invalid Video', Response::HTTP_BAD_REQUEST);
+                    // throw  new OperationFailedException('invalid Video', Response::HTTP_BAD_REQUEST);
                 }
                 $originalName = $file->getClientOriginalName();
                 $date = Carbon::now()->format('Y-m-d');
@@ -192,7 +192,7 @@ trait ImageTrait
             if (! empty($file)) {
                 $extension = $file->getClientOriginalExtension(); // getting file extension
                 if (! in_array(strtolower($extension), ['mp3', 'ogg', 'wav', 'aac', 'alac'])) {
-                    throw  new OperationFailedException('invalid Video', Response::HTTP_BAD_REQUEST);
+                    // throw  new OperationFailedException('invalid Video', Response::HTTP_BAD_REQUEST);
                 }
                 $originalName = $file->getClientOriginalName();
                 $date = Carbon::now()->format('Y-m-d');
@@ -244,7 +244,7 @@ trait ImageTrait
             if (! empty($file)) {
                 $extension = $file->getClientOriginalExtension(); // getting file extension
                 if (! in_array(strtolower($extension), ['xls', 'pdf', 'doc', 'docx', 'xlsx', 'txt', 'csv', 'ppt', 'pptx'])) {
-                    throw  new OperationFailedException('invalid Attachment', Response::HTTP_BAD_REQUEST);
+                    // throw  new OperationFailedException('invalid Attachment', Response::HTTP_BAD_REQUEST);
                 }
                 $originalName = $file->getClientOriginalName();
                 $date = Carbon::now()->format('Y-m-d');

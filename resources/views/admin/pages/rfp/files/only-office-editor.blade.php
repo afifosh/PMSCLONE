@@ -7,6 +7,22 @@ $configData = Helper::appClasses();
 @section('title', 'File Editor')
 
 @section('content')
+<h4>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{url('/')}}">Home</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{{ route('admin.draft-rfps.index')}}">Draft RFPs</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{{ route('admin.draft-rfps.files.index', ['draft_rfp' => $file->rfp_id])}}">Files</a>
+      </li>
+      <li class="breadcrumb-item active">{{$file->title}}</li>
+    </ol>
+  </nav>
+</h4>
     @php
         $filetype = 'docx';
         $docKey = getDocEditorKey($file->file);

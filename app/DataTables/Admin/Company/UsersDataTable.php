@@ -28,7 +28,7 @@ class UsersDataTable extends DataTable
                   </div>
                   <div class="d-flex flex-column">
                     <span class="text-body text-truncate">
-                      <span class="fw-semibold">'.htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8').'</span>
+                      <span class="fw-semibold"><a href="'.route('admin.company-users.show', $row->id).'">'.htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8').'</a></span>
                     </span>
                     <small class="text-muted">'.htmlspecialchars($row->email, ENT_QUOTES, 'UTF-8').'</small>
                   </div>

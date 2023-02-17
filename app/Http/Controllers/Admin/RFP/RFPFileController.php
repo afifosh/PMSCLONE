@@ -9,16 +9,22 @@ use App\Models\RFPFile;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Support\Facades\Storage;
 use Firebase\JWT\JWT;
+use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
+use Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException;
+use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 
 class RFPFileController extends Controller
 {
-  public function index()
+  public function index(Request $request, $draft_rfp)
   {
-    // $data = new \stdClass();
-    // $data->users = User::where('id', '!=', auth()->id())->get();
-    // $data->files = FileShare::where('user_id', auth()->id())->with('file')->get();
+    $draft_rfp = RFPDraft::where('id', $draft_rfp)->mine()->with('program')->firstOrFail();
 
-    // return view('admin.files', compact('data'));
+    $query = RFPFile::query();
+    $query->when($request->filter, function ($q) use ($request) {
+      return $q->filter($request->filter);
+    });
+    $files = $query->where('rfp_id', $draft_rfp->id)->latest()->get();
+    return view('admin.pages.rfp.file-manager', compact('draft_rfp', 'files'));
   }
 
   /**
@@ -31,25 +37,49 @@ class RFPFileController extends Controller
     //
   }
 
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  \App\Http\Requests\StoreFileRequest  $request
-   * @return \Illuminate\Http\Response
-   */
-  public function store(Request $request, FileUploadRepository $file_repo)
+  public function store($draft_rfp, Request $request, FileUploadRepository $file_repo)
   {
+
     $request->validate([
-      'file' => 'required|mimes:doc,docx,pdf,png,jpg,jpeg,txt,xls,xlsx,csv,ppt,pptx',
-      'Draft_RFP' => 'required|exists:rfp_drafts,id'
+      'file' => 'required|mimetypes:text/plain,application/*,image/*,video/*,audio/*'
     ]);
-    // $path = $request->file('file')->store('/');
-    $draft_rfp = RFPDraft::where('id', $request->Draft_RFP)->mine()->firstOrFail();
-    $path = $file_repo->addAttachment($request->file('file'), '');
+
+    $draft_rfp = RFPDraft::where('id', $draft_rfp)->mine()->firstOrFail();
+
+    $receiver = new FileReceiver("file", $request, HandlerFactory::classFromRequest($request));
+    // check if the upload is success, throw exception or return response you need
+    if ($receiver->isUploaded() === false) {
+      throw new UploadMissingFileException();
+    }
+    // receive the file
+    $save = $receiver->receive();
+
+    // check if the upload has finished (in chunk mode it will send smaller files)
+    if ($save->isFinished()) {
+      // save the file and return any response you need, current example uses `move` function. If you are
+      // not using move, you need to manually delete the file by unlink($save->getFile()->getPathname())
+      return $this->saveFile($request, $save->getFile(), $draft_rfp, $file_repo);
+    }
+
+    // we are in chunk mode, lets send the current progress
+    /** @var AbstractHandler $handler */
+    $handler = $save->handler();
+
+    return response()->json([
+      "done" => $handler->getPercentageDone(),
+      'status' => true
+    ]);
+  }
+  public function saveFile(Request $request, $file, RFPDraft $draft_rfp, FileUploadRepository $file_repo)
+  {
+    $mimes = new \Mimey\MimeTypes;
+    $path = $draft_rfp->id . DIRECTORY_SEPARATOR . $file_repo->addAttachment($file, $draft_rfp->id);
     $draft_rfp->files()->create([
       'uploaded_by' => auth()->id(),
       'file' => $path,
-      'title' => $request->file('file')->getClientOriginalName()
+      'title' => $file->getClientOriginalName(),
+      'mime_type' => $mimes->getMimeType($file->getClientOriginalExtension()),
+      'extension' => $file->getClientOriginalExtension(),
     ]);
     // set v1
     $histDir = getHistoryDir(getStoragePath($path));  // get the history directory
@@ -59,10 +89,9 @@ class RFPFileController extends Controller
       "id" => auth()->id(),
       "name" => auth()->user()->full_name,
     ];
-
     // write the encoded file information to the createdInfo.json file
     file_put_contents($histDir . DIRECTORY_SEPARATOR . "createdInfo.json", json_encode($json, JSON_PRETTY_PRINT));
-
+    unlink($file->getPathname());
     return $this->sendRes('Uploaded Successfully', ['event' => 'page_reload', 'close' => 'modal']);
   }
 
@@ -114,10 +143,10 @@ class RFPFileController extends Controller
     // }';
 
 
-$data['ext'] = pathinfo(Storage::path($file->file), PATHINFO_EXTENSION);
+    $data['ext'] = pathinfo(Storage::path($file->file), PATHINFO_EXTENSION);
     $data['payload'] = '{
           "document": {
-              "fileType": "'.$data['ext'].'",
+              "fileType": "' . $data['ext'] . '",
               "title": "' . $file->title . '",
               "url": "' . $data['file_url'] . '",
               "key": "' . getDocEditorKey($file->file) . '",
@@ -157,7 +186,7 @@ $data['ext'] = pathinfo(Storage::path($file->file), PATHINFO_EXTENSION);
               }
           }
       }';
-      // "documentType": "word",
+    // "documentType": "word",
     // env('APP_URL').'/only-office.php?file='.$file->file
     $payload = json_decode($data['payload'], true);
     // dd($payload);

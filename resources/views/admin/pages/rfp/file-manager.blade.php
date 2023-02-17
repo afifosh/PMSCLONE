@@ -1,21 +1,24 @@
 @extends('admin/layouts/layoutMaster')
-
-{{-- page title --}}
 @section('title','File Manager')
-
+{{-- page styles --}}
 @section('vendor-style')
   <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/vendors/fonts/font-awesome/css/font-awesome.min.css')}}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/jstree.min.css')}}">     
-  
+  <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/jstree.min.css')}}">
+
   <link rel="stylesheet" href="{{asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}">
-  
-  <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/components.css')}}">   
+
+  <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/components.css')}}">
     <!-- END: Vendor CSS-->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/file-icon-vectors@1.0.0/dist/file-icon-vectors.min.css" />
+  <link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
+
 @endsection
 {{-- page styles --}}
 @section('page-style')
-  <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/extensions/ext-component-tree.css')}}">        
-  <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/pages/app-file-manager.css')}}">    
+  <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/extensions/ext-component-tree.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/pages/app-file-manager.css')}}">
+  <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/page-profile.css')}}" />
 @endsection
 
 
@@ -30,17 +33,18 @@
 <script src="https://unpkg.com/feather-icons"></script>
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
  <script src="{{asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')}}"></script>
+ <script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
 <script>
-    
+
         //  Notifications & messages scrollable
     $('.scrollable-container').each(function () {
       var scrollable_container = new PerfectScrollbar($(this)[0], {
         wheelPropagation: false
       });
     });
-    
+
 </script>
-  
+
 
 @endsection
 
@@ -48,8 +52,87 @@
 <script>
   feather.replace()
 </script>
+<script>
+
+    // previewTemplate: Updated Dropzone default previewTemplate
+  // ! Don't change it unless you really know what you are doing
+  const previewTemplate = `<div class="dz-preview dz-file-preview">
+        <div class="dz-details">
+          <div class="dz-thumbnail">
+            <img data-dz-thumbnail>
+            <span class="dz-nopreview">No preview</span>
+            <div class="dz-success-mark"></div>
+            <div class="dz-error-mark"></div>
+            <div class="dz-error-message"><span data-dz-errormessage></span></div>
+            <div class="progress">
+              <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+            </div>
+          </div>
+          <div class="dz-filename" data-dz-name></div>
+          <div class="dz-size" data-dz-size></div>
+        </div>
+        </div>`;
+      //  Notifications & messages scrollable
+    $('.scrollable-container').each(function () {
+    var scrollable_container = new PerfectScrollbar($(this)[0], {
+        wheelPropagation: false
+      });
+    });
+    $('.upload-file-modal').on('click', function () {
+      $('#add-file-modal').modal('show');
+    });
+    $('#add-file-modal').on('shown.bs.modal', function (e) {
+      const dropzoneMulti = new Dropzone('#dropzone-multi', {
+        previewTemplate: previewTemplate,
+        parallelUploads: 1,
+        addRemoveLinks: true,
+        chunking: true,
+        method: "POST",
+        maxFilesize: 50,
+        chunkSize: 190000,
+        autoProcessQueue : true,
+        // If true, the individual chunks of a file are being uploaded simultaneously.
+        // parallelChunkUploads: true,
+        url: "{{ route('admin.draft-rfps.files.store', ['draft_rfp' => $draft_rfp]) }}",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(file, response) {
+            console.log(response);
+        },
+        init: function(){
+            /* Called once the file has been processed. It could have failed or succeded */
+            this.on("complete", function(file){
+
+            });
+            /* Called after the file is uploaded and sucessful */
+            this.on("sucess", function(file){
+
+            });
+            /* Called before the file is being sent */
+            this.on("sending", function(file){
+            });
+        }
+      });
+    });
+</script>
 @endsection
 @section('content')
+<h4>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{url('/')}}">Home</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{{ route('admin.draft-rfps.index')}}">Draft RFPs</a>
+      </li>
+      <li class="breadcrumb-item active">Files</li>
+    </ol>
+  </nav>
+</h4>
+
+@include('admin.pages.rfp.header', ['tab' => 'files'])
 
 <!-- overlay container -->
 <div class="body-content-overlay"></div>
@@ -65,7 +148,7 @@
 @include('admin/pages/rfp//file-manager-sidebar')
                 </div>
             </div>
-       
+
             <div class="content-right">
                 <div class="content-wrapper container-xxl p-0">
                     <div class="content-header row">
@@ -306,7 +389,7 @@
                                 <!-- Folders Container Starts -->
                                 <div class="view-container">
                                     <h6 class="files-section-title mt-25 mb-75">Folders</h6>
-                                    
+
                                     <div class="files-header">
                                         <h6 class="fw-bold mb-0">Filename</h6>
                                         <div>
@@ -381,151 +464,43 @@
                                 <!-- Files Container Starts -->
                                 <div class="view-container">
                                     <h6 class="files-section-title mt-2 mb-75">Files</h6>
-                               @forelse ($draft_rfp->files as $file)
-                                <div class="card file-manager-item file">
-                                  <div class="form-check">
-                                      <input type="checkbox" class="form-check-input" id="customCheck7" />
-                                      <label class="form-check-label" for="customCheck7"></label>
-                                  </div>
-                                  <div class="card-img-top file-logo-wrapper">
-                                      <div class="dropdown float-end">
-                                          <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
+                                @for ($i=0; $i<5; $i++)
+                                  @forelse ($files as $file)
+                                    <div class="card file-manager-item file">
+                                      <div class="form-check">
+                                          <input type="checkbox" class="form-check-input" id="customCheck{{$file->id}}" />
+                                          <label class="form-check-label" for="customCheck{{$file->id}}"></label>
                                       </div>
-                                      <div class="d-flex align-items-center justify-content-center w-100">
-                                          <img src="../../../app-assets/images/icons/jpg.png" alt="file-icon" height="35" />
+                                      <div class="card-img-top file-logo-wrapper">
+                                          <div class="dropdown float-end">
+                                              <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
+                                          </div>
+                                          <div class="d-flex align-items-center justify-content-center w-100">
+                                              {{-- <img src="../../../app-assets/images/icons/{{getExtension($file->file)}}.png" alt="file-icon" height="35" /> --}}
+                                              <span class="fiv-sqo fiv-icon-{{$file->extension}} fiv-size-lg"></span>
+                                          </div>
                                       </div>
-                                  </div>
-                                  <div class="card-body">
-                                      <div class="content-wrapper">
-                                          <p class="card-text file-name mb-0"><a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a></p>
-                                          <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
-                                          {{-- <p class="card-text file-date">23 may 2019</p> --}}
+                                      <div class="card-body">
+                                          <div class="content-wrapper">
+                                              <p class="card-text file-name mb-0">
+                                                @if (strpos($file->mime_type, 'application/') === 0 )
+                                                  <a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a>
+                                                @else
+                                                    {{$file->title}}
+                                                @endif</p>
+                                              <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
+                                              {{-- <p class="card-text file-date">23 may 2019</p> --}}
+                                          </div>
+                                          <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
                                       </div>
-                                      <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
-                                  </div>
-                                </div>
-                              @empty
-                                <div class="flex-grow-1 align-items-center no-result mb-3">
-                                  <i data-feather="alert-circle" class="me-50"></i>
-                                  No Results
-                                </div>
-                              @endforelse
-                              @forelse ($draft_rfp->files as $file)
-                                <div class="card file-manager-item file">
-                                  <div class="form-check">
-                                      <input type="checkbox" class="form-check-input" id="customCheck7" />
-                                      <label class="form-check-label" for="customCheck7"></label>
-                                  </div>
-                                  <div class="card-img-top file-logo-wrapper">
-                                      <div class="dropdown float-end">
-                                          <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
-                                      </div>
-                                      <div class="d-flex align-items-center justify-content-center w-100">
-                                          <img src="../../../app-assets/images/icons/jpg.png" alt="file-icon" height="35" />
-                                      </div>
-                                  </div>
-                                  <div class="card-body">
-                                      <div class="content-wrapper">
-                                          <p class="card-text file-name mb-0"><a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a></p>
-                                          <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
-                                          {{-- <p class="card-text file-date">23 may 2019</p> --}}
-                                      </div>
-                                      <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
-                                  </div>
-                                </div>
-                              @empty
-                                <div class="flex-grow-1 align-items-center no-result mb-3">
-                                  <i data-feather="alert-circle" class="me-50"></i>
-                                  No Results
-                                </div>
-                              @endforelse              
-                              @forelse ($draft_rfp->files as $file)
-                                <div class="card file-manager-item file">
-                                  <div class="form-check">
-                                      <input type="checkbox" class="form-check-input" id="customCheck7" />
-                                      <label class="form-check-label" for="customCheck7"></label>
-                                  </div>
-                                  <div class="card-img-top file-logo-wrapper">
-                                      <div class="dropdown float-end">
-                                          <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
-                                      </div>
-                                      <div class="d-flex align-items-center justify-content-center w-100">
-                                          <img src="../../../app-assets/images/icons/jpg.png" alt="file-icon" height="35" />
-                                      </div>
-                                  </div>
-                                  <div class="card-body">
-                                      <div class="content-wrapper">
-                                          <p class="card-text file-name mb-0"><a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a></p>
-                                          <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
-                                          {{-- <p class="card-text file-date">23 may 2019</p> --}}
-                                      </div>
-                                      <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
-                                  </div>
-                                </div>
-                              @empty
-                                <div class="flex-grow-1 align-items-center no-result mb-3">
-                                  <i data-feather="alert-circle" class="me-50"></i>
-                                  No Results
-                                </div>
-                              @endforelse
-                              @forelse ($draft_rfp->files as $file)
-                                <div class="card file-manager-item file">
-                                  <div class="form-check">
-                                      <input type="checkbox" class="form-check-input" id="customCheck7" />
-                                      <label class="form-check-label" for="customCheck7"></label>
-                                  </div>
-                                  <div class="card-img-top file-logo-wrapper">
-                                      <div class="dropdown float-end">
-                                          <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
-                                      </div>
-                                      <div class="d-flex align-items-center justify-content-center w-100">
-                                          <img src="../../../app-assets/images/icons/jpg.png" alt="file-icon" height="35" />
-                                      </div>
-                                  </div>
-                                  <div class="card-body">
-                                      <div class="content-wrapper">
-                                          <p class="card-text file-name mb-0"><a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a></p>
-                                          <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
-                                          {{-- <p class="card-text file-date">23 may 2019</p> --}}
-                                      </div>
-                                      <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
-                                  </div>
-                                </div>
-                              @empty
-                                <div class="flex-grow-1 align-items-center no-result mb-3">
-                                  <i data-feather="alert-circle" class="me-50"></i>
-                                  No Results
-                                </div>
-                              @endforelse                              
-                              @forelse ($draft_rfp->files as $file)
-                                <div class="card file-manager-item file">
-                                  <div class="form-check">
-                                      <input type="checkbox" class="form-check-input" id="customCheck7" />
-                                      <label class="form-check-label" for="customCheck7"></label>
-                                  </div>
-                                  <div class="card-img-top file-logo-wrapper">
-                                      <div class="dropdown float-end">
-                                          <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
-                                      </div>
-                                      <div class="d-flex align-items-center justify-content-center w-100">
-                                          <img src="../../../app-assets/images/icons/jpg.png" alt="file-icon" height="35" />
-                                      </div>
-                                  </div>
-                                  <div class="card-body">
-                                      <div class="content-wrapper">
-                                          <p class="card-text file-name mb-0"><a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a></p>
-                                          <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
-                                          {{-- <p class="card-text file-date">23 may 2019</p> --}}
-                                      </div>
-                                      <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
-                                  </div>
-                                </div>
-                              @empty
-                                <div class="flex-grow-1 align-items-center no-result mb-3">
-                                  <i data-feather="alert-circle" class="me-50"></i>
-                                  No Results
-                                </div>
-                              @endforelse
+                                    </div>
+                                  @empty
+                                    <div class="flex-grow-1 align-items-center no-result mb-3">
+                                      <i data-feather="alert-circle" class="me-50"></i>
+                                      No Results
+                                    </div>
+                                  @endforelse
+                                @endfor
                                 </div>
                                 <!-- /Files Container Ends -->
                             <div class="ps__rail-x" style="left: 0px; bottom: -8px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 8px; height: 754px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 6px; height: 634px;"></div></div></div>
@@ -753,26 +728,35 @@
 
 {{-- modals --}}
   <div class="modal fade" id="add-file-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
-              <form action="{{ route('admin.files.store') }}" method="POST" enctype="multipart/form-data">
+              <form action="{{ route('admin.draft-rfps.files.store', ['draft_rfp' => $draft_rfp]) }}" method="POST" enctype="multipart/form-data">
                   @csrf
                     <div class="modal-header">
                       <h5 class="modal-title" id="globalModalTitle">Upload File</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                       <div class="modal-body">
-                          <div class="form-group">
+                        <div class="dropzone needsclick" id="dropzone-multi">
+                          <div class="dz-message needsclick">
+                            Drop files here or click to upload
+                            {{-- <span class="note needsclick">(This is just a demo dropzone. Selected files are <strong>not</strong> actually uploaded.)</span> --}}
+                          </div>
+                          <div class="fallback">
+                            <input name="file" type="file" />
+                          </div>
+                        </div>
+                          {{-- <div class="form-group">
                               <label for="formFile" class="form-label">Select File</label>
                               <input class="form-control" type="file" name="file" id="formFile"
                                   required>
-                          </div>
+                          </div> --}}
                           <input type="hidden" name="Draft_RFP" value="{{$draft_rfp->id}}">
                       </div>
-                      <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      {{-- <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                           <button type="submit" data-form="ajax-form" class="btn btn-primary">Upload</button>
-                      </div>
+                      </div> --}}
               </form>
           </div>
       </div>
