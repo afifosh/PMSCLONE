@@ -29,9 +29,8 @@
     toast_success("{{ucwords(str_replace('-', ' ', session('status')))}}");
     @endif
 
-    let guard = "{{ config('fortify.guard') }}"
     @auth
-      @if(config('fortify.guard') === 'web' && Route::currentRouteName() !== 'auth.lock')
+      @if(Auth::getDefaultDriver() === 'web' && Route::currentRouteName() !== 'auth.lock')
         $.sessionTimeout({
           keepAliveUrl: '/keep-alive',
           logoutUrl: '/logout',

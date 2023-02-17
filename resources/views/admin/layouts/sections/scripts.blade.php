@@ -38,7 +38,7 @@
     @endif
 
     @auth
-      @if(config('fortify.guard') === 'admin' && Route::currentRouteName() !== 'admin.auth.lock')
+      @if(Auth::getDefaultDriver() === 'admin' && Route::currentRouteName() !== 'admin.auth.lock')
         $.sessionTimeout({
           keepAliveUrl: '/admin/keep-alive',
           logoutUrl: '/admin/logout',
