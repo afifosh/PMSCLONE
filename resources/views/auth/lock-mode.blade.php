@@ -1,9 +1,10 @@
 @php
 $customizerHidden = 'customizer-hide';
 $pageConfigs = ['myLayout' => 'blank'];
+$configData = Helper::appClasses();
 @endphp
 
-@extends('admin.layouts/layoutMaster')
+@extends('layouts/layoutMaster')
 
 @section('title', 'Account Locked')
 
@@ -34,7 +35,9 @@ $pageConfigs = ['myLayout' => 'blank'];
         <!-- /Left Text -->
         <div class="d-none d-lg-flex col-lg-7 p-0">
             <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center">
+                <img src="{{ asset('assets/img/illustrations/auth-login-illustration-'.$configData['style'].'.png') }}" alt="auth-login-cover" class="img-fluid my-5 auth-illustration" data-app-light-img="illustrations/auth-login-illustration-light.png" data-app-dark-img="illustrations/auth-login-illustration-dark.png">
 
+                <img src="{{ asset('assets/img/illustrations/bg-shape-image-'.$configData['style'].'.png') }}" alt="auth-login-cover" class="platform-bg" data-app-light-img="illustrations/bg-shape-image-light.png" data-app-dark-img="illustrations/bg-shape-image-dark.png">
             </div>
         </div>
         <!-- /Left Text -->
@@ -45,10 +48,10 @@ $pageConfigs = ['myLayout' => 'blank'];
                 <!-- Logo -->
                 <div class="app-brand mb-4 d-flex flex-column align-items-center justify-content-center">
                     <a href="{{url('/')}}" class="app-brand-link gap-2">
-                        <!-- <span class="app-brand-logo demo">@include('_partials.macros',["height"=>20,"withbg"=>'fill: #fff;'])</span> -->
+                        <span class="app-brand-logo demo">@include('_partials.macros',["height"=>120,"withbg"=>'fill: #fff;'])</span>
                     </a>
                     <div class="mt-3">
-                        <!-- <h5 class="mb-1 fs-6 fw-bold text-uppercase">{{ __('Account Locked') }}</h5> -->
+                        <h5 class="mb-1 fs-5 fw-bold text-uppercase">{{ __('Account Locked') }}</h5>
                     </div>
 
                     <div class="mt-4">
@@ -58,7 +61,7 @@ $pageConfigs = ['myLayout' => 'blank'];
                     </div>
 
                     <div class="mt-5">
-                        <h5 class="fw-bold">{{ Auth::user()->full_name }}</h5>
+                        <h5 class="fw-bold fs-6">{{ Auth::user()->full_name }}</h5>
                     </div>
                 </div>
 

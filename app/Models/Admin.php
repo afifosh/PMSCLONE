@@ -107,4 +107,13 @@ class Admin extends Authenticatable implements MustVerifyEmail
       return $this->belongsTo(CompanyDesignation::class, 'designation_id', 'id');
     }
 
+    /**
+     * Admin has many morph fields of password history
+     * 
+     * @return MorphMany
+     */
+    public function passwordHistories() 
+    {
+      return $this->morphMany(PasswordHistory::class, 'authable');
+    }
 }
