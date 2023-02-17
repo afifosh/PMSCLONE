@@ -44,6 +44,8 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::post('update-notification-count', [NotificationController::class, 'updateNotificationCount'])->name('update.notification.count');
+    Route::get('/pages/account-settings-notifications', [NotificationController::class, 'notificationTable'])->name('account.settings.notifications');
+
 
   });
 });
