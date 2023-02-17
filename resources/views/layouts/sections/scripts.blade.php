@@ -11,12 +11,8 @@
 <script src="{{ asset(mix('assets/vendor/libs/toastr/toastr.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
-@auth
-  @if(Route::currentRouteName() !== 'auth.lock' && Route::currentRouteName() !== 'admin.auth.lock')
-  <!-- Session Timeout -->
-  <script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
-  @endif
-@endauth
+<script src="{{ asset('js/bootstrap-session-timeout.js') }}"></script>
+
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
@@ -35,11 +31,11 @@
 
     let guard = "{{ config('fortify.guard') }}"
     @auth
-      @if(Route::currentRouteName() !== 'auth.lock' && Route::currentRouteName() !== 'admin.auth.lock')
+      @if(config('fortify.guard') === 'web' && Route::currentRouteName() !== 'auth.lock')
         $.sessionTimeout({
           keepAliveUrl: '/keep-alive',
-          logoutUrl: guard === 'web' ? '/logout' : '/admin/logout',
-          redirUrl: guard === 'web' ? '/auth/lock' : '/admin/auth/lock',
+          logoutUrl: '/logout',
+          redirUrl: '/auth/lock',
           warnAfter: +"{{ config('auth.timeout_warning_seconds') }}",
           redirAfter: +"{{ config('auth.timeout_after_seconds') }}",
           countdownBar: true,

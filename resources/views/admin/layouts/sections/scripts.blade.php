@@ -11,10 +11,8 @@
 <script src="{{ asset(mix('assets/vendor/libs/toastr/toastr.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
-@auth
-  <!-- Session Timeout -->
-  <script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
-@endauth
+<script src="{{ asset('js/bootstrap-session-timeout.js') }}"></script>
+
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
@@ -40,19 +38,20 @@
     @endif
 
     @auth
-      $.sessionTimeout({
-        keepAliveUrl: '/admin/keep-alive',
-        logoutUrl: '/admin/logout',
-        redirUrl: '/admin/auth/lock',
-        warnAfter: +"{{ config('auth.timeout_warning_seconds') }}",
-        redirAfter: +"{{ config('auth.timeout_after_seconds') }}",
-        countdownBar: true,
-        countdownMessage: 'Redirecting in {timer} seconds.',
-        useLocalStorageSynchronization: true,
-        ignoreUserActivity: true,
-        clearWarningOnUserActivity: false,
-      });
-    
+      @if(config('fortify.guard') === 'admin' && Route::currentRouteName() !== 'admin.auth.lock')
+        $.sessionTimeout({
+          keepAliveUrl: '/admin/keep-alive',
+          logoutUrl: '/admin/logout',
+          redirUrl: '/admin/auth/lock',
+          warnAfter: +"{{ config('auth.timeout_warning_seconds') }}",
+          redirAfter: +"{{ config('auth.timeout_after_seconds') }}",
+          countdownBar: true,
+          countdownMessage: 'Redirecting in {timer} seconds.',
+          useLocalStorageSynchronization: true,
+          ignoreUserActivity: true,
+          clearWarningOnUserActivity: false,
+        });
+      @endif
     var site_url = "{{ url('/') }}";
     var page = 1;
 
