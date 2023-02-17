@@ -77,7 +77,7 @@
                   </div> \
                   <div class="modal-footer"> \
                     <button id="session-timeout-dialog-logout" type="button" class="btn btn-default">' + opt.logoutButton + '</button> \
-                    <button id="session-timeout-dialog-keepalive" type="button" class="btn btn-primary" data-dismiss="modal">' + opt.keepAliveButton + '</button> \
+                    <button id="session-timeout-dialog-keepalive" type="button" class="btn btn-primary" data-bs-dismiss="modal">' + opt.keepAliveButton + '</button> \
                   </div> \
                 </div> \
               </div> \
