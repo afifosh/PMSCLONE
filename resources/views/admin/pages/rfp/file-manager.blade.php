@@ -89,7 +89,7 @@
         chunking: true,
         method: "POST",
         maxFilesize: 50,
-        chunkSize: 190000,
+        chunkSize: 1900000,
         autoProcessQueue : true,
         // If true, the individual chunks of a file are being uploaded simultaneously.
         // parallelChunkUploads: true,
