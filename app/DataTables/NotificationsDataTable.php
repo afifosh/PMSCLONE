@@ -30,14 +30,8 @@ class NotificationsDataTable extends DataTable
       ->addColumn('message', function ($row) {
         return 'You have probably logged in from a diferent device or location';
       })
-      ->addColumn('device', function ($row) {
-        return $row->data['auth_device'];
-      })
-      ->addColumn('city', function ($row) {
-        return $row->data['city'];
-      })
-      ->addColumn('country', function ($row) {
-        return $row->data['country'];
+      ->addColumn('data', function ($row) {
+        return view('pages.notifications.data', compact('row'));
       })
       ->addColumn('created_at', function ($row) {
         return $row->created_at->diffForHumans();
@@ -99,9 +93,7 @@ class NotificationsDataTable extends DataTable
     {
         return [
             Column::make('message'),
-            Column::make('device'),
-            Column::make('city'),
-            Column::make('country'),
+            Column::make('data'),
             Column::make('created_at')->title(__('Time')),
         ];
     }
