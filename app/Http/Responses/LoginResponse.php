@@ -20,6 +20,7 @@ class LoginResponse extends ResponsesLoginResponse implements LoginResponseContr
       $user = Auth::guard(config('fortify.guard'))->user();
       $ip = $request->ip();
       $currentUserInfo = Location::get($ip);
+      \Log::debug('currentUserInfo');
       \Log::debug($currentUserInfo);
       if ($user->checkIfLastLoginDetailsChanged()) {
         $user->notify(new AuthLogNotification($user->authentications, $user->lastLoginAgent(),  $user->lastLoginLocation()));
