@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTables\Admin\AdminsDataTable;
+use App\DataTables\NotificationsDataTable;
 use App\Models\Admin;
 use App\Models\Notification;
+use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -25,7 +28,8 @@ class NotificationController extends Controller
             $notifications = Notification::where('notifiable_type', $notifiable_type)
                 ->where('notifiable_id', $user->id)
                 ->orderBy('created_at', 'DESC')
-                ->paginate(3);
+                ->take(5)
+                ->get();
 
 
             return response()->json([
@@ -60,5 +64,10 @@ class NotificationController extends Controller
             \Log::debug($e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function notificationTable(NotificationsDataTable $dataTable)
+    {
+        return $dataTable->render('pages.notifications.notifications');
     }
 }

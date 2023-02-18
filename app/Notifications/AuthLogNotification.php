@@ -62,7 +62,7 @@ class AuthLogNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'auth_device' => $this->auth_device,
+            'device' => $this->auth_device,
             'city' => $this->location['city'],
             'country' => $this->location['country'],
         ];

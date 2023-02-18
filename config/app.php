@@ -166,6 +166,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Jenssegers\Agent\AgentServiceProvider::class,
+        Stevebauman\Location\LocationServiceProvider::class,
         /*
          * Package Service Providers...
          */

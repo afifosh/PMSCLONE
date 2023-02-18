@@ -34,6 +34,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
     Route::resource('admin-account', AdminAccountController::class)->only('edit');
 
+    Route::get('/pages/account-settings-notifications', [NotificationController::class, 'notificationTable'])->name('account.settings.notifications');
+
     Route::resource('roles', AdminRoleController::class);
 
     Route::resource('company-roles', CompanyRoleController::class);

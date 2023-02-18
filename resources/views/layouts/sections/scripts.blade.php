@@ -50,28 +50,28 @@
       @endif
 
       var site_url = "{{ url('/') }}";
-          var page = 1;
 
-          notifications(page);
+          notifications();
 
           $(document).ready(function() {
-            $('.view-more-li.load-more').click(function() {
-              page++;
-              notifications(page);
-            });
 
             $('.notification-bell').click(function() {
-              console.log('workig');
-
+              $.ajax({
+                  type: 'post'
+                  , url: "{{ route('update.notification.count') }}"
+                })
+                .done(function(response) {
+                  $('.notification-bell').hide();
+                })
 
             })
           });
 
 
-          function notifications(page) {
+          function notifications() {
             $.ajax({
                 type: 'get'
-                , url: site_url + '/notifications?' + 'page=' + page
+                , url: site_url + '/notifications'
               })
               .done(function(response) {
                 $('.dropdown-notifications-ul-list').append(response.data)
