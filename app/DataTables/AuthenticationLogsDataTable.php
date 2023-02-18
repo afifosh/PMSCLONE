@@ -2,6 +2,8 @@
 
 namespace App\DataTables;
 
+use App\Models\Admin;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
@@ -53,8 +55,6 @@ class AuthenticationLogsDataTable extends DataTable
      */
     public function query(AuthenticationLog $model): QueryBuilder
     {
-        return $model->newQuery();
-
         $user = auth()->user();
         $current_guard = Auth::getDefaultDriver();
         if ($current_guard == "web") {

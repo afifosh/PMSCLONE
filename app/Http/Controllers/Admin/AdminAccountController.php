@@ -59,7 +59,7 @@ class AdminAccountController extends Controller
    * @param  \App\Models\Admin  $admin
    * @return \Illuminate\Http\Response
    */
-  public function edit(Request $request, NotificationsDataTable $dataTable, AuthenticationLogsDataTable $authTable)
+  public function edit(Request $request, NotificationsDataTable $dataTable)
   {
     if ($request->t == 'security')
       return view('admin.pages.account.account-edit-security');
