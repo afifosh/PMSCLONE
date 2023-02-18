@@ -53,15 +53,10 @@
         });
       @endif
     var site_url = "{{ url('/') }}";
-    var page = 1;
 
-    notifications(page);
+    notifications();
 
     $(document).ready(function() {
-      $('.view-more-li.load-more').click(function() {
-        page++;
-        notifications(page);
-      });
 
       $('.notification-bell').click(function() {
         $.ajax({
@@ -69,7 +64,6 @@
             , url: "{{ route('admin.update.notification.count') }}"
           })
           .done(function(response) {
-            console.log('done');
             $('.notification-bell').hide();
           })
 
@@ -77,10 +71,10 @@
     });
 
 
-    function notifications(page) {
+    function notifications() {
       $.ajax({
           type: 'get'
-          , url: site_url + '/admin/notifications?' + 'page=' + page
+          , url: site_url + '/admin/notifications'
         })
         .done(function(response) {
           $('.dropdown-notifications-ul-list').append(response.data)

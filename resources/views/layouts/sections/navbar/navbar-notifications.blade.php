@@ -9,7 +9,7 @@
     <div class="flex-grow-1">
       <h6 class="mb-1">Alert!</h6>
       <p class="mb-0">You have logged in from a different device.
-        <br> <b>Device:</b> {{ $notification->data['auth_device'] }}
+        <br> <b>Device:</b> {{ $notification->data['device'] }}
         <br> <b>City:</b> {{ $notification->data['city'] }}
         <br> <b>Country:</b> {{ $notification->data['country'] }}
       </p>
