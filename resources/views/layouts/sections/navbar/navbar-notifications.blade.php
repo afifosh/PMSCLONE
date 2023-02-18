@@ -7,17 +7,13 @@
       </div>
     </div>
     <div class="flex-grow-1">
-      <h6 class="mb-1">Alert!</h6>
-      <p class="mb-0">You have logged in from a different device.
-        @isset($notification->data['device'])
-          <br> <b>Device:</b> {{ $notification->data['device'] }}
-        @endisset
-        @isset($notification->data['city'])
-          <br> <b>City:</b> {{ $notification->data['city'] }}
-        @endisset
-        @isset($notification->data['city'])
-          <br> <b>Country:</b> {{ $notification->data['country'] }}
-        @endisset
+      <h6 class="mb-1">{{ __('Suspecious actvity on your account') }}</h6>
+      <p class="mb-0">
+        {{ __('Recently we have detected unusual activity your account.') }}
+        <br>
+        <br> <b>@lang('IP address:')</b> {{ $notification->data['ipAddress'] }}
+        <br> <b>@lang('City:')</b> {{ $notification->data['location']['city'] }}
+        <br> <b>@lang('Country:')</b> {{ $notification->data['location']['country'] }}
       </p>
       {{-- <small class="text-muted">5 days ago</small> --}}
     </div>
