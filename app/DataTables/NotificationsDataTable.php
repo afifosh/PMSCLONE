@@ -26,17 +26,18 @@ class NotificationsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-      
-      ->addColumn('message', function ($row) {
-        return 'You have probably logged in from a diferent device or location';
-      })
-      ->addColumn('data', function ($row) {
-        return view('pages.notifications.data', compact('row'));
-      })
-      ->addColumn('created_at', function ($row) {
-        return $row->created_at->diffForHumans();
-      })
-      ->rawColumns(['message', 'device', 'city', 'country', 'created_at']);
+            ->addColumn('message', function ($row) {
+                if (isset($row->data['location'])) {
+                    return 'New authentication alert.';
+                }
+            })
+            ->addColumn('data', function ($row) {
+                return view('pages.notifications.data', compact('row'));
+            })
+            ->addColumn('created_at', function ($row) {
+                return $row->created_at->diffForHumans();
+            })
+            ->rawColumns(['message', 'data', 'created_at']);
     }
 
     /**
@@ -55,9 +56,9 @@ class NotificationsDataTable extends DataTable
             $notifiable_type = Admin::class;
         }
         return $model
-        ->where('notifiable_id', $user->id)
-        ->where('notifiable_type', $notifiable_type)
-        ->newQuery();
+            ->where('notifiable_id', $user->id)
+            ->where('notifiable_type', $notifiable_type)
+            ->newQuery();
     }
 
     /**
@@ -68,20 +69,20 @@ class NotificationsDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('notifications-table')
-                    ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    //->dom('Bfrtip')
-                    ->orderBy(1)
-                    ->selectStyleSingle()
-                    ->buttons([
-                        Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
-                    ]);
+            ->setTableId('notifications-table')
+            ->columns($this->getColumns())
+            ->minifiedAjax()
+            //->dom('Bfrtip')
+            ->orderBy(1)
+            ->selectStyleSingle()
+            ->buttons([
+                Button::make('excel'),
+                Button::make('csv'),
+                Button::make('pdf'),
+                Button::make('print'),
+                Button::make('reset'),
+                Button::make('reload')
+            ]);
     }
 
     /**

@@ -7,6 +7,7 @@ $configData = Helper::appClasses();
 @section('title', 'Account settings - Notifications')
 
 @section('vendor-style')
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 @endsection
@@ -16,6 +17,7 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('vendor-script')
+<script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
@@ -46,3 +48,8 @@ $configData = Helper::appClasses();
   </div>
 </div>
 @endsection
+
+@push('scripts')
+    {{$dataTable->scripts()}}
+    <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+@endpush
