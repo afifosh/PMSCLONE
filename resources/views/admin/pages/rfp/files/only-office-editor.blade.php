@@ -1,5 +1,5 @@
 @php
-$configData = Helper::appClasses();
+    $configData = Helper::appClasses();
 @endphp
 
 @extends('admin/layouts/layoutMaster')
@@ -7,22 +7,25 @@ $configData = Helper::appClasses();
 @section('title', 'File Editor')
 
 @section('content')
-<h4>
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item">
-        <a href="{{url('/')}}">Home</a>
-      </li>
-      <li class="breadcrumb-item">
-        <a href="{{ route('admin.draft-rfps.index')}}">Draft RFPs</a>
-      </li>
-      <li class="breadcrumb-item">
-        <a href="{{ route('admin.draft-rfps.files.index', ['draft_rfp' => $file->rfp_id])}}">Files</a>
-      </li>
-      <li class="breadcrumb-item active">{{$file->title}}</li>
-    </ol>
-  </nav>
-</h4>
+    <div class="row breadcrumbs-top">
+        <div class="col-12 d-flex">
+            <span class="content-header-title float-left border-end px-2 me-2 h4">File Editor</span>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb pt-1">
+                  <li class="breadcrumb-item">
+                      <a href="{{ url('/') }}">Home</a>
+                  </li>
+                  <li class="breadcrumb-item">
+                      <a href="{{ route('admin.draft-rfps.index') }}">Draft RFPs</a>
+                  </li>
+                  <li class="breadcrumb-item">
+                      <a href="{{ route('admin.draft-rfps.files.index', ['draft_rfp' => $file->rfp_id]) }}">Files</a>
+                  </li>
+                  <li class="breadcrumb-item active">{{ $file->title }}</li>
+              </ol>
+          </nav>
+        </div>
+    </div>
     @php
         $filetype = 'docx';
         $docKey = getDocEditorKey($file->file);
@@ -99,7 +102,7 @@ $configData = Helper::appClasses();
                 "token": "{{ $token }}",
                 "height": 900,
                 "document": {
-                    "fileType": "{{$ext}}",
+                    "fileType": "{{ $ext }}",
                     "title": "{{ $file->title }}",
                     "url": "{{ $file_url }}",
                     "key": "{{ getDocEditorKey($file->file) }}",
@@ -169,7 +172,7 @@ $configData = Helper::appClasses();
                 // the user is trying to click the specific document version in the document version history
                 config.events['onRequestHistoryData'] = function(event) {
                     var ver = event.data;
-                    console.log('request hist data',event.data);
+                    console.log('request hist data', event.data);
                     console.log('request hist data data', histData);
 
                     docEditor.setHistoryData(histData[ver -
@@ -180,17 +183,17 @@ $configData = Helper::appClasses();
                     console.log(event.data.version);
                     $.ajax({
                         type: "post",
-                        url: "{{route('admin.file.restore_version')}}",
+                        url: "{{ route('admin.file.restore_version') }}",
                         data: {
-                            version : version,
-                            file : '{{$file->file}}'
+                            version: version,
+                            file: '{{ $file->file }}'
                         },
-                        success: function (response) {
+                        success: function(response) {
                             // his = response[0];
                             // histData = response[1][version - 5];
                             // docEditor.setHistoryData(response[1][version - 5]);
                             docEditor.refreshHistory(response[0][0]);
-                            console.log('respo[0] ',response[0]);
+                            console.log('respo[0] ', response[0]);
                         }
                     });
 

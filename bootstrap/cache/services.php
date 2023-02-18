@@ -37,23 +37,25 @@
     33 => 'Carbon\\Laravel\\ServiceProvider',
     34 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     35 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    36 => 'Pion\\Laravel\\ChunkUpload\\Providers\\ChunkUploadServiceProvider',
-    37 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
-    38 => 'Spatie\\Permission\\PermissionServiceProvider',
-    39 => 'Yajra\\DataTables\\ButtonsServiceProvider',
-    40 => 'Yajra\\DataTables\\EditorServiceProvider',
-    41 => 'Yajra\\DataTables\\FractalServiceProvider',
-    42 => 'Yajra\\DataTables\\HtmlServiceProvider',
-    43 => 'Yajra\\DataTables\\DataTablesServiceProvider',
-    44 => 'App\\Providers\\AppServiceProvider',
-    45 => 'App\\Providers\\AuthServiceProvider',
-    46 => 'App\\Providers\\EventServiceProvider',
-    47 => 'App\\Providers\\RouteServiceProvider',
-    48 => 'App\\Providers\\MenuServiceProvider',
-    49 => 'App\\Providers\\FortifyServiceProvider',
-    50 => 'Spatie\\Permission\\PermissionServiceProvider',
-    51 => 'Yajra\\DataTables\\DataTablesServiceProvider',
-    52 => 'Laravolt\\Avatar\\ServiceProvider',
+    36 => 'OwenIt\\Auditing\\AuditingServiceProvider',
+    37 => 'Pion\\Laravel\\ChunkUpload\\Providers\\ChunkUploadServiceProvider',
+    38 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
+    39 => 'Spatie\\Permission\\PermissionServiceProvider',
+    40 => 'Yajra\\DataTables\\ButtonsServiceProvider',
+    41 => 'Yajra\\DataTables\\EditorServiceProvider',
+    42 => 'Yajra\\DataTables\\FractalServiceProvider',
+    43 => 'Yajra\\DataTables\\HtmlServiceProvider',
+    44 => 'Yajra\\DataTables\\DataTablesServiceProvider',
+    45 => 'App\\Providers\\AppServiceProvider',
+    46 => 'App\\Providers\\AuthServiceProvider',
+    47 => 'App\\Providers\\EventServiceProvider',
+    48 => 'OwenIt\\Auditing\\AuditingServiceProvider',
+    49 => 'App\\Providers\\RouteServiceProvider',
+    50 => 'App\\Providers\\MenuServiceProvider',
+    51 => 'App\\Providers\\FortifyServiceProvider',
+    52 => 'Spatie\\Permission\\PermissionServiceProvider',
+    53 => 'Yajra\\DataTables\\DataTablesServiceProvider',
+    54 => 'Laravolt\\Avatar\\ServiceProvider',
   ),
   'eager' => 
   array (
@@ -235,6 +237,7 @@
     'form' => 'Collective\\Html\\HtmlServiceProvider',
     'Collective\\Html\\HtmlBuilder' => 'Collective\\Html\\HtmlServiceProvider',
     'Collective\\Html\\FormBuilder' => 'Collective\\Html\\HtmlServiceProvider',
+    'OwenIt\\Auditing\\Contracts\\Auditor' => 'OwenIt\\Auditing\\AuditingServiceProvider',
   ),
   'when' => 
   array (
@@ -281,6 +284,9 @@
     array (
     ),
     'Collective\\Html\\HtmlServiceProvider' => 
+    array (
+    ),
+    'OwenIt\\Auditing\\AuditingServiceProvider' => 
     array (
     ),
   ),

@@ -118,24 +118,17 @@
 </script>
 @endsection
 @section('content')
-<h4>
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item">
-        <a href="{{url('/')}}">Home</a>
-      </li>
-      <li class="breadcrumb-item">
-        <a href="{{ route('admin.draft-rfps.index')}}">Draft RFPs</a>
-      </li>
-      <li class="breadcrumb-item active">Files</li>
-    </ol>
-  </nav>
-</h4>
 
 @include('admin.pages.rfp.header', ['tab' => 'files'])
 
 <!-- overlay container -->
 <div class="body-content-overlay"></div>
+<style>
+  .feather-14{
+    width: 14px;
+    height: 14px;
+}
+</style>
 
 <!-- file manager app content starts -->
 <div class="app-content content file-manager-application">
@@ -472,26 +465,70 @@
                                           <label class="form-check-label" for="customCheck{{$file->id}}"></label>
                                       </div>
                                       <div class="card-img-top file-logo-wrapper">
-                                          <div class="dropdown float-end">
+                                          {{-- <div class="dropdown float-end">
                                               <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
-                                          </div>
+                                          </div> --}}
+                                          @if (!$file->trashed_at)
+                                            <div class="btn btn-sm btn-icon dropdown-toggle hide-arrow float-end" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></div>
+                                            <div class="dropdown-menu dropdown-menu-end m-0">
+                                                <a class="dropdown-item" target="_blank" href="{{ route('admin.draft-rfps.files.show', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
+                                                  <i class="feather-14" data-feather="eye"></i>
+                                                  <span class="align-middle">Preview</span>
+                                              </a>
+                                              <a class="dropdown-item" href="#">
+                                                <i class="feather-14" data-feather="copy"></i>
+                                                  <span class="align-middle">Make a copy</span>
+                                              </a>
+                                              <a class="dropdown-item" href="{{route('admin.draft-rfps.files.download', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
+                                                <i class="feather-14" data-feather="download"></i>
+                                                  <span class="align-middle">Download</span>
+                                              </a>
+                                              <div class="dropdown-divider"></div>
+                                              <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Rename File" data-href="{{route('admin.draft-rfps.files.edit', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
+                                                  <i class="feather-14" data-feather="edit"></i>
+                                                  <span class="align-middle">Rename</span>
+                                              </a>
+                                              <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('admin.draft-rfps.files.destroy', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
+                                                <i class="feather-14" data-feather="trash"></i>
+                                                  <span class="align-middle">Delete</span>
+                                              </a>
+                                              <div class="dropdown-divider"></div>
+                                              <button class="dropdown-item" data-toggle="ajax-modal" data-title="File Activity" data-href="{{route('admin.draft-rfps.files.get-activity', ['draft_rfp' => $file->rfp_id, 'file' => $file->id])}}">
+                                                <i class="feather-14" data-feather="info"></i>
+                                                  <span class="align-middle">Info</span>
+                                              </button>
+                                              <a class="dropdown-item" href="#">
+                                                <i class="feather-14" data-feather="alert-circle"></i>
+                                                  <span class="align-middle">Report</span>
+                                              </a>
+                                              </div>
+                                            @endif
+                                          {{-- <div class="dropdown-menu dropdown-menu-end file-dropdown">
+
+                                        </div> --}}
                                           <div class="d-flex align-items-center justify-content-center w-100">
-                                              {{-- <img src="../../../app-assets/images/icons/{{getExtension($file->file)}}.png" alt="file-icon" height="35" /> --}}
-                                              <span class="fiv-sqo fiv-icon-{{$file->extension}} fiv-size-lg"></span>
+                                              {{-- <img src="../../../app-assets/images/icons/{{$file->extension}}.png" alt="file-icon" height="35" /> --}}
+                                              {{-- <span class="fiv-sqo fiv-icon-{{$file->extension}} fiv-size-lg"></span> --}}
+                                              @include('admin._partials.attachment-icon', ['text' => strtoupper($file->extension)])
                                           </div>
                                       </div>
                                       <div class="card-body">
                                           <div class="content-wrapper">
                                               <p class="card-text file-name mb-0">
-                                                @if (strpos($file->mime_type, 'application/') === 0 )
+                                                @if ($file->is_editable() && !$file->trashed_at)
                                                   <a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a>
                                                 @else
                                                     {{$file->title}}
                                                 @endif</p>
-                                              <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
+                                                @if (!$file->trashed_at)
+                                                  <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
+                                                @endif
+
                                               {{-- <p class="card-text file-date">23 may 2019</p> --}}
                                           </div>
-                                          <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
+                                          @if (!$file->trashed_at)
+                                            <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
+                                          @endif
                                       </div>
                                     </div>
                                   @empty
@@ -733,7 +770,7 @@
               <form action="{{ route('admin.draft-rfps.files.store', ['draft_rfp' => $draft_rfp]) }}" method="POST" enctype="multipart/form-data">
                   @csrf
                     <div class="modal-header">
-                      <h5 class="modal-title" id="globalModalTitle">Upload File</h5>
+                      <h5 class="modal-title">Upload File</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                       <div class="modal-body">

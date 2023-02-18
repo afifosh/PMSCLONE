@@ -14,26 +14,26 @@
         <span class="align-middle">Add New</span>
       </button>
       <div class="dropdown-menu" aria-labelledby="addNewFile">
-        <div class="dropdown-item" data-bs-toggle="modal" data-bs-target="#new-folder-modal">
+        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#new-folder-modal">
           <div class="mb-0">
             <i data-feather="folder" class="me-25"></i>
             <span class="align-middle">Folder</span>
           </div>
-        </div>
-        <div class="dropdown-item">
+        </button>
+        <button class="dropdown-item upload-file-modal">
           <div class="mb-0" for="file-upload">
             <i data-feather="upload-cloud" class="me-25"></i>
-            <span class="align-middle upload-file-modal">File Upload</span>
+            <span class="align-middle">File Upload</span>
             {{-- <input type="file" id="file-upload" hidden /> --}}
           </div>
-        </div>
-        <div class="dropdown-item">
+        </button>
+        <button class="dropdown-item">
           <div for="folder-upload" class="mb-0">
             <i data-feather="upload-cloud" class="me-25"></i>
             <span class="align-middle">Folder Upload</span>
-            <input type="file" id="folder-upload" webkitdirectory mozdirectory hidden />
+            {{-- <input type="file" id="folder-upload" webkitdirectory mozdirectory hidden /> --}}
           </div>
-        </div>
+        </button>
       </div>
     </div>
     <!-- add file button ends -->

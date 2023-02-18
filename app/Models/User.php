@@ -14,10 +14,12 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Avatar;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Tenantable, HasEnum;
+    use \OwenIt\Auditing\Auditable;
 
     public const DT_ID = 'users_dataTable';
     /**

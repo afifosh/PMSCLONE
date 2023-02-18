@@ -3,10 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Avatar;
 
-class CompanyContactPerson extends Model
+class CompanyContactPerson extends BaseModel
 {
     use HasFactory;
 

@@ -316,6 +316,11 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
                 $('#dataTableBuilder').DataTable().ajax.reload();
               }
             }
+            if(response.data.event == 'page_reload'){
+              setTimeout(function() { // wait for 1 second
+                location.reload(); // then reload the page
+              }, 1000);
+            }
           } else {
             toast_danger(response.message)
           }
@@ -337,6 +342,10 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
   });
 });
 window.initModalSelect2 = function(){
+  if(typeof select2 == 'undefined')
+  {
+    return true;
+  }
   $('.globalOfSelect2').select2({
     dropdownParent: $('#globalModal')
   });
@@ -370,6 +379,8 @@ window.initModalSelect2 = function(){
 // ajax OffCanvax
 $(document).on('click', '[data-toggle="ajax-modal"]', function () {
   var title = $(this).data('title');
+  console.log(title);
+  console.log($('#globalModalTitle').html());
   var url = $(this).data('href');
   var modal_size = $(this).data('size');
   $('.modal-dialog').removeClass('modal-lg modal-sm modal-xs modal-xl');
@@ -378,6 +389,8 @@ $(document).on('click', '[data-toggle="ajax-modal"]', function () {
   }
   console.log(modal_size);
   $('.modal-dialog').addClass(modal_size);
+  $('#globalModalTitle').html(title);
+  console.log($('#globalModalTitle').html());
   $.ajax({
     type: 'get',
     url: url,

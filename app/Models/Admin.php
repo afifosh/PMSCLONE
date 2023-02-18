@@ -14,10 +14,12 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Lab404\Impersonate\Models\Impersonate;
 use Avatar;
-class Admin extends Authenticatable implements MustVerifyEmail
+use OwenIt\Auditing\Contracts\Auditable;
+
+class Admin extends Authenticatable implements MustVerifyEmail, Auditable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum;
-
+    use \OwenIt\Auditing\Auditable;
     /**
      * The attributes that are mass assignable.
      *
@@ -92,6 +94,11 @@ class Admin extends Authenticatable implements MustVerifyEmail
     public function leadingDepartments()
     {
       return $this->hasMany(CompanyDepartment::class, 'head_id', 'id');
+    }
+
+    public function fileLogs()
+    {
+      return $this->morphMany(RFPFileLog::class, 'actioner', 'actioner_type', 'actioner_id');
     }
 
 }

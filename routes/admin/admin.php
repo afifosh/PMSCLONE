@@ -54,6 +54,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
     Route::get('draft-rfps/{draft_rfp}/users', [RFPDraftController::class, 'draft_users_tab'])->name('draft-rfps.users_tab');
     Route::resource('draft-rfps', RFPDraftController::class);
+
+    Route::get('/draft-rfps/{draft_rfp}/files/{file}/download', [RFPFileController::class, 'download'])->name('draft-rfps.files.download');
+    Route::get('/draft-rfps/{draft_rfp}/files/{file}/activity', [RFPFileController::class, 'getActivity'])->name('draft-rfps.files.get-activity');
     Route::resource('draft-rfps.files', RFPFileController::class);
     Route::get('/edit-file/{file?}', [RFPFileController::class, 'editFileWithOffice'])->name('edit-file');
     Route::post('restore-file-update', [OnlyOfficeController::class, 'restoreVersion'])->name('file.restore_version');

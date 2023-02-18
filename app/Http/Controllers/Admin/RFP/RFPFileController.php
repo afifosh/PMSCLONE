@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\RFPDraft;
 use App\Models\RFPFile;
+use App\Repositories\FileActionsRepository;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Support\Facades\Storage;
 use Firebase\JWT\JWT;
@@ -25,16 +26,6 @@ class RFPFileController extends Controller
     });
     $files = $query->where('rfp_id', $draft_rfp->id)->latest()->get();
     return view('admin.pages.rfp.file-manager', compact('draft_rfp', 'files'));
-  }
-
-  /**
-   * Show the form for creating a new resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
-  public function create()
-  {
-    //
   }
 
   public function store($draft_rfp, Request $request, FileUploadRepository $file_repo)
@@ -74,23 +65,28 @@ class RFPFileController extends Controller
   {
     $mimes = new \Mimey\MimeTypes;
     $path = $draft_rfp->id . DIRECTORY_SEPARATOR . $file_repo->addAttachment($file, $draft_rfp->id);
-    $draft_rfp->files()->create([
+    $uploaded_file = $draft_rfp->files()->create([
       'uploaded_by' => auth()->id(),
       'file' => $path,
       'title' => $file->getClientOriginalName(),
       'mime_type' => $mimes->getMimeType($file->getClientOriginalExtension()),
       'extension' => $file->getClientOriginalExtension(),
     ]);
-    // set v1
-    $histDir = getHistoryDir(getStoragePath($path));  // get the history directory
-    // turn the file information into the json format
-    $json = [
-      "created" => date("Y-m-d H:i:s"),
-      "id" => auth()->id(),
-      "name" => auth()->user()->full_name,
-    ];
-    // write the encoded file information to the createdInfo.json file
-    file_put_contents($histDir . DIRECTORY_SEPARATOR . "createdInfo.json", json_encode($json, JSON_PRETTY_PRINT));
+
+    if ($uploaded_file->is_editable()) {
+      // set v1
+      $histDir = getHistoryDir(getStoragePath($path));  // get the history directory
+      // turn the file information into the json format
+      $json = [
+        "created" => date("Y-m-d H:i:s"),
+        "id" => auth()->id(),
+        "name" => auth()->user()->full_name,
+      ];
+      // write the encoded file information to the createdInfo.json file
+      file_put_contents($histDir . DIRECTORY_SEPARATOR . "createdInfo.json", json_encode($json, JSON_PRETTY_PRINT));
+    }
+    $uploaded_file->createLog('Uploaded File');
+
     unlink($file->getPathname());
     return $this->sendRes('Uploaded Successfully', ['event' => 'page_reload', 'close' => 'modal']);
   }
@@ -98,51 +94,9 @@ class RFPFileController extends Controller
   public function editFileWithOffice($file, Request $request)
   {
     $file = RFPFile::where('id', $file)->mine()->firstOrFail();
-    // if (!$file->shares()->where('user_id', auth()->id())->first()) {
-    //   return back()->with('error', 'something went wrong');
-    // }
-    $data['api_url'] = 'http://146.190.123.183/web-apps/apps/api/documents/api.js';
-    // $data['api_url'] = 'http://localhost:8060/web-apps/apps/api/documents/api.js';
+    $data['api_url'] = config('onlyoffice.doc_server_api_url');
     $data['file_url'] = Storage::url($file->file);
-    // dd($data);
     $data['file'] = $file;
-
-    // $payload = '{
-    //     "document": {
-    //         "key": "Khirz6zTPdfd7",
-    //         "permissions": {
-    //             "comment": true,
-    //             "commentGroups": {
-    //                 "edit": ["Group2", ""],
-    //                 "remove": [""],
-    //                 "view": ""
-    //             },
-    //             "copy": true,
-    //             "deleteCommentAuthorOnly": false,
-    //             "download": true,
-    //             "edit": true,
-    //             "editCommentAuthorOnly": false,
-    //             "fillForms": true,
-    //             "modifyContentControl": true,
-    //             "modifyFilter": true,
-    //             "print": true,
-    //             "review": true,
-    //             "reviewGroups": ["Group1", "Group2", ""]
-    //         },
-    //         "url": "https://example.com/url-to-example-document.docx"
-    //     },
-    //     "editorConfig": {
-    //         "callbackUrl": "https://example.com/url-to-callback.ashx",
-    //         "mode": "edit",
-    //         "user": {
-    //             "group": "Group1",
-    //             "id": "78e1e841",
-    //             "name": "Smith"
-    //         }
-    //     }
-    // }';
-
-
     $data['ext'] = pathinfo(Storage::path($file->file), PATHINFO_EXTENSION);
     $data['payload'] = '{
           "document": {
@@ -186,58 +140,61 @@ class RFPFileController extends Controller
               }
           }
       }';
-    // "documentType": "word",
     // env('APP_URL').'/only-office.php?file='.$file->file
     $payload = json_decode($data['payload'], true);
-    // dd($payload);
     $data['token'] = JWT::encode($payload, config('onlyoffice.secret'), 'HS256');
-
+    $file->createLog('Opened File For Editing');
 
     return view('admin.pages.rfp.files.only-office-editor', $data);
   }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  \App\Models\File  $file
-   * @return \Illuminate\Http\Response
-   */
-  public function show(File $file)
+  public function show($draft_rfp, $file, FileActionsRepository $file_repo)
   {
-    //
+    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
+    $file->createLog('Opened File');
+
+    return $file_repo->previewFile($file->file);
   }
 
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  \App\Models\File  $file
-   * @return \Illuminate\Http\Response
-   */
-  public function edit(File $file)
+  public function edit($draft_rfp, $file, Request $request)
   {
-    //
+    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
+
+    return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.files.edit', compact('file'))->render()]);
   }
 
-  /**
-   * Update the specified resource in storage.
-   *
-   * @param  \App\Http\Requests\UpdateFileRequest  $request
-   * @param  \App\Models\File  $file
-   * @return \Illuminate\Http\Response
-   */
-  public function update(UpdateFileRequest $request, File $file)
+  public function update($draft_rfp, $file, Request $request)
   {
-    //
+    $request->validate(['title' => 'required|string|max:255']);
+    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
+    $file->createLog('Renamed File from ' . $file->title . ' to ' . $request->title);
+    $file->update(['title' => $request->title]);
+
+    return $this->sendRes('Updated Successfully', ['event' => 'page_reload', 'close' => 'modal']);
   }
 
-  /**
-   * Remove the specified resource from storage.
-   *
-   * @param  \App\Models\File  $file
-   * @return \Illuminate\Http\Response
-   */
-  public function destroy(File $file)
+  public function download($draft_rfp, $file, FileActionsRepository $file_repo)
   {
-    //
+    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
+    $file->createLog('Downloaded File');
+
+    return $file_repo->downloadFile($file->file, $file->title, '', ['extension' => $file->extension]);
+  }
+
+  public function destroy($draft_rfp, $file, FileActionsRepository $file_repo)
+  {
+    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
+    $file_repo->moveFile($file->file, 'trash' . DIRECTORY_SEPARATOR . 'draft-files' . DIRECTORY_SEPARATOR . $file->file);
+    $file->update(['trashed_at' => now()]);
+    $file->createLog('Deleted File');
+
+    return $this->sendRes('Moved To Trash', ['event' => 'page_reload', 'close' => 'modal']);
+  }
+
+  public function getActivity($draft_rfp, $file)
+  {
+    $file = RFPFile::where('id', $file)->mine()->with('logs.actioner')->firstOrFail();
+
+    return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.files.activity-timeline', compact('file'))->render()]);
   }
 }

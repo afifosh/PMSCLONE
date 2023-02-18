@@ -4,10 +4,9 @@ namespace App\Models;
 
 use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Avatar;
 
-class Company extends Model
+class Company extends BaseModel
 {
   use HasFactory, HasEnum;
 

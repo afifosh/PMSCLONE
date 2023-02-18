@@ -7,9 +7,6 @@ use App\Traits\ImageTrait;
 use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ChatRepository
- */
 class FileUploadRepository
 {
     /**

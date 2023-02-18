@@ -20,6 +20,7 @@
     "laravel/sanctum": "^2.14",
     "laravel/tinker": "^2.7",
     "laravolt/avatar": "^4.1",
+    "owen-it/laravel-auditing": "^13.1",
     "pion/laravel-chunk-upload": "^1.5",
     "ralouphie/mimey": "^1.0",
     "spatie/laravel-permission": "^5.8",
