@@ -33,6 +33,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::resource('admin-account', AdminAccountController::class)->only('edit');
+    Route::get('admin-account-auth-logs', [AdminAccountController::class, 'authLogs'])->name('auth-logs');
 
     Route::get('/pages/account-settings-notifications', [NotificationController::class, 'notificationTable'])->name('account.settings.notifications');
 

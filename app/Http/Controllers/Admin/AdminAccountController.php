@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DataTables\AuthenticationLogsDataTable;
 use App\DataTables\NotificationsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
@@ -58,13 +59,19 @@ class AdminAccountController extends Controller
    * @param  \App\Models\Admin  $admin
    * @return \Illuminate\Http\Response
    */
-  public function edit(Request $request, NotificationsDataTable $dataTable)
+  public function edit(Request $request, NotificationsDataTable $dataTable, AuthenticationLogsDataTable $authTable)
   {
     if ($request->t == 'security')
       return view('admin.pages.account.account-edit-security');
     elseif ($request->t == 'notifications')
       return $dataTable->render('admin.pages.account.account-notifications');
     return view('admin.pages.account.account-edit-general');
+  }
+
+
+  public function authLogs(AuthenticationLogsDataTable $dataTable)
+  {
+    return $dataTable->render('admin.pages.account.auth-logs');
   }
 
   /**
