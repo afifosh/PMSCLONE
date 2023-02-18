@@ -2,7 +2,7 @@
 
 namespace App\Http\Responses;
 
-use App\Notifications\Auth\AuthLogNotification;
+use App\Notifications\Auth\NewLocation;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Http\Responses\LoginResponse as ResponsesLoginResponse;
@@ -21,13 +21,9 @@ class LoginResponse extends ResponsesLoginResponse implements LoginResponseContr
      */
     $user = Auth::guard(config('fortify.guard'))->user();
 
-    if ($user->findIfLoginUpdated()) {
+    if ($user->findIfLoginIpUpdated()) {
       $user->notify(
-        new AuthLogNotification(
-          $user->authentications,
-          $user->lastLoginAgent(),
-          $user->lastLoginLocation()
-        )
+        new NewLocation($user->latestAuthentication)
       );
     }
 

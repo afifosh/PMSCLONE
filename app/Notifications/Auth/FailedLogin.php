@@ -3,7 +3,6 @@
 namespace App\Notifications\Auth;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Log;
 use Rappasoft\LaravelAuthenticationLog\Notifications\FailedLogin as NotificationsFailedLogin;
 
 class FailedLogin extends NotificationsFailedLogin

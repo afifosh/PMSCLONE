@@ -68,9 +68,7 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
               </li>
               <li class="dropdown-notifications-list scrollable-container">
                 <ul class="dropdown-notifications-ul-list list-group list-group-flush">
-                  <p class="mb-0 p-3">
-                    {{ __('Hooray.') }} {{ __('You are all all caught up') }}
-                  </p>
+                  
                 </ul>
               </li>
               <li class="dropdown-menu-footer border-top view-more-li load-more">
