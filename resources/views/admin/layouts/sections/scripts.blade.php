@@ -58,7 +58,7 @@
 
     $(document).ready(function() {
 
-      $('.notification-bell').click(function() {
+      $('.dropdown-notifications a.dropdown-toggle').click(function() {
         $.ajax({
             type: 'post'
             , url: "{{ route('admin.update.notification.count') }}"

@@ -51,12 +51,11 @@
 
           $(document).ready(function() {
 
-            $('.notification-bell').click(function() {
+            $('.dropdown-notifications a.dropdown-toggle').click(function() {
               $.ajax({
                   type: 'post'
                   , url: "{{ route('update.notification.count') }}"
-                })
-                .done(function(response) {
+                }).done(function(response) {
                   $('.notification-bell').hide();
                 })
 
