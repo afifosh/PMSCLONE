@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DataTables\NotificationsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use Illuminate\Http\Request;
@@ -57,10 +58,12 @@ class AdminAccountController extends Controller
    * @param  \App\Models\Admin  $admin
    * @return \Illuminate\Http\Response
    */
-  public function edit(Request $request)
+  public function edit(Request $request, NotificationsDataTable $dataTable)
   {
     if ($request->t == 'security')
       return view('admin.pages.account.account-edit-security');
+    elseif ($request->t == 'notifications')
+      return $dataTable->render('admin.pages.account.account-notifications');
     return view('admin.pages.account.account-edit-general');
   }
 
