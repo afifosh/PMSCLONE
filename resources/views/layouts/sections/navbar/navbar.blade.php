@@ -70,7 +70,7 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
                 </ul>
               </li>
               <li class="dropdown-menu-footer border-top view-more-li load-more">
-                <a href="{{ route('account.settings.notifications') }}" class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center">
+                <a href="{{ route('user-account.edit', ['user_account' => auth()->id(), 't' => 'notifications']) }}" class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center">
                   @lang('View all')
                 </a>
               </li>
