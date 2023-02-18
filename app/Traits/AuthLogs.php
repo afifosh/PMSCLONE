@@ -6,8 +6,7 @@ use Jenssegers\Agent\Agent;
 
 trait AuthLogs
 {
-
-  public function checkIfLastLoginDetailsChanged()
+  public function findIfLoginUpdated()
   {
     $previous_login_agent = $this->previousUserAgent();
     $lastLoginAgent = $this->lastLoginAgent();
@@ -35,6 +34,7 @@ trait AuthLogs
     if ($previous_login_city == null || $previous_login_city == '') {
       return false;
     }
+
     if ($previous_login_country == null || $previous_login_country == '') {
       return false;
     }
@@ -42,15 +42,6 @@ trait AuthLogs
     if ($previous_login_device == null || $previous_login_device == "") {
       return false;
     }
-
-    // \Log::debug("previous_login_city: " . $previous_login_city);
-    // \Log::debug("previous_login_country: " . $previous_login_country);
-    // \Log::debug("previous_login_device: " . $previous_login_device);
-
-    // \Log::debug("last_login_city: " . $last_login_city);
-    // \Log::debug("last_login_country: " . $last_login_country);
-    // \Log::debug("last_login_device: " . $last_login_device);
-
 
     if ($previous_login_city != $last_login_city) {
       return true;
