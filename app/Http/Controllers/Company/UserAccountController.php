@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Company;
 
+use App\DataTables\NotificationsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -57,10 +58,12 @@ class UserAccountController extends Controller
    * @param  \App\Models\User  $user
    * @return \Illuminate\Http\Response
    */
-  public function edit(Request $request, User $user_account)
+  public function edit(Request $request, User $user_account, NotificationsDataTable $dataTable)
   {
     if ($request->t == 'security')
       return view('pages.account.account-edit-security');
+    elseif ($request->t == 'notifications')
+      return $dataTable->render('pages.account.account-notifications');
     return view('pages.account.account-edit-general');
   }
 

@@ -26,18 +26,25 @@ class NotificationsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+
             ->addColumn('message', function ($row) {
-                if (isset($row->data['location'])) {
-                    return 'New authentication alert.';
+                $data = $row->data;
+
+                if (isset($data['location'])) {
+                    return view('notifications.datatables.notification-message', compact('row'));
                 }
             })
             ->addColumn('data', function ($row) {
-                return view('pages.notifications.data', compact('row'));
+                $data = $row->data;
+
+                if (isset($data['location'])) {
+                    return view('notifications.datatables.notification-data', compact('data'));
+                }
             })
             ->addColumn('created_at', function ($row) {
                 return $row->created_at->diffForHumans();
             })
-            ->rawColumns(['message', 'data', 'created_at']);
+            ->rawColumns(['message', 'device', 'city', 'country', 'created_at']);
     }
 
     /**
@@ -93,9 +100,9 @@ class NotificationsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('message'),
+            Column::make('message')->title(__('Notification Title'))->width(250),
             Column::make('data'),
-            Column::make('created_at')->title(__('Time')),
+            Column::make('created_at')->title(__('How Long ago'))->width(250),
         ];
     }
 
