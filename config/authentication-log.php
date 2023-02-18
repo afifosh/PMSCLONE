@@ -35,7 +35,7 @@ return [
             'location' => true,
 
             // The Notification class to send
-            'template' => \Rappasoft\LaravelAuthenticationLog\Notifications\FailedLogin::class,
+            'template' => \App\Notifications\Auth\FailedLogin::class,
         ],
     ],
 
