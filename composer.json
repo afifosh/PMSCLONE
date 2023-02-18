@@ -21,7 +21,7 @@
     "laravel/tinker": "^2.7",
     "laravolt/avatar": "^4.1",
     "predis/predis": "^2.1",
-    "rappasoft/laravel-authentication-log": "dev-cloudflare-ip",
+    "rappasoft/laravel-authentication-log": "dev-cloudflare",
     "spatie/laravel-permission": "^5.8",
     "torann/geoip": "^3.0",
     "yajra/laravel-datatables": "^9.0",
@@ -83,7 +83,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/Soban3/laravel-authentication-log/tree/cloudflare-ip"
+      "url": "git@github.com:Soban3/laravel-authentication-log.git"
     }
   ]
 }
