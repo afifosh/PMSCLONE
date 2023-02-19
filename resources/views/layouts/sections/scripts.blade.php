@@ -11,6 +11,7 @@
 <script src="{{ asset(mix('assets/vendor/libs/toastr/toastr.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
+<script src="{{ asset(mix('assets/js/custom/bell-notifications.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/bootstrap-session-timeout.js')) }}"></script>
 
 @yield('vendor-script')
@@ -30,51 +31,20 @@
     @endif
 
     @auth
-      @if(Auth::getDefaultDriver() === 'web' && Route::currentRouteName() !== 'auth.lock')
-        $.sessionTimeout({
-          keepAliveUrl: '/keep-alive',
-          logoutUrl: '/logout',
-          redirUrl: '/auth/lock',
-          warnAfter: +"{{ config('auth.timeout_warning_seconds') }}",
-          redirAfter: +"{{ config('auth.timeout_after_seconds') }}",
-          countdownBar: true,
-          countdownMessage: 'Redirecting in {timer} seconds.',
-          useLocalStorageSynchronization: true,
-          ignoreUserActivity: true,
-          clearWarningOnUserActivity: false,
-        });
-      @endif
-
-      var site_url = "{{ url('/') }}";
-
-          notifications();
-
-          $(document).ready(function() {
-
-            $('.dropdown-notifications a.dropdown-toggle').click(function() {
-              $.ajax({
-                  type: 'post'
-                  , url: "{{ route('update.notification.count') }}"
-                }).done(function(response) {
-                  $('.notification-bell').hide();
-                })
-
-            })
-          });
-
-
-          function notifications() {
-            $.ajax({
-                type: 'get'
-                , url: site_url + '/notifications'
-              })
-              .done(function(response) {
-                $('.dropdown-notifications-ul-list').append(response.data)
-              })
-              .fail(function(jqXHR, ajaxOptions, thrownError) {
-                // alert('No response from server');
-              });
-          }
+    @if(Auth::getDefaultDriver() === 'web' && Route::currentRouteName() !== 'auth.lock')
+      $.sessionTimeout({
+        keepAliveUrl: '/keep-alive',
+        logoutUrl: '/logout',
+        redirUrl: '/auth/lock',
+        warnAfter: +"{{ config('auth.timeout_warning_seconds') }}",
+        redirAfter: +"{{ config('auth.timeout_after_seconds') }}",
+        countdownBar: true,
+        countdownMessage: 'Redirecting in {timer} seconds.',
+        useLocalStorageSynchronization: true,
+        ignoreUserActivity: true,
+        clearWarningOnUserActivity: false,
+      });
+    @endif
     @endauth
   });
 

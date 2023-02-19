@@ -65,8 +65,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     });
 
 
-    Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications');
-    Route::post('update-notification-count', [NotificationController::class, 'updateNotificationCount'])->name('update.notification.count');
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
+    Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
     Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]));
   });
 });

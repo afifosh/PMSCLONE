@@ -83,6 +83,8 @@
               </div> \
              </div>');
 
+            $('#session-timeout-dialog').modal({backdrop: 'static', keyboard: false})
+
             // "Logout" button click
             $('#session-timeout-dialog-logout').on('click', function() {
                 window.location = opt.logoutUrl;
