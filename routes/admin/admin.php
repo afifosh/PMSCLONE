@@ -21,8 +21,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified', CheckForLockMode::class)->group(function () {
 
-  Route::get('auth/lock', LockModeController::class . '@lock')->name('auth.lock');
-  Route::post('auth/unlock', LockModeController::class . '@unlock')->name('auth.unlock');
+  Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]))->name('alive');
+  Route::prefix('auth')->name('auth.')->group(function() {
+    Route::get('lock', [LockModeController::class, '@lock'])->name('lock');
+    Route::post('unlock', [LockModeController::class ,'@unlock'])->name('unlock');
+  });
 
   Route::prefix('password')->name('password.expired.')->group(function () {
     Route::view('expired', 'admin.auth.expired-password');
@@ -67,7 +70,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
-    Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]));
   });
 });
 

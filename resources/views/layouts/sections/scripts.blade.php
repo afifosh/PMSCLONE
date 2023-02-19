@@ -12,7 +12,19 @@
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/bell-notifications.js')) }}"></script>
+@auth
+@if(Auth::getDefaultDriver() === 'web' && Route::currentRouteName() !== 'auth.lock')
 <script src="{{ asset(mix('assets/js/bootstrap-session-timeout.js')) }}"></script>
+<script>
+  var keepAliveUrl = "{{ route('alive') }}"
+  var logoutUrl = "{{ route('logout') }}"
+  var redirUrl = "{{ route('auth.lock') }}"
+  var warnAfter = +"{{ config('auth.timeout_warning_seconds') }}"
+  var redirAfter = +"{{ config('auth.timeout_after_seconds') }}"
+</script>
+<script src="{{ asset(mix('assets/js/custom/session-timeout.js')) }}"></script>
+@endif
+@endauth
 
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
@@ -29,23 +41,6 @@
     @if(session()->has('status'))
     toast_success("{{ucwords(str_replace('-', ' ', session('status')))}}");
     @endif
-
-    @auth
-    @if(Auth::getDefaultDriver() === 'web' && Route::currentRouteName() !== 'auth.lock')
-      $.sessionTimeout({
-        keepAliveUrl: '/keep-alive',
-        logoutUrl: '/logout',
-        redirUrl: '/auth/lock',
-        warnAfter: +"{{ config('auth.timeout_warning_seconds') }}",
-        redirAfter: +"{{ config('auth.timeout_after_seconds') }}",
-        countdownBar: true,
-        countdownMessage: 'Redirecting in {timer} seconds.',
-        useLocalStorageSynchronization: true,
-        ignoreUserActivity: true,
-        clearWarningOnUserActivity: false,
-      });
-    @endif
-    @endauth
   });
 
 </script>

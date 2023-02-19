@@ -10,6 +10,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,8 +26,12 @@ Route::get('/invitations/{token}/accept', [InvitationController::class, 'accept'
 Route::post('/invitations/{token}/confirm', [InvitationController::class, 'acceptConfirm'])->name('invitation.confirm');
 Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->group(function () {
 
-    Route::get('auth/lock', LockModeController::class.'@lock')->name('auth.lock');
-    Route::post('auth/unlock', LockModeController::class.'@unlock')->name('auth.unlock');
+    Route::any('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]))->name('alive');
+    Route::prefix('auth')->name('auth.')->group(function() {
+        Route::get('lock', [LockModeController::class, '@lock'])->name('lock');
+        Route::post('unlock', [LockModeController::class ,'@unlock'])->name('unlock');
+    });
 
     Route::prefix('password')->name('password.expired.')->group(function () {
         Route::view('expired', 'auth.expired-password');
@@ -39,8 +44,6 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
 
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
-
-    Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]));
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notification/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
