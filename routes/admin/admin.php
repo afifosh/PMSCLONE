@@ -23,8 +23,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
   Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]))->name('alive');
   Route::prefix('auth')->name('auth.')->group(function() {
-    Route::get('lock', [LockModeController::class, '@lock'])->name('lock');
-    Route::post('unlock', [LockModeController::class ,'@unlock'])->name('unlock');
+    Route::get('lock', [LockModeController::class, 'lock'])->name('lock');
+    Route::post('unlock', [LockModeController::class ,'unlock'])->name('unlock');
   });
 
   Route::prefix('password')->name('password.expired.')->group(function () {
