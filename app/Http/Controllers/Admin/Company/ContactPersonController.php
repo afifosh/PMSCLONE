@@ -43,17 +43,19 @@ class ContactPersonController extends Controller
   public function store(Request $request, Company $company)
   {
     $request->validate([
+      'first_name' => 'required|max:255|string',
+      'last_name' => 'required|max:255|string',
       'email' => 'required|unique:users,email|unique:company_contact_persons,email',
       'expiry_time' => 'required',
       'role' => 'required'
     ]);
 
-    $contPerson = $company->contactPersons()->create($request->only('email'));
+    $contPerson = $company->contactPersons()->create($request->only('first_name', 'last_name', 'email'));
     $contPerson->invitations()->update(['status' => 'revoked']);
     $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role, 'status' => 'pending']);
     dispatch(new InvitationMailJob($data));
 
-    return $this->sendRes('Added Successfully', ['close' => 'globalOffCanvas']);
+    return $this->sendRes('Added Successfully', ['close' => 'globalModal']);
   }
 
   /**

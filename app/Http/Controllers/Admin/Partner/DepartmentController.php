@@ -8,20 +8,23 @@ use App\Models\Admin;
 use App\Models\CompanyDepartment;
 use App\Models\PartnerCompany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
   public function index(DepartmentsDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.partner.departments.index');
+    $data['organizations'] = PartnerCompany::has('departments')->pluck('name', 'id');
+    $data['heads'] = Admin::has('leadingDepartments')->distinct('email')->get();
+    return $dataTable->render('admin.pages.partner.departments.index', $data);
     // return view('admin.pages.partner.departments.index');
   }
   public function create()
   {
     $data['department'] = new CompanyDepartment();
-    $data['admins'] = Admin::pluck('email', 'id')->prepend('Select Head', '');
-    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend('Select Company', '');
+    $data['admins'] = Admin::get();
+    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend('Select Organization', '');
     $data['departments'] = ['' => 'Select Department'];
     return $this->sendRes('success', ['view_data' => view('admin.pages.partner.departments.edit', $data)->render()]);
   }
@@ -36,7 +39,7 @@ class DepartmentController extends Controller
       'head' => 'nullable|exists:admins,id',
     ]);
     CompanyDepartment::create(['name' => $att['name'], 'company_id' => $att['company'], 'head_id' => $att['head']]);
-    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => CompanyDepartment::DT_ID, 'close' => 'globalOffCanvas']);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => CompanyDepartment::DT_ID, 'close' => 'globalModal']);
   }
 
   public function show(CompanyDepartment $department)
@@ -49,6 +52,7 @@ class DepartmentController extends Controller
     $data['department'] = $department;
     $data['admins'] = Admin::pluck('email', 'id')->prepend('Select Head', '');
     $data['companies'] = PartnerCompany::pluck('name', 'id');
+    $data['departments'] = ['' => 'Select Department'];
     return $this->sendRes('success', ['view_data' => view('admin.pages.partner.departments.edit', $data)->render()]);
   }
 
@@ -61,7 +65,7 @@ class DepartmentController extends Controller
       'head' => 'nullable|exists:admins,id',
     ]);
     if ($department->update(['name' => $att['name'], 'company_id' => $att['company'], 'head_id' => $att['head']])) {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => CompanyDepartment::DT_ID, 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => CompanyDepartment::DT_ID, 'close' => 'globalModal']);
     }
   }
 

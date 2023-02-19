@@ -29,7 +29,6 @@
   <span class="text-muted fw-light">User Profile /</span> Profile
 </h4> --}}
 
-
 <!-- Header -->
 <div class="row">
   <div class="col-12">
@@ -57,7 +56,7 @@
                   <i class='ti ti-map-pin'></i> Vatican City
                 </li>
                 <li class="list-inline-item">
-                  <i class='ti ti-calendar'></i> Joined April 2021</li>
+                  <i class='ti ti-calendar'></i> Added At {{ formatDateTime($program->created_at)}}</li>
               </ul>
             </div>
             <a href="javascript:void(0)" class="btn btn-primary">
@@ -77,8 +76,8 @@
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
       <li class="nav-item"><a class="nav-link" href="{{ route('admin.programs.show', $program)}}"><i class='ti-xs ti ti-user-check me-1'></i> Profile</a></li>
       <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class='ti-xs ti ti-users me-1'></i> Users</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/profile-projects')}}"><i class='ti-xs ti ti-layout-grid me-1'></i> Projects</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/profile-connections')}}"><i class='ti-xs ti ti-link me-1'></i> Connections</a></li>
+      <li class="nav-item"><a class="nav-link" href="javascript:void(0);"><i class='ti-xs ti ti-layout-grid me-1'></i> Projects</a></li>
+      <li class="nav-item"><a class="nav-link" href="javascript:void(0);"><i class='ti-xs ti ti-link me-1'></i> Connections</a></li>
     </ul>
   </div>
 </div>

@@ -17,10 +17,12 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Avatar;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
-  use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Tenantable, HasEnum, AuthenticationLoggable, AuthLogs;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Tenantable, HasEnum, AuthenticationLoggable, AuthLogs;
+    use \OwenIt\Auditing\Auditable;
 
     public const DT_ID = 'users_dataTable';
     /**
@@ -36,6 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'status',
         'password_changed_at',
+        'email_verified_at',
     ];
 
     /**

@@ -13,13 +13,15 @@ class DesignationController extends Controller
 {
   public function index(DesignationsDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.partner.designations.index');
+    $data['organizations'] = PartnerCompany::has('departments.designations')->distinct()->pluck('name', 'id');
+    $data['departments'] = CompanyDepartment::has('designations')->distinct()->pluck('name', 'id');
+    return $dataTable->render('admin.pages.partner.designations.index', $data);
     // return view('admin.pages.partner.designations.index');
   }
   public function create()
   {
     $data['designation'] = new CompanyDesignation();
-    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend(__('Select Company'), '');
+    $data['companies'] = PartnerCompany::pluck('name', 'id')->prepend(__('Select Organization'), '');
     $data['departments'] = ['' => __('Select Department')];
     return $this->sendRes('success', ['view_data' => view('admin.pages.partner.designations.edit', $data)->render()]);
   }
@@ -32,7 +34,7 @@ class DesignationController extends Controller
       'department' => 'required|exists:company_departments,id',
     ]);
     CompanyDesignation::create(['name' => $att['name'], 'department_id' => $att['department']]);
-    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalOffCanvas']);
+    return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalModal']);
   }
 
   public function show(CompanyDesignation $designation)
@@ -53,10 +55,10 @@ class DesignationController extends Controller
     $att = $request->validate([
       'name' => 'required|string|max:255',
       'company' => 'required|exists:partner_companies,id',
-      'department' => 'nullable|exists:company_departments,id',
+      'department' => 'exists:company_departments,id',
     ]);
     if ($designation->update(['name' => $att['name'], 'department_id' => $att['department']])) {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalOffCanvas']);
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => CompanyDesignation::DT_ID, 'close' => 'globalModal']);
     }
   }
 

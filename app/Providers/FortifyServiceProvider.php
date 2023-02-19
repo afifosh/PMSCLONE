@@ -23,6 +23,7 @@ class FortifyServiceProvider extends ServiceProvider
       config(['fortify.guard' => 'admin']);
       config(['fortify.passwords' => 'admins']);
       config(['fortify.home' => RouteServiceProvider::ADMIN_HOME]);
+      config(['fortify.redirects.logout' => 'admin/login']);
     }
 
     $this->app->singleton(
@@ -51,7 +52,7 @@ class FortifyServiceProvider extends ServiceProvider
       return Limit::perMinute(5)->by($request->session()->get('login.id'));
     });
 
-    if(config('fortify.guard' == 'admin')){
+    if(config('fortify.guard') == 'admin'){
       Fortify::viewPrefix('admin.auth.');
     }else{
       Fortify::viewPrefix('auth.');

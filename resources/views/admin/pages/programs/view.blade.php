@@ -44,7 +44,7 @@
             <div class="user-profile-info">
               <h4>{{ $program->name }}
                 @if ($program->parent)
-                  ({{$program->parent->name}})
+                  (<a href="{{route('admin.programs.show', $program->parent)}}">{{$program->parent->name}}</a>)
                 @endif
               </h4>
               <ul class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
@@ -55,7 +55,7 @@
                   <i class='ti ti-map-pin'></i> Vatican City
                 </li>
                 <li class="list-inline-item">
-                  <i class='ti ti-calendar'></i> Joined April 2021</li>
+                  <i class='ti ti-calendar'></i> Added At {{ formatDateTime($program->created_at)}}</li>
               </ul>
             </div>
             <a href="javascript:void(0)" class="btn btn-primary">

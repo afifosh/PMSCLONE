@@ -1,6 +1,6 @@
 <div class="d-inline-block text-nowrap">
     @can('update user')
-        <button class="btn btn-sm btn-icon" data-toggle="ajax-offcanvas" data-title="Edit User" data-href="{{route('admin.users.edit', $admin)}}"><i class="ti ti-edit"></i></button>
+        <button class="btn btn-sm btn-icon" data-toggle="ajax-modal" data-title="Edit User" data-href="{{route('admin.users.edit', $admin)}}"><i class="ti ti-edit"></i></button>
     @endcan
     @can('delete user')
         <button class="btn btn-sm btn-icon delete-record" data-toggle="ajax-delete"
@@ -12,6 +12,7 @@
         <a href="javascript:;" class="dropdown-item">View</a>
         @can('update user')
             <a href="javascript:;" class="dropdown-item">Suspend</a>
+            <a href="javascript:;" class="dropdown-item" data-toggle="ajax-modal" data-title="Edit User Password" data-href="{{route('admin.users.editPassword', $admin)}}">Edit Password</a>
         @endcan
 
         @can('impersonate user')

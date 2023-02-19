@@ -26,11 +26,25 @@ class AdminsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('full_name', function ($row) {
-        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8')."</span>";
+      ->addColumn('user', function ($row) {
+        return '<div class="d-flex justify-content-start align-items-center">
+                <div class="avatar-wrapper">
+                  <div class="avatar avatar-sm me-3"><img src="' . $row->avatar . '" alt="Avatar" class="rounded-circle">
+                  </div>
+                </div>
+                <div class="d-flex flex-column">
+                  <span class="text-body text-truncate">
+                    <span class="fw-semibold"><a href="' . route('admin.users.show', $row->id) . '" class="fw-semibold">' . htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8') . '</a></span>
+                  </span>
+                  <small class="text-muted">' . htmlspecialchars($row->email, ENT_QUOTES, 'UTF-8') . '</small>
+                </div>
+              </div>';
       })
       ->addColumn('roles', function ($row) {
         return $row->roles->pluck('name')->implode(', ');
+      })
+      ->editColumn('status', function ($row) {
+        return $this->makeStatus($row->status);
       })
       ->addColumn('action', function (Admin $admin) {
         return view('admin.pages.roles.admins.action', compact('admin'));
@@ -49,9 +63,9 @@ class AdminsDataTable extends DataTable
         $password_changed_at = new Carbon(($row->password_changed_at) ? $row->password_changed_at : $row->created_at);
 
         $password_expire_days_setting =
-            isset($app_settings->password_expire_days) && ! is_null($app_settings->password_expire_days)
-            ? $app_settings->password_expire_days
-            : config('auth.password_expire_days');
+          isset($app_settings->password_expire_days) && !is_null($app_settings->password_expire_days)
+          ? $app_settings->password_expire_days
+          : config('auth.password_expire_days');
 
         $days = $password_expire_days_setting - Carbon::now()->diffInDays($password_changed_at);
 
@@ -60,12 +74,21 @@ class AdminsDataTable extends DataTable
       ->editColumn('email_verified_at', function ($row) {
         return $row->email_verified_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
-      ->filterColumn('full_name', function($query, $keyword) {
-        $sql = "CONCAT(admins.first_name,' ',admins.last_name)  like ?";
+      ->filterColumn('user', function ($query, $keyword) {
+        $sql = "CONCAT(admins.first_name,' ',admins.last_name, ' ',admins.email)  like ?";
         $query->whereRaw($sql, ["%{$keyword}%"]);
-    })
-      ->setRowId('id')
-      ->rawColumns(['full_name','2f-auth', 'pwd_expires', 'action', 'email_verified_at']);
+      })
+      ->filterColumn('organization', function ($query, $keyword) {
+        $query->whereHas('designation.department.company', function ($q) use ($keyword) {
+          return $q->where('name', 'like', '%' . $keyword . '%');
+        });
+      })
+      ->filterColumn('roles', function ($query, $keyword) {
+        $query->whereHas('roles', function ($q) use ($keyword) {
+          return $q->where('name', 'like', '%' . $keyword . '%');
+        });
+      })
+      ->rawColumns(['user', '2f-auth', 'pwd_expires', 'action', 'email_verified_at', 'status']);
   }
 
   /**
@@ -76,7 +99,38 @@ class AdminsDataTable extends DataTable
    */
   public function query(Admin $model): QueryBuilder
   {
-    return $model->select(['admins.*', DB::raw("CONCAT(admins.first_name,' ',admins.last_name) as full_name")])->with('roles');
+    $query = $model->query();
+    $query->when(request('filter_status'), function ($query) {
+      return $query->whereIn('status', request('filter_status'));
+    });
+    $query->when(request('filer_roles'), function ($query) {
+      return $query->whereHas('roles', function ($whas) {
+        return $whas->whereIn('name', request('filer_roles'));
+      });
+    });
+    $query->when(request('filter_companies'), function ($q) {
+      return $q->whereHas('designation.department', function ($dep) {
+        return $dep->whereIn('company_id', request('filter_companies'));
+      });
+    });
+    return $query->select(['admins.*', DB::raw("CONCAT(admins.first_name,' ',admins.last_name) as full_name")])->with('roles');
+  }
+
+  protected function makeStatus($status)
+  {
+    $b_status = htmlspecialchars(ucwords($status), ENT_QUOTES, 'UTF-8');
+    switch ($status) {
+      case 'active':
+        return '<span class="badge bg-label-success">' . $b_status . '</span>';
+        break;
+      case 'suspended':
+        return '<span class="badge bg-label-secondary">' . $b_status . '</span>';
+        break;
+
+      default:
+        return '<span class="badge bg-label-warning">' . $b_status . '</span>';
+        break;
+    }
   }
 
   /**
@@ -93,7 +147,7 @@ class AdminsDataTable extends DataTable
         'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New User</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
-          'data-toggle' => "ajax-offcanvas",
+          'data-toggle' => "ajax-modal",
           'data-title' => 'Add User',
           'data-href' => route('admin.users.create')
         ]
@@ -139,19 +193,11 @@ class AdminsDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      // Column::computed('action')
-      //       ->exportable(true)
-      //       ->printable(true)
-      //       ->width(60)
-      //       ->addClass('text-center'),
-      // Column::make('id'),
-      Column::make('full_name'),
-      // Column::make('last_name'),
-      Column::make('email'),
+      Column::make('user'),
       Column::make('phone'),
       Column::make('organization'),
       Column::make('roles'),
-      // Column::make('roles'),
+      Column::make('status'),
       Column::make('email_verified_at')->title(__('Verified')),
       Column::make('2f-auth'),
       Column::make('pwd_expires')

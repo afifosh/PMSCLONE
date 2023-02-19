@@ -10,6 +10,13 @@
       'Debugbar' => 'Barryvdh\\Debugbar\\Facades\\Debugbar',
     ),
   ),
+  'beyondcode/laravel-query-detector' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'BeyondCode\\QueryDetector\\QueryDetectorServiceProvider',
+    ),
+  ),
   'fruitcake/laravel-cors' => 
   array (
     'providers' => 
@@ -116,6 +123,20 @@
     'providers' => 
     array (
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    ),
+  ),
+  'owen-it/laravel-auditing' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'OwenIt\\Auditing\\AuditingServiceProvider',
+    ),
+  ),
+  'pion/laravel-chunk-upload' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Pion\\Laravel\\ChunkUpload\\Providers\\ChunkUploadServiceProvider',
     ),
   ),
   'rappasoft/laravel-authentication-log' => 

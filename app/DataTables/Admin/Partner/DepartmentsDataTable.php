@@ -25,20 +25,42 @@ class DepartmentsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
+      ->addColumn('head', function (CompanyDepartment $department) {
+        if (!$department->head) {
+          return '-';
+        }
+        return '<div class="d-flex justify-content-start align-items-center">
+                <div class="avatar-wrapper">
+                  <div class="avatar avatar-sm me-3"><img src="' . $department->head->avatar . '" alt="Avatar" class="rounded-circle">
+                  </div>
+                </div>
+                <div class="d-flex flex-column">
+                  <span class="text-body text-truncate">
+                    <span class="fw-semibold"><a href="'.route('admin.users.show', $department->head->id).'" class="fw-semibold">' . htmlspecialchars($department->head->full_name, ENT_QUOTES, 'UTF-8') . '</a></span>
+                  </span>
+                  <small class="text-muted">' . htmlspecialchars($department->head->email, ENT_QUOTES, 'UTF-8') . '</small>
+                </div>
+              </div>';
+      })
       ->addColumn('action', function (CompanyDepartment $department) {
         return view('admin.pages.partner.departments.action', compact('department'));
       })
-      ->addColumn('company', function (CompanyDepartment $department) {
+      ->addColumn('organization', function (CompanyDepartment $department) {
         return $department->company->name;
       })
-      ->addColumn('head', function (CompanyDepartment $department) {
-        $img = $department->head->avatar;
-        $fname = $department->head->full_name;
-        $name = "<img class='avatar avatar-sm pull-up rounded-circle' src='$img' alt='Avatar'><span class='mx-2'>".htmlspecialchars($fname, ENT_QUOTES, 'UTF-8')."</span>";
-        return $name;
+      ->filterColumn('head', function ($query, $keyword) {
+        $query->whereHas('head', function ($q) use ($keyword) {
+          $sql = "CONCAT(admins.first_name,' ',admins.last_name, ' ',admins.email)  like ?";
+          return $q->whereRaw($sql, ["%{$keyword}%"]);
+        });
+      })
+      ->filterColumn('organization', function ($query, $keyword) {
+        $query->whereHas('company', function ($q) use ($keyword) {
+          return $q->where('name', 'like', "%{$keyword}%");
+        });
       })
       ->setRowId('id')
-      ->rawColumns(['head' ,'action']);
+      ->rawColumns(['head', 'action']);
   }
 
   /**
@@ -49,7 +71,17 @@ class DepartmentsDataTable extends DataTable
    */
   public function query(CompanyDepartment $model): QueryBuilder
   {
-    return $model->newQuery();
+    $query = $model->query();
+
+    $query->when(request('filer_heads'), function ($q) {
+      return $q->whereIn('head_id', request('filer_heads'));
+    });
+
+    $query->when(request('filter_organizations'), function ($q) {
+      return $q->whereIn('company_id', request('filter_organizations'));
+    });
+
+    return $query->with('head');
   }
 
   /**
@@ -65,7 +97,7 @@ class DepartmentsDataTable extends DataTable
         'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New Department</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
-          'data-toggle' => "ajax-offcanvas",
+          'data-toggle' => "ajax-modal",
           'data-title' => 'Add Department',
           'data-href' => route('admin.partner.departments.create')
         ]
@@ -97,9 +129,9 @@ class DepartmentsDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('name'),
+      Column::make('name')->title('Department Name'),
       Column::make('head'),
-      Column::make('company'),
+      Column::make('organization'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

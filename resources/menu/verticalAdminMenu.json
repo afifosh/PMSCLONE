@@ -50,7 +50,7 @@
     {
       "name": "Companies",
       "icon": "menu-icon fas fa-building",
-      "slug": ["admin.companies.", "admin.company-roles", "admin.company-invitations."],
+      "slug": ["admin.companies.", "admin.company-roles", "admin.company-invitations.", "admin.company-users."],
       "permission" : ["read company role"],
       "submenu": [
         {
@@ -66,6 +66,12 @@
           "permission": "read company role"
         },
         {
+          "url": "/admin/company-users",
+          "name": "Company Users",
+          "slug": "admin.company-users.index",
+          "permission": "read company role"
+        },
+        {
           "url": "/admin/company-invitations",
           "name": "Invitations",
           "slug": "admin.company-invitations.index",
@@ -78,6 +84,12 @@
       "name": "Programs",
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "slug": "admin.programs.index"
+    },
+    {
+      "url": "/admin/draft-rfps",
+      "name": "Draft RFPs",
+      "icon": "menu-icon tf-icons ti ti-color-swatch",
+      "slug": "admin.draft-rfps.index"
     },
     {
       "url": "/admin/settings",

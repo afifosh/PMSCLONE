@@ -10541,42 +10541,52 @@ __webpack_require__.r(__webpack_exports__);
 (dropzone_dist_dropzone__WEBPACK_IMPORTED_MODULE_0___default().autoDiscover) = false;
 
 // File upload progress animation
-(dropzone_dist_dropzone__WEBPACK_IMPORTED_MODULE_0___default().prototype.uploadFiles) = function (files) {
-  var minSteps = 6;
-  var maxSteps = 60;
-  var timeBetweenSteps = 100;
-  var bytesPerStep = 100000;
-  var isUploadSuccess = true;
-  var self = this;
-  for (var i = 0; i < files.length; i++) {
-    var file = files[i];
-    var totalSteps = Math.round(Math.min(maxSteps, Math.max(minSteps, file.size / bytesPerStep)));
-    for (var step = 0; step < totalSteps; step++) {
-      var duration = timeBetweenSteps * (step + 1);
-      setTimeout(function (file, totalSteps, step) {
-        return function () {
-          file.upload = {
-            progress: 100 * (step + 1) / totalSteps,
-            total: file.size,
-            bytesSent: (step + 1) * file.size / totalSteps
-          };
-          self.emit('uploadprogress', file, file.upload.progress, file.upload.bytesSent);
-          if (file.upload.progress === 100) {
-            if (isUploadSuccess) {
-              file.status = (dropzone_dist_dropzone__WEBPACK_IMPORTED_MODULE_0___default().SUCCESS);
-              self.emit('success', file, 'success', null);
-            } else {
-              file.status = (dropzone_dist_dropzone__WEBPACK_IMPORTED_MODULE_0___default().ERROR);
-              self.emit('error', file, 'Some upload error', null);
-            }
-            self.emit('complete', file);
-            self.processQueue();
-          }
-        };
-      }(file, totalSteps, step), duration);
-    }
-  }
-};
+// Dropzone.prototype.uploadFiles = function (files) {
+//   const minSteps = 6;
+//   const maxSteps = 60;
+//   const timeBetweenSteps = 100;
+//   const bytesPerStep = 100000;
+//   const isUploadSuccess = true;
+
+//   const self = this;
+
+//   for (let i = 0; i < files.length; i++) {
+//     const file = files[i];
+//     const totalSteps = Math.round(Math.min(maxSteps, Math.max(minSteps, file.size / bytesPerStep)));
+
+//     for (let step = 0; step < totalSteps; step++) {
+//       const duration = timeBetweenSteps * (step + 1);
+
+//       setTimeout(
+//         (function (file, totalSteps, step) {
+//           return function () {
+//             file.upload = {
+//               progress: (100 * (step + 1)) / totalSteps,
+//               total: file.size,
+//               bytesSent: ((step + 1) * file.size) / totalSteps
+//             };
+
+//             self.emit('uploadprogress', file, file.upload.progress, file.upload.bytesSent);
+//             if (file.upload.progress === 100) {
+//               if (isUploadSuccess) {
+//                 file.status = Dropzone.SUCCESS;
+//                 self.emit('success', file, 'success', null);
+//               } else {
+//                 file.status = Dropzone.ERROR;
+//                 self.emit('error', file, 'Some upload error', null);
+//               }
+
+//               self.emit('complete', file);
+//               self.processQueue();
+//             }
+//           };
+//         })(file, totalSteps, step),
+//         duration
+//       );
+//     }
+//   }
+// };
+
 
 }();
 /******/ 	return __webpack_exports__;

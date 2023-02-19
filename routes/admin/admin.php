@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminAccountController;
@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\Admin\AppSettingController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
+use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\EmailServiceController;
@@ -20,6 +21,10 @@ use App\Http\Controllers\Auth\ExpiredPasswordController;
 use App\Http\Controllers\Auth\LockModeController;
 use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\RFP\RFPDraftController;
+use App\Http\Controllers\Admin\RFP\RFPFileController;
+use App\Http\Controllers\OnlyOfficeController;
+
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified', CheckForLockMode::class)->group(function () {
 
@@ -43,13 +48,18 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
     Route::resource('company-roles', CompanyRoleController::class);
 
-    Route::get('/users/{admin}/impersonate', [AdminUsersController::class, 'impersonate'])->name('impersonate-admin');
+    Route::get('/users/{user}/impersonate', [AdminUsersController::class, 'impersonate'])->name('impersonate-admin');
     Route::get('/users/leave-impersonate', [AdminUsersController::class, 'leaveImpersonate'])->name('leave-impersonate');
+    Route::get('/users/{user}/editPassword', [AdminUsersController::class, 'editPassword'])->name('users.editPassword');
+    Route::put('/users/{user}/updatePassword', [AdminUsersController::class, 'updatePassword'])->name('users.updatePassword');
     Route::resource('users', AdminUsersController::class);
 
+    Route::get('companies/{company}/users', [CompanyController::class, 'showUsers'])->name('companies.showUsers');
+    Route::get('companies/{company}/invitations', [CompanyController::class, 'showInvitations'])->name('companies.showInvitations');
     Route::resource('companies', CompanyController::class);
     Route::resource('companies.contact-persons', ContactPersonController::class);
     Route::resource('company-invitations', InvitationController::class);
+    Route::resource('company-users', UserController::class);
 
     Route::prefix('partner')->name('partner.')->group(function () {
       Route::resource('companies', PatnerCompanyController::class);
@@ -59,8 +69,21 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
       Route::resource('designations', DesignationController::class);
     });
 
+
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
+
+    Route::get('draft-rfps/{draft_rfp}/users', [RFPDraftController::class, 'draft_users_tab'])->name('draft-rfps.users_tab');
+    Route::resource('draft-rfps', RFPDraftController::class);
+
+    Route::get('/draft-rfps/{draft_rfp}/files/{file}/download', [RFPFileController::class, 'download'])->name('draft-rfps.files.download');
+    Route::get('/draft-rfps/{draft_rfp}/files/{file}/activity', [RFPFileController::class, 'getActivity'])->name('draft-rfps.files.get-activity');
+    Route::resource('draft-rfps.files', RFPFileController::class);
+    Route::get('/edit-file/{file?}', [RFPFileController::class, 'editFileWithOffice'])->name('edit-file');
+    Route::post('restore-file-update', [OnlyOfficeController::class, 'restoreVersion'])->name('file.restore_version');
+
+    Route::get('file-manager', [AppsController::class, 'file_manager'])->name('app-file-manager');
+
     // Route::resource('companies.invitations', InvitationController::class);
     Route::prefix('settings')->name('setting.')->group(function () {
       Route::get('/', [AppSettingController::class, 'index'])->name('index');
@@ -75,4 +98,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
   });
 });
 
-require __DIR__ . '/auth.php';
+Route::any('update-file/{file}', [OnlyOfficeController::class, 'updateFile'])->name('update-file');
+
+require __DIR__.'/auth.php';

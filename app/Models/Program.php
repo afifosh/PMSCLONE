@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class Program extends Model
+class Program extends BaseModel
 {
     use HasFactory;
 
@@ -17,6 +16,17 @@ class Program extends Model
       'created_at' => 'datetime:d M, Y',
       'updated_at' => 'datetime:d M, Y',
     ];
+
+    public function scopeMine($query){
+      if(auth('admin')->check() && auth('admin')->id() == 1){
+        return $query;
+      }
+      return $query->whereHas('users', function($q){
+        return $q->where('admins.id', auth()->id());
+      })->orWhereHas('parent.users', function($q){
+        return $q->where('admins.id', auth()->id());
+      });
+    }
 
     public function users()
     {

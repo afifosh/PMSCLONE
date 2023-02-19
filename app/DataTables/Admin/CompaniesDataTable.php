@@ -27,11 +27,39 @@ class CompaniesDataTable extends DataTable
       ->editColumn('added_by', function ($company) {
         return $company->addedBy->email ?? '-';
       })
+      ->editColumn('status', function ($row) {
+        return $this->makeStatus($row->status);
+      })
       ->addColumn('action', function (Company $company) {
         return view('admin.pages.company.action', compact('company'));
       })
+      ->filterColumn('added_by', function($query, $keyword){
+        return $query->whereHas('addedBy', function($q) use ($keyword){
+          return $q->where('email', 'like', '%'.$keyword.'%');
+        });
+      })
       ->setRowId('id')
-      ->rawColumns(['name', 'action']);
+      ->rawColumns(['name', 'action', 'status']);
+  }
+
+  protected function makeStatus($status)
+  {
+    $b_status = htmlspecialchars(ucwords($status), ENT_QUOTES, 'UTF-8');
+    switch ($status) {
+      case 'active':
+        return '<span class="badge bg-label-success">' . $b_status . '</span>';
+        break;
+      case 'pending':
+        return '<span class="badge bg-label-warning">' . $b_status . '</span>';
+        break;
+      case 'disabled':
+        return '<span class="badge bg-label-secondary">' . $b_status . '</span>';
+        break;
+
+      default:
+        return '<span class="badge bg-label-warning">' . $b_status . '</span>';
+        break;
+    }
   }
 
   /**
@@ -58,7 +86,7 @@ class CompaniesDataTable extends DataTable
         'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create New Company</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
-          'data-toggle' => "ajax-offcanvas",
+          'data-toggle' => "ajax-modal",
           'data-title' => 'Create New Company',
           'data-href' => route('admin.companies.create')
         ]

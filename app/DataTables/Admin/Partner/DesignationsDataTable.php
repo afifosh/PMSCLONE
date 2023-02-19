@@ -20,17 +20,27 @@ class DesignationsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-    ->addColumn('action', function (CompanyDesignation $designation) {
-      return view('admin.pages.partner.designations.action', compact('designation'));
-    })
-    ->addColumn('department', function(CompanyDesignation $designation){
-      return $designation->department->name;
-    })
-    ->addColumn('company', function(CompanyDesignation $designation){
-      return $designation->department->company->name;
-    })
-    ->setRowId('id')
-    ->rawColumns(['action']);
+      ->addColumn('action', function (CompanyDesignation $designation) {
+        return view('admin.pages.partner.designations.action', compact('designation'));
+      })
+      ->addColumn('department', function (CompanyDesignation $designation) {
+        return $designation->department->name;
+      })
+      ->addColumn('organization', function (CompanyDesignation $designation) {
+        return $designation->department->company->name;
+      })
+      ->filterColumn('organization', function ($query, $keyword) {
+        $query->whereHas('department.company', function ($q) use ($keyword) {
+          return $q->where('name', 'like', "%{$keyword}%");
+        });
+      })
+      ->filterColumn('department', function ($query, $keyword) {
+        $query->whereHas('department', function ($q) use ($keyword) {
+          return $q->where('name', 'like', "%{$keyword}%");
+        });
+      })
+      ->setRowId('id')
+      ->rawColumns(['action']);
   }
 
   /**
@@ -41,7 +51,19 @@ class DesignationsDataTable extends DataTable
    */
   public function query(CompanyDesignation $model): QueryBuilder
   {
-    return $model->newQuery();
+    $query = $model->query();
+
+    $query->when(request('filer_departments'), function ($q) {
+      return $q->whereIn('department_id', request('filer_departments'));
+    });
+
+    $query->when(request('filter_organizations'), function ($q) {
+      $q->whereHas('department', function ($dep) {
+        return $dep->whereIn('company_id', request('filter_organizations'));
+      });
+    });
+
+    return $query;
   }
 
   /**
@@ -57,7 +79,7 @@ class DesignationsDataTable extends DataTable
         'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New Designation</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
-          'data-toggle' => "ajax-offcanvas",
+          'data-toggle' => "ajax-modal",
           'data-title' => 'Add Designation',
           'data-href' => route('admin.partner.designations.create')
         ]
@@ -89,9 +111,9 @@ class DesignationsDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('name'),
+      Column::make('name')->title('Designation Name'),
       Column::make('department'),
-      Column::make('company'),
+      Column::make('organization'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

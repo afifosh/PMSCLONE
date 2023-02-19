@@ -1,6 +1,6 @@
 <div class="d-inline-block text-nowrap">
     @can('update company')
-        <button class="btn btn-sm btn-icon" data-toggle="ajax-offcanvas" data-title="Edit Company" data-href="{{route('admin.companies.edit', $company)}}"><i class="ti ti-edit"></i></button>
+        <button class="btn btn-sm btn-icon" data-toggle="ajax-modal" data-title="Edit Company" data-href="{{route('admin.companies.edit', $company)}}"><i class="ti ti-edit"></i></button>
     @endcan
     @can('delete company')
         <button class="btn btn-sm btn-icon delete-record" data-toggle="ajax-delete"
@@ -12,7 +12,7 @@
         <a href="javascript:;" class="dropdown-item">{{__('View')}}</a>
         @can('update company')
             <a href="javascript:;" class="dropdown-item">{{__('Suspend')}}</a>
-            <a href="javascript:;" data-toggle="ajax-offcanvas" data-title="{{__('Create Contact Person')}}" data-href="{{route('admin.companies.contact-persons.create', $company)}}" class="dropdown-item">{{__('Create Contact Person')}}</a>
+            <a href="javascript:;" data-toggle="ajax-modal" data-title="{{__('Create Contact Person')}}" data-href="{{route('admin.companies.contact-persons.create', $company)}}" class="dropdown-item">{{__('Create Contact Person')}}</a>
         @endcan
     </div>
 </div>

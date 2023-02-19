@@ -16,39 +16,24 @@ class CompanyController extends Controller
 
   function __construct()
   {
-    $this->middleware('permission:read company|create company|update company|delete company', ['only' => ['index', 'show']]);
+    $this->middleware('permission:read company|create company|update company|delete company', ['only' => ['index', 'show', 'showUsers', 'showInvitations']]);
     $this->middleware('permission:create company', ['only' => ['create', 'store']]);
     $this->middleware('permission:update company', ['only' => ['edit', 'update']]);
     $this->middleware('permission:delete company', ['only' => ['destroy']]);
   }
-  /**
-   * Display a listing of the resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
+
   public function index(CompaniesDataTable $datatable)
   {
     return $datatable->render('admin.pages.company.index');
     return view('admin.pages.company.index');
   }
 
-  /**
-   * Show the form for creating a new resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
   public function create()
   {
     $company = new Company();
     return $this->sendRes('success', ['view_data' => view('admin.pages.company.edit', compact('company'))->render()]);
   }
 
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\Response
-   */
   public function store(Request $request)
   {
     $att = $request->validate([
@@ -57,24 +42,25 @@ class CompanyController extends Controller
       'email' => ['required', 'string', 'max:255', 'unique:companies,email'],
       'status' => 'required',
     ]);
-    if(Company::create($att + ['added_by' => auth()->id()]))
-    {
-      return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalOffCanvas']);
+    if (Company::create($att + ['added_by' => auth()->id()])) {
+      return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);
     }
   }
 
-  public function show(Company $company, Request $request)
+  public function show(Company $company, InvitationsDataTable $dataTable)
   {
-    if(!$request->tab || $request->tab == 'profile'){
-      $dataTable = new InvitationsDataTable();
       return $dataTable->render('admin.pages.company.show-profile', compact('company'));
-    }elseif($request->tab == 'users'){
-      $company->load('users');
-      return view('admin.pages.company.show-users', compact('company'));
-    }elseif($request->tab == 'invitations'){
-      $dataTable = new InvitationsDataTable();
-      return $dataTable->render('admin.pages.company.show-invitations', compact('company'));
-    }
+  }
+
+  public function showUsers(Company $company)
+  {
+    $company->load('users');
+    return view('admin.pages.company.show-users', compact('company'));
+  }
+
+  public function showInvitations(Company $company, InvitationsDataTable $dataTable)
+  {
+    return $dataTable->render('admin.pages.company.show-invitations', compact('company'));
   }
 
   public function edit(Company $company)
@@ -87,12 +73,11 @@ class CompanyController extends Controller
     $att = $request->validate([
       'name' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
       'website' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
-      'email' => ['required', 'string', 'max:255',Rule::unique('companies')->ignore($company->id),],
+      'email' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
       'status' => 'required',
     ]);
-    if($company->update($att))
-    {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalOffCanvas']);
+    if ($company->update($att)) {
+      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);
     }
   }
 

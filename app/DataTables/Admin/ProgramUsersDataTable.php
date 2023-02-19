@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin;
 
+use App\Models\Program;
 use App\Models\ProgramUser;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -24,19 +25,51 @@ class ProgramUsersDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->addColumn('user', function ($row) {
-        return "<img class='avatar avatar-sm pull-up rounded-circle' src='".$row->user->avatar."' alt='Avatar'><span class='mx-2'>" . htmlspecialchars($row->user->full_name, ENT_QUOTES, 'UTF-8') . "</span>";
+        return '<div class="d-flex justify-content-start align-items-center">
+                <div class="avatar-wrapper">
+                  <div class="avatar avatar-sm me-3"><img src="' . $row->user->avatar . '" alt="Avatar" class="rounded-circle">
+                  </div>
+                </div>
+                <div class="d-flex flex-column">
+                  <span class="text-body text-truncate">
+                    <a href="'.route('admin.users.show', $row->user).'" class="fw-semibold">' . htmlspecialchars($row->user->full_name, ENT_QUOTES, 'UTF-8') . '</a>
+                  </span>
+                  <small class="text-muted">' . htmlspecialchars($row->user->email, ENT_QUOTES, 'UTF-8') . '</small>
+                </div>
+              </div>';
       })
-      ->editColumn('added_by', function($row){
-        return $row->addedBy->full_name ?? '-';
+      ->editColumn('added_by', function ($row) {
+        return '<div class="d-flex justify-content-start align-items-center">
+                <div class="avatar-wrapper">
+                  <div class="avatar avatar-sm me-3"><img src="' . $row->addedBy->avatar . '" alt="Avatar" class="rounded-circle">
+                  </div>
+                </div>
+                <div class="d-flex flex-column">
+                  <span class="text-body text-truncate">
+                    <a href="'.route('admin.users.show', $row->addedBy).'" class="fw-semibold">' . htmlspecialchars($row->addedBy->full_name, ENT_QUOTES, 'UTF-8') . '</a>
+                  </span>
+                  <small class="text-muted">' . htmlspecialchars($row->addedBy->email, ENT_QUOTES, 'UTF-8') . '</small>
+                </div>
+              </div>';
       })
-      ->addColumn('user_organization', function($row){
-        return $row->user->company->name ?? '-';
+      ->addColumn('user_organization', function ($row) {
+        return @$row->user->designation->department->company->name ?? '-';
       })
       ->addColumn('action', function (ProgramUser $programUser) {
         return view('admin.pages.programs.users.action', compact('programUser'));
       })
+      ->filterColumn('user', function ($query, $keyword) {
+        return $query->whereHas('user', function ($q) use ($keyword) {
+          return $q->where('email', 'like', "%" . $keyword . "%");
+        });
+      })
+      ->filterColumn('added_by', function ($query, $keyword) {
+        return $query->whereHas('addedBy', function ($q) use ($keyword) {
+          return $q->where('email', 'like', "%" . $keyword . "%");
+        });
+      })
       ->setRowId('id')
-      ->rawColumns(['user', 'action']);
+      ->rawColumns(['user', 'added_by', 'action']);
   }
 
   /**
@@ -48,8 +81,8 @@ class ProgramUsersDataTable extends DataTable
   public function query(ProgramUser $model): QueryBuilder
   {
     $query = $model->query();
-    $query->when(request()->program, function($query){
-      return $query->where('program_id', request()->program->id)->orWhere('program_id', request()->program->parent_id);
+    $query->when(request()->program, function ($query) {
+      return $query->ofProgram(request()->program);
     });
     return $query;
   }
@@ -67,7 +100,7 @@ class ProgramUsersDataTable extends DataTable
         'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add User</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
-          'data-toggle' => "ajax-offcanvas",
+          'data-toggle' => "ajax-modal",
           'data-title' => 'Add User',
           'data-href' => route('admin.programs.users.create', ['program' => request()->program])
         ]

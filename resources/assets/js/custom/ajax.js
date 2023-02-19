@@ -226,10 +226,15 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
               .DataTable()
               .ajax.reload();
           }
+          if(data.data.event == 'page_reload'){
+            setTimeout(function() { // wait for 1 second
+              location.reload(); // then reload the page
+            }, 1000);
+          }
           //console.log(current.closest('.modal').modal("hide"));
           current.removeClass('disabled');
-          if(data.data.close == 'globalOffCanvas'){
-            globalOffCanvas.hide();
+          if(data.data.close == 'globalModal'){
+            $('#globalModal').modal('hide');
           }else if(data.data.close == 'modal'){
             current.closest('.modal').modal('hide');
           }
@@ -311,6 +316,11 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
                 $('#dataTableBuilder').DataTable().ajax.reload();
               }
             }
+            if(response.data.event == 'page_reload'){
+              setTimeout(function() { // wait for 1 second
+                location.reload(); // then reload the page
+              }, 1000);
+            }
           } else {
             toast_danger(response.message)
           }
@@ -331,28 +341,67 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
     }
   });
 });
-window.OffcanvasSelect2 = function(){
+window.initModalSelect2 = function(){
+  if(typeof select2 == 'undefined')
+  {
+    return true;
+  }
   $('.globalOfSelect2').select2({
-    dropdownParent: $('#globalOffcanvas')
-});
+    dropdownParent: $('#globalModal')
+  });
+
+  var UsersSelect2 = $('.globalOfSelect2User');
+
+  if (UsersSelect2.length) {
+    // custom template to render icons
+    function renderUser(option) {
+      if (!option.id) {
+        return option.text;
+      }
+      return '<div class="d-flex justify-content-start align-items-center user-name"><div class="avatar-wrapper"><div class="avatar avatar-sm me-3"><img src="'+$(option.element).data('avatar')+'"></div></div><div class="d-flex flex-column"><span class="text-body text-truncate"><span class="fw-semibold">'+$(option.element).data('full_name')+'</span></span><small class="text-muted">'+option.text+'</small></div></div>';
+    }
+    function renderSelectedUser(option) {
+      if (!$(option.element).data('full_name')) {
+        return option.text;
+      }
+      return $(option.element).data('full_name')
+    }
+    UsersSelect2.select2({
+      templateResult: renderUser,
+      templateSelection: renderSelectedUser,
+      escapeMarkup: function (es) {
+        return es;
+      },
+      dropdownParent: $('#globalModal')
+    });
+  }
 }
 // ajax OffCanvax
-$(document).on('click', '[data-toggle="ajax-offcanvas"]', function () {
+$(document).on('click', '[data-toggle="ajax-modal"]', function () {
   var title = $(this).data('title');
+  console.log(title);
+  console.log($('#globalModalTitle').html());
   var url = $(this).data('href');
+  var modal_size = $(this).data('size');
+  $('.modal-dialog').removeClass('modal-lg modal-sm modal-xs modal-xl');
+  if (typeof modal_size ==  'undefined' || modal_size == '') {
+    modal_size = 'modal-lg';
+  }
+  console.log(modal_size);
+  $('.modal-dialog').addClass(modal_size);
+  $('#globalModalTitle').html(title);
+  console.log($('#globalModalTitle').html());
   $.ajax({
     type: 'get',
     url: url,
     success: function (response) {
-      console.log(response);
-    $('#globalOffcanvasTitle').html(title);
-    $('#globalOffcanvasBody').html(response.data.view_data);
-    window.globalOffCanvas = new bootstrap.Offcanvas($('#globalOffcanvas'))
-    globalOffCanvas.show();
-    OffcanvasSelect2();
-    if(typeof initFlatPickr != 'undefined'){
-      initFlatPickr();
-    }
+      $('#globalModalTitle').html(title);
+      $('#globalModalBody').html(response.data.view_data);
+      initModalSelect2();
+      if(typeof initFlatPickr != 'undefined'){
+        initFlatPickr();
+      }
+      $('#globalModal').modal('show');
     },
   });
 });
@@ -389,7 +438,7 @@ $(document).on('change', '[data-updateOptions="ajax-options"]', function () {
         }
 
       }
-      OffcanvasSelect2();
+      initModalSelect2();
       if(typeof initFlatPickr != 'undefined'){
         initFlatPickr();
       }
