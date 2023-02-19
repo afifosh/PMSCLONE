@@ -24,9 +24,9 @@ class EmailServiceRequest extends FormRequest
     public function rules()
     {
         return [
-            'service' => 'required|in:ses,mailgun,smtp,sendmail,mailtrap|exists:email_services,service',
-            'email_sent_from_name' => 'required',
-            'email_sent_from_email' => 'required|email',
+            'name' => 'required|in:ses,mailgun,smtp,sendmail,mailtrap|exists:email_services,name',
+            'sent_from_name' => 'required',
+            'sent_from_address' => 'required|email',
             // ses
             'ses_host' => 'required_if:service,ses',
             'ses_access_key_id' => 'required_if:service,ses',

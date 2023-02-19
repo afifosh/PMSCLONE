@@ -20,9 +20,9 @@
     "laravel/sanctum": "^2.14",
     "laravel/tinker": "^2.7",
     "laravolt/avatar": "^4.1",
-    "rappasoft/laravel-authentication-log": "^2.0",
+    "predis/predis": "^2.1",
+    "rappasoft/laravel-authentication-log": "dev-cloudflare",
     "spatie/laravel-permission": "^5.8",
-    "stevebauman/location": "^6.6",
     "torann/geoip": "^3.0",
     "yajra/laravel-datatables": "^9.0",
     "yajra/laravel-datatables-buttons": "^9.1",
@@ -79,5 +79,11 @@
     "sort-packages": true
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:Soban3/laravel-authentication-log.git"
+    }
+  ]
 }

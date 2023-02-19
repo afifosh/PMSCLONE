@@ -36,13 +36,7 @@ $configData = Helper::appClasses();
 
 <div class="row">
   <div class="col-md-12">
-    <ul class="nav nav-pills flex-column flex-md-row mb-4">
-      <li class="nav-item"><a class="nav-link" href="{{ route('user-account.edit', ['user_account' => auth()->id(), 't' => 'general'])}}"><i class="ti-xs ti ti-users me-1"></i> Account</a></li>
-      <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class="ti-xs ti ti-lock me-1"></i> Security</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/account-settings-billing')}}"><i class="ti-xs ti ti-file-description me-1"></i> Billing & Plans</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/account-settings-notifications')}}"><i class="ti-xs ti ti-bell me-1"></i> Notifications</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/account-settings-connections')}}"><i class="ti-xs ti ti-link me-1"></i> Connections</a></li>
-    </ul>
+    @include('pages.account._partials.tabs')
     <!-- Change Password -->
     <div class="card mb-4">
       <h5 class="card-header">Change Password</h5>
@@ -51,6 +45,12 @@ $configData = Helper::appClasses();
         <form method="POST" action="{{route('user-password.update')}}">
           @method('PUT')
           @csrf
+          @if ($errors->updatePassword->any())
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {!! implode('<br/>', $errors->all('<span>:message</span>')) !!}
+            </div>
+          @endif
           <div class="row">
             <div class="mb-3 col-md-6 form-password-toggle">
               <label class="form-label" for="currentPassword">Current Password</label>

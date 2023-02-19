@@ -3,9 +3,12 @@
 namespace App\Observers;
 
 use App\Models\User;
+use App\Traits\PasswordHistory;
 
 class UserObserver
 {
+    use PasswordHistory;
+
     /**
      * Handle the User "created" event.
      *
@@ -14,9 +17,7 @@ class UserObserver
      */
     public function created(User $user)
     {
-        $user->passwordHistories()->create([
-            'password' => $user->password
-        ]);
+        $this->storePasswordHistory($user);
     }
 
     /**
@@ -27,18 +28,7 @@ class UserObserver
      */
     public function updated(User $user)
     {
-        if(! $user->isDirty('password')) {
-            return;
-        }
-
-        // if threshold reached, delete one record
-        if ($user->passwordHistories()->count() === config('auth.password_history_count')) {
-            $user->passwordHistories()->first()->delete();
-        }
-
-        $user->passwordHistories()->create([
-            'password' => $user->password
-        ]);
+        $this->updatePasswordHistory($user);
     }
 
     /**
@@ -71,6 +61,6 @@ class UserObserver
      */
     public function forceDeleted(User $user)
     {
-        $user->passwordHistories()->delete();
+        $this->deletePasswordHistory($user);
     }
 }

@@ -17,34 +17,34 @@ class EmailServiceSeeder extends Seeder
         /**
          * Supported services
          */
-        $services = [
-            [
-                'service_label' => 'Amazon SES',
-                'service' => 'ses',
+        $services = array (
+            array(
+                'label'     => 'Amazon SES',
+                'name'      => 'ses',
                 'is_active' => true,
-            ],
-            [
-                'service_label' => 'Mailgun',
-                'service' => 'mailgun',
-            ],
-            [
-                'service_label' => 'SMTP',
-                'service' => 'smtp',
-            ],
-            [
-                'service_label' => 'Sendmail',
-                'service' => 'sendmail',
-            ],
-            [
-                'service_label' => 'Mailtrap',
-                'service' => 'mailtrap',
-            ],
-        ];
+            ),
+            array(
+                'label' => 'Mailgun',
+                'name'  => 'mailgun',
+            ),
+            array(
+                'label' => 'SMTP',
+                'name'  => 'smtp',
+            ),
+            array(
+                'label' => 'Sendmail',
+                'name'  => 'sendmail',
+            ),
+            array(
+                'label' => 'Mailtrap',
+                'name'  => 'mailtrap',
+            ),
+        );
 
         foreach ($services as $service) {
             DB::table('email_services')->insert([
-                'service_label' => $service['service_label'],
-                'service' => $service['service'],
+                'label'     => $service['label'],
+                'name'   => $service['name'],
                 'is_active' => $service['is_active'] ?? false,
             ]);
         }

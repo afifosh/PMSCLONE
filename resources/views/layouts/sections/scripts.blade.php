@@ -11,12 +11,8 @@
 <script src="{{ asset(mix('assets/vendor/libs/toastr/toastr.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
-@auth
-  @if(Route::currentRouteName() !== 'auth.lock' && Route::currentRouteName() !== 'admin.auth.lock')
-  <!-- Session Timeout -->
-  <script src="{{asset('assets/vendor/libs/timeout/bootstrap-session-timeout.js')}}"></script>
-  @endif
-@endauth
+<script src="{{ asset('js/bootstrap-session-timeout.js') }}"></script>
+
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
@@ -33,18 +29,18 @@
     toast_success("{{ucwords(str_replace('-', ' ', session('status')))}}");
     @endif
 
-    let guard = "{{ config('fortify.guard') }}"
     @auth
-      @if(Route::currentRouteName() !== 'auth.lock' && Route::currentRouteName() !== 'admin.auth.lock')
+      @if(Auth::getDefaultDriver() === 'web' && Route::currentRouteName() !== 'auth.lock')
         $.sessionTimeout({
           keepAliveUrl: '/keep-alive',
-          logoutUrl: guard === 'web' ? '/logout' : '/admin/logout',
-          redirUrl: guard === 'web' ? '/auth/lock' : '/admin/auth/locked',
-          warnAfter: +"{{ cache('timeout_warning_seconds') }}",
-          redirAfter: +"{{ cache('timeout_after_seconds') }}",
+          logoutUrl: '/logout',
+          redirUrl: '/auth/lock',
+          warnAfter: +"{{ config('auth.timeout_warning_seconds') }}",
+          redirAfter: +"{{ config('auth.timeout_after_seconds') }}",
           countdownBar: true,
           countdownMessage: 'Redirecting in {timer} seconds.',
           useLocalStorageSynchronization: true,
+          ignoreUserActivity: true,
           clearWarningOnUserActivity: false,
         });
       @endif
@@ -55,12 +51,11 @@
 
           $(document).ready(function() {
 
-            $('.notification-bell').click(function() {
+            $('.dropdown-notifications a.dropdown-toggle').click(function() {
               $.ajax({
                   type: 'post'
                   , url: "{{ route('update.notification.count') }}"
-                })
-                .done(function(response) {
+                }).done(function(response) {
                   $('.notification-bell').hide();
                 })
 

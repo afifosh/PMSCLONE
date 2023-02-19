@@ -11,6 +11,7 @@ class AppSetting extends Model
 
     protected $fillable = [
         'password_expire_days',
+        'password_history_count',
         'timeout_warning_seconds',
         'timeout_after_seconds',
     ];

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EmailService extends Model
 {
@@ -16,18 +15,21 @@ class EmailService extends Model
      * @var array
      */
     protected $fillable = [
-        'service_label',
-        'service',
+        'label',
+        'name',
         'is_active',
+        'sent_from_name',
+        'sent_from_address',
+        'transport',
+        'host',
+        'port',
+        'encryption',
+        'username',
+        'password',
+        'access_key_id',
+        'secret_access_key',
+        'region',
+        'domain_name',
+        'api_key',
     ];
-
-    /**
-     * An email service has many fields
-     * 
-     * @return HasMany
-     */
-    public function emailServiceFields()
-    {
-        return $this->hasMany(EmailServiceField::class);
-    }
 }

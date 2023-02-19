@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AppSetting\GeneralSettingRequest;
 use App\Models\AppSetting;
 use App\Models\EmailService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -18,37 +18,36 @@ class AppSettingController extends Controller
      */
     public function index()
     {
-        $general_settings = AppSetting::first();
-        $email_services = EmailService::with('emailServiceFields')->get();
-
+        $generalSettings = AppSetting::first();
+        $emailServices = EmailService::query()->get();
 
         return view(
             'admin.app-setting',
-            compact('email_services', 'general_settings')
+            compact('emailServices', 'generalSettings')
         );
     }
 
     /**
      * Stores / Updates general settings tab
      * 
-     * @param Request $request
+     * @param GeneralSettingRequest $request
      * @return Redirect
      */
-    public function storeGeneralSettings(Request $request)
+    public function storeGeneralSettings(GeneralSettingRequest $request)
     {
-        $request->validate([
-            'password_expire_days' => 'required|numeric|gt:1',
-            'timeout_warning_seconds' => 'required|numeric|gte:3000',
-            'timeout_after_seconds' => 'required|numeric|gt:timeout_warning_seconds',
-        ]);
-
-        AppSetting::updateOrCreate([
-            'id' => 1,
-        ], [
+        AppSetting::updateOrCreate(['id' => 1], [
+            'password_history_count' => $request->password_history_count,
             'password_expire_days' => $request->password_expire_days,
             'timeout_warning_seconds' => $request->timeout_warning_seconds,
             'timeout_after_seconds' => $request->timeout_after_seconds,
         ]);
+
+        cache()->store(config('cache.default'))->put(
+            'idle_timeout_settings',
+            json_encode(
+                $request->only(['timeout_warning_seconds', 'timeout_after_seconds'])
+            ),
+        );
 
         return redirect()->back()->with(['status' => __('Settings updated successfully')]);
     }
