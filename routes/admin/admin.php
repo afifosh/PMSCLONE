@@ -31,10 +31,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
     Route::resource('company-roles', CompanyRoleController::class);
 
-    Route::get('/users/{admin}/impersonate', [AdminUsersController::class, 'impersonate'])->name('impersonate-admin');
+    Route::get('/users/{user}/impersonate', [AdminUsersController::class, 'impersonate'])->name('impersonate-admin');
     Route::get('/users/leave-impersonate', [AdminUsersController::class, 'leaveImpersonate'])->name('leave-impersonate');
+    Route::get('/users/{user}/editPassword', [AdminUsersController::class, 'editPassword'])->name('users.editPassword');
+    Route::put('/users/{user}/updatePassword', [AdminUsersController::class, 'updatePassword'])->name('users.updatePassword');
     Route::resource('users', AdminUsersController::class);
 
+    Route::get('companies/{company}/users', [CompanyController::class, 'showUsers'])->name('companies.showUsers');
+    Route::get('companies/{company}/invitations', [CompanyController::class, 'showInvitations'])->name('companies.showInvitations');
     Route::resource('companies', CompanyController::class);
     Route::resource('companies.contact-persons', ContactPersonController::class);
     Route::resource('company-invitations', InvitationController::class);

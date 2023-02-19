@@ -12,6 +12,7 @@
         <a href="javascript:;" class="dropdown-item">View</a>
         @can('update user')
             <a href="javascript:;" class="dropdown-item">Suspend</a>
+            <a href="javascript:;" class="dropdown-item" data-toggle="ajax-modal" data-title="Edit User Password" data-href="{{route('admin.users.editPassword', $admin)}}">Edit Password</a>
         @endcan
 
         @can('impersonate user')

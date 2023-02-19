@@ -24,11 +24,7 @@ class AdminUsersController extends Controller
     $this->middleware('permission:delete user', ['only' => ['destroy']]);
     $this->middleware('permission:impersonate user', ['only' => ['impersonate']]);
   }
-  /**
-   * Display a listing of the resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
+
   public function index(AdminsDataTable $dataTable)
   {
     // $data['roles'] = Role::where('guard_name', 'admin')->with('users')->withCount('users')->get();
@@ -39,11 +35,6 @@ class AdminUsersController extends Controller
         // return view('admin.pages.partner.employees.index', $data);
   }
 
-  /**
-   * Show the form for creating a new resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
   public function create()
   {
     $data['user'] = new Admin();
@@ -54,12 +45,6 @@ class AdminUsersController extends Controller
     return $this->sendRes('success', ['view_data' => view('admin.pages.roles.admins.edit', $data)->render()]);
   }
 
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\Response
-   */
   public function store(Request $request)
   {
     $att = $request->validate([
@@ -73,40 +58,30 @@ class AdminUsersController extends Controller
       'roles.*' => 'exists:roles,id',
       'company_id' => 'required|exists:partner_companies,id',
       'department_id' => 'required|exists:company_departments,id',
-      'designation_id' => 'required|exists:company_designations,id'
+      'designation_id' => 'required|exists:company_designations,id',
+      'email_verified_at' => 'sometimes',
     ],[
       'company_id.required' => __('Company field is required'),
       'department_id.required' => __('Department field is required'),
       'designation_id.required' => __('Designation field is required'),
     ]);
     unset($att['roles']);
-    if ($request->password) {
-      $att['password'] = Hash::make($att['password']);
-    } else {
-      unset($att['password']);
-    }
+    // if ($request->password) {
+    //   $att['password'] = Hash::make($att['password']);
+    // } else {
+    //   unset($att['password']);
+    // }
+    $att['email_verified_at'] = $request->boolean('email_verified_at') ? now() : null;
     $user = Admin::create($att);
     $user->syncRoles($request->roles);
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
   }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  \App\Models\Admin  $admin
-   * @return \Illuminate\Http\Response
-   */
   public function show(Admin $user)
   {
     return view('admin.pages.roles.admins.show', compact('user'));
   }
 
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  \App\Models\Admin  $admin
-   * @return \Illuminate\Http\Response
-   */
   public function edit(Admin $user)
   {
     $data['user'] = $user;
@@ -117,13 +92,21 @@ class AdminUsersController extends Controller
     return $this->sendRes('success', ['view_data' => view('admin.pages.roles.admins.edit', $data)->render()]);
   }
 
-  /**
-   * Update the specified resource in storage.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  \App\Models\Admin  $admin
-   * @return \Illuminate\Http\Response
-   */
+  public function editPassword(Admin $user)
+  {
+    $data['user'] = $user;
+    return $this->sendRes('success', ['view_data' => view('admin.pages.roles.admins.edit-password', $data)->render()]);
+  }
+
+  public function updatePassword(Request $request, Admin $user)
+  {
+    $request->validate([
+      'password' => 'required|min:8|max:255|confirmed',
+    ]);
+    $user->update(['password' => Hash::make($request->password)]);
+    return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
+  }
+
   public function update(Request $request, Admin $user)
   {
     $att = $request->validate([
@@ -137,13 +120,16 @@ class AdminUsersController extends Controller
       'roles.*' => 'exists:roles,id',
       'company_id' => 'required|exists:partner_companies,id',
       'department_id' => 'required|exists:company_departments,id',
-      'designation_id' => 'required|exists:company_designations,id'
+      'designation_id' => 'required|exists:company_designations,id',
+      'email_verified_at' => 'sometimes'
     ]);
     unset($att['roles']);
-    if ($request->password) {
-      $att['password'] = Hash::make($att['password']);
-    } else {
-      unset($att['password']);
+    if($user->email_verified_at && $request->boolean('email_verified_at')){
+      unset($att['email_verified_at']);
+    }else if(!$user->email_verified_at && $request->boolean('email_verified_at')){
+      $att['email_verified_at'] = now();
+    }else if(!$request->boolean('email_verified_at')){
+      $att['email_verified_at'] = null;
     }
     $user->syncRoles($request->roles);
     if ($user->update($att)) {
@@ -151,12 +137,6 @@ class AdminUsersController extends Controller
     }
   }
 
-  /**
-   * Remove the specified resource from storage.
-   *
-   * @param  \App\Models\Admin  $admin
-   * @return \Illuminate\Http\Response
-   */
   public function destroy(Admin $user)
   {
     if ($user->id == 1)
@@ -166,9 +146,9 @@ class AdminUsersController extends Controller
     }
   }
 
-  public function impersonate(Admin $admin)
+  public function impersonate(Admin $user)
   {
-    auth('admin')->user()->impersonate($admin, 'admin');
+    auth('admin')->user()->impersonate($user, 'admin');
 
     return back()->with('success', 'impersonated');
   }

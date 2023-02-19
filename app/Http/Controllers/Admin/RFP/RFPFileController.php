@@ -175,16 +175,17 @@ class RFPFileController extends Controller
 
   public function download($draft_rfp, $file, FileActionsRepository $file_repo)
   {
-    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
+    $file = RFPFile::where('id', $file)->mine()->withBin()->firstOrFail();
     $file->createLog('Downloaded File');
-
+    if($file->trashed_at)
+      return $file_repo->downloadFile(RFPFile::TRASH_PATH.$file->file, $file->title, '', ['extension' => $file->extension]);
     return $file_repo->downloadFile($file->file, $file->title, '', ['extension' => $file->extension]);
   }
 
   public function destroy($draft_rfp, $file, FileActionsRepository $file_repo)
   {
     $file = RFPFile::where('id', $file)->mine()->firstOrFail();
-    $file_repo->moveFile($file->file, 'trash' . DIRECTORY_SEPARATOR . 'draft-files' . DIRECTORY_SEPARATOR . $file->file);
+    $file_repo->moveFile($file->file, RFPFile::TRASH_PATH. $file->file);
     $file->update(['trashed_at' => now()]);
     $file->createLog('Deleted File');
 

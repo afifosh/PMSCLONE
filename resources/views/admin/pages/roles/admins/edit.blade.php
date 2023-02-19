@@ -20,14 +20,14 @@
       {{ Form::label('phone', __('Phone'), ['class' => 'col-form-label']) }}
       {!! Form::text('phone', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Phone Number')]) !!}
   </div>
-  <div class="form-group col-6">
+  {{-- <div class="form-group col-6">
     {{ Form::label('password', __('Password'), ['class' => 'col-form-label']) }}
     {!! Form::password('password', ['class' => 'form-control', 'placeholder' => __('******')]) !!}
   </div>
   <div class="form-group col-6">
     {{ Form::label('password_confirmation', __('Confirm Password'), ['class' => 'col-form-label']) }}
     {!! Form::password('password_confirmation', ['class' => 'form-control', 'placeholder' => __('******')]) !!}
-  </div>
+  </div> --}}
   {{-- <div class="form-group col-6">
 
     {{ Form::label('avatar', __('Avatar'), ['class' => '']) }}
@@ -61,12 +61,25 @@
     {{ Form::label('roles', __('Role'), ['class' => 'col-form-label']) }}
     {!! Form::select('roles[]', $roles, $user->roles, ['class' => 'form-select globalOfSelect2', 'multiple' => 'multiple']) !!}
   </div>
-<div class="form-group col-12">
+<div class="form-group col-6">
   {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}
 @php
 $enum = $user::getPossibleEnumValues('status');
 @endphp
   {!! Form::select('status', array_combine($enum, array_map('ucwords',$enum)), $user->status, ['class' => 'form-select globalOfSelect2']) !!}
+</div>
+
+<div class="form-group col-6">
+  <label class="switch d-flex flex-column">
+    {{ Form::label('email_verified_at', __('Verified'), ['class' => 'col-form-label']) }}
+    {{ Form::checkbox('email_verified_at', $user->email_verified_at, $user->email_verified_at,['class' => 'switch-input is-invalid'])}}
+    {{-- <input type="checkbox" class="switch-input is-invalid" checked /> --}}
+    <span class="switch-toggle-slider position-relative mt-2">
+      <span class="switch-on"></span>
+      <span class="switch-off"></span>
+    </span>
+    <span class="switch-label"></span>
+  </label>
 </div>
 </div>
 

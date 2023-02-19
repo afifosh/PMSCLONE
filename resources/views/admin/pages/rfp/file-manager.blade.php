@@ -468,7 +468,7 @@
                                           {{-- <div class="dropdown float-end">
                                               <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
                                           </div> --}}
-                                          @if (!$file->trashed_at)
+                                          @if (!$file->deleted_at)
                                             <div class="btn btn-sm btn-icon dropdown-toggle hide-arrow float-end" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></div>
                                             <div class="dropdown-menu dropdown-menu-end m-0">
                                                 <a class="dropdown-item" target="_blank" href="{{ route('admin.draft-rfps.files.show', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">

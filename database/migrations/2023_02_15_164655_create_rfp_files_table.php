@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('mime_type')->nullable();
             $table->string('extension')->nullable();
             $table->timestamp('trashed_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

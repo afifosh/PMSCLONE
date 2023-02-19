@@ -4,14 +4,17 @@ namespace App\Models;
 
 use App\Models\Scopes\NotTrashedScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RFPFile extends BaseModel
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = "rfp_files";
 
     protected $fillable = ['rfp_id', 'uploaded_by', 'trashed_at', 'title', 'file', 'mime_type', 'extension'];
+
+    public const TRASH_PATH = '/trash/draft-files/';
 
     public function rfp()
     {
@@ -31,6 +34,11 @@ class RFPFile extends BaseModel
     public function createLog($log)
     {
       return $this->logs()->create(['log' => $log, 'actioner_id' => auth()->id(), 'actioner_type' => auth()->user()::class]);
+    }
+
+    public function scopeWithBin($query)
+    {
+      return $query->withoutGlobalScope(NotTrashedScope::class);
     }
 
     public function scopeFilter($query, $filter)

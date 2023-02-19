@@ -32,7 +32,8 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
         'email',
         'password',
         'status',
-        'designation_id'
+        'designation_id',
+        'email_verified_at'
     ];
 
     /**
