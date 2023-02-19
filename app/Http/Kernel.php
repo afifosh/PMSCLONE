@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'mustBeActive' => \App\Http\Middleware\UserAndCompanyMustActive::class,
+        'passwordMustNotBeExpired' => \App\Http\Middleware\EnsurePasswordNotExpired::class,
     ];
 }

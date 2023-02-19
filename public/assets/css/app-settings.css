@@ -1,0 +1,120 @@
+.app-setting .setting-sidebar {
+  position: absolute;
+  left: calc(-16.25rem - 1.2rem);
+  width: 16.25rem;
+  height: 100%;
+  z-index: 4;
+  -ms-flex-preferred-size: 16.25rem;
+  flex-basis: 16.25rem;
+  transition: all 0.2s;
+}
+
+@media (min-width: 992px) {
+  .app-setting .setting-sidebar {
+    position: static;
+    height: auto;
+    background-color: transparent !important;
+  }
+}
+
+.app-setting .setting-sidebar.show {
+  left: 0;
+}
+
+.app-setting .setting-sidebar .setting-filter {
+  height: calc(100vh - 16.6rem);
+}
+
+.layout-horizontal .app-setting .setting-sidebar .setting-filter {
+  height: calc(100vh - 15.6rem);
+}
+
+@media (min-width: 1200px) {
+  .layout-horizontal .app-setting .setting-sidebar .setting-filter {
+    height: calc(100vh - 16.6rem - 2rem);
+  }
+}
+
+.app-setting .setting-sidebar .setting-filter li {
+  padding: 0.4375rem 1.5rem;
+  border-left: 2px solid transparent;
+}
+
+.app-setting .setting-sidebar .setting-filter li a>span {
+  font-weight: 500;
+}
+
+.app-setting .setting-sidebar .setting-filter li h6 {
+  font-size: 1rem;
+}
+
+.light-style .app-setting .setting-sidebar {
+  background-color: #fff;
+}
+
+.light-style .app-setting .setting-sidebar ul li:not(.active) a {
+  color: #6f6b7d;
+}
+
+.dark-style .app-setting .setting-sidebar {
+  background-color: #2f3349;
+}
+
+.dark-style .app-setting .setting-sidebar ul li:not(.active) a {
+  color: #b6bee3;
+}
+
+[dir=rtl] .app-setting .setting-sidebar {
+  right: calc(-16.25rem - 1.2rem);
+  left: auto;
+}
+
+[dir=rtl] .app-setting .setting-sidebar.show {
+  right: 0;
+  left: auto;
+}
+
+[dir=rtl] .app-setting .setting-sidebar .setting-filter li {
+  border-left: 0;
+  border-right: 2px solid transparent;
+}
+
+.app-setting .setting-sidebar .setting-filter .setting-list li:first-child {
+  margin-top: 0;
+}
+
+.app-setting .setting-sidebar .setting-filter .setting-list li:last-child {
+  margin-bottom: 0;
+}
+
+.app-setting .setting-sidebar .setting-filter .setting-list li.active {
+  border-color: #cd545b;
+}
+
+@media (min-width: 992px) {
+  .app-setting .settings-list .setting {
+    height: calc(100vh - 19.5rem);
+  }
+}
+
+@media (max-width: 991.98px) {
+  .app-setting .settings-list .setting {
+    height: calc(100vh - 17.5rem);
+  }
+}
+
+.layout-horizontal .app-setting .settings-list .setting {
+  height: calc(100vh - 17rem);
+}
+
+@media (min-width: 992px) {
+  .layout-horizontal .app-setting .settings-list .setting {
+    height: calc(100vh - 18.5rem);
+  }
+}
+
+@media (min-width: 1200px) {
+  .layout-horizontal .app-setting .settings-list .setting {
+    height: calc(100vh - 19.5rem - 2rem) !important;
+  }
+}

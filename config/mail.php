@@ -46,10 +46,15 @@ return [
 
         'ses' => [
             'transport' => 'ses',
+            'access_key_id' => env('AWS_ACCESS_KEY_ID'),
+            'secret_access_key' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
         ],
 
         'mailgun' => [
             'transport' => 'mailgun',
+            'domain_name' => env('MAILGUN_DOMAIN_NAME'),
+            'api_key' => env('MAILGUN_API_KEY'),
         ],
 
         'postmark' => [

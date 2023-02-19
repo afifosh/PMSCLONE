@@ -1,6 +1,11 @@
 @php
 $containerNav = $containerNav ?? 'container-fluid';
 $navbarDetached = ($navbarDetached ?? '');
+$user = auth()->user();
+$notifications_count = \DB::table('notifications')->where('notifiable_type', 'App\Models\User')
+            ->where('notifiable_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
 @endphp
 
 <!-- Navbar -->
@@ -44,6 +49,34 @@ $navbarDetached = ($navbarDetached ?? '');
         <!--/ Style Switcher -->
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
+          <!-- Notification -->
+          <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+            <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+              <i class="ti ti-bell ti-md"></i>
+              @if($notifications_count > 0)
+                <span class="badge bg-danger rounded-pill badge-notifications notification-bell">{{ $notifications_count }}</span>
+              @endif
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end py-0">
+              <li class="dropdown-menu-header border-bottom">
+                <div class="dropdown-header d-flex align-items-center py-3">
+                  <h5 class="text-body mb-0 me-auto">Notification</h5>
+                  <a href="javascript:void(0)" class="dropdown-notifications-all text-body" data-bs-toggle="tooltip" data-bs-placement="top" title="Mark all as read"><i class="ti ti-mail-opened fs-4"></i></a>
+                </div>
+              </li>
+              <li class="dropdown-notifications-list scrollable-container">
+                <ul class="dropdown-notifications-ul-list list-group list-group-flush">
+                  
+                </ul>
+              </li>
+              <li class="dropdown-menu-footer border-top view-more-li load-more">
+                <a href="{{ route('user-account.edit', ['user_account' => auth()->id(), 't' => 'notifications']) }}" class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center">
+                  @lang('View all')
+                </a>
+              </li>
+            </ul>
+          </li>
+          <!--/ Notification -->
 
           <!-- User -->
           <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -70,7 +103,7 @@ $navbarDetached = ($navbarDetached ?? '');
                         @endif
                       </span>
                       @forelse (auth('web')->user()->roles as $temp)
-                        <small class="text-muted">{{ $temp->name }}</small><br>
+                      <small class="text-muted">{{ $temp->name }}</small><br>
                       @empty
                       @endforelse
 
@@ -87,24 +120,32 @@ $navbarDetached = ($navbarDetached ?? '');
                   <span class="align-middle">My Profile</span>
                 </a>
               </li>
-              {{-- @if (Auth::check() && Laravel\Jetstream\Jetstream::hasApiFeatures())
               <li>
-                <a class="dropdown-item" href="{{ route('api-tokens.index') }}">
-                  <i class='ti ti-key me-2 ti-sm'></i>
-                  <span class="align-middle">API Tokens</span>
-                </a>
-              </li>
-              @endif --}}
-              <li>
-                <a class="dropdown-item" href="javascript:void(0);">
+                <a class="dropdown-item" href="{{ route('auth.lock') }}">
                   <span class="d-flex align-items-center align-middle">
-                    <i class="flex-shrink-0 ti ti-credit-card me-2 ti-sm"></i>
-                    <span class="flex-grow-1 align-middle">Billing</span>
-                    <span class="flex-shrink-0 badge badge-center rounded-pill bg-label-danger w-px-20 h-px-20">2</span>
+                    <i class="flex-shrink-0 ti ti-lock me-2 ti-sm"></i>
+                    <span class="flex-grow-1 align-middle">{{ __('Lock Account') }}</span>
                   </span>
                 </a>
               </li>
-              {{-- @if (Auth::User() && Laravel\Jetstream\Jetstream::hasTeamFeatures())
+              {{-- @if (Auth::check() && Laravel\Jetstream\Jetstream::hasApiFeatures())
+              <li>
+                <a class="dropdown-item" href="{{ route('api-tokens.index') }}">
+              <i class='ti ti-key me-2 ti-sm'></i>
+              <span class="align-middle">API Tokens</span>
+              </a>
+          </li>
+          @endif --}}
+          <li>
+            <a class="dropdown-item" href="javascript:void(0);">
+              <span class="d-flex align-items-center align-middle">
+                <i class="flex-shrink-0 ti ti-credit-card me-2 ti-sm"></i>
+                <span class="flex-grow-1 align-middle">Billing</span>
+                <span class="flex-shrink-0 badge badge-center rounded-pill bg-label-danger w-px-20 h-px-20">2</span>
+              </span>
+            </a>
+          </li>
+          {{-- @if (Auth::User() && Laravel\Jetstream\Jetstream::hasTeamFeatures())
               <li>
                 <div class="dropdown-divider"></div>
               </li>
@@ -116,59 +157,59 @@ $navbarDetached = ($navbarDetached ?? '');
               </li>
               <li>
                 <a class="dropdown-item" href="{{ Auth::user() ? route('teams.show', Auth::user()->currentTeam->id) : 'javascript:void(0)' }}">
-                  <i class='ti ti-settings me-2'></i>
-                  <span class="align-middle">Team Settings</span>
-                </a>
-              </li>
-              @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-              <li>
-                <a class="dropdown-item" href="{{ route('teams.create') }}">
-                  <i class='ti ti-user me-2'></i>
-                  <span class="align-middle">Create New Team</span>
-                </a>
-              </li>
-              @endcan
-              <li>
-                <div class="dropdown-divider"></div>
-              </li>
-              <lI>
-                <h6 class="dropdown-header">Switch Teams</h6>
-              </lI>
-              <li>
-                <div class="dropdown-divider"></div>
-              </li>
-              @if (Auth::user())
-              @foreach (Auth::user()->allTeams() as $team) --}}
-              {{-- Below commented code read by artisan command while installing jetstream. !! Do not remove if you want to use jetstream. --}}
+          <i class='ti ti-settings me-2'></i>
+          <span class="align-middle">Team Settings</span>
+          </a>
+          </li>
+          @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
+          <li>
+            <a class="dropdown-item" href="{{ route('teams.create') }}">
+              <i class='ti ti-user me-2'></i>
+              <span class="align-middle">Create New Team</span>
+            </a>
+          </li>
+          @endcan
+          <li>
+            <div class="dropdown-divider"></div>
+          </li>
+          <lI>
+            <h6 class="dropdown-header">Switch Teams</h6>
+          </lI>
+          <li>
+            <div class="dropdown-divider"></div>
+          </li>
+          @if (Auth::user())
+          @foreach (Auth::user()->allTeams() as $team) --}}
+          {{-- Below commented code read by artisan command while installing jetstream. !! Do not remove if you want to use jetstream. --}}
 
-              {{-- <x-jet-switchable-team :team="$team" /> --}}
-              {{-- @endforeach
+          {{-- <x-jet-switchable-team :team="$team" /> --}}
+          {{-- @endforeach
               @endif
               @endif --}}
-              <li>
-                <div class="dropdown-divider"></div>
-              </li>
-              @if (Auth::check())
-              <li>
-                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                  <i class='ti ti-logout me-2'></i>
-                  <span class="align-middle">Logout</span>
-                </a>
-              </li>
-              <form method="POST" id="logout-form" action="{{ route('logout') }}">
-                @csrf
-              </form>
-              @else
-              <li>
-                <a class="dropdown-item" href="{{ Route::has('login') ? route('login') : 'javascript:void(0)' }}">
-                  <i class='ti ti-login me-2'></i>
-                  <span class="align-middle">Login</span>
-                </a>
-              </li>
-              @endif
-            </ul>
+          <li>
+            <div class="dropdown-divider"></div>
           </li>
-          <!--/ User -->
+          @if (Auth::check())
+          <li>
+            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <i class='ti ti-logout me-2'></i>
+              <span class="align-middle">Logout</span>
+            </a>
+          </li>
+          <form method="POST" id="logout-form" action="{{ route('logout') }}">
+            @csrf
+          </form>
+          @else
+          <li>
+            <a class="dropdown-item" href="{{ Route::has('login') ? route('login') : 'javascript:void(0)' }}">
+              <i class='ti ti-login me-2'></i>
+              <span class="align-middle">Login</span>
+            </a>
+          </li>
+          @endif
+        </ul>
+        </li>
+        <!--/ User -->
         </ul>
       </div>
 

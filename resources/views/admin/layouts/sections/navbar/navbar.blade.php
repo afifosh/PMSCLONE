@@ -1,6 +1,12 @@
 @php
 $containerNav = $containerNav ?? 'container-fluid';
 $navbarDetached = ($navbarDetached ?? '');
+
+$user = auth()->user();
+$notifications_count = \DB::table('notifications')->where('notifiable_type', 'App\Models\Admin')
+            ->where('notifiable_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
 @endphp
 
 <!-- Navbar -->
@@ -45,6 +51,35 @@ $navbarDetached = ($navbarDetached ?? '');
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
 
+          <!-- Notification -->
+          <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+            <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+              <i class="ti ti-bell ti-md"></i>
+              @if($notifications_count > 0)
+                <span class="badge bg-danger rounded-pill badge-notifications notification-bell">{{ $notifications_count }}</span>
+              @endif
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end py-0">
+              <li class="dropdown-menu-header border-bottom">
+                <div class="dropdown-header d-flex align-items-center py-3">
+                  <h5 class="text-body mb-0 me-auto">Notification</h5>
+                  <a href="javascript:void(0)" class="dropdown-notifications-all text-body" data-bs-toggle="tooltip" data-bs-placement="top" title="Mark all as read"><i class="ti ti-mail-opened fs-4"></i></a>
+                </div>
+              </li>
+              <li class="dropdown-notifications-list scrollable-container">
+                <ul class="dropdown-notifications-ul-list list-group list-group-flush">
+                  
+                </ul>
+              </li>
+              <li class="dropdown-menu-footer border-top view-more-li load-more">
+                <a href="{{ route('admin.admin-account.edit', ['admin_account' => auth()->id(), 't' => 'notifications']) }}" class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center">
+                  @lang('View all')
+                </a>
+              </li>
+            </ul>
+          </li>
+          <!--/ Notification -->
+
           <!-- User -->
           <li class="nav-item navbar-dropdown dropdown-user dropdown">
             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -85,6 +120,14 @@ $navbarDetached = ($navbarDetached ?? '');
                 <a class="dropdown-item" href="{{ route('admin.admin-account.edit', auth()->id()) }}">
                   <i class="ti ti-user-check me-2 ti-sm"></i>
                   <span class="align-middle">My Profile</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{ route('admin.auth.lock') }}">
+                  <span class="d-flex align-items-center align-middle">
+                    <i class="flex-shrink-0 ti ti-lock me-2 ti-sm"></i>
+                    <span class="flex-grow-1 align-middle">{{ __('Lock Account') }}</span>
+                  </span>
                 </a>
               </li>
               {{-- @if (Auth::check() && Laravel\Jetstream\Jetstream::hasApiFeatures())

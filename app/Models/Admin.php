@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\Admin\VerifyEmail;
 use App\Notifications\Admin\ResetPassword;
+use App\Traits\AuthLogs;
 use App\Traits\HasEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,9 +15,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Lab404\Impersonate\Models\Impersonate;
 use Avatar;
+use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
+
 class Admin extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs;
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +33,8 @@ class Admin extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'status',
-        'designation_id'
+        'designation_id',
+        'password_changed_at',
     ];
 
     /**
@@ -52,6 +56,20 @@ class Admin extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Get admin guard key
+     *
+     * @return string
+     */
+    public static function GET_LOCK_KEY() {
+      return 'VUEXY_ADMIN_LOCK_KEY';
+    }
+
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
     public function getAvatarAttribute($value)
     {
       if(!$value)
@@ -89,4 +107,13 @@ class Admin extends Authenticatable implements MustVerifyEmail
       return $this->belongsTo(CompanyDesignation::class, 'designation_id', 'id');
     }
 
+    /**
+     * Admin has many morph fields of password history
+     *
+     * @return MorphMany
+     */
+    public function passwordHistories()
+    {
+      return $this->morphMany(PasswordHistory::class, 'authable');
+    }
 }
