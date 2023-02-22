@@ -17,7 +17,7 @@
 
   <div class="form-group col-6">
     {{ Form::label('expires_at', __('Invitation Expiry'), ['class' => 'col-form-label']) }}
-    {!! Form::text('expires_at', null, ['class' => 'form-control flatpickr', 'data-flatpickr' => '{"enableTime":false, "dateFormat": "Y-m-d"}']) !!}
+    {!! Form::text('expires_at', null, ['class' => 'form-control flatpickr', 'data-flatpickr' => '{"minDate":"today", "enableTime":false, "dateFormat": "Y-m-d"}']) !!}
   </div>
 
   <div class="form-group col-6">

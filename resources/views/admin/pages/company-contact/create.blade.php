@@ -19,7 +19,7 @@
     </div>
     <div class="form-group col-6">
       {{ Form::label('expiry_time', __('Invitation Expiry'), ['class' => 'col-form-label']) }}
-      {!! Form::text('expiry_time', null, ['class' => 'form-control flatpickr', 'data-flatpickr' => '{"enableTime":true, "dateFormat": "Y-m-d H:i"}', 'required'=> 'true']) !!}
+      {!! Form::text('expiry_time', null, ['class' => 'form-control flatpickr', 'data-flatpickr' => '{"minDate":"today", "enableTime":true, "dateFormat": "Y-m-d H:i"}', 'required'=> 'true']) !!}
   </div>
   <div class="form-group col-6">
       {{ Form::label('company_id', __('Company'), ['class' => 'col-form-label']) }}

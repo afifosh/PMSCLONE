@@ -41,7 +41,7 @@ class FileShareController extends Controller
       'users' => 'required|array',
       'users.*' => 'required|exists:admins,id|unique:file_shares,user_id,NULL,id,rfp_file_id,' . $file->id,
       'permission' => 'required|in:' . implode(',', array_keys(FileShare::Permissions)),
-      'expires_at' => 'nullable|date',
+      'expires_at' => 'nullable|date|after:yesterday|date_format:Y-m-d',
     ]);
     try {
       foreach ($request->users as $user) {
