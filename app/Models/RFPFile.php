@@ -152,6 +152,11 @@ class RFPFile extends BaseModel
       return $this->hasMany(FileShare::class, 'rfp_file_id', 'id');
     }
 
+    public function sharedUsers()
+    {
+      return $this->hasManyThrough(Admin::class, FileShare::class, 'rfp_file_id', 'id');
+    }
+
     public function getMode()
     {
       return $this->getPermission() != 'view' ? 'edit' : 'view';
@@ -160,27 +165,5 @@ class RFPFile extends BaseModel
     public function getPermission()
     {
       return @$this->shares()->where('user_id', auth()->id())->first()->permission ?? 'edit';
-    }
-
-    public function hasPermission($permission)
-    {
-      if(auth()->id() == 1 || $permission == 'view'){
-        return true;
-      }
-      $userPermission = @$this->shares()->where('user_id', auth()->id())->first()->permission;
-      if($userPermission){
-        switch ($permission) {
-          case 'comment':
-            return $userPermission == 'comment';
-            break;
-          case 'edit':
-            return $userPermission == 'edit';
-            break;
-          default:
-            return false;
-            break;
-        }
-      }
-      return false;
     }
 }

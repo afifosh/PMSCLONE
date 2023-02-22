@@ -18,6 +18,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('rfp_file_id')->constrained('rfp_files')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('admins')->onDelete('cascade');
+            $table->foreignId('shared_by')->constrained('admins')->onDelete('cascade');
             $table->enum('permission', array_keys(FileShare::Permissions))->default('view');
             $table->date('expires_at')->nullable();
             $table->unique(['rfp_file_id', 'user_id']);

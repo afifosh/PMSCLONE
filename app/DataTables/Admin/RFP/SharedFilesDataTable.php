@@ -32,33 +32,28 @@ class SharedFilesDataTable extends DataTable
     return (new EloquentDataTable($query))
       ->addColumn('action', 'sharedfiles.action')
       ->addColumn('user', function ($row) {
-        return '<div class="d-flex justify-content-start align-items-center">
-                  <div class="avatar-wrapper">
-                    <div class="avatar avatar-sm me-3"><img src="' . $row->user->avatar . '" alt="Avatar" class="rounded-circle">
-                    </div>
-                  </div>
-                  <div class="d-flex flex-column">
-                    <span class="text-body text-truncate">
-                      <span class="fw-semibold"><a href="' . route('admin.users.show', $row->id) . '">' . htmlspecialchars($row->user->full_name, ENT_QUOTES, 'UTF-8') . '</a></span>
-                    </span>
-                    <small class="text-muted">' . htmlspecialchars($row->user->email, ENT_QUOTES, 'UTF-8') . '</small>
-                  </div>
-                </div>';
+        return view('admin._partials.sections.user-info', ['user' => $row->user]);
+      })
+      ->addColumn('shared_by', function ($row) {
+        return view('admin._partials.sections.user-info', ['user' => $row->sharedBy]);
+      })
+      ->addColumn('all_shares', function ($row) {
+        return view('admin._partials.sections.user-avatar-group', ['users' => $row->file->sharedUsers]);
       })
       ->addColumn('file', function ($row) {
         return $row->file->title;
       })
       ->editColumn('permission', function ($row) {
-        return '<span class="badge bg-label-success">'.ucfirst($row->permission).'</span>';
+        return '<span class="badge bg-label-success">' . ucfirst($row->permission) . '</span>';
       })
       ->addColumn('expires_at', function ($row) {
         if ($row->expires_at) {
-          return $row->expires_at->isPast() ? '<span class="badge bg-label-danger">Expired '.$row->expires_at->format('d M, Y').'</span>' : '<span class="badge bg-label-warning">' . $row->expires_at->format('d M, Y') . '</span>';
+          return $row->expires_at->isPast() ? '<span class="badge bg-label-danger">Expired ' . $row->expires_at->format('d M, Y') . '</span>' : '<span class="badge bg-label-warning">' . $row->expires_at->format('d M, Y') . '</span>';
         } else {
           return '<span class="badge bg-label-warning"> Never</span>';
         }
       })
-      ->addColumn('action', function($fileShare){
+      ->addColumn('action', function ($fileShare) {
         return view('admin.pages.rfp.file-share.action', compact('fileShare'));
       })
       ->filterColumn('user', function ($query, $keyword) {
@@ -67,12 +62,12 @@ class SharedFilesDataTable extends DataTable
           $query->whereRaw($sql, ["%{$keyword}%"]);
         });
       })
-      ->filterColumn('file', function($query, $keyword){
-        $query->whereHas('file', function($query) use ($keyword){
+      ->filterColumn('file', function ($query, $keyword) {
+        $query->whereHas('file', function ($query) use ($keyword) {
           $query->where('title', 'like', "%{$keyword}%");
         });
       })
-      ->rawColumns(['user','action', 'expires_at', 'permission']);
+      ->rawColumns(['user', 'action', 'expires_at', 'permission', 'all_shares']);
   }
 
   /**
@@ -110,7 +105,14 @@ class SharedFilesDataTable extends DataTable
         Button::make('print'),
         Button::make('reset'),
         Button::make('reload')
-      ]);
+      ])
+      ->parameters(
+        [
+          "drawCallback" => "function (settings) {
+            $('[data-toggle=\"tooltip\"]').tooltip();
+          }"
+        ]
+      );
   }
 
   /**
@@ -121,8 +123,10 @@ class SharedFilesDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      Column::make('user'),
+      Column::make('shared_by')->title('Shared By'),
+      Column::make('user')->title('Shared With'),
       Column::make('file'),
+      Column::make('all_shares')->title('All Shares'),
       Column::make('permission'),
       Column::make('expires_at')->title('Expires At'),
       Column::make('created_at')->title('Shared At'),

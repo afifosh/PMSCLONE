@@ -9,7 +9,7 @@ class FileShare extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['rfp_file_id', 'user_id', 'permission', 'expires_at'];
+    protected $fillable = ['rfp_file_id', 'user_id', 'shared_by', 'permission', 'expires_at'];
 
     public const Permissions = [
         'view' => 'View',
@@ -31,5 +31,10 @@ class FileShare extends Model
     public function user()
     {
         return $this->belongsTo(Admin::class, 'user_id', 'id');
+    }
+
+    public function sharedBy()
+    {
+        return $this->belongsTo(Admin::class, 'shared_by', 'id');
     }
 }

@@ -40,7 +40,6 @@ class FileShareController extends Controller
     $request->validate([
       'users' => 'required|array',
       'users.*' => 'required|exists:admins,id|unique:file_shares,user_id,NULL,id,rfp_file_id,' . $file->id,
-      // 'users' => 'required|exists:admins,id|unique:file_shares,user_id,NULL,id,rfp_file_id,' . $file->id,
       'permission' => 'required|in:' . implode(',', array_keys(FileShare::Permissions)),
       'expires_at' => 'nullable|date',
     ]);
@@ -50,6 +49,7 @@ class FileShareController extends Controller
           'user_id' => $user,
           'permission' => $request->permission,
           'expires_at' => $request->expires_at,
+          'shared_by' => auth()->id(),
         ]);
         $file->createLog('Shared File with ' . Admin::find($user)->full_name . ' with ' . FileShare::Permissions[$request->permission] . ' permission' . ($request->expires_at ? ' till ' . $request->expires_at : ''));
       }
