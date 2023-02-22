@@ -89,7 +89,7 @@
       <!-- links for file manager sidebar ends -->
 
       <!-- storage status of file manager starts-->
-      <div class="storage-status mb-1 px-4">
+      <div class="storage-status mb-5 px-4">
         <h6 class="section-label mb-1">Storage Status</h6>
         <div class="d-flex align-items-center cursor-pointer">
           <i data-feather="server" class="font-large-1"></i>
