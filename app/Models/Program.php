@@ -28,6 +28,15 @@ class Program extends BaseModel
       });
     }
 
+    public function programUsers()
+    {
+      return Admin::whereHas('programs', function($q){
+        return $q->where('programs.id', $this->id);
+      })->orWhereHas('programs.parent', function($q){
+        return $q->where('programs.id', $this->id);
+      })->get();
+    }
+
     public function users()
     {
       return $this->belongsToMany(Admin::class, ProgramUser::class, 'program_id', 'admin_id')->withTimestamps();

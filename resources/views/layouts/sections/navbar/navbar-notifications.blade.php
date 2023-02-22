@@ -1,4 +1,5 @@
 @foreach($notifications as $notification)
+@if ($notification->type == 'App\Notifications\Auth\LoginNotification\NewDevice' || $notification->type == 'App\Notifications\Auth\LoginNotification\NewLocation')
 <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
   <div class="d-flex">
     <div class="flex-shrink-0 me-3">
@@ -15,12 +16,17 @@
         <br> <b>@lang('City:')</b> {{ $notification->data['location']['city'] }}
         <br> <b>@lang('Country:')</b> {{ $notification->data['location']['country'] }}
       </p>
-      {{-- <small class="text-muted">5 days ago</small> --}}
     </div>
     <div class="flex-shrink-0 dropdown-notifications-actions">
-      <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
-      <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ti ti-x"></span></a>
+      <a href="javascript:void(0)" class="dropdown-notifications-read">test<span class="badge badge-dot"></span></a>
+      <a href="javascript:void(0)" class="dropdown-notifications-archive">test2<span class="ti ti-x"></span></a>
     </div>
   </div>
 </li>
+@else
+@isset($notification->data['data']['view'])
+@include($notification->data['data']['view'], ['notification' => $notification])
+@endisset
+@endif
+
 @endforeach

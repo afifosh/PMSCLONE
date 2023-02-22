@@ -8,6 +8,8 @@ use App\Models\Admin;
 use App\Models\FileShare;
 use App\Models\RFPDraft;
 use App\Models\RFPFile;
+use App\Notifications\Admin\FileShared;
+use App\Notifications\Admin\FileUpdated;
 use Illuminate\Http\Request;
 
 class FileShareController extends Controller
@@ -45,12 +47,14 @@ class FileShareController extends Controller
     ]);
     try {
       foreach ($request->users as $user) {
-        $file->shares()->create([
+        $file_share = $file->shares()->create([
           'user_id' => $user,
           'permission' => $request->permission,
           'expires_at' => $request->expires_at,
           'shared_by' => auth()->id(),
         ]);
+        \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileShared($file_share));
+        \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileShared($file_share));
         $file->createLog('Shared File with ' . Admin::find($user)->full_name . ' with ' . FileShare::Permissions[$request->permission] . ' permission' . ($request->expires_at ? ' till ' . $request->expires_at : ''));
       }
 
