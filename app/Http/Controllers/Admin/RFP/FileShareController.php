@@ -54,7 +54,7 @@ class FileShareController extends Controller
           'shared_by' => auth()->id(),
         ]);
         \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileShared($file_share));
-        \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileShared($file_share));
+        \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileShared($file_share, ['data' => ['url' => route('admin.shared_files.index')]]));
         $file->createLog('Shared File with ' . Admin::find($user)->full_name . ' with ' . FileShare::Permissions[$request->permission] . ' permission' . ($request->expires_at ? ' till ' . $request->expires_at : ''));
       }
 

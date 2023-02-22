@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\RFPDraft;
 use App\Models\RFPFile;
+use App\Notifications\Admin\FileUpdated;
 use App\Repositories\FileActionsRepository;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Support\Facades\Storage;
@@ -144,6 +145,12 @@ class RFPFileController extends Controller
     $file->createLog('Opened File In editor');
     $payload['height'] = 900;
     $data['payload'] = json_encode($payload, JSON_PRETTY_PRINT);
+
+    $notiData['title'] = auth()->user()->full_name . ' opened file for editing';
+    $notiData['image'] = auth()->user()->avatar;
+    $notiData['user'] = auth()->user();
+    \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData + ['url' => route('admin.shared-files.index')]));
+    \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData));
 
     return view('admin.pages.rfp.files.only-office-editor', $data);
   }

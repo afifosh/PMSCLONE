@@ -14,10 +14,12 @@ class FileShared extends Notification
     use Queueable;
 
     protected $file_share;
+    protected $data;
 
-    public function __construct(FileShare $file_share)
+    public function __construct(FileShare $file_share, $data = [])
     {
       $this->file_share = $file_share;
+      $this->data = $data;
     }
 
     /**
@@ -46,7 +48,7 @@ class FileShared extends Notification
                 'description' => $this->file_share->sharedBy->full_name . ' shared a file ( '.$this->file_share->file->title.' )',
                 'shared_with_id' => $this->file_share->user->id,
                 'shared_with_name' => $this->file_share->user->full_name,
-                'action_url' => route('admin.draft-rfps.files.index', $this->file_share->file->rfp_id),
+                'action_url' => isset($data['url']) ? $data['url'] : route('admin.draft-rfps.files.index', $this->file_share->file->rfp_id),
                 'view' => 'admin.notifications.file-shared',
             ]
         ];
