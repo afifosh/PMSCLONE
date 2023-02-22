@@ -16,9 +16,19 @@ class FileShareController extends Controller
 {
   public function index($draft_rfp, $file, SharedFilesDataTable $dataTable)
   {
-    $draft_rfp = RFPDraft::mine()->findOrFail($draft_rfp);
+    $data['draft_rfp'] = $draft_rfp = RFPDraft::mine()->findOrFail($draft_rfp);
     $dataTable->setDraftRFP($draft_rfp);
-    return $dataTable->render('admin.pages.rfp.file-share.index', compact('draft_rfp'));
+    $data['files'] = RFPFile::where('rfp_id', $draft_rfp->id)->distinct()->pluck('title', 'id');
+    $fileKeys = array_keys($data['files']->toArray());
+    $data['sharedBy'] = Admin::whereHas('sharedByFiles', function ($q) use ($fileKeys) {
+      $q->whereIn('rfp_file_id', $fileKeys);
+    })->get();
+    $data['sharedWith'] = Admin::whereHas('sharedFiles', function ($q) use ($fileKeys) {
+      $q->whereIn('rfp_file_id', $fileKeys);
+    })->get();
+    $data['permissions'] = FileShare::Permissions;
+    $data['statuses'] = FileShare::Statuses;
+    return $dataTable->render('admin.pages.rfp.file-share.index', $data);
     // return view('admin.pages.rfp.file-share.index');
   }
 
@@ -54,7 +64,7 @@ class FileShareController extends Controller
           'shared_by' => auth()->id(),
         ]);
         \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileShared($file_share));
-        \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileShared($file_share, ['data' => ['url' => route('admin.shared_files.index')]]));
+        \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileShared($file_share, ['data' => ['url' => route('admin.shared-files.index')]]));
         $file->createLog('Shared File with ' . Admin::find($user)->full_name . ' with ' . FileShare::Permissions[$request->permission] . ' permission' . ($request->expires_at ? ' till ' . $request->expires_at : ''));
       }
 

@@ -138,4 +138,9 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
     {
       return $this->hasMany(FileShare::class, 'user_id', 'id');
     }
+
+    public function sharedByFiles()
+    {
+      return $this->hasMany(FileShare::class, 'shared_by', 'id');
+    }
 }

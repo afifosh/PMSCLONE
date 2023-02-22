@@ -8,8 +8,6 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class SharedFilesDataTable extends DataTable
@@ -45,7 +43,7 @@ class SharedFilesDataTable extends DataTable
       })
       ->addColumn('expires_at', function ($row) {
         if ($row->expires_at) {
-          return $row->expires_at > today() ? '<span class="badge bg-label-danger">' . $row->expires_at->format('d M, Y') . '</span>' : '<span class="badge bg-label-warning">' . $row->expires_at->format('d M, Y') . '</span>';
+          return $row->expires_at < today() ? '<span class="badge bg-label-danger">' . $row->expires_at->format('d M, Y') . '</span>' : '<span class="badge bg-label-warning">' . $row->expires_at->format('d M, Y') . '</span>';
         } else {
           return '<span class="badge bg-label-warning"> Never</span>';
         }
@@ -53,7 +51,7 @@ class SharedFilesDataTable extends DataTable
       ->addColumn('status', function ($row){
         if($row->is_revoked){
           return '<span class="badge bg-label-danger">Revoked</span>';
-        }elseif($row->expires_at && $row->expires_at > today()){
+        }elseif($row->expires_at && $row->expires_at < today()){
           return '<span class="badge bg-label-danger">Expired</span>';
         }else{
           return '<span class="badge bg-label-success">Active</span>';
@@ -84,9 +82,10 @@ class SharedFilesDataTable extends DataTable
    */
   public function query(FileShare $model): QueryBuilder
   {
-    return $model->whereHas('file', function ($q) {
+    $query = $model->whereHas('file', function ($q) {
       $q->where('rfp_id', $this->draft_rfp->id);
     })->latest()->newQuery();
+    return $query->applyRequestFilters()->with(['user', 'sharedBy', 'file']);
   }
 
   /**
