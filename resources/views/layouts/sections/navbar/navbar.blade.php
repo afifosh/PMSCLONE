@@ -51,7 +51,8 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
         <ul class="navbar-nav flex-row align-items-center ms-auto">
           <!-- Notification -->
           <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
-            <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            <a id="notifications-onload" class="d-none" href="javascript:void(0);" data-href="{{ route('notifications') }}"></a>
+            <a data-href="{{ route('notifications.count') }}" class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
               <i class="ti ti-bell ti-md"></i>
               @if($notifications_count > 0)
                 <span class="badge bg-danger rounded-pill badge-notifications notification-bell">{{ $notifications_count }}</span>
