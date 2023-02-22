@@ -513,7 +513,7 @@
                                               <div class="dropdown-divider"></div>
                                               <button class="dropdown-item" data-toggle="ajax-modal" data-title="File Activity" data-href="{{route('admin.draft-rfps.files.get-activity', ['draft_rfp' => $file->rfp_id, 'file' => $file->id])}}">
                                                 <i class="feather-14" data-feather="info"></i>
-                                                  <span class="align-middle">Info</span>
+                                                  <span class="align-middle">File Activity</span>
                                               </button>
                                               <a class="dropdown-item" href="#">
                                                 <i class="feather-14" data-feather="alert-circle"></i>

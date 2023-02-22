@@ -237,16 +237,9 @@ class RFPFileController extends Controller
 
   public function getActivity($draft_rfp, $file)
   {
-    $file = RFPFile::mineOrShared()->withBin()->withTrashCheck()->with('logs.actioner')->findOrFail($file);
+    $file = RFPFile::mineOrShared()->withBin()->withTrashCheck()->findOrFail($file);
+    $logs = $file->logs()->latest()->limit(15)->get();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.files.activity-timeline', compact('file'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.files.activity-timeline', compact('logs'))->render()]);
   }
-
-  // public function getDeletedFiles(Request $request, RFPDraft $draft_rfp)
-  // {
-  //   abort_if(auth()->id() != 1, 404);
-  //   $files = RFPFile::withTrashed()->where('rfp_id', $draft_rfp->id)->withBin()->whereNotNull('deleted_at')->get();
-
-  //   return view('admin.pages.rfp.file-manager', compact('draft_rfp', 'files'));
-  // }
 }

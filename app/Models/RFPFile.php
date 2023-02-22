@@ -32,7 +32,7 @@ class RFPFile extends BaseModel
 
     public function logs()
     {
-      return $this->hasMany(RFPFileLog::class, 'file_id', 'id')->latest();
+      return $this->hasMany(RFPFileLog::class, 'file_id', 'id')->with('actioner')->latest();
     }
 
     public function createLog($log)

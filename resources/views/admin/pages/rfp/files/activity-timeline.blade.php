@@ -1,6 +1,6 @@
 <div class="card-body pb-0">
   <ul class="timeline ms-1 mb-0">
-    @forelse ($file->logs as $log)
+    @forelse ($logs as $log)
       <li class="timeline-item timeline-item-transparent">
         <span class="timeline-point timeline-point-primary"></span>
         <div class="timeline-event">
