@@ -242,11 +242,11 @@ class RFPFileController extends Controller
     return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.files.activity-timeline', compact('file'))->render()]);
   }
 
-  public function getDeletedFiles(Request $request, RFPDraft $draft_rfp)
-  {
-    abort_if(auth()->id() != 1, 404);
-    $files = RFPFile::withTrashed()->where('rfp_id', $draft_rfp->id)->withBin()->whereNotNull('deleted_at')->get();
+  // public function getDeletedFiles(Request $request, RFPDraft $draft_rfp)
+  // {
+  //   abort_if(auth()->id() != 1, 404);
+  //   $files = RFPFile::withTrashed()->where('rfp_id', $draft_rfp->id)->withBin()->whereNotNull('deleted_at')->get();
 
-    return view('admin.pages.rfp.file-manager', compact('draft_rfp', 'files'));
-  }
+  //   return view('admin.pages.rfp.file-manager', compact('draft_rfp', 'files'));
+  // }
 }

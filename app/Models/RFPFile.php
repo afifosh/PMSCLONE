@@ -18,6 +18,7 @@ class RFPFile extends BaseModel
 
     public const TRASH_PATH = '/trash/draft-files/';
     public const DEL_PATH = '/deleted/draft-files/';
+    public const ROUTE_FILTERS = ['important', 'documents', 'images', 'videos', 'audios', 'archives', 'trash', 'deleted-files'];
 
     public function rfp()
     {
@@ -56,6 +57,10 @@ class RFPFile extends BaseModel
       // $query->when($filter == 'documents', function($q){
       //   return $q->where('mime_type', 'like', 'application/%');
       // });
+      $query->when($filter == 'deleted-files', function($q){
+        abort_if(auth()->id() != 1, 404);
+        $q->withTrashed()->withBin()->whereNotNull('deleted_at');
+      });
       $query->when($filter == 'trash', function($q){
         return $q->withoutGlobalScope(NotTrashedScope::class)->whereNotNull('trashed_at');
       });

@@ -56,7 +56,7 @@
           <span class="align-middle">Trash</span>
         </a>
         @if (auth()->id() == 1)
-          <a href="{{route('admin.draft-rfps.files.deleted', $draft_rfp)}}" class="list-group-item list-group-item-action {{request()->route()->getName() == 'admin.draft-rfps.files.deleted' ? 'active' : ''}}">
+          <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp, 'filter' => 'deleted-files'])}}" class="list-group-item list-group-item-action  {{request('filter') == 'deleted-files' ? 'active' : ''}}">
             <i data-feather="trash" class="me-50 font-medium-3"></i>
             <span class="align-middle">{{__('Deleted Files')}}</span>
           </a>
