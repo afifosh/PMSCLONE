@@ -37,20 +37,26 @@ class SharedFilesDataTable extends DataTable
       ->addColumn('shared_by', function ($row) {
         return view('admin._partials.sections.user-info', ['user' => $row->sharedBy]);
       })
-      ->addColumn('all_shares', function ($row) {
-        return view('admin._partials.sections.user-avatar-group', ['users' => $row->file->sharedUsers]);
-      })
       ->addColumn('file', function ($row) {
-        return $row->file->title;
+        return view('admin.pages.rfp.file-share.file-editor', compact('row'));
       })
       ->editColumn('permission', function ($row) {
         return '<span class="badge bg-label-success">' . ucfirst($row->permission) . '</span>';
       })
       ->addColumn('expires_at', function ($row) {
         if ($row->expires_at) {
-          return $row->expires_at->isPast() ? '<span class="badge bg-label-danger">Expired ' . $row->expires_at->format('d M, Y') . '</span>' : '<span class="badge bg-label-warning">' . $row->expires_at->format('d M, Y') . '</span>';
+          return $row->expires_at > today() ? '<span class="badge bg-label-danger">' . $row->expires_at->format('d M, Y') . '</span>' : '<span class="badge bg-label-warning">' . $row->expires_at->format('d M, Y') . '</span>';
         } else {
           return '<span class="badge bg-label-warning"> Never</span>';
+        }
+      })
+      ->addColumn('status', function ($row){
+        if($row->is_revoked){
+          return '<span class="badge bg-label-danger">Revoked</span>';
+        }elseif($row->expires_at && $row->expires_at > today()){
+          return '<span class="badge bg-label-danger">Expired</span>';
+        }else{
+          return '<span class="badge bg-label-success">Active</span>';
         }
       })
       ->addColumn('action', function ($fileShare) {
@@ -67,7 +73,7 @@ class SharedFilesDataTable extends DataTable
           $query->where('title', 'like', "%{$keyword}%");
         });
       })
-      ->rawColumns(['user', 'action', 'expires_at', 'permission', 'all_shares']);
+      ->rawColumns(['user', 'action', 'expires_at', 'permission', 'status']);
   }
 
   /**
@@ -126,9 +132,9 @@ class SharedFilesDataTable extends DataTable
       Column::make('shared_by')->title('Shared By'),
       Column::make('user')->title('Shared With'),
       Column::make('file'),
-      Column::make('all_shares')->title('All Shares'),
       Column::make('permission'),
       Column::make('expires_at')->title('Expires At'),
+      Column::make('status')->title('Status')->orderable(false)->searchable(false),
       Column::make('created_at')->title('Shared At'),
     ];
   }
