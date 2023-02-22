@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Program;
 use App\Models\RFPDraft;
 use Illuminate\Http\Request;
+use OwenIt\Auditing\Models\Audit;
 
 class RFPDraftController extends Controller
 {
@@ -52,6 +53,19 @@ class RFPDraftController extends Controller
     request()->program = $draft_rfp->program;
     $dataTable = new ProgramUsersDataTable();
     return $dataTable->render('admin.pages.rfp.show-users', compact('draft_rfp'));
+  }
+
+  public function draft_activity_tab($draft_rfp, Request $request)
+  {
+    $draft_rfp = RFPDraft::mine()->findOrFail($draft_rfp);
+
+    $audits = $draft_rfp->audits()->with('user')->latest()->paginate();
+
+    return view('admin.pages.rfp.draft-activity', compact('draft_rfp', 'audits'));
+
+    // request()->program = $draft_rfp->program;
+    // $dataTable = new ProgramUsersDataTable();
+    // return $dataTable->render('admin.pages.rfp.show-users', compact('draft_rfp'));
   }
 
   public function edit(RFPDraft $draft_rfp)

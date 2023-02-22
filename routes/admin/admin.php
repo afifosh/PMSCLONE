@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
 use App\Http\Controllers\Admin\Program\ProgramController;
 use App\Http\Controllers\Admin\Program\ProgramUserController;
+use App\Http\Controllers\Admin\RFP\FileShareController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\ExpiredPasswordController;
 use App\Http\Controllers\Auth\LockModeController;
@@ -23,6 +24,7 @@ use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use App\Http\Controllers\Admin\RFP\RFPFileController;
+use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\OnlyOfficeController;
 
 
@@ -38,6 +40,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
 
   Route::middleware('passwordMustNotBeExpired')->group(function () {
     Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
+
+    Route::post('/admin-account/update-profile-pic', [AdminAccountController::class, 'updateProfilePic'])->name('admin-account.update-profile');
 
     Route::resource('admin-account', AdminAccountController::class)->only('edit');
     Route::get('admin-account-auth-logs', [AdminAccountController::class, 'authLogs'])->name('auth-logs');
@@ -74,13 +78,21 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::resource('programs.users', ProgramUserController::class);
 
     Route::get('draft-rfps/{draft_rfp}/users', [RFPDraftController::class, 'draft_users_tab'])->name('draft-rfps.users_tab');
+    Route::get('draft-rfps/{draft_rfp}/activity', [RFPDraftController::class, 'draft_activity_tab'])->name('draft-rfps.activity_tab');
+    Route::get('/draft-rfps/{draft_rfp}/files-activity', [RFPFileController::class, 'files_activity_tab'])->name('draft-rfps.files_activity');
     Route::resource('draft-rfps', RFPDraftController::class);
 
     Route::get('/draft-rfps/{draft_rfp}/files/{file}/download', [RFPFileController::class, 'download'])->name('draft-rfps.files.download');
+    Route::get('/draft-rfps/{draft_rfp}/files/{file}/restore', [RFPFileController::class, 'restoreFile'])->name('draft-rfps.files.restore');
     Route::get('/draft-rfps/{draft_rfp}/files/{file}/activity', [RFPFileController::class, 'getActivity'])->name('draft-rfps.files.get-activity');
+    Route::delete('/draft-rfps/{draft_rfp}/files/{file}/move-to-trash', [RFPFileController::class, 'moveToTrash'])->name('draft-rfps.files.trash');
+    Route::get('/draft-rfps/{draft_rfp}/files/deleted-files', [RFPFileController::class, 'getDeletedFiles'])->name('draft-rfps.files.deleted');
     Route::resource('draft-rfps.files', RFPFileController::class);
+    Route::resource('draft-rfps.files.shares', FileShareController::class);
     Route::get('/edit-file/{file?}', [RFPFileController::class, 'editFileWithOffice'])->name('edit-file');
     Route::post('restore-file-update', [OnlyOfficeController::class, 'restoreVersion'])->name('file.restore_version');
+
+    Route::resource('shared-files', SharedFileController::class)->only(['index']);
 
     Route::get('file-manager', [AppsController::class, 'file_manager'])->name('app-file-manager');
 

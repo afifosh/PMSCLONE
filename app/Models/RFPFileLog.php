@@ -13,6 +13,16 @@ class RFPFileLog extends Model
 
     protected $fillable = ['file_id', 'log', 'actioner_id', 'actioner_type'];
 
+    public function scopeMine($query)
+    {
+      if(auth('admin')->check() && auth('admin')->id() == 1){
+        return $query;
+      }
+      return $query->whereHas('file', function($q){
+        $q->mine();
+      });
+    }
+
     public function actioner()
     {
         return $this->morphTo('actioner', 'actioner_type', 'actioner_id');

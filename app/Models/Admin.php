@@ -15,6 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Lab404\Impersonate\Models\Impersonate;
 use Avatar;
+use Illuminate\Support\Facades\Storage;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use OwenIt\Auditing\Contracts\Auditable;
 class Admin extends Authenticatable implements MustVerifyEmail, Auditable
@@ -29,6 +30,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
     protected $fillable = [
         'first_name',
         'last_name',
+        'avatar',
         'phone',
         'email',
         'password',
@@ -38,6 +40,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
         'email_verified_at'
     ];
 
+    public const AVATAR_PATH = 'admins-avatars';
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -75,7 +78,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
     {
       if(!$value)
       return Avatar::create($this->full_name)->toBase64();
-      return $value;
+      return @Storage::url($value);
     }
 
     public function getFullNameAttribute()
@@ -127,4 +130,12 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
       return $this->morphMany(RFPFileLog::class, 'actioner', 'actioner_type', 'actioner_id');
     }
 
+    /**
+     * Admin has many shared files
+     */
+
+    public function sharedFiles()
+    {
+      return $this->hasMany(FileShare::class, 'user_id', 'id');
+    }
 }

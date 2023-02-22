@@ -34,29 +34,35 @@
     <div class="card mb-4">
       <h5 class="card-header">Profile Details</h5>
       <!-- Account -->
+      <form action="{{route('admin.admin-account.update-profile')}}" method="POST" enctype="multipart/form-data">
       <div class="card-body">
         <div class="d-flex align-items-start align-items-sm-center gap-4">
           <img src="{{ auth()->user()->avatar }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" />
           <div class="button-wrapper">
-            <label for="upload" class="btn btn-primary me-2 mb-3" tabindex="0">
-              <span class="d-none d-sm-block">Upload new photo</span>
-              <i class="ti ti-upload d-block d-sm-none"></i>
-              <input type="file" id="upload" class="account-file-input" hidden accept="image/png, image/jpeg" />
-            </label>
-            <button type="button" class="btn btn-label-secondary account-image-reset mb-3">
-              <i class="ti ti-refresh-dot d-block d-sm-none"></i>
-              <span class="d-none d-sm-block">Reset</span>
-            </button>
-
-            <div class="text-muted">Allowed JPG, GIF or PNG. Max size of 800K</div>
+              @csrf
+              <label for="upload" class="btn btn-primary me-2 mb-3" tabindex="0">
+                <span class="d-none d-sm-block">Upload new photo</span>
+                <i class="ti ti-upload d-block d-sm-none"></i>
+                <input type="file" id="upload" name="profile" class="account-file-input" hidden accept="image/png, image/jpeg" />
+              </label>
+              <button type="button" class="btn btn-label-secondary account-image-reset mb-3">
+                <i class="ti ti-refresh-dot d-block d-sm-none "></i>
+                <span class="d-none d-sm-block">Reset</span>
+              </button>
+              <div class="text-muted">Allowed JPG, GIF or PNG. Max size of 800K</div>
+              @error('profile')
+                <div class="alert alert-danger alert-dismissible my-2">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    {{ $message }}
+                </div>
+              @enderror
           </div>
         </div>
       </div>
       <hr class="my-0">
       <div class="card-body">
-        <form method="POST" action="{{ route('admin.user-profile-information.update') }}">
           @csrf
-          @method('PUT')
+          {{-- @method('PUT') --}}
           <div class="row">
             <div class="mb-3 col-md-6">
               <label for="firstName" class="form-label">First Name</label>

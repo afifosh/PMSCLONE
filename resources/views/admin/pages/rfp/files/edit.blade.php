@@ -3,7 +3,7 @@
 <div class="row">
     <div class="form-group">
       {{ Form::label('title', __('Name'), ['class' => 'col-form-label']) }}
-      {!! Form::text('title', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
+      {!! Form::text('title', pathinfo($file->title)['filename'], ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
     </div>
 </div>
 

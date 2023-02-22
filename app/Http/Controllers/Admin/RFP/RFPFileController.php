@@ -13,6 +13,7 @@ use Firebase\JWT\JWT;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
+use Throwable;
 
 class RFPFileController extends Controller
 {
@@ -26,6 +27,13 @@ class RFPFileController extends Controller
     });
     $files = $query->where('rfp_id', $draft_rfp->id)->latest()->get();
     return view('admin.pages.rfp.file-manager', compact('draft_rfp', 'files'));
+  }
+
+  public function files_activity_tab(Request $request, $draft_rfp)
+  {
+    $draft_rfp = RFPDraft::mine()->findOrFail($draft_rfp);
+    $logs = $draft_rfp->fileLogs()->latest()->paginate();
+    return view('admin.pages.rfp.file-activity', compact('draft_rfp', 'logs'));
   }
 
   public function store($draft_rfp, Request $request, FileUploadRepository $file_repo)
@@ -86,79 +94,71 @@ class RFPFileController extends Controller
       file_put_contents($histDir . DIRECTORY_SEPARATOR . "createdInfo.json", json_encode($json, JSON_PRETTY_PRINT));
     }
     $uploaded_file->createLog('Uploaded File');
-
     unlink($file->getPathname());
     return $this->sendRes('Uploaded Successfully', ['event' => 'page_reload', 'close' => 'modal']);
   }
 
   public function editFileWithOffice($file, Request $request)
   {
-    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
+    $data['file'] = $file = RFPFile::mineOrShared()->findOrFail($file);
     $data['api_url'] = config('onlyoffice.doc_server_api_url');
-    $data['file_url'] = Storage::url($file->file);
-    $data['file'] = $file;
-    $data['ext'] = pathinfo(Storage::path($file->file), PATHINFO_EXTENSION);
-    $data['payload'] = '{
-          "document": {
-              "fileType": "' . $data['ext'] . '",
-              "title": "' . $file->title . '",
-              "url": "' . $data['file_url'] . '",
-              "key": "' . getDocEditorKey($file->file) . '",
-              "permissions": {
-                  "comment": true,
-                  "commentGroups": {
-                      "edit": "",
-                      "remove": "",
-                      "view": ""
-                  },
-                  "copy": true,
-                  "deleteCommentAuthorOnly": false,
-                  "download": true,
-                  "edit": true,
-                  "editCommentAuthorOnly": false,
-                  "fillForms": true,
-                  "modifyContentControl": true,
-                  "modifyFilter": true,
-                  "print": true,
-                  "review": true,
-                  "changeHistory" : true,
-                  "reviewGroups": ["Group1", "Group2", ""]
-              }
-          },
-          "editorConfig": {
-              "callbackUrl": "' . route('update-file', $file) . '",
-              "mode": "edit",
-              "user": {
-                  "group": "Group1",
-                  "id": "' . auth()->id() . '",
-                  "name": "' . auth()->user()->full_name . '"
-              },
-              "customization": {
-                  "review": {
-                  "trackChanges": true
-                  }
-              }
-          }
-      }';
-    // env('APP_URL').'/only-office.php?file='.$file->file
-    $payload = json_decode($data['payload'], true);
-    $data['token'] = JWT::encode($payload, config('onlyoffice.secret'), 'HS256');
-    $file->createLog('Opened File For Editing');
+    $payload['document'] = [
+      'fileType' => $file->extension,
+      'title' => $file->title,
+      'url' => Storage::url($file->file),
+      'key' => getDocEditorKey($file->file),
+      'permissions' => [
+        'comment' => $file->getMode() == 'edit' ? true : false, // commmets true for edit and comment permission, mode view only for view
+        'commentGroups' => [
+          'edit' => '',
+          'remove' => '',
+          'view' => ''
+        ],
+        'edit' => $file->getPermission() != 'view' ? true : false, //if the file is shared with edit permission, then the file will be opened in edit mode. false for comments and view.
+        'copy' => true,
+        'deleteCommentAuthorOnly' => false,
+        'download' => true,
+        'editCommentAuthorOnly' => false,
+        'fillForms' => true,
+        'modifyContentControl' => true,
+        'modifyFilter' => true,
+        'print' => true,
+        'review' => true,
+        'changeHistory' => true
+      ]
+    ];
+    $payload['editorConfig'] = [
+      'callbackUrl' => route('update-file', $file),
+      'user' => [
+        'id' => auth()->id(),
+        'name' => auth()->user()->full_name
+      ],
+      'customization' => [
+        'review' => [
+          'trackChanges' => true
+        ]
+      ],
+      'mode' => $file->getMode(), // 'edit' or 'view. 'edit' for edit and comments mode and 'view' for view mode
+    ];
+    $payload['token'] = JWT::encode($payload, config('onlyoffice.secret'), 'HS256');
+    $file->createLog('Opened File In editor');
+    $payload['height'] = 900;
+    $data['payload'] = json_encode($payload, JSON_PRETTY_PRINT);
 
     return view('admin.pages.rfp.files.only-office-editor', $data);
   }
 
   public function show($draft_rfp, $file, FileActionsRepository $file_repo)
   {
-    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
-    $file->createLog('Opened File');
+    $file = RFPFile::mineOrShared()->findOrFail($file);
+    $file->createLog('Opened File to '.$file->getMode());
 
     return $file_repo->previewFile($file->file);
   }
 
   public function edit($draft_rfp, $file, Request $request)
   {
-    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
+    $file = RFPFile::mineOrShared()->findOrFail($file);
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.files.edit', compact('file'))->render()]);
   }
@@ -166,36 +166,80 @@ class RFPFileController extends Controller
   public function update($draft_rfp, $file, Request $request)
   {
     $request->validate(['title' => 'required|string|max:255']);
-    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
-    $file->createLog('Renamed File from ' . $file->title . ' to ' . $request->title);
-    $file->update(['title' => $request->title]);
+    $file = RFPFile::mineOrShared()->findOrFail($file);
+    $file->createLog('Renamed File from ' . pathinfo($file->title)['filename'] . ' to ' . $request->title);
+    $file->update(['title' => $request->title . '.' . $file->extension]);
 
     return $this->sendRes('Updated Successfully', ['event' => 'page_reload', 'close' => 'modal']);
   }
 
-  public function download($draft_rfp, $file, FileActionsRepository $file_repo)
+  public function download($draft_rfp, $file, Request $request, FileActionsRepository $file_repo)
   {
-    $file = RFPFile::where('id', $file)->mine()->withBin()->firstOrFail();
-    $file->createLog('Downloaded File');
-    if($file->trashed_at)
-      return $file_repo->downloadFile(RFPFile::TRASH_PATH.$file->file, $file->title, '', ['extension' => $file->extension]);
-    return $file_repo->downloadFile($file->file, $file->title, '', ['extension' => $file->extension]);
+    try {
+      $file = RFPFile::mineOrShared()->withBin()->withTrashCheck()->findOrFail($file);
+      $file->createLog('Downloaded version' . $request->version);
+      return $file_repo->downloadFile($file->curVerPath($request->version), pathinfo($file->title, PATHINFO_FILENAME) . ' version-' . $request->version . '.' . $file->extension, '', $file->extension);
+    } catch (Throwable $e) {
+      return back()->with('error', $e->getMessage());
+    }
   }
 
-  public function destroy($draft_rfp, $file, FileActionsRepository $file_repo)
+  public function moveToTrash($draft_rfp, $file, FileActionsRepository $file_repo)
   {
-    $file = RFPFile::where('id', $file)->mine()->firstOrFail();
-    $file_repo->moveFile($file->file, RFPFile::TRASH_PATH. $file->file);
+    $file = RFPFile::mineOrShared()->findOrFail($file);
+    Storage::move($file->file . '-hist', RFPFile::TRASH_PATH . $file->file . '-hist');
+    $file_repo->moveFile($file->file, RFPFile::TRASH_PATH . $file->file);
     $file->update(['trashed_at' => now()]);
-    $file->createLog('Deleted File');
+    $file->createLog('Moved file to trash');
 
     return $this->sendRes('Moved To Trash', ['event' => 'page_reload', 'close' => 'modal']);
   }
 
+  public function destroy($draft_rfp, $file, FileActionsRepository $file_repo)
+  {
+    $file = RFPFile::mineOrShared()->withBin()->withTrashCheck()->findOrFail($file);
+    if (!$file->deleted_at) {
+      Storage::move(RFPFile::TRASH_PATH . $file->file . '-hist', RFPFile::DEL_PATH . $file->file . '-hist');
+      $file_repo->moveFile(RFPFile::TRASH_PATH . $file->file, RFPFile::DEL_PATH . $file->file);
+      $file->delete();
+      $file->createLog('Deleted File');
+    } else {
+      $file->createLog('Deleted File Permanently');
+      $file->deleteForcefully(RFPFile::DEL_PATH . $file->file);
+    }
+
+    return $this->sendRes('File Deleted', ['event' => 'page_reload', 'close' => 'modal']);
+  }
+
+  public function restoreFile($draft_rfp, $file, FileActionsRepository $file_repo)
+  {
+    $file = RFPFile::whereNotNull('trashed_at')->mineOrShared()->withBin()->withTrashCheck()->findOrFail($file);
+    if ($file->deleted_at) {
+      $file_repo->moveFile(RFPFile::DEL_PATH . $file->file, $file->file);
+      Storage::move(RFPFile::DEL_PATH . $file->file . '-hist', $file->file . '-hist');
+      $file->createLog('Restored Deleted File');
+    } else {
+      $file_repo->moveFile(RFPFile::TRASH_PATH . $file->file, $file->file);
+      Storage::move(RFPFile::TRASH_PATH . $file->file . '-hist', $file->file . '-hist');
+      $file->createLog('Restored File From Trash');
+    }
+    $file->update(['trashed_at' => null, 'deleted_at' => null]);
+
+    return back()->with('success', __('File Restored'));
+  }
+
   public function getActivity($draft_rfp, $file)
   {
-    $file = RFPFile::where('id', $file)->mine()->with('logs.actioner')->firstOrFail();
+    $file = RFPFile::mineOrShared()->withBin()->withTrashCheck()->with('logs.actioner')->findOrFail($file);
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.files.activity-timeline', compact('file'))->render()]);
+  }
+
+  public function getDeletedFiles(Request $request, RFPDraft $draft_rfp)
+  {
+    abort_if(auth()->id() != 1, 404);
+    $files = RFPFile::withTrashed()->where('rfp_id', $draft_rfp->id)->withBin()->whereNotNull('deleted_at')->get();
+
+    return view('admin.pages.rfp.file-manager', compact('draft_rfp', 'files'));
   }
 }

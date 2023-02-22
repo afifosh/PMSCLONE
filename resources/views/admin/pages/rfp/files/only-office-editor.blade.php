@@ -98,50 +98,7 @@
                 docEditor.setRevisedFile(file_data); // select a document for comparing
                 $('#versionModal').modal('hide');
             });
-            var config = {
-                "token": "{{ $token }}",
-                "height": 900,
-                "document": {
-                    "fileType": "{{ $ext }}",
-                    "title": "{{ $file->title }}",
-                    "url": "{{ $file_url }}",
-                    "key": "{{ getDocEditorKey($file->file) }}",
-                    "permissions": {
-                        "comment": true,
-                        "commentGroups": {
-                            "edit": "",
-                            "remove": "",
-                            "view": ""
-                        },
-                        "copy": true,
-                        "deleteCommentAuthorOnly": false,
-                        "download": true,
-                        "edit": true,
-                        "editCommentAuthorOnly": false,
-                        "fillForms": true,
-                        "modifyContentControl": true,
-                        "modifyFilter": true,
-                        "print": true,
-                        "review": true,
-                        "changeHistory": true,
-                        "reviewGroups": ["Group1", "Group2", ""]
-                    },
-                },
-                "editorConfig": {
-                    "callbackUrl": "{{ route('update-file', $file) }}",
-                    "mode": "edit",
-                    "user": {
-                        "group": "Group1",
-                        "id": "{{ auth()->id() }}",
-                        "name": "{{ auth()->user()->full_name }}"
-                    },
-                    "customization": {
-                        "review": {
-                            "trackChanges": true
-                        }
-                    }
-                }
-            };
+            var config = {!!$payload!!};
             // "documentType": "word",
             // var сonnectEditor = function() {
 

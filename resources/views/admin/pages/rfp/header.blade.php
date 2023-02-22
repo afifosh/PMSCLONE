@@ -42,6 +42,9 @@
       <li class="nav-item"><a class="nav-link {{$tab == 'profile' ? 'active disabled' : ''}}" href="{{ route('admin.draft-rfps.show', ['draft_rfp' => $draft_rfp])}}"><i class='ti-xs ti ti-user-check me-1'></i> Profile</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'users' ? 'active disabled' : ''}}" href="{{ route('admin.draft-rfps.users_tab', ['draft_rfp' => $draft_rfp]) }}"><i class='ti-xs ti ti-users me-1'></i> Users</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'files' ? 'active disabled' : ''}}"  href="{{ route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp]) }}"><i class='ti-xs ti ti-layout-grid me-1'></i> Files</a></li>
+      <li class="nav-item"><a class="nav-link {{$tab == 'shared-files' ? 'active disabled' : ''}}"  href="{{ route('admin.draft-rfps.files.shares.index', ['draft_rfp' => $draft_rfp, 'file' => 'all']) }}"><i class='fa fa-retweet me-1'></i>Shared Files</a></li>
+      <li class="nav-item"><a class="nav-link {{$tab == 'files-activity' ? 'active disabled' : ''}}"  href="{{ route('admin.draft-rfps.files_activity', ['draft_rfp' => $draft_rfp]) }}"><i class='ti-xs ti ti-layout-grid me-1'></i> Files Activity</a></li>
+      <li class="nav-item"><a class="nav-link {{$tab == 'draft-activity' ? 'active disabled' : ''}}"  href="{{ route('admin.draft-rfps.activity_tab', ['draft_rfp' => $draft_rfp]) }}"><i class='ti-xs ti ti-layout-grid me-1'></i> Draft Activity</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'none' ? 'active disabled' : ''}}" href="{{url('pages/profile-connections')}}"><i class='ti-xs ti ti-link me-1'></i> Connections</a></li>
     </ul>
   </div>

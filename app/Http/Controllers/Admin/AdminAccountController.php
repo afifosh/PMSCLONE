@@ -6,8 +6,11 @@ use App\DataTables\AuthenticationLogsDataTable;
 use App\DataTables\NotificationsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Repositories\FileUploadRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class AdminAccountController extends Controller
 {
@@ -72,6 +75,25 @@ class AdminAccountController extends Controller
   public function authLogs(AuthenticationLogsDataTable $dataTable)
   {
     return $dataTable->render('admin.pages.account.auth-logs');
+  }
+
+  public function updateProfilePic(Request $request, UpdatesUserProfileInformation $updater, FileUploadRepository $file_repo)
+  {
+    $request->validate([
+      'profile' => 'sometimes|mimetypes:image/*',
+    ]);
+
+    if($request->hasFile('profile'))
+    {
+      $path = Admin::AVATAR_PATH.'/user-'.auth()->id();
+      $avatar = $path.'/'.$file_repo->addAttachment($request->file('profile'), $path);
+      $request->user()->update(['avatar' => $avatar]);
+    }
+    $updater->update($request->user(), $request->all());
+
+    return $request->wantsJson()
+      ? new JsonResponse('', 200)
+      : back()->with('status', 'profile-information-updated');
   }
 
   /**

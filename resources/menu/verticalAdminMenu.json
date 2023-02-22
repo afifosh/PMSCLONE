@@ -92,6 +92,12 @@
       "slug": "admin.draft-rfps.index"
     },
     {
+      "url": "/admin/shared-files",
+      "name": "Shared Files",
+      "icon": "menu-icon fa fa-retweet",
+      "slug": "admin.shared-files.index"
+    },
+    {
       "url": "/admin/settings",
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",

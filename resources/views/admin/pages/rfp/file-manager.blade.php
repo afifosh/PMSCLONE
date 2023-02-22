@@ -4,17 +4,13 @@
 @section('vendor-style')
   <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/vendors/fonts/font-awesome/css/font-awesome.min.css')}}">
   <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/jstree.min.css')}}">
-
   <link rel="stylesheet" href="{{asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}">
-
   <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/components.css')}}">
-    <!-- END: Vendor CSS-->
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/file-icon-vectors@1.0.0/dist/file-icon-vectors.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/file-icon-vectors@1.0.0/dist/file-icon-vectors.min.css" />
   <link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
-
+  <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
+  <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 @endsection
-{{-- page styles --}}
 @section('page-style')
   <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/plugins/extensions/ext-component-tree.css')}}">
   <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/pages/app-file-manager.css')}}">
@@ -28,27 +24,27 @@
 <!--  <link rel="stylesheet" href="{{asset('assets/css/file-manager/jstree.min.css')}}">-->
 <!--@endsection-->
 @section('vendor-script')
-<script src="{{asset('assets/js/file-manager/app-file-manager.js')}}"></script>
-<script src="{{asset('assets/js/file-manager/jstree.min.js')}}"></script>
-<script src="https://unpkg.com/feather-icons"></script>
-<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
- <script src="{{asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')}}"></script>
- <script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
-<script>
-
-        //  Notifications & messages scrollable
+  <script src="{{asset('assets/js/file-manager/app-file-manager.js')}}"></script>
+  <script src="{{asset('assets/js/file-manager/jstree.min.js')}}"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="{{asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')}}"></script>
+  <script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
+  <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+  <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
+  <script>
+    //  Notifications & messages scrollable
     $('.scrollable-container').each(function () {
       var scrollable_container = new PerfectScrollbar($(this)[0], {
         wheelPropagation: false
       });
     });
-
-</script>
-
-
+  </script>
 @endsection
 
 @section('page-script')
+<script src={{asset('assets/js/custom/select2.js')}}></script>
+<script src={{asset('assets/js/custom/flatpickr.js')}}></script>
 <script>
   feather.replace()
 </script>
@@ -81,45 +77,47 @@
     $('.upload-file-modal').on('click', function () {
       $('#add-file-modal').modal('show');
     });
-    $('#add-file-modal').on('shown.bs.modal', function (e) {
-      const dropzoneMulti = new Dropzone('#dropzone-multi', {
-        previewTemplate: previewTemplate,
-        parallelUploads: 1,
-        addRemoveLinks: true,
-        chunking: true,
-        method: "POST",
-        maxFilesize: 50,
-        chunkSize: 1900000,
-        autoProcessQueue : true,
-        // If true, the individual chunks of a file are being uploaded simultaneously.
-        // parallelChunkUploads: true,
-        url: "{{ route('admin.draft-rfps.files.store', ['draft_rfp' => $draft_rfp]) }}",
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(file, response) {
-            console.log(response);
-        },
-        init: function(){
-            /* Called once the file has been processed. It could have failed or succeded */
-            this.on("complete", function(file){
+    @isset($draft_rfp)
+      $('#add-file-modal').on('shown.bs.modal', function (e) {
+        const dropzoneMulti = new Dropzone('#dropzone-multi', {
+          previewTemplate: previewTemplate,
+          parallelUploads: 1,
+          addRemoveLinks: true,
+          chunking: true,
+          method: "POST",
+          maxFilesize: 50,
+          chunkSize: 1900000,
+          autoProcessQueue : true,
+          // If true, the individual chunks of a file are being uploaded simultaneously.
+          // parallelChunkUploads: true,
+          url: "{{ route('admin.draft-rfps.files.store', ['draft_rfp' => $draft_rfp]) }}",
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          success: function(file, response) {
+              console.log(response);
+          },
+          init: function(){
+              /* Called once the file has been processed. It could have failed or succeded */
+              this.on("complete", function(file){
 
-            });
-            /* Called after the file is uploaded and sucessful */
-            this.on("sucess", function(file){
+              });
+              /* Called after the file is uploaded and sucessful */
+              this.on("sucess", function(file){
 
-            });
-            /* Called before the file is being sent */
-            this.on("sending", function(file){
-            });
-        }
+              });
+              /* Called before the file is being sent */
+              this.on("sending", function(file){
+              });
+          }
+        });
       });
-    });
+    @endif
 </script>
 @endsection
 @section('content')
-
-@include('admin.pages.rfp.header', ['tab' => 'files'])
+{{-- {{dd(isset($draft_rfp))}} --}}
+@includeWhen(isset($draft_rfp), 'admin.pages.rfp.header', ['tab' => 'files'])
 
 <!-- overlay container -->
 <div class="body-content-overlay"></div>
@@ -138,7 +136,8 @@
 
             <div class="sidebar-left">
                 <div class="sidebar">
-@include('admin/pages/rfp//file-manager-sidebar')
+                  @includeWhen(isset($draft_rfp),'admin/pages/rfp/file-manager-sidebar')
+                  @includeWhen(!isset($draft_rfp),'admin/pages/rfp/shared-files-sidebar')
                 </div>
             </div>
 
@@ -235,7 +234,7 @@
                                             <div class="card shadow-none border cursor-pointer">
                                                 <div class="card-body">
                                                     <div class="d-flex justify-content-between">
-                                                        <img src="../../../app-assets/images/icons/drive.png" alt="google drive" height="38">
+                                                        <img src="{{asset('app-assets/images/icons/drive.png')}}" alt="google drive" height="38">
                                                         <div class="dropdown-items-wrapper">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical" id="dropdownMenuLink1" role="button" data-bs-toggle="dropdown" aria-expanded="false"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink1">
@@ -271,7 +270,7 @@
                                             <div class="card shadow-none border cursor-pointer">
                                                 <div class="card-body">
                                                     <div class="d-flex justify-content-between">
-                                                        <img src="../../../app-assets/images/icons/dropbox.png" alt="dropbox" height="38">
+                                                        <img src="{{asset('app-assets/images/icons/dropbox.png')}}" alt="dropbox" height="38">
                                                         <div class="dropdown-items-wrapper">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical" id="dropdownMenuLink2" role="button" data-bs-toggle="dropdown" aria-expanded="false"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink2">
@@ -307,7 +306,7 @@
                                             <div class="card shadow-none border cursor-pointer">
                                                 <div class="card-body">
                                                     <div class="d-flex justify-content-between">
-                                                        <img src="../../../app-assets/images/icons/onedrivenew.png" alt="icloud" height="38" class="p-25">
+                                                        <img src="{{asset('app-assets/images/icons/onedrivenew.png')}}" alt="icloud" height="38" class="p-25">
                                                         <div class="dropdown-items-wrapper">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical" id="dropdownMenuLink3" role="button" data-bs-toggle="dropdown" aria-expanded="false"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink3">
@@ -343,7 +342,7 @@
                                             <div class="card shadow-none border cursor-pointer">
                                                 <div class="card-body">
                                                     <div class="d-flex justify-content-between">
-                                                        <img src="../../../app-assets/images/icons/icloud-1.png" alt="icloud" height="38" class="p-25">
+                                                        <img src="{{asset('app-assets/images/icons/icloud-1.png')}}" alt="icloud" height="38" class="p-25">
                                                         <div class="dropdown-items-wrapper">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical" id="dropdownMenuLink4" role="button" data-bs-toggle="dropdown" aria-expanded="false"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink4">
@@ -457,7 +456,6 @@
                                 <!-- Files Container Starts -->
                                 <div class="view-container">
                                     <h6 class="files-section-title mt-2 mb-75">Files</h6>
-                                @for ($i=0; $i<5; $i++)
                                   @forelse ($files as $file)
                                     <div class="card file-manager-item file">
                                       <div class="form-check">
@@ -465,13 +463,10 @@
                                           <label class="form-check-label" for="customCheck{{$file->id}}"></label>
                                       </div>
                                       <div class="card-img-top file-logo-wrapper">
-                                          {{-- <div class="dropdown float-end">
-                                              <i data-feather="more-vertical" class="toggle-dropdown mt-n25"></i>
-                                          </div> --}}
-                                          @if (!$file->deleted_at)
-                                            <div class="btn btn-sm btn-icon dropdown-toggle hide-arrow float-end" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></div>
+                                            <div class="dropdown hide-arrow float-end" data-bs-toggle="dropdown"><i class="feather-14" data-feather="more-vertical" class="toggle-dropdown mt-n25"></i></div>
                                             <div class="dropdown-menu dropdown-menu-end m-0">
-                                                <a class="dropdown-item" target="_blank" href="{{ route('admin.draft-rfps.files.show', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
+                                              @if(!$file->trashed_at)
+                                              <a class="dropdown-item" target="_blank" href="{{ route('admin.draft-rfps.files.show', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
                                                   <i class="feather-14" data-feather="eye"></i>
                                                   <span class="align-middle">Preview</span>
                                               </a>
@@ -479,19 +474,42 @@
                                                 <i class="feather-14" data-feather="copy"></i>
                                                   <span class="align-middle">Make a copy</span>
                                               </a>
-                                              <a class="dropdown-item" href="{{route('admin.draft-rfps.files.download', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
+                                              @endif
+                                              @php
+                                                $ver_count = @getFileVersion(getHistoryDir(getStoragePath(ltrim($file->curFilePath(), '/')))) ?? 0;
+                                              @endphp
+                                              @for ($ver_count; $ver_count > 0; $ver_count--)
+                                              <a class="dropdown-item" href="{{route('admin.draft-rfps.files.download', ['draft_rfp' => $file->rfp_id, 'file' => $file, 'version' => $ver_count])}}">
                                                 <i class="feather-14" data-feather="download"></i>
-                                                  <span class="align-middle">Download</span>
+                                                  <span class="align-middle">Download v{{$ver_count}}</span>
                                               </a>
+                                              @endfor
                                               <div class="dropdown-divider"></div>
-                                              <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Rename File" data-href="{{route('admin.draft-rfps.files.edit', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
+                                              @if(!$file->trashed_at)
+                                                <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Share File" data-href="{{route('admin.draft-rfps.files.shares.create', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
                                                   <i class="feather-14" data-feather="edit"></i>
-                                                  <span class="align-middle">Rename</span>
-                                              </a>
-                                              <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('admin.draft-rfps.files.destroy', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
-                                                <i class="feather-14" data-feather="trash"></i>
-                                                  <span class="align-middle">Delete</span>
-                                              </a>
+                                                  <span class="align-middle">Share</span>
+                                                </a>
+                                                <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Rename File" data-href="{{route('admin.draft-rfps.files.edit', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
+                                                    <i class="feather-14" data-feather="edit"></i>
+                                                    <span class="align-middle">Rename</span>
+                                                </a>
+                                                <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('admin.draft-rfps.files.trash', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
+                                                  <i class="feather-14" data-feather="trash"></i>
+                                                    <span class="align-middle">Delete</span>
+                                                </a>
+                                              @endif
+                                              @if ($file->trashed_at || $file->deleted_at)
+                                                  <a class="dropdown-item" href="{{route('admin.draft-rfps.files.restore', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
+                                                      <i class="feather-14" data-feather="refresh-cw"></i>
+                                                      <span class="align-middle">Restore</span>
+                                                  </a>
+                                                  <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('admin.draft-rfps.files.destroy', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
+                                                    <i class="feather-14" data-feather="trash"></i>
+                                                      <span class="align-middle">Delete Permanently</span>
+                                                  </a>
+                                              @endif
+
                                               <div class="dropdown-divider"></div>
                                               <button class="dropdown-item" data-toggle="ajax-modal" data-title="File Activity" data-href="{{route('admin.draft-rfps.files.get-activity', ['draft_rfp' => $file->rfp_id, 'file' => $file->id])}}">
                                                 <i class="feather-14" data-feather="info"></i>
@@ -502,33 +520,23 @@
                                                   <span class="align-middle">Report</span>
                                               </a>
                                               </div>
-                                            @endif
-                                          {{-- <div class="dropdown-menu dropdown-menu-end file-dropdown">
-
-                                        </div> --}}
                                           <div class="d-flex align-items-center justify-content-center w-100">
-                                              {{-- <img src="../../../app-assets/images/icons/{{$file->extension}}.png" alt="file-icon" height="35" /> --}}
-                                              {{-- <span class="fiv-sqo fiv-icon-{{$file->extension}} fiv-size-lg"></span> --}}
-                                              @include('admin._partials.attachment-icon', ['text' => strtoupper($file->extension)])
+                                            <i class="feather-folder" data-feather="file"></i>
                                           </div>
                                       </div>
                                       <div class="card-body">
-                                          <div class="content-wrapper">
-                                              <p class="card-text file-name mb-0">
-                                                @if ($file->is_editable() && !$file->trashed_at)
-                                                  <a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a>
-                                                @else
-                                                    {{$file->title}}
-                                                @endif</p>
-                                                @if (!$file->trashed_at)
-                                                  <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->file))}}</p>
-                                                @endif
-
-                                              {{-- <p class="card-text file-date">23 may 2019</p> --}}
-                                          </div>
-                                          @if (!$file->trashed_at)
-                                            <small class="file-accessed text-muted">Last modified: {{formatUNIXTimeStamp(Storage::lastModified($file->file))}}</small>
-                                          @endif
+                                        <div class="content-wrapper">
+                                            <p class="card-text file-name mb-0">
+                                              @if ($file->is_editable() && !$file->trashed_at)
+                                                <a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a>
+                                              @else
+                                                {{$file->title}}
+                                              @endif
+                                            </p>
+                                            <p class="card-text file-size mb-0">{{human_filesize(Storage::size($file->curFilePath()))}}</p>
+                                            <p class="card-text file-date">{{formatUNIXTimeStamp(Storage::lastModified($file->curFilePath()))}}</p>
+                                        </div>
+                                        <small class="file-accessed text-muted">{{formatUNIXTimeStamp(Storage::lastModified($file->curFilePath()))}}</small>
                                       </div>
                                     </div>
                                   @empty
@@ -537,7 +545,6 @@
                                       No Results
                                     </div>
                                   @endforelse
-                                @endfor
                                 </div>
                                 <!-- /Files Container Ends -->
                             <div class="ps__rail-x" style="left: 0px; bottom: -8px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 8px; height: 754px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 6px; height: 634px;"></div></div></div>
@@ -573,7 +580,7 @@
                                         <div class="tab-content" id="myTabContent">
                                             <div class="tab-pane fade show active" id="details-tab" role="tabpanel" aria-labelledby="details-tab">
                                                 <div class="d-flex flex-column justify-content-center align-items-center py-5">
-                                                    <img src="../../../app-assets/images/icons/js.png" alt="file-icon" height="64">
+                                                    <img src="{{asset('app-assets/images/icons/js.png')}}" alt="file-icon" height="64">
                                                     <p class="mb-0 mt-1">54kb</p>
                                                 </div>
                                                 <h6 class="file-manager-title my-2">Settings</h6>
@@ -634,7 +641,7 @@
                                                 <h6 class="file-manager-title my-2">Today</h6>
                                                 <div class="d-flex align-items-center mb-2">
                                                     <div class="avatar avatar-sm me-50">
-                                                        <img src="../../../app-assets/images/avatars/5-small.png" alt="avatar" width="28">
+                                                        <img src="{{asset('app-assets/images/icons/5-small.png')}}" alt="avatar" width="28">
                                                     </div>
                                                     <div class="more-info">
                                                         <p class="mb-0">
@@ -670,7 +677,7 @@
                                                 </div>
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar avatar-sm me-50">
-                                                        <img src="../../../app-assets/images/portrait/small/avatar-s-1.jpg" alt="Avatar" width="28">
+                                                        <img src="{{asset('app-assets/images/icons/avatar-s-1.png')}}" alt="Avatar" width="28">
                                                     </div>
                                                     <div class="more-info">
                                                         <p class="mb-0">
@@ -682,14 +689,14 @@
                                                 <h6 class="file-manager-title mt-3 mb-2">3 days ago</h6>
                                                 <div class="d-flex align-items-start">
                                                     <div class="avatar avatar-sm me-50">
-                                                        <img src="../../../app-assets/images/portrait/small/avatar-s-1.jpg" alt="Avatar" width="28">
+                                                        <img src="{{asset('app-assets/images/icons/avatar-s-1.png')}}" alt="Avatar" width="28">
                                                     </div>
                                                     <div class="more-info">
                                                         <p class="mb-50">
                                                             <span class="fw-bold">You</span>
                                                             uploaded this file
                                                         </p>
-                                                        <img src="../../../app-assets/images/icons/js.png" alt="Avatar" class="me-50" height="24">
+                                                        <img src="{{asset('app-assets/images/icons/js.png')}}" alt="Avatar" class="me-50" height="24">
                                                         <span class="fw-bold">app.js</span>
                                                     </div>
                                                 </div>
@@ -702,7 +709,7 @@
                         <!-- File Info Sidebar Ends -->
 
                         <!-- File Dropdown Starts-->
-                        <div class="dropdown-menu dropdown-menu-end file-dropdown">
+                        {{-- <div class="dropdown-menu dropdown-menu-end file-dropdown">
                             <a class="dropdown-item" href="#">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye align-middle me-50"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                 <span class="align-middle">Preview</span>
@@ -733,7 +740,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle align-middle me-50"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                                 <span class="align-middle">Report</span>
                             </a>
-                        </div>
+                        </div> --}}
                         <!-- /File Dropdown Ends -->
 
                         <!-- Create New Folder Modal Starts-->
@@ -764,6 +771,7 @@
 <!-- file manager app content ends -->
 
 {{-- modals --}}
+@isset($draft_rfp)
   <div class="modal fade" id="add-file-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -798,4 +806,5 @@
           </div>
       </div>
     </div>
+@endif
 @endsection

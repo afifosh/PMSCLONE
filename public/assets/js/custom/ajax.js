@@ -231,6 +231,11 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
               location.reload(); // then reload the page
             }, 1000);
           }
+          if(data.data.event == 'redirect'){
+            setTimeout(function() { // wait for 1 second
+              window.location.href = data.data.url;
+            }, 1000);
+          }
           //console.log(current.closest('.modal').modal("hide"));
           current.removeClass('disabled');
           if(data.data.close == 'globalModal'){
@@ -256,7 +261,7 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
         current.closest('form').find('.validation-error').remove();
         $.each(error.responseJSON.errors, function (ind, val) {
           const error = '<div class="text-danger validation-error">'+ val[0] +'</div>'
-          const target = $(current.closest('form').find('[name="'+ind+'"]'));
+          const target = $(current.closest('form').find('[name="'+ind+'"]')).length ? $(current.closest('form').find('[name="'+ind+'"]')) : $(current.closest('form').find('[name="'+ind+'[]"]'));
           target.addClass('invalid');
           if(target.hasClass('globalOfSelect2') && target.next('.select2-container').length) {
               $(error).insertAfter(target.next('.select2-container'));

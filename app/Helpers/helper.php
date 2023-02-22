@@ -35,8 +35,3 @@ if (!function_exists('get_ext')) {
     return $guesser->guess($mimeType);
   }
 }
-function getExtension($title)
-{
-  $filename=explode('.',$title);
-  return end($filename);
-}

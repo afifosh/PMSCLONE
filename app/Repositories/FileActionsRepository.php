@@ -9,9 +9,8 @@ class FileActionsRepository
   public function downloadFile($file_path, $download_title, $disk = '', $options = [])
   {
     $disk = $disk ? $disk : config('filesystems.default');
-
     if (Storage::disk($disk)->exists($file_path)) {
-      $download_title = isset($options['extension']) ? str_replace("." . $options['extension'], "", $download_title) . '.' . $options['extension'] : $download_title;
+      $download_title = isset($options['extension']) ? pathinfo($download_title, PATHINFO_FILENAME) : $download_title;
       return Storage::download($file_path, $download_title);
     }
   }
