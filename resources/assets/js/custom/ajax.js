@@ -289,7 +289,7 @@ $(document).on('click', '.clear-form' , function(){
   $(this).closest('form').find('select').find('option').filter('[selected]').removeAttr('selected');
 
   var dateFields = $(".flatpickr");
-  // Iterate over each date field and clear its value
+  // Iterate over each date field and clear its value////
   $(".flatpickr").attr('value', '');
   dateFields.each(function(index, element) {
     var flatpickrInstance = element._flatpickr;
