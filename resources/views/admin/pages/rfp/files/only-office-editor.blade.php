@@ -19,6 +19,9 @@
                       <a href="{{ route('admin.draft-rfps.index') }}">Draft RFPs</a>
                   </li>
                   <li class="breadcrumb-item">
+                    <a href="{{ route('admin.draft-rfps.show', $file->rfp_id) }}">{{$file->rfp->name}}</a>
+                </li>
+                  <li class="breadcrumb-item">
                       <a href="{{ route('admin.draft-rfps.files.index', ['draft_rfp' => $file->rfp_id]) }}">Files</a>
                   </li>
                   <li class="breadcrumb-item active">{{ $file->title }}</li>
