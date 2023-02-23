@@ -86,4 +86,27 @@ class FileShareController extends Controller
       return $this->sendError('Something went wrong', ['error' => $th->getMessage()], 500);
     }
   }
+
+  public function revoke(Request $request ,$draft_rfp, $file, $share)
+  {
+    try {
+      $file = RFPFile::mine()->findOrFail($file);
+      $share = $file->shares()->findOrFail($share);
+      if ($request->isMethod('post')) {
+        $share->update(['revoked_by' => auth()->id()]);
+        $file->createLog('Revoked File Share with ' . $share->user->full_name);
+
+        $notiData['title'] = auth()->user()->full_name . ' Revoked file sharing';
+        $notiData['image'] = auth()->user()->avatar;
+        $notiData['user'] = auth()->user();
+        \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData + ['url' => route('admin.shared-files.index')]));
+        \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData));
+        return $this->sendRes('File Share Revoked Successfully', ['event' => 'table_reload', 'table_id' => 'sharedfiles-table', 'close' => 'modal']);
+      }elseif($request->isMethod('get')){
+        return $this->sendRes('Confirmation', ['view_data' => view('admin.pages.rfp.file-share.revoke-confirmation', compact('share'))->render()]);
+      }
+    } catch (\Throwable $th) {
+      //throw $th;
+    }
+  }
 }

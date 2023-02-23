@@ -43,7 +43,7 @@ class FileUpdated extends Notification
             'title' => $this->data['title'],
             'data' => [
                 'image' => $this->data['image'],
-                'description' => $this->data['user']->full_name . ' updated a file ( '.$this->file->title.' )',
+                'description' => isset($data['desc']) ? isset($data['desc']) : $this->data['user']->full_name . ' updated a file ( '.$this->file->title.' )',
                 'action_url' => isset($data['url']) ? $data['url'] : route('admin.draft-rfps.files.index', $this->file->rfp_id),
                 'view' => 'admin.notifications.file-updated',
             ]

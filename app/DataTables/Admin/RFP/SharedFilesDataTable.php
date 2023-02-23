@@ -49,7 +49,7 @@ class SharedFilesDataTable extends DataTable
         }
       })
       ->addColumn('status', function ($row){
-        if($row->is_revoked){
+        if($row->revoked_by){
           return '<span class="badge bg-label-danger">Revoked</span>';
         }elseif($row->expires_at && $row->expires_at < today()){
           return '<span class="badge bg-label-danger">Expired</span>';

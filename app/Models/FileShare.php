@@ -9,7 +9,7 @@ class FileShare extends Model
 {
   use HasFactory;
 
-  protected $fillable = ['rfp_file_id', 'user_id', 'shared_by', 'permission', 'expires_at'];
+  protected $fillable = ['rfp_file_id', 'user_id', 'shared_by', 'permission', 'expires_at', 'revoked_by'];
 
   public const Permissions = [
     'view' => 'View',
@@ -48,12 +48,12 @@ class FileShare extends Model
   {
     $query->when(request()->has('filter_status'), function ($q) {
       if (request()->filter_status == 'active') {
-        $q->where('is_revoked', false);
-        $q->where('expires_at', '>', today());
+        $q->whereNull('revoked_by');
+        $q->where('expires_at', '>=', today());
       } elseif (request()->filter_status == 'revoked') {
-        $q->where('is_revoked', true);
+        $q->whereNotNull('revoked_by');
       } elseif (request()->filter_status == 'expired') {
-        $q->where('is_revoked', false);
+        $q->whereNull('revoked_by');
         $q->where('expires_at', '<', today());
       }
     });

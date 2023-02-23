@@ -66,7 +66,8 @@ $configData = Helper::appClasses();
             </select>
           </div>
           <div class="col-md-4 mt-3">
-            <select name="filter_status" class="form-select select2" data-placeholder="Status">
+            <select name="filter_status" class="form-select select2">
+              <option value="">@lang('Select Status')</option>
               @forelse ($statuses as $id => $status)
                 <option value="{{$id}}">{{ $status }}</option>
               @empty
