@@ -38,8 +38,13 @@ class RFPDraft extends BaseModel
     return $this->hasMany(RFPFile::class, 'rfp_id', 'id');
   }
 
+  public function files_withTrashed()
+  {
+    return $this->hasMany(RFPFile::class, 'rfp_id', 'id')->withTrashed();
+  }
+
   public function fileLogs()
   {
-    return $this->hasManyThrough(RFPFileLog::class, RFPFile::class, 'rfp_id', 'file_id', 'id', 'id');
+    return $this->hasManyThrough(RFPFileLog::class, RFPFile::class, 'rfp_id', 'file_id', 'id', 'id')->withTrashedParents();
   }
 }

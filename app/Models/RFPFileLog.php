@@ -33,7 +33,7 @@ class RFPFileLog extends Model
       });
       $query->when(request()->has('filter_date_range'), function($q){
         $date = explode(' to ', request('filter_date_range'));
-        if(empty($date) && count($date) == 2){
+        if(count($date) == 2){
           $q->whereBetween('rfp_file_logs.created_at', $date);
         }elseif(!empty($date[0]) && count($date) == 1){
           $q->whereDate('rfp_file_logs.created_at', $date[0]);

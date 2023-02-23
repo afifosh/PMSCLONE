@@ -33,9 +33,12 @@ class RFPFileController extends Controller
 
   public function files_activity_tab(Request $request, $draft_rfp)
   {
-    // dd($request->all());
+    $request->validate([
+      'filter_files' => 'nullable|array|exists:rfp_file_logs,id',
+      'filter_actioner' => 'nullable|array|exists:rfp_file_logs,actioner_id',
+    ]);
     $draft_rfp = RFPDraft::mine()->findOrFail($draft_rfp);
-    $files = $draft_rfp->files()->pluck('title', 'id');
+    $files = $draft_rfp->files()->withTrashed()->withBin()->pluck('title', 'id');
     $users = Admin::whereHas('fileLogs', function($q) use ($files) {
       $q->whereIn('file_id', array_keys($files->toArray()));
     })->get();
