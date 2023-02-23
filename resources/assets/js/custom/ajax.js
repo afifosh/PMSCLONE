@@ -284,6 +284,18 @@ $('.close_modal').on('click', function () {
 });
 
 // Delete Record
+$(document).on('click', '.clear-form' , function(){
+  $(this).closest('form').find('select').attr("value", "").val('').trigger('change').select2("close");
+  $(this).closest('form').find('select').find('option').filter('[selected]').removeAttr('selected');
+
+  var dateFields = $(".flatpickr");
+  // Iterate over each date field and clear its value
+  $(".flatpickr").attr('value', '');
+  dateFields.each(function(index, element) {
+    var flatpickrInstance = element._flatpickr;
+    flatpickrInstance.clear();
+  });
+})
 $(document).on('click', '[data-toggle="ajax-delete"]', function () {
   dtrModal = $('.dtr-bs-modal.show');
   var url = $(this).data('href');

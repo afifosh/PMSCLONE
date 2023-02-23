@@ -23,6 +23,24 @@ class RFPFileLog extends Model
       });
     }
 
+    public function scopeApplyRequestFilters($query)
+    {
+      $query->when(request('filter_files') && !empty(request('filter_files')) && is_array(request('filter_files')), function($q){
+        $q->whereIn('file_id', request('filter_files'));
+      });
+      $query->when(request()->has('filter_actioner'), function($q){
+        $q->whereIn('actioner_id', request('filter_actioner'));
+      });
+      $query->when(request()->has('filter_date_range'), function($q){
+        $date = explode(' to ', request('filter_date_range'));
+        if(empty($date) && count($date) == 2){
+          $q->whereBetween('rfp_file_logs.created_at', $date);
+        }elseif(!empty($date[0]) && count($date) == 1){
+          $q->whereDate('rfp_file_logs.created_at', $date[0]);
+        }
+      });
+    }
+
     public function actioner()
     {
         return $this->morphTo('actioner', 'actioner_type', 'actioner_id');

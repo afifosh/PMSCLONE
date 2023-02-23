@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\RFP;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\RFPDraft;
 use App\Models\RFPFile;
 use App\Notifications\Admin\FileUpdated;
@@ -32,9 +33,14 @@ class RFPFileController extends Controller
 
   public function files_activity_tab(Request $request, $draft_rfp)
   {
+    // dd($request->all());
     $draft_rfp = RFPDraft::mine()->findOrFail($draft_rfp);
-    $logs = $draft_rfp->fileLogs()->latest()->paginate();
-    return view('admin.pages.rfp.file-activity', compact('draft_rfp', 'logs'));
+    $files = $draft_rfp->files()->pluck('title', 'id');
+    $users = Admin::whereHas('fileLogs', function($q) use ($files) {
+      $q->whereIn('file_id', array_keys($files->toArray()));
+    })->get();
+    $logs = $draft_rfp->fileLogs()->applyRequestFilters()->latest()->paginate();
+    return view('admin.pages.rfp.file-activity', compact('draft_rfp', 'logs', 'files', 'users'));
   }
 
   public function store($draft_rfp, Request $request, FileUploadRepository $file_repo)
