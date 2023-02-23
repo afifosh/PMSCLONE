@@ -48,8 +48,9 @@ class FileShare extends Model
   {
     $query->when(request()->has('filter_status'), function ($q) {
       if (request()->filter_status == 'active') {
-        $q->whereNull('revoked_by');
-        $q->where('expires_at', '>=', today());
+        $q->where(function ($q) {
+          $q->Where('expires_at', '>=', today())->orWhereNull('expires_at');
+        })->whereNull('revoked_by');
       } elseif (request()->filter_status == 'revoked') {
         $q->whereNotNull('revoked_by');
       } elseif (request()->filter_status == 'expired') {

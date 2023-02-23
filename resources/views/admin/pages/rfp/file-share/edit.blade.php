@@ -1,5 +1,5 @@
 @if ($share->id)
-    {!! Form::model($share, ['route' => ['admin.draft-rfps.files.shares.update', ['draft_rfp' => $file->rfp_id, 'share' => 'share_or_user_id']], 'method' => 'PUT']) !!}
+    {!! Form::model($share, ['route' => ['admin.draft-rfps.files.shares.reinvite', ['draft_rfp' => $share->id, 'file' => $share->rfp_file_id ,'share' => $share->id]], 'method' => 'POST']) !!}
 @else
     {!! Form::model($share, ['route' => ['admin.draft-rfps.files.shares.store', ['draft_rfp' => $file->rfp_id, 'file' => $file]], 'method' => 'POST']) !!}
 @endif

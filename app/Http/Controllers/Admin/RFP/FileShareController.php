@@ -11,6 +11,7 @@ use App\Models\RFPFile;
 use App\Notifications\Admin\FileShared;
 use App\Notifications\Admin\FileUpdated;
 use Illuminate\Http\Request;
+use Throwable;
 
 class FileShareController extends Controller
 {
@@ -87,7 +88,7 @@ class FileShareController extends Controller
     }
   }
 
-  public function revoke(Request $request ,$draft_rfp, $file, $share)
+  public function revoke(Request $request, $draft_rfp, $file, $share)
   {
     try {
       $file = RFPFile::mine()->findOrFail($file);
@@ -102,11 +103,37 @@ class FileShareController extends Controller
         \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData + ['url' => route('admin.shared-files.index')]));
         \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData));
         return $this->sendRes('File Share Revoked Successfully', ['event' => 'table_reload', 'table_id' => 'sharedfiles-table', 'close' => 'modal']);
-      }elseif($request->isMethod('get')){
+      } elseif ($request->isMethod('get')) {
         return $this->sendRes('Confirmation', ['view_data' => view('admin.pages.rfp.file-share.revoke-confirmation', compact('share'))->render()]);
       }
     } catch (\Throwable $th) {
-      //throw $th;
+      $this->sendError('Something went wrong', ['error' => $th->getMessage()]);
+    }
+  }
+
+  public function reinvite(Request $request, $draft_rfp, $file, $share)
+  {
+    $file = RFPFile::mine()->findOrFail($file);
+    $share = $file->shares()->whereNull('revoked_by')->where('expires_at', '<', today())->findOrFail($share);
+    if ($request->isMethod('post')) {
+      $request->validate([
+        'permission' => 'required|in:' . implode(',', array_keys(FileShare::Permissions)),
+        'expires_at' => 'nullable|date|after:yesterday|date_format:Y-m-d',
+      ]);
+      $file_share = $file->shares()->create([
+        'user_id' => $share->user_id,
+        'permission' => $request->permission,
+        'expires_at' => $request->expires_at,
+        'shared_by' => auth()->id(),
+      ]);
+      \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileShared($file_share));
+      \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileShared($file_share, ['data' => ['url' => route('admin.shared-files.index')]]));
+      $file->createLog('Reshared File with ' . $share->user->full_name . ' with ' . FileShare::Permissions[$request->permission] . ' permission' . ($request->expires_at ? ' till ' . $request->expires_at : ''));
+
+      return $this->sendRes('File ReShared Successfully', ['event' => 'table_reload', 'table_id' => 'sharedfiles-table', 'close' => 'modal']);
+    } elseif ($request->isMethod('get')) {
+      $permissions = FileShare::Permissions;
+      return $this->sendRes('Reinvite Form', ['view_data' => view('admin.pages.rfp.file-share.re-invite', compact('share', 'permissions'))->render()]);
     }
   }
 }

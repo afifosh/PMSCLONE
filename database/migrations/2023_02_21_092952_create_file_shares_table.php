@@ -22,7 +22,6 @@ return new class extends Migration
             $table->enum('permission', array_keys(FileShare::Permissions))->default('view');
             $table->date('expires_at')->nullable();
             $table->foreignId('revoked_by')->nullable()->constrained('admins')->onDelete('cascade');
-            $table->unique(['rfp_file_id', 'user_id']);
             $table->timestamps();
         });
     }
