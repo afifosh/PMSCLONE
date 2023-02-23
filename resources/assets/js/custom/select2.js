@@ -27,5 +27,5 @@ window.initSelect2 = function(){
   }
 }
 $(document).ready(function () {
-  initSelect2();
+  initSelect2();//
 });
