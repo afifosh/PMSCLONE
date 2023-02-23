@@ -283,9 +283,9 @@ $('.close_modal').on('click', function () {
   $(this).closest('.modal').modal('hide');
 });
 
-// Delete Record
+
 $(document).on('click', '.clear-form' , function(){
-  $(this).closest('form').find('select').attr("value", "").val('').trigger('change').select2("close");
+  $(this).closest('form').find('select').val('').trigger('change').select2("close");
   $(this).closest('form').find('select').find('option').filter('[selected]').removeAttr('selected');
 
   var dateFields = $(".flatpickr");
@@ -296,6 +296,7 @@ $(document).on('click', '.clear-form' , function(){
     flatpickrInstance.clear();
   });
 })
+// Delete Record
 $(document).on('click', '[data-toggle="ajax-delete"]', function () {
   dtrModal = $('.dtr-bs-modal.show');
   var url = $(this).data('href');
