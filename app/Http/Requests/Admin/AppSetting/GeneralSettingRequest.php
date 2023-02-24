@@ -26,7 +26,7 @@ class GeneralSettingRequest extends FormRequest
         return [
             'password_history_count' => 'required|numeric|min:1|max:10',
             'password_expire_days' => 'required|numeric|gt:1',
-            'timeout_warning_seconds' => 'required|numeric|gte:3000',
+            'timeout_warning_seconds' => 'required|numeric|gte:3',
             'timeout_after_seconds' => 'required|numeric|gt:timeout_warning_seconds',
         ];
     }

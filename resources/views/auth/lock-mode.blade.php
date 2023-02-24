@@ -17,6 +17,7 @@ $configData = Helper::appClasses();
 @section('page-style')
 <!-- Page -->
 <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-auth.css') }}">
+<link rel="stylesheet" href="{{ asset(mix('assets/css/auth.css')) }}">
 @endsection
 
 @section('vendor-script')
