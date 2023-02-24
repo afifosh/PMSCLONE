@@ -486,8 +486,12 @@
                                               @endfor
                                               <div class="dropdown-divider"></div>
                                               @if(!$file->trashed_at)
+                                                <a class="dropdown-item" href="{{ route('admin.draft-rfps.files.toggle-important', ['draft_rfp' => $file->rfp_id, 'file' => $file->id ]) }}">
+                                                  <i class="feather-14" data-feather="award"></i>
+                                                  <span class="align-middle">{{ $file->is_important ? 'Unmark Important' : 'Mark Important'}}</span>
+                                                </a>
                                                 <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Share File" data-href="{{route('admin.draft-rfps.files.shares.create', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
-                                                  <i class="feather-14" data-feather="edit"></i>
+                                                  <i class="feather-14" data-feather="repeat"></i>
                                                   <span class="align-middle">Share</span>
                                                 </a>
                                                 <a class="dropdown-item" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Rename File" data-href="{{route('admin.draft-rfps.files.edit', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
@@ -512,7 +516,7 @@
 
                                               <div class="dropdown-divider"></div>
                                               <button class="dropdown-item" data-toggle="ajax-modal" data-title="File Activity" data-href="{{route('admin.draft-rfps.files.get-activity', ['draft_rfp' => $file->rfp_id, 'file' => $file->id])}}">
-                                                <i class="feather-14" data-feather="info"></i>
+                                                <i class="feather-14" data-feather="unlock"></i>
                                                   <span class="align-middle">File Activity</span>
                                               </button>
                                               <a class="dropdown-item" href="#">

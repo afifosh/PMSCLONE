@@ -251,4 +251,18 @@ class RFPFileController extends Controller
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.files.activity-timeline', compact('logs'))->render()]);
   }
+
+  public function toggleImportant($draft_rfp, $file)
+  {
+    $file = RFPFile::mine()->findOrFail($file);
+    if($file->is_important)
+      $file->createLog('Marked File as Important');
+    else
+      $file->createLog('Removed File From Important');
+    $file->update(['is_important' => !$file->is_important]);
+    if($file->is_important)
+      return back()->with('success', __('File Marked as Important'));
+    else
+      return back()->with('success', __('File Removed from Important'));
+  }
 }

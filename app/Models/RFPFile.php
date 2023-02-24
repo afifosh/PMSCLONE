@@ -14,7 +14,7 @@ class RFPFile extends BaseModel
 
     protected $table = "rfp_files";
 
-    protected $fillable = ['rfp_id', 'uploaded_by', 'trashed_at', 'title', 'file', 'mime_type', 'extension', 'deleted_at'];
+    protected $fillable = ['rfp_id', 'uploaded_by', 'trashed_at', 'title', 'file', 'mime_type', 'extension', 'deleted_at', 'is_important'];
 
     public const TRASH_PATH = '/trash/draft-files/';
     public const DEL_PATH = '/deleted/draft-files/';
@@ -54,9 +54,9 @@ class RFPFile extends BaseModel
 
     public function scopeFilter($query, $filter)
     {
-      // $query->when($filter == 'documents', function($q){
-      //   return $q->where('mime_type', 'like', 'application/%');
-      // });
+      $query->when($filter == 'important', function($q){
+        return $q->where('is_important', true);
+      });
       $query->when($filter == 'deleted-files', function($q){
         abort_if(auth()->id() != 1, 404);
         $q->withTrashed()->withBin()->whereNotNull('deleted_at');

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('uploaded_by')->constrained('admins')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('title');
             $table->string('file');
+            $table->boolean('is_important')->default(false);
             $table->string('mime_type')->nullable();
             $table->string('extension')->nullable();
             $table->timestamp('trashed_at')->nullable();

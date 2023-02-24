@@ -121,12 +121,12 @@ return [
     */
 
     'password_timeout' => 10800,
-    
+
     'password_expire_days' => 30,
 
-    'password_history_count' => 3,
+    'password_history_count' => 300,
 
-    'timeout_warning_seconds' => 3,
+    'timeout_warning_seconds' => 300,
 
-    'timeout_after_seconds' => 20,
+    'timeout_after_seconds' => 2000,
 ];
