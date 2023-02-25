@@ -31,21 +31,22 @@ class SharedFileController extends Controller
     // return view('admin.pages.rfp.shared-files.index', compact('files'));
   }
 
-  public function fileActivity($file)
+  public function fileActivity($file, $rfp = null)
   {
     $data['file']= $file = RFPFile::mineOrShared()->withBin()->withTrashCheck()->findOrFail($file);
     $data['users'] = Admin::whereHas('fileLogs', function($q) use ($file) {
       $q->where('file_id', $file->id);
     })->get();
-
     $data['logs'] = $file->logs()->applyRequestFilters()->with('actioner')->latest()->paginate();
+    $data['rfp'] = $rfp;
 
     return view('admin.pages.rfp.file-activity', $data);
   }
 
-  public function fileVersions($file)
+  public function fileVersions($file, $rfp = null)
   {
     $data['file']= RFPFile::mineOrShared()->withBin()->withTrashCheck()->findOrFail($file);
+    $data['draft_rfp'] = $rfp;
 
     return view('admin.pages.rfp.file-versions', $data);
   }

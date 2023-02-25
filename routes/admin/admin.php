@@ -98,8 +98,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('/edit-file/{file}/{rfp?}', [RFPFileController::class, 'editFileWithOffice'])->name('edit-file');
     Route::post('restore-file-update', [OnlyOfficeController::class, 'restoreVersion'])->name('file.restore_version');
 
-    Route::get('/files/{file}/activity', [SharedFileController::class, 'fileActivity'])->name('shared-files.file-activity');
-    Route::get('/files/{file}/versions', [SharedFileController::class, 'fileVersions'])->name('shared-files.file-versions');
+    Route::get('/files/{file}/activity/{rfp?}', [SharedFileController::class, 'fileActivity'])->name('shared-files.file-activity');
+    Route::get('/files/{file}/versions/{rfp?}', [SharedFileController::class, 'fileVersions'])->name('shared-files.file-versions');
     Route::resource('shared-files', SharedFileController::class)->only(['index']);
 
     Route::get('file-manager', [AppsController::class, 'file_manager'])->name('app-file-manager');

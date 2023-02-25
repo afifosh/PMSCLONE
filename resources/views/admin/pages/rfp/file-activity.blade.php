@@ -38,7 +38,48 @@ $configData = Helper::appClasses();
 @isset($draft_rfp)
 @include('admin.pages.rfp.header', ['tab' => 'files-activity'])
 @endisset
-
+@if (!@$draft_rfp)
+  <div class="row breadcrumbs-top">
+    <div class="col-12 d-flex justify-content-between">
+      <div class="d-flex">
+        <span class="content-header-title float-left border-end px-2 me-2 h4">File Activity</span>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb pt-1">
+                <li class="breadcrumb-item">
+                    <a href="{{ url('/') }}">Home</a>
+                </li>
+                @if(@$rfp)
+                  <li class="breadcrumb-item">
+                      <a href="{{ route('admin.draft-rfps.index') }}">Draft RFPs</a>
+                  </li>
+                  <li class="breadcrumb-item">
+                      <a href="{{ route('admin.draft-rfps.show', $file->rfp_id) }}">{{ $file->rfp->name }}</a>
+                  </li>
+                  <li class="breadcrumb-item">
+                      <a href="{{ route('admin.draft-rfps.files.index', ['draft_rfp' => $file->rfp_id]) }}">Files</a>
+                  </li>
+                @else
+                  <li class="breadcrumb-item">
+                    <a href="{{ route('admin.draft-rfps.index') }}">Shared Files</a>
+                  </li>
+                @endif
+                <li class="breadcrumb-item active">{{ $file->title }}</li>
+            </ol>
+        </nav>
+      </div>
+      <div>
+        <div class="btn-group">
+          <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ route('admin.shared-files.file-versions', ['file' => $file->id, 'rfp' => $rfp])}}">Versions History</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+@endif
 
 <div class="card">
   <h5 class="card-header">Search Filter</h5>
