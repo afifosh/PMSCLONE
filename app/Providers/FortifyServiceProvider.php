@@ -24,6 +24,7 @@ class FortifyServiceProvider extends ServiceProvider
       config(['fortify.passwords' => 'admins']);
       config(['fortify.home' => RouteServiceProvider::ADMIN_HOME]);
       config(['fortify.redirects.logout' => 'admin/login']);
+      config('fortify.middleware', ['web', 'guest:web']);
     }
 
     $this->app->singleton(

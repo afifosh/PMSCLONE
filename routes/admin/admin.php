@@ -28,7 +28,7 @@ use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\OnlyOfficeController;
 use App\Models\RFPFile;
 
-Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified', CheckForLockMode::class)->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','adminVerified', CheckForLockMode::class)->group(function () {
 
   Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]))->name('alive');
   Route::prefix('auth')->name('auth.')->group(function() {

@@ -20,7 +20,7 @@ use Laravel\Fortify\Http\Controllers\TwoFactorSecretKeyController;
 use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 
 // Admin Routes
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('guest:web')->group(function () {
     // Route::get('/company', [PagesController::class, 'company_page'])->middleware(['auth:admin', 'adminVerified']);
     // Route::get('/dashboard', [PagesController::class, 'admin_dashboard'])->middleware(['auth:admin', 'adminVerified']);
 
