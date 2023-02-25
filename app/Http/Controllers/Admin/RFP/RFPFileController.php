@@ -168,7 +168,7 @@ class RFPFileController extends Controller
   public function show($draft_rfp, $file, FileActionsRepository $file_repo)
   {
     $file = RFPFile::mineOrShared()->findOrFail($file);
-    $file->createLog('Opened File to '.$file->getMode());
+    $file->createLog('Opened File');
 
     return $file_repo->previewFile($file->file);
   }
