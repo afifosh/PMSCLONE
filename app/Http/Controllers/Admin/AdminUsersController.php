@@ -9,10 +9,11 @@ use App\Models\CompanyDepartment;
 use App\Models\CompanyDesignation;
 use App\Models\PartnerCompany;
 use App\Models\Role;
+use App\Notifications\Admin\WelcomeNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Support\Str;
 class AdminUsersController extends Controller
 {
 
@@ -71,8 +72,11 @@ class AdminUsersController extends Controller
     // } else {
     //   unset($att['password']);
     // }
+    $password = Str::random(15);
+    $att['password'] = Hash::make($password);
     $att['email_verified_at'] = $request->boolean('email_verified_at') ? now() : null;
     $user = Admin::create($att);
+    $user->notify(new WelcomeNotification($password));
     $user->syncRoles($request->roles);
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
   }
