@@ -54,9 +54,13 @@
                   <i class='ti ti-calendar'></i> Joined {{formatDateTime($user->created_at)}}</li>
               </ul>
             </div>
-            <a href="javascript:void(0)" class="btn btn-primary">
-              <i class='ti ti-user-check me-1'></i>Connected
-            </a>
+            @if (auth()->user()::class == $user::class)
+              @can('impersonate user')
+                  @canBeImpersonated($user, 'admin')
+                  <a href="{{ route('admin.impersonate-admin', $user) }}" class="btn btn-primary"><i class='ti ti-user-check me-1'></i>Impersonate</a>
+                  @endCanBeImpersonated
+              @endcan
+            @endif
           </div>
         </div>
       </div>
