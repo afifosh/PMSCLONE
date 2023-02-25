@@ -65,7 +65,7 @@ class NotificationsDataTable extends DataTable
         return $model
             ->where('notifiable_id', $user->id)
             ->where('notifiable_type', $notifiable_type)
-            ->newQuery();
+            ->latest()->newQuery();
     }
 
     /**

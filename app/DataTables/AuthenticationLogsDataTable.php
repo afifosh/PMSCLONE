@@ -27,7 +27,7 @@ class AuthenticationLogsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            
+
             ->addColumn('ip_address', function ($row) {
                 return $row->ip_address;
             })
@@ -35,7 +35,7 @@ class AuthenticationLogsDataTable extends DataTable
                 return $row->user_agent;
             })
             ->addColumn('login_at', function ($row) {
-                return $row->login_at->diffForHumans();
+                return $row->login_at ? $row->login_at->diffForHumans() : '-';
             })
             ->addColumn('login_successful', function ($row) {
                 return view('admin.pages.account.login-status', compact('row'));
@@ -65,7 +65,7 @@ class AuthenticationLogsDataTable extends DataTable
         return $model
             ->where('authenticatable_id', $user->id)
             ->where('authenticatable_type', $notifiable_type)
-            ->newQuery();
+            ->orderBy('id', 'DESC')->newQuery();
     }
 
     /**
@@ -105,7 +105,7 @@ class AuthenticationLogsDataTable extends DataTable
             Column::make('login_at'),
             Column::make('login_successful'),
             Column::make('location'),
-            
+
         ];
     }
 
