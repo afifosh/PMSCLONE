@@ -83,7 +83,7 @@ class FileShare extends Model
       $q->where('user_id', auth()->id())->where(function ($q) {
         $q->where(function ($q) {
           $q->where('expires_at', '>=', now())->orWhereNull('expires_at');
-        })->whereNull('revoked_by', false);
+        })->whereNull('revoked_by');
       });
     });
   }
