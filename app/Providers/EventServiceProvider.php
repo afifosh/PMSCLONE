@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Listeners\BouncedEmail;
+use App\Listeners\EmailDelivered;
+use App\Listeners\EmailLinkClicked;
+use App\Listeners\EmailSent;
+use App\Listeners\EmailViewed;
 use App\Models\Admin;
 use App\Models\User;
 use App\Observers\AdminObserver;
@@ -21,6 +26,24 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        'jdavidbakr\MailTracker\Events\EmailSentEvent' => [
+          EmailSent::class,
+        ],
+        'jdavidbakr\MailTracker\Events\ViewEmailEvent' => [
+            EmailViewed::class,
+        ],
+        'jdavidbakr\MailTracker\Events\LinkClickedEvent' => [
+            EmailLinkClicked::class,
+        ],
+        'jdavidbakr\MailTracker\Events\EmailDeliveredEvent' => [
+            EmailDelivered::class,
+        ],
+        // 'jdavidbakr\MailTracker\Events\ComplaintMessageEvent' => [
+        //     'App\Listeners\EmailComplaint',
+        // ],
+        'jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent' => [
+            BouncedEmail::class,
         ],
     ];
 

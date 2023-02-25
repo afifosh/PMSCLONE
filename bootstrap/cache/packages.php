@@ -35,6 +35,13 @@
       'Image' => 'Intervention\\Image\\Facades\\Image',
     ),
   ),
+  'jdavidbakr/mail-tracker' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'jdavidbakr\\MailTracker\\MailTrackerServiceProvider',
+    ),
+  ),
   'jenssegers/agent' => 
   array (
     'providers' => 
