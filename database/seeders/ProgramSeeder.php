@@ -17,7 +17,7 @@ class ProgramSeeder extends Seeder
      */
     public function run()
     {
-      Program::factory()->count(20)->create()->each(function ($program) {
+      Program::factory()->count(12)->create()->each(function ($program) {
         $program->users()->attach(Admin::where('id', '!=', 1)->inRandomOrder()->limit(3)->get(), ['added_by' => 1]);
 
         Program::factory()->count(rand(0, 2))->create(['parent_id' => $program->id])->each(function($p){
