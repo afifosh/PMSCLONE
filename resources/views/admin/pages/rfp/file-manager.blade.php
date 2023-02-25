@@ -478,12 +478,10 @@
                                               @php
                                                 $ver_count = @getFileVersion(getHistoryDir(getStoragePath(ltrim($file->curFilePath(), '/')))) ?? 0;
                                               @endphp
-                                              @for ($ver_count; $ver_count > 0; $ver_count--)
-                                              <a class="dropdown-item" href="{{route('admin.draft-rfps.files.download', ['draft_rfp' => $file->rfp_id, 'file' => $file, 'version' => $ver_count])}}">
+                                              <a class="dropdown-item" href="{{route('admin.draft-rfps.files.download', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
                                                 <i class="feather-14" data-feather="download"></i>
-                                                  <span class="align-middle">Download v{{$ver_count}}</span>
+                                                  <span class="align-middle">Download</span>
                                               </a>
-                                              @endfor
                                               <div class="dropdown-divider"></div>
                                               @if(!$file->trashed_at)
                                                 <a class="dropdown-item" href="{{ route('admin.draft-rfps.files.toggle-important', ['draft_rfp' => $file->rfp_id, 'file' => $file->id ]) }}">

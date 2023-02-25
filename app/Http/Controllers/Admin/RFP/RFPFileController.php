@@ -194,8 +194,9 @@ class RFPFileController extends Controller
   {
     try {
       $file = RFPFile::mineOrShared()->withBin()->withTrashCheck()->findOrFail($file);
-      $file->createLog('Downloaded version' . $request->version);
-      return $file_repo->downloadFile($file->curVerPath($request->version), pathinfo($file->title, PATHINFO_FILENAME) . ' version-' . $request->version . '.' . $file->extension, '', $file->extension);
+      $version = $request->version ?? @getFileVersion(getHistoryDir(getStoragePath(ltrim($file->curFilePath(), '/'))));
+      $file->createLog('Downloaded version' . $version);
+      return $file_repo->downloadFile($file->curVerPath($version), pathinfo($file->title, PATHINFO_FILENAME) . ' version-' . $version . '.' . $file->extension, '', $file->extension);
     } catch (Throwable $e) {
       return back()->with('error', $e->getMessage());
     }
