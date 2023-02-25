@@ -3,13 +3,11 @@
 namespace App\Notifications\Admin;
 
 use App\Models\FileShare;
-use App\Models\RFPFile;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FileShared extends Notification
+class FileShared extends Notification implements ShouldQueue
 {
     use Queueable;
 

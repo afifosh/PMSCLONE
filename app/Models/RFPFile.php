@@ -173,4 +173,9 @@ class RFPFile extends BaseModel
     {
       return @$this->shares()->where('user_id', auth()->id())->first()->permission ?? 'edit';
     }
+
+    public function uploadedBy()
+    {
+      return $this->belongsTo(Admin::class, 'uploaded_by', 'id');
+    }
 }

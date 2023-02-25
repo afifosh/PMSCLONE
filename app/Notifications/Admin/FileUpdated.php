@@ -4,10 +4,9 @@ namespace App\Notifications\Admin;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FileUpdated extends Notification
+class FileUpdated extends Notification implements ShouldQueue
 {
     use Queueable;
 

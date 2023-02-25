@@ -8,6 +8,7 @@ use App\Models\Admin;
 use App\Models\RFPDraft;
 use App\Models\RFPFile;
 use App\Notifications\Admin\FileUpdated;
+use App\Notifications\Admin\FileUploaded;
 use App\Repositories\FileActionsRepository;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +17,7 @@ use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Throwable;
+use Notification;
 
 class RFPFileController extends Controller
 {
@@ -105,6 +107,7 @@ class RFPFileController extends Controller
     }
     $uploaded_file->createLog('Uploaded File');
     unlink($file->getPathname());
+    Notification::send($uploaded_file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUploaded($uploaded_file));
     return $this->sendRes('Uploaded Successfully', ['event' => 'page_reload', 'close' => 'modal']);
   }
 
