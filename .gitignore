@@ -15,6 +15,7 @@ yarn-error.log
 /.vscode
 /public/uploads
 /public/css
+public/assets
 /public/js
 /public/mix-manifest.json
 # But not these files...
