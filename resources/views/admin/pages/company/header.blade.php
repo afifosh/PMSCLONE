@@ -41,7 +41,6 @@
       <li class="nav-item"><a class="nav-link {{$tab == 'profile' ? 'active disabled' : ''}}" href="{{ route('admin.companies.show', $company) }}"><i class='ti ti-user-check ti-xs me-1'></i> Profile</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'users' ? 'active disabled' : ''}}" href="{{ route('admin.companies.showUsers', ['company' => $company]) }}"><i class='ti ti-users ti-xs me-1'></i> Users</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'invitations' ? 'active disabled' : ''}}" href="{{ route('admin.companies.showInvitations', ['company' => $company]) }}"><i class='ti ti-link ti-xs me-1'></i> Invitations</a></li>
-      <li class="nav-item"><a class="nav-link {{$tab == 'connections' ? 'active disabled' : ''}}" href="javascript:void(0);"><i class='ti ti-layout-grid ti-xs me-1'></i> Connections</a></li>
     </ul>
   </div>
 </div>
