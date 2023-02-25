@@ -12,9 +12,9 @@
       <p class="mb-0">
         {{ __('Recently we have detected unusual activity your account.') }}
         <br>
-        <br> <b>@lang('IP address:')</b> {{ $notification->data['ipAddress'] }}
-        <br> <b>@lang('City:')</b> {{ $notification->data['location']['city'] }}
-        <br> <b>@lang('Country:')</b> {{ $notification->data['location']['country'] }}
+        <br> <b>@lang('IP address:')</b> {{ @$notification->data['ipAddress'] }}
+        <br> <b>@lang('City:')</b> {{ @$notification->data['location']['city'] }}
+        <br> <b>@lang('Country:')</b> {{ @$notification->data['location']['country'] }}
       </p>
     </div>
     <div class="flex-shrink-0 dropdown-notifications-actions">
