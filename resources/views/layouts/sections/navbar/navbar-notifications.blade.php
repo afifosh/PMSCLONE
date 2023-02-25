@@ -1,5 +1,5 @@
 @foreach($notifications as $notification)
-@if ($notification->type == 'App\Notifications\Auth\LoginNotification\NewDevice' || $notification->type == 'App\Notifications\Auth\LoginNotification\NewLocation')
+@if ( true || $notification->type == 'App\Notifications\Auth\NewDevice' || $notification->type == 'App\Notifications\Auth\NewLocation')
 <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
   <div class="d-flex">
     <div class="flex-shrink-0 me-3">
@@ -18,8 +18,8 @@
       </p>
     </div>
     <div class="flex-shrink-0 dropdown-notifications-actions">
-      <a href="javascript:void(0)" class="dropdown-notifications-read">test<span class="badge badge-dot"></span></a>
-      <a href="javascript:void(0)" class="dropdown-notifications-archive">test2<span class="ti ti-x"></span></a>
+      <a href="javascript:void(0)" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>
+      <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="ti ti-x"></span></a>
     </div>
   </div>
 </li>

@@ -46,6 +46,11 @@ class FileShare extends Model
 
   public function scopeApplyRequestFilters($query)
   {
+    $query->when(request()->has('filter_drafts'), function ($q) {
+      $q->whereHas('file', function ($q) {
+        $q->whereIn('rfp_id', request('filter_drafts'));
+      });
+    });
     $query->when(request()->has('filter_status'), function ($q) {
       if (request()->filter_status == 'active') {
         $q->where(function ($q) {
@@ -69,6 +74,17 @@ class FileShare extends Model
     });
     $query->when(request()->has('filter_shared_by'), function ($q) {
       $q->whereIn('shared_by', request()->filter_shared_by);
+    });
+  }
+
+  public function scopeMineShared($query)
+  {
+    return $query->when(auth()->id() != 1, function ($q) {
+      $q->where('user_id', auth()->id())->where(function ($q) {
+        $q->where(function ($q) {
+          $q->where('expires_at', '>=', now())->orWhereNull('expires_at');
+        })->whereNull('revoked_by', false);
+      });
     });
   }
 }

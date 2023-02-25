@@ -29,13 +29,15 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@include('admin.pages.rfp.header', ['tab' => 'shared-files'])
 @can(true)
   <div class="mt-3  col-12">
     <div class="card">
       <h5 class="card-header">Search Filter</h5>
       <form class="js-datatable-filter-form">
         <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
+          <div class="col-md-4">
+            {!! Form::select('filter_drafts[]', $drafts, null, ['class' => 'form-select select2', 'multiple', 'data-placeholder' => "Draft"]) !!}
+          </div>
           <div class="col-md-4">
             <select name="filter_shared_by[]" class="form-select select2User" multiple data-placeholder="Shared By">
               @forelse ($sharedBy as $user)
@@ -45,17 +47,9 @@ $configData = Helper::appClasses();
             </select>
           </div>
           <div class="col-md-4">
-            <select name="filter_shared_with[]" class="form-select select2User" multiple data-placeholder="Shared With">
-              @forelse ($sharedWith as $user)
-                <option value="{{$user->id}}" data-full_name="{{$user->full_name}}" data-avatar="{{$user->avatar}}">{{$user->email}}</option>
-              @empty
-              @endforelse
-            </select>
-          </div>
-          <div class="col-md-4">
             {!! Form::select('filter_files[]', $files, null, ['class' => 'form-select select2', 'multiple', 'data-placeholder' => "Files"]) !!}
           </div>
-          <div class="col-md-4 mt-3">
+          <div class="col-md-4">
             {!! Form::select('filter_permissions[]', $permissions, null, ['class' => 'form-select select2', 'multiple', 'data-placeholder' => "Permission"]) !!}
           </div>
           <div class="col-md-4 mt-3">

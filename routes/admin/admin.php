@@ -95,9 +95,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'adminVerified'
     Route::match(['get', 'post'], '/draft-rfps/{draft_rfp}/files/{file}/shares/{share}/revoke', [FileShareController::class, 'revoke'])->name('draft-rfps.files.shares.revoke');
     Route::match(['get', 'post'], '/draft-rfps/{draft_rfp}/files/{file}/shares/{share}/reinvite', [FileShareController::class, 'reinvite'])->name('draft-rfps.files.shares.reinvite');
     Route::resource('draft-rfps.files.shares', FileShareController::class);
-    Route::get('/edit-file/{file?}', [RFPFileController::class, 'editFileWithOffice'])->name('edit-file');
+    Route::get('/edit-file/{file}/{rfp?}', [RFPFileController::class, 'editFileWithOffice'])->name('edit-file');
     Route::post('restore-file-update', [OnlyOfficeController::class, 'restoreVersion'])->name('file.restore_version');
 
+    Route::get('/files/{file}/activity', [SharedFileController::class, 'fileActivity'])->name('shared-files.file-activity');
+    Route::get('/files/{file}/versions', [SharedFileController::class, 'fileVersions'])->name('shared-files.file-versions');
     Route::resource('shared-files', SharedFileController::class)->only(['index']);
 
     Route::get('file-manager', [AppsController::class, 'file_manager'])->name('app-file-manager');

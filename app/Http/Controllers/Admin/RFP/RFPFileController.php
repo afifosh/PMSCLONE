@@ -108,7 +108,7 @@ class RFPFileController extends Controller
     return $this->sendRes('Uploaded Successfully', ['event' => 'page_reload', 'close' => 'modal']);
   }
 
-  public function editFileWithOffice($file, Request $request)
+  public function editFileWithOffice($file, $rfp = '')
   {
     $data['file'] = $file = RFPFile::mineOrShared()->findOrFail($file);
     $data['api_url'] = config('onlyoffice.doc_server_api_url');
@@ -160,6 +160,7 @@ class RFPFileController extends Controller
     $notiData['user'] = auth()->user();
     \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData + ['url' => route('admin.shared-files.index')]));
     \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData));
+    $data['draft_rfp'] = $rfp;
 
     return view('admin.pages.rfp.files.only-office-editor', $data);
   }

@@ -35,23 +35,35 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
+@isset($draft_rfp)
 @include('admin.pages.rfp.header', ['tab' => 'files-activity'])
+@endisset
+
 
 <div class="card">
   <h5 class="card-header">Search Filter</h5>
-  <form id="asdasdfdsf" class="js-datatable-filter-form" method="GET" action="{{route('admin.draft-rfps.files_activity', $draft_rfp)}}">
+  @isset($draft_rfp)
+    <form method="GET" action="{{route('admin.draft-rfps.files_activity', $draft_rfp)}}">
+  @else
+    <form method="GET" action="{{ route('admin.shared-files.file-activity', ['file' => $file->id]) }}">
+  @endisset
+
     <div class="d-flex align-items-center row pb-2 gap-3 mx-3 gap-md-0">
-      <div class="col-md-4">
-        {{ Form::select('filter_files[]', $files, request('filter_files'), ['class' => 'form-select select2', 'data-placeholder' => 'Files', 'multiple']) }}
-      </div>
-      <div class="col-md-4">
-        @php
-          $optionParameters = collect($users)->mapWithKeys(function ($item) {
-              return [$item['id'] => ['data-full_name' => $item['full_name'], 'data-avatar' => $item['avatar']]];
-          })->all();
-        @endphp
-        {{ Form::select('filter_actioner[]', $users->pluck('email', 'id'), request('filter_actioner'), ['class' => 'form-select select2User', 'data-placeholder' => 'Users', 'multiple'], $optionParameters) }}
-      </div>
+      @isset($files)
+        <div class="col-md-4">
+          {{ Form::select('filter_files[]', $files, request('filter_files'), ['class' => 'form-select select2', 'data-placeholder' => 'Files', 'multiple']) }}
+        </div>
+      @endisset
+      @isset($users)
+        <div class="col-md-4">
+          @php
+            $optionParameters = collect($users)->mapWithKeys(function ($item) {
+                return [$item['id'] => ['data-full_name' => $item['full_name'], 'data-avatar' => $item['avatar']]];
+            })->all();
+          @endphp
+          {{ Form::select('filter_actioner[]', $users->pluck('email', 'id'), request('filter_actioner'), ['class' => 'form-select select2User', 'data-placeholder' => 'Users', 'multiple'], $optionParameters) }}
+        </div>
+      @endisset
       <div class="col-md-4">
         <div class="form-group">
           <input name="filter_date_range" value="{{request('filter_date_range')}}" type="text" class="form-control flatpickr" data-flatpickr='{"mode": "range", "dateFormat": "Y-m-d"}' placeholder="Date Range">
@@ -67,40 +79,7 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </form>
-  <div class="card-body pb-0">
-    <ul class="timeline ms-1 mb-0">
-      @forelse ($logs as $log)
-        <li class="timeline-item timeline-item-transparent">
-          <span class="timeline-point timeline-point-primary"></span>
-          <div class="timeline-event">
-            <div class="timeline-header">
-              <h6 class="mb-0">{{ $log->log }}</h6>
-              <small class="text-muted">{{$log->created_at->diffForHumans()}}</small>
-            </div>
-            <p class="mb-2">{{ $log->actioner->full_name }} {{ $log->log}} @ {{formatDateTime($log->created_at)}}</p>
-            <div class="d-flex flex-wrap">
-              <div class="avatar me-2">
-                <img src="{{ $log->actioner->avatar }}" alt="Avatar" class="rounded-circle" />
-              </div>
-              <div class="ms-1">
-                <h6 class="mb-0">{{ $log->actioner->full_name }}</h6>
-                <span>{{ $log->actioner->email }}</span>
-              </div>
-            </div>
-          </div>
-        </li>
-      @empty
-        <li class="timeline-item timeline-item-transparent">
-          <span class="timeline-point timeline-point-primary"></span>
-          <div class="timeline-event">
-            <div class="timeline-header">
-              <h6 class="mb-0">No Activity</h6>
-            </div>
-          </div>
-        </li>
-      @endforelse
-    </ul>
-  </div>
+  @include('admin.pages.rfp.file-activity-logs', ['logs' => $logs])
   <div class="row">
     <div class="col-12">
       <div class="card-footer d-flex justify-content-end">
@@ -108,10 +87,6 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </div>
-  {{-- {{$logs->links()}} --}}
 </div>
-
-
-
 @endsection
 

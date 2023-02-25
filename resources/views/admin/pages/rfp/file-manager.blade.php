@@ -532,7 +532,7 @@
                                         <div class="content-wrapper">
                                             <p class="card-text file-name mb-0">
                                               @if ($file->is_editable() && !$file->trashed_at)
-                                                <a href="{{route('admin.edit-file', $file->id)}}">{{$file->title}}</a>
+                                                <a href="{{route('admin.edit-file', [ 'file' => $file->id, 'rfp' => $file->rfp_id])}}">{{$file->title}}</a>
                                               @else
                                                 {{$file->title}}
                                               @endif

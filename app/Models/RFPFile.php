@@ -143,13 +143,15 @@ class RFPFile extends BaseModel
 
     public function scopeAvailableShared($query)
     {
-      return $query->when(auth()->id() != 1, function($q){
-        return $q->whereHas('shares', function($q){
+      // return $query->when(auth()->id() != 1, function($q){
+        return $query->whereHas('shares', function($q){
           $q->where('user_id', auth()->id())->where(function($q){
-            $q->where('expires_at', '>=', now())->orWhereNull('expires_at');
+            $q->where(function($q){
+              $q->where('expires_at', '>=', now())->orWhereNull('expires_at');
+            })->whereNull('revoked_by');
           });
         });
-      });
+      // });
     }
 
     public function shares()
