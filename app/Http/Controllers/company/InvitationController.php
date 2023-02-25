@@ -31,6 +31,7 @@ class InvitationController extends Controller
       $user->assignRole($invitation->role_id);
       $invitation->update(['status' => 'accepted']);
       auth()->login($user);
+      $invitation->createLog('Invitation Accepted');
       return redirect()->route('pages-home');
     } catch (Throwable $e) {
       return back()->with('status', $e->getMessage());

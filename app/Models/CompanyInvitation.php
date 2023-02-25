@@ -26,4 +26,19 @@ class CompanyInvitation extends BaseModel
     {
       return $this->belongsTo(Role::class, 'role_id', 'id');
     }
+
+    public function logs()
+    {
+      return $this->morphMany(TimelineLog::class, 'logable', 'logable_type', 'logable_id');
+    }
+
+    public function createLog($log, $data = null)
+    {
+      $actioner = ['actioner_id' => null, 'actioner_type' => null];
+      if(auth()->check()){
+        $actioner['actioner_id'] = auth()->id();
+        $actioner['actioner_type'] = auth()->user()::class;
+      }
+      return $this->logs()->create(['log' => $log, 'data' => $data,] + $actioner);
+    }
 }

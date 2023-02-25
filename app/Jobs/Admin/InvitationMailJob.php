@@ -37,6 +37,7 @@ class InvitationMailJob implements ShouldQueue
     {
       Mail::to($this->data->contactPerson->email)->send(new CompanyInvitationMail($this->data));
       $this->data->update(['status' => 'sent']);
+      $this->data->createLog('Invitation mail sent to '.$this->data->contactPerson->email);
     }
     public function fail($exception = null)
     {

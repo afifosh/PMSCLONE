@@ -64,6 +64,7 @@ class InvitationController extends Controller
       $contPerson->invitations()->update(['status' => 'revoked']);
       $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role, 'status' => 'pending']);
       dispatch(new InvitationMailJob($data));
+      $data->createLog('Invitation Created', $data->toArray());
 
       return $this->sendRes('Added Successfully', ['event' => 'table_reload', 'table_id' => CompanyInvitation::DT_ID, 'close' => 'globalModal']);
     }
@@ -112,6 +113,7 @@ class InvitationController extends Controller
       $contPerson->invitations()->delete();
       $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role, 'status' => 'pending']);
       dispatch(new InvitationMailJob($data));
+      $data->createLog('Invitations Created');
 
       return $this->sendRes('Added Successfully', ['event' => 'table_reload', 'table_id' => CompanyInvitation::DT_ID, 'close' => 'globalModal']);
     }

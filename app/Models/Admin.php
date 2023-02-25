@@ -130,6 +130,11 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
       return $this->morphMany(RFPFileLog::class, 'actioner', 'actioner_type', 'actioner_id');
     }
 
+    public function logs()
+    {
+      return $this->morphMany(TimelineLog::class, 'actioner', 'actioner_type', 'actioner_id');
+    }
+
     /**
      * Admin has many shared files
      */
