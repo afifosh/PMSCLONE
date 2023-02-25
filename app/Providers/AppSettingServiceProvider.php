@@ -29,6 +29,7 @@ class AppSettingServiceProvider extends ServiceProvider
 
         if (is_null($app_settings)) {
             $this->cacheAppSettings();
+            $app_settings = cache()->store(config('cache.default'))->get('idle_timeout_settings');
         }
 
         $app_settings = json_decode($app_settings);
@@ -47,7 +48,7 @@ class AppSettingServiceProvider extends ServiceProvider
         $timeout_warning_seconds = isset($app_setting) && !is_null($app_setting) &&
             !is_null($app_setting->timeout_warning_seconds) ? $app_setting->timeout_warning_seconds
             : config('auth.timeout_warning_seconds');
-
+        
         $timeout_after_seconds = isset($app_setting) && !is_null($app_setting) &&
             !is_null($app_setting->timeout_after_seconds) ? $app_setting->timeout_after_seconds
             : config('auth.timeout_after_seconds');
