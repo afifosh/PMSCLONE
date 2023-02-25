@@ -137,7 +137,6 @@
             <div class="sidebar-left">
                 <div class="sidebar">
                   @includeWhen(isset($draft_rfp),'admin/pages/rfp/file-manager-sidebar')
-                  @includeWhen(!isset($draft_rfp),'admin/pages/rfp/shared-files-sidebar')
                 </div>
             </div>
 
@@ -466,22 +465,32 @@
                                             <div class="dropdown hide-arrow float-end" data-bs-toggle="dropdown"><i class="feather-14" data-feather="more-vertical" class="toggle-dropdown mt-n25"></i></div>
                                             <div class="dropdown-menu dropdown-menu-end m-0">
                                               @if(!$file->trashed_at)
-                                              <a class="dropdown-item" target="_blank" href="{{ route('admin.draft-rfps.files.show', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
+                                              @if ($file->is_editable() && !$file->trashed_at)
+                                                <a class="dropdown-item" href="{{route('admin.edit-file', [ 'file' => $file->id, 'rfp' => $file->rfp_id])}}">
                                                   <i class="feather-14" data-feather="eye"></i>
-                                                  <span class="align-middle">Preview</span>
-                                              </a>
+                                                  <span class="align-middle">Edit</span>
+                                                </a>
+                                              @else
+                                                <a class="dropdown-item" target="_blank" href="{{ route('admin.draft-rfps.files.show', ['draft_rfp' => $file->rfp_id, 'file' => $file]) }}">
+                                                    <i class="feather-14" data-feather="eye"></i>
+                                                    <span class="align-middle">Preview</span>
+                                                </a>
+                                              @endif
                                               <a class="dropdown-item" href="#">
                                                 <i class="feather-14" data-feather="copy"></i>
                                                   <span class="align-middle">Make a copy</span>
                                               </a>
                                               @endif
-                                              @php
-                                                $ver_count = @getFileVersion(getHistoryDir(getStoragePath(ltrim($file->curFilePath(), '/')))) ?? 0;
-                                              @endphp
                                               <a class="dropdown-item" href="{{route('admin.draft-rfps.files.download', ['draft_rfp' => $file->rfp_id, 'file' => $file])}}">
                                                 <i class="feather-14" data-feather="download"></i>
                                                   <span class="align-middle">Download</span>
                                               </a>
+                                              @if($file->is_editable())
+                                                <a class="dropdown-item" href="{{ route('admin.shared-files.file-versions', ['file' => $file->id, 'rfp' => $file->rfp])}}">
+                                                  <i class="fa fa-sm fa-clock-rotate-left"></i>
+                                                    <span class="align-middle">Versions History</span>
+                                                </a>
+                                              @endif
                                               <div class="dropdown-divider"></div>
                                               @if(!$file->trashed_at)
                                                 <a class="dropdown-item" href="{{ route('admin.draft-rfps.files.toggle-important', ['draft_rfp' => $file->rfp_id, 'file' => $file->id ]) }}">
