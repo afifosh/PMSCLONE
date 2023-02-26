@@ -11,6 +11,12 @@ use Yajra\DataTables\Services\DataTable;
 
 class DraftRfpsDataTable extends DataTable
 {
+  protected $program_id;
+
+  public function setProgram($program_id)
+  {
+    $this->program_id = $program_id;
+  }
   /**
    * Build DataTable class.
    *
@@ -43,7 +49,11 @@ class DraftRfpsDataTable extends DataTable
    */
   public function query(RFPDraft $model): QueryBuilder
   {
-    return $model->mine();
+    $q = $model->mine();
+    $q->when($this->program_id, function ($q) {
+      $q->where('program_id', $this->program_id);
+    });
+    return $q;
   }
 
   /**
@@ -61,7 +71,7 @@ class DraftRfpsDataTable extends DataTable
         'attr' => [
           'data-toggle' => "ajax-modal",
           'data-title' => 'Add New',
-          'data-href' => route('admin.draft-rfps.create')
+          'data-href' => route('admin.draft-rfps.create',['program_id' => $this->program_id ?? null])
         ]
       ];
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Program;
 
 use App\DataTables\Admin\ProgramsDataTable;
+use App\DataTables\Admin\RFP\DraftRfpsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
 use Illuminate\Http\Request;
@@ -65,5 +66,13 @@ class ProgramController extends Controller
     if ($program->delete()) {
       return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => Program::DT_ID]);
     }
+  }
+
+  public function showDraftRFPs($program , DraftRfpsDataTable $dataTable)
+  {
+    $program = Program::mine()->findOrFail($program);
+    $dataTable->setProgram($program->id);
+    return $dataTable->render('admin.pages.rfp.index');
+    return view('admin.pages.rfp.index');
   }
 }

@@ -17,10 +17,13 @@ class RFPDraftController extends Controller
     return $dataTable->render('admin.pages.rfp.index');
     // return view('admin.pages.partner.companies.index');
   }
-  public function create()
+  public function create($program_id = null)
   {
+    $program_id ?
+      $data['programs'] = Program::mine()->where('id',$program_id)->pluck('name', 'id')
+      : $data['programs'] = Program::mine()->pluck('name', 'id')->prepend('Select Program', '');
     $data['draft_rfp'] = new RFPDraft();
-    $data['programs'] = Program::mine()->pluck('name', 'id')->prepend('Select Program', '');
+
     return $this->sendRes('success', ['view_data' => view('admin.pages.rfp.edit', $data)->render()]);
   }
 

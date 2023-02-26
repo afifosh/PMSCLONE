@@ -74,6 +74,7 @@
   <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
       <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class='ti-xs ti ti-user-check me-1'></i> Profile</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('admin.programs.showDraftRFPs', ['program' => $program->id])}}"><i class='ti-xs ti ti-users me-1'></i> RFP Drafs</a></li>
       <li class="nav-item"><a class="nav-link" href="{{ route('admin.programs.users.index', ['program' => $program->id])}}"><i class='ti-xs ti ti-users me-1'></i> Users</a></li>
     </ul>
   </div>
