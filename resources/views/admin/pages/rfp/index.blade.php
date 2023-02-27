@@ -20,11 +20,17 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 @endsection
 
+@section('page-style')
+<link rel="stylesheet" href="{{asset('assets/vendor/css/pages/page-profile.css')}}" />
+@endsection
+
+
 @section('page-script')
 <script src={{asset('assets/js/custom/select2.js')}}></script>
 @endsection
 
 @section('content')
+@includeWhen(isset($program), 'admin.pages.programs.program-nav', ['tab' => 'rfps']);
 @can(true)
   <div class="mt-3  col-12">
     <div class="card">
