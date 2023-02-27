@@ -19,11 +19,11 @@ class DatabaseSeeder extends Seeder
     {
         // $this->call(UserSeeder::class);
         // \App\Models\User::factory(30)->create();
-        // $this->call(ModuleSeeder::class);
-        // $this->call(AdminRolesPermissionsSeeder::class);
-        // $this->call(UserRolesPermissionsSeeder::class);
-        // $this->call(AdminSeeder::class);
-        // $this->call(HRSeeder::class);
+        $this->call(ModuleSeeder::class);
+        $this->call(AdminRolesPermissionsSeeder::class);
+        $this->call(UserRolesPermissionsSeeder::class);
+        $this->call(AdminSeeder::class);
+        $this->call(HRSeeder::class);
         // $this->call(CompanySeeder::class);
         // $this->call(ProgramSeeder::class);
     }
