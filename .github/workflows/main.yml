@@ -27,6 +27,7 @@ jobs:
               git pull origin master
               rm .env -f
               cp .env.server .env
-              composer install
+              composer update
               php artisan key:generate
-              php artisan migrate:fresh --seed
+              php artisan migrate:fresh
+              php artisan db:seed --no-memory-limit
