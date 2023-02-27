@@ -60,6 +60,9 @@
                   <a href="{{ route('admin.impersonate-admin', $user) }}" class="btn btn-primary"><i class='ti ti-user-check me-1'></i>Impersonate</a>
                   @endCanBeImpersonated
               @endcan
+              @if(session('impersonated_by'))
+                  <a href="{{ route('admin.leave-impersonate') }}" class="btn btn-primary"><i class='ti ti-user-check me-1'></i>Leave Impersonation</a>
+              @endif
             @endif
           </div>
         </div>
