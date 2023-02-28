@@ -2,12 +2,14 @@
 
 namespace App\Mail;
 
+use App\Models\CompanyInvitation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Headers;
 
 class CompanyInvitationMail extends Mailable
 {
@@ -22,6 +24,21 @@ class CompanyInvitationMail extends Mailable
     public function __construct($data)
     {
         $this->data = $data;
+    }
+
+    /**
+     * Get the message headers.
+     *
+     * @return \Illuminate\Mail\Mailables\Headers
+     */
+    public function headers()
+    {
+        return new Headers(
+            text: [
+                'X-Model' => 'CompanyInvitation',
+                'X-ID' => $this->data->id,
+            ],
+        );
     }
 
     /**
