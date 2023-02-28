@@ -500,12 +500,14 @@
 .layout-menu-toggle {
   display: block;
   // Updated menu toggle icon for menu expanded and collapsed
-  .menu-toggle-icon::before {
-    content: '\efb1';
+  .menu-toggle-icon svg.css-toggle {
+    width:24px;
+    height:24px;
   }
-  .menu-toggle-icon::before {
+  .menu-toggle-icon svg {
     .layout-menu-collapsed & {
-      content: '\ea6b';
+      transform: rotateZ(180deg);
+      transition: transform 0.3s ease;
     }
   }
 }
