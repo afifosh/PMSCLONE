@@ -25,6 +25,12 @@ class BouncedEmail
      */
     public function handle($event)
     {
-        //
+      $model = 'App\\Models\\' . $event->sent_email->getHeader('X-Model');
+      $model_id = $event->sent_email->getHeader('X-ID');
+      if ($model_id) {
+        $instance = $model::find($model_id);
+        $instance->createLog('Email Bounced');
+        $instance->update(['status' => 'bounced']);
+      }
     }
 }

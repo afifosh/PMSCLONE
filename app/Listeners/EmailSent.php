@@ -10,25 +10,24 @@ use jdavidbakr\MailTracker\Events\EmailSentEvent;
 
 class EmailSent
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
+  /**
+   * Create the event listener.
+   *
+   * @return void
+   */
+  public function __construct()
+  {
+    //
+  }
 
-    public function handle(EmailSentEvent $event)
-    {
-      $p = Program::first();
-      $p->update(['description' => json_encode($event)]);
-      $tracker = $event->sent_email;
-      $model = 'App\\Models\\'.$event->sent_email->getHeader('X-Model');
-      $model_id = $event->sent_email->getHeader('X-ID');
+  public function handle(EmailSentEvent $event)
+  {
+    $model = 'App\\Models\\' . $event->sent_email->getHeader('X-Model');
+    $model_id = $event->sent_email->getHeader('X-ID');
+    if ($model_id) {
       $instance = $model::find($model_id);
-      $instance->update(['token' => 'email_sent']);
-      // Perform your tracking/linking tasks on $model knowing the SentEmail object
+      $instance->createLog('Email Sent');
+      $instance->update(['status' => 'sent']);
     }
+  }
 }
