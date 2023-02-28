@@ -53,7 +53,7 @@ class AdminsDataTable extends DataTable
         return $row->two_factor_confirmed_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
       ->addColumn('organization', function ($row) {
-        return @$row->designation->department->company->name;
+        return @$row->designation->department->company->name ? view('admin._partials.sections.company-avatar', ['company' => @$row->designation->department->company]) : '-';
       })
       ->addColumn('roles', function ($row) {
         return $row->roles->pluck('name')->implode(', ');

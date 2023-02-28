@@ -35,7 +35,7 @@ class UsersDataTable extends DataTable
                 </div>';
       })
       ->addColumn('company', function (User $user) {
-        return $user->company->name ?? '-';
+        return $user->company->name ? view('admin._partials.sections.company-avatar', ['company' => $user->company]) : '-';
       })
       ->editColumn('status', function($row){
         return $this->makeStatus($row->status);

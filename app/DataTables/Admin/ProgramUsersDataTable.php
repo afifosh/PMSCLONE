@@ -53,7 +53,7 @@ class ProgramUsersDataTable extends DataTable
               </div>';
       })
       ->addColumn('user_organization', function ($row) {
-        return @$row->user->designation->department->company->name ?? '-';
+        return @$row->user->designation->department->company->name ? view('admin._partials.sections.company-avatar', ['company' => @$row->user->designation->department->company]) : '-';
       })
       ->addColumn('action', function (ProgramUser $programUser) {
         return view('admin.pages.programs.users.action', compact('programUser'));
