@@ -3,7 +3,7 @@
     $pageConfigs = ['myLayout' => 'blank'];
 @endphp
 
-@extends('admin.layouts/layoutMaster')
+@extends('admin.layouts/layoutMaster' , ['body_class' => 'authentication'])
 
 @section('title', 'Login')
 
