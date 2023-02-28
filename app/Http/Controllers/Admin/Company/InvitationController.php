@@ -142,4 +142,11 @@ class InvitationController extends Controller
         return $this->sendRes('Revoked Successfully', ['event' => 'table_reload', 'table_id' => CompanyInvitation::DT_ID, 'close' => 'modal']);
       }
     }
+
+    public function invitationLogs(Request $request, CompanyInvitation $companyInvitation)
+    {
+      $logs = $companyInvitation->logs()->with('actioner')->latest()->limit(15)->get();
+
+      return $this->sendRes('success', ['view_data' => view('admin.pages.company.invitations.logs', compact('logs'))->render()]);
+    }
 }
