@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('token');
             $table->string('role_id');
             $table->timestamp('valid_till')->useCurrent();
-            $table->enum('status', ['pending', 'failed','sent', 'delivered', 'seen', 'clicked', 'accepted','revoked'])->default('pending');
+            $table->enum('status', ['pending', 'failed','sent', 'bounced', 'delivered', 'seen', 'clicked', 'accepted','revoked'])->default('pending');
             $table->timestamps();
         });
     }
