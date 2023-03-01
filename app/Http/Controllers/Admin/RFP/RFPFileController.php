@@ -41,7 +41,7 @@ class RFPFileController extends Controller
     ]);
     $draft_rfp = RFPDraft::mine()->findOrFail($draft_rfp);
     $files = $draft_rfp->files()->withTrashed()->withBin()->pluck('title', 'id');
-    $users = Admin::whereHas('fileLogs', function($q) use ($files) {
+    $users = Admin::whereHas('fileLogs', function ($q) use ($files) {
       $q->whereIn('file_id', array_keys($files->toArray()));
     })->get();
     $logs = $draft_rfp->fileLogs()->applyRequestFilters()->latest()->paginate();
@@ -88,7 +88,7 @@ class RFPFileController extends Controller
     $uploaded_file = $draft_rfp->files()->create([
       'uploaded_by' => auth()->id(),
       'file' => $path,
-      'title' => $file->getClientOriginalName(),
+      'title' => $this->prepareTitle($file->getClientOriginalName(), $draft_rfp),
       'mime_type' => $mimes->getMimeType($file->getClientOriginalExtension()),
       'extension' => $file->getClientOriginalExtension(),
     ]);
@@ -109,6 +109,20 @@ class RFPFileController extends Controller
     unlink($file->getPathname());
     Notification::send($uploaded_file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUploaded($uploaded_file));
     return $this->sendRes('Uploaded Successfully', ['event' => 'page_reload', 'close' => 'modal']);
+  }
+
+  protected function prepareTitle($file_title, RFPDraft $draft_rfp)
+  {
+    $title = pathinfo($file_title, PATHINFO_FILENAME);
+    $count = 1;
+    if(RFPFile::where('rfp_id', $draft_rfp->id)->where('title', $title)->count() > 0){
+      while(RFPFile::where('rfp_id', $draft_rfp->id)->where('title', 'like', $title. '%')->count() > 0){
+        ++$count;
+        $title = pathinfo($file_title, PATHINFO_FILENAME) . ' (' . $count . ')';
+      }
+    }
+
+    return $title . '.' . pathinfo($file_title, PATHINFO_EXTENSION);
   }
 
   public function editFileWithOffice($file, $rfp = '')
@@ -260,12 +274,12 @@ class RFPFileController extends Controller
   public function toggleImportant($draft_rfp, $file)
   {
     $file = RFPFile::mine()->findOrFail($file);
-    if($file->is_important)
+    if ($file->is_important)
       $file->createLog('Marked File as Important');
     else
       $file->createLog('Unmarked Important');
     $file->update(['is_important' => !$file->is_important]);
-    if($file->is_important)
+    if ($file->is_important)
       return back()->with('success', __('File Marked as Important'));
     else
       return back()->with('success', __('File Unmarked Important'));
