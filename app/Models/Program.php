@@ -33,7 +33,7 @@ class Program extends BaseModel
       return Admin::whereHas('programs', function($q){
         return $q->where('programs.id', $this->id);
       })->orWhereHas('programs.parent', function($q){
-        return $q->where('programs.id', $this->id);
+        return $q->where('id', $this->id);
       })->get();
     }
 
