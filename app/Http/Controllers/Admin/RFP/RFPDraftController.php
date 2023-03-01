@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Program;
 use App\Models\RFPDraft;
 use Illuminate\Http\Request;
-use OwenIt\Auditing\Models\Audit;
+use Illuminate\Support\Str;
 
 class RFPDraftController extends Controller
 {
@@ -34,7 +34,7 @@ class RFPDraftController extends Controller
       'program_id' => 'required|exists:programs,id',
       'description' => 'required|string',
     ]);
-    RFPDraft::create($att);
+    RFPDraft::create($att + ['uuid' => Str::uuid()]);
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => RFPDraft::DT_ID, 'close' => 'globalModal']);
   }
 

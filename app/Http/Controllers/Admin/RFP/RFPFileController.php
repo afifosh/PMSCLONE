@@ -84,7 +84,7 @@ class RFPFileController extends Controller
   public function saveFile(Request $request, $file, RFPDraft $draft_rfp, FileUploadRepository $file_repo)
   {
     $mimes = new \Mimey\MimeTypes;
-    $path = $draft_rfp->id . DIRECTORY_SEPARATOR . $file_repo->addAttachment($file, $draft_rfp->id);
+    $path = $draft_rfp->uuid . DIRECTORY_SEPARATOR . $file_repo->addAttachment($file, $draft_rfp->uuid);
     $uploaded_file = $draft_rfp->files()->create([
       'uploaded_by' => auth()->id(),
       'file' => $path,

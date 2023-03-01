@@ -17,6 +17,7 @@ class RFPDraftFactory extends Factory
     public function definition()
     {
         return [
+            'uuid' => $this->faker->unique()->uuid(),
             'name' => $this->faker->firstName(),
             'description' => $this->faker->paragraph()
         ];

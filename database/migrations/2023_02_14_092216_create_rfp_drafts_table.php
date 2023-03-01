@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('rfp_drafts', function (Blueprint $table) {
             $table->id();
+            $table->uuid()->unique();
             $table->foreignId('program_id')->constrained('programs')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->text('description');
