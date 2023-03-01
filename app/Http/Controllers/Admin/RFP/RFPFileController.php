@@ -263,11 +263,11 @@ class RFPFileController extends Controller
     if($file->is_important)
       $file->createLog('Marked File as Important');
     else
-      $file->createLog('Removed File From Important');
+      $file->createLog('Unmarked Important');
     $file->update(['is_important' => !$file->is_important]);
     if($file->is_important)
       return back()->with('success', __('File Marked as Important'));
     else
-      return back()->with('success', __('File Removed from Important'));
+      return back()->with('success', __('File Unmarked Important'));
   }
 }
