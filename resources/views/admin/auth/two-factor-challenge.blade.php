@@ -49,7 +49,7 @@
                         <form id="formAuthentication" action="{{ route('admin.two-factor.login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label class="form-label" for="eamil">Authentication code</label>
+                                <label class="form-label" for="eamil">Admin Authentication code</label>
                                 <div class="input-group input-group-merge">
                                     <input id="code" placeholder="{{ __('Authentication code') }}" type="text"
                                         class="form-control @error('code') is-invalid @enderror" name="code" required

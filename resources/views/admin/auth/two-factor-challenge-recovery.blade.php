@@ -49,7 +49,7 @@
                         <form id="formAuthentication" action="{{ route('admin.two-factor.login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label class="form-label" for="eamil">Recovery coddde</label>
+                                <label class="form-label" for="eamil">Admin  Recovery coddde</label>
                                 <div class="input-group input-group-merge">
                                     <input id="code" placeholder="{{ __('Recovery code') }}" type="text"
                                         class="form-control @error('code') is-invalid @enderror" name="recovery_code" required
