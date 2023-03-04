@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\ExpiredPasswordController;
 use App\Http\Controllers\Auth\LockModeController;
+use App\Http\Controllers\Company\CompanyProfileController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
@@ -44,6 +45,8 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
 
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
+
+    Route::get('company-profile', [CompanyProfileController::class, 'editDetails'])->name('company.editDetails');
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notification/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
