@@ -118,3 +118,7 @@
     height: calc(100vh - 19.5rem - 2rem) !important;
   }
 }
+
+.setting {
+  overflow-y: auto;
+}

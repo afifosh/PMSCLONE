@@ -31,7 +31,7 @@ class AppSettingController extends Controller
     {
         $emailServices = EmailService::query()->get();
 
-        return view('admin.pages.settings.email', compact('emailServices'));
+        return view('admin.pages.settings.emails.email', compact('emailServices'));
     }
 
     /**

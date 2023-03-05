@@ -17,5 +17,5 @@
 @endsection
 
 @section('page-script')
-    <!-- <script src="{{asset('assets/js/custom/app-settings.js')}}"></script> -->
+    <script src="{{asset('assets/js/custom/app-settings.js')}}"></script>
 @endsection
