@@ -6,6 +6,12 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         <div class="text-center mb-4">
           <h3 class="mb-2">Enable 2FA Auth</h3>
+          <div class="text-gray-500 fw-semibold fs-6 mb-2">
+        Using an authenticator app like
+        <a href="https://support.google.com/accounts/answer/1066447?hl=en" target="_blank">Google Authenticator</a>,
+        <a href="https://www.microsoft.com/en-us/account/authenticator" target="_blank">Microsoft Authenticator</a>,
+        scan the QR code. It will generate a 6 digit code for you to enter below.    
+         </div>
           <div class="pb-5">
             @if (auth()->user()->two_factor_secret)
                 {!! auth()->user()->twoFactorQrCodeSvg() !!}
