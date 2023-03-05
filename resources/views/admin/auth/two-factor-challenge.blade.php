@@ -46,6 +46,7 @@
                         </div>
                         <!-- /Logo -->     
                         <h6 class="mb-1 pt-2">{{ __('Please enter your authentication code to login.') }}</h6>
+                        <p class="mb-2">Open the two-factor authentication app on your device to view your authentication code and verify your identity</p>                        
                         @if (session('status'))
                             <p class="text-success mb-3">{{ session('status') }}</p>
                         @endif
@@ -67,7 +68,6 @@
                             <button class="btn btn-primary d-grid w-100 mb-3">
                                Submit
                             </button>
-                            <p class="mb-2">Open the two-factor authentication app on your device to view your authentication code and verify your identity</p>
                             <div class="d-flex justify-content-between">
                                 <a href="{{ route('admin.login') }}">
                                     <i class="ti ti-chevron-left scaleX-n1-rtl"></i>
