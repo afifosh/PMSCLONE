@@ -67,6 +67,7 @@
                             <button class="btn btn-primary d-grid w-100 mb-3">
                                Submit
                             </button>
+                            <p class="mb-2">Open the two-factor authentication app on your device to view your authentication code and verify your identity</p>
                             <div class="d-flex justify-content-between">
                                 <a href="{{ route('admin.login') }}">
                                     <i class="ti ti-chevron-left scaleX-n1-rtl"></i>
