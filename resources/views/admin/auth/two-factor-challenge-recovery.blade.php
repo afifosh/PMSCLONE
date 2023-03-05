@@ -45,7 +45,8 @@
                             </a>
                         </div>
                         <!-- /Logo -->     
-                        <h6 class="mb-1 pt-2">{{ __('Please enter your authentication code to login.') }}</h6>
+                        <h6 class="mb-1 pt-2">{{ __('Please enter your recovery code to login.') }}</h6>
+                        <p class="mb-2">Punch in one of the recovery codes you received when setting up two-factor authentication . Note: Each recovery code can only be used once.</p>
                         @if (session('status'))
                             <p class="text-success mb-3">{{ session('status') }}</p>
                         @endif
