@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\DataTables\Admin\CompaniesDataTable;
 use App\DataTables\Admin\Company\InvitationsDataTable;
+use App\DataTables\Admin\Company\UsersDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Throwable;
@@ -52,10 +54,14 @@ class CompanyController extends Controller
       return $dataTable->render('admin.pages.company.show-profile', compact('company'));
   }
 
-  public function showUsers(Company $company)
+  public function showUsers(Company $company, UsersDataTable $dataTable)
   {
-    $company->load('users');
-    return view('admin.pages.company.show-users', compact('company'));
+    $dataTable->company_id = $company->id;
+    $data['statuses'] = User::distinct()->pluck('status', 'status');
+    $data['roles'] = Role::where('guard_name', 'web')->distinct()->pluck('name');
+    $data['company'] = $company;
+    return $dataTable->render('admin.pages.company.users.index', $data);
+    // return view('admin.pages.company.users.index');
   }
 
   public function showInvitations(Company $company, InvitationsDataTable $dataTable)
