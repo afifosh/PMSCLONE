@@ -102,7 +102,7 @@ class DraftRfpsDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('name')->title('FRP Name'),
+      Column::make('name')->title('RFP Name'),
       Column::make('program'),
       Column::make('description'),
       Column::make('created_at'),

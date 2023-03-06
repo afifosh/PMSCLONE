@@ -11,6 +11,9 @@ use Yajra\DataTables\Services\DataTable;
 
 class UsersDataTable extends DataTable
 {
+
+  public $company_id;
+
   /**
    * Build DataTable class.
    *
@@ -106,6 +109,9 @@ class UsersDataTable extends DataTable
     });
     $query->when(request('filter_companies'), function($q){
       $q->whereIn('company_id', request('filter_companies'));
+    });
+    $query->when($this->company_id, function($q){
+      $q->where('company_id', $this->company_id);
     });
     return $query;
     // return $model->with('roles');

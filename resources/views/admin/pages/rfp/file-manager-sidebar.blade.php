@@ -1,5 +1,5 @@
 <div class="sidebar-file-manager">
-  <div class="sidebar-inner">
+  <div class="sidebar-inner mb-5">
     <!-- sidebar menu links starts -->
     <!-- add file button -->
     <div class="dropdown dropdown-actions">
@@ -42,7 +42,7 @@
     <div class="sidebar-list">
       <!-- links for file manager sidebar -->
       <div class="list-group">
-        <div class="my-drive"></div>
+        {{-- <div class="my-drive"></div> --}}
         <a href="{{route('admin.draft-rfps.files.index', ['draft_rfp' => $draft_rfp])}}" class="list-group-item list-group-item-action {{request()->route()->getName() == 'admin.draft-rfps.files.index' && !request('filter') ? 'active' : ''}}">
           <i data-feather="clock" class="me-50 font-medium-3"></i>
           <span class="align-middle">Recents</span>
@@ -89,7 +89,7 @@
       <!-- links for file manager sidebar ends -->
 
       <!-- storage status of file manager starts-->
-      <div class="storage-status mb-5 px-4">
+      {{-- <div class="storage-status mb-5 px-4">
         <h6 class="section-label mb-1">Storage Status</h6>
         <div class="d-flex align-items-center cursor-pointer">
           <i data-feather="server" class="font-large-1"></i>
@@ -107,7 +107,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> --}}
       <!-- storage status of file manager ends-->
     </div>
     <!-- side bar list items ends  -->

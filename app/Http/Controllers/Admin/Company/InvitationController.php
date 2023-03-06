@@ -109,8 +109,9 @@ class InvitationController extends Controller
         'role' => 'required'
       ]);
 
+      $companyInvitation->update(['status' => 'revoked']);
+      $companyInvitation->createLog('Invitation Resent');
       $contPerson = $companyInvitation->contactPerson;
-      $contPerson->invitations()->update(['status' => 'revoked']);
       $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role, 'status' => 'pending']);
       dispatch(new InvitationMailJob($data));
       $data->createLog('Invitation Resent');
@@ -137,7 +138,7 @@ class InvitationController extends Controller
         return $this->sendRes('success', ['view_data' => view('admin.pages.company.invitations.revoke', compact('companyInvitation'))->render()]);
       }
       $companyInvitation->status = 'revoked';
-      $companyInvitation->createLog('Invitation revoked by '.auth()->user()->full_name);
+      $companyInvitation->createLog('Invitation revoked');
       if ($companyInvitation->save()) {
         return $this->sendRes('Revoked Successfully', ['event' => 'table_reload', 'table_id' => CompanyInvitation::DT_ID, 'close' => 'modal']);
       }

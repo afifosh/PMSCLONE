@@ -18,9 +18,9 @@
 <script>
   var keepAliveUrl = "{{ route('alive') }}"
   var logoutUrl = "{{ route('logout') }}"
-  var redirUrl = "{{ route('auth.lock') }}"
+  var redirUrl = "{{ route('logout') }}"
   var warnAfter = +"{{ config('auth.timeout_warning_seconds') }}"
-  var redirAfter = +"{{ config('auth.timeout_after_seconds') }}"
+  var redirAfter = +"{{ config('auth.timeout_after_seconds') }}" + warnAfter
 </script>
 <script src="{{ asset(mix('assets/js/custom/session-timeout.js')) }}"></script>
 @endif
