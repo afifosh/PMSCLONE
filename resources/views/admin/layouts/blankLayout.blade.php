@@ -6,6 +6,7 @@ $configData = Helper::appAdminClasses();
 
 /* Display elements */
 $customizerHidden = ($customizerHidden ?? '');
+$containerNav = ($containerNav ?? 'container-xxl');
 $isFooter = ($isFooter ?? true);
 @endphp
 
