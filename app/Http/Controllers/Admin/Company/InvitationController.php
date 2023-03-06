@@ -138,7 +138,7 @@ class InvitationController extends Controller
         return $this->sendRes('success', ['view_data' => view('admin.pages.company.invitations.revoke', compact('companyInvitation'))->render()]);
       }
       $companyInvitation->status = 'revoked';
-      $companyInvitation->createLog('Invitation revoked by '.auth()->user()->full_name);
+      $companyInvitation->createLog('Invitation revoked');
       if ($companyInvitation->save()) {
         return $this->sendRes('Revoked Successfully', ['event' => 'table_reload', 'table_id' => CompanyInvitation::DT_ID, 'close' => 'modal']);
       }
