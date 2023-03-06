@@ -30,6 +30,7 @@
 @section('content')
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
+        @include('admin._partials.auth-section')
             <div class="authentication-inner py-4">
                 <!-- Login -->
                 <div class="card">
