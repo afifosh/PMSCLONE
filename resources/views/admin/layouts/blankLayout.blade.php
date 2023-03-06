@@ -6,7 +6,7 @@ $configData = Helper::appAdminClasses();
 
 /* Display elements */
 $customizerHidden = ($customizerHidden ?? '');
-
+$isFooter = ($isFooter ?? true);
 @endphp
 
 @extends('admin.layouts/commonMaster' )
@@ -17,4 +17,9 @@ $customizerHidden = ($customizerHidden ?? '');
 @yield('content')
 <!--/ Content -->
 
+<!-- Footer -->
+@if ($isFooter)
+@include('admin/layouts/sections/footer/footer')
+@endif
+<!-- / Footer -->
 @endsection
