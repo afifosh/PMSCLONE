@@ -239,7 +239,7 @@
                             <!-- search area ends here -->
 
                             <div class="file-manager-content-body ps ps--active-y">
-                                <!-- drives area starts-->
+                                {{-- <!-- drives area starts-->
                                 <div class="drives">
                                     <div class="row">
                                         <div class="col-12">
@@ -466,9 +466,10 @@
                                         No Results
                                     </div>
                                 </div>
-                                <!-- /Folders Container Ends -->
+                                <!-- /Folders Container Ends --> --}}
 
                                 <!-- Files Container Starts -->
+                                @isset($files[0])
                                 <div class="view-container">
                                     <h6 class="files-section-title mt-2 mb-75">Files</h6>
                                   @forelse ($files as $file)
@@ -567,15 +568,16 @@
                                       </div>
                                     </div>
                                   @empty
-                                    <div class="flex-grow-1 align-items-center no-result mb-3">
+                                    {{-- <div class="flex-grow-1 align-items-center no-result mb-3">
                                       <i data-feather="alert-circle" class="me-50"></i>
                                       No Results
-                                    </div>
+                                    </div> --}}
                                   @endforelse
                                 </div>
                                 <!-- /Files Container Ends -->
                             <div class="ps__rail-x" style="left: 0px; bottom: -8px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 8px; height: 754px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 6px; height: 634px;"></div></div></div>
                         </div>
+                        @endisset
                         <!-- file manager app content ends -->
 
                         <!-- File Info Sidebar Starts-->
