@@ -23,11 +23,11 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitation.accept');
-Route::post('/invitations/{token}/confirm', [InvitationController::class, 'acceptConfirm'])->name('invitation.confirm');
+Route::get('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitation.accept')->middleware('guest' ,'guest:admin', 'guest:web');
+Route::post('/invitations/{token}/confirm', [InvitationController::class, 'acceptConfirm'])->name('invitation.confirm')->middleware('guest' ,'guest:admin', 'guest:web');
+Route::any('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
 Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->group(function () {
 
-    Route::any('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]))->name('alive');
     Route::prefix('auth')->name('auth.')->group(function() {
         Route::get('lock', [LockModeController::class, 'lock'])->name('lock');
