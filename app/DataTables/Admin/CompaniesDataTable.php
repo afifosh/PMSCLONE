@@ -119,7 +119,7 @@ class CompaniesDataTable extends DataTable
       // Column::make('id'),
       Column::make('name')->title(__('Bussines Legal Name')),
       Column::make('website'),
-      Column::make('email'),
+      Column::make('source'),
       Column::make('added_by'),
       Column::make('status'),
       // Column::make('created_at'),

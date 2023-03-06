@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('email')->nullable();
             $table->enum('status', ['active', 'disabled', 'pending']);
+            $table->enum('source', ['Self Enrolled', 'Self Registered'])->default('Self Enrolled');
             $table->timestamps();
         });
     }
