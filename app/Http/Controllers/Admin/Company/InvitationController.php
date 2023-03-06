@@ -109,8 +109,9 @@ class InvitationController extends Controller
         'role' => 'required'
       ]);
 
+      $companyInvitation->update(['status' => 'revoked']);
+      $companyInvitation->createLog('Invitation Resent');
       $contPerson = $companyInvitation->contactPerson;
-      $contPerson->invitations()->update(['status' => 'revoked']);
       $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role, 'status' => 'pending']);
       dispatch(new InvitationMailJob($data));
       $data->createLog('Invitation Resent');
