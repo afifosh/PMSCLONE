@@ -21,7 +21,7 @@ class EnsurePasswordNotExpired
     {
         $guard = Auth::getDefaultDriver();
         $user = $request->user();
-        $password_changed_at = new Carbon(($user->password_changed_at) ? $user->password_changed_at : $user->created_at);
+        $password_changed_at = new Carbon(($user->password_changed_at) ? $user->password_changed_at : null );
         $app_settings = AppSetting::first();
 
         $redirects = [
@@ -34,7 +34,7 @@ class EnsurePasswordNotExpired
             ? $app_settings->password_expire_days
             : config('auth.password_expire_days');
 
-        if (Carbon::now()->diffInDays($password_changed_at) >= $password_expire_days) {
+        if (!$user->password_changed_at || Carbon::now()->diffInDays($password_changed_at) >= $password_expire_days) {
             return $redirects[$guard];
         }
 

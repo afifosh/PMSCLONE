@@ -12,7 +12,7 @@ class InvitationController extends Controller
 {
   public function accept($token)
   {
-    $invitation = CompanyInvitation::where('token', $token)->where('valid_till', '>=', now())->where('status', 'sent')->firstOrFail();
+    $invitation = CompanyInvitation::where('token', $token)->where('valid_till', '>=', now())->whereNotIn('status', ['revoked', 'accepted'])->firstOrFail();
     return view('auth.accept-company-invitation', compact('invitation'));
   }
 
@@ -21,7 +21,7 @@ class InvitationController extends Controller
     $request->validate([
       'password' => 'required|min:8|confirmed',
     ]);
-    $invitation = CompanyInvitation::where('token', $token)->where('valid_till', '>=', now())->where('status', 'sent')->firstOrFail();
+    $invitation = CompanyInvitation::where('token', $token)->where('valid_till', '>=', now())->whereNotIn('status', ['revoked', 'accepted'])->firstOrFail();
     try {
       $company = $invitation->contactPerson->company;
       $user = $company->users()->create([

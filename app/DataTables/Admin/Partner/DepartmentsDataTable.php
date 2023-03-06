@@ -46,7 +46,7 @@ class DepartmentsDataTable extends DataTable
         return view('admin.pages.partner.departments.action', compact('department'));
       })
       ->addColumn('organization', function (CompanyDepartment $department) {
-        return $department->company->name;
+        return $department->company->name ? view('admin._partials.sections.company-avatar', ['company' => @$department->company]) : '-';
       })
       ->filterColumn('head', function ($query, $keyword) {
         $query->whereHas('head', function ($q) use ($keyword) {

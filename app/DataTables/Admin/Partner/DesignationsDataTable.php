@@ -27,7 +27,7 @@ class DesignationsDataTable extends DataTable
         return $designation->department->name;
       })
       ->addColumn('organization', function (CompanyDesignation $designation) {
-        return $designation->department->company->name;
+        return @$designation->department->company->name ? view('admin._partials.sections.company-avatar', ['company' => $designation->department->company]) : '-';
       })
       ->filterColumn('organization', function ($query, $keyword) {
         $query->whereHas('department.company', function ($q) use ($keyword) {

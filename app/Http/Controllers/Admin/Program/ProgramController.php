@@ -72,7 +72,7 @@ class ProgramController extends Controller
   {
     $program = Program::mine()->findOrFail($program);
     $dataTable->setProgram($program->id);
-    return $dataTable->render('admin.pages.rfp.index');
+    return $dataTable->render('admin.pages.rfp.index', compact('program'));
     return view('admin.pages.rfp.index');
   }
 }

@@ -12,6 +12,12 @@
       "icon": "menu-icon  tf-icons ti ti-settings",
       "slug": "users.index",
       "permission": ["read user", "read role"]
+    },
+    {
+      "url": "/company-profile",
+      "name": "Company Profile",
+      "icon": "menu-icon tf-icons ti ti-profile",
+      "slug": "company.editDetails"
     }
   ]
 }

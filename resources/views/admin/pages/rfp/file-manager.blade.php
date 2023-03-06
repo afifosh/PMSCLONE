@@ -81,15 +81,17 @@
       $('#add-file-modal').on('shown.bs.modal', function (e) {
         const dropzoneMulti = new Dropzone('#dropzone-multi', {
           previewTemplate: previewTemplate,
-          parallelUploads: 1,
+          parallelUploads: 4,
           addRemoveLinks: true,
           chunking: true,
           method: "POST",
-          maxFilesize: 50,
+          maxFilesize: 100,
           chunkSize: 1900000,
           autoProcessQueue : true,
           // If true, the individual chunks of a file are being uploaded simultaneously.
-          // parallelChunkUploads: true,
+          parallelChunkUploads: true,
+          retryChunks: true,
+          acceptedFiles: 'text/plain,application/*,image/*,video/*,audio/*',
           url: "{{ route('admin.draft-rfps.files.store', ['draft_rfp' => $draft_rfp]) }}",
           headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -109,6 +111,20 @@
               /* Called before the file is being sent */
               this.on("sending", function(file){
               });
+              this.on("error", function(file, errorMessage, xhr){
+                // Check if the response is a validation error
+                if (xhr.status === 422) {
+                  // Parse the validation errors from the response
+                  var errors = JSON.parse(xhr.responseText).errors;
+
+                  // Loop through the validation errors and add them to the file preview
+                  $.each(errors, function(key, value) {
+                    var error = value[0];
+                    var dzError = $('<div>').addClass('dz-error-message').text(error);
+                    $(file.previewElement).append(dzError);
+                  });
+                }
+              })
           }
         });
       });

@@ -42,7 +42,7 @@ class FileShareController extends Controller
     })->whereDoesntHave('sharedFiles', function ($q) use ($file) {
       $q->where('rfp_file_id', $file->id);
     })->get();
-    $data['permissions'] = FileShare::Permissions;
+    $data['permissions'] = $file->is_editable() ? FileShare::Permissions : ['view' => 'View'];
 
     return $this->sendRes('success', ['view_data' =>  view('admin.pages.rfp.file-share.edit', $data)->render()]);
   }

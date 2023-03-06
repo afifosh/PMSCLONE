@@ -27,10 +27,9 @@ class FortifyServiceProvider extends ServiceProvider
       config('fortify.middleware', ['web', 'guest:web']);
     }
 
-    $this->app->singleton(
-      \Laravel\Fortify\Contracts\LoginResponse::class,
-      \App\Http\Responses\LoginResponse::class,
-    );
+    $this->app->singleton(\Laravel\Fortify\Contracts\LoginResponse::class, \App\Http\Responses\LoginResponse::class);
+    $this->app->singleton(\Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse::class, \App\Http\Responses\FailedTwoFactorLoginResponse::class);
+    $this->app->singleton(\Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable::class, \App\Actions\Fortify\CustomRedirectIfTwoFactorAuthenticatable::class);
   }
 
   /**
@@ -53,19 +52,20 @@ class FortifyServiceProvider extends ServiceProvider
       return Limit::perMinute(5)->by($request->session()->get('login.id'));
     });
 
-    if(config('fortify.guard') == 'admin'){
+    if (config('fortify.guard') == 'admin') {
       Fortify::viewPrefix('admin.auth.');
-    }else{
+    } else {
       Fortify::viewPrefix('auth.');
     }
 
     Fortify::twoFactorChallengeView(function (Request $request) {
-      if (str_contains(session('url.intended'), 'admin')){
-        if($request->type != 'recovery-code')
+      if(config('fortify.guard') == 'admin') {
+      // if (str_contains(session('url.intended'), 'admin')) {
+        if ($request->type != 'recovery-code')
           return view('admin.auth.two-factor-challenge');
         return view('admin.auth.two-factor-challenge-recovery');
       }
-      if($request->type != 'recovery-code')
+      if ($request->type != 'recovery-code')
         return view('auth.two-factor-challenge');
       return view('auth.two-factor-challenge-recovery');
     });

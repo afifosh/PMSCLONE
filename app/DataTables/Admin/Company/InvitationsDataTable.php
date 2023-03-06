@@ -36,7 +36,7 @@ class InvitationsDataTable extends DataTable
                 </div>';
       })
       ->addColumn('company', function ($row) {
-        return $row->contactPerson->company->name ?? '-';
+        return @$row->contactPerson->company->name ? view('admin._partials.sections.company-avatar', ['company' => $row->contactPerson->company]) : '-';
       })
       ->addColumn('role', function ($row) {
         return $row->role->name;

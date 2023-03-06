@@ -8,6 +8,7 @@
             <h6 class="mb-0">{{ $log->log }}</h6>
             <small class="text-muted">{{$log->created_at->diffForHumans()}}</small>
           </div>
+          @if($log->actioner)
           <p class="mb-2">{{ $log->actioner->full_name }} {{ $log->log}} @ {{formatDateTime($log->created_at)}}</p>
           <div class="d-flex flex-wrap">
             <div class="avatar me-2">
@@ -18,6 +19,7 @@
               <span>{{ $log->actioner->email }}</span>
             </div>
           </div>
+          @endif
         </div>
       </li>
     @empty

@@ -110,10 +110,10 @@ class InvitationController extends Controller
       ]);
 
       $contPerson = $companyInvitation->contactPerson;
-      $contPerson->invitations()->delete();
+      $contPerson->invitations()->update(['status' => 'revoked']);
       $data = $contPerson->invitations()->create(['token' => bin2hex(random_bytes(16)), 'valid_till' => $request->expiry_time, 'role_id' => $request->role, 'status' => 'pending']);
       dispatch(new InvitationMailJob($data));
-      $data->createLog('Invitations Created');
+      $data->createLog('Invitation Resent');
 
       return $this->sendRes('Added Successfully', ['event' => 'table_reload', 'table_id' => CompanyInvitation::DT_ID, 'close' => 'globalModal']);
     }
@@ -129,5 +129,24 @@ class InvitationController extends Controller
       if ($companyInvitation->delete()) {
         return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => CompanyInvitation::DT_ID]);
       }
+    }
+
+    public function revokeInvitation(Request $request, CompanyInvitation $companyInvitation)
+    {
+      if($request->method() == 'GET') {
+        return $this->sendRes('success', ['view_data' => view('admin.pages.company.invitations.revoke', compact('companyInvitation'))->render()]);
+      }
+      $companyInvitation->status = 'revoked';
+      $companyInvitation->createLog('Invitation revoked by '.auth()->user()->full_name);
+      if ($companyInvitation->save()) {
+        return $this->sendRes('Revoked Successfully', ['event' => 'table_reload', 'table_id' => CompanyInvitation::DT_ID, 'close' => 'modal']);
+      }
+    }
+
+    public function invitationLogs(Request $request, CompanyInvitation $companyInvitation)
+    {
+      $logs = $companyInvitation->logs()->with('actioner')->latest()->limit(15)->get();
+
+      return $this->sendRes('success', ['view_data' => view('admin.pages.company.invitations.logs', compact('logs'))->render()]);
     }
 }

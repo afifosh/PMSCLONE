@@ -39,4 +39,24 @@ class Company extends BaseModel
   {
     return $this->hasMany(CompanyContactPerson::class);
   }
+
+  public function detail()
+  {
+    return $this->hasOne(CompanyDetail::class);
+  }
+
+  public function addresses()
+  {
+    return $this->hasMany(CompanyAddress::class);
+  }
+
+  public function bankAccounts()
+  {
+    return $this->hasMany(CompanyBankAccount::class);
+  }
+
+  public function contacts()
+  {
+    return $this->hasMany(CompanyContact::class);
+  }
 }

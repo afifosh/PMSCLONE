@@ -12,7 +12,7 @@ class RFPDraft extends BaseModel
 
   public const DT_ID = 'rfps_dataTable';
 
-  protected $fillable = ['name', 'program_id', 'description'];
+  protected $fillable = ['uuid', 'name', 'program_id', 'description'];
 
   protected $casts = [
     'created_at' => 'datetime:d M, Y',

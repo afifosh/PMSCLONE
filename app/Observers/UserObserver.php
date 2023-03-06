@@ -9,6 +9,12 @@ class UserObserver
 {
     use PasswordHistory;
 
+    public function creating(User $user)
+    {
+      if(auth('web')->check())
+      $user->company_id = auth('web')->user()->company_id;
+    }
+
     /**
      * Handle the User "created" event.
      *

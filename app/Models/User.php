@@ -7,6 +7,7 @@ use App\Notifications\User\UserVerifyEmailQueued;
 use App\Traits\AuthLogs;
 use App\Traits\HasEnum;
 use App\Traits\Tenantable;
+use App\Traits\TenancyScope;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -21,7 +22,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Tenantable, HasEnum, AuthenticationLoggable, AuthLogs;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, HasEnum, AuthenticationLoggable, AuthLogs, TenancyScope;
     use \OwenIt\Auditing\Auditable;
 
     public const DT_ID = 'users_dataTable';
@@ -52,6 +53,12 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
+
+    // public static function boot()
+    // {
+    //   parent::boot();
+    //   static::addGlobalScope(new TenancyScope(Auth::user()));
+    // }
 
     /**
      * The attributes that should be cast.

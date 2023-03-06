@@ -39,9 +39,16 @@ $configData = Helper::appClasses();
             <h6 class="fw-normal mb-2">Total {{ $role->users_count}} users</h6>
             <ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
               @forelse ($role->users as $user)
+                @if ($loop->iteration <= 5)
                 <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" title="{{ $user->full_name }}" class="avatar avatar-sm pull-up">
                   <img class="rounded-circle" src="{{ $user->avatar }}" alt="Avatar">
                 </li>
+                @else
+                  <div class="avatar">
+                    <span class="avatar-initial bg-dark text-light rounded-circle pull-up" data-bs-toggle="tooltip" data-bs-placement="top" title="+{{count($role->users)-$loop->iteration+1}}">+{{count($role->users)-$loop->iteration+1}}</span>
+                  </div>
+                @break
+                @endif
               @empty
               @endforelse
             </ul>
