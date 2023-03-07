@@ -9,7 +9,11 @@
             <small class="text-muted">{{$log->created_at->diffForHumans()}}</small>
           </div>
           @if($log->actioner)
-          <p class="mb-2"> {{ $log->log}} by {{ $log->actioner->full_name }} @ {{formatDateTime($log->created_at)}}</p>
+          <p class="mb-2"> {{ $log->log}} by {{ $log->actioner->full_name }} @ {{formatDateTime($log->created_at)}}
+            @if ($log->data['ip'])
+            from {{ $log->data['ip'] }}
+            @endif
+          </p>
           <div class="d-flex flex-wrap">
             <div class="avatar me-2">
               <img src="{{ $log->actioner->avatar }}" alt="Avatar" class="rounded-circle" />
