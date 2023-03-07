@@ -2,14 +2,14 @@
 
   // Variables
   return [
-      'creatorName' => 'Pixinvent',
-      'creatorUrl' => 'https://pixinvent.com',
+      'creatorName' => 'Riyadh Art',
+      'creatorUrl' => 'https://riyadhart.sa',
       'templateName' => 'Riyadh Art Platform',
-      'templateSuffix' => 'Bootstrap Admin Template',
+      'templateSuffix' => 'Riyadh Art Platform',
       'templateVersion' => '1.0.0',
       'templateFree' => false,
-      'templateDescription' => 'Start your development with a Dashboard for Bootstrap 5',
-      'templateKeyword' => 'dashboard, bootstrap 5 dashboard, bootstrap 5 design, bootstrap 5',
+      'templateDescription' => 'PMS',
+      'templateKeyword' => 'PMS',
       'licenseUrl' => 'https://themeforest.net/licenses/standard',
       'livePreview' => 'https://pixinvent.com/demo/vuexy-html-bootstrap-admin-template/landing-page/',
       'productPage' => 'https://1.envato.market/vuexy_admin',
@@ -19,7 +19,7 @@
       'generator' => '',
       'changelog' => 'https://pixinvent.com/demo/vuexy-html-bootstrap-admin-template/vuexy-changelog.html',
       'repository' => 'https://github.com/pixinvent/vuexy-html-admin-template',
-      'gitRepo' => 'pixinvent',
+      'gitRepo' => 'Riyadh Art',
       'gitRepoAccess' => 'vuexy-html-admin-template',
       'githubFreeUrl' => 'https://pixinvent.com/tools/github/github-access',
       'facebookUrl' => 'https://www.facebook.com/pixinvents/',
