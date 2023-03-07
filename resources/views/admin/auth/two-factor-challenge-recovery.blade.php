@@ -28,6 +28,7 @@
 @endsection
 
 @section('content')
+@include('admin._partials.auth-section')
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
             <div class="authentication-inner py-4">
@@ -53,11 +54,7 @@
                         <form id="formAuthentication" action="{{ route('admin.two-factor.login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-<<<<<<< HEAD
                                 <label class="form-label" for="eamil">Recovery code</label>
-=======
-                                <label class="form-label" for="eamil">Admin  Recovery coddde</label>
->>>>>>> origin/master
                                 <div class="input-group input-group-merge">
                                     <input id="code" placeholder="{{ __('Recovery code') }}" type="text"
                                         class="form-control @error('code') is-invalid @enderror" name="recovery_code" required
