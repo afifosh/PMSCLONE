@@ -82,9 +82,12 @@ class CompanyController extends Controller
       'email' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
       'status' => 'required',
     ]);
-    if ($company->update($att)) {
+    $company->update($att);
+    auth()->user()->approve($company->modifications()->first());
+    // $company->approve('name');
+    // if ($company->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);
-    }
+    // }
   }
 
   public function destroy(Company $company)

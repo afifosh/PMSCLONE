@@ -26,6 +26,7 @@ class PatnerCompanyController extends Controller
       'name' => 'required|string|max:255|unique:partner_companies,name',
       'website' => 'required|string|max:255|unique:partner_companies,website',
       'phone' => 'required|string|max:255',
+      'status' => 'required|in:active,inactive',
     ]);
     PartnerCompany::create($att);
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => PartnerCompany::DT_ID, 'close' => 'globalModal']);
@@ -47,6 +48,7 @@ class PatnerCompanyController extends Controller
       'name' => 'required|string|max:255',
       'website' => 'required|string|max:255',
       'phone' => 'required|string|max:255',
+      'status' => 'required|in:active,inactive',
     ]);
     if ($company->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => PartnerCompany::DT_ID, 'close' => 'globalModal']);

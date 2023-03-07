@@ -2,16 +2,22 @@
 
 namespace App\Models;
 
+use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Avatar;
 
 class PartnerCompany extends BaseModel
 {
-    use HasFactory;
+    use HasFactory, HasEnum;
 
     public const DT_ID = 'partner-companies-dataTable';
 
-    protected $fillable = ['name', 'website', 'phone'];
+    protected $fillable = ['name', 'website', 'phone', 'status'];
+
+    public const STATUS = [
+      'active' => 'Active',
+      'inactive' => 'Inactive',
+    ];
 
     protected $casts = [
       'created_at' => 'datetime:d M, Y',

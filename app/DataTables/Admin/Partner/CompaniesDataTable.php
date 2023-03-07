@@ -23,13 +23,29 @@ class CompaniesDataTable extends DataTable
     ->editColumn('name', function ($row){
       return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8')."</span>";
     })
+    ->editColumn('status', function ($row) {
+      return $this->makeStatus($row->status);
+    })
     ->addColumn('action', function (PartnerCompany $company) {
       return view('admin.pages.partner.companies.action', compact('company'));
     })
     ->setRowId('id')
-    ->rawColumns(['name', 'action']);
+    ->rawColumns(['name', 'action', 'status']);
   }
 
+  protected function makeStatus($status)
+  {
+    $b_status = htmlspecialchars(ucwords($status), ENT_QUOTES, 'UTF-8');
+    switch ($status) {
+      case 'active':
+        return '<span class="badge bg-label-success">' . $b_status . '</span>';
+        break;
+
+      default:
+        return '<span class="badge bg-label-warning">' . $b_status . '</span>';
+        break;
+    }
+  }
   /**
    * Get query source of dataTable.
    *
@@ -90,6 +106,7 @@ class CompaniesDataTable extends DataTable
       Column::make('name')->title('Organization Name'),
       Column::make('website'),
       Column::make('phone'),
+      Column::make('status'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

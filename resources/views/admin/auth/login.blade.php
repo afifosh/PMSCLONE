@@ -48,6 +48,12 @@
                         @if (session('status'))
                             <p class="text-success mb-3">{{ session('status') }}</p>
                         @endif
+                        @if (session()->has('inactive-user'))
+                          <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                              <p class="text-danger mb-3">{{ session('inactive-user') }}</p>
+                          </div>
+                        @endif
                         <form id="formAuthentication" class="mb-3" action="" method="POST">
                             @csrf
                             @if ($errors->any())

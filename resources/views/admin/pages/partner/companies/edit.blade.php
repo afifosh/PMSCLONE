@@ -15,10 +15,18 @@
         {!! Form::text('website', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Website')]) !!}
     </div>
 
-    <div class="form-group">
+    <div class="form-group col-6">
       {{ Form::label('phone', __('Phone'), ['class' => 'col-form-label']) }}
       {!! Form::text('phone', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Phone Number')]) !!}
     </div>
+
+    <div class="form-group col-6">
+      {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}
+      @php
+        $enum = $company::getPossibleEnumValues('status');
+      @endphp
+          {!! Form::select('status', array_combine($enum, array_map('ucwords',$enum)), $company->status, ['class' => 'form-select globalOfSelect2']) !!}
+      </div>
 </div>
 
 <div class="mt-3">
