@@ -6,6 +6,7 @@ use App\Notifications\Admin\VerifyEmail;
 use App\Notifications\Admin\ResetPassword;
 use App\Traits\AuthLogs;
 use App\Traits\HasEnum;
+use Approval\Traits\ApprovesChanges;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +23,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs;
     use \OwenIt\Auditing\Auditable;
+    use ApprovesChanges;
     /**
      * The attributes that are mass assignable.
      *

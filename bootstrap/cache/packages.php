@@ -171,6 +171,13 @@
       0 => 'Spatie\\Permission\\PermissionServiceProvider',
     ),
   ),
+  'stephenlake/laravel-approval' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Approval\\ApprovalServiceProvider',
+    ),
+  ),
   'torann/geoip' => 
   array (
     'providers' => 

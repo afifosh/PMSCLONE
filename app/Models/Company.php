@@ -5,10 +5,22 @@ namespace App\Models;
 use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Avatar;
+// use Approval\Traits\RequiresApproval;
 
 class Company extends BaseModel
 {
   use HasFactory, HasEnum;
+//   use RequiresApproval;
+
+//   protected function requiresApprovalWhen(array $modifications) : bool
+// {
+//     // Handle some logic that determines if this change requires approval
+//     //
+//     // Return true if the model requires approval, return false if it
+//     // should update immediately without approval.
+//     return false;
+// }
+
 
   public const DT_ID = 'companies_datatable';
 
