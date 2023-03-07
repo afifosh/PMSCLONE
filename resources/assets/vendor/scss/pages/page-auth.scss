@@ -7,16 +7,94 @@
 
 $authentication-1-inner-max-width: 400px !default;
 
-body.authentication {
-  background-image: url(/assets/img/pages/bg.png);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
+.footer {
+  bottom:0;
+  padding:20px calc(1.5rem * .5);
+  position:absolute;
+  right:0;
+  left:0;
+  height:60px;
+
+ }
+ @media (max-width:991.98px) {
+  .footer {
+   left:0
+  }
+ }
+ 
+ [data-layout=horizontal] .footer {
+  left:0!important
+ }
+ 
+
+ html {
+  position:relative;
+  min-height: calc(100% - 60px);
+ }
+ .authentication-wrapper {
+  padding-bottom:60px;
+  position:relative;
+  z-index:2;
+  width:100%
+ }
+ .auth-page-wrapper .footer {
+  left:0;
+  background-color:transparent;
+ }
+ .auth-one-bg-position {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  width:100%;
+  height:380px
+ }
+ @media (max-width:575.98px) {
+  .auth-one-bg-position {
+   height:280px
+  }
+ }
+ .auth-one-bg {
+  background-image: url(/assets/img/pages/bg.jpeg);
+  background-position:center;
+  background-size:cover
+ }
+ .auth-one-bg .bg-overlay {
+  background:-webkit-gradient(linear,left top,right top,from(#000),to(#000));
+  background:linear-gradient(to right,#000,#000);
+ }
+
+ .bg-overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  opacity: .7;
+ }
+ .shape {
+  position:absolute;
+  bottom:0;
+  right:0;
+  left:0;
+  z-index:1;
+  pointer-events:none
+ }
+ .shape>svg {
+  width:100%;
+  height:auto;
+ }
+ 
+ .particles-js-canvas-el {
+  position:relative
+ }
+
 .authentication-wrapper {
   display: flex;
   flex-basis: 100%;
-  min-height: 100vh;
+  //min-height: 100vh;
   width: 100%;
 
   .authentication-inner {
