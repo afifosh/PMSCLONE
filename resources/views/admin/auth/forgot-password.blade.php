@@ -27,6 +27,7 @@
 @endsection
 
 @section('content')
+@include('admin._partials.auth-section')
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
             <div class="authentication-inner py-4">
