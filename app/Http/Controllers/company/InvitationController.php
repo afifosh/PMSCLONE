@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\company;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\Company\ManualInvitationLogerJob;
 use App\Models\CompanyInvitation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,6 +15,9 @@ class InvitationController extends Controller
   public function accept($token)
   {
     $invitation = CompanyInvitation::where('token', $token)->where('valid_till', '>=', now())->whereNotIn('status', ['revoked', 'accepted'])->firstOrFail();
+    if($invitation->status == 'sent'){
+      ManualInvitationLogerJob::dispatch($invitation)->delay(now()->addSeconds(8));
+    }
     return view('auth.accept-company-invitation', compact('invitation'));
   }
 

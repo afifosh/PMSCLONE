@@ -29,7 +29,7 @@ class EmailViewed
       $model_id = $event->sent_email->getHeader('X-ID');
       if ($model_id) {
         $instance = $model::find($model_id);
-        $instance->createLog('Email seen');
+        $instance->createLog('Email Seen');
         $instance->update(['status' => 'seen']);
       }
     }
