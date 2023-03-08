@@ -199,7 +199,7 @@ btnCopy.on('click', function () {
     <!--/ Two-steps verification -->
 
     <!-- Create an API key -->
-    <div class="card mb-4">
+    <!-- <div class="card mb-4">
       <h5 class="card-header">Create an API key</h5>
       <div class="row">
         <div class="col-md-5 order-md-0 order-1">
@@ -235,7 +235,7 @@ btnCopy.on('click', function () {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <!--/ Create an API key -->
 
     <!-- Recent Devices -->
