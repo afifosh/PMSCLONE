@@ -98,6 +98,18 @@
       "slug": "admin.shared-files.index"
     },
     {
+      "url": "/admin/workflows",
+      "name": "Workflows",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "admin.workflows.index"
+    },
+    {
+      "url": "/admin/approval-workflows",
+      "name": "Approval Workflows",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "admin.approval-workflows.index"
+    },
+    {
       "url": "/admin/settings",
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",

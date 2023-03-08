@@ -213,6 +213,21 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
   var url = form.attr('action');
 
   var fd = new FormData(form[0]);
+
+//   const form = document.querySelector('form');
+// const formData = new FormData(form);
+
+const inputs = form[0].querySelectorAll('input, select, textarea');
+for (const input of inputs) {
+  if (input.type === 'checkbox' || input.type === 'radio') {
+    if (!input.checked) {
+      fd.append(input.name, '');
+    }
+  } else {
+    fd.append(input.name, input.value);
+  }
+}
+
   $.ajax({
     type: 'POST',
     url: url,
@@ -254,6 +269,7 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
       current.removeClass('disabled');
     },
     error: function (error) {
+      current.removeClass('disabled');
       // toast_danger(error.statusText);
       if(error.responseJSON && error.responseJSON.errors)
       {
@@ -261,9 +277,30 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
         current.closest('form').find('.validation-error').remove();
         $.each(error.responseJSON.errors, function (ind, val) {
           const error = '<div class="text-danger validation-error">'+ val[0] +'</div>'
-          const target = $(current.closest('form').find('[name="'+ind+'"]')).length ? $(current.closest('form').find('[name="'+ind+'"]')) : $(current.closest('form').find('[name="'+ind+'[]"]'));
+
+          var tsname1 = ind.split('.').map(function(str) {
+            return /\d+/.test(str) ? '[' + str + ']' : str;
+          }).join('');
+          tsname = tsname1;
+          transformedName = tsname1.replace(/\[\d*\]$/, '[]');
+
+          if($(current.closest('form').find('[name="'+ind+'"]')).length){
+            var target = $(current.closest('form').find('[name="'+ind+'"]'));
+          }else if($(current.closest('form').find('[name="'+ind+'[]"]')).length){
+            var target = $(current.closest('form').find('[name="'+ind+'[]"]'));
+          }else if($(current.closest('form').find('[name="'+ind+'['+ind+']"]')).length){
+            var target = $(current.closest('form').find('[name="'+ind+'['+ind+']"]'));
+          }else if($(current.closest('form').find('[name="'+tsname+'"]')).length){
+            var target = $(current.closest('form').find('[name="'+tsname+'"]'));
+          }else if($(current.closest('form').find('[name="'+tsname+'[]"]')).length){
+            var target = $(current.closest('form').find('[name="'+tsname+'[]"]'));
+          }else if($(current.closest('form').find('[name="'+transformedName+'"]')).length){
+            var target = $(current.closest('form').find('[name="'+transformedName+'"]'));
+          }else if($(current.closest('form').find('[name="'+transformedName+'[]"]')).length){
+            var target = $(current.closest('form').find('[name="'+transformedName+'[]"]'));
+          }
           target.addClass('invalid');
-          if(target.hasClass('globalOfSelect2') && target.next('.select2-container').length) {
+          if((target.hasClass('globalOfSelect2') || target.hasClass('select2User')) && target.next('.select2-container').length) {
               $(error).insertAfter(target.next('.select2-container'));
           }else{
             target.after(error);
@@ -397,18 +434,14 @@ window.initModalSelect2 = function(){
 // ajax OffCanvax
 $(document).on('click', '[data-toggle="ajax-modal"]', function () {
   var title = $(this).data('title');
-  console.log(title);
-  console.log($('#globalModalTitle').html());
   var url = $(this).data('href');
   var modal_size = $(this).data('size');
   $('.modal-dialog').removeClass('modal-lg modal-sm modal-xs modal-xl');
   if (typeof modal_size ==  'undefined' || modal_size == '') {
     modal_size = 'modal-lg';
   }
-  console.log(modal_size);
   $('.modal-dialog').addClass(modal_size);
   $('#globalModalTitle').html(title);
-  console.log($('#globalModalTitle').html());
   $.ajax({
     type: 'get',
     url: url,

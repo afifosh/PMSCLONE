@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\PartnerCompany;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('partner_companies', function (Blueprint $table) {
+        Schema::create('approval_workflow_levels', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('workflow_id')->constrained('workflows')->cascadeOnDelete();
             $table->string('name');
-            $table->string('avatar')->nullable();
-            $table->string('website')->unique();
-            $table->string('phone')->nullable();
-            $table->enum('status', array_keys(PartnerCompany::STATUS))->default('active');
+            $table->integer('order');
             $table->timestamps();
         });
     }
@@ -32,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('partner_companies');
+        Schema::dropIfExists('approval_workflow_levels');
     }
 };

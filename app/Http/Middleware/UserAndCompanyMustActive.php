@@ -25,7 +25,7 @@ class UserAndCompanyMustActive
         return redirect()->route('login');
       }
     }elseif(auth('admin')->check()){
-      if (auth('admin')->user()->status != 'active' || ( auth('admin')->user()->designation_id && @auth()->user()->designation()->department->company->status != 'active')) {
+      if (auth('admin')->user()->status != 'active' || ( auth('admin')->user()->designation_id && @auth()->user()->designation->department->company->status != 'active')) {
         $message = auth('admin')->user()->status != 'active' ? 'Your Account Is not active. Please Contact Support' : 'Your Organization Is not active. Please Contact Support';
         auth('admin')->logout();
         session()->flush();

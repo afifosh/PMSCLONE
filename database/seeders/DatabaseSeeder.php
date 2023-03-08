@@ -26,5 +26,6 @@ class DatabaseSeeder extends Seeder
         $this->call(HRSeeder::class);
         $this->call(CompanySeeder::class);
         $this->call(ProgramSeeder::class);
+        $this->call(WorkflowSeeder::class);
     }
 }

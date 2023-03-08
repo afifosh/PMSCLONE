@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use App\Http\Controllers\Admin\RFP\RFPFileController;
 use App\Http\Controllers\Admin\SharedFileController;
+use App\Http\Controllers\Admin\Workflow\ApprovalWorkflowController;
+use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
 use App\Models\RFPFile;
 
@@ -107,6 +109,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::resource('shared-files', SharedFileController::class)->only(['index']);
 
     Route::get('file-manager', [AppsController::class, 'file_manager'])->name('app-file-manager');
+
+    Route::resource('workflows', WorkflowController::class)->only(['index']);
+    Route::resource('approval-workflows', ApprovalWorkflowController::class)->only(['index', 'edit', 'update']);
 
     // Route::resource('companies.invitations', InvitationController::class);
     Route::prefix('settings')->name('setting.')->group(function () {
