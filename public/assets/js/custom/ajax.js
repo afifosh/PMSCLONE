@@ -278,11 +278,16 @@ for (const input of inputs) {
         $.each(error.responseJSON.errors, function (ind, val) {
           const error = '<div class="text-danger validation-error">'+ val[0] +'</div>'
 
+
           var tsname1 = ind.split('.').map(function(str) {
             return /\d+/.test(str) ? '[' + str + ']' : str;
           }).join('');
-          tsname = tsname1;
+          var tsname = tsname1;
           transformedName = tsname1.replace(/\[\d*\]$/, '[]');
+
+          var ts2 = ind.replace(/\.(\w+)/g, '[$1]');
+          var t = ts2;
+          var ts3 = t.replace(/\[\d+\]$/, '[]');
 
           if($(current.closest('form').find('[name="'+ind+'"]')).length){
             var target = $(current.closest('form').find('[name="'+ind+'"]'));
@@ -298,6 +303,12 @@ for (const input of inputs) {
             var target = $(current.closest('form').find('[name="'+transformedName+'"]'));
           }else if($(current.closest('form').find('[name="'+transformedName+'[]"]')).length){
             var target = $(current.closest('form').find('[name="'+transformedName+'[]"]'));
+          }else if($(current.closest('form').find('[name="'+ts2+'"]')).length){
+            var target = $(current.closest('form').find('[name="'+ts2+'"]'));
+          }else if($(current.closest('form').find('[name="'+ts2+'[]"]')).length){
+            var target = $(current.closest('form').find('[name="'+ts2+'[]"]'));
+          }else if($(current.closest('form').find('[name="'+ts3+'"]')).length){
+            var target = $(current.closest('form').find('[name="'+ts3+'"]'));
           }
           target.addClass('invalid');
           if((target.hasClass('globalOfSelect2') || target.hasClass('select2User')) && target.next('.select2-container').length) {

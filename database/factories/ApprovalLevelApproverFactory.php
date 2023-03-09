@@ -18,7 +18,7 @@ class ApprovalLevelApproverFactory extends Factory
     public function definition()
     {
         return [
-          'approver_id' => Admin::doesnthave('approvalLevels')->inRandomOrder()->first()->id,
+          'user_id' => Admin::doesnthave('approvalLevels')->inRandomOrder()->first()->id,
         ];
     }
 }

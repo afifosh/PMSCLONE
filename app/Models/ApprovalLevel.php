@@ -11,6 +11,11 @@ class ApprovalLevel extends Model
 
   protected $table = 'approval_workflow_levels';
 
+  protected $fillable = [
+    'workflow_id',
+    'name'
+  ];
+
   public function workflow()
   {
     return $this->belongsTo(Workflow::class);
@@ -18,6 +23,6 @@ class ApprovalLevel extends Model
 
   public function approvers()
   {
-    return $this->belongsToMany(Admin::class, 'approval_level_approvers', 'approval_level_id', 'approver_id');
+    return $this->belongsToMany(Admin::class, 'approval_level_approvers', 'workflow_level_id', 'user_id');
   }
 }

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('workflow_id')->constrained('workflows')->cascadeOnDelete();
             $table->string('name');
-            $table->integer('order');
             $table->timestamps();
         });
     }

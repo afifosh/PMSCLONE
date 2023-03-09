@@ -21,11 +21,11 @@ class ApprovalLevelApprover extends Model
 
     public function scopeForLevel($query, $level)
     {
-        return $query->where('approval_level_id', $level->id);
+        return $query->where('workflow_level_id', $level->id);
     }
 
     public function scopeForApprover($query, $approver)
     {
-        return $query->where('approver_id', $approver->id);
+        return $query->where('user_id', $approver->id);
     }
 }

@@ -25,11 +25,9 @@ class ApprovalWorkflowUpdateRequest extends FormRequest
     {
         return [
           'workflow_name' => 'required|string',
-          'name' => 'required|array',
-          'name.*' => 'required|string',
-          'approvers' => 'required|array',
-          'approvers.*' => 'required|array',
-          'approvers.*.*' => 'required|string|exists:admins,id',
+          'level.*.name' => 'required|string',
+          'level.*.approvers' => 'required|array',
+          'level.*.approvers.*' => 'required||exists:admins,id',
         ];
     }
 
@@ -37,9 +35,9 @@ class ApprovalWorkflowUpdateRequest extends FormRequest
     {
       return [
         'workflow_name.required' => 'Workflow Name is required',
-        'name.*.required' => 'Level Name is required',
-        'approvers.required' => 'Approvers are required',
-        'approvers.*.*.required' => 'Approvers are required',
+        'level.*.name.required' => 'Level Name is required',
+        'level.*.approvers.required' => 'Approvers are required',
+        'level.*.approvers.*.required' => 'Approvers are required',
       ];
     }
 }

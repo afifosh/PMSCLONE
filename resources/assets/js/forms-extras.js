@@ -155,9 +155,57 @@ $(function () {
         row++;
 
         $(this).slideDown();
+
+        // Select2
+        var UsersSelect2 = $(this).find('.select2User');
+
+        if (UsersSelect2.length) {
+          // custom template to render icons
+          function renderUser(option) {
+            if (!option.id) {
+              return option.text;
+            }
+            return '<div class="d-flex justify-content-start align-items-center user-name"><div class="avatar-wrapper"><div class="avatar avatar-sm me-3"><img src="'+$(option.element).data('avatar')+'"></div></div><div class="d-flex flex-column"><span class="text-body text-truncate"><span class="fw-semibold">'+$(option.element).data('full_name')+'</span></span><small class="text-muted">'+option.text+'</small></div></div>';
+          }
+          function renderSelectedUser(option) {
+            if (!$(option.element).data('full_name')) {
+              return option.text;
+            }
+            return $(option.element).data('full_name')
+          }
+          UsersSelect2.select2({
+            templateResult: renderUser,
+            templateSelection: renderSelectedUser,
+            escapeMarkup: function (es) {
+              return es;
+            }
+          });
+        }
+
+        // $(this).find('.select2').each(function() {
+        //   if (!$(this).data('select2')) {
+        //     $(this).select2();
+        //   }
+        // });
       },
       hide: function (e) {
         confirm('Are you sure you want to delete this element?') && $(this).slideUp(e);
+      },
+      isFirstItemUndeletable: true,
+      afterAdd: function (repeaterItem) {
+        // Append the newly created element to the end of the list
+        $(repeaterItem).appendTo($('[data-repeater-list]'));
+
+        // Initialize Select2 for all select elements in the newly added repeater item
+        $(repeaterItem).find('.select2').each(function() {
+          if (!$(this).data('select2')) {
+            $(this).select2();
+          }
+        });
+      },
+      beforeAdd: function (repeaterItem) {
+        // Move the newly created element to the end of the list
+        $(repeaterItem).appendTo($('[data-repeater-list]'));
       }
     });
   }

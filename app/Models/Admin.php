@@ -153,6 +153,6 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
 
     public function approvalLevels()
     {
-      return $this->belongsToMany(ApprovalLevel::class, ApprovalLevelApprover::class, 'approver_id', 'approval_level_id')->withTimestamps();
+      return $this->belongsToMany(ApprovalLevel::class, ApprovalLevelApprover::class, 'user_id', 'workflow_level_id')->withTimestamps();
     }
 }

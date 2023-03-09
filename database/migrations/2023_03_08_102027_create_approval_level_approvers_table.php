@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('approval_level_approvers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('approval_level_id')->constrained('approval_workflow_levels')->cascadeOnDelete();
-            $table->foreignId('approver_id')->constrained('admins')->cascadeOnDelete();
+            $table->foreignId('workflow_level_id')->constrained('approval_workflow_levels')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('admins')->cascadeOnDelete();
             $table->timestamps();
         });
     }
