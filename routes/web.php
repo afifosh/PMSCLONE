@@ -47,6 +47,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
     Route::resource('users', UserController::class);
 
     Route::get('company-profile', [CompanyProfileController::class, 'editDetails'])->name('company.editDetails');
+    Route::post('company-profile', [CompanyProfileController::class, 'updateDetails'])->name('company.updateDetails');
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notification/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');

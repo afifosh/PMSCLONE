@@ -21,6 +21,39 @@
 
 @section('page-script')
 <script src="{{asset('assets/js/custom/company-profile-page.js')}}"></script>
+<script>
+  $(function () {
+    let accountUserImage = document.getElementById('uploadedAvatar');
+    const fileInput = document.querySelector('.account-file-input'),
+      resetFileInput = document.querySelector('.account-image-reset');
+
+    if (accountUserImage) {
+      const resetImage = accountUserImage.src;
+      fileInput.onchange = () => {
+        if (fileInput.files[0]) {
+          accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
+        }
+      };
+      resetFileInput.onclick = () => {
+        fileInput.value = '';
+        accountUserImage.src = resetImage;
+      };
+    }
+  });
+
+  $('[data-switch-toggle]').on('click', function () {
+    var target = $(this).data('switch-toggle');
+    $(this).is(":checked") ? $(target).removeClass('d-none') : $(target).addClass('d-none');
+  });
+  $('.save-draft').on('click', function () {
+    $(this).closest('form').find('input[name="submit_type"]').val('draft');
+    $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
+  });
+  $('.btn-next').on('click', function () {
+    $(this).closest('form').find('input[name="submit_type"]').val('submit');
+    $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
+  });
+</script>
 @endsection
 
 @section('content')
@@ -91,8 +124,8 @@
         <!-- Account Details -->
         <div id="company-details" class="content">
           <div class="content-header mb-3">
-            <h6 class="mb-0">Account Details</h6>
-            <small>Enter Your Account Details.</small>
+            <h6 class="mb-0">Company Details</h6>
+            <small>Enter Company Details.</small>
           </div>
           @include('pages.company-profile.details-form')
         </div>
@@ -166,7 +199,7 @@
                 <span class="align-middle d-sm-inline-block d-none">Previous</span>
               </button>
               <div>
-                <button class="btn btn-outline-secondary btn-prev" type="button">Save Draft</button>
+                <button class="btn btn-outline-secondary" type="button">Save Draft</button>
                 <button class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
               </div>
             </div>
@@ -186,7 +219,7 @@
               <span class="align-middle d-sm-inline-block d-none">Previous</span>
             </button>
             <div>
-              <button class="btn btn-outline-secondary btn-prev" type="button">Save Draft</button>
+              <button class="btn btn-outline-secondary" type="button">Save Draft</button>
               <button class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
             </div>
           </div>

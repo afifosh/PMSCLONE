@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Avatar;
+use Illuminate\Support\Facades\Storage;
+
 // use Approval\Traits\RequiresApproval;
 
 class Company extends BaseModel
@@ -34,8 +36,8 @@ class Company extends BaseModel
   public function getAvatarAttribute($value)
   {
     if(!$value)
-      return Avatar::create($this->name)->toBase64();
-    return $value;
+      return @$this->detail->logo ? @Storage::url($this->detail->logo) : Avatar::create($this->name)->toBase64();
+    return @Storage::url($value);
   }
 
   public function addedBy()
@@ -55,6 +57,16 @@ class Company extends BaseModel
   public function detail()
   {
     return $this->hasOne(CompanyDetail::class);
+  }
+
+  public function draftDetail()
+  {
+    return $this->morphOne(DraftData::class, 'draftable')->where('type', 'detail');
+  }
+
+  public function draftData()
+  {
+    return $this->morphMany(DraftData::class, 'draftable');
   }
 
   public function addresses()

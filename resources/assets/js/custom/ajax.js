@@ -251,6 +251,10 @@ for (const input of inputs) {
               window.location.href = data.data.url;
             }, 1000);
           }
+          if(data.data.event == 'functionCall'){
+            // call the function whose name is in the data.data.function
+            typeof window[data.data.function] == "function" ? window[data.data.function]() : null;
+          }
           //console.log(current.closest('.modal').modal("hide"));
           current.removeClass('disabled');
           if(data.data.close == 'globalModal'){
@@ -311,7 +315,7 @@ for (const input of inputs) {
             var target = $(current.closest('form').find('[name="'+ts3+'"]'));
           }
           target.addClass('invalid');
-          if((target.hasClass('globalOfSelect2') || target.hasClass('select2User')) && target.next('.select2-container').length) {
+          if((target.hasClass('globalOfSelect2') || target.hasClass('select2User') || target.hasClass('select2')) && target.next('.select2-container').length) {
               $(error).insertAfter(target.next('.select2-container'));
           }else{
             target.after(error);

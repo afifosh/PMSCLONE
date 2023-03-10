@@ -63,7 +63,7 @@
     <span class="align-middle d-sm-inline-block d-none">Previous</span>
   </button>
   <div>
-    <button class="btn btn-outline-secondary btn-prev" type="button">Save Draft</button>
+    <button class="btn btn-outline-secondary" type="button">Save Draft</button>
     <button class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Submit</span> <i class="ti ti-arrow-right"></i></button>
   </div>
 </div>

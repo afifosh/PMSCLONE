@@ -5,13 +5,7 @@
 'use strict';
 
 $(function () {
-  const select2 = $('.select2'),
-    selectPicker = $('.selectpicker');
-
-  // Bootstrap select
-  if (selectPicker.length) {
-    selectPicker.selectpicker();
-  }
+  const select2 = $('.select2');
 
   // select2
   if (select2.length) {
@@ -37,13 +31,16 @@ $(function () {
     const numberedStepper = new Stepper(wizardNumbered, {
       linear: false
     });
-    if (wizardNumberedBtnNextList) {
-      wizardNumberedBtnNextList.forEach(wizardNumberedBtnNext => {
-        wizardNumberedBtnNext.addEventListener('click', event => {
-          numberedStepper.next();
-        });
-      });
-    }
+    window.triggerNext = function () {
+      numberedStepper.next();
+    };
+    // if (wizardNumberedBtnNextList) {
+    //   wizardNumberedBtnNextList.forEach(wizardNumberedBtnNext => {
+    //     wizardNumberedBtnNext.addEventListener('click', event => {
+    //       numberedStepper.next();
+    //     });
+    //   });
+    // }
     if (wizardNumberedBtnPrevList) {
       wizardNumberedBtnPrevList.forEach(wizardNumberedBtnPrev => {
         wizardNumberedBtnPrev.addEventListener('click', event => {

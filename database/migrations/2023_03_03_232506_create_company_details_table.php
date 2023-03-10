@@ -17,11 +17,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name')->nullable();
+            $table->string('website')->nullable();
             $table->integer('locality_type')->nullable()->comment('1: foreign, 2: local');
-            $table->string('geographical_coverage')->nullable();
-            $table->string('sa_name')->nullable();
+            $table->json('geographical_coverage')->nullable();
+            $table->string('sa_company_name')->nullable();
             $table->string('logo')->nullable();
-            $table->date('year_founded')->nullable();
+            $table->date('date_founded')->nullable();
             $table->string('duns_number')->nullable();
             $table->string('no_of_employees')->nullable();
             $table->string('legal_form')->nullable();
@@ -31,7 +32,7 @@ return new class extends Migration
             $table->string('youtube_url')->nullable();
             $table->text('description')->nullable();
             $table->string('parent_company')->nullable();
-            $table->string('subsidaries')->nullable();
+            $table->json('subsidiaries')->nullable();
             $table->integer('status')->default(0);
             $table->timestamps();
         });
