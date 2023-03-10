@@ -29,10 +29,13 @@ class WorkflowController extends Controller
   public function update(Workflow $workflow, ApprovalWorkflowUpdateRequest $request)
   {
     $workflow->update(['name' => $request->workflow_name]);
+    $active_ids = [];
     foreach ($request->level as $level) {
       $uLevel = $workflow->levels()->updateOrCreate(['id' => $level['id']], ['name' => $level['name']]);
       $uLevel->approvers()->sync(array_unique($level['approvers']));
+      $active_ids[] = $uLevel->id;
     }
+    $workflow->levels()->whereNotIn('id', $active_ids)->delete();
 
     return $this->sendRes('Workflow Updated Successfully', ['event' => 'redirect', 'url' => route('admin.workflows.index')]);
   }
