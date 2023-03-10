@@ -98,7 +98,8 @@
   </div>
   <div class="col-sm-6 mt-0 {{isset($detail['subsidiaries'][0]) ? '' : 'd-none'}}" id="sub-company">
     <label class="form-label">Please Provide Subsidiary Company(s)</label>
-    {!! Form::select('subsidiaries[]', [], $detail['subsidiaries'], ['class' => 'form-select select2', 'multiple', 'data-tags' => 'true']) !!}
+    {!! Form::select('subsidiaries[]', isset($detail['subsidiaries'][0]) ? array_combine($detail['subsidiaries'], $detail['subsidiaries']) : [],
+      $detail['subsidiaries'], ['class' => 'form-select select2', 'multiple', 'data-tags' => 'true']) !!}
   </div>
   <input class="d-none" type="text" name="submit_type">
   <div class="col-12 d-flex justify-content-between">
