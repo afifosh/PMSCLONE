@@ -16,22 +16,27 @@ class AppSettingController extends Controller
      * 
      * @return View
      */
-    public function index()
+    public function security(): View
     {
         $generalSettings = AppSetting::first();
 
-        return view('admin.pages.settings.general', compact('generalSettings'));
+        return view('admin.pages.settings.security.index', compact('generalSettings'));
+    }
+
+    public function general(): View
+    {
+        return view('admin.pages.settings.general.index');
     }
 
     /**
      * Email settings
      * @return View
      */
-    public function email()
+    public function email(): View
     {
         $emailServices = EmailService::query()->get();
 
-        return view('admin.pages.settings.emails.email', compact('emailServices'));
+        return view('admin.pages.settings.emails.index', compact('emailServices'));
     }
 
     /**

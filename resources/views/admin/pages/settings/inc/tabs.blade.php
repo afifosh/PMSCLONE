@@ -1,7 +1,8 @@
 <!-- Settings Sidebar -->
 @php
 $urls = [
-'security' => 'admin.setting.index',
+'general' => 'admin.setting.general',
+'security' => 'admin.setting.security',
 'email' => 'admin.setting.email',
 ];
 $active = Request::route()->getName();
@@ -10,7 +11,13 @@ $active = Request::route()->getName();
     <div class="btn-compost-wrapper d-grid"></div>
     <div class="setting-filter py-2">
         <ul class="setting-list list-unstyled mb-4">
-            <li class="{{ $active === $urls['security'] ? 'active' : '' }} d-flex justify-content-between py-3" data-target="general">
+            <li class="{{ $active === $urls['general'] ? 'active' : '' }} d-flex justify-content-between py-3" data-target="general">
+                <a href="{{ route($urls['general']) }}" class="d-flex flex-wrap align-items-center">
+                    <i class="ti ti-lock"></i>
+                    <span class="align-middle ms-2">@lang('General')</span>
+                </a>
+            </li>
+            <li class="{{ $active === $urls['security'] ? 'active' : '' }} d-flex justify-content-between py-3" data-target="security">
                 <a href="{{ route($urls['security']) }}" class="d-flex flex-wrap align-items-center">
                     <i class="ti ti-lock"></i>
                     <span class="align-middle ms-2">@lang('Security')</span>

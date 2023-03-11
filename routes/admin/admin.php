@@ -113,9 +113,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
     // Route::resource('companies.invitations', InvitationController::class);
     Route::prefix('settings')->name('setting.')->group(function () {
-      Route::get('/', [AppSettingController::class, 'index'])->name('index');
-      Route::get('/email', [AppSettingController::class, 'email'])->name('email');
-      Route::post('general', [AppSettingController::class, 'storeGeneralSettings'])->name('store');
+      Route::get('security', [AppSettingController::class, 'security'])->name('security');
+      Route::post('security', [AppSettingController::class, 'storeGeneralSettings'])->name('security.store');
+      Route::get('general', [AppSettingController::class, 'general'])->name('general');
+      Route::get('email', [AppSettingController::class, 'email'])->name('email');
       Route::post('email', [EmailServiceController::class, 'upsert'])->name('email.upsert');
     });
 
