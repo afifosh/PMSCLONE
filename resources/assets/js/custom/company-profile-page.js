@@ -13,17 +13,44 @@ $(function () {
       var $this = $(this);
       $this.wrap('<div class="position-relative"></div>');
       $this.select2({
-        placeholder: 'Select value',
         dropdownParent: $this.parent()
       });
     });
   }
 });
+$('[data-switch-toggle]').on('click', function () {
+  var target = $(this).data('switch-toggle');
+  $(this).is(':checked') ? $(target).removeClass('d-none') : $(target).addClass('d-none');
+});
+$('.save-draft').on('click', function () {
+  $(this).closest('form').find('input[name="submit_type"]').val('draft');
+  $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
+});
+$('.btn-next').on('click', function () {
+  $(this).closest('form').find('input[name="submit_type"]').val('submit');
+  $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
+});
 (function () {
+  let accountUserImage = document.getElementById('uploadedAvatar');
+  const fileInput = document.querySelector('.account-file-input'),
+    resetFileInput = document.querySelector('.account-image-reset');
+
+  if (accountUserImage) {
+    const resetImage = accountUserImage.src;
+    fileInput.onchange = () => {
+      if (fileInput.files[0]) {
+        accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
+      }
+    };
+    resetFileInput.onclick = () => {
+      fileInput.value = '';
+      accountUserImage.src = resetImage;
+    };
+  }
   // Numbered Wizard
   // --------------------------------------------------------------------
   const wizardNumbered = document.querySelector('.wizard-numbered'),
-    wizardNumberedBtnNextList = [].slice.call(wizardNumbered.querySelectorAll('.btn-next')),
+    // wizardNumberedBtnNextList = [].slice.call(wizardNumbered.querySelectorAll('.btn-next')),
     wizardNumberedBtnPrevList = [].slice.call(wizardNumbered.querySelectorAll('.btn-prev')),
     wizardNumberedBtnSubmit = wizardNumbered.querySelector('.btn-submit');
 
@@ -77,9 +104,29 @@ $(function () {
         row++;
 
         $(this).slideDown();
+        $(this).find('.select2').each(function() {
+          if (!$(this).data('select2')) {
+            var $this = $(this);
+            $this.wrap('<div class="position-relative"></div>');
+            $this.select2({
+              dropdownParent: $this.parent()
+            });
+          }
+        });
       },
       hide: function (e) {
         confirm('Are you sure you want to delete this element?') && $(this).slideUp(e);
+      },
+      isFirstItemUndeletable: true,
+      afterAdd: function (repeaterItem) {
+        alert('t');
+        // Initialize Select2 for all select elements in the newly added repeater item
+        $(repeaterItem).find('.select2').each(function() {
+          alert('t');
+          if (!$(this).data('select2')) {
+            $(this).select2();
+          }
+        });
       }
     });
   }

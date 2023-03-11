@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name')->nullable();
-            $table->string('country')->nullable();
+            $table->string('country_id')->nullable();
             $table->string('address_line_1')->nullable();
             $table->string('address_line_2')->nullable();
             $table->string('address_line_3')->nullable();
@@ -32,9 +32,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
-            $table->boolean('is_purchasing_address')->default(false);
-            $table->boolean('is_billing_address')->default(false);
-            $table->boolean('is_rfp_address')->default(false);
+            $table->json('address_type')->nullable();
             $table->integer('status')->default(0);
             $table->timestamps();
         });

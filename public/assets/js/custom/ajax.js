@@ -314,6 +314,7 @@ for (const input of inputs) {
           }else if($(current.closest('form').find('[name="'+ts3+'"]')).length){
             var target = $(current.closest('form').find('[name="'+ts3+'"]'));
           }
+          console.log(ind ,'target', target);
           target.addClass('invalid');
           if((target.hasClass('globalOfSelect2') || target.hasClass('select2User') || target.hasClass('select2')) && target.next('.select2-container').length) {
               $(error).insertAfter(target.next('.select2-container'));

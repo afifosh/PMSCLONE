@@ -46,8 +46,13 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
 
-    Route::get('company-profile', [CompanyProfileController::class, 'editDetails'])->name('company.editDetails');
-    Route::post('company-profile', [CompanyProfileController::class, 'updateDetails'])->name('company.updateDetails');
+    Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
+      Route::get('/', 'editDetails')->name('editDetails');
+      Route::post('/', 'updateDetails')->name('updateDetails');
+      Route::post('/contacts', 'updateContacts')->name('updateContacts');
+      Route::post('/addresses', 'updateAddresses')->name('updateAddresses');
+      Route::post('/bank-account', 'updateBankAccounts')->name('updateBankAccounts');
+    });
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notification/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');

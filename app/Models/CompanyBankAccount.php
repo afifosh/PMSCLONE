@@ -7,12 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompanyBankAccount extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $guarded = [];
+  protected $fillable = [
+    'country_id',
+    'name',
+    'branch',
+    'street',
+    'city',
+    'state',
+    'post_code',
+    'account_no',
+    'iban_no',
+    'swift_code'
+  ];
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
+  public function company()
+  {
+    return $this->belongsTo(Company::class);
+  }
 }
