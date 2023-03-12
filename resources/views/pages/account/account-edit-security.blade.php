@@ -238,7 +238,7 @@ btnCopy.on('click', function () {
     <!--/ Create an API key -->
 
     <!-- API Key List & Access -->
-    <div class="card mb-4">
+    <!-- <div class="card mb-4">
       <h5 class="card-header">API Key List & Access</h5>
       <div class="card-body">
         <p>An API key is a simple encrypted string that identifies an application without any principal. They are useful for accessing public data anonymously, and are used to associate API requests with your project for quota and billing.</p>
@@ -301,7 +301,7 @@ btnCopy.on('click', function () {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <!--/ API Key List & Access -->
 
     <!-- Recent Devices -->
