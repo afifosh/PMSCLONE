@@ -66,7 +66,7 @@
                             @endif
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email or Username test</label>
-                                <input type="text" class="form-control" id="email" name="email"
+                                <input type="text" autocomplete="off" class="form-control" id="email" name="email" 
                                     placeholder="Enter your email or username" autofocus>
                             </div>
                             <div class="mb-3 form-password-toggle">
@@ -79,7 +79,7 @@
                                 <div class="input-group input-group-merge">
                                     <input type="password" id="password" class="form-control" name="password"
                                         placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                        aria-describedby="password" />
+                                        aria-describedby="password" autoComplete="new-password"/>
                                     <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
                                 </div>
                             </div>
