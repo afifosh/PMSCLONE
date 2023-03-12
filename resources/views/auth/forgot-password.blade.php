@@ -2,7 +2,7 @@
     $customizerHidden = 'customizer-hide';
     $pageConfigs = ['myLayout' => 'blank'];
 @endphp
-@extends('layouts/layoutMaster')
+@extends('admin.layouts/layoutMaster' , ['body_class' => 'authentication'])
 
 @section('title', 'Forgot Password')
 
@@ -27,22 +27,24 @@
 @endsection
 
 @section('content')
+@include('_partials.auth-section')
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
             <div class="authentication-inner py-4">
                 <!-- Forgot Password -->
                 <div class="card">
+                  <!-- Start Header -->
+                  @include('_partials.auth-svg-top')
+                 <!-- End Header -->                    
                     <div class="card-body">
                         <!-- Logo -->
                         <div class="app-brand justify-content-center mb-4 mt-2">
                             <a href="{{ url('/') }}" class="app-brand-link gap-2">
-                                <span class="app-brand-logo demo">@include('_partials.macros', ['height' => 20, 'withbg' => 'fill: #fff;'])</span>
-                                <span
-                                    class="app-brand-text demo text-body fw-bold">{{ config('variables.templateName') }}</span>
+                                <span class="app-brand-mainlogo demo">@include('_partials.mainlogo', ['height' => 150, 'withbg' => 'fill: #000;'])</span>
                             </a>
                         </div>
-                        <!-- /Logo -->
-                        <h4 class="mb-1 pt-2">Forgot Password? 🔒</h4>
+                        <!-- /Logo -->                   
+                        <h6 class="mb-1 pt-2">Forgot Password?</h6>
                         <p class="mb-4">Enter your email and we'll send you instructions to reset your password</p>
                         @if (session('status'))
                             <p class="text-success mb-3">{{ session('status') }}</p>
