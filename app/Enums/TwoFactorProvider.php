@@ -2,12 +2,10 @@
 
 namespace App\Enums;
 
-use MyCLabs\Enum\Enum;
-
 /**
  *  Two factor provider enum
  */
-final class TwoFactorProvider extends Enum
+enum TwoFactorProviderEnum:string
 {
     const SMS = 'sms';
     const MAIL = 'mail';
