@@ -186,7 +186,8 @@ return [
         Laravolt\Avatar\ServiceProvider::class,
 
         App\Providers\AppSettingServiceProvider::class,
-        App\Providers\EmailServiceProvider::class
+        App\Providers\EmailServiceProvider::class,
+        App\Providers\SettingServiceProvider::class,
     ],
 
     /*

@@ -28,7 +28,7 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         'jdavidbakr\MailTracker\Events\EmailSentEvent' => [
-          EmailSent::class,
+            EmailSent::class,
         ],
         'jdavidbakr\MailTracker\Events\ViewEmailEvent' => [
             EmailViewed::class,
@@ -44,6 +44,9 @@ class EventServiceProvider extends ServiceProvider
         // ],
         'jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent' => [
             BouncedEmail::class,
+        ],
+        'App\Events\DeliverySettingUpdated' => [
+            'App\Listeners\CacheDeliverySetting'
         ],
     ];
 

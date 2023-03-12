@@ -24,6 +24,7 @@ use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use App\Http\Controllers\Admin\RFP\RFPFileController;
+use App\Http\Controllers\Admin\Setting\DeliverySettingController;
 use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
@@ -116,8 +117,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
       Route::get('security', [AppSettingController::class, 'security'])->name('security');
       Route::post('security', [AppSettingController::class, 'storeGeneralSettings'])->name('security.store');
       Route::get('general', [AppSettingController::class, 'general'])->name('general');
-      Route::get('email', [AppSettingController::class, 'email'])->name('email');
-      Route::post('email', [EmailServiceController::class, 'upsert'])->name('email.upsert');
+
+      Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {
+        Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+      });
     });
 
 

@@ -1,9 +1,9 @@
 <!-- Settings Sidebar -->
 @php
 $urls = [
-'general' => 'admin.setting.general',
-'security' => 'admin.setting.security',
-'email' => 'admin.setting.email',
+    'general' => 'admin.setting.general',
+    'security' => 'admin.setting.security',
+    'email' => 'admin.setting.delivery.index',
 ];
 $active = Request::route()->getName();
 @endphp

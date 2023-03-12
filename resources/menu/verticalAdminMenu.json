@@ -104,10 +104,10 @@
       "slug": "admin.workflows.index"
     },
     {
-      "url": "/admin/settings",
+      "url": "/admin/settings/general",
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": "admin.settings.index"
+      "slug": "admin.settings.general"
     }
   ]
 }
