@@ -74,19 +74,19 @@
             </div>
             <div class="d-flex justify-content-end">
               <div class="ps-2">
-                <input class="form-check-input" name="addresses[][address_type]" @checked(in_array('purchasing', $address['address_type'])) value="purchasing" type="checkbox">
+                <input class="form-check-input" name="addresses[][address_type]" @checked(in_array('purchasing', $address['address_type'] ?? [])) value="purchasing" type="checkbox">
                 <label class="form-check-label">
                   Purchasing Address
                 </label>
               </div>
               <div class="ps-2">
-                <input class="form-check-input" name="addresses[][address_type]" @checked(in_array('billing', $address['address_type'])) value="billing" type="checkbox">
+                <input class="form-check-input" name="addresses[][address_type]" @checked(in_array('billing', $address['address_type'] ?? [])) value="billing" type="checkbox">
                 <label class="form-check-label">
                   Payment Address
                 </label>
               </div>
               <div class="ps-2">
-                <input class="form-check-input" name="addresses[][address_type]" @checked(in_array('rfp_only', $address['address_type'])) value="rfp_only" type="checkbox">
+                <input class="form-check-input" name="addresses[][address_type]" @checked(in_array('rfp_only', $address['address_type'] ?? [])) value="rfp_only" type="checkbox">
                 <label class="form-check-label">
                   RFP Only Address
                 </label>
