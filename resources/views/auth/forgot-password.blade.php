@@ -2,7 +2,7 @@
     $customizerHidden = 'customizer-hide';
     $pageConfigs = ['myLayout' => 'blank'];
 @endphp
-@extends('admin.layouts/layoutMaster' , ['body_class' => 'authentication'])
+@extends('layouts/layoutMaster' , ['body_class' => 'authentication'])
 
 @section('title', 'Forgot Password')
 
