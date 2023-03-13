@@ -1,19 +1,30 @@
 document.addEventListener('DOMContentLoaded', function () {
     (function () {
         let provider = document.getElementById('provider')
+        let providerDataAttr = provider.getAttribute('data-attr')
 
         let deliveryServices = Array.from(document.querySelectorAll('.deliveryService'))
 
         provider.addEventListener('change', e => {
-            deliveryServices.forEach(deliveryService => {
-                deliveryService.classList.add('d-none')
-            })
-
-            const classSuffix = 'Service'
-
-            document.getElementById(
-                e.target.options[e.target.selectedIndex].value + classSuffix
-            ).classList.remove('d-none')
+            hideDeliveryServices(deliveryServices)
+            showDeliveryService(e.target.options[e.target.selectedIndex].value)
         })
+
+        if (providerDataAttr != '') {
+            hideDeliveryServices(deliveryServices)
+            showDeliveryService(providerDataAttr)
+        }
     })();
 })
+
+let hideDeliveryServices = (deliveryServices) => {
+    deliveryServices.forEach(deliveryService => {
+        deliveryService.classList.add('d-none')
+    })
+}
+
+let showDeliveryService = (deliveryService) => {
+    const classSuffix = 'Service'
+
+    document.getElementById(deliveryService + classSuffix).classList.remove('d-none')
+}

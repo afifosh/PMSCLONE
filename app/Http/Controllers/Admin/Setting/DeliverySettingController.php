@@ -42,5 +42,7 @@ class DeliverySettingController extends Controller
         $this->service->setDefaultSettings('default_mail', $context);
 
         DeliverySettingUpdated::dispatch();
+
+        return redirect()->route('admin.setting.delivery.index');
     }
 }
