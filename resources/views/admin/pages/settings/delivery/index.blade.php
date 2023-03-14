@@ -31,7 +31,7 @@
                                 </label>
                                 <select id="provider" data-attr="{{ $settings['provider'] ?? '' }}" class="selectpicker w-100" data-style="btn-default">
                                     @foreach($deliveryServices as $key => $service)
-                                    <option value="{{ $key }}" data-tokens="{{ $key }}" {{ $settings['provider'] === $key ? 'selected' : '' }}>
+                                    <option value="{{ $key }}" data-tokens="{{ $key }}" {{ isset($settings['provider']) && $settings['provider'] === $key ? 'selected' : '' }}>
                                         {{ __($service) }}
                                     </option>
                                     @endforeach
@@ -41,31 +41,31 @@
                         <!-- AMAZON SES -->
                         <x-admin.settings.delivery.delivery-form identifier="amazon_sesService" provider="amazon_ses" :$settings>
                             @include('admin.pages.settings.delivery.inc.amazon-ses', 
-                                ['settings' => $settings['provider'] === 'amazon_ses' ? $settings : null]
+                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'amazon_ses' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- MAILGUN -->
                         <x-admin.settings.delivery.delivery-form identifier="mailgunService" provider="mailgun" :$settings>
                             @include('admin.pages.settings.delivery.inc.mailgun',
-                                ['settings' => $settings['provider'] === 'mailgun' ? $settings : null]
+                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'mailgun' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- SMTP -->
                         <x-admin.settings.delivery.delivery-form identifier="smtpService" provider="smtp" :$settings>
                             @include('admin.pages.settings.delivery.inc.smtp', 
-                                ['settings' => $settings['provider'] === 'smtp' ? $settings : null]
+                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'smtp' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- SENDMAIL -->
                         <x-admin.settings.delivery.delivery-form identifier="sendmailService" provider="sendmail" :$settings>
                             @include('admin.pages.settings.delivery.inc.sendmail', 
-                                ['settings' => $settings['provider'] === 'sendmail' ? $settings : null]
+                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'sendmail' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- MAILTRAP -->
                         <x-admin.settings.delivery.delivery-form identifier="mailtrapService" provider="mailtrap" :$settings>
                             @include('admin.pages.settings.delivery.inc.mailtrap', 
-                                ['settings' => $settings['provider'] === 'mailtrap' ? $settings : null]
+                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'mailtrap' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                     </div>
