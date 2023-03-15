@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Approval\CompanyApprovalBaseLogic;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CompanyDetail extends Model
 {
-  use HasFactory, Tenantable;
+  use HasFactory, Tenantable, CompanyApprovalBaseLogic;
 
   protected $fillable = [
     'name',

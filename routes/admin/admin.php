@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\Admin\AppSettingController;
+use App\Http\Controllers\Admin\Company\ApprovalRequestController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
 use App\Http\Controllers\Admin\Company\UserController;
@@ -110,6 +111,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('file-manager', [AppsController::class, 'file_manager'])->name('app-file-manager');
 
     Route::resource('workflows', WorkflowController::class)->only(['index', 'edit', 'update']);
+
+    Route::get('approval-requests/level/{level}', [ApprovalRequestController::class, 'getLevelReqeusts'])->name('approval-requests.level');
+    Route::resource('approval-requests', ApprovalRequestController::class)->only(['index', 'show', 'update']);
 
     // Route::resource('companies.invitations', InvitationController::class);
     Route::prefix('settings')->name('setting.')->group(function () {

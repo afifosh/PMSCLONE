@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Approval\CompanyApprovalBaseLogic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CompanyBankAccount extends Model
 {
-  use HasFactory;
+  use HasFactory, CompanyApprovalBaseLogic;
 
   protected $fillable = [
     'country_id',
