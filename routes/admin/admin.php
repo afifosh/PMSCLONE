@@ -113,6 +113,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::resource('workflows', WorkflowController::class)->only(['index', 'edit', 'update']);
 
     Route::get('approval-requests/level/{level}', [ApprovalRequestController::class, 'getLevelReqeusts'])->name('approval-requests.level');
+    Route::get('approval-requests/level/{level}/companies/{company}', [ApprovalRequestController::class, 'getCompanyReqeust'])->name('approval-requests.level.companies.show');
     Route::resource('approval-requests', ApprovalRequestController::class)->only(['index', 'show', 'update']);
 
     // Route::resource('companies.invitations', InvitationController::class);

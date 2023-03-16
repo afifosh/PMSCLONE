@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('email')->nullable();
             $table->enum('status', ['active', 'disabled', 'pending']);
+            $table->integer('approval_status')->default(0)->comment('0:pending info, 1:approved, 2: ready for Approval, 3: need to be updated');
+            $table->integer('approval_level')->default(1);
             $table->enum('source', ['Self Enrolled', 'Self Registered'])->default('Self Enrolled');
             $table->timestamps();
         });

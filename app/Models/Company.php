@@ -7,21 +7,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Avatar;
 use Illuminate\Support\Facades\Storage;
 
-// use Approval\Traits\RequiresApproval;
+use Approval\Traits\RequiresApproval;
 
 class Company extends BaseModel
 {
   use HasFactory, HasEnum;
-//   use RequiresApproval;
+  use RequiresApproval;
 
-//   protected function requiresApprovalWhen(array $modifications) : bool
-// {
-//     // Handle some logic that determines if this change requires approval
-//     //
-//     // Return true if the model requires approval, return false if it
-//     // should update immediately without approval.
-//     return false;
-// }
+  protected function requiresApprovalWhen(array $modifications) : bool
+{
+    // Handle some logic that determines if this change requires approval
+    //
+    // Return true if the model requires approval, return false if it
+    // should update immediately without approval.
+    return false;
+}
 
 
   public const DT_ID = 'companies_datatable';
@@ -57,6 +57,30 @@ class Company extends BaseModel
   public function detail()
   {
     return $this->hasOne(CompanyDetail::class);
+  }
+
+  public function POCDetail()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+    return $modificationClass::whereModifiableType(CompanyDetail::class)->whereJsonContains('modifications->company_id->modified', $this->id);
+  }
+
+  public function POCContact()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+    return $modificationClass::whereModifiableType(CompanyContact::class)->whereJsonContains('modifications->company_id->modified', $this->id);
+  }
+
+  public function POCAddress()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+    return $modificationClass::whereModifiableType(CompanyAddress::class)->whereJsonContains('modifications->company_id->modified', $this->id);
+  }
+
+  public function POCBankAccount()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+    return $modificationClass::whereModifiableType(CompanyBankAccount::class)->whereJsonContains('modifications->company_id->modified', $this->id);
   }
 
   public function draftDetail()

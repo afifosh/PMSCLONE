@@ -15,7 +15,7 @@ return [
     */
 
     'models' => [
-      'modification' => \Approval\Models\Modification::class,
+      'modification' => App\Models\Modification::class, //\Approval\Models\Modification::class,
       'approval'     => \Approval\Models\Approval::class,
       'disapproval'  => \Approval\Models\Disapproval::class,
     ],

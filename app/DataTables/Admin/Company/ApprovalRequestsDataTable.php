@@ -1,7 +1,8 @@
 <?php
 
-namespace App\DataTables\Admin;
+namespace App\DataTables\Admin\Company;
 
+use App\Models\ApprovalRequest;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -9,9 +10,13 @@ use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class CompaniesDataTable extends DataTable
+class ApprovalRequestsDataTable extends DataTable
 {
-  public bool $approval_requests = false;
+  public $level = 0;
+  function __construct($params = [])
+  {
+    $this->level = $params['level'];
+  }
   /**
    * Build DataTable class.
    *
@@ -21,8 +26,9 @@ class CompaniesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('name', function ($company){
-        return view('admin._partials.sections.company-avatar', compact('company'));
+      ->editColumn('name', function ($company) {
+        $url = route('admin.approval-requests.level.companies.show', ['level' => $company->approval_level, 'company' => $company->id]);
+        return view('admin._partials.sections.company-avatar', compact('company', 'url'));
       })
       ->editColumn('added_by', function ($company) {
         return $company->addedBy->email ?? '-';
@@ -30,12 +36,9 @@ class CompaniesDataTable extends DataTable
       ->editColumn('status', function ($row) {
         return $this->makeStatus($row->status);
       })
-      ->addColumn('action', function (Company $company) {
-        return view('admin.pages.company.action', compact('company'));
-      })
-      ->filterColumn('added_by', function($query, $keyword){
-        return $query->whereHas('addedBy', function($q) use ($keyword){
-          return $q->where('email', 'like', '%'.$keyword.'%');
+      ->filterColumn('added_by', function ($query, $keyword) {
+        return $query->whereHas('addedBy', function ($q) use ($keyword) {
+          return $q->where('email', 'like', '%' . $keyword . '%');
         });
       })
       ->setRowId('id')
@@ -71,8 +74,8 @@ class CompaniesDataTable extends DataTable
   public function query(Company $model): QueryBuilder
   {
     $query = $model->newQuery();
-    $query->when($this->approval_requests, function ($query){
-      return $query->where('approval_status', 2);
+    $query->when($this->level, function ($query) {
+      return $query->where('approval_status', 2)->where('approval_level', $this->level);
     });
     return $query->with('addedBy');
   }
@@ -85,16 +88,6 @@ class CompaniesDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    if (auth('admin')->user()->can('create company') && !$this->approval_requests)
-      $buttons[] = [
-        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create New Company</span>',
-        'className' =>  'btn btn-primary mx-3',
-        'attr' => [
-          'data-toggle' => "ajax-modal",
-          'data-title' => 'Create New Company',
-          'data-href' => route('admin.companies.create')
-        ]
-      ];
     return $this->builder()
       ->setTableId(Company::DT_ID)
       ->columns($this->getColumns())
@@ -105,7 +98,6 @@ class CompaniesDataTable extends DataTable
       <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
       >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
-      ->addAction(['width' => '80px'])
       ->orderBy(0, 'DESC')
       ->parameters([
         'buttons' => $buttons,
@@ -127,7 +119,7 @@ class CompaniesDataTable extends DataTable
       Column::make('source'),
       Column::make('added_by'),
       Column::make('status'),
-      // Column::make('created_at'),
+      Column::make('created_at'),
       Column::make('updated_at'),
     ];
   }
@@ -139,6 +131,6 @@ class CompaniesDataTable extends DataTable
    */
   protected function filename(): string
   {
-    return 'Companies_' . date('YmdHis');
+    return 'ApprovalRequests_' . date('YmdHis');
   }
 }

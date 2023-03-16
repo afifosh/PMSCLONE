@@ -18,13 +18,21 @@ class CompanyProfileController extends Controller
 {
   public function editDetails()
   {
-    $data['detail'] = auth()->user()->company->draftDetail ? auth()->user()->company->draftDetail->data :  auth()->user()->company->detail ?? new CompanyDetail;
+    $data['detail'] = auth()->user()->company->POCDetail()->first() ? $this->transformModifications(auth()->user()->company->POCDetail()->first()->modifications) : (auth()->user()->company->draftDetail ? auth()->user()->company->draftDetail->data :  auth()->user()->company->detail ?? new CompanyDetail);
     $data['contacts'] = auth()->user()->company->draftContacts ? auth()->user()->company->draftContacts->data :  (isset(auth()->user()->company->contacts[0]) ? auth()->user()->company->contacts : [new CompanyContactPerson]);
     $data['bankAccounts'] = auth()->user()->company->draftBankAccounts ? auth()->user()->company->draftBankAccounts->data :  (isset(auth()->user()->company->bankAccounts[0]) ? auth()->user()->company->bankAccounts : [new CompanyBankAccount]);
     $data['addresses'] = auth()->user()->company->draftAddresses ? auth()->user()->company->draftAddresses->data :  (isset(auth()->user()->company->addresses[0]) ? auth()->user()->company->addresses : [new CompanyAddress]);
     $data['form'] = 'company-details';
     $data['countries'] = Country::pluck('name', 'id');
     return view('pages.company-profile.edit', $data);
+  }
+
+  protected function transformModifications($modifications)
+  {
+    foreach ($modifications as $key => $value) {
+      $modifications[$key] = $value['modified'];
+    }
+    return $modifications;
   }
 
   public function updateDetails(DetailsUpdateRequest $request, FileUploadRepository $fileRepo)
@@ -86,6 +94,8 @@ class CompanyProfileController extends Controller
       }
       auth()->user()->company->draftBankAccounts()->where('type', 'bank_accounts')->delete();
       auth()->user()->company->bankAccounts()->whereNotIn('id', $available_bank_account_ids)->delete();
+      auth()->user()->company->forceFill(['approval_status' => 2]); // ready for approval;
+      auth()->user()->company->save();
     } else {
       auth()->user()->company->draftBankAccounts()->updateOrCreate(['type' => 'bank_accounts'], ['data' => $request->bank_accounts]);
     }
