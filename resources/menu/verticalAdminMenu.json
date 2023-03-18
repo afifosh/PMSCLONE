@@ -104,17 +104,10 @@
       "slug": "admin.workflows.index"
     },
     {
+      "url": "/admin/approval-requests",
       "name": "Approval Requests",
       "icon": "menu-icon fas fa-building",
-      "slug": ["admin.approval-requests.level"],
-      "submenu": [
-        {
-          "url": "/admin/approval-requests",
-          "name": "Requests",
-          "slug": "admin.approval-requests.level",
-          "permission" : "read company"
-        }
-      ]
+      "slug": "admin.approval-requests.index"
     },
     {
       "url": "/admin/settings",

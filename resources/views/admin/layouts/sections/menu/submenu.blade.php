@@ -1,29 +1,6 @@
 <ul class="menu-sub">
     @if (isset($menu))
         @foreach ($menu as $submenu)
-          @if ($submenu->slug == 'admin.approval-requests.level')
-          @forelse (\App\Models\ApprovalLevel::get() as $level)
-            @php
-                $activeClass =  Route::currentRouteName() === $submenu->slug && $level->id == request()->level ? 'active' : '';
-            @endphp
-              <li class="menu-item {{ $activeClass }}">
-                <a href="{{ route('admin.approval-requests.level',['level' => $level]) }}"
-                    class="{{ isset($submenu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}"
-                    @if (isset($submenu->target) and !empty($submenu->target)) target="_blank" @endif>
-                    @if (isset($submenu->icon))
-                        <i class="{{ $submenu->icon }}"></i>
-                    @endif
-                    <div>{{ isset($submenu->name) ? __('level '. $loop->iteration. ' '.$submenu->name) : '' }}</div>
-                </a>
-
-                {{-- submenu --}}
-                @if (isset($submenu->submenu))
-                    @include('admin.layouts.sections.menu.submenu', ['menu' => $submenu->submenu])
-                @endif
-            </li>
-          @empty
-          @endforelse
-          @else
             @canany($submenu->permission ?? true)
                 {{-- active menu method --}}
                 @php
@@ -47,7 +24,6 @@
                         }
                     }
                 @endphp
-
                 <li class="menu-item {{ $activeClass }}">
                     <a href="{{ isset($submenu->url) ? url($submenu->url) : 'javascript:void(0)' }}"
                         class="{{ isset($submenu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}"
@@ -57,14 +33,12 @@
                         @endif
                         <div>{{ isset($submenu->name) ? __($submenu->name) : '' }}</div>
                     </a>
-
                     {{-- submenu --}}
                     @if (isset($submenu->submenu))
                         @include('admin.layouts.sections.menu.submenu', ['menu' => $submenu->submenu])
                     @endif
                 </li>
             @endcan
-          @endif
         @endforeach
     @endif
 </ul>

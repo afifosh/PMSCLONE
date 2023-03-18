@@ -94,7 +94,7 @@
       <span class="align-middle d-sm-inline-block d-none">Previous</span>
     </button>
     <div>
-      <button class="btn btn-primary btn-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
+      <button class="btn btn-primary btn-next do-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
       <button type="button" data-form="ajax-form" class="d-none"></button>
     </div>
   </div>

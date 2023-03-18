@@ -14,14 +14,14 @@ class Company extends BaseModel
   use HasFactory, HasEnum;
   use RequiresApproval;
 
-  protected function requiresApprovalWhen(array $modifications) : bool
-{
+  protected function requiresApprovalWhen(array $modifications): bool
+  {
     // Handle some logic that determines if this change requires approval
     //
     // Return true if the model requires approval, return false if it
     // should update immediately without approval.
     return false;
-}
+  }
 
 
   public const DT_ID = 'companies_datatable';
@@ -35,7 +35,7 @@ class Company extends BaseModel
 
   public function getAvatarAttribute($value)
   {
-    if(!$value)
+    if (!$value)
       return @$this->detail->logo ? @Storage::url($this->detail->logo) : Avatar::create($this->name)->toBase64();
     return @Storage::url($value);
   }
@@ -121,5 +121,12 @@ class Company extends BaseModel
   public function contacts()
   {
     return $this->hasMany(CompanyContact::class);
+  }
+
+  public function scopeApplyRequestFilters($query)
+  {
+    $query->when(request()->has('filter_levels') && is_array(request()->filter_levels), function ($q) {
+      $q->whereIn('approval_level', request()->filter_levels);
+    });
   }
 }

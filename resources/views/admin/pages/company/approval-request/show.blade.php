@@ -89,7 +89,8 @@
       </div>
     </div>
     <div class="bs-stepper-content">
-      {{-- <form onSubmit="return false"> --}}
+      {{-- < onSubmit="return false"> --}}
+      <form action="{{route('admin.approval-requests.level.companies.update', ['level' => $company->approval_level, 'company' => $company->id])}}" method="POST">
         <!-- Account Details -->
         <div id="company-details" class="content">
           <div class="content-header mb-3">
@@ -124,6 +125,7 @@
         <div id="company-bank-accounts" class="content">
           @include('admin.pages.company.approval-request.banks-form')
         </div>
+      </form>
     </div>
   </div>
 </div>

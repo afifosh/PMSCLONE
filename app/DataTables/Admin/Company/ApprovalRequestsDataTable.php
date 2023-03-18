@@ -12,11 +12,6 @@ use Yajra\DataTables\Services\DataTable;
 
 class ApprovalRequestsDataTable extends DataTable
 {
-  public $level = 0;
-  function __construct($params = [])
-  {
-    $this->level = $params['level'];
-  }
   /**
    * Build DataTable class.
    *
@@ -74,10 +69,8 @@ class ApprovalRequestsDataTable extends DataTable
   public function query(Company $model): QueryBuilder
   {
     $query = $model->newQuery();
-    $query->when($this->level, function ($query) {
-      return $query->where('approval_status', 2)->where('approval_level', $this->level);
-    });
-    return $query->with('addedBy');
+    $query->where('approval_status', 2)->with('addedBy');
+    return $query->applyRequestFilters();
   }
 
   /**
@@ -118,6 +111,7 @@ class ApprovalRequestsDataTable extends DataTable
       Column::make('website'),
       Column::make('source'),
       Column::make('added_by'),
+      Column::make('approval_level'),
       Column::make('status'),
       Column::make('created_at'),
       Column::make('updated_at'),
