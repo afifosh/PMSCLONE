@@ -2,7 +2,7 @@
     $configData = Helper::appClasses();
 @endphp
 
-@section('title', 'Settings')
+@section('title', __($title))
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css')}}" />

@@ -1,6 +1,6 @@
 @extends('admin/layouts/layoutMaster')
 
-@include('admin.pages.settings.inc.header')
+@include('admin.pages.settings.inc.header', ['title' => 'Delivery Settings'])
 
 @section('content')
 <h4 class="fw-semibold mb-4">@lang('Settings')</h4>
