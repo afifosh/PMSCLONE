@@ -4,15 +4,6 @@
 ])
 <div>
     <div class="row">
-        @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            {!! implode('<br />', $errors->all('<span>:message</span>')) !!}
-        </div>
-        @endif
-    </div>
-
-    <div class="row">
         <div class="col-md-6 mb-4">
             <label for="fromName-{{$identifier}}" class="form-label fs-6 mb-2 fw-semibold">
                 @lang('Email sent from name')

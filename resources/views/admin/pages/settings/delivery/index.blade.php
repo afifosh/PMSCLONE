@@ -24,6 +24,17 @@
                     @endphp
                     <div class="setting-item">
                         <div class="row">
+                            @if ($errors->any())
+                            <div class="col-md-12 ">
+                                <div class="alert alert-danger alert-dismissible">
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    {!! implode('<br />', $errors->all('<span>:message</span>')) !!}
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="row">
                             <!-- Supported mail services -->
                             <div class="col-md-6 mb-4">
                                 <label for="provider" class="form-label fs-6 mb-2 fw-semibold">
@@ -40,32 +51,32 @@
                         </div>
                         <!-- AMAZON SES -->
                         <x-admin.settings.delivery.delivery-form identifier="amazon_sesService" provider="amazon_ses" :$settings>
-                            @include('admin.pages.settings.delivery.inc.amazon-ses', 
-                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'amazon_ses' ? $settings : null]
+                            @include('admin.pages.settings.delivery.inc.amazon-ses',
+                            ['settings' => isset($settings['provider']) && $settings['provider'] === 'amazon_ses' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- MAILGUN -->
                         <x-admin.settings.delivery.delivery-form identifier="mailgunService" provider="mailgun" :$settings>
                             @include('admin.pages.settings.delivery.inc.mailgun',
-                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'mailgun' ? $settings : null]
+                            ['settings' => isset($settings['provider']) && $settings['provider'] === 'mailgun' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- SMTP -->
                         <x-admin.settings.delivery.delivery-form identifier="smtpService" provider="smtp" :$settings>
-                            @include('admin.pages.settings.delivery.inc.smtp', 
-                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'smtp' ? $settings : null]
+                            @include('admin.pages.settings.delivery.inc.smtp',
+                            ['settings' => isset($settings['provider']) && $settings['provider'] === 'smtp' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- SENDMAIL -->
                         <x-admin.settings.delivery.delivery-form identifier="sendmailService" provider="sendmail" :$settings>
-                            @include('admin.pages.settings.delivery.inc.sendmail', 
-                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'sendmail' ? $settings : null]
+                            @include('admin.pages.settings.delivery.inc.sendmail',
+                            ['settings' => isset($settings['provider']) && $settings['provider'] === 'sendmail' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- MAILTRAP -->
                         <x-admin.settings.delivery.delivery-form identifier="mailtrapService" provider="mailtrap" :$settings>
-                            @include('admin.pages.settings.delivery.inc.mailtrap', 
-                                ['settings' => isset($settings['provider']) && $settings['provider'] === 'mailtrap' ? $settings : null]
+                            @include('admin.pages.settings.delivery.inc.mailtrap',
+                            ['settings' => isset($settings['provider']) && $settings['provider'] === 'mailtrap' ? $settings : null]
                             )
                         </x-admin.settings.delivery.delivery-form>
                     </div>
