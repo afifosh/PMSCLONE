@@ -2,6 +2,8 @@
 
 namespace App\Services\Core\Setting\Cache;
 
+use App\Repositories\SettingRepository;
+use App\Services\Core\Setting\Delivery\DeliverySettingService;
 use Exception;
 use Illuminate\Support\Facades\Schema;
 
@@ -25,7 +27,7 @@ class BaseCacheService
 
         cache()->store(config('cache.default'))->put(
             $cacheKey,
-            static::getDefault($provider, $service)
+            (new static)->getDefault($provider, $service)
         );
 
         return true;

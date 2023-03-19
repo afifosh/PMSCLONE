@@ -121,6 +121,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
       Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {
         Route::get('', 'index')->name('index');
+        Route::get('show', 'show')->name('show');
         Route::put('', 'update')->name('update');
       });
 

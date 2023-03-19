@@ -6,6 +6,7 @@ use App\Events\DeliverySettingUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Setting\DeliverySettingRequest;
 use App\Services\Core\Setting\Delivery\DeliverySettingService;
+use Illuminate\Http\Request;
 
 class DeliverySettingController extends Controller
 {
@@ -25,6 +26,15 @@ class DeliverySettingController extends Controller
         );
 
         return view('admin.pages.settings.delivery.index', ['settings' => $deliverySettings]);
+    }
+
+    public function show(Request $request)
+    {
+        $request->validate(['provider' => 'required']);
+
+        return $this->service->getFormattedDeliverySettings(
+            [$request->provider, 'default_mail_email_name']
+        );
     }
 
     public function update(DeliverySettingRequest $request)
