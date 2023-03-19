@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Setting;
 
+use App\Events\BroadcastSettingUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Setting\BroadcastRequest;
 use App\Services\Core\Setting\Delivery\DeliverySettingService;
@@ -41,5 +42,7 @@ class BroadcastSettingController extends Controller
         }
 
         $this->service->setDefaultSettings('default_broadcast', $context, $context = 'broadcast');
+
+        BroadcastSettingUpdated::dispatch();
     }
 }

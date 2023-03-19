@@ -2,14 +2,13 @@
 
 namespace App\Listeners;
 
-use App\Events\DeliverySettingUpdated;
-use App\Services\Core\Setting\Cache\DeliveryCacheService;
+use App\Events\BroadcastSettingUpdated;
+use App\Services\Core\Setting\Cache\BroadcastCacheService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class CacheDeliverySetting
+class CacheBroadcastSetting
 {
-
     /**
      * Create the event listener.
      *
@@ -23,11 +22,11 @@ class CacheDeliverySetting
     /**
      * Handle the event.
      *
-     * @param  \App\Events\DeliverySettingUpdated  $event
+     * @param  \App\Events\BroadcastSettingUpdated  $event
      * @return void
      */
-    public function handle(DeliverySettingUpdated $event)
+    public function handle(BroadcastSettingUpdated $event)
     {
-        DeliveryCacheService::handle();
+        BroadcastCacheService::handle();
     }
 }

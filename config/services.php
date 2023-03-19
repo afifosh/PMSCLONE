@@ -30,4 +30,5 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'broadcast_custom_driver' => env('BROADCAST_CUSTOM_DRIVER', 'ajax'),
 ];
