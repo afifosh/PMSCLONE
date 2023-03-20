@@ -1,11 +1,10 @@
-<form action="{{route('company.updateBankAccounts')}}" method="POST">
+<form action="{{route('admin.approval-requests.level.companies.update', ['company' => $company->id, 'level' => $company->approval_level])}}" method="post">
   @csrf
-  <div class="row g-3 form-repeater">
-    <div data-repeater-list="bank_accounts">
+  <div class="row g-3">
       @forelse ($bankAccounts as $account)
-      <div class="p-3 mt-4 border rounded position-relative" data-repeater-item style="background-color: #f1f0f2;">
+      <div class="p-3 mt-4 border rounded position-relative" style="background-color: #f1f0f2;">
         <div class="row">
-          {!! Form::hidden('bank_accounts[][id]', @$account['id']) !!}
+          {!! Form::hidden('modification_ids[]', $account['modification_id']) !!}
           <div class="mb-3 col-lg-6 col-xl-3 col-12 mb-0">
             <label class="form-label">Country <span class="text-danger">*</span></label>
             {!! Form::select('bank_accounts[][country_id]',$countries->prepend('Select Country', ''), @$account['country_id'], ['class' => 'form-select select2', 'disabled']) !!}
@@ -47,10 +46,20 @@
             <input type="text" name="bank_accounts[][swift_code]" value="{{@$account['swift_code']}}" class="form-control" placeholder="Swift Code" disabled />
           </div>
         </div>
+        @isset($account['modification_id'])
+          <hr>
+          <div class="form-check form-switch col-sm-6 ms-1">
+            <label class="form-check-label" for="approval_{{$account['modification_id']}}">Approval Status</label>
+            <input class="form-check-input" id="approval_{{$account['modification_id']}}" data-switch-toggle-in="#disapproval_block_{{$account['modification_id']}}" data-inverted name="approval_status[{{$account['modification_id']}}]" type="checkbox" checked/>
+          </div>
+          <div class="mb-3 col-12 d-none" id="disapproval_block_{{$account['modification_id']}}">
+            <label for="disapproval_reason" class="form-label">Disapproval Reason <span class="text-danger">*</span></label>
+            <textarea class="form-control" name="disapproval_reason[{{$account['modification_id']}}]" id="disapproval_reason" rows="3"></textarea>
+          </div>
+        @endisset
       </div>
       @empty
       @endforelse
-    </div>
   <input class="d-none" type="text" name="submit_type">
   <div class="col-12 d-flex justify-content-between">
     <button class="btn btn-label-secondary btn-prev" type="button"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>

@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin\Company;
 
+use App\Models\ApprovalLevel;
 use App\Models\ApprovalRequest;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
@@ -69,7 +70,7 @@ class ApprovalRequestsDataTable extends DataTable
   public function query(Company $model): QueryBuilder
   {
     $query = $model->newQuery();
-    $query->where('approval_status', 2)->with('addedBy');
+    $query->where('approval_status', 2)->where('approval_level', auth()->user()->approvalLevelNo())->with('addedBy');
     return $query->applyRequestFilters();
   }
 

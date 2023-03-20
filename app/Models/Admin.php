@@ -103,6 +103,26 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
         return $this->id != 1;
     }
 
+    public function authorizedToApproveOrDisapprove(\Approval\Models\Modification $mod) : bool
+    {
+      if(isset($mod->modifications['company_id']['modified'])){
+        $company = Company::where('id', $mod->modifications['company_id']['modified'])->first();
+      }
+        $level = ApprovalLevel::pluck('id')->toArray()[$company->approval_level - 1]; // get the current level id
+        $approver = ApprovalLevelApprover::where('workflow_level_id', $level)->where('user_id', auth()->id())->first();
+        return $approver ? true : false;
+    }
+
+    protected function authorizedToApprove(\Approval\Models\Modification $mod) : bool
+    {
+      return $this->authorizedToApproveOrDisapprove($mod);
+    }
+
+    protected function authorizedToDisapprove(\Approval\Models\Modification $mod) : bool
+    {
+      return $this->authorizedToApproveOrDisapprove($mod);
+    }
+
     public function programs()
     {
       return $this->belongsToMany(Program::class, ProgramUser::class, 'admin_id', 'program_id')->withTimestamps();
@@ -154,5 +174,10 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
     public function approvalLevels()
     {
       return $this->belongsToMany(ApprovalLevel::class, ApprovalLevelApprover::class, 'user_id', 'workflow_level_id')->withTimestamps();
+    }
+
+    public function approvalLevelNo()
+    {
+      return auth()->user()->approvalLevels && auth()->user()->approvalLevels[0] ? ApprovalLevel::pluck('id')->search(auth()->user()->approvalLevels[0]->id) + 1 : 0;
     }
 }

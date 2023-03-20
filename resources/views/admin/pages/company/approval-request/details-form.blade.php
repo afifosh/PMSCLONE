@@ -1,5 +1,6 @@
-<form action="{{route('company.updateDetails')}}" method="post">
+<form action="{{route('admin.approval-requests.level.companies.update', ['company' => $company->id, 'level' => $company->approval_level])}}" method="post">
   @csrf
+  {!! Form::hidden('modification_ids[]', $detail['modification_id']) !!}
 <div class="card-body">
   <div class="d-flex align-items-start align-items-sm-center gap-4">
     {{-- <img src="{{ $detail->avatar }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" /> --}}
@@ -88,6 +89,17 @@
     {!! Form::select('subsidiaries[]', isset($detail['subsidiaries'][0]) ? array_combine($detail['subsidiaries'], $detail['subsidiaries']) : [],
       $detail['subsidiaries'], ['disabled', 'class' => 'form-select select2', 'multiple', 'data-tags' => 'true']) !!}
   </div>
+  @isset($detail['modification_id'])
+    <hr>
+    <div class="form-check form-switch col-sm-6 ms-1">
+      <label class="form-check-label" for="approval_{{$detail['modification_id']}}">Approval Status</label>
+      <input class="form-check-input" id="approval_{{$detail['modification_id']}}" data-switch-toggle-in="#disapproval_block_{{$detail['modification_id']}}" data-inverted name="approval_status[{{$detail['modification_id']}}]" type="checkbox" checked/>
+    </div>
+    <div class="mb-3 col-12 d-none" id="disapproval_block_{{$detail['modification_id']}}">
+      <label for="disapproval_reason" class="form-label">Disapproval Reason <span class="text-danger">*</span></label>
+      <textarea class="form-control" name="disapproval_reason[{{$detail['modification_id']}}]" id="disapproval_reason" rows="3"></textarea>
+    </div>
+  @endisset
   <input class="d-none" type="text" name="submit_type">
   <div class="col-12 d-flex justify-content-between">
     <button class="btn btn-label-secondary btn-prev" disabled> <i class="ti ti-arrow-left me-sm-1 me-0"></i>

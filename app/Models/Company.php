@@ -83,6 +83,39 @@ class Company extends BaseModel
     return $modificationClass::whereModifiableType(CompanyBankAccount::class)->whereJsonContains('modifications->company_id->modified', $this->id);
   }
 
+  public function POCmodifications()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+    return $modificationClass::whereJsonContains('modifications->company_id->modified', $this->id);
+  }
+
+  public function isApprovalRequiredForCurrentLevel($level = ''): bool
+  {
+    $is_inc = true;
+    $level = $level ? $level : $this->approval_level;
+    if ($this->POCmodifications()->count() > 0) {
+      foreach ($this->POCmodifications()->get() as $modification) {
+        if ($level > $modification->approvals()->count()) {
+          $is_inc = false;
+          break;
+        }
+      }
+    }
+    return !$is_inc;
+  }
+
+  public function incApprovalLevelIfRequired()
+  {
+    if (!$this->isApprovalRequiredForCurrentLevel()) {
+      if ($this->approval_level >= ApprovalLevel::count())
+        $this->forceFill(['approval_status' => 1]); // Approved by all
+      else
+        $this->forceFill(['approval_level' => $this->approval_level + 1]);
+      $this->save();
+      return true;
+    }
+  }
+
   public function draftDetail()
   {
     return $this->morphOne(DraftData::class, 'draftable')->where('type', 'detail');

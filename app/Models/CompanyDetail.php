@@ -63,4 +63,9 @@ class CompanyDetail extends Model
   {
     return $this->belongsTo(Company::class);
   }
+
+  public function modifications()
+  {
+    return $this->morphMany(Modification::class, 'modifiable');
+  }
 }
