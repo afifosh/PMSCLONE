@@ -48,7 +48,6 @@ class AppSettingController extends Controller
     public function storeGeneralSettings(GeneralSettingRequest $request)
     {
         AppSetting::updateOrCreate(['id' => 1], [
-            'password_history_count' => $request->password_history_count,
             'password_expire_days' => $request->password_expire_days,
             'timeout_warning_seconds' => $request->timeout_warning_seconds,
             'timeout_after_seconds' => $request->timeout_after_seconds,
