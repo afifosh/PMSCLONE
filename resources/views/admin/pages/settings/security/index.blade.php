@@ -15,15 +15,17 @@
                 <hr>
                 <div class="setting pt-0 px-4">
                     <div class="setting-item" data-general="true" data-bs-toggle="sidebar">
-                        <form method="POST" action="{{ route('admin.setting.security.store') }}">
+                        <form method="POST" action="{{ route('admin.setting.security.update') }}">
                             @csrf
+                            @method('PUT')
+                            <input type="hidden" name="type" value="security" />
                             <div class="row">
                                 <!-- Password expires after -->
                                 <div class="col-md-6 mb-3">
                                     <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                         @lang('Password expires after')
                                     </label>
-                                    <input name="password_expire_days" value="{{ $generalSettings->password_expire_days ?? config('auth.password_expire_days') }}" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
+                                    <input name="password_expire_days" value="{{ $setting['password_expire_days'] ?? config('auth.password_expire_days') }}" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
                                     @error('password_expire_days')
                                     <div class="alert alert-danger alert-dismissible my-2">
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -40,7 +42,7 @@
                                     <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                         @lang('Password history count')
                                     </label>
-                                    <input name="password_history_count" value="{{ $generalSettings->password_history_count ?? config('auth.password_history_count') }}" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
+                                    <input name="password_history_count" value="{{ $setting['password_history_count'] ?? config('auth.password_history_count') }}" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
                                     @error('password_history_count')
                                     <div class="alert alert-danger alert-dismissible my-2">
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -60,7 +62,7 @@
                                     <label for="timeoutWarningIn" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                         @lang('Timeout warning in')
                                     </label>
-                                    <input name="timeout_warning_seconds" value="{{ $generalSettings->timeout_warning_seconds ?? config('auth.timeout_warning_seconds') }}" type="text" class="form-control" id="timeoutWarningIn" placeholder="{{ __('Timeout warning after x seconds') }}" aria-describedby="timeoutWarningIn" />
+                                    <input name="timeout_warning_seconds" value="{{ $setting['timeout_warning_seconds'] ?? config('auth.timeout_warning_seconds') }}" type="text" class="form-control" id="timeoutWarningIn" placeholder="{{ __('Timeout warning after x seconds') }}" aria-describedby="timeoutWarningIn" />
                                     @error('timeout_warning_seconds')
                                     <div class="alert alert-danger alert-dismissible my-2">
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -76,7 +78,7 @@
                                     <label for="timeoutAfter" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                         @lang('Timeout after')
                                     </label>
-                                    <input name="timeout_after_seconds" value="{{ $generalSettings->timeout_after_seconds ?? config('auth.timeout_after_seconds') }}" type="text" class="form-control" id="timeoutAfter" placeholder="{{ __('Timeout after x amount of seconds') }}" aria-describedby="timeoutAfter" />
+                                    <input name="timeout_after_seconds" value="{{ $setting['timeout_after_seconds'] ?? config('auth.timeout_after_seconds') }}" type="text" class="form-control" id="timeoutAfter" placeholder="{{ __('Timeout after x amount of seconds') }}" aria-describedby="timeoutAfter" />
                                     @error('timeout_after_seconds')
                                     <div class="alert alert-danger alert-dismissible my-2">
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

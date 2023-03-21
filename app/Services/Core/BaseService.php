@@ -8,6 +8,15 @@ class BaseService
 {
     protected $model;
 
+    protected array $attributes = [];
+
+    public function setAttrs(array $attrs): self
+    {
+        $this->attributes = $attrs;
+
+        return $this;
+    }
+
     public function setModel(Model $model): BaseService
     {
         $this->model = $model;
@@ -28,6 +37,11 @@ class BaseService
             ->save();
 
         return $this->model;
+    }
+
+    public function getFillAble($parameters = []): array
+    {
+        return count($this->attributes) ? $this->attributes : $parameters;
     }
 
     public function find($id)

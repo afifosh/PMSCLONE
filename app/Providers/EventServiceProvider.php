@@ -47,6 +47,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\BroadcastSettingUpdated' => [
             'App\Listeners\CacheBroadcastSetting'
         ],
+        'App\Events\SecuritySettingUpdated' => [
+            'App\Listeners\CacheSetting'
+        ],
     ];
 
     /**

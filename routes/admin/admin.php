@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use App\Http\Controllers\Admin\RFP\RFPFileController;
 use App\Http\Controllers\Admin\Setting\BroadcastSettingController;
 use App\Http\Controllers\Admin\Setting\DeliverySettingController;
+use App\Http\Controllers\Admin\Setting\SecuritySettingController;
 use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
@@ -115,8 +116,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
     // Route::resource('companies.invitations', InvitationController::class);
     Route::prefix('settings')->name('setting.')->group(function () {
-      Route::get('security', [AppSettingController::class, 'security'])->name('security');
-      Route::post('security', [AppSettingController::class, 'storeGeneralSettings'])->name('security.store');
+      Route::prefix('security')->name('security.')->controller(SecuritySettingController::class)->group(function() {
+        Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+    });
+
       Route::get('general', [AppSettingController::class, 'general'])->name('general');
 
       Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {

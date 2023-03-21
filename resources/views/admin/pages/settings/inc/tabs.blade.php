@@ -2,7 +2,7 @@
 @php
 $urls = [
     'general' => 'admin.setting.general',
-    'security' => 'admin.setting.security',
+    'security' => 'admin.setting.security.index',
     'email' => 'admin.setting.delivery.index',
     'broadcast' => 'admin.setting.broadcast.index',
 ];

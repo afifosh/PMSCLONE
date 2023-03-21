@@ -1,0 +1,46 @@
+<?php
+
+
+namespace App\Services\Core\Setting\General;
+
+
+use App\Repositories\SettingRepository;
+use App\Services\Core\BaseService;
+
+class SettingService extends BaseService
+{
+    public function update($context = 'app')
+    {
+        $settings = request()->except('allowed_resource', '_token', '_method');
+
+        return collect(array_keys($settings))->map(function ($key) use ($settings, $context) {
+
+            $setting = resolve(SettingRepository::class)
+                ->createSettingInstance($key, $context);
+
+            if (request()->file($key)) {
+                $this->deleteImage(optional($setting)->value);
+                $settings[$key] = $this->uploadImage(request()->file($key), config('file.' . $key . '.folder'), config('file.' . $key . '.height'));
+            }
+
+            $this->setModel($setting);
+
+            if ($locale = request()->get('language')) {
+                session()->put('locale', $locale);
+            }
+
+            return parent::save([
+                'name' => $key,
+                'value' => $settings[$key],
+                'context' => $context
+            ]);
+        });
+    }
+
+
+    public function getFormattedSettings($context = 'app')
+    {
+        return resolve(SettingRepository::class)
+            ->getFormattedSettings($context);
+    }
+}
