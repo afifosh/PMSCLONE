@@ -24,26 +24,32 @@ class BankAccountUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'submit_type' => 'required|string',
-            'bank_accounts' => 'required_if:submit_type,submit|array',
-            'bank_accounts.*.id' => 'nullable|exists:bank_accounts,id',
-            'bank_accounts.*.country_id' => 'required_if:submit_type,submit|nullable|exists:countries,id',
-            'bank_accounts.*.name' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'bank_accounts.*.branch' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'bank_accounts.*.street' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'bank_accounts.*.city' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'bank_accounts.*.state' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'bank_accounts.*.post_code' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'bank_accounts.*.account_no' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'bank_accounts.*.iban_no' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'bank_accounts.*.swift_code' => 'required_if:submit_type,submit|nullable|string|max:30',
+            'country_id' => 'required|exists:countries,id',
+            'name' => 'required|string|max:30',
+            'branch' => 'required|string|max:30',
+            'street' => 'required|string|max:30',
+            'city' => 'required|string|max:30',
+            'state' => 'required|string|max:30',
+            'post_code' => 'required|string|max:30',
+            'account_no' => 'required|string|max:30',
+            'iban_no' => 'required|string|max:30',
+            'swift_code' => 'required|string|max:30',
         ];
     }
 
     public function messages()
     {
       return [
-        'bank_accounts.*.*.required_if' => 'This field is required.',
+        'country_id.required' => 'Country is required',
+        'name.required' => 'Name is required',
+        'branch.required' => 'Branch is required',
+        'street.required' => 'Street is required',
+        'city.required' => 'City is required',
+        'state.required' => 'State is required',
+        'post_code.required' => 'Post Code is required',
+        'account_no.required' => 'Account No is required',
+        'iban_no.required' => 'IBAN No is required',
+        'swift_code.required' => 'Swift Code is required',
       ];
     }
 }

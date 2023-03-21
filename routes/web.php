@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Auth\ExpiredPasswordController;
 use App\Http\Controllers\Auth\LockModeController;
+use App\Http\Controllers\Company\CompanyProfile\AddressController;
+use App\Http\Controllers\Company\CompanyProfile\BankAccountController;
+use App\Http\Controllers\Company\CompanyProfile\ContactController;
 use App\Http\Controllers\Company\CompanyProfileController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\company\InvitationController;
@@ -49,9 +52,15 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
     Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
       Route::get('/', 'editDetails')->name('editDetails');
       Route::post('/', 'updateDetails')->name('updateDetails');
-      Route::post('/contacts', 'updateContacts')->name('updateContacts');
-      Route::post('/addresses', 'updateAddresses')->name('updateAddresses');
+      Route::post('/contactss', 'updateContacts')->name('updateContacts');
+      Route::post('/addressess', 'updateAddresses')->name('updateAddresses');
       Route::post('/bank-account', 'updateBankAccounts')->name('updateBankAccounts');
+    });
+
+    Route::prefix('company-profile')->name('company.')->group(function (){
+      Route::resource('contacts', ContactController::class);
+      Route::resource('addresses', AddressController::class);
+      Route::resource('bank-accounts', BankAccountController::class);
     });
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');

@@ -24,25 +24,32 @@ class ContactsUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'submit_type' => 'required|string',
-            'contacts.*.type' => 'required_if:submit_type,submit|nullable|integer',
-            'contacts.*.id' => 'nullable|exists:company_contacts,id',
-            'contacts.*.title' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'contacts.*.first_name' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'contacts.*.last_name' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'contacts.*.position' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'contacts.*.phone' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'contacts.*.mobile' => 'required_if:submit_type,submit|nullable|string|max:30',
-            'contacts.*.email' => 'required_if:submit_type,submit|nullable|email',
-            'contacts.*.fax' => 'required_if:submit_type,submit|nullable|string|max:30',
-            // 'contacts.*.poa' => 'required_if:submit_type,submit|nullable|string',
+            'type' => 'required|integer',
+            'title' => 'required|string|max:30',
+            'first_name' => 'required|string|max:30',
+            'last_name' => 'required|string|max:30',
+            'position' => 'required|string|max:30',
+            'phone' => 'required|string|max:30',
+            'mobile' => 'required|string|max:30',
+            'email' => 'required|email',
+            'fax' => 'required|string|max:30',
+            // 'poa' => 'required|string',
         ];
     }
 
     public function messages()
     {
       return [
-        'contacts.*.*.required_if' => 'This field is required.',
+        'type.required' => 'Contact Type is required',
+        'title.required' => 'Title is required',
+        'first_name.required' => 'First Name is required',
+        'last_name.required' => 'Last Name is required',
+        'position.required' => 'Position is required',
+        'phone.required' => 'Phone is required',
+        'mobile.required' => 'Mobile is required',
+        'email.required' => 'Email is required',
+        'fax.required' => 'Fax is required',
+        // 'poa.required' => 'POA is required',
       ];
     }
 }

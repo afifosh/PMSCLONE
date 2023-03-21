@@ -121,21 +121,6 @@ class Company extends BaseModel
     return $this->morphOne(DraftData::class, 'draftable')->where('type', 'detail');
   }
 
-  public function draftContacts()
-  {
-    return $this->morphOne(DraftData::class, 'draftable')->where('type', 'contacts');
-  }
-
-  public function draftAddresses()
-  {
-    return $this->morphOne(DraftData::class, 'draftable')->where('type', 'addresses');
-  }
-
-  public function draftBankAccounts()
-  {
-    return $this->morphOne(DraftData::class, 'draftable')->where('type', 'bank_accounts');
-  }
-
   public function draftData()
   {
     return $this->morphMany(DraftData::class, 'draftable');
