@@ -53,6 +53,9 @@ class DeliverySettingController extends Controller
 
         DeliverySettingUpdated::dispatch();
 
-        return redirect()->route('admin.setting.delivery.index');
+        return redirect()->route('admin.setting.delivery.index')->with(
+            'status',
+            __('Delivery settings updated')
+        );
     }
 }

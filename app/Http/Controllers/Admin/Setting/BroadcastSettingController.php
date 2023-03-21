@@ -44,5 +44,10 @@ class BroadcastSettingController extends Controller
         $this->service->setDefaultSettings('default_broadcast', $context, $context = 'broadcast');
 
         BroadcastSettingUpdated::dispatch();
+
+        return redirect()->route('admin.setting.broadcast.index')->with(
+            'status',
+            __('Broadcast settings updated')
+        );
     }
 }
