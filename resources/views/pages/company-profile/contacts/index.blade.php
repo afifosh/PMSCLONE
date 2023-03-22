@@ -4,18 +4,19 @@
 </div>
 <div class="row mb-3">
   @forelse ($contacts as $contact)
-    <div class="col-md-6 mb-md-0 mb-2">
+    <div class="col-md-6 mb-md-3">
       <div class="form-check custom-option custom-option-basic">
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
-            <h6 class="fw-semibold mb-0">John Doe (Default)</h6>
-            <span class="badge bg-label-primary">Home</span>
+            <h6 class="fw-semibold mb-0">{{$contact['first_name']}} {{$contact['last_name']}} ({{$contact['position']}})</h6>
+            <span class="badge bg-label-{{$contact['id'] ? 'primary' : 'warning'}}">{{$contact['id'] ? 'Approved' : 'Pending Approval'}}</span>
           </span>
           <span class="custom-option-body">
-            <small>4135 Parkway Street, Los Angeles, CA, 90017.<br /> Mobile : 1234567890 Cash / Card on delivery available</small>
+            <small>Email : {{$contact['email']}}<br /> Phone : {{$contact['phone']}}</small>
             <hr class="my-2">
             <span class="d-flex">
-              <a class="me-2" href="javascript:void(0)">Edit</a> <a href="javascript:void(0)">Remove</a>
+              <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Contact Person" data-href="{{route('company.contacts.edit', $contact['id'])}}">Edit</a>
+              <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.contacts.destroy', $contact['id']) }}">Remove</a>
             </span>
           </span>
         </label>

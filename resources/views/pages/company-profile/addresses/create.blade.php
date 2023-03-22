@@ -71,15 +71,15 @@
   </div>
   <div class="d-flex justify-content-end">
     <div class="ps-2">
-      {!! Form::checkbox('address_type', 'purchasing', false, ['class' => 'form-check-input']) !!}
+      {!! Form::checkbox('address_type[]', 'purchasing', false, ['class' => 'form-check-input']) !!}
       {!! Form::label('', 'Purchasing Address', ['class' => 'form-check-label']) !!}
     </div>
     <div class="ps-2">
-      {!! Form::checkbox('address_type', 'billing', false, ['class' => 'form-check-input']) !!}
+      {!! Form::checkbox('address_type[]', 'billing', false, ['class' => 'form-check-input']) !!}
       {!! Form::label('', 'Payment Address', ['class' => 'form-check-label']) !!}
     </div>
     <div class="ps-2">
-      {!! Form::checkbox('address_type', 'rfp_only', false, ['class' => 'form-check-input']) !!}
+      {!! Form::checkbox('address_type[]', 'rfp_only', false, ['class' => 'form-check-input']) !!}
       {!! Form::label('', 'RFP Only Address', ['class' => 'form-check-label']) !!}
     </div>
   </div>

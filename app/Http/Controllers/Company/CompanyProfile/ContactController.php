@@ -9,81 +9,46 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+  public function index()
+  {
+    if (request()->ajax()) {
+      $data['contacts'] = auth()->user()->company->contacts;
+      return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.index', $data)->render()]);
     }
+  }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-      $data['contact'] = new CompanyContact();
-      return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.create', $data)->render()]);
-    }
+  public function create()
+  {
+    $data['contact'] = new CompanyContact();
+    return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.create', $data)->render()]);
+  }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(ContactsUpdateRequest $request)
-    {
-      auth()->user()->company->addresses()->create($request->all());
-      return $this->sendRes('Added Successfully', ['event' => 'page_reload']);
-    }
+  public function store(ContactsUpdateRequest $request)
+  {
+    auth()->user()->company->contacts()->create($request->all());
+    return $this->sendRes('Added Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
+  }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\CompanyContact  $companyContact
-     * @return \Illuminate\Http\Response
-     */
-    public function show(CompanyContact $companyContact)
-    {
-        //
-    }
+  public function show(CompanyContact $companyContact)
+  {
+    //
+  }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CompanyContact  $companyContact
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CompanyContact $companyContact)
-    {
-        //
-    }
+  public function edit($contact)
+  {
+    $data['contact'] = auth()->user()->company->contacts()->findOrFail($contact);
+    return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.create', $data)->render()]);
+  }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CompanyContact  $companyContact
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, CompanyContact $companyContact)
-    {
-        //
-    }
+  public function update(ContactsUpdateRequest $request, $contact)
+  {
+    auth()->user()->company->contacts()->findOrFail($contact)->update($request->all());
+    return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
+  }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\CompanyContact  $companyContact
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(CompanyContact $companyContact)
-    {
-        //
-    }
+  public function destroy($contact)
+  {
+    auth()->user()->company->contacts()->findOrFail($contact)->delete();
+    return $this->sendRes('Deleted Successfully', ['event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
+  }
 }

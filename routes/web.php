@@ -52,9 +52,6 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
     Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
       Route::get('/', 'editDetails')->name('editDetails');
       Route::post('/', 'updateDetails')->name('updateDetails');
-      Route::post('/contactss', 'updateContacts')->name('updateContacts');
-      Route::post('/addressess', 'updateAddresses')->name('updateAddresses');
-      Route::post('/bank-account', 'updateBankAccounts')->name('updateBankAccounts');
     });
 
     Route::prefix('company-profile')->name('company.')->group(function (){

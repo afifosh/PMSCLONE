@@ -10,82 +10,48 @@ use Illuminate\Http\Request;
 
 class AddressController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-      //
+  public function index()
+  {
+    if (request()->ajax()) {
+      $data['addresses'] = auth()->user()->company->addresses;
+      return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.addresses.index', $data)->render()]);
     }
+  }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-      $data['address'] = new CompanyAddress();
-      $data['countries'] = Country::pluck('name', 'id');
-      return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.addresses.create', $data)->render()]);
-    }
+  public function create()
+  {
+    $data['address'] = new CompanyAddress();
+    $data['countries'] = Country::pluck('name', 'id');
+    return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.addresses.create', $data)->render()]);
+  }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(AddressUpdateRequest $request)
-    {
-      auth()->user()->company->addresses()->create($request->all());
-      return $this->sendRes('Added Successfully', ['event' => 'page_reload']);
-    }
+  public function store(AddressUpdateRequest $request)
+  {
+    auth()->user()->company->addresses()->create($request->all());
+    return $this->sendRes('Added Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 3]);
+  }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\CompanyAddress  $companyAddress
-     * @return \Illuminate\Http\Response
-     */
-    public function show(CompanyAddress $companyAddress)
-    {
-        //
-    }
+  public function show(CompanyAddress $companyAddress)
+  {
+    //
+  }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CompanyAddress  $companyAddress
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CompanyAddress $companyAddress)
-    {
-        //
-    }
+  public function edit($address)
+  {
+    $data['address'] = auth()->user()->company->addresses()->findOrFail($address);
+    $data['countries'] = Country::pluck('name', 'id');
+    return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.addresses.create', $data)->render()]);
+  }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CompanyAddress  $companyAddress
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, CompanyAddress $companyAddress)
-    {
-        //
-    }
+  public function update(AddressUpdateRequest $request, $address)
+  {
+    auth()->user()->company->addresses()->findOrFail($address)->update($request->all());
+    return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 3]);
+  }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\CompanyAddress  $companyAddress
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(CompanyAddress $companyAddress)
-    {
-        //
-    }
+  public function destroy($address)
+  {
+    auth()->user()->company->addresses()->findOrFail($address)->delete();
+    return $this->sendRes('Deleted Successfully', ['event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 3]);
+  }
 }

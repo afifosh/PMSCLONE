@@ -253,7 +253,8 @@ for (const input of inputs) {
           }
           if(data.data.event == 'functionCall'){
             // call the function whose name is in the data.data.function
-            typeof window[data.data.function] == "function" ? window[data.data.function]() : null;
+            if(typeof data.data.function_params != "undefined" && data.data.function_params != null && data.data.function_params != '')
+            typeof window[data.data.function] == "function" ? window[data.data.function](data.data.function_params) : null;
           }
           //console.log(current.closest('.modal').modal("hide"));
           current.removeClass('disabled');
@@ -391,6 +392,16 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
               setTimeout(function() { // wait for 1 second
                 location.reload(); // then reload the page
               }, 1000);
+            }
+            if(response.data.event == 'redirect'){
+              setTimeout(function() { // wait for 1 second
+                window.location.href = response.data.url;
+              }, 1000);
+            }
+            if(response.data.event == 'functionCall'){
+              // call the function whose name is in the response.data.function
+              if(typeof response.data.function_params != "undefined" && response.data.function_params != null && response.data.function_params != '')
+              typeof window[response.data.function] == "function" ? window[response.data.function](response.data.function_params) : null;
             }
           } else {
             toast_danger(response.message)

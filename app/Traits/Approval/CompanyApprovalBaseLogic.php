@@ -22,6 +22,6 @@ trait CompanyApprovalBaseLogic
     //
     // Return true if the model requires approval, return false if it
     // should update immediately without approval.
-    return true;
+    return false;
   }
 }

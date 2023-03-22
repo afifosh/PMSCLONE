@@ -29,7 +29,7 @@
 <div class="col-12 mb-4">
   <div class="bs-stepper wizard-numbered mt-2">
     <div class="bs-stepper-header">
-      <div class="step" data-target="#company-details">
+      <div class="step step-index-0" data-target="#company-details">
         <button type="button" class="step-trigger">
           <span class="bs-stepper-circle">1</span>
           <span class="bs-stepper-label">
@@ -41,7 +41,7 @@
       <div class="line">
         <i class="ti ti-chevron-right"></i>
       </div>
-      <div class="step" data-target="#company-contacts">
+      <div class="step step-index-1" data-target="#company-contacts" data-href="{{route('company.contacts.index')}}">
         <button type="button" class="step-trigger">
           <span class="bs-stepper-circle">2</span>
           <span class="bs-stepper-label">
@@ -54,7 +54,7 @@
       <div class="line">
         <i class="ti ti-chevron-right"></i>
       </div>
-      <div class="step" data-target="#company-addresses">
+      <div class="step step-index-2" data-target="#company-addresses" data-href="{{route('company.addresses.index')}}">
         <button type="button" class="step-trigger">
           <span class="bs-stepper-circle">3</span>
           <span class="bs-stepper-label">
@@ -66,7 +66,7 @@
       <div class="line">
         <i class="ti ti-chevron-right"></i>
       </div>
-      <div class="step" data-target="#company-documents">
+      <div class="step step-index-3" data-target="#company-documents">
         <button type="button" class="step-trigger">
           <span class="bs-stepper-circle">4</span>
           <span class="bs-stepper-label">
@@ -78,7 +78,7 @@
       <div class="line">
         <i class="ti ti-chevron-right"></i>
       </div>
-      <div class="step" data-target="#company-bank-accounts">
+      <div class="step step-index-4" data-target="#company-bank-accounts" data-href="{{route('company.bank-accounts.index')}}">
         <button type="button" class="step-trigger">
           <span class="bs-stepper-circle">5</span>
           <span class="bs-stepper-label">
@@ -89,7 +89,6 @@
       </div>
     </div>
     <div class="bs-stepper-content">
-      {{-- <form onSubmit="return false"> --}}
         <!-- Account Details -->
         <div id="company-details" class="content">
           <div class="content-header mb-3">
@@ -100,15 +99,9 @@
         </div>
         <!-- Personal Info -->
         <div id="company-contacts" class="content">
-          @include('pages.company-profile.contacts-form')
         </div>
         <!-- Social Links -->
         <div id="company-addresses" class="content">
-          <div class="content-header mb-3">
-            <h6 class="mb-0">Addresses</h6>
-            <small>Manage Addresses</small>
-          </div>
-          @include('pages.company-profile.addresses-form')
         </div>
         <div id="company-documents" class="content">
           <div class="col-12 d-flex justify-content-between">
@@ -122,7 +115,6 @@
           </div>
         </div>
         <div id="company-bank-accounts" class="content">
-          @include('pages.company-profile.banks-form')
         </div>
     </div>
   </div>

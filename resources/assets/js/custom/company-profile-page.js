@@ -53,38 +53,46 @@ $('.btn-next').on('click', function () {
   }
   // Numbered Wizard
   // --------------------------------------------------------------------
-  const wizardNumbered = document.querySelector('.wizard-numbered'),
-    // wizardNumberedBtnNextList = [].slice.call(wizardNumbered.querySelectorAll('.btn-next')),
-    wizardNumberedBtnPrevList = [].slice.call(wizardNumbered.querySelectorAll('.btn-prev')),
-    wizardNumberedBtnSubmit = wizardNumbered.querySelector('.btn-submit');
-
-  if (typeof wizardNumbered !== undefined && wizardNumbered !== null) {
-    const numberedStepper = new Stepper(wizardNumbered, {
-      linear: false
+  const wizardElm = $('.wizard-numbered')[0]
+  const  wizardNumberedBtnPrevList = [].slice.call($(wizardElm).find('.btn-prev'));
+  const companyProfileStepper = new Stepper(wizardElm, {
+    linear: false
+  });
+  window.triggerNext = function () {
+    companyProfileStepper.next();
+  };
+  window.triggerStep = function (step) {
+    companyProfileStepper.to(0);
+    companyProfileStepper.to(step);
+  };
+  if (wizardNumberedBtnPrevList) {
+    wizardNumberedBtnPrevList.forEach(wizardNumberedBtnPrev => {
+      wizardNumberedBtnPrev.addEventListener('click', event => {
+        companyProfileStepper.previous();
+      });
     });
-    window.triggerNext = function () {
-      numberedStepper.next();
-    };
-    // if (wizardNumberedBtnNextList) {
-    //   wizardNumberedBtnNextList.forEach(wizardNumberedBtnNext => {
-    //     wizardNumberedBtnNext.addEventListener('click', event => {
-    //       numberedStepper.next();
-    //     });
-    //   });
-    // }
-    if (wizardNumberedBtnPrevList) {
-      wizardNumberedBtnPrevList.forEach(wizardNumberedBtnPrev => {
-        wizardNumberedBtnPrev.addEventListener('click', event => {
-          numberedStepper.previous();
-        });
-      });
-    }
-    if (wizardNumberedBtnSubmit) {
-      wizardNumberedBtnSubmit.addEventListener('click', event => {
-        alert('Submitted..!!');
-      });
-    }
   }
+  wizardElm.addEventListener('show.bs-stepper', function (event) {
+    const stepElm = $(wizardElm).find('.step-index-' + event.detail.indexStep)[0];
+    const target = $($(stepElm).data('target'));
+    const url = $(stepElm).data('href');
+    if (url){
+      getData(url).then(function (resp) {
+        $(target).html(resp.data.view_data);
+      });
+    }
+  });
+
+  function getData(url){
+    return $.ajax({
+      url: url,
+      type: 'get',
+      success: function (data) {
+        return data;
+      }
+    });
+  }
+  // Form Wizard
 
   var formRepeater = $('.form-repeater');
   if (formRepeater.length) {
