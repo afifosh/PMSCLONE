@@ -18,6 +18,7 @@ use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticationController;
 use Laravel\Fortify\Http\Controllers\TwoFactorQrCodeController;
 use Laravel\Fortify\Http\Controllers\TwoFactorSecretKeyController;
 use Laravel\Fortify\Http\Controllers\VerifyEmailController;
+use Laravel\Fortify\Features;
 
 // Admin Routes
 Route::prefix('admin')->middleware('guest:web')->group(function () {
@@ -100,7 +101,9 @@ Route::prefix('admin')->middleware('guest:web')->group(function () {
                 'guest:admin',
             ]));
 
-        $twoFactorMiddleware = 'auth:admin';
+        $twoFactorMiddleware = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
+            ? [config('fortify.auth_middleware', 'auth').':'.config('fortify.guard'), 'password.confirm:admin.password.confirm']
+            : [config('fortify.auth_middleware', 'auth').':'.config('fortify.guard')];
 
         Route::post('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'store'])
             ->middleware($twoFactorMiddleware)
