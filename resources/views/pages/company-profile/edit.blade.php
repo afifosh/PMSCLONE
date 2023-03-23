@@ -29,7 +29,7 @@
 <div class="col-12 mb-4">
   <div class="bs-stepper wizard-numbered mt-2">
     <div class="bs-stepper-header">
-      <div class="step step-index-0" data-target="#company-details">
+      <div class="step step-index-0" data-target="#company-details" data-href="{{route('company.editDetails')}}">
         <button type="button" class="step-trigger">
           <span class="bs-stepper-circle">1</span>
           <span class="bs-stepper-label">
@@ -91,11 +91,7 @@
     <div class="bs-stepper-content">
         <!-- Account Details -->
         <div id="company-details" class="content">
-          <div class="content-header mb-3">
-            <h6 class="mb-0">Company Details</h6>
-            <small>Enter Company Details.</small>
-          </div>
-          @include('pages.company-profile.details-form')
+          @include('pages.company-profile.detail.index')
         </div>
         <!-- Personal Info -->
         <div id="company-contacts" class="content">

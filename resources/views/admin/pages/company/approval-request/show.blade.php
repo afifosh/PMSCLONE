@@ -20,7 +20,7 @@
 @endsection
 
 @section('page-script')
-<script src="{{asset('assets/js/custom/company-profile-page.js')}}"></script>
+<script src="{{asset('assets/js/custom/admin-company-profile-page.js')}}"></script>
 <script>
 </script>
 @endsection

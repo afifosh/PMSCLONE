@@ -52,6 +52,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
     Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
       Route::get('/', 'editDetails')->name('editDetails');
       Route::post('/', 'updateDetails')->name('updateDetails');
+      Route::any('/submit-request', 'submitApprovalRequest')->name('submitApprovalRequest');
     });
 
     Route::prefix('company-profile')->name('company.')->group(function (){

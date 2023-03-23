@@ -1,7 +1,4 @@
-<div class="content-header mb-3">
-  <h6 class="mb-0">Addresses</h6>
-  <small>Manage Addresses</small>
-</div>
+@include('pages.company-profile.header-component', ['head_title' => 'Addresses', 'head_sm' => 'Manage Addresses'])
 <div class="row mb-3">
   @forelse ($addresses as $address)
     <div class="col-md-6 mb-md-3">
@@ -26,8 +23,12 @@
     </div>
   @empty
     <div class="col-12">
-      <div class="alert alert-warning">
-        <i class="ti ti-alert me-2"></i> No addresses found.
+      <div class="mx-auto text-center">
+        <div class="my-5">
+          <i class="fa fa-magnifying-glass fa-7x" style="color: #cd545b;"></i>
+          <h3>No Address Found!</h3>
+          <span>Looks like you have not added any address yet. <br> No Worries click the add new button to add a new address</span>
+        </div>
       </div>
     </div>
   @endforelse
@@ -39,6 +40,5 @@
   <div>
     <button type="button" class="btn btn-label-primary me-2" data-toggle="ajax-modal" data-title="Add New Address" data-href="{{route('company.addresses.create')}}">Add new address</button>
     <button class="btn btn-primary btn-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
-    <button type="button" data-form="ajax-form" class="d-none"></button>
   </div>
 </div>

@@ -27,6 +27,14 @@ class CompaniesDataTable extends DataTable
       ->editColumn('added_by', function ($company) {
         return $company->addedBy->email ?? '-';
       })
+      ->editColumn('step_completed_count', function ($company) {
+        $perc = ($company->step_completed_count/5)*100;
+        return <<<EOL
+                <div class="progress w-100" style="height:10px;">
+                  <div class="progress-bar" role="progressbar" style="width: $perc%" aria-valuenow="$perc" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                EOL;
+      })
       ->editColumn('status', function ($row) {
         return $this->makeStatus($row->status);
       })
@@ -39,7 +47,7 @@ class CompaniesDataTable extends DataTable
         });
       })
       ->setRowId('id')
-      ->rawColumns(['name', 'action', 'status']);
+      ->rawColumns(['name', 'action', 'status', 'step_completed_count']);
   }
 
   protected function makeStatus($status)
@@ -123,9 +131,10 @@ class CompaniesDataTable extends DataTable
     return [
       // Column::make('id'),
       Column::make('name')->title(__('Bussines Legal Name')),
-      Column::make('website'),
+      // Column::make('website'),
       Column::make('source'),
       Column::make('added_by'),
+      Column::make('step_completed_count')->title(__('Setup'))->orderable(false)->searchable(false),
       Column::make('status'),
       // Column::make('created_at'),
       Column::make('updated_at'),

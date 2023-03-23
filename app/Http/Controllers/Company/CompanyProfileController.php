@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Company\CompanyProfile\DetailsUpdateRequest;
-use App\Models\CompanyBankAccount;
-use App\Models\CompanyContactPerson;
 use App\Models\CompanyDetail;
 use App\Models\Country;
 use App\Repositories\FileUploadRepository;
@@ -14,9 +12,11 @@ class CompanyProfileController extends Controller
 {
   public function editDetails()
   {
-    $data['detail'] = auth()->user()->company->POCDetail()->first() ? $this->transformModifications(auth()->user()->company->POCDetail()->first()->modifications) : (auth()->user()->company->draftDetail ? auth()->user()->company->draftDetail->data :  auth()->user()->company->detail ?? new CompanyDetail);
+    $data['detail'] = auth()->user()->company->POCDetail()->first() ? $this->transformModifications(auth()->user()->company->POCDetail()->first()->modifications) : auth()->user()->company->detail ?? new CompanyDetail;
     $data['countries'] = Country::pluck('name', 'id');
-    return view('pages.company-profile.edit', $data);
+
+    return request()->ajax() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
+      : view('pages.company-profile.edit', $data);
   }
 
   protected function transformModifications($modifications)
@@ -58,5 +58,14 @@ class CompanyProfileController extends Controller
       $att['sa_company_name'] = null;
 
     return $att;
+  }
+
+  public function submitApprovalRequest()
+  {
+    if (auth()->user()->company->canBeSentForApproval()) {
+      auth()->user()->company->forceFill(['approval_status' => 2, 'approval_level' => 1])->save();
+      return redirect()->back()->with('success', 'Approval Request Submitted Successfully');
+    }
+    return redirect()->back()->with('error', 'Please fill all the required fields');
   }
 }

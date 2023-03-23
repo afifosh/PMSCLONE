@@ -1,3 +1,4 @@
+@include('pages.company-profile.header-component', ['head_title' => 'Bank Accounts', 'head_sm' => 'Manage Accounts'])
 <div class="row mb-3">
   @forelse ($bankAccounts as $account)
     <div class="col-md-6 mb-md-3">
@@ -19,11 +20,15 @@
       </div>
     </div>
   @empty
-    <div class="col-12">
-      <div class="alert alert-warning">
-        <i class="ti ti-alert me-2"></i> No Saved Accounts found.
+  <div class="col-12">
+    <div class="mx-auto text-center">
+      <div class="my-5">
+        <i class="fa fa-magnifying-glass fa-7x" style="color: #cd545b;"></i>
+        <h3>No Account Found!</h3>
+        <span>Looks like you have not added any bank account yet. <br> No Worries click the add new button to add a new account</span>
       </div>
     </div>
+  </div>
   @endforelse
 </div>
 <div class="col-12 d-flex justify-content-between">
@@ -32,7 +37,6 @@
   </button>
   <div>
     <button type="button" class="btn btn-label-primary me-2" data-toggle="ajax-modal" data-title="Add New Account" data-href="{{route('company.bank-accounts.create')}}">Add new Account</button>
-    <button class="btn btn-primary btn-next" type="button"> <span class="align-middle d-sm-inline-block me-sm-1">Submit</span></button>
-    <button type="button" data-form="ajax-form" class="d-none"></button>
+    <a href="{{route('company.submitApprovalRequest')}}" class="btn btn-primary {{auth()->user()->company->canBeSentForApproval() ? '': 'disabled'}}" type="button"> <span class="align-middle d-sm-inline-block me-sm-1">Send for Approval</span></a>
   </div>
 </div>

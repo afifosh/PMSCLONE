@@ -253,8 +253,10 @@ for (const input of inputs) {
           }
           if(data.data.event == 'functionCall'){
             // call the function whose name is in the data.data.function
-            if(typeof data.data.function_params != "undefined" && data.data.function_params != null && data.data.function_params != '')
-            typeof window[data.data.function] == "function" ? window[data.data.function](data.data.function_params) : null;
+            typeof window[data.data.function] == "function" ?
+              (typeof data.data.function_params != "undefined" ? window[data.data.function](data.data.function_params)
+                : window[data.data.function]())
+              : null;
           }
           //console.log(current.closest('.modal').modal("hide"));
           current.removeClass('disabled');

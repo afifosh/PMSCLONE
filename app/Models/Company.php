@@ -40,6 +40,16 @@ class Company extends BaseModel
     return @Storage::url($value);
   }
 
+  public function getStepCompletedCountAttribute()
+  {
+    $completed = 0;
+    $completed += $this->POCDetail()->exists() || $this->detail ? 1 : 0;
+    $completed += $this->POCContact()->exists() || $this->contacts->count() ? 1 : 0;
+    $completed += $this->POCAddress()->exists() || $this->addresses->count() ? 1 : 0;
+    $completed += $this->POCBankAccount()->exists() || $this->bankAccounts->count() ? 1 : 0;
+    return $completed;
+  }
+
   public function addedBy()
   {
     return $this->belongsTo(Admin::class, 'added_by', 'id');
@@ -146,5 +156,15 @@ class Company extends BaseModel
     $query->when(request()->has('filter_levels') && is_array(request()->filter_levels), function ($q) {
       $q->whereIn('approval_level', request()->filter_levels);
     });
+  }
+
+  public function canBeSentForApproval()
+  {
+    return $this->approval_status != 2 // not already sent for approval
+      && ($this->POCAddress()->exists() || $this->addresses->count()) // has changed address or approved address
+      && ($this->POCDetail()->exists() || $this->detail) // has changed detail or approved detail
+      && ($this->POCContact()->exists() || $this->contacts->count()) // has changed contact or approved contact
+      && ($this->POCBankAccount()->exists() || $this->bankAccounts->count()) // has changed bank account or approved bank account
+      && $this->POCmodifications()->count(); // has changed something
   }
 }

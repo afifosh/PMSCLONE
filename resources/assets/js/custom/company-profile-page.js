@@ -30,7 +30,7 @@ $('.save-draft').on('click', function () {
   $(this).closest('form').find('input[name="submit_type"]').val('draft');
   $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
 });
-$('.btn-next').on('click', function () {
+$('.submit-and-next').on('click', function () {
   $(this).closest('form').find('input[name="submit_type"]').val('submit');
   $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
 });
@@ -53,11 +53,10 @@ $('.btn-next').on('click', function () {
   }
   // Numbered Wizard
   // --------------------------------------------------------------------
-  const wizardElm = $('.wizard-numbered')[0]
-  const  wizardNumberedBtnPrevList = [].slice.call($(wizardElm).find('.btn-prev'));
-  const companyProfileStepper = new Stepper(wizardElm, {
-    linear: false
-  });
+  const wizardElm = $('.wizard-numbered')[0],
+    companyProfileStepper = new Stepper(wizardElm, {
+      linear: false
+    });
   window.triggerNext = function () {
     companyProfileStepper.next();
   };
@@ -65,80 +64,40 @@ $('.btn-next').on('click', function () {
     companyProfileStepper.to(0);
     companyProfileStepper.to(step);
   };
-  if (wizardNumberedBtnPrevList) {
-    wizardNumberedBtnPrevList.forEach(wizardNumberedBtnPrev => {
-      wizardNumberedBtnPrev.addEventListener('click', event => {
-        companyProfileStepper.previous();
-      });
-    });
-  }
+  $(document).on('click', '.btn-prev', function () {
+    companyProfileStepper.previous();
+  });
+  $(document).on('click', '.btn-next', function () {
+    companyProfileStepper.next();
+  });
   wizardElm.addEventListener('show.bs-stepper', function (event) {
-    const stepElm = $(wizardElm).find('.step-index-' + event.detail.indexStep)[0];
-    const target = $($(stepElm).data('target'));
-    const url = $(stepElm).data('href');
-    if (url){
+    const stepElm = $(wizardElm).find('.step-index-' + event.detail.indexStep)[0],
+      target = $($(stepElm).data('target')),
+      url = $(stepElm).data('href');
+    if (url) {
       getData(url).then(function (resp) {
         $(target).html(resp.data.view_data);
+        $(target)
+          .find('.select2')
+          .each(function () {
+            if (!$(this).data('select2')) {
+              var $this = $(this);
+              $this.wrap('<div class="position-relative"></div>');
+              $this.select2({
+                dropdownParent: $this.parent()
+              });
+            }
+          });
       });
     }
   });
 
-  function getData(url){
+  function getData(url) {
     return $.ajax({
       url: url,
       type: 'get',
       success: function (data) {
         return data;
-      }
-    });
-  }
-  // Form Wizard
-
-  var formRepeater = $('.form-repeater');
-  if (formRepeater.length) {
-    var row = 2;
-    var col = 1;
-    formRepeater.on('submit', function (e) {
-      e.preventDefault();
-    });
-    formRepeater.repeater({
-      show: function () {
-        var fromControl = $(this).find('.form-control, .form-select');
-        var formLabel = $(this).find('.form-label');
-
-        fromControl.each(function (i) {
-          var id = 'form-repeater-' + row + '-' + col;
-          $(fromControl[i]).attr('id', id);
-          $(formLabel[i]).attr('for', id);
-          col++;
-        });
-
-        row++;
-
-        $(this).slideDown();
-        $(this).find('.select2').each(function() {
-          if (!$(this).data('select2')) {
-            var $this = $(this);
-            $this.wrap('<div class="position-relative"></div>');
-            $this.select2({
-              dropdownParent: $this.parent()
-            });
-          }
-        });
-      },
-      hide: function (e) {
-        confirm('Are you sure you want to delete this element?') && $(this).slideUp(e);
-      },
-      isFirstItemUndeletable: true,
-      afterAdd: function (repeaterItem) {
-        alert('t');
-        // Initialize Select2 for all select elements in the newly added repeater item
-        $(repeaterItem).find('.select2').each(function() {
-          alert('t');
-          if (!$(this).data('select2')) {
-            $(this).select2();
-          }
-        });
       }
     });
   }

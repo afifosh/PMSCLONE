@@ -1,3 +1,4 @@
+@include('pages.company-profile.header-component', ['head_title' => 'Company Details', 'head_sm' => 'Manage Details'])
 <form action="{{route('company.updateDetails')}}" method="post">
   @csrf
 <div class="card-body">
@@ -107,10 +108,10 @@
       <span class="align-middle d-sm-inline-block d-none">Previous</span>
     </button>
     <div>
-      @if (!auth()->user()->company->detail)
+      {{-- @if (!auth()->user()->company->detail)
         <button class="btn btn-outline-secondary save-draft" type="button">Save Draft</button>
-      @endif
-      <button class="btn btn-primary btn-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
+      @endif --}}
+      <button class="btn btn-primary submit-and-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
       <button type="button" data-form="ajax-form" class="d-none"></button>
     </div>
   </div>

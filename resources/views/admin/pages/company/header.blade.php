@@ -26,9 +26,15 @@
                   <i class='ti ti-calendar'></i> Joined April 2021</li>
               </ul>
             </div>
-            <a href="javascript:void(0)" class="btn btn-primary">
-              <i class='ti ti-user-check me-1'></i>Connected
-            </a>
+            <div>
+              <div class="d-flex justify-content-between">
+                <span class="">Setup Progress</span>
+                <span>{{$company->step_completed_count}}/5</span>
+              </div>
+              <div class="progress" style="height:10px; width:300px">
+                <div class="progress-bar" role="progressbar" style="width: {{($company->step_completed_count/5)*100}}%" aria-valuenow="{{($company->step_completed_count/5)*100}}" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
