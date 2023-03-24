@@ -167,4 +167,9 @@ class Company extends BaseModel
       && ($this->POCBankAccount()->exists() || $this->bankAccounts->count()) // has changed bank account or approved bank account
       && $this->POCmodifications()->count(); // has changed something
   }
+
+  public function isEditable()  //user can make changes if not sent for approval
+  {
+    return $this->approval_status !=2 ;
+  }
 }

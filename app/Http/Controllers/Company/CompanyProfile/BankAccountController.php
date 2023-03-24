@@ -14,6 +14,7 @@ class BankAccountController extends Controller
   {
     if (request()->ajax()) {
       $data['bankAccounts'] = auth()->user()->company->bankAccounts;
+      $data['pending_creation_accounts'] = auth()->user()->company->POCBankAccount()->where('is_update', false)->get();
       return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.bank-accounts.index', $data)->render()]);
     }
   }
@@ -27,31 +28,49 @@ class BankAccountController extends Controller
 
   public function store(BankAccountUpdateRequest $request)
   {
-    auth()->user()->company->bankAccounts()->create($request->all());
+    auth()->user()->company->bankAccounts()->create($request->validated());
     return $this->sendRes('Added Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 5]);
   }
 
-  public function show(CompanyBankAccount $companyBankAccount)
+  public function show($bank_account)
   {
-    //
+    if (request()->type == 'pending_creation') {
+      $data['bank_account'] = auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account);
+    } else {
+      $data['bank_account'] = auth()->user()->company->bankAccounts()->findOrFail($bank_account);
+    }
+    $data['countries'] = Country::pluck('name', 'id');
+    $data['options'] = ['disabled' => 'disabled'];
+    return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.bank-accounts.create', $data)->render()]);
   }
 
   public function edit($bank_account)
   {
-    $data['bank_account'] = auth()->user()->company->bankAccounts()->findOrFail($bank_account);
+    $data['bank_account'] = request()->type == 'pending_creation' ? auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)
+      : auth()->user()->company->bankAccounts()->findOrFail($bank_account);
     $data['countries'] = Country::pluck('name', 'id');
+
     return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.bank-accounts.create', $data)->render()]);
   }
 
-  public function update(Request $request, $bank_account)
+  public function update(BankAccountUpdateRequest $request, $bank_account)
   {
-    auth()->user()->company->bankAccounts()->findOrFail($bank_account)->update($request->all());
+    if (request()->model_type == 'pending_creation') {
+      auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->delete();
+      auth()->user()->company->bankAccounts()->create($request->validated());
+    } else {
+      auth()->user()->company->bankAccounts()->findOrFail($bank_account)->update($request->validated());
+    }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 5]);
   }
 
   public function destroy($bank_account)
   {
-    auth()->user()->company->bankAccounts()->findOrFail($bank_account)->delete();
+    if (request()->type == 'pending_creation') {
+      auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->delete();
+    } else {
+      auth()->user()->company->bankAccounts()->findOrFail($bank_account)->delete();
+    }
     return $this->sendRes('Deleted Successfully', ['event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 5]);
   }
 }

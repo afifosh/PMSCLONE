@@ -12,14 +12,46 @@
             <small>IBAN Number : {{$account['iban_no']}}<br /> Swift Code : {{$account['swift_code']}}</small>
             <hr class="my-2">
             <span class="d-flex">
-              <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Contact Person" data-href="{{route('company.bank-accounts.edit', $account['id'])}}">Edit</a>
-              <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.bank-accounts.destroy', $account['id']) }}">Remove</a>
+              <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Bank Account" data-href="{{route('company.bank-accounts.show', $account['id'])}}">View</a>
+              @if(auth()->user()->company->isEditable())
+                <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Bank Account" data-href="{{route('company.bank-accounts.edit', $account['id'])}}">Edit</a>
+                <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.bank-accounts.destroy', $account['id']) }}">Remove</a>
+              @endif
             </span>
           </span>
         </label>
       </div>
     </div>
   @empty
+  @endforelse
+  @forelse ($pending_creation_accounts as $pending_account)
+  @php
+    $account = transformModifiedData($pending_account->modifications);
+  @endphp
+    <div class="col-md-6 mb-md-3">
+      <div class="form-check custom-option custom-option-basic">
+        <label class="form-check-label custom-option-content">
+          <span class="custom-option-header mb-2">
+            <h6 class="fw-semibold mb-0">{{ $account['account_no']}} ({{$account['name']}})</h6>
+            <span class="badge bg-label-{{@$account['id'] ? 'primary' : 'warning'}}">{{@$account['id'] ? 'Approved': 'Pending Approval'}}</span>
+          </span>
+          <span class="custom-option-body">
+            <small>IBAN Number : {{$account['iban_no']}}<br /> Swift Code : {{$account['swift_code']}}</small>
+            <hr class="my-2">
+            <span class="d-flex">
+              <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Bank Account" data-href="{{route('company.bank-accounts.show', ['bank_account' => $pending_account->id, 'type' => 'pending_creation'])}}">View</a>
+              @if(auth()->user()->company->isEditable())
+                <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Bank Account" data-href="{{route('company.bank-accounts.edit', ['bank_account' => $pending_account->id, 'type' => 'pending_creation'])}}">Edit</a>
+                <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.bank-accounts.destroy', ['bank_account' => $pending_account->id, 'type' => 'pending_creation']) }}">Remove</a>
+              @endif
+            </span>
+          </span>
+        </label>
+      </div>
+    </div>
+  @empty
+  @endforelse
+  @if (!$bankAccounts->count() && !$pending_creation_accounts->count())
   <div class="col-12">
     <div class="mx-auto text-center">
       <div class="my-5">
@@ -29,7 +61,7 @@
       </div>
     </div>
   </div>
-  @endforelse
+  @endif
 </div>
 <div class="col-12 d-flex justify-content-between">
   <button class="btn btn-label-secondary btn-prev" type="button"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>

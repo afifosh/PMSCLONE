@@ -28,10 +28,20 @@ if (!function_exists('human_filesize')) {
   }
 }
 
-if (!function_exists('get_ext')) {
-  function get_ext($mimeType)
+// if (!function_exists('get_ext')) {
+//   function get_ext($mimeType)
+//   {
+//     $guesser = MimeTypeExtensionGuesser::getInstance();
+//     return $guesser->guess($mimeType);
+//   }
+// }
+
+if(!function_exists('transformModifiedData')) { // Get modified data from modidifications array
+  function transformModifiedData($modifications)
   {
-    $guesser = MimeTypeExtensionGuesser::getInstance();
-    return $guesser->guess($mimeType);
+    foreach ($modifications as $key => $value) {
+      $modifications[$key] = $value['modified'];
+    }
+    return $modifications;
   }
 }
