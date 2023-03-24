@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminUsersController;
-use App\Http\Controllers\Admin\AppSettingController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
 use App\Http\Controllers\Admin\Company\UserController;
@@ -121,7 +120,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
         Route::put('', 'update')->name('update');
     });
 
-      Route::get('general', [AppSettingController::class, 'general'])->name('general');
+      Route::get('general', function() {})->name('general');
 
       Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {
         Route::get('', 'index')->name('index');

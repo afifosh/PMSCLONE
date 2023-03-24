@@ -52,7 +52,7 @@ class SettingCacheService extends BaseCacheService
                 $cached = $this->cachedSettings($cacheKey);
             }
 
-            app($this->cacheManager[$context['handler']])->load($cached);
+            app($this->cacheManager[$context]['handler'])->load($cached);
         }
     }
 
