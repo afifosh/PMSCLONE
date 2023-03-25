@@ -235,7 +235,10 @@ for (const input of inputs) {
     success: function (data) {
       if (data.success) {
         if (data.success) {
-          toast_success(data.message);
+          if(data.message){
+            toast_success(data.message);
+          }
+
           if (data.data.event == 'table_reload' && data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
             $('#' + data.data.table_id)
               .DataTable()

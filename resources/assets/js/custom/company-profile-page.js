@@ -30,27 +30,21 @@ $('.save-draft').on('click', function () {
   $(this).closest('form').find('input[name="submit_type"]').val('draft');
   $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
 });
-$('.submit-and-next').on('click', function () {
+$(document).on('click', '.submit-and-next', function () {
   $(this).closest('form').find('input[name="submit_type"]').val('submit');
   $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
 });
-(function () {
-  let accountUserImage = document.getElementById('uploadedAvatar');
-  const fileInput = document.querySelector('.account-file-input'),
-    resetFileInput = document.querySelector('.account-image-reset');
-
-  if (accountUserImage) {
-    const resetImage = accountUserImage.src;
-    fileInput.onchange = () => {
-      if (fileInput.files[0]) {
-        accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
-      }
-    };
-    resetFileInput.onclick = () => {
-      fileInput.value = '';
-      accountUserImage.src = resetImage;
-    };
+$(document).on('change', '.account-file-input', function () {
+  if (this.files && this.files[0]) {
+    $('#uploadedAvatar').attr('src', window.URL.createObjectURL(this.files[0]))
   }
+});
+$(document).on('click', '.account-image-reset', function () {
+  $('#uploadedAvatar').attr('src', $('#uploadedAvatar').data('default'));
+  $('.account-file-input').val('');
+});
+(function () {
+  // --------------------------------------------------------------------
   // Numbered Wizard
   // --------------------------------------------------------------------
   const wizardElm = $('.wizard-numbered')[0],

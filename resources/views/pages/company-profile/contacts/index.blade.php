@@ -51,7 +51,7 @@
     </div>
   @empty
   @endforelse
-  @if (!$contacts && !$pending_creation_contacts)
+  @if (!$contacts->count() && !$pending_creation_contacts->count())
   <div class="col-12">
     <div class="mx-auto text-center">
       <div class="my-5">
@@ -68,7 +68,9 @@
     <span class="align-middle d-sm-inline-block d-none">Previous</span>
   </button>
   <div>
-    <button type="button" class="btn btn-label-primary me-2" data-toggle="ajax-modal" data-title="Add New Contact Person" data-href="{{route('company.contacts.create')}}">Add new</button>
+    @if (auth()->user()->company->isEditable())
+      <button type="button" class="btn btn-label-primary me-2" data-toggle="ajax-modal" data-title="Add New Contact Person" data-href="{{route('company.contacts.create')}}">Add new</button>
+    @endif
     <button class="btn btn-primary btn-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
   </div>
 </div>

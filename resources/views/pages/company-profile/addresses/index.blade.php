@@ -73,7 +73,9 @@
     <span class="align-middle d-sm-inline-block d-none">Previous</span>
   </button>
   <div>
-    <button type="button" class="btn btn-label-primary me-2" data-toggle="ajax-modal" data-title="Add New Address" data-href="{{route('company.addresses.create')}}">Add new address</button>
+    @if (auth()->user()->company->isEditable())
+      <button type="button" class="btn btn-label-primary me-2" data-toggle="ajax-modal" data-title="Add New Address" data-href="{{route('company.addresses.create')}}">Add new address</button>
+    @endif
     <button class="btn btn-primary btn-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
   </div>
 </div>

@@ -8,6 +8,11 @@ use App\Models\CompanyContact;
 
 class ContactController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('companyMustBeEditable')->except(['index', 'show']);
+  }
+
   public function index()
   {
     if (request()->ajax()) {

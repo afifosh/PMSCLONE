@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 
 class AddressController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('companyMustBeEditable')->except(['index', 'show']);
+  }
+
   public function index()
   {
     if (request()->ajax()) {

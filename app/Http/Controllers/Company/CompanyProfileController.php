@@ -10,6 +10,11 @@ use App\Repositories\FileUploadRepository;
 
 class CompanyProfileController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('companyMustBeEditable:true')->only(['updateDetails']);
+  }
+
   public function editDetails()
   {
     $data['detail'] = auth()->user()->company->POCDetail()->first() ? $this->transformModifications(auth()->user()->company->POCDetail()->first()->modifications) : auth()->user()->company->detail ?? new CompanyDetail;

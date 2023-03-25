@@ -68,7 +68,9 @@
     <span class="align-middle d-sm-inline-block d-none">Previous</span>
   </button>
   <div>
-    <button type="button" class="btn btn-label-primary me-2" data-toggle="ajax-modal" data-title="Add New Account" data-href="{{route('company.bank-accounts.create')}}">Add new Account</button>
+    @if (auth()->user()->company->isEditable())
+      <button type="button" class="btn btn-label-primary me-2" data-toggle="ajax-modal" data-title="Add New Account" data-href="{{route('company.bank-accounts.create')}}">Add new Account</button>
+    @endif
     <a href="{{route('company.submitApprovalRequest')}}" class="btn btn-primary {{auth()->user()->company->canBeSentForApproval() ? '': 'disabled'}}" type="button"> <span class="align-middle d-sm-inline-block me-sm-1">Send for Approval</span></a>
   </div>
 </div>
