@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "81bb8fa032b02e6ab339c1643dbf89a3",
+    "content-hash": "2d6fe4a41a224965c8cbcb6bf75bdf06",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1565,6 +1565,198 @@
                 }
             ],
             "time": "2021-10-07T12:57:01+00:00"
+        },
+        {
+            "name": "imanghafoori/laravel-nullable",
+            "version": "v1.2.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imanghafoori1/laravel-nullable.git",
+                "reference": "deda588a9decaae1629f1447720b7f55506fb642"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imanghafoori1/laravel-nullable/zipball/deda588a9decaae1629f1447720b7f55506fb642",
+                "reference": "deda588a9decaae1629f1447720b7f55506fb642",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "~5.1|6.*|7.*|8.*|9.*|10.*",
+                "php": "^7.1.3|7.2.*|7.3.*|7.4.*|8.0.*|8.1.*|8.2.*"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "~4.0"
+            },
+            "suggest": {
+                "imanghafoori/laravel-anypass": " Allows you login with any password in local environment.",
+                "imanghafoori/laravel-decorator": "Allows you to easily apply the decorator pattern in a laravel app.",
+                "imanghafoori/laravel-masterpass": "You can easily set a master password without code change.",
+                "imanghafoori/laravel-terminator": "Gives you opportunity to refactor your controllers.",
+                "imanghafoori/laravel-widgetize": "Gives you a better structure and caching opportunity for your web pages."
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Imanghafoori\\Helpers\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Iman Ghafoori",
+                    "email": "imanghafoori1@gmail.com"
+                }
+            ],
+            "description": "A package to help you write expressive defensive code in a functional manner",
+            "homepage": "https://github.com/imanghafoori1/laravel-nullable",
+            "keywords": [
+                "laravel",
+                "laravel5-package",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/imanghafoori1/laravel-nullable/issues",
+                "source": "https://github.com/imanghafoori1/laravel-nullable/tree/v1.2.8"
+            },
+            "time": "2023-02-15T13:51:37+00:00"
+        },
+        {
+            "name": "imanghafoori/laravel-password-history",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imanghafoori1/laravel-password-history.git",
+                "reference": "031c2f405597b1d50e5f06bd468268ec528e7039"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imanghafoori1/laravel-password-history/zipball/031c2f405597b1d50e5f06bd468268ec528e7039",
+                "reference": "031c2f405597b1d50e5f06bd468268ec528e7039",
+                "shasum": ""
+            },
+            "require": {
+                "imanghafoori/laravel-nullable": "^1.2",
+                "imanghafoori/laravel-smart-facades": "^1.0",
+                "laravel/framework": "~5.1|6.*|7.*|8.*|9.*|10.*|11.*",
+                "php": "^7.1.3|7.2.*|7.3.*|7.4.*|8.*"
+            },
+            "require-dev": {
+                "mockery/mockery": "*",
+                "orchestra/testbench": "~3.0"
+            },
+            "suggest": {
+                "imanghafoori/laravel-anypass": " Allows you login with any password in local environment.",
+                "imanghafoori/laravel-decorator": "Allows you to easily apply the decorator pattern.",
+                "imanghafoori/laravel-heyman": "It allows to write expressive code to authorize, validate and authenticate.",
+                "imanghafoori/laravel-masterpass": "You can easily set a master password without code change.",
+                "imanghafoori/laravel-terminator": "Gives you opportunity to refactor your controllers."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Imanghafoori\\PasswordHistory\\PasswordHistoryServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Imanghafoori\\PasswordHistory\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Iman Ghafoori",
+                    "email": "imanghafoori1@gmail.com"
+                }
+            ],
+            "description": "A package to keep a history of all password changes of users",
+            "homepage": "https://github.com/imanghafoori1/laravel-password-history",
+            "keywords": [
+                "Laravel-Security",
+                "laravel",
+                "laravel-authentication",
+                "laravel-login",
+                "laravel-package",
+                "laravel-password",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/imanghafoori1/laravel-password-history/issues",
+                "source": "https://github.com/imanghafoori1/laravel-password-history/tree/v1.0.1"
+            },
+            "time": "2023-02-16T10:22:32+00:00"
+        },
+        {
+            "name": "imanghafoori/laravel-smart-facades",
+            "version": "v1.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imanghafoori1/laravel-smart-facades.git",
+                "reference": "aba4134ab6ae1a2325da96d2c5e7f844471f13a8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imanghafoori1/laravel-smart-facades/zipball/aba4134ab6ae1a2325da96d2c5e7f844471f13a8",
+                "reference": "aba4134ab6ae1a2325da96d2c5e7f844471f13a8",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/events": "~5.1|^6.0|^7.0|^8.0|^9.0|10.*",
+                "illuminate/support": "~5.1|^6.0|^7.0|^8.0|^9.0|10.*",
+                "php": ">=7.1.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "~7.0|~8.0",
+                "phpunit/phpunit": "~9.0"
+            },
+            "suggest": {
+                "imanghafoori/laravel-anypass": " Allows you login with any password in local environment.",
+                "imanghafoori/laravel-masterpass": "You can easily set a master password without code change.",
+                "imanghafoori/laravel-terminator": "Gives you opportunity to refactor your controllers.",
+                "imanghafoori/laravel-widgetize": "Gives you a better structure and caching opportunity for your web pages."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imanghafoori\\SmartFacades\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Iman Ghafoori",
+                    "email": "imanghafoori1@gmail.com"
+                }
+            ],
+            "description": "Adds some features on the top of laravel facades",
+            "homepage": "https://github.com/imanghafoori1/laravel-smart-facades",
+            "keywords": [
+                "laravel",
+                "laravel-facades",
+                "laravel-package",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/imanghafoori1/laravel-smart-facades/issues",
+                "source": "https://github.com/imanghafoori1/laravel-smart-facades/tree/v1.0.10"
+            },
+            "time": "2023-02-15T15:00:01+00:00"
         },
         {
             "name": "intervention/image",
@@ -10589,5 +10781,5 @@
         "php": "^8.0.2"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

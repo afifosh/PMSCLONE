@@ -32,6 +32,7 @@ class UpdateUserPassword implements UpdatesUserPasswords
             'password' => $this->passwordRules(),
         ], [
             'current_password.current_password' => __('The provided password does not match your current password.'),
+            'auth.password_used' => __('This password is already used. Please use a new password'),
         ])->validateWithBag('updatePassword');
 
         $user->forceFill([
@@ -45,6 +46,7 @@ class UpdateUserPassword implements UpdatesUserPasswords
             'password' => $this->passwordRules(),
         ], [
             'current_password.current_password' => __('The provided password does not match your current password.'),
+            'auth.password_used' => __('This password is already used. Please use a new password'),
         ])->validateWithBag('updatePassword');
 
         $user->forceFill([

@@ -2,7 +2,7 @@
 
 namespace App\Actions\Fortify;
 
-use App\Rules\NotFromPasswordHistory;
+use Imanghafoori\PasswordHistory\Rules\NotBeInPasswordHistory;
 use Laravel\Fortify\Rules\Password;
 
 trait PasswordValidationRules
@@ -14,6 +14,12 @@ trait PasswordValidationRules
      */
     protected function passwordRules(): array
     {
-        return ['required', 'string', new Password, 'confirmed', new NotFromPasswordHistory];
+        $rules = ['required', 'string', new Password, 'confirmed'];
+
+        if (! is_null(auth()->user())) {
+            $rules[] = NotBeInPasswordHistory::ofUser(auth()->user());
+        }
+
+        return $rules;
     }
 }
