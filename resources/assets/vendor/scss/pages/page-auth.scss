@@ -7,10 +7,95 @@
 
 $authentication-1-inner-max-width: 400px !default;
 
+.footer {
+  bottom:0;
+  padding:20px calc(1.5rem * .5);
+  position:absolute;
+  right:0;
+  left:0;
+  height:60px;
+
+ }
+ @media (max-width:991.98px) {
+  .footer {
+   left:0
+  }
+ }
+ 
+ [data-layout=horizontal] .footer {
+  left:0!important
+ }
+ 
+
+ html {
+  position:relative;
+  min-height: calc(100% - 60px);
+ }
+ .authentication-wrapper {
+  margin-top: 100px;
+  padding-bottom:60px;
+  position:relative;
+  z-index:2;
+  width:100%
+ }
+ .auth-page-wrapper .footer {
+  left:0;
+  background-color:transparent;
+ }
+ .auth-one-bg-position {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  width:100%;
+  height:380px
+ }
+ @media (max-width:575.98px) {
+  .auth-one-bg-position {
+   height:280px
+  }
+ }
+ .auth-one-bg {
+  background-image: url(/assets/img/pages/bg.jpeg);
+  background-position:center;
+  background-size:cover
+ }
+ .auth-one-bg .bg-overlay {
+  background:-webkit-gradient(linear,left top,right top,from(#000),to(#000));
+  background:linear-gradient(to right,#000,#000);
+ }
+
+ .bg-overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  opacity: .7;
+ }
+ .shape {
+  position:absolute;
+  bottom:0;
+  right:0;
+  left:0;
+  z-index:1;
+  pointer-events:none
+ }
+ .shape>svg {
+  width:100%;
+  height:auto;
+ }
+ 
+ .particles-js-canvas-el {
+  position:relative
+ }
+
 .authentication-wrapper {
   display: flex;
   flex-basis: 100%;
-  min-height: 100vh;
+  //min-height: 100vh;
   width: 100%;
 
   .authentication-inner {
@@ -70,25 +155,6 @@ $authentication-1-inner-max-width: 400px !default;
   &.authentication-basic .authentication-inner {
     max-width: $authentication-1-inner-max-width;
     position: relative;
-    &:before {
-      width: 238px;
-      height: 233px;
-      content: ' ';
-      position: absolute;
-      top: -55px;
-      left: -40px;
-      background-image: url("data:image/svg+xml,%3Csvg width='239' height='234' viewBox='0 0 239 234' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='88.5605' y='0.700195' width='149' height='149' rx='19.5' stroke='%237367F0' stroke-opacity='0.16'/%3E%3Crect x='0.621094' y='33.761' width='200' height='200' rx='10' fill='%237367F0' fill-opacity='0.08'/%3E%3C/svg%3E%0A");
-    }
-    &:after {
-      width: 180px;
-      height: 180px;
-      content: ' ';
-      position: absolute;
-      z-index: -1;
-      bottom: -30px;
-      right: -56px;
-      background-image: url("data:image/svg+xml,%3Csvg width='181' height='181' viewBox='0 0 181 181' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='1.30469' y='1.44312' width='178' height='178' rx='19' stroke='%237367F0' stroke-opacity='0.16' stroke-width='2' stroke-dasharray='8 8'/%3E%3Crect x='22.8047' y='22.9431' width='135' height='135' rx='10' fill='%237367F0' fill-opacity='0.08'/%3E%3C/svg%3E");
-    }
   }
 
   // For two-steps auth

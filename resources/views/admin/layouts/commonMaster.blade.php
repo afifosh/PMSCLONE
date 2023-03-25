@@ -18,8 +18,6 @@
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}" />
 
-
-
   <!-- Include Styles -->
   @include('admin/layouts/sections/styles')
 
@@ -27,8 +25,7 @@
   @include('admin/layouts/sections/scriptsIncludes')
 </head>
 
-<body style="overflow-x: hidden;">
-
+<body style="overflow-x: hidden;"  class="{{ !empty($body_class) ? $body_class : '' }}">
 
   <!-- Layout Content -->
   @yield('layoutContent')

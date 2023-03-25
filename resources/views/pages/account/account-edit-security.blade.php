@@ -27,6 +27,37 @@ $configData = Helper::appClasses();
 @section('page-script')
 <script src="{{asset('assets/js/pages-account-settings-security.js')}}"></script>
 <script src="{{asset('assets/js/modal-enable-otp.js')}}"></script>
+<script>
+  /*=========================================================================================
+    File Name: ext-component-clipboard.js
+    Description: Copy to clipboard
+    --------------------------------------------------------------------------------------
+    Item Name: Vuexy  - Vuejs, HTML & Laravel Admin Dashboard Template
+    Author: PIXINVENT
+    Author URL: http://www.themeforest.net/user/pixinvent
+==========================================================================================*/
+
+$(document).ready(function () {
+
+var btnCopy = $('.ti-copy'),
+  isRtl = $('html').attr('data-textdirection') === 'rtl';
+
+// copy text on click
+btnCopy.on('click', function () {
+  var tiID = "ti-copy-" + $(this).attr('id');
+  let copyText = document.getElementById(tiID); //document.querySelector("p");
+    navigator.clipboard.writeText(copyText.innerText).then(function() {
+      console.log("Copied to clipboard");
+    }, function(err) {
+      console.error("Could not copy text: ", err);
+    });
+
+  toastr['success']('', 'Copied to clipboard!', {
+    rtl: isRtl
+  });
+});
+             });
+</script>
 @endsection
 
 @section('content')
@@ -113,13 +144,33 @@ $configData = Helper::appClasses();
             @if (auth()->user()->two_factor_secret)
                 @method('DElETE')
                 @if (auth()->user()->two_factor_confirmed_at)
+                <div class="col-md-12">
+      
+            <div class="mb-3 position-relative">
+              <div class="d-flex align-items-center mb-3">
+                <h5 class="mb-0 me-3">Recovery Codes</h5>
+              </div>
+
+        <p>The recovery codes that you saved or printed during setup can be used if you ever lose your authenticator device, if you remove the application, or you remove your site’s entry by mistake. Make sure that you store these codes in a safe place.</p>
+        <div class="row">
+          <div class="col-md-12">
+          @foreach (json_decode(decrypt(auth()->user()->two_factor_recovery_codes)) as $code)
+            <div class="bg-lighter rounded p-3 position-relative mb-1">
+              <div class="dropdown api-key-actions">
+                <a class="btn text-muted hide-arrow p-0"><span class="text-muted cursor-pointer"><i id ="{{ $loop->index }}" class="ti ti-copy ti-sm"></i></span></a>
+              </div>
+              <div class="d-flex align-items-center ">
+              <p class="mb-0 fw-semibold" id="ti-copy-{{ $loop->index }}">{{ $code }}</p>
+              </div>
+            </div>
+            @endforeach
+          </div>
+        </div>
+
+            </div>
+
+          </div>                
                   <div>
-                      <h3>Recovery Codes:</h3>
-                      <ul>
-                          @foreach (json_decode(decrypt(auth()->user()->two_factor_recovery_codes)) as $code)
-                              <li>{{ $code }}</li>
-                          @endforeach
-                      </ul>
                   </div>
                   <button class="btn btn-danger">Disable 2-step verification</button>
                 @else
@@ -147,7 +198,7 @@ $configData = Helper::appClasses();
     <!--/ Two-steps verification -->
 
     <!-- Create an API key -->
-    <div class="card mb-4">
+    <!-- <div class="card mb-4">
       <h5 class="card-header">Create an API key</h5>
       <div class="row">
         <div class="col-md-5 order-md-0 order-1">
@@ -183,11 +234,11 @@ $configData = Helper::appClasses();
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <!--/ Create an API key -->
 
     <!-- API Key List & Access -->
-    <div class="card mb-4">
+    <!-- <div class="card mb-4">
       <h5 class="card-header">API Key List & Access</h5>
       <div class="card-body">
         <p>An API key is a simple encrypted string that identifies an application without any principal. They are useful for accessing public data anonymously, and are used to associate API requests with your project for quota and billing.</p>
@@ -250,7 +301,7 @@ $configData = Helper::appClasses();
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <!--/ API Key List & Access -->
 
     <!-- Recent Devices -->

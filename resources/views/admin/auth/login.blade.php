@@ -3,7 +3,7 @@
     $pageConfigs = ['myLayout' => 'blank'];
 @endphp
 
-@extends('admin.layouts/layoutMaster')
+@extends('admin.layouts/layoutMaster' , ['body_class' => 'authentication'])
 
 @section('title', 'Login')
 
@@ -28,22 +28,25 @@
 @endsection
 
 @section('content')
-    <div class="container-xxl">
+@include('admin._partials.auth-section')
+<div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
+
             <div class="authentication-inner py-4">
                 <!-- Login -->
                 <div class="card">
+                  <!-- Start Header -->
+                  @include('admin._partials.auth-svg-top')
+                 <!-- End Header -->                  
                     <div class="card-body">
                         <!-- Logo -->
                         <div class="app-brand justify-content-center mb-4 mt-2">
                             <a href="{{ url('/') }}" class="app-brand-link gap-2">
-                                <span class="app-brand-logo demo">@include('admin._partials.macros', ['height' => 20, 'withbg' => 'fill: #fff;'])</span>
-                                <span
-                                    class="app-brand-text demo text-body fw-bold ms-1">{{ config('variables.templateName') }}</span>
+                                <span class="app-brand-mainlogo demo">@include('admin._partials.mainlogo', ['height' => 150, 'withbg' => 'fill: #000;'])</span>
                             </a>
                         </div>
                         <!-- /Logo -->
-                        <h4 class="mb-1 pt-2">Welcome to {{ config('variables.templateName') }}! 👋</h4>
+                        <h6 class="mb-1 pt-2">Welcome to {{ config('variables.templateName') }}!</h6>
                         <p class="mb-4">Please sign-in to your account and start the adventure</p>
                         @if (session('status'))
                             <p class="text-success mb-3">{{ session('status') }}</p>
@@ -93,23 +96,6 @@
                                 <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
                             </div>
                         </form>
-                        <div class="divider my-4">
-                            <div class="divider-text">or</div>
-                        </div>
-
-                        <div class="d-flex justify-content-center">
-                            <a href="javascript:;" class="btn btn-icon btn-label-facebook me-3">
-                                <i class="tf-icons fa-brands fa-facebook-f fs-5"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon btn-label-google-plus me-3">
-                                <i class="tf-icons fa-brands fa-google fs-5"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon btn-label-twitter">
-                                <i class="tf-icons fa-brands fa-twitter fs-5"></i>
-                            </a>
-                        </div>
                     </div>
                 </div>
                 <!-- /Register -->

@@ -4,7 +4,7 @@ $pageConfigs = ['myLayout' => 'blank'];
 $configData = Helper::appClasses();
 @endphp
 
-@extends('admin/layouts/layoutMaster')
+@extends('admin.layouts/layoutMaster' , ['body_class' => 'authentication'])
 
 @section('title', 'Account Locked')
 
@@ -31,42 +31,36 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-<div class="authentication-wrapper authentication-cover authentication-bg">
-    <div class="authentication-inner row">
-        <!-- /Left Text -->
-        <div class="d-none d-lg-flex col-lg-7 p-0">
-            <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center">
-                <img src="{{ asset('assets/img/illustrations/auth-login-illustration-'.$configData['style'].'.png') }}" alt="auth-login-cover" class="img-fluid my-5 auth-illustration" data-app-light-img="illustrations/auth-login-illustration-light.png" data-app-dark-img="illustrations/auth-login-illustration-dark.png">
-
-                <img src="{{ asset('assets/img/illustrations/bg-shape-image-'.$configData['style'].'.png') }}" alt="auth-login-cover" class="platform-bg" data-app-light-img="illustrations/bg-shape-image-light.png" data-app-dark-img="illustrations/bg-shape-image-dark.png">
-            </div>
-        </div>
-        <!-- /Left Text -->
-
-        <!-- Login -->
-        <div class="d-flex col-12 col-lg-5 align-items-center p-sm-5 p-4">
-            <div class="w-px-400 mx-auto">
-                <!-- Logo -->
-                <div class="app-brand mb-4 d-flex flex-column align-items-center justify-content-center">
-                    <a href="{{url('/')}}" class="app-brand-link gap-2">
-                        <span class="app-brand-logo demo">@include('_partials.macros',["height"=>120,"withbg"=>'fill: #fff;'])</span>
-                    </a>
-                    <div class="mt-3">
-                        <h5 class="mb-1 fs-5 fw-bold text-uppercase">{{ __('Account Locked') }}</h5>
-                    </div>
-
-                    <div class="mt-4">
-                        <div class="avatar mb-3 lock-screen-avatar">
-                            <img src="{{ Auth::user()->avatar }}" alt class="h-auto rounded-circle">
+@include('admin._partials.auth-section')
+    <div class="container-xxl">
+        <div class="authentication-wrapper authentication-basic container-p-y">
+            <div class="authentication-inner py-4">
+                <!-- Account Lock -->
+                <div class="card">
+                  <!-- Start Header -->
+                  @include('admin._partials.auth-svg-top')
+                 <!-- End Header -->                    
+                    <div class="card-body">
+                        <!-- Logo -->
+                        <div class="app-brand justify-content-center mb-4 mt-2">
+                            <a href="{{ url('/') }}" class="app-brand-link gap-2">
+                                <span class="app-brand-mainlogo demo">@include('admin._partials.mainlogo', ['height' => 150, 'withbg' => 'fill: #000;'])</span>
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="mt-5">
-                        <h5 class="fw-bold fs-6">{{ Auth::user()->full_name }}</h5>
-                    </div>
-                </div>
-
-                <form id="formAuthentication" class="mb-3" action="{{ route('admin.auth.unlock') }}" method="POST">
+                        <!-- /Logo -->                   
+                        <h6 class="mb-1 pt-2">{{ __('Account Locked') }}</h6>
+                        <p class="mb-4">Enter your  password</p>
+                        <div class="text-center">
+                        <div class="mt-4">
+                              <div class="mx-auto d-block mb-3">
+                                <img src="{{ Auth::user()->avatar }}" alt class="h-auto rounded-circle">
+                           </div>
+                         </div>
+                          <div class="mt-2">
+                            <h5 class="fw-bold fs-6">{{ Auth::user()->full_name }}</h5>
+                         </div>
+                         </div>
+                        <form id="formAuthentication" class="mb-3" action="{{ route('admin.auth.unlock') }}" method="POST">
                     @csrf
                     @if ($errors->any())
                     <div class="alert alert-danger alert-dismissible">
@@ -90,9 +84,10 @@ $configData = Helper::appClasses();
                         </button>
                     </div>
                 </form>
+                    </div>
+                </div>
+                <!-- /Account Lock-->
             </div>
         </div>
-        <!-- /Login -->
     </div>
-</div>
 @endsection

@@ -2,7 +2,7 @@
 $configData = Helper::appClasses();
 @endphp
 
-@extends('admin/layouts/layoutMaster')
+@extends('layouts/layoutMaster')
 
 @section('title', 'Home')
 
@@ -15,10 +15,8 @@ $configData = Helper::appClasses();
                     <div class="card-body">
                         <!-- Logo -->
                         <div class="app-brand justify-content-center mb-4 mt-2">
-                            <a href="{{ url('/') }}" class="app-brand-link gap-2">
-                                <span class="app-brand-logo demo">@include('_partials.macros', ['height' => 20, 'withbg' => 'fill: #fff;'])</span>
-                                <span
-                                    class="app-brand-text demo text-body fw-bold">{{ config('variables.templateName') }}</span>
+                           <a href="{{ url('/') }}" class="app-brand-link gap-2">
+                                <span class="app-brand-mainlogo demo">@include('_partials.mainlogo', ['height' => 150, 'withbg' => 'fill: #000;'])</span>
                             </a>
                         </div>
                         <!-- /Logo -->
