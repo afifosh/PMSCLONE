@@ -32,4 +32,4 @@ jobs:
               php artisan migrate:fresh
               php artisan db:seed --force
               nvm use 16 && yarn
-              yarn watch
+              yarn dev
