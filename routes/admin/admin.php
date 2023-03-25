@@ -25,6 +25,10 @@ use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use App\Http\Controllers\Admin\RFP\RFPFileController;
+use App\Http\Controllers\Admin\Setting\BroadcastSettingController;
+use App\Http\Controllers\Admin\Setting\DeliverySettingController;
+use App\Http\Controllers\Admin\Setting\GeneralSettingController;
+use App\Http\Controllers\Admin\Setting\SecuritySettingController;
 use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
@@ -118,10 +122,26 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
     // Route::resource('companies.invitations', InvitationController::class);
     Route::prefix('settings')->name('setting.')->group(function () {
-      Route::get('/', [AppSettingController::class, 'index'])->name('index');
-      Route::get('/email', [AppSettingController::class, 'email'])->name('email');
-      Route::post('general', [AppSettingController::class, 'storeGeneralSettings'])->name('store');
-      Route::post('email', [EmailServiceController::class, 'upsert'])->name('email.upsert');
+      Route::prefix('security')->name('security.')->controller(SecuritySettingController::class)->group(function() {
+        Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+    });
+
+      Route::prefix('general')->name('general.')->controller(GeneralSettingController::class)->group(function() {
+        Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+      });
+
+      Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {
+        Route::get('', 'index')->name('index');
+        Route::get('show', 'show')->name('show');
+        Route::put('', 'update')->name('update');
+      });
+
+      Route::prefix('broadcast')->name('broadcast.')->controller(BroadcastSettingController::class)->group(function() {
+        Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+      });
     });
 
 
