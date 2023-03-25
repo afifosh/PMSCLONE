@@ -44,6 +44,8 @@ class SettingServiceProvider extends ServiceProvider
             BroadcastCacheService::class
         ])->each(fn ($service) => app($service)->load());
 
-        app(SettingCacheService::class)->load(['security']);
+        app(SettingCacheService::class)->load(
+            ['app', 'security']
+        );
     }
 }

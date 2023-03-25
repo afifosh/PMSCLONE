@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Schema;
 class SettingCacheService extends BaseCacheService
 {
     private $cacheManager = [
+        'app' => [
+            'key' => 'app-general-settings',
+            'handler' => \App\Services\Core\Setting\ConfigManager\General::class,
+        ],
         'security' => [
             'key' => 'app-security-settings',
             'handler' => \App\Services\Core\Setting\ConfigManager\Security::class,

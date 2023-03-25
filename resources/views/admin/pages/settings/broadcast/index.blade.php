@@ -26,7 +26,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <select name="broadcast_driver" id="broadcast_driver" data-attr="{{ $settings['broadcast_driver'] ?? '' }}" class="selectpicker w-100" data-style="btn-default">
+                                    <select name="broadcast_driver" id="broadcast_driver" data-attr="{{ $settings['broadcast_driver'] ?? '' }}" class="selectpicker w-100" data-style="btn-default" data-live-search="true">
                                         <option value="pusher" data-tokens="pusher" {{ isset($settings['broadcast_driver']) && $settings['broadcast_driver'] === 'pusher' ? 'selected' : '' }}>
                                             {{ __('Pusher') }}
                                         </option>

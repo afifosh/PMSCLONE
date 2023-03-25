@@ -25,6 +25,7 @@ return [
     ],
     'context' => [
         'app',
+        'security',
         'campaign',
         'list',
         'user',

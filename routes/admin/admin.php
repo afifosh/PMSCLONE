@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use App\Http\Controllers\Admin\RFP\RFPFileController;
 use App\Http\Controllers\Admin\Setting\BroadcastSettingController;
 use App\Http\Controllers\Admin\Setting\DeliverySettingController;
+use App\Http\Controllers\Admin\Setting\GeneralSettingController;
 use App\Http\Controllers\Admin\Setting\SecuritySettingController;
 use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\Admin\Workflow\WorkflowController;
@@ -120,7 +121,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
         Route::put('', 'update')->name('update');
     });
 
-      Route::get('general', function() {})->name('general');
+      Route::prefix('general')->name('general.')->controller(GeneralSettingController::class)->group(function() {
+        Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+      });
 
       Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {
         Route::get('', 'index')->name('index');

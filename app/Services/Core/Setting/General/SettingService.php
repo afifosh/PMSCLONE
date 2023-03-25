@@ -6,16 +6,19 @@ namespace App\Services\Core\Setting\General;
 
 use App\Repositories\SettingRepository;
 use App\Services\Core\BaseService;
+use App\Traits\FileHandler;
 
 class SettingService extends BaseService
 {
+    use FileHandler;
+
     public function update($context = 'app')
     {
         $settings = request()->except('allowed_resource', '_token', '_method');
 
         return collect(array_keys($settings))->map(function ($key) use ($settings, $context) {
 
-            $setting = resolve(SettingRepository::class)
+            $setting = app(SettingRepository::class)
                 ->createSettingInstance($key, $context);
 
             if (request()->file($key)) {
