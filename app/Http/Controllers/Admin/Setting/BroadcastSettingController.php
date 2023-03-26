@@ -45,9 +45,13 @@ class BroadcastSettingController extends Controller
 
         BroadcastSettingUpdated::dispatch();
 
-        return redirect()->route('admin.setting.broadcast.index')->with(
-            'status',
-            __('Broadcast settings updated')
+        return $this->sendRes(
+            'Updated broadcast settings',
+            [
+                'view_data' => view(
+                    'admin.pages.settings.broadcast.index',
+                )->render()
+            ]
         );
     }
 }

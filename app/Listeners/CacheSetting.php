@@ -24,10 +24,10 @@ class CacheSetting
     /**
      * Handle the event.
      *
-     * @param  \App\Events\SecuritySettingUpdated  $event
+     * @param $event
      * @return void
      */
-    public function handle(SecuritySettingUpdated $event)
+    public function handle($event)
     {
         SettingCacheService::handle($this->context);
     }

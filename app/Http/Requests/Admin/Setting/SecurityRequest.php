@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin\Setting;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SettingRequest extends FormRequest
+class SecurityRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,10 @@ class SettingRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_name' => 'required',
-            'company_logo' => 'nullable|image',
-            'company_icon' => 'nullable|image',
-            'timezone' => 'required|in:'.implode(',', timezone_identifiers_list()),
+            'password_history_depth' => 'required|numeric|min:1|max:10',
+            'password_expire_days' => 'required|numeric|gt:1',
+            'timeout_warning_seconds' => 'required|numeric',
+            'timeout_after_seconds' => 'required|numeric|gte:3',
         ];
     }
 }

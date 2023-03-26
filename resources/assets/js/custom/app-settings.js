@@ -82,6 +82,11 @@ let updateElement = (id, newValue) => {
 // general settings below
 let bootGeneralSetting = () => {
     const form = document.getElementById('general-setting-form')
+    
+    if(! form) {
+        return
+    }
+
     registerFileInputListeners(form.querySelectorAll('.img-holder-placeholder'))
 }
 

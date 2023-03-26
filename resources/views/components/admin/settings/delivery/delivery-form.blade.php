@@ -16,7 +16,7 @@
 
         {{ $slot }}
 
-        <button type="submit" class="btn btn-primary me-sm-3">
+        <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">
             @lang('Update')
         </button>
     </div>

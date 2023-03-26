@@ -233,6 +233,10 @@ for (const input of inputs) {
     url: url,
     data: fd, // serializes the form's elements.
     success: function (data) {
+      // remove any validation messages
+      current.closest('form').find('.invalid').removeClass('invalid');
+      current.closest('form').find('.validation-error').remove();
+
       if (data.success) {
         if (data.success) {
           if(data.message){
