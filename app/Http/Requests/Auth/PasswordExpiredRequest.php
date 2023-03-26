@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\Rules\NotFromPasswordHistory;
+use Imanghafoori\PasswordHistory\Rules\NotBeInPasswordHistory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
@@ -28,7 +28,7 @@ class PasswordExpiredRequest extends FormRequest
         return [
             'current_password' => 'required',
             'password' => [
-                'required', 'confirmed', new NotFromPasswordHistory,
+                'required', 'confirmed', NotBeInPasswordHistory::ofUser(auth()->user()),
                 Password::min(6)->letters()->numbers()->mixedCase()->uncompromised(),
             ],
         ];

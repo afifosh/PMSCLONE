@@ -35,11 +35,11 @@ class DeliveryCacheService extends BaseCacheService implements CachesConfigurati
      * @var array
      */
     protected $providers = [
-        'amazon_ses' => App\Services\Core\Setting\Delivery\Configuration\Amazon::class,
-        'mailgun' => App\Services\Core\Setting\Delivery\Configuration\Mailgun::class,
-        'smtp' => App\Services\Core\Setting\Delivery\Configuration\SMTP::class,
-        'mailtrap' => App\Services\Core\Setting\Delivery\Configuration\SMTP::class,
-        'sendmail' => App\Services\Core\Setting\Delivery\Configuration\Sendmail::class,
+        'amazon_ses' => \App\Services\Core\Setting\Delivery\Configuration\Amazon::class,
+        'mailgun' => \App\Services\Core\Setting\Delivery\Configuration\Mailgun::class,
+        'smtp' => \App\Services\Core\Setting\Delivery\Configuration\SMTP::class,
+        'mailtrap' => \App\Services\Core\Setting\Delivery\Configuration\SMTP::class,
+        'sendmail' => \App\Services\Core\Setting\Delivery\Configuration\Sendmail::class,
     ];
 
     /**

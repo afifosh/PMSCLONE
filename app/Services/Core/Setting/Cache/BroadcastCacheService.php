@@ -35,7 +35,7 @@ class BroadcastCacheService extends BaseCacheService implements CachesConfigurat
      * @var array
      */
     protected $providers = [
-        'pusher' => App\Services\Core\Setting\Broadcast\ProviderConfiguration\Pusher::class,
+        'pusher' => \App\Services\Core\Setting\Broadcast\ProviderConfiguration\Pusher::class,
     ];
 
     /**

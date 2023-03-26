@@ -26,6 +26,7 @@ class SettingRequest extends FormRequest
         return [
             'company_name' => 'required',
             'company_logo' => 'nullable|image',
+            'company_icon' => 'nullable|image',
             'timezone' => 'required|in:'.implode(',', timezone_identifiers_list()),
         ];
     }

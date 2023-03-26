@@ -58,6 +58,11 @@ class DeliverySettingController extends Controller
             [
                 'view_data' => view(
                     'admin.pages.settings.delivery.index',
+                    [
+                        'settings' => $this->service->getFormattedDeliverySettings(
+                            [optional($this->service->getDefaultSettings())->value, 'default_mail_email_name']
+                        )
+                    ]
                 )->render()
             ]
         );

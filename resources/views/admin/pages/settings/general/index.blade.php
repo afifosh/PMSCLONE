@@ -54,7 +54,7 @@
                                             {{ __('Change logo') }}
                                         </div>
                                     </div>
-                                    <input class="d-none" name="company_logo" type="file" />
+                                    <input class="d-none" name="company_logo" type="file" accept="image/*" />
                                 </div>
                             </div>
 
@@ -72,7 +72,7 @@
                                             {{ __('Change icon') }}
                                         </div>
                                     </div>
-                                    <input class="d-none" name="company_icon" type="file" />
+                                    <input class="d-none" name="company_icon" type="file" accept=".ico" />
                                 </div>
                             </div>
                             <!-- timezone -->

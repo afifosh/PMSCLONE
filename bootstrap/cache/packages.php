@@ -24,6 +24,13 @@
       0 => 'Fruitcake\\Cors\\CorsServiceProvider',
     ),
   ),
+  'imanghafoori/laravel-password-history' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Imanghafoori\\PasswordHistory\\PasswordHistoryServiceProvider',
+    ),
+  ),
   'intervention/image' => 
   array (
     'providers' => 
