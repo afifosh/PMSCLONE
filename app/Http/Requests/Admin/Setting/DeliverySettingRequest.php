@@ -40,7 +40,7 @@ class DeliverySettingRequest extends FormRequest
         elseif ($this->provider == 'smtp' || $this->provider == 'mailtrap')
             return $this->smtpRules();
         else
-            return ['provider' => 'required'];
+            return array_merge(['provider' => 'required'], $this->basicRules);
     }
 
     /**
@@ -67,6 +67,7 @@ class DeliverySettingRequest extends FormRequest
             'host' => 'required|min:3',
             'access_key_id' => 'required|min:3',
             'secret_access_key' => 'required|min:3',
+            'region' => 'required',
         ], $this->basicRules);
     }
 

@@ -82,7 +82,7 @@
                                 </div>
                             </div>
                             <!-- button to submit form -->
-                            <button type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                            <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
                         </form>
                     </div>
                 </div>

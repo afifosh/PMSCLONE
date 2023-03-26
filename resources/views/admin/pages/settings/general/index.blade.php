@@ -94,7 +94,7 @@
                                 </div>
                             </div>
                             <!-- submit form -->
-                            <button type="submit" class="btn btn-primary me-sm-3 mb-4">@lang('Update')</button>
+                            <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3 mb-4">@lang('Update')</button>
                         </form>
                     </div>
                 </div>

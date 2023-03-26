@@ -37,20 +37,20 @@
                                     </div>
                                 </div>
 
-                                <!-- Password history count -->
+                                <!-- Password history depth -->
                                 <div class="col-md-6 mb-3">
-                                    <label for="passwordExpiryDays" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
-                                        @lang('Password history count')
+                                    <label for="passwordHistoryDepth" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
+                                        @lang('Password history depth')
                                     </label>
-                                    <input name="password_history_count" value="{{ $setting['password_history_count'] ?? config('auth.password_history_count') }}" type="text" class="form-control" id="passwordExpiryDays" placeholder="{{ __('Number of days') }}" aria-describedby="passwordExpiryDays" />
-                                    @error('password_history_count')
+                                    <input name="password_history_depth" value="{{ $setting['password_history_depth'] ?? config('auth.password_history_depth') }}" type="text" class="form-control" id="passwordHistoryDepth" placeholder="{{ __('Password history depth') }}" aria-describedby="passwordHistoryDepth" />
+                                    @error('password_history_depth')
                                     <div class="alert alert-danger alert-dismissible my-2">
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                         {{ $message }}
                                     </div>
                                     @enderror
                                     <div id="defaultFormControlHelp" class="form-text">
-                                        @lang('Please input the number of password history count')
+                                        @lang('Please input the number of password history depth')
                                     </div>
                                 </div>
                             </div>
@@ -92,7 +92,7 @@
                             </div>
 
                             <!-- button to submit form -->
-                            <button type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                            <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
                         </form>
                     </div>
                 </div>

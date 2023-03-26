@@ -28,8 +28,16 @@ class GeneralSettingController extends Controller
     {
         $this->service->update();
 
-        return redirect()->route('admin.setting.general.index');
-
         GeneralSettingUpdated::dispatch();
+
+        return $this->sendRes(
+            'Updated general settings',
+            [
+                'view_data' => view(
+                    'admin.pages.settings.general.index',
+                )->render()
+            ]
+        );
+
     }
 }
