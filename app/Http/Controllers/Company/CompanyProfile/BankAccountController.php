@@ -64,7 +64,8 @@ class BankAccountController extends Controller
       auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->delete();
       auth()->user()->company->bankAccounts()->create($request->validated());
     } else {
-      auth()->user()->company->bankAccounts()->findOrFail($bank_account)->update($request->validated());
+      auth()->user()->company->bankAccounts()->findOrFail($bank_account)->modifications()->delete();
+      auth()->user()->company->bankAccounts()->findOrFail($bank_account)->updateIfDirty($request->validated());
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 5]);
   }

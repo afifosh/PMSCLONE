@@ -65,6 +65,7 @@
     61 => 'Laravolt\\Avatar\\ServiceProvider',
     62 => 'App\\Providers\\EmailServiceProvider',
     63 => 'App\\Providers\\SettingServiceProvider',
+    64 => 'App\\Providers\\CustomBladeDirectiveServiceProvider',
   ),
   'eager' => 
   array (
@@ -115,6 +116,7 @@
     44 => 'Laravolt\\Avatar\\ServiceProvider',
     45 => 'App\\Providers\\EmailServiceProvider',
     46 => 'App\\Providers\\SettingServiceProvider',
+    47 => 'App\\Providers\\CustomBladeDirectiveServiceProvider',
   ),
   'deferred' => 
   array (

@@ -68,4 +68,12 @@ class CompanyDetail extends Model
   {
     return $this->morphMany(Modification::class, 'modifiable');
   }
+
+  public function updateIfDirty($attributes)
+  {
+    $this->fill($attributes);
+    if ($this->isDirty()) {
+      return $this->save();
+    }
+  }
 }

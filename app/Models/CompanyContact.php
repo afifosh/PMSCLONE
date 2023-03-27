@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Approval\CompanyApprovalBaseLogic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Termwind\Components\Dd;
 
 class CompanyContact extends Model
 {
@@ -28,5 +29,13 @@ class CompanyContact extends Model
   public function company()
   {
     return $this->belongsTo(Company::class);
+  }
+
+  public function updateIfDirty($attributes)
+  {
+    $this->fill($attributes);
+    if ($this->isDirty()) {
+      return $this->save();
+    }
   }
 }

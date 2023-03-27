@@ -187,6 +187,7 @@ return [
 
         App\Providers\EmailServiceProvider::class,
         App\Providers\SettingServiceProvider::class,
+        App\Providers\CustomBladeDirectiveServiceProvider::class,
     ],
 
     /*

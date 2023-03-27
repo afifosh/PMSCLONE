@@ -16,7 +16,7 @@ class ContactController extends Controller
   public function index()
   {
     if (request()->ajax()) {
-      $data['contacts'] = auth()->user()->company->contacts;
+      $data['contacts'] = auth()->user()->company->contacts()->with('modifications')->get();
       $data['pending_creation_contacts'] = auth()->user()->company->POCContact()->where('is_update', false)->get();
       return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.index', $data)->render()]);
     }
@@ -50,7 +50,7 @@ class ContactController extends Controller
     if(request()->type == 'pending_creation'){
       $data['contact'] = auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact);
     }else{
-      $data['contact'] = auth()->user()->company->contacts()->findOrFail($contact);
+      $data['contact'] = auth()->user()->company->contacts()->with('modifications')->findOrFail($contact);
     }
 
     return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.create', $data)->render()]);
@@ -62,7 +62,8 @@ class ContactController extends Controller
       auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact)->delete();
       auth()->user()->company->contacts()->create($request->validated());
     }else{
-      auth()->user()->company->contacts()->findOrFail($contact)->update($request->validated());
+      auth()->user()->company->contacts()->findOrFail($contact)->modifications()->delete();
+      auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($request->validated());
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
   }
