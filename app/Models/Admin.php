@@ -6,7 +6,7 @@ use App\Notifications\Admin\VerifyEmail;
 use App\Notifications\Admin\ResetPassword;
 use App\Traits\AuthLogs;
 use App\Traits\HasEnum;
-use Approval\Traits\ApprovesChanges;
+use App\Traits\Approval\ApprovesChanges;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -176,8 +176,24 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
       return $this->belongsToMany(ApprovalLevel::class, ApprovalLevelApprover::class, 'user_id', 'workflow_level_id')->withTimestamps();
     }
 
+    public function approvalLevelIds()
+    {
+      return $this->approvalLevels->pluck('id')->toArray();
+    }
+
     public function approvalLevelNo()
     {
       return auth()->user()->approvalLevels && auth()->user()->approvalLevels[0] ? ApprovalLevel::pluck('id')->search(auth()->user()->approvalLevels[0]->id) + 1 : 0;
+    }
+
+    public function approvalLevelsOrdered() : array
+    {
+      $levels = [];
+      if(auth()->user()->approvalLevelIds()){
+        foreach(auth()->user()->approvalLevelIds() as $id){
+          $levels[] = ApprovalLevel::pluck('id')->search($id) + 1;
+        }
+      }
+      return $levels;
     }
 }

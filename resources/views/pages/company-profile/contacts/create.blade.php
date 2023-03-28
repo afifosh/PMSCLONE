@@ -14,6 +14,7 @@
 
 @if (is_a($contact, 'App\Models\Modification'))
   @php
+      $contact_original = $contact;
       $contact = transformModifiedData($contact->modifications);
   @endphp
   {!! Form::hidden('model_type', 'pending_creation') !!}
@@ -22,6 +23,15 @@
 @php
   $options = $options ?? [];
 @endphp
+
+@isset($contact_original)
+  @forelse ($contact_original->disapprovals as $disapproval)
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{$disapproval->reason}}</strong>
+  </div>
+  @empty
+  @endforelse
+@endisset
 
 <div class="row">
   <div class="form-group col-6">
@@ -64,14 +74,19 @@
     {!! Form::text('fax', $contact['fax'], $options + ['class' => 'form-control', 'placeholder' => __('Fax')]) !!}
     @modificationAlert(@$modifications['fax'])
   </div>
-  <div class="form-group col-6">
+  <div class="form-group col-12">
     {{ Form::label('email', __('Email'), ['class' => 'col-form-label']) }}
     {!! Form::text('email', $contact['email'], $options + ['class' => 'form-control', 'placeholder' => __('Email')]) !!}
     @modificationAlert(@$modifications['email'])
   </div>
-  <div class="form-group col-6">
-    {{ Form::label('poa', __('POA Letter'), ['class' => 'col-form-label']) }}
-    {!! Form::file('poa', $options + ['class' => 'form-control']) !!}
+  <hr class="mt-3">
+  <div class="form-check form-switch col-sm-6 mt-3">
+    {!! Form::checkbox('is_authorized', 'on', @$contact['poa'], $options + ['class' => 'form-check-input', 'data-switch-toggle' => '#poa_letter', 'id' => 'is_authorized']) !!}
+    <label class="form-check-label" for="is_authorized">Is Authorized</label>
+  </div>
+  <div class="form-group col-6 mt-0 {{ @$contact['poa'] && !$options ? '' : 'd-none'}}" id="poa_letter">
+    {{ Form::label('poa', __('Please Provide POA Letter'), ['class' => 'col-form-label mt-0']) }}
+    {!! Form::file('poa', $options + ['class' => 'form-control mt-0']) !!}
   </div>
 </div>
 <div class="mt-3">

@@ -14,6 +14,7 @@
 
 @if (is_a($address, 'App\Models\Modification'))
   @php
+      $address_original = $address;
       $address = transformModifiedData($address->modifications);
   @endphp
   {!! Form::hidden('model_type', 'pending_creation') !!}
@@ -22,6 +23,15 @@
 @php
     $options = isset($options) ? $options : [];
 @endphp
+
+@isset($address_original)
+  @forelse ($address_original->disapprovals as $disapproval)
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{$disapproval->reason}}</strong>
+  </div>
+  @empty
+  @endforelse
+@endisset
 
 <div class="row">
   <div class="form-group col-6">
@@ -106,18 +116,19 @@
   </div>
   <div class="d-flex justify-content-end">
     <div class="ps-2">
-      {!! Form::checkbox('address_type[]', 'purchasing', false, ['class' => 'form-check-input']) !!}
+      {!! Form::checkbox('address_type[]', 'purchasing', $address['address_type'] && in_array('purchasing', $address['address_type']) ?? false, ['class' => 'form-check-input']) !!}
       {!! Form::label('', 'Purchasing Address', ['class' => 'form-check-label']) !!}
     </div>
     <div class="ps-2">
-      {!! Form::checkbox('address_type[]', 'billing', false, ['class' => 'form-check-input']) !!}
+      {!! Form::checkbox('address_type[]', 'billing', $address['address_type'] && in_array('billing', $address['address_type']) ?? false, ['class' => 'form-check-input']) !!}
       {!! Form::label('', 'Payment Address', ['class' => 'form-check-label']) !!}
     </div>
     <div class="ps-2">
-      {!! Form::checkbox('address_type[]', 'rfp_only', false, ['class' => 'form-check-input']) !!}
+      {!! Form::checkbox('address_type[]', 'rfp_only', $address['address_type'] && in_array('rfp_only', $address['address_type']) ?? false, ['class' => 'form-check-input']) !!}
       {!! Form::label('', 'RFP Only Address', ['class' => 'form-check-label']) !!}
     </div>
   </div>
+  <div class="d-flex justify-content-end">@modificationAlert(@@$modifications['address_type'])</div>
 </div>
 <div class="mt-3">
     <div class="btn-flt float-end">

@@ -14,6 +14,7 @@
 
 @if (is_a($bank_account, 'App\Models\Modification'))
   @php
+      $bank_account_original = $bank_account;
       $bank_account = transformModifiedData($bank_account->modifications);
   @endphp
   {!! Form::hidden('model_type', 'pending_creation') !!}
@@ -22,6 +23,15 @@
 @php
   $options = $options ?? [];
 @endphp
+
+@isset($bank_account_original)
+    @forelse ($bank_account_original->disapprovals as $disapproval)
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>{{$disapproval->reason}}</strong>
+    </div>
+    @empty
+    @endforelse
+@endisset
 
 <div class="row">
   <div class="form-group col-6">

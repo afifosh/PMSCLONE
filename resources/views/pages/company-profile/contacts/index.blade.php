@@ -41,7 +41,7 @@
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{$contact['first_name']}} {{$contact['last_name']}} ({{$contact['position']}})</h6>
-            <span class="badge bg-label-{{@$contact['id'] ? 'primary' : 'warning'}}">{{@$contact['id'] ? 'Approved' : 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{@$contact['id'] ? 'primary' : 'warning'}}">{{@$contact['id'] ? 'Approved' : ($pending_creation_contact->disapprovals()->count() ? 'Rejected': 'Pending Approval')}}</span>
           </span>
           <span class="custom-option-body">
             <small>Email : {{$contact['email']}}<br /> Phone : {{$contact['phone']}}</small>

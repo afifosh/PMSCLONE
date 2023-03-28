@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Traits\Approval\CompanyApprovalBaseLogic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Termwind\Components\Dd;
 
 class CompanyContact extends Model
 {
@@ -25,6 +24,8 @@ class CompanyContact extends Model
     'poa',
     'status',
   ];
+
+  public const POA_PATH = 'poa-letters/company';
 
   public function company()
   {

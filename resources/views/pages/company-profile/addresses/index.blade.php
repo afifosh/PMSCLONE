@@ -43,7 +43,7 @@
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{$address['name']}}</h6>
-            <span class="badge bg-label-{{@$address['id'] ? 'primary' : 'warning'}}">{{@$address['id'] ? 'Approved' : 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{@$address['id'] ? 'primary' : 'warning'}}">{{@$address['id'] ? 'Approved' : ($pending_addresse->disapprovals()->count() ? 'Rejected': 'Pending Approval')}}</span>
           </span>
           <span class="custom-option-body">
             <small>{{$address['address_line_1']}}, {{$address['address_line_2']}}, {{$address['address_line_3']}}<br />

@@ -41,7 +41,7 @@
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{ $account['account_no']}} ({{$account['name']}})</h6>
-            <span class="badge bg-label-{{@$account['id'] ? 'primary' : 'warning'}}">{{@$account['id'] ? 'Approved': 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{@$account['id'] ? 'primary' : 'warning'}}">{{@$account['id'] ? 'Approved': ($pending_account->disapprovals()->count() ? 'Rejected': 'Pending Approval')}}</span>
           </span>
           <span class="custom-option-body">
             <small>IBAN Number : {{$account['iban_no']}}<br /> Swift Code : {{$account['swift_code']}}</small>
