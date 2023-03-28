@@ -15,6 +15,14 @@ trait FileHandler
     protected string $storagePrefix = 'public';
     protected bool $isOriginalName = false;
 
+    private function getDirectoryVisibility() 
+    {
+        // if storage prefix is public that means that the public disk is being used
+        // & we will make use of the storage symlink.
+        // to access these files we will need the visibility set to public
+        return $this->storagePrefix === 'public' ? 'public' : 'private';
+    }
+
     public function storeFile(UploadedFile $file, $folder = 'avatar'): string
     {
         $name = $this->generateUploadingFileName($file);
@@ -58,7 +66,10 @@ trait FileHandler
     {
         try {
             $file_path = $subdirectory . '/' . uniqid() . '.' . $file->getClientOriginalExtension();
-            Storage::put($this->storagePrefix . '/' . $file_path, $this->makeImage($file, $height)->__toString(), 'public');
+            Storage::put($this->storagePrefix . '/' . $file_path, $this->makeImage($file, $height)->__toString(), [
+                'directory_visibility' => $this->getDirectoryVisibility(),
+                'visibility' => 'public', // file visibility
+            ]);
             return (object)["success" => true, "message" => "File has been uploaded successfully", "path" => $file_path];
         } catch (Exception $exception) {
             logger('in catch');
