@@ -17,7 +17,7 @@ class CompanyProfileController extends Controller
 
   public function editDetails()
   {
-    $data['detail'] = auth()->user()->company->POCDetail()->first() ? $this->transformModifications(auth()->user()->company->POCDetail()->first()->modifications) : auth()->user()->company->detail ?? new CompanyDetail;
+    $data['detail'] = auth()->user()->company->POCDetail()->first() ? $this->transformModifications(auth()->user()->company->POCDetail()->first()->modifications) : auth()->user()->company->detail()->with('modifications')->first() ?? null;
     $data['countries'] = Country::pluck('name', 'id');
 
     return request()->ajax() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
@@ -35,11 +35,11 @@ class CompanyProfileController extends Controller
   public function updateDetails(DetailsUpdateRequest $request, FileUploadRepository $fileRepo)
   {
     $att = $this->makeData($request, $fileRepo);
-    if ($request->submit_type == 'submit') {
-      auth()->user()->company->detail()->updateOrCreate(['company_id' => auth()->user()->company_id], $att);
-      auth()->user()->company->draftDetail()->where('type', 'detail')->delete();
-    } else {
-      auth()->user()->company->draftDetail()->updateOrCreate(['type' => 'detail'], ['data' => $att]);
+    if(auth()->user()->company->detail){
+      auth()->user()->company->detail->modifications()->delete();
+      auth()->user()->company->detail->updateIfDirty($att);
+    }else{
+      auth()->user()->company->detail()->create($att);
     }
 
     return $request->submit_type == 'submit' ? $this->sendRes('Added Successfully', ['event' => 'functionCall', 'function' => 'triggerNext'])

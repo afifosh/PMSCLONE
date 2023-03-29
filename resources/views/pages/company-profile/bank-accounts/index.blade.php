@@ -1,12 +1,20 @@
 @include('pages.company-profile.header-component', ['head_title' => 'Bank Accounts', 'head_sm' => 'Manage Accounts'])
 <div class="row mb-3">
   @forelse ($bankAccounts as $account)
+    @php
+      $account_original = $account;
+      if ($account->modifications->count()) {
+        $account = transformModifiedData($account->modifications[0]->modifications) + $account->toArray();
+      }
+    @endphp
     <div class="col-md-6 mb-md-3">
       <div class="form-check custom-option custom-option-basic">
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{ $account['account_no']}} ({{$account['name']}})</h6>
-            <span class="badge bg-label-primary">{{$account['id'] ? 'Approved': 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{(!$account_original->modifications->count() && $account['id']) ? 'primary' : 'warning'}}">
+              {{$account['id'] ? ($account_original->modifications->count() ? 'Partially Approved' : 'Approved') : 'Pending Approval'}}
+            </span>
           </span>
           <span class="custom-option-body">
             <small>IBAN Number : {{$account['iban_no']}}<br /> Swift Code : {{$account['swift_code']}}</small>
@@ -33,7 +41,7 @@
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{ $account['account_no']}} ({{$account['name']}})</h6>
-            <span class="badge bg-label-{{@$account['id'] ? 'primary' : 'warning'}}">{{@$account['id'] ? 'Approved': 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{@$account['id'] ? 'primary' : 'warning'}}">{{@$account['id'] ? 'Approved': ($pending_account->disapprovals()->count() ? 'Rejected': 'Pending Approval')}}</span>
           </span>
           <span class="custom-option-body">
             <small>IBAN Number : {{$account['iban_no']}}<br /> Swift Code : {{$account['swift_code']}}</small>

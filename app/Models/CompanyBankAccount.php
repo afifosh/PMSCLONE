@@ -27,4 +27,12 @@ class CompanyBankAccount extends Model
   {
     return $this->belongsTo(Company::class);
   }
+
+  public function updateIfDirty($attributes)
+  {
+    $this->fill($attributes);
+    if ($this->isDirty()) {
+      return $this->save();
+    }
+  }
 }

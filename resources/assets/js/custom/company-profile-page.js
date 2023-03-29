@@ -18,11 +18,11 @@ $(function () {
     });
   }
 });
-$('[data-switch-toggle]').on('click', function () {
+$(document).on('click', '[data-switch-toggle]', function () {
   var target = $(this).data('switch-toggle');
   $(this).is(':checked') ? $(target).removeClass('d-none') : $(target).addClass('d-none');
 });
-$('[data-switch-toggle-in]').on('click', function () {
+$(document).on('click', '[data-switch-toggle-in]', function () {
   var target = $(this).data('switch-toggle-in');
   !$(this).is(':checked') ? $(target).removeClass('d-none') : $(target).addClass('d-none');
 });

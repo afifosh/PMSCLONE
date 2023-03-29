@@ -8,8 +8,6 @@ use App\Http\Requests\Admin\CompanyProfile\ApprovalUpdateRequest;
 use App\Models\ApprovalLevel;
 use App\Models\Company;
 use App\Models\Country;
-use App\Models\Modification;
-use Illuminate\Http\Request;
 
 class ApprovalRequestController extends Controller
 {
@@ -63,6 +61,8 @@ class ApprovalRequestController extends Controller
         auth()->user()->approve($mod);
       } else {
         auth()->user()->disapprove($mod, $request->disapproval_reason[$modification_id]);
+        $company->forceFill(['approval_status' => 3, 'approval_level' => 1]);
+        $company->save();
       }
       $company->incApprovalLevelIfRequired();
     }

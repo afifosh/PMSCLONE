@@ -186,6 +186,7 @@ return [
         Laravolt\Avatar\ServiceProvider::class,
 
         App\Providers\SettingServiceProvider::class,
+        App\Providers\CustomBladeDirectiveServiceProvider::class,
     ],
 
     /*

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Company\CompanyProfile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Company\CompanyProfile\ContactsUpdateRequest;
 use App\Models\CompanyContact;
+use App\Repositories\FileUploadRepository;
+use App\Traits\ImageTrait;
 
 class ContactController extends Controller
 {
@@ -16,8 +18,8 @@ class ContactController extends Controller
   public function index()
   {
     if (request()->ajax()) {
-      $data['contacts'] = auth()->user()->company->contacts;
-      $data['pending_creation_contacts'] = auth()->user()->company->POCContact()->where('is_update', false)->get();
+      $data['contacts'] = auth()->user()->company->contacts()->with('modifications', 'modifications.disapprovals')->get();
+      $data['pending_creation_contacts'] = auth()->user()->company->POCContact()->where('is_update', false)->with('disapprovals')->get();
       return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.index', $data)->render()]);
     }
   }
@@ -28,17 +30,17 @@ class ContactController extends Controller
     return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.create', $data)->render()]);
   }
 
-  public function store(ContactsUpdateRequest $request)
+  public function store(ContactsUpdateRequest $request, FileUploadRepository $fileUploadRepository)
   {
-    auth()->user()->company->contacts()->create($request->validated());
+    auth()->user()->company->contacts()->create($this->uploadPOA($request, $fileUploadRepository));
     return $this->sendRes('Added Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
   }
 
   public function show($contact)
   {
-    if(request()->type == 'pending_creation'){
-      $data['contact'] = auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact);
-    }else{
+    if (request()->type == 'pending_creation') {
+      $data['contact'] = auth()->user()->company->POCContact()->where('is_update', false)->with('approvals', 'disapprovals')->findOrFail($contact);
+    } else {
       $data['contact'] = auth()->user()->company->contacts()->findOrFail($contact);
     }
     $data['options'] = ['disabled' => 'disabled'];
@@ -47,22 +49,29 @@ class ContactController extends Controller
 
   public function edit($contact)
   {
-    if(request()->type == 'pending_creation'){
+    if (request()->type == 'pending_creation') {
       $data['contact'] = auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact);
-    }else{
-      $data['contact'] = auth()->user()->company->contacts()->findOrFail($contact);
+    } else {
+      $data['contact'] = auth()->user()->company->contacts()->with('modifications')->findOrFail($contact);
     }
 
     return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.create', $data)->render()]);
   }
 
-  public function update(ContactsUpdateRequest $request, $contact)
+  public function update(ContactsUpdateRequest $request, $contact, FileUploadRepository $fileRepository)
   {
     if (request()->model_type == 'pending_creation') {
-      auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact)->delete();
-      auth()->user()->company->contacts()->create($request->validated());
-    }else{
-      auth()->user()->company->contacts()->findOrFail($contact)->update($request->validated());
+      $cont = auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact);
+      if($request->hasFile('poa') || !$request->is_authorized)
+        @$cont->modifications['poa']['modified'] ? ImageTrait::deleteImage($cont->modifications['poa']['modified'], 'public') : '';
+      auth()->user()->company->contacts()->create($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
+      $cont->delete();
+    } else {
+      $cont = auth()->user()->company->contacts()->findOrFail($contact)->modifications();
+      if($request->hasFile('poa') || !$request->is_authorized)
+        @$cont[0]->modifications['poa']['modified'] ? ImageTrait::deleteImage($cont->modifications['poa']['modified'], 'public') : '';
+      auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
+      $cont->delete();
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
   }
@@ -75,5 +84,20 @@ class ContactController extends Controller
       auth()->user()->company->contacts()->findOrFail($contact)->delete();
     }
     return $this->sendRes('Deleted Successfully', ['event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
+  }
+
+  public function uploadPOA(ContactsUpdateRequest $request, FileUploadRepository $fileRepository)
+  {
+    $poa = [];
+    $all = $request->validated();
+    if ($request->hasFile('poa')) {
+      $path = CompanyContact::POA_PATH . '/' . auth()->user()->company_id;
+      $poa['poa'] = $path . '/' . $fileRepository->addAttachment($request->file('poa'), $path, 'public');
+    }else{
+      if(!$request->is_authorized){
+        unset($all['poa']);
+      }
+    }
+    return $poa  + $all;
   }
 }

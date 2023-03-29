@@ -1,12 +1,20 @@
 @include('pages.company-profile.header-component', ['head_title' => 'Contact Persons', 'head_sm' => 'Manage Your Contacts'])
 <div class="row mb-3">
   @forelse ($contacts as $contact)
+  @php
+    $contact_original = $contact;
+    if ($contact->modifications->count()) {
+      $contact = transformModifiedData($contact->modifications[0]->modifications) + $contact->toArray();
+    }
+  @endphp
     <div class="col-md-6 mb-md-3">
       <div class="form-check custom-option custom-option-basic">
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{$contact['first_name']}} {{$contact['last_name']}} ({{$contact['position']}})</h6>
-            <span class="badge bg-label-{{$contact['id'] ? 'primary' : 'warning'}}">{{$contact['id'] ? 'Approved' : 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{(!$contact_original->modifications->count() && $contact['id']) ? 'primary' : 'warning'}}">
+              {{$contact['id'] ? ($contact_original->modifications->count() ? 'Partially Approved' : 'Approved') : 'Pending Approval'}}
+            </span>
           </span>
           <span class="custom-option-body">
             <small>Email : {{$contact['email']}}<br /> Phone : {{$contact['phone']}}</small>
@@ -33,7 +41,7 @@
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{$contact['first_name']}} {{$contact['last_name']}} ({{$contact['position']}})</h6>
-            <span class="badge bg-label-{{@$contact['id'] ? 'primary' : 'warning'}}">{{@$contact['id'] ? 'Approved' : 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{@$contact['id'] ? 'primary' : 'warning'}}">{{@$contact['id'] ? 'Approved' : ($pending_creation_contact->disapprovals()->count() ? 'Rejected': 'Pending Approval')}}</span>
           </span>
           <span class="custom-option-body">
             <small>Email : {{$contact['email']}}<br /> Phone : {{$contact['phone']}}</small>

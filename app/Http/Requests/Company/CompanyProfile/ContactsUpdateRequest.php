@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Company\CompanyProfile;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ContactsUpdateRequest extends FormRequest
 {
@@ -33,7 +34,11 @@ class ContactsUpdateRequest extends FormRequest
             'mobile' => 'required|string|max:30',
             'email' => 'required|email',
             'fax' => 'required|string|max:30',
-            // 'poa' => 'required|string',
+            'is_authorized' => 'string|nullable',
+            'poa' => Rule::requiredIf(function () {
+              return $this->is_authorized && !request()->contact;
+            }),
+            // 'required_if:is_authorized,on'
         ];
     }
 
@@ -49,7 +54,7 @@ class ContactsUpdateRequest extends FormRequest
         'mobile.required' => 'Mobile is required',
         'email.required' => 'Email is required',
         'fax.required' => 'Fax is required',
-        // 'poa.required' => 'POA is required',
+        'poa.required_if' => 'POA is required',
       ];
     }
 }

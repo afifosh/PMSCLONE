@@ -25,8 +25,18 @@ class CompanyContact extends Model
     'status',
   ];
 
+  public const POA_PATH = 'poa-letters/company';
+
   public function company()
   {
     return $this->belongsTo(Company::class);
+  }
+
+  public function updateIfDirty($attributes)
+  {
+    $this->fill($attributes);
+    if ($this->isDirty()) {
+      return $this->save();
+    }
   }
 }

@@ -64,7 +64,8 @@ class AddressController extends Controller
       auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address)->delete();
       auth()->user()->company->addresses()->create($request->validated());
     }else{
-      auth()->user()->company->addresses()->findOrFail($address)->update($request->validated());
+      auth()->user()->company->addresses()->findOrFail($address)->modifications()->delete();
+      auth()->user()->company->addresses()->findOrFail($address)->updateIfDirty($request->validated());
     }
 
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 3]);

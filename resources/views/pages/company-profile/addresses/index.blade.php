@@ -1,12 +1,20 @@
 @include('pages.company-profile.header-component', ['head_title' => 'Addresses', 'head_sm' => 'Manage Addresses'])
 <div class="row mb-3">
   @forelse ($addresses as $address)
+    @php
+      $address_original = $address;
+      if ($address->modifications->count()) {
+        $address = transformModifiedData($address->modifications[0]->modifications) + $address->toArray();
+      }
+    @endphp
     <div class="col-md-6 mb-md-3">
       <div class="form-check custom-option custom-option-basic">
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{$address['name']}}</h6>
-            <span class="badge bg-label-primary">{{$address['id'] ? 'Approved' : 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{(!$address_original->modifications->count() && $address['id']) ? 'primary' : 'warning'}}">
+              {{$address['id'] ? ($address_original->modifications->count() ? 'Partially Approved' : 'Approved') : 'Pending Approval'}}
+            </span>
           </span>
           <span class="custom-option-body">
             <small>{{$address['address_line_1']}}, {{$address['address_line_2']}}, {{$address['address_line_3']}}<br />
@@ -35,7 +43,7 @@
         <label class="form-check-label custom-option-content">
           <span class="custom-option-header mb-2">
             <h6 class="fw-semibold mb-0">{{$address['name']}}</h6>
-            <span class="badge bg-label-{{@$address['id'] ? 'primary' : 'warning'}}">{{@$address['id'] ? 'Approved' : 'Pending Approval'}}</span>
+            <span class="badge bg-label-{{@$address['id'] ? 'primary' : 'warning'}}">{{@$address['id'] ? 'Approved' : ($pending_addresse->disapprovals()->count() ? 'Rejected': 'Pending Approval')}}</span>
           </span>
           <span class="custom-option-body">
             <small>{{$address['address_line_1']}}, {{$address['address_line_2']}}, {{$address['address_line_3']}}<br />
