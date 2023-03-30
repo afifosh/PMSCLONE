@@ -110,6 +110,12 @@
       "slug": "admin.approval-requests.index"
     },
     {
+      "url": "/admin/kyc-documents",
+      "name": "Approval Documents",
+      "icon": "menu-icon fas fa-building",
+      "slug": "admin.kyc-documents.index"
+    },
+    {
       "url": "/admin/settings/general",
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",

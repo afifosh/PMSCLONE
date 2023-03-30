@@ -172,4 +172,20 @@ class Company extends BaseModel
   {
     return $this->approval_status !=2 ;
   }
+
+  public function getPOCLocalityType()
+  {
+    $locality_type = null;
+    if (auth()->user()->company->POCDetail()->where('is_update', 0)->exists()) {
+      $locality_type = @auth()->user()->company->POCDetail()->where('is_update', 0)->first()->modifications['locality_type']['modified'];
+    }
+    if (!$locality_type && auth()->user()->company->POCDetail()->where('is_update', 1)->exists()) {
+      $locality_type = @auth()->user()->company->POCDetail()->where('is_update', 1)->first()->modifications['locality_type']['modified'];
+    }
+    if (!$locality_type && auth()->user()->company->detail && auth()->user()->company->detail->locality_type) {
+      $locality_type = auth()->user()->company->detail->locality_type;
+    }
+
+    return $locality_type;
+  }
 }

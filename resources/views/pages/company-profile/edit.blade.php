@@ -66,7 +66,7 @@
       <div class="line">
         <i class="ti ti-chevron-right"></i>
       </div>
-      <div class="step step-index-3" data-target="#company-documents">
+      <div class="step step-index-3" data-target="#company-documents" data-href="{{route('company.kyc-documents.index')}}">
         <button type="button" class="step-trigger">
           <span class="bs-stepper-circle">4</span>
           <span class="bs-stepper-label">
@@ -100,15 +100,6 @@
         <div id="company-addresses" class="content">
         </div>
         <div id="company-documents" class="content">
-          <div class="col-12 d-flex justify-content-between">
-            <button class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
-              <span class="align-middle d-sm-inline-block d-none">Previous</span>
-            </button>
-            <div>
-              <button class="btn btn-outline-secondary" type="button">Save Draft</button>
-              <button class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
-            </div>
-          </div>
         </div>
         <div id="company-bank-accounts" class="content">
         </div>

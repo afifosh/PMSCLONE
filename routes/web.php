@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LockModeController;
 use App\Http\Controllers\Company\CompanyProfile\AddressController;
 use App\Http\Controllers\Company\CompanyProfile\BankAccountController;
 use App\Http\Controllers\Company\CompanyProfile\ContactController;
+use App\Http\Controllers\Company\CompanyProfile\DocumentController;
 use App\Http\Controllers\Company\CompanyProfileController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\company\InvitationController;
@@ -58,6 +59,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
     Route::prefix('company-profile')->name('company.')->group(function (){
       Route::resource('contacts', ContactController::class);
       Route::resource('addresses', AddressController::class);
+      Route::resource('kyc-documents', DocumentController::class);
       Route::resource('bank-accounts', BankAccountController::class);
     });
 

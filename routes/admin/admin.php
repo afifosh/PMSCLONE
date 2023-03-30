@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\Admin\Company\ApprovalRequestController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
+use App\Http\Controllers\Admin\Company\KycDocumentController;
 use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
@@ -113,6 +114,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('file-manager', [AppsController::class, 'file_manager'])->name('app-file-manager');
 
     Route::resource('workflows', WorkflowController::class)->only(['index', 'edit', 'update']);
+    Route::resource('kyc-documents', KycDocumentController::class);
 
     Route::get('approval-requests/level/{level}/companies/{company}', [ApprovalRequestController::class, 'getCompanyReqeust'])->name('approval-requests.level.companies.show');
     Route::post('approval-requests/level/{level}/companies/{company}', [ApprovalRequestController::class, 'updateApprovalRequest'])->name('approval-requests.level.companies.update');
