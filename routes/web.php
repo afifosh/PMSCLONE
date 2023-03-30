@@ -7,6 +7,7 @@ use App\Http\Controllers\Company\CompanyProfile\BankAccountController;
 use App\Http\Controllers\Company\CompanyProfile\ContactController;
 use App\Http\Controllers\Company\CompanyProfileController;
 use App\Http\Controllers\Company\DashboardController;
+use App\Http\Controllers\Company\EmailAccount\EmailAccountController;
 use App\Http\Controllers\company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
@@ -48,6 +49,9 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
 
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
+
+
+    Route::resource('emails', EmailAccountController::class);
 
     Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
       Route::get('/', 'editDetails')->name('editDetails');
