@@ -105,7 +105,7 @@ class Company extends BaseModel
     $level = $level ? $level : $this->approval_level;
     if ($this->POCmodifications()->count() > 0) {
       foreach ($this->POCmodifications()->get() as $modification) {
-        if ($level > $modification->approvals()->count()) {
+        if (($level > $modification->approvals()->count()) && $modification->disapprovals()->count() == 0) {
           $is_inc = false;
           break;
         }
@@ -170,7 +170,7 @@ class Company extends BaseModel
 
   public function isEditable()  //user can make changes if not sent for approval
   {
-    return $this->approval_status !=2 ;
+    return $this->approval_status != 2;
   }
 
   public function getPOCLocalityType()
@@ -187,5 +187,32 @@ class Company extends BaseModel
     }
 
     return $locality_type;
+  }
+
+  public function getPOCLogo(): ?string
+  {
+    $logo = null;
+    if (auth()->user()->company->POCDetail()->where('is_update', 0)->exists()) {
+      $logo = @auth()->user()->company->POCDetail()->where('is_update', 0)->first()->modifications['logo']['modified'];
+    }
+    if (!$logo && auth()->user()->company->POCDetail()->where('is_update', 1)->exists()) {
+      $logo = @auth()->user()->company->POCDetail()->where('is_update', 1)->first()->modifications['logo']['modified'];
+    }
+    if (!$logo && auth()->user()->company->detail && auth()->user()->company->detail->logo) {
+      $logo = auth()->user()->company->detail->logo;
+    }
+
+    return $logo;
+  }
+
+  public function getPOCLogoUrl(): ?string
+  {
+    $logo = $this->getPOCLogo();
+    if ($logo && Storage::disk('public')->exists($logo))
+      $logo = Storage::disk('public')->url($logo);
+
+    $logo = $logo ? $logo : auth()->user()->company->avatar;
+
+    return $logo;
   }
 }

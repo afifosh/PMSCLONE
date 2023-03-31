@@ -1,6 +1,4 @@
-<form action="{{route('admin.approval-requests.level.companies.update', ['company' => $company->id, 'level' => $company->approval_level])}}" method="post">
-  @csrf
-  {!! Form::hidden('modification_ids[]', $detail['modification_id']) !!}
+{!! Form::hidden('modification_ids[]', $detail['modification_id']) !!}
 <div class="card-body">
   <div class="d-flex align-items-start align-items-sm-center gap-4">
     {{-- <img src="{{ $detail->avatar }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" /> --}}
@@ -106,9 +104,7 @@
       <span class="align-middle d-sm-inline-block d-none">Previous</span>
     </button>
     <div>
-      <button class="btn btn-primary btn-next do-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
-      <button type="button" data-form="ajax-form" class="d-none"></button>
+      <button class="btn btn-primary" onclick="triggerNext();" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
 </div>
-</form>

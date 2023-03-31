@@ -28,7 +28,7 @@ class DetailsUpdateRequest extends FormRequest
       'submit_type' => 'required|string',
       'name' => 'required_if:submit_type,submit|nullable|string|max:255',
       'logo' => Rule::requiredIf(function () {
-        return $this->submit_type == 'submit' && !@auth()->user()->company->detail->logo;
+        return $this->submit_type == 'submit' && !@auth()->user()->company->getPOCLogo();
       }),
       'website' => 'required_if:submit_type,submit|nullable|url|max:255',
       'locality_type' => 'required_if:submit_type,submit|nullable|integer',

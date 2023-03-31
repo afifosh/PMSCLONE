@@ -17,7 +17,8 @@ class CompanyProfileController extends Controller
 
   public function editDetails()
   {
-    $data['detail'] = auth()->user()->company->POCDetail()->first() ? $this->transformModifications(auth()->user()->company->POCDetail()->first()->modifications) : auth()->user()->company->detail()->with('modifications')->first() ?? null;
+    $data['POCDetail'] = auth()->user()->company->POCDetail()->exists() ? auth()->user()->company->POCDetail()->with('approvals', 'disapprovals')->latest()->first() : null;
+    $data['detail'] = $data['POCDetail'] ? $this->transformModifications($data['POCDetail']->modifications) : auth()->user()->company->detail()->with('modifications')->first() ?? null;
     $data['countries'] = Country::pluck('name', 'id');
 
     return request()->ajax() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
@@ -39,6 +40,7 @@ class CompanyProfileController extends Controller
       auth()->user()->company->detail->modifications()->delete();
       auth()->user()->company->detail->updateIfDirty($att);
     }else{
+      auth()->user()->company->POCDetail()->delete();
       auth()->user()->company->detail()->create($att);
     }
 
@@ -54,7 +56,7 @@ class CompanyProfileController extends Controller
     }
     $att = isset($logo) ? ['logo' => $logo] + $request->validated() : $request->validated();
     if (!isset($logo))
-      unset($att['logo']);
+      $att['logo']= auth()->user()->company->getPOCLogo();
     if (!$request->boolean('is_subsidory'))
       $att['parent_company'] = null;
     if (!$request->boolean('is_parent'))

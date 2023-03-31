@@ -70,7 +70,7 @@ class ApprovalRequestsDataTable extends DataTable
   public function query(Company $model): QueryBuilder
   {
     $query = $model->newQuery();
-    $query->where('approval_status', 2)->whereIn('approval_level', auth()->user()->approvalLevelsOrdered())->with('addedBy');
+    $query->whereIn('approval_status', [2, 3])->whereIn('approval_level', auth()->user()->approvalLevelsOrdered())->with('addedBy');
     return $query->applyRequestFilters();
   }
 

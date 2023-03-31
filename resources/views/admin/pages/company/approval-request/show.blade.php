@@ -89,7 +89,9 @@
       </div>
     </div>
     <div class="bs-stepper-content">
-      {{-- < onSubmit="return false"> --}}
+      <form action="{{route('admin.approval-requests.level.companies.update', ['company' => $company->id, 'level' => $company->approval_level])}}" method="post">
+        @csrf
+        {{-- < onSubmit="return false"> --}}
         <!-- Account Details -->
         <div id="company-details" class="content">
           <div class="content-header mb-3">
@@ -116,14 +118,14 @@
               <span class="align-middle d-sm-inline-block d-none">Previous</span>
             </button>
             <div>
-              <button class="btn btn-outline-secondary" type="button">Save Draft</button>
-              <button class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
+              <button class="btn btn-primary" onclick="triggerNext();"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
             </div>
           </div>
         </div>
         <div id="company-bank-accounts" class="content">
           @include('admin.pages.company.approval-request.banks-form')
         </div>
+      </form>
     </div>
   </div>
 </div>

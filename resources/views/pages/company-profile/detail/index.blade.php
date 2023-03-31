@@ -11,8 +11,16 @@
 <form action="{{route('company.updateDetails')}}" method="post">
   @csrf
 <div class="card-body">
+  @if($POCDetail && $POCDetail->disapprovals->count())
+    @forelse ($POCDetail->disapprovals as $disapproval)
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>{{$disapproval->reason}}</strong>
+    </div>
+    @empty
+    @endforelse
+  @endif
   <div class="d-flex align-items-start align-items-sm-center gap-4">
-    <img src="{{ auth('web')->user()->company->avatar }}" data-default="{{ auth('web')->user()->company->avatar }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" />
+    <img src="{{ auth()->user()->company->getPOCLogoUrl() }}" data-default="{{ auth()->user()->company->getPOCLogoUrl() }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" />
     <div class="button-wrapper">
       <label for="upload" class="btn btn-primary me-2 mb-3" tabindex="0">
         <span class="d-none d-sm-block">Upload Logo</span>
