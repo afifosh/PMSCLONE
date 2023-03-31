@@ -2,21 +2,29 @@
 
 namespace App\Http\Controllers\Company\EmailAccount;
 
+use App\Contracts\Repositories\EmailAccountRepository;
+use App\Criteria\EmailAccount\EmailAccountsForUserCriteria;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EmailAccountRequest;
 use App\Models\EmailAccount;
 
 class EmailAccountController extends Controller
 {
- 
-    public function __construct()
+     /**
+     * Initialize new EmailAccountController instance.
+     *
+     * @param \App\Contracts\Repositories\EmailAccountRepository $repository
+     */
+    public function __construct(protected EmailAccountRepository $repository)
     {
     }
 
     public function index()
     {
-        $accounts = EmailAccount::where('user_id',\Auth::user()->id)->get();
-
+        // $accounts = EmailAccount::where('user_id',\Auth::user()->id)->get();
+        $accounts = $this->repository->withResponseRelations()
+        ->pushCriteria(new EmailAccountsForUserCriteria(\Auth::user()))
+        ->all();
         return view('pages.emails.index',compact('accounts'));
     }
 
@@ -29,11 +37,11 @@ class EmailAccountController extends Controller
      */
     public function show($id)
     {
-        // $account = $this->repository->withResponseRelations()->find($id);
+         $account = $this->repository->withResponseRelations()->find($id);
 
-        // $this->authorize('view', $account);
+         $this->authorize('view', $account);
 
-        // return $this->response(new EmailAccountResource($account));
+         return view('pages.emails.show',compact('account'));
     }
 
     /**
@@ -45,11 +53,11 @@ class EmailAccountController extends Controller
      */
     public function store(EmailAccountRequest $request)
     {
-        // $model = $this->repository->create($request->all());
+        $model = $this->repository->create($request->all());
 
-        // $account = $this->repository->withResponseRelations()->find($model->id);
+        $account = $this->repository->withResponseRelations()->find($model->id);
 
-        // $account->wasRecentlyCreated = true;
+        $account->wasRecentlyCreated = true;
 
         // return $this->response(
         //     new EmailAccountResource($account),

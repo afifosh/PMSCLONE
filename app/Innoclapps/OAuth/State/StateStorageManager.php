@@ -24,7 +24,7 @@ class StateStorageManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->container['config']['innoclapps.oauth.state.storage'];
+        return 'session';
     }
 
     /**

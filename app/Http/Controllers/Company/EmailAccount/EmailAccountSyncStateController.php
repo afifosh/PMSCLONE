@@ -10,7 +10,7 @@
  * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
  */
 
-namespace App\Http\Controllers\EmailAccount;
+namespace App\Http\Controllers\Company\EmailAccount;
 
 use App\Enums\SyncState;
 use App\Http\Controllers\Controller;

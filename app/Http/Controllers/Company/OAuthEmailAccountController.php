@@ -33,11 +33,10 @@ class OAuthEmailAccountController extends Controller
     public function connect($type, $providerName, Request $request, OAuthManager $manager)
     {
         abort_if(
-            ! $request->user()->isSuperAdmin() && EmailAccountType::from($type) === EmailAccountType::SHARED,
+             EmailAccountType::from($type) === EmailAccountType::SHARED,
             403,
             'Unauthorized action.'
         );
-
         return redirect($manager->createProvider($providerName)
             ->getAuthorizationUrl(['state' => $this->createState($request, $type, $manager)]));
     }
@@ -55,9 +54,9 @@ class OAuthEmailAccountController extends Controller
     {
         return OAuthState::putWithParameters([
             'return_url'         => '/mail/accounts?viaOAuth=true',
-            'period'             => $request->period,
+            'period'             => '',
             'email_account_type' => $type,
-            're_auth'            => $request->re_auth,
+            're_auth'            => '',
             'key'                => $manager->generateRandomState(),
         ]);
     }

@@ -65,21 +65,14 @@ class InnoclappsServiceProvider extends ServiceProvider
     * @var array
     */
     public $bindings = [
-        DashboardRepository::class             => DashboardRepositoryEloquent::class,
-        WorkflowRepository::class              => WorkflowRepositoryEloquent::class,
         PermissionRepository::class            => PermissionRepositoryEloquent::class,
         MailableRepository::class              => MailableRepositoryEloquent::class,
         RoleRepository::class                  => RoleRepositoryEloquent::class,
-        CountryRepository::class               => CountryRepositoryEloquent::class,
         OAuthAccountRepository::class          => OAuthAccountRepositoryEloquent::class,
         FilterRepository::class                => FilterRepositoryEloquent::class,
         PendingMediaRepository::class          => PendingMediaRepositoryEloquent::class,
         MediaRepository::class                 => MediaRepositoryEloquent::class,
         CustomFieldRepository::class           => CustomFieldRepositoryEloquent::class,
-        ZapierHookRepository::class            => ZapierHookRepositoryEloquent::class,
-        PinnedTimelineSubjectRepository::class => PinnedTimelineSubjectRepositoryEloquent::class,
-        PatchRepository::class                 => PatchRepositoryEloquent::class,
-        ImportRepository::class                => ImportRepositoryEloquent::class,
     ];
 
     /**

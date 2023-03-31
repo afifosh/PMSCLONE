@@ -25,6 +25,27 @@
 @section('page-script')
 <script src="{{asset('assets/js/custom/company-profile-page.js')}}"></script>
 <script>
+    $('#account_type').on('change',function(){
+        if($(this).find(':selected').val()==='Imap'){
+            $("#imap-area").css("filter","none");
+        }
+        else{
+            $("#imap-area").css("filter","blur(4px)");
+        }
+    });
+    $('#save-form').on('click',function(){
+      if($('#account_type').find(':selected').val()==='Gmail'){
+       window.location=("{{url('/mail/accounts/personal/google/connect')}}");
+        }
+        else if($('#account_type').find(':selected').val()==='Outlook'){
+          var url= '/mail/accounts/' + 'personal' + '/microsoft/connect';
+
+        }
+        else{
+
+        }
+    });
+    
 </script>
 @endsection
 
@@ -941,9 +962,20 @@
           </li>
         </ul>
         </div>
+       
+      </div>
+      <div class="card-footer">
+      <div class="col-md-12">
+
+            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
+            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" class="btn btn-primary">Connect Personal Account</button>
+        </div>
       </div>
     </div>
   </div>
+ @include('pages.emails.partials.connect-account')
+</div>
+
 @endif
 
 @endsection

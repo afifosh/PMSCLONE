@@ -153,6 +153,18 @@
       0 => 'Pion\\Laravel\\ChunkUpload\\Providers\\ChunkUploadServiceProvider',
     ),
   ),
+  'plank/laravel-mediable' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Plank\\Mediable\\MediableServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'MediaUploader' => 'Plank\\Mediable\\Facades\\MediaUploader',
+      'ImageManipulator' => 'Plank\\Mediable\\Facades\\ImageManipulator',
+    ),
+  ),
   'rappasoft/laravel-authentication-log' => 
   array (
     'providers' => 

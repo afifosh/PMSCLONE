@@ -10,7 +10,7 @@
  * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
  */
 
-namespace App\Http\Controllers\EmailAccount;
+namespace App\Http\Controllers\Company\EmailAccount;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmailAccountResource;

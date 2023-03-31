@@ -127,6 +127,61 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+     /*
+    |--------------------------------------------------------------------------
+    | Mail client configuration
+    |--------------------------------------------------------------------------
+    |
+    */
+    'mail_client' => [
+        'sync' => [
+            /*
+            |--------------------------------------------------------------------------
+            | Sync mail client interval definition
+            |--------------------------------------------------------------------------
+            |
+            | The mail client synchronizer, sync emails every 5 minutes, the interval can be defined below.
+            |
+            | The accepted values are: Minute, TwoMinutes, ThreeMinutes, FourMinutes, FiveMinutes, TenMinutes, FifteenMinutes,
+            | ThirtyMinutes, hourly, TwoHours, ThreeHours, FourHours, SixHours
+            */
+            'every' => env('MAIL_CLIENT_SYNC_INTERVAL', 'ThreeMinutes'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Synchronization config
+    |--------------------------------------------------------------------------
+    |
+    */
+    'sync' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Synchronization interval definition
+        |--------------------------------------------------------------------------
+        |
+        | For periodic synchronization like Google, the events by default
+        | are synchronized every 3 minutes, the interval can be defined below.
+        |
+        | The accepted values are: Minute, TwoMinutes, ThreeMinutes, FourMinutes, FiveMinutes, TenMinutes, FifteenMinutes,
+        | ThirtyMinutes, hourly, TwoHours, ThreeHours, FourHours, SixHours
+        */
+        'every' => env('SYNC_INTERVAL', 'ThreeMinutes'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application security config
+    |--------------------------------------------------------------------------
+    | Here you can specify whether HTML purification should be performed on all
+    | request data which contains HTML.
+    |
+    */
+    'security' => [
+        'purify' => env('HTML_PURIFY', true),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -173,6 +228,8 @@ return [
         /*
          * Application Service Providers...
          */
+        App\Innoclapps\InnoclappsServiceProvider::class,
+
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
@@ -184,7 +241,8 @@ return [
         Spatie\Permission\PermissionServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         Laravolt\Avatar\ServiceProvider::class,
-
+        App\Providers\InboxServiceProvider::class,
+        App\Innoclapps\OAuth\OAuthServiceProvider::class,
         App\Providers\SettingServiceProvider::class,
         App\Providers\CustomBladeDirectiveServiceProvider::class,
     ],
