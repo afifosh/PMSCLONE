@@ -298,7 +298,7 @@ class Client
      */
     protected function addHeaders($request)
     {
-        if ($preferredTimezone = config('innoclapps.microsoft.prefer_timezone')) {
+        if ($preferredTimezone = config('app.microsoft.prefer_timezone')) {
             $request->addHeaders(['Prefer' => 'outlook.timezone="' . $preferredTimezone . '"']);
         }
 

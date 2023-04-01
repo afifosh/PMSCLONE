@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Company\EmailAccount;
+namespace App\Http\Controllers\Admin\EmailAccount;
 
 use App\Contracts\Repositories\EmailAccountRepository;
 use App\Criteria\EmailAccount\EmailAccountsForUserCriteria;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EmailAccountRequest;
 use App\Models\EmailAccount;
+use Illuminate\Http\Request;
 
 class EmailAccountController extends Controller
 {
@@ -19,13 +20,14 @@ class EmailAccountController extends Controller
     {
     }
 
-    public function index()
+    public function index(Request $request)
     {
         // $accounts = EmailAccount::where('user_id',\Auth::user()->id)->get();
         $accounts = $this->repository->withResponseRelations()
         ->pushCriteria(new EmailAccountsForUserCriteria(\Auth::user()))
         ->all();
-        return view('pages.emails.index',compact('accounts'));
+
+        return view('admin.pages.emails.index',compact('accounts'));
     }
 
     /**
@@ -75,12 +77,12 @@ class EmailAccountController extends Controller
      */
     public function update($id, EmailAccountRequest $request)
     {
-        // $this->authorize('update', $this->repository->find($id));
+         $this->authorize('update', $this->repository->find($id));
 
         // // The user is not allowed to update these fields after creation
-        // $except = ['email', 'connection_type', 'user_id', 'initial_sync_from'];
+         $except = ['email', 'connection_type', 'user_id', 'initial_sync_from'];
 
-        // $account = $this->repository->update($request->except($except), $id);
+         $account = $this->repository->update($request->except($except), $id);
 
         // return $this->response(
         //     new EmailAccountResource($this->repository->withResponseRelations()->find($account->id))
@@ -97,9 +99,9 @@ class EmailAccountController extends Controller
      */
     public function destroy($id)
     {
-        // $this->authorize('delete', $this->repository->find($id));
+         $this->authorize('delete', $this->repository->find($id));
 
-        // $this->repository->delete($id);
+         $this->repository->delete($id);
 
         // return $this->response([
         //     'unread_count' => $this->repository->countUnreadMessagesForUser($request->user()),
@@ -108,6 +110,6 @@ class EmailAccountController extends Controller
 
     public function unread()
     {
-        // return $this->repository->countUnreadMessagesForUser($request->user());
+         return $this->repository->countUnreadMessagesForUser(\Auth::user());
     }
 }

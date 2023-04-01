@@ -1,4 +1,4 @@
-@extends('layouts/layoutMaster')
+@extends('admin.layouts/layoutMaster')
 
 @section('title', 'Emails')
 
@@ -35,10 +35,10 @@
     });
     $('#save-form').on('click',function(){
       if($('#account_type').find(':selected').val()==='Gmail'){
-       window.location=("{{url('/mail/accounts/personal/google/connect')}}");
+       window.location=("{{url('/admin/mail/accounts/personal/google/connect')}}?period="+$('input[name=initial_sync_from]:checked').val());
         }
         else if($('#account_type').find(':selected').val()==='Outlook'){
-          var url= '/mail/accounts/' + 'personal' + '/microsoft/connect';
+          window.location=("{{url('/admin/mail/accounts/personal/microsoft/connect')}}?period="+$('input[name=initial_sync_from]:checked').val());
 
         }
         else{
@@ -973,7 +973,7 @@
       </div>
     </div>
   </div>
- @include('pages.emails.partials.connect-account')
+ @include('admin.pages.emails.partials.connect-account')
 </div>
 
 @endif

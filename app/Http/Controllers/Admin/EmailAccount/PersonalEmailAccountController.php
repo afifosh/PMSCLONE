@@ -10,16 +10,17 @@
  * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
  */
 
-namespace App\Http\Controllers\Company\EmailAccount;
+namespace App\Http\Controllers\Admin\EmailAccount;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmailAccountResource;
 use App\Contracts\Repositories\EmailAccountRepository;
 
-class SharedEmailAccountController extends Controller
+class PersonalEmailAccountController extends Controller
 {
     /**
-     * Initialize new SharedEmailAccountController instance.
+     * Initialize new PersonalEmailAccountController instance.
      *
      * @param \App\Contracts\Repositories\EmailAccountRepository $repository
      */
@@ -28,13 +29,15 @@ class SharedEmailAccountController extends Controller
     }
 
     /**
-     * Display shared email accounts
+     * Display personal email accounts for the logged in user
+     *
+     * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke()
+    public function __invoke(Request $request)
     {
-        $accounts = $this->repository->withResponseRelations()->getShared();
+        $accounts = $this->repository->withResponseRelations()->getPersonal((int) $request->user()->id);
 
         return $this->response(
             EmailAccountResource::collection($accounts)

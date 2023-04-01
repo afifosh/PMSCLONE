@@ -138,11 +138,11 @@ class OAuthManager
     public function createGoogleProvider()
     {
         return new GoogleProvider([
-            'clientId'     => config('innoclapps.google.client_id'),
-            'clientSecret' => config('innoclapps.google.client_secret'),
-            'redirectUri'  => url(config('innoclapps.google.redirect_uri')),
-            'accessType'   => config('innoclapps.google.access_type'),
-            'scopes'       => config('innoclapps.google.scopes'),
+            'clientId'     => config('app.google.client_id'),
+            'clientSecret' => config('app.google.client_secret'),
+            'redirectUri'  => url(config('app.google.redirect_uri')),
+            'accessType'   => config('app.google.access_type'),
+            'scopes'       => config('app.google.scopes'),
         ]);
     }
 
@@ -154,10 +154,10 @@ class OAuthManager
     public function createMicrosoftProvider()
     {
         return new MicrosoftProvider([
-            'clientId'     => config('innoclapps.microsoft.client_id'),
-            'clientSecret' => config('innoclapps.microsoft.client_secret'),
-            'redirectUri'  => url(config('innoclapps.microsoft.redirect_uri')),
-            'scopes'       => config('innoclapps.microsoft.scopes'),
+            'clientId'     => config('app.microsoft.client_id'),
+            'clientSecret' => config('app.microsoft.client_secret'),
+            'redirectUri'  => url(config('app.microsoft.redirect_uri')),
+            'scopes'       => config('app.microsoft.scopes'),
         ]);
     }
 

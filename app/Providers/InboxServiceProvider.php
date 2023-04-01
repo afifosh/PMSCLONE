@@ -27,6 +27,7 @@ use App\Contracts\Repositories\EmailAccountFolderRepository;
 use App\Contracts\Repositories\EmailAccountMessageRepository;
 use App\Repositories\PredefinedMailTemplateRepositoryEloquent;
 use App\Contracts\Repositories\PredefinedMailTemplateRepository;
+use App\Repositories\UserRepositoryEloquent;
 
 class InboxServiceProvider extends ServiceProvider
 {
@@ -36,6 +37,7 @@ class InboxServiceProvider extends ServiceProvider
     * @var array
     */
     public $bindings = [
+        \App\Contracts\Repositories\UserRepository::class             => \App\Repositories\UserRepositoryEloquent::class,
         EmailAccountRepository::class           => EmailAccountRepositoryEloquent::class,
         EmailAccountFolderRepository::class     => EmailAccountFolderRepositoryEloquent::class,
         EmailAccountMessageRepository::class    => EmailAccountMessageRepositoryEloquent::class,

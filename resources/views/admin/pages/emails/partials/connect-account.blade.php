@@ -18,20 +18,20 @@
       <div class="mb-3">
       <label class="form-label d-block" for="initial_sync_from">Sync emails from</label>
         <div class="form-check form-check-inline">
-            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="initial_sync_from1" value="now">
-            <label class="form-check-label" for="inlineRadio1">Now</label>
+            <input class="form-check-input initial_sync_from" checked type="radio" name="initial_sync_from" id="initial_sync_from1" value="{{date('Y-m-d H:i:s')}}">
+            <label class="form-check-label" for="initial_sync_from1">Now</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="inlineRadio2" value="1month">
-            <label class="form-check-label" for="inlineRadio2">1 month ago</label>
+            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="initial_sync_from2" value="{{date('Y-m-d H:i:s', strtotime('+1 month', strtotime(date('Y-m-d H:i:s'))))}}">
+            <label class="form-check-label" for="initial_sync_from1">1 month ago</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="inlineRadio3" value="3month">
-            <label class="form-check-label" for="inlineRadio3">3 months ago</label>
+            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="initial_sync_from3" value="{{date('Y-m-d H:i:s', strtotime('+3 month', strtotime(date('Y-m-d H:i:s'))))}}">
+            <label class="form-check-label" for="initial_sync_from3">3 months ago</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="inlineRadio4" value="6month">
-            <label class="form-check-label" for="inlineRadio4">6 months ago</label>
+            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="initial_sync_from4" value="{{date('Y-m-d H:i:s', strtotime('+6 month', strtotime(date('Y-m-d H:i:s'))))}}">
+            <label class="form-check-label" for="initial_sync_from4">6 months ago</label>
           </div>
     </div>
     <div id="imap-area" style="filter:blur(4px);">

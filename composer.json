@@ -13,6 +13,7 @@
     "firebase/php-jwt": "^6.4",
     "fruitcake/laravel-cors": "^2.0.5",
     "genealabs/laravel-pivot-events": "9.0",
+    "google/apiclient": "^2.13",
     "guzzlehttp/guzzle": "^7.2",
     "imanghafoori/laravel-password-history": "^1.0",
     "jdavidbakr/mail-tracker": "*",

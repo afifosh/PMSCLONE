@@ -10,12 +10,13 @@
  * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Enums\EmailAccountType;
 use App\Innoclapps\Facades\OAuthState;
 use App\Innoclapps\OAuth\OAuthManager;
+use App\Http\Controllers\Controller;
 
 class OAuthEmailAccountController extends Controller
 {
@@ -32,11 +33,10 @@ class OAuthEmailAccountController extends Controller
     public function connect($type, $providerName, Request $request, OAuthManager $manager)
     {
         abort_if(
-            ! $request->user()->isSuperAdmin() && EmailAccountType::from($type) === EmailAccountType::SHARED,
+             EmailAccountType::from($type) === EmailAccountType::SHARED,
             403,
             'Unauthorized action.'
         );
-
         return redirect($manager->createProvider($providerName)
             ->getAuthorizationUrl(['state' => $this->createState($request, $type, $manager)]));
     }
@@ -53,7 +53,7 @@ class OAuthEmailAccountController extends Controller
     protected function createState($request, $type, $manager)
     {
         return OAuthState::putWithParameters([
-            'return_url'         => '/mail/accounts?viaOAuth=true',
+            'return_url'         => '/admin/mail/accounts?viaOAuth=true',
             'period'             => $request->period,
             'email_account_type' => $type,
             're_auth'            => $request->re_auth,

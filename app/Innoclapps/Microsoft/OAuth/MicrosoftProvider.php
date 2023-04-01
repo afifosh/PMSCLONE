@@ -39,7 +39,7 @@ class MicrosoftProvider extends GenericProvider
      */
     public function getBaseAuthorizationUrl()
     {
-        $config = config('innoclapps.microsoft');
+        $config = config('app.microsoft');
 
         return collect([
             $config['login_url_base'],
@@ -57,7 +57,7 @@ class MicrosoftProvider extends GenericProvider
      */
     public function getBaseAccessTokenUrl(array $params)
     {
-        $config = config('innoclapps.microsoft');
+        $config = config('app.microsoft');
 
         return collect([
             $config['login_url_base'],

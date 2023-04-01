@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Contracts\Repositories\UserRepository;
 use App\Innoclapps\Contracts\Repository\CriteriaInterface;
 use App\Innoclapps\Contracts\Repository\RepositoryInterface;
+use App\Models\Admin;
 
 class QueriesByUserCriteria implements CriteriaInterface
 {
@@ -84,7 +85,7 @@ class QueriesByUserCriteria implements CriteriaInterface
     {
         if (is_null($user)) {
             $user = Auth::user();
-        } elseif ($user instanceof User) {
+        } elseif ($user instanceof Admin) {
             $user = $user;
         } else {
             $user = resolve(UserRepository::class)->find($user);

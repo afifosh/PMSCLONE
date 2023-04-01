@@ -14,12 +14,6 @@
       "permission": ["read user", "read role"]
     },
     {
-      "url": "/emails",
-      "name": "Emails",
-      "icon": "menu-icon tf-icons ti ti-mail",
-      "slug": "emails.index"
-    },
-    {
       "url": "/company-profile",
       "name": "Company Profile",
       "icon": "menu-icon tf-icons ti ti-profile",

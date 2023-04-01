@@ -10,7 +10,7 @@
  * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
  */
 
-namespace App\Http\Controllers\Company\EmailAccount;
+namespace App\Http\Controllers\Admin\EmailAccount;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;

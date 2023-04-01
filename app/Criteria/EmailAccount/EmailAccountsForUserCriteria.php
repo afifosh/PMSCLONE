@@ -41,10 +41,10 @@ class EmailAccountsForUserCriteria extends QueriesByUserCriteria
      *
      * @return \Illumindata\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder
      */
-    public static function applyQuery($model, $user = null, $columnName = 'user_id')
+    public static function applyQuery($model, $user = null, $columnName = 'id')
     {
-        $user = static::determineUser($user);
 
+        $user = static::determineUser($user);
         $model->whereHas('user', function ($subQuery) use ($user, $columnName) {
             return parent::applyQuery($subQuery, $user, $columnName);
         });
