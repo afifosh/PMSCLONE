@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 let bootAppSetting = () => {
     let provider = document.getElementById('provider')
+
     if (!provider) {
         return
     }
@@ -18,6 +19,11 @@ let bootAppSetting = () => {
 
     provider.addEventListener('change', e => {
         const selected = e.target.options[e.target.selectedIndex].value
+        
+        if (selected == '') {
+            return
+        }
+
         loadDeliverySettings(selected, provider)
         hideDeliveryServices(deliveryServices)
         showDeliveryService(selected)
@@ -55,10 +61,16 @@ let loadDeliverySettings = (selectedProvider, provider) => {
 let getDeliverySetting = (map, selectedProvider, provider) => {
     window.axios.get(provider.getAttribute('data-tokens') + '?provider=' + selectedProvider).then(response => {
         const data = response.data
-        const skipKeys = ['from_name', 'from_email', 'provider']
+        const skipKeys = ['provider']
+        const withSuffix = ['from_name', 'from_email']
 
         Object.keys(data).forEach(key => {
             if (skipKeys.findIndex(findKey => findKey == key) !== -1) {
+                return true
+            }
+
+            if (withSuffix.findIndex(findKey => findKey == key) !== -1) {
+                updateElement(`${key}-${selectedProvider}Service`, data[key])
                 return true
             }
 
@@ -69,6 +81,10 @@ let getDeliverySetting = (map, selectedProvider, provider) => {
 
 let updateElement = (id, newValue) => {
     const element = document.getElementById(id)
+
+    if (!element) {
+        return
+    }
 
     if (element.nodeName === 'INPUT') {
         element.value = newValue
@@ -82,8 +98,8 @@ let updateElement = (id, newValue) => {
 // general settings below
 let bootGeneralSetting = () => {
     const form = document.getElementById('general-setting-form')
-    
-    if(! form) {
+
+    if (!form) {
         return
     }
 
@@ -98,13 +114,16 @@ let onFileInputClick = (e) => {
     const imgHolder = e.target.closest('.img-holder')
 
     const img = imgHolder.getElementsByTagName('img')
-    
+
     const fileInput = imgHolder.nextElementSibling
 
     // if the file input / img is not found return from function
-    if (fileInput.type != 'file' || ! img || 0 in img == false) {
+    if (fileInput.type != 'file' || !img || 0 in img == false) {
         return
     }
+
+    // clear the file input first so that same file can be selected on onchange
+    fileInput.addEventListener('click', (e) => e.target.value = '')
 
     // add event change listener as well
     fileInput.addEventListener('change', (e) => previewUploadedImage(e, img))

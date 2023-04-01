@@ -26,8 +26,8 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <select name="broadcast_driver" id="broadcast_driver" data-attr="{{ $settings['broadcast_driver'] ?? '' }}" class="selectpicker w-100" data-style="btn-default" data-live-search="true">
-                                        <option value="pusher" data-tokens="pusher" {{ isset($settings['broadcast_driver']) && $settings['broadcast_driver'] === 'pusher' ? 'selected' : '' }}>
+                                    <select name="broadcast_driver" id="broadcast_driver" data-attr="{{ $setting['broadcast_driver'] ?? '' }}" class="selectpicker w-100 do-not-clear-with-form" data-style="btn-default" data-live-search="true">
+                                        <option value="pusher" data-tokens="pusher" {{ isset($setting['broadcast_driver']) && $setting['broadcast_driver'] === 'pusher' ? 'selected' : '' }}>
                                             {{ __('Pusher') }}
                                         </option>
                                     </select>
@@ -82,7 +82,12 @@
                                 </div>
                             </div>
                             <!-- button to submit form -->
-                            <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                            <div class="mb-4">
+                                <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                                <x-ui.clear-form-button class="btn btn-dark">
+                                    {{ __('Clear Form') }}
+                                </x-ui.clear-form-button>
+                            </div>
                         </form>
                     </div>
                 </div>

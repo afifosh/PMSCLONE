@@ -92,7 +92,13 @@
                             </div>
 
                             <!-- button to submit form -->
-                            <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                            <div class="mb-4">
+                                <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                                <x-ui.clear-form-button class="btn btn-dark">
+                                    {{ __('Clear Form') }}
+                                </x-ui.clear-form-button>
+                            </div>
+
                         </form>
                     </div>
                 </div>

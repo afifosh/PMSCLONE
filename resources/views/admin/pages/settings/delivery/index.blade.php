@@ -15,25 +15,14 @@
                 <div class="setting pt-0 px-4">
                     @php
                     $deliveryServices = [
-                    'amazon_ses' => 'Amazon SES',
-                    'mailgun' => 'Mailgun',
-                    'smtp' => 'SMTP',
-                    'sendmail' => 'Sendmail',
-                    'mailtrap' => 'Mailtrap',
+                        'amazon_ses' => 'Amazon SES',
+                        'mailgun' => 'Mailgun',
+                        'smtp' => 'SMTP',
+                        'sendmail' => 'Sendmail',
+                        'mailtrap' => 'Mailtrap',
                     ];
                     @endphp
                     <div class="setting-item">
-                        <div class="row">
-                            @if ($errors->any())
-                            <div class="col-md-12 ">
-                                <div class="alert alert-danger alert-dismissible">
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    {!! implode('<br />', $errors->all('<span>:message</span>')) !!}
-                                </div>
-                            </div>
-                            @endif
-                        </div>
-
                         <div class="row">
                             <!-- Supported mail services -->
                             <div class="col-md-6 mb-4">

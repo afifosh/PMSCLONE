@@ -17,12 +17,14 @@ class SettingService extends BaseService
         $settings = request()->except('allowed_resource', '_token', '_method');
 
         return collect(array_keys($settings))->map(function ($key) use ($settings, $context) {
+            $setting = app(SettingRepository::class)
+                ->createSettingInstance($key, $context);
+
+            $this->handleIfFileDeleted($setting);
+
             if (is_null(request()->input($key))) {
                 return true;
             }
-            
-            $setting = app(SettingRepository::class)
-                ->createSettingInstance($key, $context);
 
             if (request()->file($key)) {
                 $this->deleteImage(optional($setting)->value);
@@ -48,5 +50,17 @@ class SettingService extends BaseService
     {
         return resolve(SettingRepository::class)
             ->getFormattedSettings($context);
+    }
+
+    private function handleIfFileDeleted($setting)
+    {
+        $request = app('request');
+
+        if ($request->has("{$setting->name}-file-deleted")) {
+            $setting->delete();
+            return true;
+        }
+
+        return false;
     }
 }

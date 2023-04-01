@@ -49,7 +49,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <div class="img-holder">
-                                        <img class="company-img" src="{{ isset($setting['company_logo']) ? asset($setting['company_logo']) : asset('assets/img/company/logo.png') }}" alt="">
+                                        <img class="company-img clear-with-form" src="{{ isset($setting['company_logo']) ? asset($setting['company_logo']) : asset('assets/img/company/logo.png') }}" alt="">
                                         <div class="text-center left-50 img-holder-placeholder">
                                             {{ __('Change logo') }}
                                         </div>
@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <div class="img-holder">
-                                        <img class="company-img" src="{{ isset($setting['company_icon']) ? asset($setting['company_icon']) : asset('assets/img/company/logo.png') }}" alt="">
+                                        <img class="company-img clear-with-form" src="{{ isset($setting['company_icon']) ? asset($setting['company_icon']) : asset('assets/img/company/logo.png') }}" alt="">
                                         <div class="text-center left-50 img-holder-placeholder">
                                             {{ __('Change icon') }}
                                         </div>
@@ -94,7 +94,12 @@
                                 </div>
                             </div>
                             <!-- submit form -->
-                            <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3 mb-4">@lang('Update')</button>
+                            <div class="mb-4">
+                                <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3 mb-4">@lang('Update')</button>
+                                <x-ui.clear-form-button class="btn btn-dark me-sm-3 mb-4">
+                                    {{ __('Clear Form') }}
+                                </x-ui.clear-form-button>
+                            </div>
                         </form>
                     </div>
                 </div>
