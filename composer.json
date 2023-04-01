@@ -26,6 +26,7 @@
     "laravel/tinker": "^2.7",
     "laravolt/avatar": "^4.1",
     "league/oauth2-google": "4.0",
+    "microsoft/microsoft-graph": "^1.92",
     "owen-it/laravel-auditing": "^13.1",
     "pion/laravel-chunk-upload": "^1.5",
     "plank/laravel-mediable": "5.8.0",

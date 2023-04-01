@@ -41,7 +41,7 @@ return new class extends Migration {
             $table->unsignedInteger('smtp_port')->nullable()->comment('IMAP');
             $table->string('smtp_encryption', 8)->nullable()->comment('IMAP');
 
-            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('created_by')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

@@ -27,7 +27,7 @@ class OAuthController extends Controller
      *
      * @var string
      */
-    protected $onErrorRedirectTo = '/dashboard';
+    protected $onErrorRedirectTo = '/admin';
 
     /**
      * Initialize OAuth Controller
@@ -91,9 +91,10 @@ class OAuthController extends Controller
                         ($responseBody['error_description'] ?? $responseBody['error'] ?? json_encode($responseBody)) :
                         $responseBody . ']';
                 }
-
+                \Log::info('errror'.$message);
                 return redirect($this->onErrorRedirectTo)->withErrors($message);
             } catch (\Exception $e) {
+                \Log::info('exception.'.$e->getMessage());
                 return redirect($this->onErrorRedirectTo)->withErrors($e->getMessage());
             }
 

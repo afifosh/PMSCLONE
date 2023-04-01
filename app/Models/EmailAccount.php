@@ -14,6 +14,7 @@ namespace App\Models;
 
 use App\Enums\SyncState;
 use App\Enums\EmailAccountType;
+use App\Innoclapps\Models\Model;
 use App\Innoclapps\Concerns\HasMeta;
 use App\Innoclapps\Contracts\Metable;
 use App\Innoclapps\MailClient\Client;
@@ -25,10 +26,13 @@ use App\Innoclapps\MailClient\ClientManager;
 use App\Innoclapps\MailClient\ConnectionType;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-class EmailAccount extends Model
+
+class EmailAccount extends Model implements Metable, Primaryable
 {
-    use HasFactory;
+    use HasMeta,
+        HasCreator,
+        HasFactory,
+        EmailAccountImap;
 
     /**
      * Indicates the primary meta key for user
