@@ -127,28 +127,7 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-     /*
-    |--------------------------------------------------------------------------
-    | Mail client configuration
-    |--------------------------------------------------------------------------
-    |
-    */
-    'mail_client' => [
-        'sync' => [
-            /*
-            |--------------------------------------------------------------------------
-            | Sync mail client interval definition
-            |--------------------------------------------------------------------------
-            |
-            | The mail client synchronizer, sync emails every 5 minutes, the interval can be defined below.
-            |
-            | The accepted values are: Minute, TwoMinutes, ThreeMinutes, FourMinutes, FiveMinutes, TenMinutes, FifteenMinutes,
-            | ThirtyMinutes, hourly, TwoHours, ThreeHours, FourHours, SixHours
-            */
-            'every' => env('MAIL_CLIENT_SYNC_INTERVAL', 'ThreeMinutes'),
-        ],
-    ],
-
+    
     /*
     |--------------------------------------------------------------------------
     | Synchronization config
@@ -267,6 +246,92 @@ return [
         'scopes' => ['https://mail.google.com/', 'https://www.googleapis.com/auth/calendar'],
     ],
 
+     /*
+    |--------------------------------------------------------------------------
+    | Application Currency
+    |--------------------------------------------------------------------------
+    |
+    | The application currency, is used on a specific features e.q. form groups
+    |
+    */
+    'currency' => 'USD',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mail client configuration
+    |--------------------------------------------------------------------------
+    |
+    | Below, you can find some of the mail client configuration options
+    |
+    */
+
+    'mail_client' => [
+        'reply_prefix'   => env('MAIL_MESSAGE_REPLY_PREFIX', 'RE: '),
+        'forward_prefix' => env('MAIL_MESSAGE_FORWARD_PREFIX', 'FW: '),
+        'sync' => [
+            /*
+            |--------------------------------------------------------------------------
+            | Sync mail client interval definition
+            |--------------------------------------------------------------------------
+            |
+            | The mail client synchronizer, sync emails every 5 minutes, the interval can be defined below.
+            |
+            | The accepted values are: Minute, TwoMinutes, ThreeMinutes, FourMinutes, FiveMinutes, TenMinutes, FifteenMinutes,
+            | ThirtyMinutes, hourly, TwoHours, ThreeHours, FourHours, SixHours
+            */
+            'every' => env('MAIL_CLIENT_SYNC_INTERVAL', 'ThreeMinutes'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mailable templates configuration
+    |--------------------------------------------------------------------------
+    |
+    | layout => The mailable templates default layout path
+    |
+    */
+
+    'mailables' => [
+        'layout' => env('MAILABLE_TEMPLATE_LAYOUT', storage_path('mail-layouts/mailable-template.html')),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Media Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you can specificy the default directory where the media files
+    | will be uploaded, keep in mind that the application will create
+    | folder tree in this directory according to custom logic e.q.
+    | /media/contacts/:id/image.jpg
+    |
+    */
+    'media' => [
+        'directory' => env('MEDIA_DIRECTORY', 'media'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application favourite colors
+    |--------------------------------------------------------------------------
+    |
+    */
+    'colors' => explode(',', env(
+        'COMMON_COLORS',
+        '#374151,#DC2626,#F59E0B,#10B981,#2563EB,#4F46E5,#7C3AED,#EC4899,#F3F4F6'
+    )),
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Repository
+    |--------------------------------------------------------------------------
+    |
+    | Provide the user repository.
+    |
+    */
+    'user_repository' => null,
     /*
     |--------------------------------------------------------------------------
     | Application security config

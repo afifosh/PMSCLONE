@@ -38,17 +38,12 @@ trait Resourceable
      */
     protected static function bootResourceable()
     {
-        if (Innoclapps::isAppInstalled()) {
             static::bootFieldsEvents();
 
             if (static::resource() instanceof AcceptsCustomFields) {
                 static::bootCustomFields();
             }
 
-            if (static::resource()::$hasZapierHooks === true) {
-                static::bootZapierHooks();
-            }
-        }
     }
 
     /**

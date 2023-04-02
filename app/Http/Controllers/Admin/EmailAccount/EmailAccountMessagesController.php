@@ -17,7 +17,6 @@ use App\MailClient\MailTracker;
 use App\Http\Requests\MessageRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ActivityResource;
-use App\Support\Concerns\CreatesFollowUpTask;
 use App\Innoclapps\MailClient\Compose\Message;
 use App\Innoclapps\Resources\AssociatesResources;
 use App\Innoclapps\Resources\Http\ResourceRequest;
@@ -37,7 +36,6 @@ use App\Innoclapps\MailClient\Exceptions\MessageNotFoundException;
 class EmailAccountMessagesController extends Controller
 {
     use InteractsWithEmailMessageAssociations,
-        CreatesFollowUpTask,
         AssociatesResources;
 
     /**
@@ -248,9 +246,8 @@ class EmailAccountMessagesController extends Controller
      */
     protected function sendMessage(AbstractComposer $composer, $accountId, Request $request)
     {
-        $this->addComposerAssociationsHeaders($composer, $request->input('associations', []));
+        // $this->addComposerAssociationsHeaders($composer, $request->input('associations', []));
         $this->addPendingAttachments($composer, $request);
-        $task = $this->handleFollowUpTaskCreation($request);
 
         try {
             $composer->subject($request->subject)
@@ -305,20 +302,7 @@ class EmailAccountMessagesController extends Controller
      *
      * @return null|\App\Models\Activity
      */
-    protected function handleFollowUpTaskCreation(Request $request)
-    {
-        $task = null;
-        if ($request->via_resource
-                && $this->shouldCreateFollowUpTask($request->all())) {
-            $task = $this->createFollowUpTask(
-                $request->task_date,
-                $request->via_resource,
-                $request->via_resource_id
-            );
-        }
 
-        return $task;
-    }
 
     /**
      * Add the attachments (if any) to the message composer

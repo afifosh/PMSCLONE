@@ -95,6 +95,7 @@ class OAuthController extends Controller
                 return redirect($this->onErrorRedirectTo)->withErrors($message);
             } catch (\Exception $e) {
                 \Log::info('exception.'.$e->getMessage());
+throw $e;
                 return redirect($this->onErrorRedirectTo)->withErrors($e->getMessage());
             }
 

@@ -311,7 +311,7 @@ class Application
      */
     public function getUserRepository()
     {
-        return resolve(config('innoclapps.user_repository'));
+        return resolve(config('app.user_repository'));
     }
 
     /**

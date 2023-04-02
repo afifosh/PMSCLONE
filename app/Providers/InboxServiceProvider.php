@@ -27,6 +27,7 @@ use App\Contracts\Repositories\EmailAccountFolderRepository;
 use App\Contracts\Repositories\EmailAccountMessageRepository;
 use App\Repositories\PredefinedMailTemplateRepositoryEloquent;
 use App\Contracts\Repositories\PredefinedMailTemplateRepository;
+use App\Contracts\Repositories\UserRepository;
 use App\Repositories\UserRepositoryEloquent;
 
 class InboxServiceProvider extends ServiceProvider
@@ -77,7 +78,7 @@ class InboxServiceProvider extends ServiceProvider
                     ->badgeVariant('info')
             );
         });
-
+        $this->app['config']->set('app.user_repository', UserRepository::class);
         $this->registerPermissions();
     }
 
