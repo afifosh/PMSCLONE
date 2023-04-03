@@ -23,7 +23,8 @@ class WorkflowSeeder extends Seeder
         ['name' => 'Level 1 verification'],
         ['name' => 'Level 2 verification']
       ])->each(function ($level) {
-        ApprovalLevelApprover::factory(5)->create(['workflow_level_id' => $level->id]);
+        ApprovalLevelApprover::factory(1)->create(['workflow_level_id' => $level->id, 'user_id' => 1]);
+        ApprovalLevelApprover::factory(2)->create(['workflow_level_id' => $level->id]);
       });
     });
   }

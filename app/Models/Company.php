@@ -215,4 +215,9 @@ class Company extends BaseModel
 
     return $logo;
   }
+
+  public function isHavingPendingProfile()
+  {
+    return $this->approved_at == null && $this->approval_level == 0;
+  }
 }

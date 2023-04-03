@@ -26,7 +26,7 @@
 
 @section('content')
     <div class="d-md-flex justify-content-between flex-row-reverse">
-        <div class="card ms-md-2 col-md-3 align-self-start mb-2">
+        <div class="card ms-md-2 col-md-3">
             <div class="card-body">
                 <div class="d-flex justify-content-center align-items-center">
                     <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/7.png"alt="Avatar"
@@ -67,11 +67,10 @@
                 <div class="card mb-2">
                     <div class="card-body d-flex">
                         <div class="avatar me-2">
-                            <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/7.png"alt="Avatar"
-                                class="rounded-circle">
+                          <span class="avatar-initial bg-label-primary text-light rounded-circle"><span class="fw-bold">1</span></span>
                         </div>
                         <div>
-                            <h6 class="card-title my-0"> 1) Profile Details</h6>
+                            <h6 class="card-title my-0">Profile Details</h6>
                             <p class="card-text">Some General Details about your company</p>
                         </div>
                         <div class="ms-auto">
@@ -82,11 +81,10 @@
                 <div class="card mb-2">
                     <div class="card-body d-flex">
                         <div class="avatar me-2">
-                            <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/7.png"alt="Avatar"
-                                class="rounded-circle">
+                          <span class="avatar-initial bg-label-primary text-light rounded-circle"><span class="fw-bold">2</span></span>
                         </div>
                         <div>
-                            <h6 class="card-title my-0"> 2) Contact Persons</h6>
+                            <h6 class="card-title my-0">Contact Persons</h6>
                             <p class="card-text">Persons to contact in your company</p>
                         </div>
                         <div class="ms-auto">
@@ -97,11 +95,10 @@
                 <div class="card mb-2">
                     <div class="card-body d-flex">
                         <div class="avatar me-2">
-                            <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/7.png"alt="Avatar"
-                                class="rounded-circle">
+                          <span class="avatar-initial bg-label-primary text-light rounded-circle"><span class="fw-bold">3</span></span>
                         </div>
                         <div>
-                            <h6 class="card-title my-0"> 3) Company Addresses</h6>
+                            <h6 class="card-title my-0">Company Addresses</h6>
                             <p class="card-text">Manage addresses of your company</p>
                         </div>
                         <div class="ms-auto">
@@ -112,11 +109,10 @@
                 <div class="card mb-2">
                     <div class="card-body d-flex">
                         <div class="avatar me-2">
-                            <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/7.png"alt="Avatar"
-                                class="rounded-circle">
+                          <span class="avatar-initial bg-label-primary text-light rounded-circle"><span class="fw-bold">4</span></span>
                         </div>
                         <div>
-                            <h6 class="card-title my-0"> 4) Verification Documents</h6>
+                            <h6 class="card-title my-0">Verification Documents</h6>
                             <p class="card-text">These are the required documents to verify the company</p>
                         </div>
                         <div class="ms-auto">
@@ -127,11 +123,10 @@
                 <div class="card mb-2">
                     <div class="card-body d-flex">
                         <div class="avatar me-2">
-                            <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/7.png"alt="Avatar"
-                                class="rounded-circle">
+                          <span class="avatar-initial bg-label-primary text-light rounded-circle"><span class="fw-bold">5</span></span>
                         </div>
                         <div>
-                            <h6 class="card-title my-0"> 5) Bank Accounts</h6>
+                            <h6 class="card-title my-0">Bank Accounts</h6>
                             <p class="card-text">Company Bank Accounts</p>
                         </div>
                         <div class="ms-auto">

@@ -22,8 +22,7 @@ class CompanyProfileController extends Controller
     $data['countries'] = Country::pluck('name', 'id');
 
     return request()->ajax() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
-      // : view('pages.company-profile.edit', $data);
-      : view('pages.company-profile.new.edit', $data);
+      : (auth()->user()->company->isHavingPendingProfile() ? view('pages.company-profile.edit', $data) : view('pages.company-profile.new.edit', $data));
 
   }
 

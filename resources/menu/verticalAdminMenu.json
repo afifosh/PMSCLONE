@@ -78,7 +78,7 @@
           "permission": "read company"
         },
         {
-          "name": "Company Approval",
+          "name": "Approval",
           "slug": ["admin.approval-requests.", "admin.change-requests", "admin.pending-companies"],
           "submenu": [
             {
