@@ -13,6 +13,7 @@ use Yajra\DataTables\Services\DataTable;
 
 class ApprovalRequestsDataTable extends DataTable
 {
+  public $type = 'approval';
   /**
    * Build DataTable class.
    *
@@ -23,7 +24,7 @@ class ApprovalRequestsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('name', function ($company) {
-        $url = route('admin.approval-requests.level.companies.show', ['level' => $company->approval_level, 'company' => $company->id]);
+        $url = $company->approval_level > 0 ? route('admin.approval-requests.level.companies.show', ['level' => $company->approval_level, 'company' => $company->id]) : null;
         return view('admin._partials.sections.company-avatar', compact('company', 'url'));
       })
       ->editColumn('added_by', function ($company) {
@@ -70,7 +71,16 @@ class ApprovalRequestsDataTable extends DataTable
   public function query(Company $model): QueryBuilder
   {
     $query = $model->newQuery();
-    $query->whereIn('approval_status', [2, 3])->whereIn('approval_level', auth()->user()->approvalLevelsOrdered())->with('addedBy');
+    $query->when($this->type == 'approval', function ($q) {
+      return $q->whereNull('approved_at')->whereIn('approval_status', [2, 3])->whereIn('approval_level', auth()->user()->approvalLevelsOrdered());
+    });
+    $query->when($this->type == 'change', function ($q) {
+      return $q->whereNotNull('approved_at')->whereIn('approval_status', [3, 2])->whereIn('approval_level', auth()->user()->approvalLevelsOrdered());
+    });
+    $query->when($this->type == 'pending', function ($q) {
+      return $q->whereNull('approved_at')->where('approval_level', 0);
+    });
+    $query->with('addedBy');
     return $query->applyRequestFilters();
   }
 

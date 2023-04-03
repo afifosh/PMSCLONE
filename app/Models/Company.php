@@ -118,7 +118,7 @@ class Company extends BaseModel
   {
     if (!$this->isApprovalRequiredForCurrentLevel()) {
       if ($this->approval_level >= ApprovalLevel::count())
-        $this->forceFill(['approval_status' => 1]); // Approved by all
+        $this->forceFill(['approval_status' => 1, 'approved_at' => now()]); // Approved by all
       else
         $this->forceFill(['approval_level' => $this->approval_level + 1]);
       $this->save();

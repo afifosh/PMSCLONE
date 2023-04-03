@@ -118,6 +118,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
     Route::get('approval-requests/level/{level}/companies/{company}', [ApprovalRequestController::class, 'getCompanyReqeust'])->name('approval-requests.level.companies.show');
     Route::post('approval-requests/level/{level}/companies/{company}', [ApprovalRequestController::class, 'updateApprovalRequest'])->name('approval-requests.level.companies.update');
+
+    Route::get('pending-companies', [ApprovalRequestController::class, 'index'])->name('pending-companies.index');
+    Route::get('change-requests', [ApprovalRequestController::class, 'index'])->name('change-requests.index');
     Route::resource('approval-requests', ApprovalRequestController::class)->only(['index', 'show', 'update']);
 
     // Route::resource('companies.invitations', InvitationController::class);

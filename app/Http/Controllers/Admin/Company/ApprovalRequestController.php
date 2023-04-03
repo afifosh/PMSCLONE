@@ -13,8 +13,18 @@ class ApprovalRequestController extends Controller
 {
   public function index(ApprovalRequestsDataTable $dataTable)
   {
+    if(request()->route()->getName() == 'admin.change-requests.index'){
+      $dataTable->type = 'change';
+      $title = 'Change Requests';
+    }elseif(request()->route()->getName() == 'admin.approval-requests.index'){
+      $dataTable->type = 'approval';
+      $title = 'Approval Requests';
+    }elseif(request()->route()->getName() == 'admin.pending-companies.index'){
+      $dataTable->type = 'pending';
+      $title = 'Pending Approval Companies';
+    }
     $levels = ApprovalLevel::pluck('name', 'id');
-    return $dataTable->render('admin.pages.company.approval-request.index', compact('levels'));
+    return $dataTable->render('admin.pages.company.approval-request.index', compact('levels', 'title'));
     // view('admin.pages.company.approval-request.index');
   }
 
