@@ -26,32 +26,66 @@
 @section('page-script')
 <script src="{{asset('assets/js/custom/company-profile-page.js')}}"></script>
 <script>
-    $('#account_type').on('change',function(){
+    $('#connection_type').on('change',function(){
         if($(this).find(':selected').val()==='Imap'){
             $("#imap-area").css("filter","none");
+            $('#save-account').prop('disabled',true);        
+            $('#test-connection').show();        
         }
         else{
             $("#imap-area").css("filter","blur(4px)");
+            $('#test-connection').attr('style', 'display: none !important');        
+            $('#save-account').prop('disabled',false);        
+
         }
     });
-    $('#save-form').on('click',function(){
-      if($('#account_type').find(':selected').val()==='Gmail'){
+    $('#save-account').on('click',function(){
+      if($('#connection_type').find(':selected').val()==='Gmail'){
        window.location=("{{url('/admin/mail/accounts/personal/google/connect')}}?period="+$('input[name=initial_sync_from]:checked').val());
         }
-        else if($('#account_type').find(':selected').val()==='Outlook'){
+        else if($('#connection_type').find(':selected').val()==='Outlook'){
           window.location=("{{url('/admin/mail/accounts/personal/microsoft/connect')}}?period="+$('input[name=initial_sync_from]:checked').val());
 
         }
-        else{
+        else if($('#connection_type').find(':selected').val()==='Imap'){
+          saveRecord(this,"POST","{{url('/admin/mail/accounts')}}","add-mail-account","Please try again");
 
         }
     });
-
+    $("#test-connection").on('click',function(){
+     var data= saveRecord(this,"POST","{{url('/admin/mail/accounts/connection')}}","add-mail-account","Please try again");
+      console.log(data.folders);
+      var html=` <div class="form-check">
+            <input name="validate_cert" class="form-check-input" type="checkbox" value="0" id="validate_cert">
+            <label class="form-check-label" for="validate_cert">
+            Allow non secure certificate.
+            </label>
+          </div>`;
+          $('#folders-area').html(html);
+    });
 </script>
 <script>
+  @if($accounts->count()>0)
             $('#send-email').on('click', function() {
           saveRecord(this,"POST","{{url('/admin/inbox/emails/'.$accounts[0]->id)}}","email-compose-form","Please try again");
             });
+            @endif
+            function editAccount(){
+              var account_id=$("#select-account").find(":selected").val();          
+            }
+  function sync(){
+    var account_id=$("#select-account").find(":selected").val();
+    var url="{{url('/admin/mail/accounts/:accountId/sync')}}";
+    url=url.replace(':accountId',account_id);
+    $.ajax({
+      url:url,
+      method:'GET',
+      success:function(response){
+        console.log(response);
+      }
+    })
+    
+  }
 </script>
 @endsection
 
@@ -62,6 +96,13 @@
     <!-- Email Sidebar -->
     <div class="col app-email-sidebar border-end flex-grow-0" id="app-email-sidebar">
       <div class="btn-compost-wrapper d-grid">
+        <div class="mb-3">
+        <select id="select-account" class="select2">
+          @foreach($accounts as $account)
+          <option value="{{$account->id}}"> {{$account->email}}</option>
+          @endforeach
+        </select>
+        </div>
         <button class="btn btn-primary btn-compose" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
       </div>
       <!-- Email Filters -->
@@ -98,15 +139,13 @@
               </div>
             </div>
             <div class="d-flex align-items-center mb-0 mb-md-2">
-              <i class="ti ti-rotate-clockwise rotate-180 scaleX-n1-rtl cursor-pointer email-refresh me-2 mt-1"></i>
+              <i onclick="sync();" class="ti ti-rotate-clockwise rotate-180 scaleX-n1-rtl cursor-pointer email-refresh me-2 mt-1"></i>
               <div class="dropdown">
                 <i class="ti ti-dots-vertical cursor-pointer" id="emailsActions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="emailsActions">
-                  <a class="dropdown-item" href="javascript:void(0)">Mark as read</a>
-                  <a class="dropdown-item" href="javascript:void(0)">Mark as unread</a>
-                  <a class="dropdown-item" href="javascript:void(0)">Delete</a>
-                  <a class="dropdown-item" href="javascript:void(0)">Archive</a>
+                  <a class="dropdown-item" onclick="editAccount();">Edit Email Account</a>
+                  <a class="dropdown-item" href="javascript:void(0)">Manage Accounts</a>
                 </div>
               </div>
             </div>
@@ -703,7 +742,7 @@
        
       </div>
       <div class="card-footer">
-      <div class="col-md-12">
+      <div style="text-align:center">
 
             <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
             <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" class="btn btn-primary">Connect Personal Account</button>

@@ -24,6 +24,7 @@ use App\Contracts\Repositories\EmailAccountRepository;
 use App\Innoclapps\MailClient\Imap\Config as ImapConfig;
 use App\Innoclapps\MailClient\Exceptions\ConnectionErrorException;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use stdClass;
 
 class EmailAccountConnectionTestController extends Controller
 {
@@ -56,10 +57,9 @@ class EmailAccountConnectionTestController extends Controller
             'smtp_port'       => 'required|numeric',
             'smtp_encryption' => ['nullable', Rule::in(ClientManager::ENCRYPTION_TYPES)],
         ]);
+        $validator->validate();
 
-        $validator->after(function ($validator) use ($request) {
-            // Validation passes, now we can validate the connections
-            $this->testConnection(
+       $response= $this->testConnection(
                 $validator,
                 [
                 'username'        => $request->input('username'),
@@ -80,11 +80,11 @@ class EmailAccountConnectionTestController extends Controller
                 'smtp_encryption' => $request->input('smtp_encryption'),
             ]
             );
-        });
-
-        $validator->validate();
-
-        return $this->response(['folders' => $this->imapFolders]);
+        if($response['status']==500)
+        {
+        return response(['message'=>$response['message']],400);
+        }
+        return response(['folders' => $this->imapFolders]);
     }
 
     /**
@@ -129,14 +129,14 @@ class EmailAccountConnectionTestController extends Controller
                     $smtpConfig['smtp_port'],
                     $smtpConfig['smtp_encryption'],
                     $smtpConfig['email'],
-                    $smtpConfig['validate_cert'],
+                    $smtpConfig['validate_cert']==null?0:$smtpConfig['validate_cert'],
                     $smtpConfig['username'],
                     $smtpConfig['password']
                 ));
 
                 ClientManager::testConnection($client);
             } catch (ConnectionErrorException $e) {
-                $validator->errors()->add('smtp-connection', 'SMTP: ' . $e->getMessage());
+                return ['message'=>'SMTP: ' . $e->getMessage(),'status'=>500];
             }
 
             try {
@@ -145,7 +145,7 @@ class EmailAccountConnectionTestController extends Controller
                     $imapConfig['imap_port'],
                     $imapConfig['imap_encryption'],
                     $imapConfig['email'],
-                    $imapConfig['validate_cert'],
+                    $smtpConfig['validate_cert']==null?0:$smtpConfig['validate_cert'],
                     $imapConfig['username'],
                     $imapConfig['password']
                 ));
@@ -153,8 +153,9 @@ class EmailAccountConnectionTestController extends Controller
                 ClientManager::testConnection($client);
 
                 $this->imapFolders = $client->getFolders();
+
             } catch (ConnectionErrorException $e) {
-                $validator->errors()->add('imap-connection', 'IMAP: ' . $e->getMessage());
+                return ['message'=>'IMAP: ' . $e->getMessage(),'status'=>500];
             }
         }
     }

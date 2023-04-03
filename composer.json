@@ -11,6 +11,7 @@
     "php": "^8.0.2",
     "akaunting/laravel-money": "^4.0",
     "barryvdh/laravel-debugbar": "^3.7",
+    "ddeboer/imap": "^1.17",
     "firebase/php-jwt": "^6.4",
     "fruitcake/laravel-cors": "^2.0.5",
     "genealabs/laravel-pivot-events": "9.0",

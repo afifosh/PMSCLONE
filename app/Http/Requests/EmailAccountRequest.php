@@ -62,10 +62,6 @@ class EmailAccountRequest extends FormRequest
             if ($this->isImapConnectionType() && ! (new RequirementsChecker)->passes('imap')) {
                 abort(409, 'In order to use IMAP account type, you will need to enable the PHP extension "imap".');
             }
-
-            if ($this->isMethod('POST') && $this->isSharedAccountRequest() && ! $this->user()->isSuperAdmin()) {
-                abort(403, 'Only super administrators can create shared email accounts.');
-            }
         });
     }
 

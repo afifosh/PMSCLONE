@@ -12,7 +12,7 @@ class RequirementsChecker
     public function check()
     {
         $results      = $this->createEmptyResultSet();
-        $requirements = config('installer.requirements');
+        $requirements = config('app.requirements');
 
         foreach ($requirements as $type => $requirement) {
             switch ($type) {
