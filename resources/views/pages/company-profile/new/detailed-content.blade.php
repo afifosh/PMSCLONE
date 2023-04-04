@@ -30,6 +30,9 @@
 @endsection
 
 @section('content')
+  <div class="alert alert-danger position-fixed w-100" style="z-index:1" role="alert">
+    Details Are Under Review, You cannot modifiy them.
+  </div>
 <!-- Header -->
 <div class="row">
   <div class="col-12">
@@ -234,6 +237,11 @@
     <div class="card mb-4">
       <div id="accounts-card-body" class="card-body">
         @include('pages.company-profile.new.detailed-content.accounts')
+      </div>
+    </div>
+    <div class="card mb-4">
+      <div id="accounts-card-body" class="card-body d-flex justify-content-end">
+        <a href="{{route('company.submitApprovalRequest')}}" class="btn btn-outline-light waves-effect bg-dark {{auth()->user()->company->canBeSentForApproval() ? '': 'disabled'}}" type="button"> <span class="align-middle d-sm-inline-block me-sm-1">Send for Approval</span></a>
       </div>
     </div>
 </div>

@@ -15,7 +15,7 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-        Admin::factory()->count(20)->sequence(fn ($sequence) => ['email' => 'admin'.$sequence->index + 1 .'@example.com'])->create()->each(function ($admin) {
+        Admin::factory()->count(10)->sequence(fn ($sequence) => ['email' => 'admin'.$sequence->index + 1 .'@example.com'])->create()->each(function ($admin) {
             $admin->assignRole(Role::where('guard_name', 'admin')->inRandomOrder()->first());
         });
     }
