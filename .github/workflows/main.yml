@@ -30,5 +30,6 @@ jobs:
               composer update
               php artisan key:generate
               php artisan migrate:fresh --seed --force
+              php artisan db:seed --class=SecondHalfSeeder --force
               nvm use 16 && yarn
               yarn dev

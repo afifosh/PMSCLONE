@@ -24,10 +24,5 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminRolesPermissionsSeeder::class);
         $this->call(UserRolesPermissionsSeeder::class);
         $this->call(AdminSeeder::class);
-        $this->call(HRSeeder::class);
-        $this->call(CompanySeeder::class);
-        $this->call(ProgramSeeder::class);
-        $this->call(WorkflowSeeder::class);
-        // $this->call(KycDocumentSeeder::class);
     }
 }
