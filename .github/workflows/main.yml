@@ -29,7 +29,16 @@ jobs:
               cp .env.server .env
               composer update
               php artisan key:generate
-              php artisan migrate:fresh --seed --force
-              php artisan db:seed --class=SecondHalfSeeder --force
+              php artisan migrate:fresh --force
+              php artisan db:seed --class=CountriesTableSeeder --force
+              php artisan db:seed --class=ModuleSeeder --force
+              php artisan db:seed --class=AdminRolesPermissionsSeeder --force
+              php artisan db:seed --class=UserRolesPermissionsSeeder --force
+              php artisan db:seed --class=AdminSeeder --force
+              php artisan db:seed --class=HRSeeder --force
+              php artisan db:seed --class=CompanySeeder --force
+              php artisan db:seed --class=ProgramSeeder --force
+              php artisan db:seed --class=WorkflowSeeder --force
+              php artisan db:seed --class=KycDocumentSeeder --force
               nvm use 16 && yarn
               yarn dev
