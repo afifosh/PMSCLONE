@@ -29,6 +29,14 @@ class CompanyProfileController extends Controller
   public function detailedContent()
   {
     $data['countries'] = Country::pluck('name', 'id');
+    $data['POCDetail'] = auth()->user()->company->POCDetail()->exists() ? auth()->user()->company->POCDetail()->with('approvals', 'disapprovals')->latest()->first() : null;
+    $data['detail'] = $data['POCDetail'] ? $this->transformModifications($data['POCDetail']->modifications) : auth()->user()->company->detail()->with('modifications')->first() ?? null;
+    $data['contacts'] = auth()->user()->company->contacts()->with('modifications', 'modifications.disapprovals')->get();
+    $data['pending_creation_contacts'] = auth()->user()->company->POCContact()->where('is_update', false)->with('disapprovals')->get();
+    $data['addresses'] = auth()->user()->company->addresses;
+    $data['pending_addresses'] = auth()->user()->company->POCAddress()->where('is_update', false)->get();
+    $data['bankAccounts'] = auth()->user()->company->bankAccounts;
+    $data['pending_creation_accounts'] = auth()->user()->company->POCBankAccount()->where('is_update', false)->get();
 
     return view('pages.company-profile.new.detailed-content', $data);
   }

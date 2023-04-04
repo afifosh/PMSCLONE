@@ -77,10 +77,11 @@
 <div class="row">
   <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-      <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class='ti-xs ti ti-user-check me-1'></i> Profile</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/profile-teams')}}"><i class='ti-xs ti ti-users me-1'></i> Teams</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/profile-projects')}}"><i class='ti-xs ti ti-layout-grid me-1'></i> Projects</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{url('pages/profile-connections')}}"><i class='ti-xs ti ti-link me-1'></i> Connections</a></li>
+      <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class='ti-xs ti ti-user-check me-1'></i> Details</a></li>
+      <li class="nav-item"><a class="nav-link" href="#contact-persons-card-body"><i class='ti-xs ti ti-users me-1'></i> Contact Persons</a></li>
+      <li class="nav-item"><a class="nav-link" href="#addresses-card-body"><i class='ti-xs ti ti-layout-grid me-1'></i> Addresses</a></li>
+      <li class="nav-item"><a class="nav-link" href="#documents-card-body"><i class='ti-xs ti ti-link me-1'></i> Documents</a></li>
+      <li class="nav-item"><a class="nav-link" href="#accounts-card-body"><i class='ti-xs ti ti-link me-1'></i> Bank Accounts</a></li>
     </ul>
   </div>
 </div>
@@ -203,212 +204,36 @@
               {!! Form::select('subsidiaries[]', @$detail['subsidiaries'][0] ? array_combine(@$detail['subsidiaries'], @$detail['subsidiaries']) : [],
                 @$detail['subsidiaries'], ['class' => 'form-select select2', 'multiple', 'data-tags' => 'true']) !!}
             </div>
-            <div class="content-end">
-              <button class="btn btn-primary submit-and-next" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Save</span></button>
-              <button type="button" data-form="ajax-form" class="d-none"></button>
+            <div class="d-flex justify-content-between">
+              <span></span>
+              <div>
+                <button class="btn btn-primary submit-and-next {{auth()->user()->company->isEditable() ? '' : 'disabled'}}" type="button"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Update</span></button>
+                <button type="button" data-form="ajax-form" class="d-none"></button>
+              </div>
             </div>
           </div>
         </form>
       </div>
     </div>
     <div class="card mb-4">
-      <div class="card-body">
-        @include('pages.company-profile.new.header-component', ['head_title' => 'Contact Persons', 'head_sm' => 'Manage Contact Persons', 'add_new' => route('company.contacts.create'), 'add_title' => 'Add New Contact Person'])
-        <hr>
-        <div class="row">
-          <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
-            <div class="form-check custom-option custom-option-basic">
-              <label class="form-check-label custom-option-content">
-                <span class="custom-option-header mb-2">
-                  <span>
-                    <h6 class="fw-semibold mb-0">John Doe</h6>
-                    <small>CEO</small>
-                  </span>
-                  <span class="badge bg-label-success">
-                    Approved
-                  </span>
-                </span>
-                <span class="custom-option-body">
-                  <small>
-                    <span class="fw-bold">Type :</span>  Owner <br />
-                    <span class="fw-bold">Email :</span>  user1@company1.com <br />
-                    <span class="fw-bold">Phone : </span> +96198151849849 <br />
-                    <span class="fw-bold">Mobile : </span> +96198151849849 <br />
-                    <span class="fw-bold">Fax : </span> +96198151849849 <br />
-                    <span class="fw-bold">Is Authorized Person : </span> Yes <br />
-                  </small>
-                  <hr class="my-2">
-                  <span class="d-flex">
-                    <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Contact Person" data-href="{{route('company.contacts.show', 1)}}">View</a>
-                      <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Contact Person" data-href="{{route('company.contacts.edit', 1)}}">Edit</a>
-                      <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.contacts.destroy', 1) }}">Remove</a>
-                  </span>
-                </span>
-              </label>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
-            <div class="form-check custom-option custom-option-basic">
-              <label class="form-check-label custom-option-content">
-                <span class="custom-option-header mb-2">
-                  <span>
-                    <h6 class="fw-semibold mb-0">John Spencier</h6>
-                    <small>CTO</small>
-                  </span>
-                  <span class="badge bg-label-success">
-                    Approved
-                  </span>
-                </span>
-                <span class="custom-option-body">
-                  <small>
-                    <span class="fw-bold">Type :</span>  Owner <br />
-                    <span class="fw-bold">Email :</span>  user1@company1.com <br />
-                    <span class="fw-bold">Phone : </span> +96198151849849 <br />
-                    <span class="fw-bold">Mobile : </span> +96198151849849 <br />
-                    <span class="fw-bold">Fax : </span> +96198151849849 <br />
-                    <span class="fw-bold">Is Authorized Person : </span> Yes <br />
-                  </small>
-                  <hr class="my-2">
-                  <span class="d-flex">
-                    <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Contact Person" data-href="{{route('company.contacts.show', 1)}}">View</a>
-                      <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Contact Person" data-href="{{route('company.contacts.edit', 1)}}">Edit</a>
-                      <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.contacts.destroy', 1) }}">Remove</a>
-                  </span>
-                </span>
-              </label>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
-            <div class="form-check custom-option custom-option-basic">
-              <label class="form-check-label custom-option-content">
-                <span class="custom-option-header mb-2">
-                  <span>
-                    <h6 class="fw-semibold mb-0">Puttin De</h6>
-                    <small>Markeing Manager</small>
-                  </span>
-                  <span class="badge bg-label-success">
-                    Approved
-                  </span>
-                </span>
-                <span class="custom-option-body">
-                  <small>
-                    <span class="fw-bold">Type :</span>  Owner <br />
-                    <span class="fw-bold">Email :</span>  user1@company1.com <br />
-                    <span class="fw-bold">Phone : </span> +96198151849849 <br />
-                    <span class="fw-bold">Mobile : </span> +96198151849849 <br />
-                    <span class="fw-bold">Fax : </span> +96198151849849 <br />
-                    <span class="fw-bold">Is Authorized Person : </span> Yes <br />
-                  </small>
-                  <hr class="my-2">
-                  <span class="d-flex">
-                    <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Contact Person" data-href="{{route('company.contacts.show', 1)}}">View</a>
-                      <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Contact Person" data-href="{{route('company.contacts.edit', 1)}}">Edit</a>
-                      <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.contacts.destroy', 1) }}">Remove</a>
-                  </span>
-                </span>
-              </label>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
-            <div class="form-check custom-option custom-option-basic">
-              <label class="form-check-label custom-option-content">
-                <span class="custom-option-header mb-2">
-                  <span>
-                    <h6 class="fw-semibold mb-0">Puttin De</h6>
-                    <small>Markeing Manager</small>
-                  </span>
-                  <span class="badge bg-label-success">
-                    Approved
-                  </span>
-                </span>
-                <span class="custom-option-body">
-                  <small>
-                    <span class="fw-bold">Type :</span>  Owner <br />
-                    <span class="fw-bold">Email :</span>  user1@company1.com <br />
-                    <span class="fw-bold">Phone : </span> +96198151849849 <br />
-                    <span class="fw-bold">Mobile : </span> +96198151849849 <br />
-                    <span class="fw-bold">Fax : </span> +96198151849849 <br />
-                    <span class="fw-bold">Is Authorized Person : </span> Yes <br />
-                  </small>
-                  <hr class="my-2">
-                  <span class="d-flex">
-                    <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Contact Person" data-href="{{route('company.contacts.show', 1)}}">View</a>
-                      <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Contact Person" data-href="{{route('company.contacts.edit', 1)}}">Edit</a>
-                      <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.contacts.destroy', 1) }}">Remove</a>
-                  </span>
-                </span>
-              </label>
-            </div>
-          </div>
-          {{-- <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
-            <div class="form-check custom-option custom-option-basic h-100">
-              <div class="text-center">
-                <div class="p-3 border rounded-circle">
-                  +
-                </div>
-                <div >Add New Contact</div>
-              </div>
-            </div>
-          </div> --}}
-        </div>
+      <div id="contact-persons-card-body" class="card-body">
+        @include('pages.company-profile.new.detailed-content.contacts');
       </div>
     </div>
     <div class="card mb-4">
-      <div class="card-body">
-        @include('pages.company-profile.new.header-component', ['head_title' => 'Company Addresses', 'head_sm' => 'Manage Company Addresses', 'add_new' => route('company.addresses.create'), 'add_title' => 'Add New Address'])
-        <hr>
-        <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
-          <div class="form-check custom-option custom-option-basic">
-            <label class="form-check-label custom-option-content">
-              <span class="custom-option-header mb-2">
-                <span>
-                  <h6 class="fw-semibold mb-0">Main Office Address</h6>
-                </span>
-                <span class="badge bg-label-success">
-                  Approved
-                </span>
-              </span>
-              <span class="custom-option-body">
-                <small>
-                  <span>818 Milton Court </span><br />
-                  <span>Id animi perspiciat sdganertn wrntwrt </span><br />
-                  <span>Culpa quisquam obcae wbbwre nr</span><br />
-                  <span class="fw-bold">Post Code :</span>  98157 <br />
-                  <span class="fw-bold">City : </span> Riyadh <br />
-                  <span class="fw-bold">State : </span> Riyadh <br />
-                  <span class="fw-bold">Country : </span> Saudi Arabia <br />
-                </small>
-                <hr class="my-2">
-                <span class="d-flex">
-                  <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Address" data-href="{{route('company.addresses.show', 1)}}">View</a>
-                  <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Address" data-href="{{route('company.addresses.edit', 1)}}">Edit</a>
-                  <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.addresses.destroy', 1) }}">Remove</a>
-                </span>
-              </span>
-            </label>
-          </div>
-        </div>
+      <div id="addresses-card-body" class="card-body">
+        @include('pages.company-profile.new.detailed-content.addresses')
       </div>
     </div>
     <div class="card mb-4">
-      <div class="card-body">
+      <div id="documents-card-body" class="card-body">
         @include('pages.company-profile.new.header-component', ['head_title' => 'Verification Documents', 'head_sm' => 'Manage Verification Documents', 'add_new' => route('company.kyc-documents.create'), 'add_title' => 'Add New'])
         <hr>
       </div>
     </div>
     <div class="card mb-4">
-      <div class="card-body">
-        @include('pages.company-profile.new.header-component', ['head_title' => 'Bank Accounts', 'head_sm' => 'Manage Bank Accounts', 'add_new' => route('company.bank-accounts.create'), 'add_title' => 'Add New Account'])
-        <hr>
-        <div class="col-12">
-          <div class="mx-auto text-center">
-            <div class="my-5">
-              <i class="fa fa-magnifying-glass fa-7x" style="color: #cd545b;"></i>
-              <h3>No Account Found!</h3>
-              <span>Looks like you have not added any bank account yet. <br> No Worries click the add new button to add a new account</span>
-            </div>
-          </div>
-        </div>
+      <div id="accounts-card-body" class="card-body">
+        @include('pages.company-profile.new.detailed-content.accounts')
       </div>
     </div>
 </div>
