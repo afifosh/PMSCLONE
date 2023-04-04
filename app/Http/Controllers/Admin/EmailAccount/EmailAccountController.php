@@ -43,8 +43,17 @@ class EmailAccountController extends Controller
 
          $this->authorize('view', $account);
 
-         return view('pages.emails.show',compact('account'));
+         return response()->json($account);
     }
+
+
+    public function edit($id)
+    {
+         $account = $this->repository->withResponseRelations()->find($id);
+
+         return view('admin.pages.emails.partials.edit-account',compact('account'))->render();
+    }
+
 
     /**
      * Store a newly created email account in storage

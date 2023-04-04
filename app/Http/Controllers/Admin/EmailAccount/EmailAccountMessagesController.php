@@ -67,10 +67,9 @@ class EmailAccountMessagesController extends Controller
 
         $messages = $this->messages->withResponseRelations()
             ->pushCriteria(new EmailAccountMessageCriteria($accountId, $folderId))
-            ->paginate($request->integer('per_page', null));
+            ->paginate($request->integer('per_page', 10));
 
-        return $this->response(
-            EmailAccountMessageResource::collection($messages)
+        return response()->json($messages
         );
     }
 
@@ -271,7 +270,7 @@ class EmailAccountMessagesController extends Controller
             $dbMessage = $this->messages->createForAccount(
                 $accountId,
                 $message,
-                $this->filterAssociations('emails', $request->associations)
+                $this->filterAssociations('emails', [])
             );
 
             $jsonResource = new EmailAccountMessageResource(
@@ -284,12 +283,10 @@ class EmailAccountMessagesController extends Controller
                         app(ResourceRequest::class)->setResource($dbMessage::resource()->name())
                     )
                 ),
-                'createdActivity' => $task ? new ActivityResource($task) : null,
             ], 201);
         }
 
         return $this->response([
-            'createdActivity' => $task ? new ActivityResource($task) : null,
         ], 202);
     }
 

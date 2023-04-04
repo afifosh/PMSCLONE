@@ -930,7 +930,7 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
      */
     protected function purge($message)
     {
-        foreach (['deals', 'contacts', 'companies', 'folders'] as $relation) {
+        foreach (['contacts', 'companies', 'folders'] as $relation) {
             tap($message->{$relation}(), function ($query) {
                 if ($query->getModel()->usesSoftDeletes()) {
                     $query->withTrashed();
@@ -964,7 +964,6 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
                 ]),
                 'contacts.nextActivity',
                 'companies.nextActivity',
-                'deals.nextActivity',
             ];
     }
 }

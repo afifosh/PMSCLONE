@@ -125,21 +125,7 @@ class EmailAccountMessage extends Model implements Presentable
         );
     }
 
-    /**
-     * A message can have many deals.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphedByMany
-     */
-    public function deals()
-    {
-        return $this->morphedByMany(
-            \App\Models\Deal::class,
-            'messageable',
-            'email_account_messageables',
-            'message_id'
-        );
-    }
-
+  
     /**
      * A message from address
      *

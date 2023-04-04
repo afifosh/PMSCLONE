@@ -113,19 +113,6 @@ trait Resourceable
         return Innoclapps::resourceByModel(static::class);
     }
 
-    /**
-     * Boot the resource Zapier hooks
-     *
-     * @return void
-     */
-    protected static function bootZapierHooks()
-    {
-        foreach (Zapier::supportedActions() as $event) {
-            static::{$event}(function ($model) use ($event) {
-                Zapier::queue($event, $model->getKey(), static::resource());
-            });
-        }
-    }
 
     /**
      * Boot the fields model events
@@ -234,6 +221,7 @@ trait Resourceable
      */
     public static function getCustomFields()
     {
+        \Log::info('resources'.json_encode(static::resource()));
         return static::getCustomFieldRepository()->forResource(
             static::resource()->name()
         );

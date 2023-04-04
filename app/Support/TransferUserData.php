@@ -15,7 +15,6 @@ namespace App\Support;
 use ReflectionClass;
 use ReflectionMethod;
 use App\Contracts\Repositories\CallRepository;
-use App\Contracts\Repositories\DealRepository;
 use App\Contracts\Repositories\NoteRepository;
 use App\Contracts\Repositories\TeamRepository;
 use App\Innoclapps\Criteria\WithTrashedCriteria;
@@ -80,15 +79,6 @@ class TransferUserData
         $repository->massUpdate(['user_id' => $this->toUserID], ['user_id' => $this->fromUserID]);
     }
 
-    /**
-     * Transfer deals
-     */
-    public function deals()
-    {
-        $repository = resolve(DealRepository::class)->pushCriteria(WithTrashedCriteria::class);
-        $repository->massUpdate(['created_by' => $this->toUserID], ['created_by' => $this->fromUserID]);
-        $repository->massUpdate(['user_id' => $this->toUserID], ['user_id' => $this->fromUserID]);
-    }
 
     /**
      * Transfer notes

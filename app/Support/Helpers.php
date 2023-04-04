@@ -74,7 +74,7 @@ if (! function_exists('get_generated_lang')) {
     function get_generated_lang($locale = null)
     {
         $content = json_decode(
-            file_get_contents(config('innoclapps.lang.json'))
+            file_get_contents(config('app.lang.json'))
         );
 
         if (is_null($locale)) {
@@ -147,7 +147,7 @@ if (! function_exists('settings')) {
                 return tap($manager->set($driver), fn ($instance) => $save && $instance->save());
             }
 
-            if (in_array($driver, array_keys(config('settings.drivers')))) {
+            if (in_array($driver, array_keys(config('setting.drivers')))) {
                 return $manager->driver($driver);
             }
 

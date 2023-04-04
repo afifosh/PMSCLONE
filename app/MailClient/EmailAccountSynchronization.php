@@ -258,7 +258,7 @@ abstract class EmailAccountSynchronization extends EmailAccountSynchronizationMa
         $processed = 0;
         $batch     = [];
         $total     = $messages->count();
-
+        \Log::info('total'.$total);
         $this->info(sprintf('Processing %s messages.', $total));
 
         foreach ($this->sortMessagesForSync($messages) as $message) {

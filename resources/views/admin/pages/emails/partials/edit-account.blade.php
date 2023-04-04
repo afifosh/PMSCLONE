@@ -1,6 +1,4 @@
- <!-- Offcanvas to add new user -->
- <div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="edit-account-modal" style="width:50%" aria-labelledby="offcanvasAddUserLabel">
-    <div class="offcanvas-header">
+ <div class="offcanvas-header">
       <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Edit Email Account</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
@@ -25,6 +23,7 @@
             </label>
           </div>
         </div>
+@if($account->connection_type=='Imap')
         <div class="mb-3">
           <label class="form-label" for="password">Password</label>
           <input type="password" id="password" class="form-control" name="password" />
@@ -80,6 +79,7 @@
 </div>
 </div>
         </div>
+@endif
         <div class="mb-3">
         <div class="form-check">
             <input name="validate_cert" class="form-check-input" type="checkbox" value="0" id="validate_cert">
@@ -100,4 +100,3 @@
         <button type="button" id="save-account" class="btn btn-primary me-sm-3 me-1 data-submit">Connect Account</button>
       </form>
     </div>
-  </div>

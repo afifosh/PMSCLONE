@@ -439,7 +439,6 @@ class Application
         if (is_object($model)) {
             $model = $model::class;
         }
-
         if (isset(static::$resourcesByModel[$model])) {
             return static::$resourcesByModel[$model];
         }
@@ -474,6 +473,7 @@ class Application
             })->map(function ($resource) {
                 return is_string($resource) ? new $resource : $resource;
             })->sortBy(fn ($resource) => $resource::name());
+
     }
 
     /**

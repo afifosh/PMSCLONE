@@ -465,13 +465,6 @@ abstract class Resource implements JsonSerializable
         }
     }
 
-    /**
-     * Register the resource available cards
-     */
-    protected function registerCards() : void
-    {
-        Cards::register($this->name(), fn () => $this->cards());
-    }
 
     /**
      * Register the resource available CRUD fields
@@ -515,8 +508,6 @@ abstract class Resource implements JsonSerializable
         if ($this instanceof Resourceful) {
             $this->registerFields();
         }
-
-        $this->registerCards();
 
         Innoclapps::booting(function () {
             $this->registerMenuItems();

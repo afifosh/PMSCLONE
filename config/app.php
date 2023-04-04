@@ -98,6 +98,37 @@ return [
     */
 
     'fallback_locale' => 'en',
+  /* -----------------------------------------------------------------
+     |  Drivers
+     | -----------------------------------------------------------------
+     */
+
+     'drivers' => [
+
+        'database' => [
+            'driver' => \App\Innoclapps\Settings\Stores\DatabaseStore::class,
+
+            'options' => [
+                'table' => 'settings',
+                'model' => \App\Innoclapps\Models\Setting::class,
+            ],
+        ],
+
+        'redis' => [
+            'driver' => App\Innoclapps\Settings\Stores\RedisStore::class,
+
+            'options' => [
+                'client' => 'predis',
+
+                'default' => [
+                    'host'     => env('REDIS_HOST', '127.0.0.1'),
+                    'port'     => env('REDIS_PORT', 6379),
+                    'database' => env('REDIS_DB', 0),
+                ],
+            ],
+        ],
+
+    ],
 
     /*
     |--------------------------------------------------------------------------

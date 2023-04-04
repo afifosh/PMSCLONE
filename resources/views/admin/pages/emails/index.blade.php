@@ -67,11 +67,17 @@
 <script>
   @if($accounts->count()>0)
             $('#send-email').on('click', function() {
-          saveRecord(this,"POST","{{url('/admin/inbox/emails/'.$accounts[0]->id)}}","email-compose-form","Please try again");
+              var account_id=$("#select-account").find(":selected").val();
+              var url="{{url('/admin/inbox/emails/:accountId')}}";
+              url=url.replace(":accountId",account_id);
+          saveRecord(this,"POST",url,"email-compose-form","Please try again");
             });
             @endif
             function editAccount(){
-              var account_id=$("#select-account").find(":selected").val();          
+              var account_id=$("#select-account").find(":selected").val();
+              var url="{{url('/admin/mail/accounts/:accountId/edit')}}";
+              url=url.replace(":accountId",account_id);
+              ajaxModal(url,"edit-account-modal");          
             }
   function sync(){
     var account_id=$("#select-account").find(":selected").val();
@@ -86,6 +92,93 @@
     })
     
   }
+  $('#select-account').on('change',function(){
+    var account_id=$("#select-account").find(":selected").val();
+    populateFolders(account_id);
+  });
+  $(function(){
+    var account_id=$("#select-account").find(":selected").val();
+    populateFolders(account_id);
+    
+  })
+  function populateFolders(account_id){
+    var url='{{url("/admin/mail/accounts/:accountId")}}';
+    url=url.replace(':accountId',account_id);
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (response, status) {
+          var folders=response.folders;
+          var html='';
+          for(var i=0; i<folders.length; i++){
+            html+=`<li class="d-flex justify-content-between" data-target="`+folders[i].id+`">
+            <a href="javascript:populateMessages(`+account_id+`,`+folders[i].id+`);" class="d-flex flex-wrap align-items-center">
+              <span class="align-middle ms-2">`+folders[i].display_name+`</span>
+            </a>
+          </li>`;
+
+          }
+          $('#folders').html(html);
+          populateMessages(account_id,folders[0].id);
+        },
+        error: function (response) {
+            var message = "";
+            if
+                (response.responseJSON.message == undefined) { message = errorMesage }
+            else { message = response.responseJSON.message }
+            toastr.error(message);
+        }
+    });
+  }
+  function populateMessages(account_id,folder_id){
+    var url='{{url("/admin/inbox/emails/:accountId/:folderId}")}}';
+    url=url.replace(':accountId',account_id);
+    url=url.replace(':folderId',folder_id);
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (response, status) {
+          var messages=response.data;
+           var html='';
+           for(var i=0; i<messages.length; i++){
+          html+=`
+            <li class="email-list-item" data-12="true" data-bs-toggle="sidebar" data-target="#app-email-view">
+              <div class="d-flex align-items-center">
+                <div class="form-check mb-0">
+                  <input class="email-list-item-input form-check-input" type="checkbox" id="email-1">
+                  <label class="form-check-label" for="email-1"></label>
+                </div>
+                <i class="email-list-item-bookmark ti ti-star ti-xs d-sm-inline-block d-none cursor-pointer ms-2 me-3"></i>
+                <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/1.png" alt="user-avatar" class="d-block flex-shrink-0 rounded-circle me-sm-3 me-2" height="32" width="32" />
+                <div class="email-list-item-content ms-2 ms-sm-0 me-2">
+                  <span class="h6 email-list-item-username me-2">`+messages[i].from.name+`</span>
+                  <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
+                </div>
+                <div class="email-list-item-meta ms-auto d-flex align-items-center">
+                  <span class="email-list-item-label badge badge-dot bg-danger d-none d-md-inline-block me-2" data-label="private"></span>
+                  <small class="email-list-item-time text-muted">08:40 AM</small>
+                  <ul class="list-inline email-list-item-actions text-nowrap">
+                    <li class="list-inline-item email-read"> <i class='ti ti-mail-opened'></i> </li>
+                    <li class="list-inline-item email-delete"> <i class='ti ti-trash'></i></li>
+                    <li class="list-inline-item"> <i class="ti ti-archive"></i> </li>
+                  </ul>
+                </div>
+              </div>
+            </li>`;
+
+          }
+           $('#email-list').html(html);
+        },
+        error: function (response) {
+            var message = "";
+            if
+                (response.responseJSON.message == undefined) { message = errorMesage }
+            else { message = response.responseJSON.message }
+            toastr.error(message);
+        }
+    });
+  }
+
 </script>
 @endsection
 
@@ -108,14 +201,13 @@
       <!-- Email Filters -->
       <div class="email-filters py-2">
         <!-- Email Filters: Folder -->
-        <ul class="email-filter-folders list-unstyled mb-4">
-      @foreach($accounts[0]->folders as $folder)
-        <li class="d-flex justify-content-between" data-target="{{$folder->id}}">
+        <ul id="folders" class="email-filter-folders list-unstyled mb-4">
+        <li class="d-flex justify-content-between">
             <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
-              <span class="align-middle ms-2">{{$folder->display_name}}</span>
+              <span class="align-middle ms-2">        Rendering...
+</span>
             </a>
           </li>
-          @endforeach
         </ul>
       </div>
     </div>
@@ -144,8 +236,9 @@
                 <i class="ti ti-dots-vertical cursor-pointer" id="emailsActions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="emailsActions">
-                  <a class="dropdown-item" onclick="editAccount();">Edit Email Account</a>
+                  <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#edit-account-modal" href="javascript:void(0)" onclick="editAccount();">Edit Email Account</a>
                   <a class="dropdown-item" href="javascript:void(0)">Manage Accounts</a>
+                  <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#offcanvasAddUser" >Connect Personal Account</button>
                 </div>
               </div>
             </div>
@@ -210,36 +303,8 @@
         <hr class="container-m-nx m-0">
         <!-- Email List: Items -->
         <div  class="email-list pt-0">
-        <ul class="list-unstyled m-0">
+        <ul id="email-list" class="list-unstyled m-0">
 
-        @foreach($accounts[0]->folders as $folder)
-
-            <li class="email-list-item" data-12="true" data-bs-toggle="sidebar" data-target="#app-email-view">
-              <div class="d-flex align-items-center">
-                <div class="form-check mb-0">
-                  <input class="email-list-item-input form-check-input" type="checkbox" id="email-1">
-                  <label class="form-check-label" for="email-1"></label>
-                </div>
-                <i class="email-list-item-bookmark ti ti-star ti-xs d-sm-inline-block d-none cursor-pointer ms-2 me-3"></i>
-                <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/1.png" alt="user-avatar" class="d-block flex-shrink-0 rounded-circle me-sm-3 me-2" height="32" width="32" />
-                <div class="email-list-item-content ms-2 ms-sm-0 me-2">
-                  <span class="h6 email-list-item-username me-2">Chandler Bing</span>
-                  <span class="email-list-item-subject d-xl-inline-block d-block"> Focused impactful open issues from the project of GitHub</span>
-                </div>
-                <div class="email-list-item-meta ms-auto d-flex align-items-center">
-                  <span class="email-list-item-label badge badge-dot bg-danger d-none d-md-inline-block me-2" data-label="private"></span>
-                  <small class="email-list-item-time text-muted">08:40 AM</small>
-                  <ul class="list-inline email-list-item-actions text-nowrap">
-                    <li class="list-inline-item email-read"> <i class='ti ti-mail-opened'></i> </li>
-                    <li class="list-inline-item email-delete"> <i class='ti ti-trash'></i></li>
-                    <li class="list-inline-item"> <i class="ti ti-archive"></i> </li>
-                  </ul>
-                </div>
-              </div>
-            </li>
-
-          
-        @endforeach
         </ul>
         </div>
       </div>
@@ -751,6 +816,9 @@
     </div>
   </div>
  @include('admin.pages.emails.partials.connect-account')
+  <!-- Offcanvas to add new user -->
+  <div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="edit-account-modal" style="width:50%" aria-labelledby="editAccountModal">
+  </div>
 </div>
 
 @endif

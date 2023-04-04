@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Innoclapps\Facades\Innoclapps;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
@@ -32,5 +33,6 @@ class AppServiceProvider extends ServiceProvider
       \URL::forceScheme('https');
       $url->formatScheme('https');
     }
+    Innoclapps::resourcesIn(app_path('Resources'));
   }
 }
