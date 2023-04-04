@@ -28,6 +28,6 @@ class DatabaseSeeder extends Seeder
         $this->call(CompanySeeder::class);
         $this->call(ProgramSeeder::class);
         $this->call(WorkflowSeeder::class);
-        $this->call(KycDocumentSeeder::class);
+        // $this->call(KycDocumentSeeder::class);
     }
 }
