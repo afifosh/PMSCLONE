@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Company\CompanyProfile\DetailsUpdateRequest;
 use App\Models\CompanyDetail;
 use App\Models\Country;
+use App\Models\KycDocument;
 use App\Repositories\FileUploadRepository;
 
 class CompanyProfileController extends Controller
@@ -37,6 +38,11 @@ class CompanyProfileController extends Controller
     $data['pending_addresses'] = auth()->user()->company->POCAddress()->where('is_update', false)->get();
     $data['bankAccounts'] = auth()->user()->company->bankAccounts;
     $data['pending_creation_accounts'] = auth()->user()->company->POCBankAccount()->where('is_update', false)->get();
+    $locality_type = auth()->user()->company->getPOCLocalityType();
+    if(!$locality_type){
+      return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
+    }
+    $data['documents'] = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->get();
 
     return view('pages.company-profile.new.detailed-content', $data);
   }

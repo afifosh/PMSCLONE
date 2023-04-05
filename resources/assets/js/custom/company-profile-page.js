@@ -47,44 +47,86 @@ $(document).on('click', '.account-image-reset', function () {
   // --------------------------------------------------------------------
   // Numbered Wizard
   // --------------------------------------------------------------------
-  const wizardElm = $('.wizard-numbered')[0],
-    companyProfileStepper = new Stepper(wizardElm, {
-      linear: false
-    });
-  window.triggerNext = function () {
-    companyProfileStepper.next();
-  };
-  window.triggerStep = function (step) {
-    companyProfileStepper.to(0);
-    companyProfileStepper.to(step);
-  };
-  $(document).on('click', '.btn-prev', function () {
-    companyProfileStepper.previous();
-  });
-  $(document).on('click', '.btn-next', function () {
-    companyProfileStepper.next();
-  });
-  wizardElm.addEventListener('show.bs-stepper', function (event) {
-    const stepElm = $(wizardElm).find('.step-index-' + event.detail.indexStep)[0],
-      target = $($(stepElm).data('target')),
-      url = $(stepElm).data('href');
-    if (url) {
-      getData(url).then(function (resp) {
-        $(target).html(resp.data.view_data);
-        $(target)
-          .find('.select2')
-          .each(function () {
-            if (!$(this).data('select2')) {
-              var $this = $(this);
-              $this.wrap('<div class="position-relative"></div>');
-              $this.select2({
-                dropdownParent: $this.parent()
-              });
-            }
-          });
+  const wizardElm = $('.wizard-numbered')[0];
+  console.log(wizardElm && true);
+  if (wizardElm) {
+    window.companyProfileStepper = new Stepper(wizardElm, {
+        linear: false
       });
+    window.triggerNext = function () {
+      companyProfileStepper.next();
+    };
+    $(document).on('click', '.btn-prev', function () {
+      companyProfileStepper.previous();
+    });
+    $(document).on('click', '.btn-next', function () {
+      companyProfileStepper.next();
+    });
+    wizardElm.addEventListener('show.bs-stepper', function (event) {
+      const stepElm = $(wizardElm).find('.step-index-' + event.detail.indexStep)[0],
+        target = $($(stepElm).data('target')),
+        url = $(stepElm).data('href');
+      if (url) {
+        getData(url).then(function (resp) {
+          $(target).html(resp.data.view_data);
+          $(target)
+            .find('.select2')
+            .each(function () {
+              if (!$(this).data('select2')) {
+                var $this = $(this);
+                $this.wrap('<div class="position-relative"></div>');
+                $this.select2({
+                  dropdownParent: $this.parent()
+                });
+              }
+            });
+        });
+      }
+    });
+  }
+
+  window.triggerStep = function (step) {
+    if(wizardElm){
+      companyProfileStepper.to(0);
+      companyProfileStepper.to(step);
+    }else if(step === 1){
+      reload_company_details();
+    }else if(step === 2){
+      reload_company_contacts();
+    }else if(step === 3){
+      reload_company_addresses();
+    }else if(step === 5){
+      reload_company_bank_acc();
     }
-  });
+  };
+
+  window.reload_company_details = function () {
+    const url = $('#details-card').data('href');
+    getData(url).then(function (resp) {
+      $('#details-card').find('.collapse').html(resp.data.view_data);
+    });
+  }
+
+  window.reload_company_contacts = function () {
+    const url = $('#contact-persons-card').data('href');
+    getData(url).then(function (resp) {
+      $('#contact-persons-card').find('.collapse').html(resp.data.view_data);
+    });
+  }
+
+  window.reload_company_addresses = function () {
+    const url = $('#addresses-card').data('href');
+    getData(url).then(function (resp) {
+      $('#addresses-card').find('.collapse').html(resp.data.view_data);
+    });
+  }
+
+  window.reload_company_bank_acc = function () {
+    const url = $('#accounts-card').data('href');
+    getData(url).then(function (resp) {
+      $('#accounts-card').find('.collapse').html(resp.data.view_data);
+    });
+  }
 
   function getData(url) {
     return $.ajax({
@@ -96,3 +138,137 @@ $(document).on('click', '.account-image-reset', function () {
     });
   }
 })();
+
+/**
+ * Cards Actions
+ */
+
+(function () {
+  const collapseElementList = [].slice.call(document.querySelectorAll('.card-collapsible'));
+  const expandElementList = [].slice.call(document.querySelectorAll('.card-expand'));
+  const closeElementList = [].slice.call(document.querySelectorAll('.card-close'));
+
+  let cardDnD = document.getElementById('sortable-4');
+
+  // Collapsible card
+  // --------------------------------------------------------------------
+  if (collapseElementList) {
+    collapseElementList.map(function (collapseElement) {
+      collapseElement.addEventListener('click', event => {
+        event.preventDefault();
+        // Collapse the element
+        new bootstrap.Collapse(collapseElement.closest('.card').querySelector('.collapse'));
+        // Toggle collapsed class in `.card-header` element
+        collapseElement.closest('.card-header').classList.toggle('collapsed');
+        // Toggle class ti-chevron-down & ti-chevron-right
+        Helpers._toggleClass(collapseElement.firstElementChild, 'ti-chevron-down', 'ti-chevron-right');
+      });
+    });
+  }
+
+  // Card Toggle fullscreen
+  // --------------------------------------------------------------------
+  if (expandElementList) {
+    expandElementList.map(function (expandElement) {
+      expandElement.addEventListener('click', event => {
+        event.preventDefault();
+        // Toggle class ti-arrows-maximize & ti-arrows-minimize
+        Helpers._toggleClass(expandElement.firstElementChild, 'ti-arrows-maximize', 'ti-arrows-minimize');
+
+        expandElement.closest('.card').classList.toggle('card-fullscreen');
+      });
+    });
+  }
+
+  // Toggle fullscreen on esc key
+  document.addEventListener('keyup', event => {
+    event.preventDefault();
+    //Esc button
+    if (event.key === 'Escape') {
+      const cardFullscreen = document.querySelector('.card-fullscreen');
+      // Toggle class ti-arrows-maximize & ti-arrows-minimize
+
+      if (cardFullscreen) {
+        Helpers._toggleClass(cardFullscreen.querySelector('.card-expand').firstChild, 'ti-arrows-maximize', 'ti-arrows-minimize');
+        cardFullscreen.classList.toggle('card-fullscreen');
+      }
+    }
+  });
+
+  // Card close
+  // --------------------------------------------------------------------
+  if (closeElementList) {
+    closeElementList.map(function (closeElement) {
+      closeElement.addEventListener('click', event => {
+        event.preventDefault();
+        closeElement.closest('.card').classList.add('d-none');
+      });
+    });
+  }
+
+  // Sortable.js (Drag & Drop cards)
+  // --------------------------------------------------------------------
+  if (typeof cardDnD !== undefined && cardDnD !== null) {
+    Sortable.create(cardDnD, {
+      animation: 500,
+      handle: '.card'
+    });
+  }
+})();
+
+// Card reload (jquery)
+// --------------------------------------------------------------------
+$(function () {
+  const cardReload = $('.card-reload');
+  if (cardReload.length) {
+    cardReload.on('click', function (e) {
+      e.preventDefault();
+      var $this = $(this);
+      var url = $this.parents('.card').data('href');
+      $this.closest('.card').block({
+        message:
+          '<div class="sk-fold sk-primary"><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div></div><h5>LOADING...</h5>',
+
+        css: {
+          backgroundColor: 'transparent',
+          border: '0'
+        },
+        overlayCSS: {
+          backgroundColor: $('html').hasClass('dark-style') ? '#000' : '#fff',
+          opacity: 0.55
+        }
+      });
+      getData(url).then(function (resp) {
+        $this.parents('.card').find('.collapse').html(resp.data.view_data);
+        $this.closest('.card').unblock();
+        $this.closest('.card').find('.select2').each(function () {
+          if (!$(this).data('select2')) {
+            var $this = $(this);
+            $this.wrap('<div class="position-relative"></div>');
+            $this.select2({
+              dropdownParent: $this.parent()
+            });
+          }
+        });
+        if ($this.closest('.card').find('.card-alert').length) {
+          $this
+            .closest('.card')
+            .find('.card-alert')
+            .html(
+              '<div class="alert alert-danger alert-dismissible fade show" role="alert"><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button><strong>Holy grail!</strong> Your success/error message here.</div>'
+            );
+        }
+      });
+    });
+  }
+
+  function getData(url) {
+    return $.ajax({
+      url: url,
+      type: 'get',
+      success: function (data) {
+        return data;
+      }
+    });
+  }
+});

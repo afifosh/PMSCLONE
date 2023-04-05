@@ -20,7 +20,11 @@ class AddressController extends Controller
     if (request()->ajax()) {
       $data['addresses'] = auth()->user()->company->addresses;
       $data['pending_addresses'] = auth()->user()->company->POCAddress()->where('is_update', false)->get();
-      return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.addresses.index', $data)->render()]);
+      $data['countries'] = Country::pluck('name', 'id');
+      $view_data = auth()->user()->company->isHavingPendingProfile() ? view('pages.company-profile.addresses.index', $data)->render()
+        : view('pages.company-profile.new.detailed-content.addresses', $data)->render();
+
+      return $this->sendRes('success', ['view_data' =>  $view_data]);
     }
   }
 

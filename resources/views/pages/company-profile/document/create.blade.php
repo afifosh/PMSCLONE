@@ -6,12 +6,12 @@
   <h5>{{$document->title}}</h5>
     @foreach ($document->fields as $index => $field)
         @if ($field['type'] == 'textarea')
-            <div class="form-group col-6">
+            <div class="form-group col-6 mt-2">
                 <label for="fields_{{ $loop->index }}" class="required">{{ $field['label'] }}</label>
                 <textarea name="doc_{{$document->id}}_field_{{$loop->index}}_{{$field['type']}}" id="fields_{{ $loop->index }}" class="form-control h-25" required></textarea>
             </div>
         @else
-            <div class="form-group col-6">
+            <div class="form-group col-6 mt-2">
                 <label for="fields_{{ $loop->index }}" class="required">{{ $field['label'] }}</label>
                 <input type="{{ $field['type'] }}" name="doc_{{$document->id}}_field_{{$loop->index}}_{{$field['type']}}" id="fields_{{ $loop->index }}"
                     class="form-control" @if ($field['type'] == 'file') accept=".jpg,.jpeg,.png" @endif required>

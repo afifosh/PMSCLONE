@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Company\CompanyProfile\BankAccountUpdateRequest;
 use App\Models\CompanyBankAccount;
 use App\Models\Country;
-use Illuminate\Http\Request;
 
 class BankAccountController extends Controller
 {
@@ -20,7 +19,11 @@ class BankAccountController extends Controller
     if (request()->ajax()) {
       $data['bankAccounts'] = auth()->user()->company->bankAccounts;
       $data['pending_creation_accounts'] = auth()->user()->company->POCBankAccount()->where('is_update', false)->get();
-      return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.bank-accounts.index', $data)->render()]);
+      $data['countries'] = Country::pluck('name', 'id');
+      $view_data = auth()->user()->company->isHavingPendingProfile() ? view('pages.company-profile.bank-accounts.index', $data)->render()
+        : view('pages.company-profile.new.detailed-content.accounts', $data)->render();
+
+      return $this->sendRes('success', ['view_data' =>  $view_data]);
     }
   }
 

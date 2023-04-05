@@ -20,7 +20,10 @@ class ContactController extends Controller
     if (request()->ajax()) {
       $data['contacts'] = auth()->user()->company->contacts()->with('modifications', 'modifications.disapprovals')->get();
       $data['pending_creation_contacts'] = auth()->user()->company->POCContact()->where('is_update', false)->with('disapprovals')->get();
-      return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.index', $data)->render()]);
+      $view_data = auth()->user()->company->isHavingPendingProfile() ? view('pages.company-profile.contacts.index', $data)->render()
+        : view('pages.company-profile.new.detailed-content.contacts', $data)->render();
+
+      return $this->sendRes('success', ['view_data' =>  $view_data]);
     }
   }
 
