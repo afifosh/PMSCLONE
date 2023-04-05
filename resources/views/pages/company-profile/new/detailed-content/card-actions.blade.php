@@ -14,9 +14,6 @@
       <li class="list-inline-item">
         <a href="javascript:void(0);" class="card-expand"><i class="tf-icons ti ti-arrows-maximize ti-sm"></i></a>
       </li>
-      <li class="list-inline-item">
-        <a href="javascript:void(0);" class="card-close"><i class="tf-icons ti ti-x ti-sm"></i></a>
-      </li>
     </ul>
   </div>
 </div>

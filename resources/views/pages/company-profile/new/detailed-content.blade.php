@@ -32,9 +32,9 @@
 @endsection
 
 @section('content')
-  {{-- <div class="alert alert-danger position-fixed w-100" style="z-index:1" role="alert">
+  <div class="alert alert-danger position-fixed w-100" style="z-index:1" role="alert">
     Details Are Under Review, You cannot modifiy them.
-  </div> --}}
+  </div>
 <!-- Header -->
 <div class="row">
   <div class="col-12">
@@ -96,40 +96,38 @@
   <div class="col-12">
     <div id="details-card" class="card card-action mb-4" data-href="{{ route('company.editDetails')}}">
       @include('pages.company-profile.new.detailed-content.card-actions', ['title' => 'Company Details', 'desc' => 'Manage Company Details'])
-      <div class="collapse">
+      <div class="collapse show">
         @include('pages.company-profile.new.detailed-content.details')
       </div>
     </div>
     <div id="contact-persons-card" class="card card-action mb-4" data-href="{{ route('company.contacts.index')}}">
       @include('pages.company-profile.new.detailed-content.card-actions', ['title' => 'Contact Persons', 'desc' => 'Manage Contact Persons'])
-      <div class="collapse">
+      <div class="collapse show">
         @include('pages.company-profile.new.detailed-content.contacts')
       </div>
     </div>
     <div id="addresses-card" class="card card-action mb-4" data-href="{{route('company.addresses.index')}}">
       @include('pages.company-profile.new.detailed-content.card-actions', ['title' => 'Company Addresses', 'desc' => 'Manage Company Addresses'])
-      <div class="collapse">
+      <div class="collapse show">
         @include('pages.company-profile.new.detailed-content.addresses')
       </div>
     </div>
     <div id="documents-card" class="card card-action mb-4" data-href="{{ route('company.kyc-documents.index')}}">
       @include('pages.company-profile.new.detailed-content.card-actions', ['title' => 'Verification Documents', 'desc' => 'Manage Verification Documents'])
-      <div class="collapse">
+      <div class="collapse show">
         @include('pages.company-profile.new.detailed-content.documents')
       </div>
     </div>
     <div id="accounts-card" class="card card-action mb-4" data-href="{{ route('company.bank-accounts.index')}}">
       @include('pages.company-profile.new.detailed-content.card-actions', ['title' => 'Bank Accounts', 'desc' => 'Manage Bank Accounts'])
-      <div class="collapse">
+      <div class="collapse show">
         @include('pages.company-profile.new.detailed-content.accounts')
       </div>
     </div>
-    @if (auth()->user()->company->isEditable())
-      <div class="card card-action mb-4">
-        <div class="card-body d-flex justify-content-end">
-          <a href="{{route('company.submitApprovalRequest')}}" class="btn btn-outline-light waves-effect bg-dark {{auth()->user()->company->canBeSentForApproval() ? '': 'disabled'}}" type="button"> <span class="align-middle d-sm-inline-block me-sm-1">Send for Approval</span></a>
-        </div>
+    <div class="card card-action mb-4">
+      <div class="card-body d-flex justify-content-end">
+        <a href="{{route('company.submitApprovalRequest')}}" class="btn btn-outline-light waves-effect bg-dark {{auth()->user()->company->canBeSentForApproval() ? '': 'disabled'}}" type="button"> <span class="align-middle d-sm-inline-block me-sm-1">Send for Approval</span></a>
       </div>
-    @endif
+    </div>
 </div>
 @endsection
