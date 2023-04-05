@@ -1,10 +1,10 @@
  <!-- Offcanvas to add new user -->
- <div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="offcanvasAddUser" style="width:50%" aria-labelledby="offcanvasAddUserLabel">
+ <div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="offcanvasAddUser" style="width:50%; background-color:white !important" aria-labelledby="offcanvasAddUserLabel">
     <div class="offcanvas-header">
       <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Create Email Account</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100">
+    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100" style="padding:inherit;">
       <form class="add-new-user pt-0" id="add-mail-account">
       <div class="mb-3">
           <label class="form-label" for="connection_type">Account Type</label>

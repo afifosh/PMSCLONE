@@ -24,162 +24,7 @@
 @endsection
 
 @section('page-script')
-<script src="{{asset('assets/js/custom/company-profile-page.js')}}"></script>
-<script>
-    $('#connection_type').on('change',function(){
-        if($(this).find(':selected').val()==='Imap'){
-            $("#imap-area").css("filter","none");
-            $('#save-account').prop('disabled',true);        
-            $('#test-connection').show();        
-        }
-        else{
-            $("#imap-area").css("filter","blur(4px)");
-            $('#test-connection').attr('style', 'display: none !important');        
-            $('#save-account').prop('disabled',false);        
-
-        }
-    });
-    $('#save-account').on('click',function(){
-      if($('#connection_type').find(':selected').val()==='Gmail'){
-       window.location=("{{url('/admin/mail/accounts/personal/google/connect')}}?period="+$('input[name=initial_sync_from]:checked').val());
-        }
-        else if($('#connection_type').find(':selected').val()==='Outlook'){
-          window.location=("{{url('/admin/mail/accounts/personal/microsoft/connect')}}?period="+$('input[name=initial_sync_from]:checked').val());
-
-        }
-        else if($('#connection_type').find(':selected').val()==='Imap'){
-          saveRecord(this,"POST","{{url('/admin/mail/accounts')}}","add-mail-account","Please try again");
-
-        }
-    });
-    $("#test-connection").on('click',function(){
-     var data= saveRecord(this,"POST","{{url('/admin/mail/accounts/connection')}}","add-mail-account","Please try again");
-      console.log(data.folders);
-      var html=` <div class="form-check">
-            <input name="validate_cert" class="form-check-input" type="checkbox" value="0" id="validate_cert">
-            <label class="form-check-label" for="validate_cert">
-            Allow non secure certificate.
-            </label>
-          </div>`;
-          $('#folders-area').html(html);
-    });
-</script>
-<script>
-  @if($accounts->count()>0)
-            $('#send-email').on('click', function() {
-              var account_id=$("#select-account").find(":selected").val();
-              var url="{{url('/admin/inbox/emails/:accountId')}}";
-              url=url.replace(":accountId",account_id);
-          saveRecord(this,"POST",url,"email-compose-form","Please try again");
-            });
-            @endif
-            function editAccount(){
-              var account_id=$("#select-account").find(":selected").val();
-              var url="{{url('/admin/mail/accounts/:accountId/edit')}}";
-              url=url.replace(":accountId",account_id);
-              ajaxModal(url,"edit-account-modal");          
-            }
-  function sync(){
-    var account_id=$("#select-account").find(":selected").val();
-    var url="{{url('/admin/mail/accounts/:accountId/sync')}}";
-    url=url.replace(':accountId',account_id);
-    $.ajax({
-      url:url,
-      method:'GET',
-      success:function(response){
-        console.log(response);
-      }
-    })
-    
-  }
-  $('#select-account').on('change',function(){
-    var account_id=$("#select-account").find(":selected").val();
-    populateFolders(account_id);
-  });
-  $(function(){
-    var account_id=$("#select-account").find(":selected").val();
-    populateFolders(account_id);
-    
-  })
-  function populateFolders(account_id){
-    var url='{{url("/admin/mail/accounts/:accountId")}}';
-    url=url.replace(':accountId',account_id);
-    $.ajax({
-        url: url,
-        type: "GET",
-        success: function (response, status) {
-          var folders=response.folders;
-          var html='';
-          for(var i=0; i<folders.length; i++){
-            html+=`<li class="d-flex justify-content-between" data-target="`+folders[i].id+`">
-            <a href="javascript:populateMessages(`+account_id+`,`+folders[i].id+`);" class="d-flex flex-wrap align-items-center">
-              <span class="align-middle ms-2">`+folders[i].display_name+`</span>
-            </a>
-          </li>`;
-
-          }
-          $('#folders').html(html);
-          populateMessages(account_id,folders[0].id);
-        },
-        error: function (response) {
-            var message = "";
-            if
-                (response.responseJSON.message == undefined) { message = errorMesage }
-            else { message = response.responseJSON.message }
-            toastr.error(message);
-        }
-    });
-  }
-  function populateMessages(account_id,folder_id){
-    var url='{{url("/admin/inbox/emails/:accountId/:folderId}")}}';
-    url=url.replace(':accountId',account_id);
-    url=url.replace(':folderId',folder_id);
-    $.ajax({
-        url: url,
-        type: "GET",
-        success: function (response, status) {
-          var messages=response.data;
-           var html='';
-           for(var i=0; i<messages.length; i++){
-          html+=`
-            <li class="email-list-item" data-12="true" data-bs-toggle="sidebar" data-target="#app-email-view">
-              <div class="d-flex align-items-center">
-                <div class="form-check mb-0">
-                  <input class="email-list-item-input form-check-input" type="checkbox" id="email-1">
-                  <label class="form-check-label" for="email-1"></label>
-                </div>
-                <i class="email-list-item-bookmark ti ti-star ti-xs d-sm-inline-block d-none cursor-pointer ms-2 me-3"></i>
-                <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/1.png" alt="user-avatar" class="d-block flex-shrink-0 rounded-circle me-sm-3 me-2" height="32" width="32" />
-                <div class="email-list-item-content ms-2 ms-sm-0 me-2">
-                  <span class="h6 email-list-item-username me-2">`+messages[i].from.name+`</span>
-                  <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
-                </div>
-                <div class="email-list-item-meta ms-auto d-flex align-items-center">
-                  <span class="email-list-item-label badge badge-dot bg-danger d-none d-md-inline-block me-2" data-label="private"></span>
-                  <small class="email-list-item-time text-muted">08:40 AM</small>
-                  <ul class="list-inline email-list-item-actions text-nowrap">
-                    <li class="list-inline-item email-read"> <i class='ti ti-mail-opened'></i> </li>
-                    <li class="list-inline-item email-delete"> <i class='ti ti-trash'></i></li>
-                    <li class="list-inline-item"> <i class="ti ti-archive"></i> </li>
-                  </ul>
-                </div>
-              </div>
-            </li>`;
-
-          }
-           $('#email-list').html(html);
-        },
-        error: function (response) {
-            var message = "";
-            if
-                (response.responseJSON.message == undefined) { message = errorMesage }
-            else { message = response.responseJSON.message }
-            toastr.error(message);
-        }
-    });
-  }
-
-</script>
+@include('admin.pages.emails.partials.scripts')
 @endsection
 
 @section('content')
@@ -187,10 +32,10 @@
 <div class="app-email card">
   <div class="row g-0">
     <!-- Email Sidebar -->
-    <div class="col app-email-sidebar border-end flex-grow-0" id="app-email-sidebar">
+    <div class="col app-email-sidebar border-end flex-grow-0" style="width:auto" id="app-email-sidebar">
       <div class="btn-compost-wrapper d-grid">
         <div class="mb-3">
-        <select id="select-account" class="select2">
+        <select id="select-account" class="select2 form-control" style="width:100%">
           @foreach($accounts as $account)
           <option value="{{$account->id}}"> {{$account->email}}</option>
           @endforeach
@@ -204,7 +49,7 @@
         <ul id="folders" class="email-filter-folders list-unstyled mb-4">
         <li class="d-flex justify-content-between">
             <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
-              <span class="align-middle ms-2">        Rendering...
+              <span class="align-middle ms-2">        Loading...
 </span>
             </a>
           </li>
@@ -236,9 +81,9 @@
                 <i class="ti ti-dots-vertical cursor-pointer" id="emailsActions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="emailsActions">
-                  <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#edit-account-modal" href="javascript:void(0)" onclick="editAccount();">Edit Email Account</a>
-                  <a class="dropdown-item" href="javascript:void(0)">Manage Accounts</a>
-                  <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#offcanvasAddUser" >Connect Personal Account</button>
+                  <button class="dropdown-item" onclick="editAccount();">Edit Email Account</button>
+                  <a class="dropdown-item" href="{{url('/admin/mail/accounts/manage-accounts')}}">Manage Accounts</a>
+                  <button class="dropdown-item" data-bs-toggle="offcanvas" onclick="localStorage.setItem('acc_type','personal');" data-bs-target="#offcanvasAddUser" >Connect Personal Account</button>
                 </div>
               </div>
             </div>
@@ -314,255 +159,7 @@
 
     <!-- Email View -->
     <div class="col app-email-view flex-grow-0 bg-body" id="app-email-view">
-      <div class="card shadow-none border-0 rounded-0 app-email-view-header p-3 py-md-3 py-2">
-        <!-- Email View : Title  bar-->
-        <div class="d-flex justify-content-between align-items-center py-2">
-          <div class="d-flex align-items-center overflow-hidden">
-            <i class="ti ti-chevron-left ti-sm cursor-pointer me-2" data-bs-toggle="sidebar" data-target="#app-email-view"></i>
-            <h6 class="text-truncate mb-0 me-2">Focused impactful open issues</h6>
-            <span class="badge bg-label-danger rounded-pill">Private</span>
-          </div>
-          <!-- Email View : Action  bar-->
-          <div class="d-flex">
-            <i class='ti ti-printer mt-1 cursor-pointer d-sm-block d-none'></i>
-            <div class="dropdown ms-3">
-              <i class="ti ti-dots-vertical cursor-pointer" id="dropdownMoreOptions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              </i>
-              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMoreOptions">
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-mail ti-xs me-1"></i>
-                  <span class="align-middle">Mark as unread</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-mail-opened ti-xs me-1"></i>
-                  <span class="align-middle">Mark as unread</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-star ti-xs me-1"></i>
-                  <span class="align-middle">Add star</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-calendar ti-xs me-1"></i>
-                  <span class="align-middle">Create Event</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-volume-off ti-xs me-1"></i>
-                  <span class="align-middle">Mute</span>
-                </a>
-                <a class="dropdown-item d-sm-none d-block" href="javascript:void(0)">
-                  <i class="ti ti-printer ti-xs me-1"></i>
-                  <span class="align-middle">Print</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <hr class="app-email-view-hr mx-n3 mb-2">
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center">
-            <i class='ti ti-trash cursor-pointer me-3' data-bs-toggle="sidebar" data-target="#app-email-view"></i>
-            <i class='ti ti-mail-opened cursor-pointer me-3'></i>
-            <div class="dropdown me-3">
-              <i class="ti ti-folder cursor-pointer" id="dropdownMenuFolder" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              </i>
-              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuFolder">
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-info-circle ti-xs me-1"></i>
-                  <span class="align-middle">Spam</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-pencil ti-xs me-1"></i>
-                  <span class="align-middle">Draft</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-trash ti-xs me-1"></i>
-                  <span class="align-middle">Trash</span>
-                </a>
-              </div>
-            </div>
-            <div class="dropdown me-3">
-              <i class="ti ti-tag cursor-pointer" id="dropdownLabel" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              </i>
-              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLabel">
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="badge badge-dot bg-success me-1"></i>
-                  <span class="align-middle">Workshop</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="badge badge-dot bg-primary me-1"></i>
-                  <span class="align-middle">Company</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="badge badge-dot bg-info me-1"></i>
-                  <span class="align-middle">Important</span>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="d-flex align-items-center flex-wrap justify-content-end">
-            <span class="d-sm-block d-none mx-3 text-muted">1-10 of 653</span>
-            <i class="ti ti-chevron-left scaleX-n1-rtl cursor-pointer text-muted me-2"></i>
-            <i class="ti ti-chevron-right scaleX-n1-rtl cursor-pointer"></i>
-          </div>
-        </div>
-      </div>
-      <hr class="m-0">
-      <!-- Email View : Content-->
-      <div class="app-email-view-content py-4">
-        <p class="email-earlier-msgs text-center text-muted cursor-pointer mb-5">1 Earlier Message</p>
-        <!-- Email View : Previous mails-->
-        <div class="card email-card-prev mx-sm-4 mx-3">
-          <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <div class="d-flex align-items-center mb-sm-0 mb-3">
-              <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/2.png" alt="user-avatar" class="flex-shrink-0 rounded-circle me-3" height="40" width="40" />
-              <div class="flex-grow-1 ms-1">
-                <h6 class="m-0">Ross Geller</h6>
-                <small class="text-muted">rossGeller@email.com</small>
-              </div>
-            </div>
-            <div class="d-flex align-items-center">
-              <p class="mb-0 me-3 text-muted">June 20th 2020, 08:30 AM</p>
-              <i class="ti ti-paperclip cursor-pointer me-2"></i>
-              <i class="email-list-item-bookmark ti ti-star ti-xs cursor-pointer me-2"></i>
-              <div class="dropdown me-3">
-                <i class="ti ti-dots-vertical cursor-pointer" id="dropdownEmail" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                </i>
-                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownEmail">
-                  <a class="dropdown-item scroll-to-reply" href="javascript:void(0)">
-                    <i class="ti ti-corner-up-left me-1"></i>
-                    <span class="align-middle">Reply</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="ti ti-corner-up-right me-1"></i>
-                    <span class="align-middle">Forward</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="ti ti-alert-octagon me-1"></i>
-                    <span class="align-middle">Report</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <p class="fw-bold">Greetings!</p>
-            <p>
-              It is a long established fact that a reader will be distracted by the readable content
-              of a
-              page when looking at its layout.The point of using Lorem Ipsum is that it has a
-              more-or-less
-              normal distribution of letters, as opposed to using 'Content here, content here',making
-              it
-              look like readable English.
-            </p>
-            <p>
-              There are many variations of passages of Lorem Ipsum available, but the majority have
-              suffered alteration in some form, by injected humour, or randomised words which don't
-              look
-              even slightly believable.
-            </p>
-            <p class="mb-0">Sincerely yours,</p>
-            <p class="fw-bold mb-0">Envato Design Team</p>
-            <hr>
-            <p class="email-attachment-title mb-2">Attachments</p>
-            <div class="cursor-pointer">
-              <i class="ti ti-file"></i>
-              <span class="align-middle ms-1">report.xlsx</span>
-            </div>
-          </div>
-        </div>
-        <!-- Email View : Last mail-->
-        <div class="card email-card-last mx-sm-4 mx-3 mt-4">
-          <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-            <div class="d-flex align-items-center mb-sm-0 mb-3">
-              <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/1.png" alt="user-avatar" class="flex-shrink-0 rounded-circle me-3" height="40" width="40" />
-              <div class="flex-grow-1 ms-1">
-                <h6 class="m-0">Chandler Bing</h6>
-                <small class="text-muted">iAmAhoot@email.com</small>
-              </div>
-            </div>
-            <div class="d-flex align-items-center">
-              <p class="mb-0 me-3 text-muted">June 20th 2020, 08:10 AM</p>
-              <i class="ti ti-paperclip cursor-pointer me-2"></i>
-              <i class="email-list-item-bookmark ti ti-star ti-xs cursor-pointer me-2"></i>
-              <div class="dropdown me-3">
-                <i class="ti ti-dots-vertical cursor-pointer" id="dropdownEmail" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownEmail">
-                  <a class="dropdown-item scroll-to-reply" href="javascript:void(0)">
-                    <i class="ti ti-corner-up-left me-1"></i>
-                    <span class="align-middle">Reply</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="ti ti-corner-up-right me-1"></i>
-                    <span class="align-middle">Forward</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="ti ti-alert-octagon me-1"></i>
-                    <span class="align-middle">Report</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <p class="fw-bold">Greetings!</p>
-            <p>
-              It is a long established fact that a reader will be distracted by the readable content
-              of a
-              page when looking at its layout.The point of using Lorem Ipsum is that it has a
-              more-or-less
-              normal distribution of letters, as opposed to using 'Content here, content here',making
-              it
-              look like readable English.
-            </p>
-            <p>
-              There are many variations of passages of Lorem Ipsum available, but the majority have
-              suffered alteration in some form, by injected humour, or randomised words which don't
-              look
-              even slightly believable.
-            </p>
-            <p class="mb-0">Sincerely yours,</p>
-            <p class="fw-bold mb-0">Envato Design Team</p>
-            <hr>
-            <p class="email-attachment-title mb-2">Attachments</p>
-            <div class="cursor-pointer">
-              <i class="ti ti-file"></i>
-              <span class="align-middle ms-1">report.xlsx</span>
-            </div>
-          </div>
-        </div>
-        <!-- Email View : Reply mail-->
-        <div class="email-reply card mt-4 mx-sm-4 mx-3">
-          <h6 class="card-header border-0">Reply to Ross Geller</h6>
-          <div class="card-body pt-0 px-3">
-            <div class="d-flex justify-content-start">
-              <div class="email-reply-toolbar border-0 w-100 ps-0">
-                <span class="ql-formats me-0">
-                  <button class="ql-bold"></button>
-                  <button class="ql-italic"></button>
-                  <button class="ql-underline"></button>
-                  <button class="ql-list" value="ordered"></button>
-                  <button class="ql-list" value="bullet"></button>
-                  <button class="ql-link"></button>
-                  <button class="ql-image"></button>
-                </span>
-              </div>
-            </div>
-            <div class="email-reply-editor"></div>
-            <div class="d-flex justify-content-end align-items-center">
-              <div class="me-3">
-                <label class="cursor-pointer" for="attach-file-1"><i class="ti ti-paperclip me-2"></i><span class="align-middle">Attachments</span></label>
-                <input type="file" name="file-input" class="d-none" id="attach-file-1">
-
-              </div>
-              <button class="btn btn-primary">
-                <i class="ti ti-send ti-xs me-1"></i>
-                <span class="align-middle">Send</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      
     </div>
     <!-- Email View -->
   </div>
@@ -809,18 +406,19 @@
       <div class="card-footer">
       <div style="text-align:center">
 
-            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
-            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" class="btn btn-primary">Connect Personal Account</button>
+            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
+            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','personal');" class="btn btn-primary">Connect Personal Account</button>
         </div>
       </div>
     </div>
   </div>
- @include('admin.pages.emails.partials.connect-account')
-  <!-- Offcanvas to add new user -->
-  <div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="edit-account-modal" style="width:50%" aria-labelledby="editAccountModal">
-  </div>
+
 </div>
 
 @endif
-
+@include('admin.pages.emails.partials.connect-account')
+  <!-- Offcanvas to add new user -->
+  <div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="edit-account-modal" style="width:50%; background-color:white !important" aria-labelledby="editAccountModal">
+<div></div>
+</div>
 @endsection

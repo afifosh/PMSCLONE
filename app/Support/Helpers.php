@@ -1,14 +1,4 @@
 <?php
-/**
- * Concord CRM - https://www.concordcrm.com
- *
- * @version   1.1.6
- *
- * @link      Releases - https://www.concordcrm.com/releases
- * @link      Terms Of Service - https://www.concordcrm.com/terms
- *
- * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
- */
 
 use Akaunting\Money\Money;
 use Akaunting\Money\Currency;
@@ -142,17 +132,18 @@ if (! function_exists('settings')) {
     {
         $manager = app(SettingsManager::class);
 
-        if ($driver) {
-            if (is_array($driver)) {
-                return tap($manager->set($driver), fn ($instance) => $save && $instance->save());
-            }
+        // if ($driver) {
+        //     if (is_array($driver)) {
+        //         return tap($manager->set($driver), fn ($instance) => $save && $instance->save());
+        //     }
 
-            if (in_array($driver, array_keys(config('setting.drivers')))) {
-                return $manager->driver($driver);
-            }
+        //     if (in_array($driver, array_keys(config('app.drivers')))) {
+        //         return $manager->driver($driver);
+        //     }
 
-            return $manager->get($driver);
-        }
+
+        //     return $manager->get('array');
+        // }
 
         return $manager;
     }

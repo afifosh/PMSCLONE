@@ -103,33 +103,39 @@ return [
      | -----------------------------------------------------------------
      */
 
-     'drivers' => [
+   
+        'drivers' => [
 
-        'database' => [
-            'driver' => \App\Innoclapps\Settings\Stores\DatabaseStore::class,
-
-            'options' => [
-                'table' => 'settings',
-                'model' => \App\Innoclapps\Models\Setting::class,
+            'array' => [
+                'driver' => App\Innoclapps\Settings\Stores\ArrayStore::class,
             ],
-        ],
-
-        'redis' => [
-            'driver' => App\Innoclapps\Settings\Stores\RedisStore::class,
-
-            'options' => [
-                'client' => 'predis',
-
-                'default' => [
-                    'host'     => env('REDIS_HOST', '127.0.0.1'),
-                    'port'     => env('REDIS_PORT', 6379),
-                    'database' => env('REDIS_DB', 0),
+    
+    
+            'database' => [
+                'driver' => \App\Innoclapps\Settings\Stores\DatabaseStore::class,
+    
+                'options' => [
+                    'table' => 'settings',
+                    'model' => \App\Innoclapps\Models\Setting::class,
                 ],
             ],
+    
+            'redis' => [
+                'driver' => App\Innoclapps\Settings\Stores\RedisStore::class,
+    
+                'options' => [
+                    'client' => 'predis',
+    
+                    'default' => [
+                        'host'     => env('REDIS_HOST', '127.0.0.1'),
+                        'port'     => env('REDIS_PORT', 6379),
+                        'database' => env('REDIS_DB', 0),
+                    ],
+                ],
+            ],
+    
         ],
-
-    ],
-
+    
     /*
     |--------------------------------------------------------------------------
     | Faker Locale
@@ -479,7 +485,7 @@ return [
          * Application Service Providers...
          */
         App\Innoclapps\InnoclappsServiceProvider::class,
-
+        App\Innoclapps\Settings\SettingServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,

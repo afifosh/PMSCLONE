@@ -221,7 +221,6 @@ trait Resourceable
      */
     public static function getCustomFields()
     {
-        \Log::info('resources'.json_encode(static::resource()));
         return static::getCustomFieldRepository()->forResource(
             static::resource()->name()
         );

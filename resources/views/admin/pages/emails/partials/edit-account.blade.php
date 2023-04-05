@@ -3,21 +3,21 @@
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100">
-      <form class="add-new-user pt-0" id="add-mail-account">
+      <form class="add-new-user pt-0" id="update-mail-account">
       <div class="mb-3">
           <label class="form-label" for="connection_type">Account Type</label>
           <select id="connection_type" disabled name="connection_type" class="select2 form-select">
             <option selected value="{{$account->connection_type}}">{{$account->connection_type}}</option>
           </select>
         </div>
-    <div id="imap-area" style="filter:blur(4px);">
+    <div id="imap-area">
         <div class="mb-3">
           <label class="form-label" for="add-user-email">Email Address</label>
-          <input type="email" id="add-user-email" value="{{$account->email}}" class="form-control" placeholder="john.doe@example.com" aria-label="john.doe@example.com" name="email" />
+          <input type="email" disabled id="add-user-email" value="{{$account->email}}" class="form-control" placeholder="john.doe@example.com" aria-label="john.doe@example.com" name="email" />
         </div>
         <div class="mb-3">
         <div class="form-check">
-            <input name="create_contact" class="form-check-input" checked="$account->create_contact" type="checkbox" value="" id="defaultCheck1">
+            <input name="create_contact" class="form-check-input" checked="{{$account->create_contact}}" type="checkbox" value="1" id="defaultCheck1">
             <label class="form-check-label" for="defaultCheck1">
             Create Contact record if record does not exists.
             </label>
@@ -80,23 +80,38 @@
 </div>
         </div>
 @endif
-        <div class="mb-3">
-        <div class="form-check">
-            <input name="validate_cert" class="form-check-input" type="checkbox" value="0" id="validate_cert">
-            <label class="form-check-label" for="validate_cert">
-            Allow non secure certificate.
-            </label>
-          </div>
-        </div>
         <h5 class="mb-3 font-medium text-neutral-700 dark:text-neutral-100">From Header</h5>
         <div class="mb-3">
           <label class="form-label" for="from_name_header">From Name</label>
           <input type="text" id="from_name_header" class="form-control" name="from_name_header" />
         </div>
-
+<div class="mb-3">
+  @foreach($account->folders as $folder)
+  <div class="form-check">
+            <input name="folders[]" onchange="folderChanged(this);" class="form-check-input" @if($folder->syncable) checked @endif type="checkbox" value="{{json_encode($folder)}}" id="defaultCheck-{{$folder->id}}">
+            <label class="form-check-label" for="folder-{{$folder->id}}">
+            {{$folder->display_name}}
+            </label>
+          </div>
+  @endforeach
+</div>
     </div>
     <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
-    <button type="button" id="test-connection" class="btn btn-primary me-sm-3 me-1 data-submit">Test Connection / Retrieve Folders</button>
-        <button type="button" id="save-account" class="btn btn-primary me-sm-3 me-1 data-submit">Connect Account</button>
+        <button type="button" id="update-account" onclick="updateAccount({{$account->id}});" class="btn btn-primary me-sm-3 me-1 data-submit">Update Account</button>
       </form>
     </div>
+    <script>
+          function updateAccount(account_id){
+      var url="{{url('/admin/mail/accounts/:id/update')}}";
+      url=url.replace(':id',account_id);
+      saveRecord(this,"PUT",url,"update-mail-account","Please try again");
+
+    }
+    function folderChanged(elem) {
+  var jsonValue = $(elem).val();
+  var objValue = JSON.parse(jsonValue);
+  objValue.syncable = elem.checked ? 'true' : 'false';
+  var newJsonValue = JSON.stringify(objValue);
+  $(elem).val(newJsonValue);
+}
+  </script>

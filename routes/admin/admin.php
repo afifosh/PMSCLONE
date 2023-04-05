@@ -49,6 +49,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
   Route::prefix('mail/accounts')->group(function () {
    // Email accounts management
    Route::get('{account}/sync', EmailAccountSync::class);
+   Route::put('{account}/update', [EmailAccountController::class, 'update']);
    Route::get('unread', [EmailAccountController::class, 'unread']);
  
    // The GET route for all shared accounts
@@ -79,6 +80,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
       Route::post('{message}/reply', [EmailAccountMessagesController::class, 'reply']);
       Route::post('{message}/forward', [EmailAccountMessagesController::class, 'forward']);
     });
+    Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class,'manageAccounts']);
     Route::resource('/mail/accounts', EmailAccountController::class);
  
     Route::prefix('inbox')->group(function () {

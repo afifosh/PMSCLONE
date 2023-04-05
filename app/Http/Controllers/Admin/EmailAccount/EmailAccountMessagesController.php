@@ -167,9 +167,9 @@ class EmailAccountMessagesController extends Controller
         try {
             $this->messages->markAsRead($message->id, $folderId);
         } catch (MessageNotFoundException $e) {
-            return $this->response(['message' => 'The message does not exist on remote server.'], 409);
+            return response(['message' => 'The message does not exist on remote server.'], 409);
         } catch (FolderNotFoundException $e) {
-            return $this->response(['message' => 'The folder the message belongs to does not exist on remote server.'], 409);
+            return response(['message' => 'The folder the message belongs to does not exist on remote server.'], 409);
         } catch (EmptyRefreshTokenException $e) {
             // Probably here the account is disabled and no other actions are needed
         }
@@ -177,11 +177,7 @@ class EmailAccountMessagesController extends Controller
         // Load relations after marked as read so the folders unread_count is correct
         $message->loadMissing($this->messages->getResponseRelations());
 
-        return $this->response((new EmailAccountMessageResource($message))->withActions(
-            $message::resource()->resolveActions(
-                app(ResourceRequest::class)->setResource($message::resource()->name())
-            )
-        ));
+        return view('admin.pages.emails.view-email',compact('message'))->render();
     }
 
     /**
@@ -199,7 +195,7 @@ class EmailAccountMessagesController extends Controller
 
         $this->messages->deleteForAccount($message->id);
 
-        return $this->response('', 204);
+        return response('deleted successfully.', 204);
     }
 
     /**
@@ -213,9 +209,7 @@ class EmailAccountMessagesController extends Controller
     {
         $this->messages->markAsRead($messageId);
 
-        return $this->response(new EmailAccountMessageResource(
-            $this->messages->withResponseRelations()->find($messageId)
-        ));
+        return response('Marked as read');
     }
 
     /**
@@ -229,9 +223,7 @@ class EmailAccountMessagesController extends Controller
     {
         $this->messages->markAsUnread($messageId);
 
-        return $this->response(new EmailAccountMessageResource(
-            $this->messages->withResponseRelations()->find($messageId)
-        ));
+        return response('Marked as unread');
     }
 
     /**
@@ -259,11 +251,11 @@ class EmailAccountMessagesController extends Controller
 
             $message = $composer->send();
         } catch (MessageNotFoundException $e) {
-            return $this->response(['message' => 'The message does not exist on remote server.'], 409);
+            return response(['message' => 'The message does not exist on remote server.'], 409);
         } catch (FolderNotFoundException $e) {
-            return $this->response(['message' => 'The folder the message belongs to does not exist on remote server.'], 409);
+            return response(['message' => 'The folder the message belongs to does not exist on remote server.'], 409);
         } catch (\Exception $e) {
-            return $this->response(['message' => $e->getMessage()], 500);
+            return response(['message' => $e->getMessage()], 500);
         }
 
         if (! is_null($message)) {
@@ -277,17 +269,10 @@ class EmailAccountMessagesController extends Controller
                 $this->messages->withResponseRelations()->find($dbMessage->id)
             );
 
-            return $this->response([
-                'message' => $jsonResource->withActions(
-                    $dbMessage::resource()->resolveActions(
-                        app(ResourceRequest::class)->setResource($dbMessage::resource()->name())
-                    )
-                ),
-            ], 201);
+            return response('Message sent successfully.', 201);
         }
 
-        return $this->response([
-        ], 202);
+        return response('', 202);
     }
 
     /**

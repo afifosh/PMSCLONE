@@ -88,13 +88,21 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
     */
     public function update(array $attributes, $id)
     {
+        if(!isset($attributes['create_contact'])){
+            $attributes['create_contact']=false;
+        }
         $account = parent::update($attributes, $id);
 
         if (isset($attributes['from_name_header'])) {
             $account->setMeta('from_name_header', $attributes['from_name_header']);
         }
 
+        $folders=$this->getFolderRepository()->getForAccount($account->id);
+        foreach($folders as $folder){
+            $this->getFolderRepository()->markAsNotSelectable($folder->id);
+        }
         foreach ($attributes['folders'] ?? [] as $folder) {
+            $folder=json_decode($folder,true);
             $this->getFolderRepository()->persistForAccount($account, $folder);
         }
 

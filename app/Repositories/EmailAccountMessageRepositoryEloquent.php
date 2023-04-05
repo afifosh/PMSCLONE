@@ -400,7 +400,7 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
      *
      * @return boolean
      */
-    public function markAsUnread($id, $folderId)
+    public function markAsUnread($id, $folderId=null)
     {
         $message = $this->find($id);
 

@@ -35,8 +35,6 @@ class EmailAccountRequest extends FormRequest
             'connection_type'   => [Rule::requiredIf($this->isMethod('POST')), new Enum(ConnectionType::class)],
             'email'             => $this->getEmailFieldRules(),
             'password'          => $this->route('account') ? 'nullable' : 'required',
-            'sent_folder_id'    => Rule::requiredIf($this->isMethod('PUT')),
-            'trash_folder_id'   => Rule::requiredIf($this->isMethod('PUT')),
             'from_name_header'  => $this->getFromNameHeaderRules(),
             'initial_sync_from' => $this->getInitialSyncFromRules(),
             'imap_server'       => ['max:191', $this->getRequiredIfRuleForImapField()],

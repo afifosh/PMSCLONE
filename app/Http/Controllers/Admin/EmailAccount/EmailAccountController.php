@@ -30,6 +30,16 @@ class EmailAccountController extends Controller
         return view('admin.pages.emails.index',compact('accounts'));
     }
 
+    public function manageAccounts(Request $request)
+    {
+        // $accounts = EmailAccount::where('user_id',\Auth::user()->id)->get();
+        $accounts = $this->repository->withResponseRelations()
+        ->pushCriteria(new EmailAccountsForUserCriteria(\Auth::user()))
+        ->all();
+
+        return view('admin.pages.emails.manage-accounts',compact('accounts'));
+    }
+
     /**
      * Display email account;
      *
@@ -70,10 +80,10 @@ class EmailAccountController extends Controller
 
         $account->wasRecentlyCreated = true;
 
-        // return $this->response(
-        //     new EmailAccountResource($account),
-        //     201
-        // );
+        return response(
+            "Account successfully",
+            201
+        );
     }
 
     /**
@@ -87,15 +97,11 @@ class EmailAccountController extends Controller
     public function update($id, EmailAccountRequest $request)
     {
          $this->authorize('update', $this->repository->find($id));
-
         // // The user is not allowed to update these fields after creation
-         $except = ['email', 'connection_type', 'user_id', 'initial_sync_from'];
-
+         $except = ['email', 'connection_type', 'user_id', 'initial_sync_from','sent_folder_id','trash_folder_id'];
          $account = $this->repository->update($request->except($except), $id);
 
-        // return $this->response(
-        //     new EmailAccountResource($this->repository->withResponseRelations()->find($account->id))
-        // );
+         return response("Updated successfully.");
     }
 
     /**

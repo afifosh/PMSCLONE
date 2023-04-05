@@ -47,7 +47,8 @@
     "yajra/laravel-datatables-buttons": "^9.1",
     "yajra/laravel-datatables-editor": "^1.25",
     "yajra/laravel-datatables-fractal": "^9.1",
-    "yajra/laravel-datatables-oracle": "^10.2"
+    "yajra/laravel-datatables-oracle": "^10.2",
+    "zbateson/mail-mime-parser": "^2.4"
   },
   "require-dev": {
     "beyondcode/laravel-query-detector": "^1.7",
@@ -67,7 +68,8 @@
     "files": [
       "app/Helpers/Helpers.php",
       "app/Helpers/helper.php",
-      "app/Helpers/onlyofficeHelpers.php"
+      "app/Helpers/onlyofficeHelpers.php",
+      "app/Support/helpers.php"
     ]
   },
   "autoload-dev": {

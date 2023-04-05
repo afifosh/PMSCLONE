@@ -155,6 +155,8 @@ class EmailAccountConnectionTestController extends Controller
                 $this->imapFolders = $client->getFolders();
 
             } catch (ConnectionErrorException $e) {
+                \Log::info($e->getMessage());
+
                 return ['message'=>'IMAP: ' . $e->getMessage(),'status'=>500];
             }
         }
