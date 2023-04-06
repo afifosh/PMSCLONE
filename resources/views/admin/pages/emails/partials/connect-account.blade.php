@@ -1,10 +1,10 @@
  <!-- Offcanvas to add new user -->
  <div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="offcanvasAddUser" style="width:50%; background-color:white !important" aria-labelledby="offcanvasAddUserLabel">
-    <div class="offcanvas-header">
+    <div class="offcanvas-header" style="display:flex">
       <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Create Email Account</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100" style="padding:inherit;">
+    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100" style="padding:20px; width:100%; display:block;">
       <form class="add-new-user pt-0" id="add-mail-account">
       <div class="mb-3">
           <label class="form-label" for="connection_type">Account Type</label>
@@ -41,7 +41,7 @@
         </div>
         <div class="mb-3">
         <div class="form-check">
-            <input name="create_contact" class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+            <input name="create_contact" class="form-check-input" type="checkbox" value="1" id="defaultCheck1">
             <label class="form-check-label" for="defaultCheck1">
             Create Contact record if record does not exists.
             </label>
@@ -70,7 +70,7 @@
           <div class="col-md-7">
         <div class="mb-3">
 <label class="form-label" for="imap_encryption">Encryption</label>
-          <select id="imap_encryption" class="form-select">
+          <select id="imap_encryption" name="imap_encryption" class="form-select">
             <option value="ssl">ssl</option>
             <option value="tls">tls</option>
             <option value="starttls">starttls</option>
@@ -94,7 +94,7 @@
           <div class="col-md-7">  
           <div class="mb-3">
           <label class="form-label" for="smtp_encryption">Encryption</label>
-          <select id="smtp_encryption" class="form-select">
+          <select id="smtp_encryption" name="smtp_encryption" class="form-select">
             <option value="ssl">ssl</option>
             <option value="tls">tls</option>
             <option value="starttls">starttls</option>
@@ -121,7 +121,7 @@
     </div>
     <div style="padding-top:30px; border-top:1px solid #ddd">
     <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
-    <button type="button" id="test-connection" class="btn btn-primary me-sm-3 me-1 data-submit">Test Connection / Retrieve Folders</button>
+    <button type="button" id="test-connection" style="display:none" class="btn btn-primary me-sm-3 me-1 data-submit">Test Connection / Retrieve Folders</button>
         <button type="button" id="save-account" class="btn btn-primary me-sm-3 me-1 data-submit">Connect Account</button>
         </div>
       </form>

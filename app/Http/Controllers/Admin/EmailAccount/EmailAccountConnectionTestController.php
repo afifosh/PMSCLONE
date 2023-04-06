@@ -63,7 +63,7 @@ class EmailAccountConnectionTestController extends Controller
                 $validator,
                 [
                 'username'        => $request->input('username'),
-                'validate_cert'   => $request->input('validate_cert'),
+                'validate_cert'   => $request->input('validate_cert')==null?0:$request->input('validate_cert'),
                 'email'           => $request->input('email'),
                 'password'        => $this->getPassword($request),
                 'imap_server'     => $request->input('imap_server'),
@@ -72,7 +72,7 @@ class EmailAccountConnectionTestController extends Controller
             ],
                 [
                 'username'        => $request->input('username'),
-                'validate_cert'   => $request->input('validate_cert'),
+                'validate_cert'   => $request->input('validate_cert')==null?0:$request->input('validate_cert'),
                 'email'           => $request->input('email'),
                 'password'        => $this->getPassword($request),
                 'smtp_server'     => $request->input('smtp_server'),
@@ -84,7 +84,7 @@ class EmailAccountConnectionTestController extends Controller
         {
         return response(['message'=>$response['message']],400);
         }
-        return response(['folders' => $this->imapFolders]);
+        return response($response);
     }
 
     /**
@@ -153,10 +153,8 @@ class EmailAccountConnectionTestController extends Controller
                 ClientManager::testConnection($client);
 
                 $this->imapFolders = $client->getFolders();
-
+                return ['data'=>$this->imapFolders,'status'=>200];
             } catch (ConnectionErrorException $e) {
-                \Log::info($e->getMessage());
-
                 return ['message'=>'IMAP: ' . $e->getMessage(),'status'=>500];
             }
         }

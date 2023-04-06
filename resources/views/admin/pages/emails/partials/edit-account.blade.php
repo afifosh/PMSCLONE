@@ -1,8 +1,8 @@
- <div class="offcanvas-header">
+ <div class="offcanvas-header" style="display:flex">
       <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Edit Email Account</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100">
+    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100" style="padding:20px; width:100%; display:block;">
       <form class="add-new-user pt-0" id="update-mail-account">
       <div class="mb-3">
           <label class="form-label" for="connection_type">Account Type</label>
@@ -110,7 +110,7 @@
     function folderChanged(elem) {
   var jsonValue = $(elem).val();
   var objValue = JSON.parse(jsonValue);
-  objValue.syncable = elem.checked ? 'true' : 'false';
+  objValue.syncable = elem.checked ? true : false;
   var newJsonValue = JSON.stringify(objValue);
   $(elem).val(newJsonValue);
 }

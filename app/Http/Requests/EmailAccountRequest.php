@@ -36,7 +36,6 @@ class EmailAccountRequest extends FormRequest
             'email'             => $this->getEmailFieldRules(),
             'password'          => $this->route('account') ? 'nullable' : 'required',
             'from_name_header'  => $this->getFromNameHeaderRules(),
-            'initial_sync_from' => $this->getInitialSyncFromRules(),
             'imap_server'       => ['max:191', $this->getRequiredIfRuleForImapField()],
             'imap_port'         => [$this->getRequiredIfRuleForImapField(), 'numeric'],
             'imap_encryption'   => ['nullable', Rule::in(ClientManager::ENCRYPTION_TYPES)],
@@ -112,22 +111,6 @@ class EmailAccountRequest extends FormRequest
      *
      * @return Rule
      */
-    protected function getInitialSyncFromRules()
-    {
-        return [
-            'date',
-            function ($attribute, $value, $fail) {
-                if ($this->isMethod('PUT')) {
-                    return;
-                }
-                // API Usage
-                if ($value && strtotime($value) < strtotime('-6 months')) {
-                    $fail('The initial synchronization date must not be older then 6 months.');
-                }
-            },
-            Rule::requiredIf($this->isMethod('POST')),
-        ];
-    }
 
     /**
      * Get the requiredIf rule for the IMAP connection type fields

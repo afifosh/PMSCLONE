@@ -53,9 +53,15 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
     */
     protected function performInsert($model, $attributes)
     {
+        if(!isset($attributes['create_contact'])){
+            $attributes['create_contact']=false;
+        }
         // If user exists, mark the account as personal before insert
         if (isset($attributes['user_id'])) {
             $model->forceFill(['user_id' => $attributes['user_id']]);
+        }
+        else{
+            $model->forceFill(['user_id' => auth()->user()->id]);
         }
 
         parent::performInsert($model, $attributes);
@@ -66,6 +72,7 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
         );
 
         foreach ($attributes['folders'] ?? [] as $folder) {
+            $folder=json_decode($folder,true);
             $this->getFolderRepository()->persistForAccount($model, $folder);
         }
 

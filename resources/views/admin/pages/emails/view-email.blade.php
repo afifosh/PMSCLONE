@@ -1,8 +1,9 @@
+
 <div class="card shadow-none border-0 rounded-0 app-email-view-header p-3 py-md-3 py-2">
         <!-- Email View : Title  bar-->
         <div class="d-flex justify-content-between align-items-center py-2">
           <div class="d-flex align-items-center overflow-hidden">
-            <i class="ti ti-chevron-left ti-sm cursor-pointer me-2" data-bs-toggle="sidebar" data-target="#app-email-view"></i>
+            <i class="ti ti-chevron-left ti-sm cursor-pointer me-2" onclick="$('#app-email-view').hide();"></i>
             <h6 class="text-truncate mb-0 me-2">{{$message->subject}}</h6>
           </div>
           <!-- Email View : Action  bar-->
@@ -54,29 +55,7 @@
                 </a>
               </div>
             </div>
-            <div class="dropdown me-3">
-              <i class="ti ti-tag cursor-pointer" id="dropdownLabel" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              </i>
-              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLabel">
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="badge badge-dot bg-success me-1"></i>
-                  <span class="align-middle">Workshop</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="badge badge-dot bg-primary me-1"></i>
-                  <span class="align-middle">Company</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="badge badge-dot bg-info me-1"></i>
-                  <span class="align-middle">Important</span>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="d-flex align-items-center flex-wrap justify-content-end">
-            <span class="d-sm-block d-none mx-3 text-muted">1-10 of 653</span>
-            <i class="ti ti-chevron-left scaleX-n1-rtl cursor-pointer text-muted me-2"></i>
-            <i class="ti ti-chevron-right scaleX-n1-rtl cursor-pointer"></i>
+        
           </div>
         </div>
       </div>
@@ -110,11 +89,11 @@
                 <i class="ti ti-dots-vertical cursor-pointer" id="dropdownEmail" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownEmail">
-                  <a class="dropdown-item scroll-to-reply" href="javascript:void(0)">
+                  <a class="dropdown-item scroll-to-reply" href="javascript:reply({{$message}})">
                     <i class="ti ti-corner-up-left me-1"></i>
                     <span class="align-middle">Reply</span>
                   </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
+                  <a class="dropdown-item" href="javascript:forward({{$message}})">
                     <i class="ti ti-corner-up-right me-1"></i>
                     <span class="align-middle">Forward</span>
                   </a>
@@ -125,13 +104,60 @@
           </div>
           <div class="card-body">
           {!!$message->html_body!!}  
-          <hr>
-            <p class="email-attachment-title mb-2">Attachments</p>
-            <div class="cursor-pointer">
-              <i class="ti ti-file"></i>
-              <span class="align-middle ms-1">report.xlsx</span>
-            </div>
-          </div>
+        <input type="hidden" id="mail_type" value="compose"/>
+        </div>
         </div>
         
       </div>
+      <script>
+        function reply(message){
+          $('#reply-email').attr("style","display:inline-block !important");
+        $('#forward-email,#send-email').attr("style","display:none !important");
+        $('#reply-email').attr('data-id',message.id);
+          $("#subject").val("RE: "+message.subject);
+         $("#to").val(message.reply_to[0].address);
+         var dateStringFormatted = new Date(message.date).toLocaleString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}).replace(/,/g, '');
+
+         let wroteText = `On `+ dateStringFormatted + " "+message.reply_to[0].name+ " <" + message.reply_to[0].address + `> wrote:`;
+
+      var html=" <br /><div class='syncmail_attr'>" +
+        wroteText +
+        '</div><blockquote class="syncmail_quote">' +
+        message.html_body +
+        '</blockquote>';
+         $('.email-editor').html(html);
+         $('mail_type').val('reply');
+         var quill = new Quill('.email-editor');
+
+          $("#emailComposeSidebar").modal('show');
+        }
+        function forward(message){
+        $('#forward-email').attr('data-id',message.id);
+
+          $('#forward-email').attr("style","display:inline-block !important");
+        $('#send-email,#reply-email').attr("style","display:none !important");
+          $("#subject").val('FW: '+message.subject);
+          var dateStringFormatted = new Date(message.date).toLocaleString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}).replace(/,/g, '');
+          debugger;
+         $('mail_type').val('forward');
+
+          var html ="<br /><div class='syncmail_attr'>" +
+          '--------Forwarded message--------</br>'+
+            'From: '+ message.from.name +' '+ 
+            '&lt;'+message.from.address+'&gt;</br>'+
+            'Date: '+dateStringFormatted +'</br>'+
+            'Subject: '+ message.subject +'</br>'+
+            `To: &lt;`+ message.to[0].address  +`&gt;</br>`+
+          '</div>' +
+          '<br /><div>' +
+          message.html_body +
+          '</div>'
+
+          $('.email-editor').html(html);
+         
+         var quill = new Quill('.email-editor');
+
+          $("#emailComposeSidebar").modal('show');
+
+        }
+      </script>

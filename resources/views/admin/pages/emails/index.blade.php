@@ -9,6 +9,12 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/katex.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/editor.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-email.css')}}" />
+<style>
+  #email-editor{
+    max-height: 300px;
+    overflow: auto;
+  }
+</style>
 @endsection
 
 @section('vendor-script')
@@ -41,7 +47,7 @@
           @endforeach
         </select>
         </div>
-        <button class="btn btn-primary btn-compose" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
+        <button class="btn btn-primary btn-compose" onclick="doAction('compose');" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
       </div>
       <!-- Email Filters -->
       <div class="email-filters py-2">
@@ -90,7 +96,7 @@
           </div>
           <hr class="mx-n3 emails-list-header-hr">
           <!-- Email List: Actions -->
-          <div class="d-none justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
               <div class="form-check mb-0 me-2">
                 <input class="form-check-input" type="checkbox" id="email-select-all">
@@ -139,9 +145,9 @@
               </div>
             </div>
             <div class="email-pagination d-sm-flex d-none align-items-center flex-wrap justify-content-between justify-sm-content-end">
-              <span class="d-sm-block d-none mx-3 text-muted">1-10 of 653</span>
-              <i class="email-prev ti ti-chevron-left scaleX-n1-rtl cursor-pointer text-muted me-2"></i>
-              <i class="email-next ti ti-chevron-right scaleX-n1-rtl cursor-pointer"></i>
+              <span class="d-sm-block d-none mx-3 text-muted" id="records-counter"></span>
+              <a class="email-prev ti ti-chevron-left scaleX-n1-rtl cursor-pointer text-muted me-2" id="prev-page"></a>
+              <a class="email-next ti ti-chevron-right scaleX-n1-rtl cursor-pointer" id="next-page"></a>
             </div>
           </div>
         </div>
@@ -178,16 +184,8 @@
           <div class="email-compose-to d-flex justify-content-between align-items-center">
               <label class="form-label mb-0" for="emailContacts">To:</label>
               <div class="select2-primary border-0 shadow-none flex-grow-1 mx-2">
-              <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2" id="to[]" name="to" placeholder="someone@email.com">
+              <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2" id="to" name="to" placeholder="someone@email.com">
                
-              <!-- <select class="select2 select-email-contacts form-select" id="emailContacts" name="emailContacts" multiple>
-                  <option data-avatar="1.png" value="Jane Foster">Jane Foster</option>
-                  <option data-avatar="3.png" value="Donna Frank">Donna Frank</option>
-                  <option data-avatar="5.png" value="Gabrielle Robertson">Gabrielle Robertson</option>
-                  <option data-avatar="7.png" value="Lori Spears">Lori Spears</option>
-                  <option data-avatar="9.png" value="Sandy Vega">Sandy Vega</option>
-                  <option data-avatar="11.png" value="Cheryl May">Cheryl May</option>
-                </select> -->
               </div>
               <div class="email-compose-toggle-wrapper">
                 <a class="email-compose-toggle-cc" href="javascript:void(0);">Cc |</a>
@@ -228,23 +226,20 @@
                   </span>
                 </div>
               </div>
-              <div class="email-editor"></div>
+              <div id="email-editor" class="email-editor"></div>
+              <input type="hidden" name="message" id="message"/>
             </div>
             <hr class="container-m-nx mt-0 mb-2">
             <div class="email-compose-actions d-flex justify-content-between align-items-center mt-3 mb-3">
               <div class="d-flex align-items-center">
                 <div class="btn-group">
                   <button type="button" id="send-email" class="btn btn-primary"><i class="ti ti-send ti-xs me-1"></i>Send</button>
-                  <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="visually-hidden">Send Options</span>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="javascript:void(0);">Schedule send</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0);">Save draft</a></li>
-                  </ul>
+                  <button type="button" id="reply-email" onclick="replyEmail(this,$(this).data('id'));" class="btn btn-primary " style="display:none !important"><i class="ti ti-send ti-xs me-1"></i>Reply</button>
+                  <button type="button" id="forward-email" onclick="forwardEmail(this,$(this).data('id'));" class="btn btn-primary " style="display:none !important"><i class="ti ti-send ti-xs me-1"></i>Forward</button>
+                
                 </div>
-                <label for="attach-file"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
-                <input type="file" name="file-input" class="d-none" id="attach-file">
+                <label for="media"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
+                <input type="file" name="file" class="d-none" id="media">
               </div>
               <div class="d-flex align-items-center">
                 <div class="dropdown">
