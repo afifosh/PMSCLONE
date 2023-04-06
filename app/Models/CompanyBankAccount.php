@@ -35,4 +35,20 @@ class CompanyBankAccount extends Model
       return $this->save();
     }
   }
+
+  public static function getFields()
+  {
+    return [
+      'Country' => 'country_id',
+      'Name' => 'name',
+      'Branch' => 'branch',
+      'Street' => 'street',
+      'City' => 'city',
+      'State' => 'state',
+      'Post Code' => 'post_code',
+      'Account No' => 'account_no',
+      'IBAN No' => 'iban_no',
+      'Swift Code' => 'swift_code'
+    ];
+  }
 }

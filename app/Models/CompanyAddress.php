@@ -47,4 +47,27 @@ class CompanyAddress extends Model
       return $this->save();
     }
   }
+
+  public static function getFields()
+  {
+    return [
+      'Address Name' => 'name',
+      'Country' => 'country_id',
+      'Address Line 1' => 'address_line_1',
+      'Address Line 2' => 'address_line_2',
+      'Address Line 3' => 'address_line_3',
+      'Website' => 'website',
+      'City/Town/Locality' => 'city',
+      'State' => 'state',
+      'Province' => 'province',
+      'Postal Code' => 'postal_code',
+      'Zip Code' => 'zip',
+      'Phone' => 'phone',
+      'Fax' => 'fax',
+      'Email' => 'email',
+      'Latitude' => 'latitude',
+      'Longitude' => 'longitude',
+      'Address Type' => 'address_type'
+    ];
+  }
 }

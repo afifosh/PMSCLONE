@@ -116,7 +116,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::resource('workflows', WorkflowController::class)->only(['index', 'edit', 'update']);
     Route::resource('kyc-documents', KycDocumentController::class);
 
-    Route::get('approval-requests/level/{level}/companies/{company}', [ApprovalRequestController::class, 'getCompanyReqeust'])->name('approval-requests.level.companies.show');
+    Route::get('approval-requests/level/{level}/companies/{company}/{tab?}', [ApprovalRequestController::class, 'getCompanyReqeust'])
+      ->whereIn('tab', ['details', 'contact-persons', 'addresses', 'documents', 'bank-accounts'])->name('approval-requests.level.companies.show');
     Route::post('approval-requests/level/{level}/companies/{company}', [ApprovalRequestController::class, 'updateApprovalRequest'])->name('approval-requests.level.companies.update');
 
     Route::get('pending-companies', [ApprovalRequestController::class, 'index'])->name('pending-companies.index');

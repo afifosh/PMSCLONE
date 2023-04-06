@@ -7,6 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CompanyProfile\ApprovalUpdateRequest;
 use App\Models\ApprovalLevel;
 use App\Models\Company;
+use App\Models\CompanyAddress;
+use App\Models\CompanyBankAccount;
+use App\Models\CompanyContact;
+use App\Models\CompanyDetail;
 use App\Models\Country;
 
 class ApprovalRequestController extends Controller
@@ -36,6 +40,20 @@ class ApprovalRequestController extends Controller
     $data['bankAccounts'] = $this->transformModificationsModel($company->POCBankAccount()->get());
     $data['countries'] = Country::pluck('name', 'id');
     $data['company'] = $company;
+    if(request()->tab == 'details' || request()->tab == null){
+      request()->tab = 'details';
+      $data['fields'] = CompanyDetail::getFields();
+    }elseif(request()->tab == 'contact-persons'){
+      $data['fields'] = CompanyContact::getFields();
+    }elseif(request()->tab == 'addresses'){
+      $data['fields'] = CompanyAddress::getFields();
+    }elseif(request()->tab == 'bank-accounts'){
+      $data['fields'] = CompanyBankAccount::getFields();
+    }elseif(request()->tab == 'documents'){
+      $data['fields'] = [];
+    }
+
+    return view('admin.pages.company.approval-request.vertical.show', $data);
     return view('admin.pages.company.approval-request.show', $data);
   }
 

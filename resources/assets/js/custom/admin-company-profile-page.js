@@ -34,6 +34,12 @@ $('.btn-next').on('click', function () {
   $(this).closest('form').find('input[name="submit_type"]').val('submit');
   $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
 });
+
+$('[data-radio-toggle-in]').on('change', function () {
+  var target = $(this).data('radio-toggle-in');
+  $(this).val() != 'true' ? $(target).removeClass('d-none') : $(target).addClass('d-none');
+});
+
 (function () {
   let accountUserImage = document.getElementById('uploadedAvatar');
   const fileInput = document.querySelector('.account-file-input'),

@@ -76,4 +76,27 @@ class CompanyDetail extends Model
       return $this->save();
     }
   }
+
+  public static function getFields()
+  {
+    return [
+      'Company Name' => 'name',
+      'Logo' => 'logo',
+      'Website' => 'website',
+      'Locality Type' => 'locality_type',
+      'Geographical Coverage' => 'geographical_coverage',
+      'Year Founded' => 'date_founded',
+      'DUNS Number' => 'duns_number',
+      'No. Of Employees' => 'no_of_employees',
+      'Legal Form' => 'legal_form',
+      'Description' => 'description',
+      'Facebook URL' => 'facebook_url',
+      'Twitter URL' => 'twitter_url',
+      'LinkedIn URL' => 'linkedin_url',
+      'YouTube URL' => 'youtube_url',
+      'SA Company Name' => 'sa_company_name',
+      'Parent Company Name' => 'parent_company',
+      'Subsidiaries' => 'subsidiaries',
+    ];
+  }
 }

@@ -39,4 +39,20 @@ class CompanyContact extends Model
       return $this->save();
     }
   }
+
+  public static function getFields()
+  {
+    return [
+      'Contact Type' => 'type',
+      'Title' => 'title',
+      'First Name' => 'first_name',
+      'Last Name' => 'last_name',
+      'Position' => 'position',
+      'Phone' => 'phone',
+      'Mobile' => 'mobile',
+      'Fax' => 'email',
+      'Email' => 'fax',
+      'POA Letter' => 'poa'
+    ];
+  }
 }
