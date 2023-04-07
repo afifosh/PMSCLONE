@@ -118,9 +118,7 @@ class EmailAccountController extends Controller
 
          $this->repository->delete($id);
 
-        // return $this->response([
-        //     'unread_count' => $this->repository->countUnreadMessagesForUser($request->user()),
-        // ]);
+        return response("Account deleted successfully.");
     }
 
     public function unread()

@@ -47,9 +47,8 @@ class EmailAccountSyncStateController extends Controller
 
         $this->repository->enableSync((int) $account->id);
 
-        return $this->response(
-            new EmailAccountResource($this->repository->withResponseRelations()->find($id))
-        );
+        return response("Sync enabled.");
+
     }
 
     /**
@@ -71,8 +70,6 @@ class EmailAccountSyncStateController extends Controller
             'Account synchronization disabled by user.'
         );
 
-        return $this->response(
-            new EmailAccountResource($this->repository->withResponseRelations()->find($id))
-        );
+        return response("Sync disabled.");
     }
 }

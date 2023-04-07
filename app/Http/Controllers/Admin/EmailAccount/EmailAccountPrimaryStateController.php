@@ -35,11 +35,12 @@ class EmailAccountPrimaryStateController extends Controller
      */
     public function update($id)
     {
+        $this->destroy();
         $this->authorize('view', $account = $this->repository->find($id));
 
         $this->repository->markAsPrimary($account, auth()->user());
 
-        return $this->response('', 204);
+        return response('Successfully updated.', 204);
     }
 
     /**
@@ -51,6 +52,6 @@ class EmailAccountPrimaryStateController extends Controller
     {
         $this->repository->removePrimary(auth()->user());
 
-        return $this->response('', 204);
+        return true;
     }
 }

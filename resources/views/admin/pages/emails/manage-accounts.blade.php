@@ -16,6 +16,32 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/js/helper.js')}}"></script>
 @section('page-script')
 @include('admin.pages.emails.partials.scripts')
+<script>
+  function disableSync(elem,account_id){
+    var url='';
+    if($(elem).prop('checked')==true){
+      var url="{{url('/admin/mail/accounts/:accountId/sync/disable')}}";
+    }
+    else{
+      var url="{{url('/admin/mail/accounts/:accountId/sync/enable')}}";
+    }
+    url=url.replace(':accountId',account_id);
+    $.ajax({
+      url:url,
+      method:'post',
+      success:function(response){
+      }
+    });
+  }
+  function makePrimary(account_id){
+    var url="{{url('/admin/mail/accounts/:accountId/primary')}}";
+    url=url.replace(':accountId',account_id);
+    $.ajax({
+      url:url,
+      method:'put'
+    })
+  }
+</script>
 @endsection
 @section('content')
   <div class="mt-3  col-12">
@@ -51,10 +77,25 @@ $configData = Helper::appClasses();
               
               </td>
               <td>
-              <span>Primary Account</span>
-              </td>
+              <span class="switch-label">Primary Account </span>
+              <label class="switch">
+              <input type="radio" class="switch-input" onchange="makePrimary({{$account->id}});" name="make_primary" />
+              <span class="switch-toggle-slider">
+                <span class="switch-on"></span>
+                <span class="switch-off"></span>
+              </span>
+            </label>
+      </td>
               <td>
-                <span>Disable Sync</span>
+              <span class="switch-label">Desable Sync </span>
+
+              <label class="switch">
+              <input type="checkbox" class="switch-input" onchange="disableSync(this,{{$account->id}});" name="disable_sync" />
+              <span class="switch-toggle-slider">
+                <span class="switch-on"></span>
+                <span class="switch-off"></span>
+              </span>
+            </label>
               </td>
               <td>
               <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></button>

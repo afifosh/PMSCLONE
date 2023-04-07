@@ -25,6 +25,7 @@ use App\Criteria\EmailAccount\EmailAccountsForUserCriteria;
 use App\Contracts\Repositories\EmailAccountFolderRepository;
 use App\Contracts\Repositories\EmailAccountMessageRepository;
 use App\Innoclapps\Contracts\Repositories\OAuthAccountRepository;
+use App\Models\Admin;
 
 class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccountRepository
 {
@@ -72,7 +73,10 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
         );
 
         foreach ($attributes['folders'] ?? [] as $folder) {
+            if(typeof($folder)=="string")
+            {
             $folder=json_decode($folder,true);
+            }
             $this->getFolderRepository()->persistForAccount($model, $folder);
         }
 
@@ -225,7 +229,7 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
     /**
     * Mark the given account as primary for the given user
     */
-    public function markAsPrimary(EmailAccount $account, Metable & User $user) : void
+    public function markAsPrimary(EmailAccount $account, Metable & Admin $user) : void
     {
         $account->markAsPrimary($user);
     }
@@ -233,7 +237,7 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
     /**
     * Remove primary account
     */
-    public function removePrimary(Metable & User $user) : void
+    public function removePrimary(Metable & Admin $user) : void
     {
         EmailAccount::unmarkAsPrimary($user);
     }

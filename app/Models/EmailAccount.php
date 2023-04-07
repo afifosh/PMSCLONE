@@ -253,7 +253,7 @@ class EmailAccount extends Model implements Metable, Primaryable
     /**
      * Mark the account as primary for the given user
      */
-    public function markAsPrimary(Metable & User $user) : static
+    public function markAsPrimary(Metable & Admin $user) : static
     {
         $user->setMeta(self::PRIMARY_META_KEY, $this->id);
 
@@ -263,7 +263,7 @@ class EmailAccount extends Model implements Metable, Primaryable
     /**
      * Unmark the account as primary for the given user
      */
-    public static function unmarkAsPrimary(Metable & User $user) : void
+    public static function unmarkAsPrimary(Metable & Admin $user) : void
     {
         $user->removeMeta(self::PRIMARY_META_KEY);
     }
