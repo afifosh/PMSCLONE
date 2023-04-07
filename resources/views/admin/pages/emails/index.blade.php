@@ -378,147 +378,110 @@
 </div>
 @else
 <div class="col-md-12 mb-4">
-    <div class="card h-100 col-md-12">
-      <div class="card-body row">
+  <div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-6 mt-4">
+      <h4 class="text-center">No email accounts configured</h4>
+      <p class="mb-3 text-center"> Connect an account to start sending and organize emails in order close deals faster </p>
+      <div class="row">
         <div class="col-md-6">
         <ul class="p-0 m-0">
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-success rounded p-2"><i class="ti ti-mail ti-sm"></i></div>
+            <div class="badge bg-label-danger rounded p-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" style="width: 20px;" class="w-20 text-primary-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99">
+                </path>
+              </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Emails</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">12,346</p>
-                <p class="ms-3 text-success mb-0">0.3%</p>
-              </div>
+              <p class="mb-0 ms-3">2-way email sync with your email provider. </p>
+              
             </div>
           </li>
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-info rounded p-2"><i class="ti ti-link ti-sm"></i></div>
+            <div class="badge bg-label-danger rounded p-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="h-6 w-6 text-primary-600" style="width: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5">
+                </path>
+              </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Opened</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">8,734</p>
-                <p class="ms-3 text-success mb-0">2.1%</p>
-              </div>
+              <p class="mb-0 ms-3">2-way email sync with your email provider. </p>
+              
             </div>
           </li>
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-warning rounded p-2"><i class="ti ti-click ti-sm"></i></div>
+            <div class="badge bg-label-danger rounded p-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class=" bg-label-danger" style="width: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" style="">
+                </path>
+              </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Clicked</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">967</p>
-                <p class="ms-3 text-success mb-0">1.4%</p>
-              </div>
+              <p class="mb-0 ms-3">
+
+Associate emails to many Contacts, Companies and Deals.
+</p>
+              
             </div>
           </li>
-          <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-primary rounded p-2"><i class="ti ti-users ti-sm"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Subscribe</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">345</p>
-                <p class="ms-3 text-success mb-0">8.5k</p>
-              </div>
-            </div>
-          </li>
-          <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-secondary rounded p-2"><i class="ti ti-alert-triangle ti-sm text-body"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Complaints</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">10</p>
-                <p class="ms-3 text-success mb-0">1.5%</p>
-              </div>
-            </div>
-          </li>
-          <li class="d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-danger rounded p-2"><i class="ti ti-ban ti-sm"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Unsubscribe</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">86</p>
-                <p class="ms-3 text-success mb-0">0.8%</p>
-              </div>
-            </div>
-          </li>
+          
+          
+          
         </ul>
         </div>
         <div class="col-md-6">
         <ul class="p-0 m-0">
+          
+          
+          
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-success rounded p-2"><i class="ti ti-mail ti-sm"></i></div>
+            <div class="badge bg-label-primary rounded p-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="h-6 w-6 text-primary-600" style="width: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z">
+                </path>
+              </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Emails</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">12,346</p>
-                <p class="ms-3 text-success mb-0">0.3%</p>
-              </div>
+              <p class="mb-0 ms-3">Save time by making use of predefined templates. </p>
+              
             </div>
           </li>
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-info rounded p-2"><i class="ti ti-link ti-sm"></i></div>
+            <div class="badge bg-label-danger rounded p-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="h-6 w-6 text-primary-600" style="width: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125">
+                </path>
+              </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Opened</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">8,734</p>
-                <p class="ms-3 text-success mb-0">2.1%</p>
-              </div>
-            </div>
-          </li>
-          <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-warning rounded p-2"><i class="ti ti-click ti-sm"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Clicked</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">967</p>
-                <p class="ms-3 text-success mb-0">1.4%</p>
-              </div>
-            </div>
-          </li>
-          <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-primary rounded p-2"><i class="ti ti-users ti-sm"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Subscribe</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">345</p>
-                <p class="ms-3 text-success mb-0">8.5k</p>
-              </div>
-            </div>
-          </li>
-          <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-secondary rounded p-2"><i class="ti ti-alert-triangle ti-sm text-body"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Complaints</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">10</p>
-                <p class="ms-3 text-success mb-0">1.5%</p>
-              </div>
+              <p class="mb-0 ms-3">
+
+Add customized signature for a more professional look.
+</p>
+              
             </div>
           </li>
           <li class="d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-danger rounded p-2"><i class="ti ti-ban ti-sm"></i></div>
+            <div class="badge bg-label-danger rounded p-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="h-6 w-6 text-primary-600" style="width: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                </path>
+              </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-3">Unsubscribe</h6>
-              <div class="d-flex">
-                <p class="mb-0 fw-semibold">86</p>
-                <p class="ms-3 text-success mb-0">0.8%</p>
-              </div>
+              <p class="mb-0 ms-3">
+
+Connect via IMAP, your Gmail or Outlook account.
+</p>
+              
             </div>
           </li>
         </ul>
         </div>
        
       </div>
-      <div class="card-footer">
-      <div style="text-align:center">
-
-            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
-            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','personal');" class="btn btn-primary">Connect Personal Account</button>
-        </div>
+      <div class="d-flex justify-content-center flex-wrap gap-4 mt-2">
+        <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
+        <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','personal');" class="btn btn-primary">Connect Personal Account</button>
       </div>
     </div>
   </div>
+
+
+
+
+
+
+
+
 
 </div>
 
