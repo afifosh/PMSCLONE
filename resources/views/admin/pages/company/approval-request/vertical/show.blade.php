@@ -3,17 +3,20 @@
 @section('title', 'Company Profile')
 
 @section('vendor-style')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css')}}" />
+@endsection
+
+@section('page-style')
+<link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-chat.css')}}" />
 @endsection
 
 @section('vendor-script')
-    <script src="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
+<script src="{{asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js')}}"></script>
 @endsection
 
 @section('page-script')
     <script src="{{asset('assets/js/custom/admin-company-profile-page.js')}}"></script>
+    <script src="{{asset('assets/js/app-chat.js')}}"></script>
 @endsection
 
 @section('content')
@@ -52,8 +55,6 @@
                 </a>
             </div>
         </div>
-        <div class="card w-100">
-            @include('admin.pages.company.approval-request.vertical.tabs.'.request()->tab)
-        </div>
+        @include('admin.pages.company.approval-request.vertical.tabs.'.request()->tab)
     </div>
 @endsection

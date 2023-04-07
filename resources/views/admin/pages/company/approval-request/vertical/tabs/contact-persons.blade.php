@@ -1,49 +1,84 @@
-<div class="card-body">
-  <h5>Contact Persons</h5>
-  @forelse ($fields as $field_title => $field_name)
-    <div class="row">
-      <span>
-          <strong>{{$field_title}} : </strong>
-      </span>
-      <div class="row mx-2">
-        <div class="mt-2 d-flex justify-content-between">
-          <div>
-            <div class="fst-italic">Current</div>
-            <div class="fw-bold">CName test</div>
-          </div>
-          <div>
-            <div class="fst-italic">New</div>
-            <div class="fw-bold">CName test new</div>
-          </div>
-          <div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="{{$field_name}}_status" id="{{$field_name}}-app" value="true" data-radio-toggle-in="#{{$field_name}}-rr" checked>
-              <label class="form-check-label" for="{{$field_name}}-app">
-                Approve
+<div class="card w-100">
+  <div class="card-body">
+    <h5>Contact Persons</h5>
+      <hr>
+      <div class="row">
+        @forelse ($contacts as $contact)
+          @php
+            $contact_original = $contact;
+            // if ($contact->modifications->count()) {
+            //   $contact = transformModifiedData($contact->modifications[0]->modifications) + $contact->toArray();
+            // }
+          @endphp
+          <div class="col-md-4 col-sm-6 mb-md-3">
+            <div class="form-check custom-option custom-option-basic">
+              <label class="form-check-label custom-option-content">
+                <span class="custom-option-header mb-2">
+                  <span>
+                    <h6 class="fw-semibold mb-0">{{@$contact['first_name']}} {{@$contact['last_name']}}</h6>
+                    <small>{{@$contact['position']}}</small>
+                  </span>
+                  <span class="badge bg-label-{{(@$contact['id']) ? 'success' : 'warning'}}">
+                    {{@$contact['id'] ? (@$contact_original->modifications->count() ? 'Partially Approved' : 'Approved') : 'Pending Approval'}}
+                  </span>
+                </span>
+                <span class="custom-option-body">
+                  <small>
+                    <span class="fw-bold">Type :</span>  {{@$contact['type'] == 1 ? 'Owner' : 'Employee'}} <br />
+                    <span class="fw-bold">Email :</span>  {{ @$contact['email']}} <br />
+                    <span class="fw-bold">Phone : </span> {{ @$contact['phone']}} <br />
+                    <span class="fw-bold">Mobile : </span> {{ @$contact['mobile']}} <br />
+                    <span class="fw-bold">Fax : </span> {{ @$contact['fax']}} <br />
+                    <span class="fw-bold">Is Authorized Person : </span> {{@@$contact['poa'] ? 'Yes' : 'No'}} <br />
+                  </small>
+                  <hr class="my-2">
+                  <span class="d-flex">
+                    <a class="me-2" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#approval-modal">View</a>
+                  </span>
+                </span>
               </label>
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="{{$field_name}}_status" data-radio-toggle-in="#{{$field_name}}-rr" value="false" id="{{$field_name}}-re" >
-              <label class="form-check-label" for="{{$field_name}}-re">
-                Reject
-              </label>
-            </div>
           </div>
-        </div>
-        <div class="row d-none" id="{{$field_name}}-rr">
-          <div class="my-2">
-            <label for="reason" class="form-label fw-bold">Rejection Reason</label>
-            <textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
-          </div>
+        @empty
+        @endforelse
+      </div>
+      <div class="row">
+        <div class="col-12 d-flex justify-content-between">
+          <button type="submit" class="btn btn-light">Previews</button>
+          <button type="submit" class="btn btn-primary">Next</button>
         </div>
       </div>
     </div>
-    <hr>
-  @empty
-  @endforelse
-  <div class="row">
-    <div class="col-12 d-flex justify-content-end">
-      <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
+</div>
+
+<!-- Add New Credit Card Modal -->
+<div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content p-3 p-md-5">
+      <div class="modal-body">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
+            <button type="reset" class="btn btn-label-secondary btn-reset" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
+<div class="modal fade" id="approval-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        {{-- <h5 class="modal-title" id="exampleModalLabel3">Modal title</h5> --}}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        @include('admin.pages.company.approval-request.vertical.tabs.details', ['body_col' => 12])
+      </div>
+    </div>
+  </div>
+</div>
+<!--/ Add New Credit Card Modal -->
+

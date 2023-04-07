@@ -32,9 +32,9 @@
 @endsection
 
 @section('content')
-  <div class="alert alert-danger position-fixed w-100" style="z-index:1" role="alert">
+  {{-- <div class="alert alert-danger position-fixed w-100" style="z-index:1" role="alert">
     Details Are Under Review, You cannot modifiy them.
-  </div>
+  </div> --}}
 <!-- Header -->
 <div class="row">
   <div class="col-12">
@@ -91,7 +91,30 @@
   </div>
 </div>
 <!--/ Navbar pills -->
+<div class="card">
+  <div id="sticky-wrapper" class="sticky-wrapper is-sticky" style="height: 86.0833px;">
+      <div style="width: 1392px; position: fixed; top: 69px; z-index: 9;"
+          class="card-header sticky-element bg-label-warning ">
+          <div style="" role="alert" class="alert alert-danger ">
+              Details Are Under Review, You cannot modifiy them.
+              <div></div>
+          </div>
+          <div
+              class="card-header sticky-element bg-label-warning d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row p-0">
+              <h5 class="card-title mb-sm-0 me-2">
+                  Details Are Under Review, You cannot modifiy them.
+              </h5>
+              <div class="action-btns">
+                  <button class="btn btn-label-primary me-3 waves-effect">
+                      <span class="align-middle"> Back</span>
+                  </button>
+                  <a href="{{route('company.submitApprovalRequest')}}" class="btn btn-primary waves-effect waves-light {{auth()->user()->company->canBeSentForApproval() ? '': 'disabled'}}">Send for Approval</a>
+              </div>
+          </div>
 
+      </div>
+  </div>
+</div>
 <div class="row">
   <div class="col-12">
     <div id="details-card" class="card card-action mb-4" data-href="{{ route('company.editDetails')}}">

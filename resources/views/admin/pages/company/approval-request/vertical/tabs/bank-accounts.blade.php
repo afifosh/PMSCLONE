@@ -1,49 +1,51 @@
-<div class="card-body">
-  <h5>Bank Accounts</h5>
-  @forelse ($fields as $field_title => $field_name)
+<div class="card w-100">
+  <div class="card-body">
+    <h5>Company Bank Accounts</h5>
+      <hr>
     <div class="row">
-      <span>
-          <strong>{{$field_title}} : </strong>
-      </span>
-      <div class="row mx-2">
-        <div class="mt-2 d-flex justify-content-between">
-          <div>
-            <div class="fst-italic">Current</div>
-            <div class="fw-bold">CName test</div>
-          </div>
-          <div>
-            <div class="fst-italic">New</div>
-            <div class="fw-bold">CName test new</div>
-          </div>
-          <div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="{{$field_name}}_status" id="{{$field_name}}-app" value="true" data-radio-toggle-in="#{{$field_name}}-rr" checked>
-              <label class="form-check-label" for="{{$field_name}}-app">
-                Approve
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="{{$field_name}}_status" data-radio-toggle-in="#{{$field_name}}-rr" value="false" id="{{$field_name}}-re" >
-              <label class="form-check-label" for="{{$field_name}}-re">
-                Reject
-              </label>
-            </div>
+      @forelse ($bankAccounts as $account)
+        @php
+          $account_original = $account;
+          // if ($account->modifications->count()) {
+          //   $account = transformModifiedData($account->modifications[0]->modifications) + $account->toArray();
+          // }
+        @endphp
+        <div class="col-md-4 col-sm-6 mb-md-3">
+          <div class="form-check custom-option custom-option-basic">
+            <label class="form-check-label custom-option-content">
+              <span class="custom-option-header mb-2">
+                <h6 class="fw-semibold mb-0">{{$account['name']}}</h6>
+                <span class="badge bg-label-{{(@$account['id']) ? 'success' : 'warning'}}">
+                  {{@$account['id'] ? 'Partially Approved' : 'Pending Approval'}}
+                </span>
+              </span>
+              <span class="custom-option-body">
+                <small>
+                  <span class="fw-bold">Account Number :</span>  {{ $account['account_no'] }} <br />
+                  <span class="fw-bold">IBAN Number :</span>  {{ $account['iban_no'] }} <br />
+                  <span class="fw-bold">Swift Code : </span> {{ $account['swift_code'] }} <br />
+                  <span class="fw-bold">Branch : </span> {{ $account['branch'] }} <br />
+                  <span class="fw-bold">Postal Code : </span> {{ $account['post_code'] }} <br />
+                  <span class="fw-bold">City : </span> {{ $account['city'] }} <br />
+                  <span class="fw-bold">State : </span> {{ $account['state'] }} <br />
+                  <span class="fw-bold">Country : </span> {{ $countries[$account['country_id']] }} <br />
+                </small>
+                <hr class="my-2">
+                <span class="d-flex">
+                  <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Bank Account" data-href="{{route('company.bank-accounts.show', 1)}}">View</a>
+                </span>
+              </span>
+            </label>
           </div>
         </div>
-        <div class="row d-none" id="{{$field_name}}-rr">
-          <div class="my-2">
-            <label for="reason" class="form-label fw-bold">Rejection Reason</label>
-            <textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
-          </div>
-        </div>
-      </div>
+      @empty
+      @endforelse
     </div>
-    <hr>
-  @empty
-  @endforelse
-  <div class="row">
-    <div class="col-12 d-flex justify-content-end">
-      <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="row">
+      <div class="col-12 d-flex justify-content-between">
+        <button type="submit" class="btn btn-light">Previews</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
     </div>
   </div>
 </div>

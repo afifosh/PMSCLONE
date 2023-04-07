@@ -44,7 +44,8 @@ class ApprovalRequestController extends Controller
       request()->tab = 'details';
       $data['fields'] = CompanyDetail::getFields();
     }elseif(request()->tab == 'contact-persons'){
-      $data['fields'] = CompanyContact::getFields();
+      // $data['fields'] = CompanyContact::getFields();
+      $data['fields'] = CompanyDetail::getFields();
     }elseif(request()->tab == 'addresses'){
       $data['fields'] = CompanyAddress::getFields();
     }elseif(request()->tab == 'bank-accounts'){
