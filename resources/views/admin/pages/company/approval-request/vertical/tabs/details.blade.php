@@ -36,7 +36,7 @@
                       <span>{{substr(is_array($detail[$field_name])? json_encode($detail[$field_name]) : $detail[$field_name], 0, 30) }}</span>
                       <div class="me-5">
                         <label class="switch switch-square">
-                          <input type="checkbox" class="switch-input" checked />
+                          <input type="checkbox" class="switch-input" data-switch-toggle-in-all="#rr-1" checked />
                           <span class="switch-toggle-slider">
                             <span class="switch-on"><i class="ti ti-check"></i></span>
                             <span class="switch-off"><i class="ti ti-x"></i></span>
@@ -49,6 +49,12 @@
                 @endforelse
               </tbody>
             </table>
+          </div>
+          <div class="row d-none mt-2" id="rr-1">
+            <div class="">
+              <label for="reason" class="form-label fw-bold">Rejection Reason</label>
+              <textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
+            </div>
           </div>
           <div class="row my-5">
             <div class="col-12 d-flex justify-content-between">
@@ -67,7 +73,7 @@
                       <span>{{ substr(is_array($detail[$field_name])? json_encode($detail[$field_name]) : $detail[$field_name],0 ,30) }}</span>
                       <div class="me-5">
                         <label class="switch switch-square">
-                          <input type="checkbox" class="switch-input" checked />
+                          <input type="checkbox" class="switch-input" data-switch-toggle-in-all="#rr-2" checked />
                           <span class="switch-toggle-slider">
                             <span class="switch-on"><i class="ti ti-check"></i></span>
                             <span class="switch-off"><i class="ti ti-x"></i></span>
@@ -79,6 +85,12 @@
                 <hr>
             @empty
             @endforelse
+            <div class="row d-none mt-2" id="rr-2">
+              <div class="">
+                <label for="reason" class="form-label fw-bold">Rejection Reason</label>
+                <textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
+              </div>
+            </div>
           </div>
           <hr class="my-5">
           <div class="row my-5">
@@ -91,7 +103,7 @@
                       <span>{{ substr(is_array($detail[$field_name])? json_encode($detail[$field_name]) : $detail[$field_name],0 ,20) }}</span>
                       <div class="me-5">
                         <label class="switch switch-square">
-                          <input type="checkbox" class="switch-input" checked />
+                          <input type="checkbox" class="switch-input" data-switch-toggle-in-all="#rr-3" checked />
                           <span class="switch-toggle-slider">
                             <span class="switch-on"><i class="ti ti-check"></i></span>
                             <span class="switch-off"><i class="ti ti-x"></i></span>
@@ -102,6 +114,12 @@
                 </div>
             @empty
             @endforelse
+            <div class="row d-none mt-2" id="rr-3">
+              <div class="">
+                <label for="reason" class="form-label fw-bold">Rejection Reason</label>
+                <textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
+              </div>
+            </div>
           </div>
           <hr>
           <div class="row">

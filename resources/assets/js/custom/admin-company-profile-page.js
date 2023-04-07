@@ -26,6 +26,18 @@ $('[data-switch-toggle-in]').on('click', function () {
   var target = $(this).data('switch-toggle-in');
   !$(this).is(':checked') ? $(target).removeClass('d-none') : $(target).addClass('d-none');
 });
+
+$('[data-switch-toggle-in-all]').on('click', function () {
+  var target = $(this).data('switch-toggle-in-all');
+  var hidden = true;
+  $('[data-switch-toggle-in-all]').each(function () {
+    if (!$(this).is(':checked')) {
+      hidden = false;
+    }
+  });
+  !hidden ? $(target).removeClass('d-none') : $(target).addClass('d-none');
+});
+
 $('.save-draft').on('click', function () {
   $(this).closest('form').find('input[name="submit_type"]').val('draft');
   $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
