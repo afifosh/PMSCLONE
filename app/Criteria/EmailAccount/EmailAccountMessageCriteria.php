@@ -23,7 +23,7 @@ class EmailAccountMessageCriteria implements CriteriaInterface
      * @param int $accountId
      * @param int $folderId
      */
-    public function __construct(protected $accountId, protected $folderId)
+    public function __construct(protected $accountId, protected $folderId, protected $term=null)
     {
     }
 
@@ -37,6 +37,9 @@ class EmailAccountMessageCriteria implements CriteriaInterface
      */
     public function apply($model, RepositoryInterface $repository)
     {
+        if($this->term!=null){
+            $model= $model->where('subject','like','%'.$this->term.'%')->orWhere('html_body','like','%'.$this->term.'%');
+        }
         return $model->where('email_account_id', $this->accountId)
             ->whereHas('folders', function ($query) {
                 return $query->where('folder_id', $this->folderId);

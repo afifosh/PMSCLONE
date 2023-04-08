@@ -114,7 +114,7 @@
       url:url,
       method:'GET',
       success:function(response){
-        location.reload();
+        toastr.success(response);
       }
     })
     

@@ -26,13 +26,14 @@ use App\Innoclapps\MailClient\ClientManager;
 use App\Innoclapps\MailClient\ConnectionType;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmailAccount extends Model implements Metable, Primaryable
 {
     use HasMeta,
         HasCreator,
         HasFactory,
-        EmailAccountImap;
+        EmailAccountImap,SoftDeletes;
 
     /**
      * Indicates the primary meta key for user

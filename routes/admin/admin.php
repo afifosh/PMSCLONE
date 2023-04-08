@@ -50,6 +50,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
    // Email accounts management
    Route::get('{account}/sync', EmailAccountSync::class);
    Route::put('{account}/update', [EmailAccountController::class, 'update']);
+   Route::delete('{account}/delete', [EmailAccountController::class, 'destroy']);
    Route::get('unread', [EmailAccountController::class, 'unread']);
  
    // The GET route for all shared accounts

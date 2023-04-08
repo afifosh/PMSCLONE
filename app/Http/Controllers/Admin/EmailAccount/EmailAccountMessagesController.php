@@ -64,13 +64,18 @@ class EmailAccountMessagesController extends Controller
     public function index($accountId, $folderId, Request $request)
     {
         $this->authorize('view', $this->accounts->find($accountId));
+        if($request->has('term')){
+            $messages = $this->messages->withResponseRelations()
+            ->pushCriteria(new EmailAccountMessageCriteria($accountId, $folderId,$request->get('term')))
+            ->paginate($request->integer('per_page', 10));
 
+        return response()->json($messages);
+        }
         $messages = $this->messages->withResponseRelations()
             ->pushCriteria(new EmailAccountMessageCriteria($accountId, $folderId))
             ->paginate($request->integer('per_page', 10));
 
-        return response()->json($messages
-        );
+        return response()->json($messages);
     }
 
     /**

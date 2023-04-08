@@ -73,7 +73,7 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
         );
 
         foreach ($attributes['folders'] ?? [] as $folder) {
-            if(typeof($folder)=="string")
+            if(gettype($folder)=="string")
             {
             $folder=json_decode($folder,true);
             }
@@ -292,10 +292,8 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
         // Detach from only messages with associations
         // This helps to not loop over all messages and delete them
         foreach (['contacts', 'companies'] as $relation) {
-            $account->messages()->whereHas($relation, function ($query) {
-                $query->withTrashed();
-            })->cursor()->each(function ($message) use ($relation) {
-                $message->{$relation}()->withTrashed()->detach();
+            $account->messages()->whereHas($relation)->cursor()->each(function ($message) use ($relation) {
+                $message->{$relation}()->detach();
             });
         }
         // To prevent looping through all messages and loading them into
@@ -309,11 +307,11 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
 
         $this->getFolderRepository()->delete($account->folders);
 
-        $systemEmailAccountId = settings('system_email_account_id');
+        // $systemEmailAccountId = settings('system_email_account_id');
 
-        if ((int) $systemEmailAccountId === (int) $account->id) {
-            settings()->forget('system_email_account_id')->save();
-        }
+        // if ((int) $systemEmailAccountId === (int) $account->id) {
+        //     settings()->forget('system_email_account_id')->save();
+        // }
     }
 
     /**

@@ -76,6 +76,8 @@
     var url='{{url("/admin/inbox/emails/:accountId/:folderId?page=")}}'+page;
     url=url.replace(':accountId',account_id);
     url=url.replace(':folderId',folder_id);
+    $("#mail-search").attr('data-account',account_id);
+    $("#mail-search").attr('data-folder',folder_id);
     $(".folder-items").removeClass('active');
     $("#folder-"+folder_id).addClass('active');
     $.ajax({
@@ -105,7 +107,7 @@
 
           }
            $('#email-list').html(html);
-           $('#records-counter').html(response.from+ "-"+ response.to +" of "+ response.total);
+           $('#records-counter').html((response.from==null?0:response.from)+ "-"+ (response.to==null?0:response.to) +" of "+ response.total);
            if(page>1)
            $('#prev-page').attr("href", "javascript:populateMessages("+account_id+","+folder_id+","+(page-1)+")");
           if(page<response.last_page)
@@ -142,6 +144,58 @@
         }
     });
   }
+  function searchMails(elem){
+    var page=1;
+    var term=$(elem).val();
+    var account_id=$(elem).data('account');
+    var folder_id=$(elem).data('folder');
+    var url='{{url("/admin/inbox/emails/:accountId/:folderId")}}?term='+term;
+    url=url.replace(':accountId',account_id);
+    url=url.replace(':folderId',folder_id);
+    $(".folder-items").removeClass('active');
+    $("#folder-"+folder_id).addClass('active');
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (response, status) {
+          var messages=response.data;
+           var html='';
+           for(var i=0; i<messages.length; i++){
+          html+=`
+            <li class="email-list-item" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
+              <div class="d-flex align-items-center">
+                <div class="form-check mb-0">
+                  <input class="email-list-item-input form-check-input" type="checkbox" id="email-`+messages[i].id+`">
+                  <label class="form-check-label" for="email-`+messages[i].id+`"></label>
+                </div>
+                <div class="email-list-item-content ms-2 ms-sm-0 me-2">
+                  <span class="h6 email-list-item-username me-2">`+messages[i].from.name+`</span>
+                  <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
+                </div>
+                <div class="email-list-item-meta ms-auto d-flex align-items-center">
+                  <span class="email-list-item-label badge badge-dot bg-danger d-none d-md-inline-block me-2" data-label="private"></span>
+                  <small class="email-list-item-time text-muted">`+new Date(messages[i].date).toLocaleTimeString()+`</small>
+                </div>
+              </div>
+            </li>`;
+
+          }
+           $('#email-list').html(html);
+           $('#records-counter').html((response.from==null?0:response.from)+ "-"+ (response.to==null?0:response.to) +" of "+ response.total);
+           if(page>1)
+           $('#prev-page').attr("href", "javascript:populateMessages("+account_id+","+folder_id+","+(page-1)+")");
+          if(page<response.last_page)
+           $('#next-page').attr("href", "javascript:populateMessages("+account_id+","+folder_id+","+(page+1)+")");
+        },
+        error: function (response) {
+            var message = "";
+            if
+                (response.responseJSON.message == undefined) { message = errorMesage }
+            else { message = response.responseJSON.message }
+            toastr.error(message);
+        }
+    });
+  }
 </script>
 @endsection
 
@@ -155,7 +209,7 @@
         <div class="mb-3">
         <select id="select-account" class="select2 form-control" style="width:100%">
           @foreach($accounts as $account)
-          <option value="{{$account->id}}"> {{$account->email}}</option>
+          <option @if($account->isprimary()) selected @endif value="{{$account->id}}"> {{$account->email}}</option>
           @endforeach
         </select>
         </div>
@@ -189,7 +243,7 @@
                   <span class="input-group-text border-0 ps-0" id="email-search">
                     <i class="ti ti-search"></i>
                   </span>
-                  <input type="text" class="form-control email-search-input border-0" placeholder="Search mail" aria-label="Search mail" aria-describedby="email-search">
+                  <input type="text" onkeyup="searchMails(this);" id="mail-search" class="form-control email-search-input border-0" placeholder="Search mail" aria-label="Search mail" aria-describedby="email-search">
                 </div>
               </div>
             </div>

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Innoclapps\Concerns\HasMeta;
+use App\Innoclapps\Contracts\Metable;
 use App\Notifications\Admin\VerifyEmail;
 use App\Notifications\Admin\ResetPassword;
 use App\Traits\AuthLogs;
@@ -19,11 +21,11 @@ use Avatar;
 use Illuminate\Support\Facades\Storage;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use OwenIt\Auditing\Contracts\Auditable;
-class Admin extends Authenticatable implements MustVerifyEmail, Auditable
+class Admin extends Authenticatable implements MustVerifyEmail,  Metable,Auditable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs;
     use \OwenIt\Auditing\Auditable;
-    use ApprovesChanges;
+    use HasMeta,ApprovesChanges;
     /**
      * The attributes that are mass assignable.
      *

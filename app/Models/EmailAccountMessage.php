@@ -20,12 +20,13 @@ use App\Innoclapps\Contracts\Presentable;
 use App\Innoclapps\Timeline\Timelineable;
 use App\Innoclapps\Resources\Resourceable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmailAccountMessage extends Model implements Presentable
 {
     use HasAvatar,
         HasMedia,
-        Resourceable,
+        Resourceable,SoftDeletes,
         Timelineable;
 
     /**

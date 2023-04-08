@@ -160,4 +160,5 @@
           $("#emailComposeSidebar").modal('show');
 
         }
+   
       </script>

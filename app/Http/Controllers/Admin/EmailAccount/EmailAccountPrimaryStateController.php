@@ -40,7 +40,7 @@ class EmailAccountPrimaryStateController extends Controller
 
         $this->repository->markAsPrimary($account, auth()->user());
 
-        return response('Successfully updated.', 204);
+        return response('Successfully updated.');
     }
 
     /**
