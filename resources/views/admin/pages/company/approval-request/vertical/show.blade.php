@@ -55,6 +55,12 @@
                 </a>
             </div>
         </div>
-        @include('admin.pages.company.approval-request.vertical.tabs.'.request()->tab)
+        <form action="{{route('admin.approval-requests.level.companies.update', ['company' => $company->id, 'level' => $company->approval_level])}}" method="post">
+          @if($errors->any())
+              {!! implode('', $errors->all('<div>:message</div>')) !!}
+          @endif
+          @csrf
+          @include('admin.pages.company.approval-request.vertical.tabs.'.request()->tab)
+        </form>
     </div>
 @endsection

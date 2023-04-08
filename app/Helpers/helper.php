@@ -45,3 +45,39 @@ if(!function_exists('transformModifiedData')) { // Get modified data from modidi
     return $modifications;
   }
 }
+
+function getCompanyStatusIcon($status)
+{
+  switch ($status) {
+    case 'pending':
+      return 'fa-solid fa-circle-exclamation';
+      break;
+    case 'approved':
+      return 'fa-regular fa-circle-check';
+      break;
+    case 'rejected':
+      return 'fa-regular fa-circle-xmark';
+      break;
+    default:
+      return 'fa-regular fa-circle-check';
+      break;
+  }
+}
+
+function getCompanyStatusColor($status)
+{
+  switch ($status) {
+    case 'pending':
+      return 'warning';
+      break;
+    case 'approved':
+      return 'success';
+      break;
+    case 'rejected':
+      return 'danger';
+      break;
+    default:
+      return 'warning';
+      break;
+  }
+}

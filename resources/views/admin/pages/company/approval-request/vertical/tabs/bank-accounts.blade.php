@@ -10,7 +10,9 @@
           //   $account = transformModifiedData($account->modifications[0]->modifications) + $account->toArray();
           // }
         @endphp
-        <div class="col-md-4 col-sm-6 mb-md-3">
+        <input id="approval-status-{{$loop->iteration}}" name="approval_status[{{$account['modification_id']}}]" type="hidden" value="1"/>
+        {!! Form::hidden('modification_ids[]', $account['modification_id']) !!}
+        <div class="col-sm-12 mb-md-3">
           <div class="form-check custom-option custom-option-basic">
             <label class="form-check-label custom-option-content">
               <span class="custom-option-header mb-2">
@@ -20,20 +22,34 @@
                 </span>
               </span>
               <span class="custom-option-body">
-                <small>
-                  <span class="fw-bold">Account Number :</span>  {{ $account['account_no'] }} <br />
-                  <span class="fw-bold">IBAN Number :</span>  {{ $account['iban_no'] }} <br />
-                  <span class="fw-bold">Swift Code : </span> {{ $account['swift_code'] }} <br />
-                  <span class="fw-bold">Branch : </span> {{ $account['branch'] }} <br />
-                  <span class="fw-bold">Postal Code : </span> {{ $account['post_code'] }} <br />
-                  <span class="fw-bold">City : </span> {{ $account['city'] }} <br />
-                  <span class="fw-bold">State : </span> {{ $account['state'] }} <br />
-                  <span class="fw-bold">Country : </span> {{ $countries[$account['country_id']] }} <br />
-                </small>
-                <hr class="my-2">
-                <span class="d-flex">
-                  <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Bank Account" data-href="{{route('company.bank-accounts.show', 1)}}">View</a>
-                </span>
+                <div class="row">
+                  @forelse ($fields as $field_title => $field_name)
+                      <div class="col-6 my-2">
+                          <div class="fw-bold">
+                            {{$field_title}}
+                          </div>
+                          <span class="fst-italic d-flex justify-content-between">
+                            <span>{{ substr(is_array(@$account[$field_name])? json_encode($account[$field_name]) : $account[$field_name],0 ,30) }}</span>
+                            <div class="me-5">
+                              <label class="switch switch-square">
+                                <input type="checkbox" class="switch-input" data-switch-toggle-in-all="#rr-{{$loop->parent->iteration}}" data-nset="#approval-status-{{$loop->parent->iteration}}" checked />
+                                <span class="switch-toggle-slider">
+                                  <span class="switch-on"><i class="ti ti-check"></i></span>
+                                  <span class="switch-off"><i class="ti ti-x"></i></span>
+                                </span>
+                              </label>
+                            </div>
+                          </span>
+                      </div>
+                  @empty
+                  @endforelse
+                  <div class="row d-none mt-2" id="rr-{{$loop->iteration}}">
+                    <div class="">
+                      <label class="form-label fw-bold">Rejection Reason</label>
+                      <textarea class="form-control" name="disapproval_reason[{{$account['modification_id']}}]" rows="3"></textarea>
+                    </div>
+                  </div>
+                </div>
               </span>
             </label>
           </div>
@@ -43,7 +59,7 @@
     </div>
     <div class="row">
       <div class="col-12 d-flex justify-content-between">
-        <button type="submit" class="btn btn-light">Previews</button>
+        <button type="button" class="btn btn-light">Previews</button>
         <button type="submit" class="btn btn-primary">Submit</button>
       </div>
     </div>

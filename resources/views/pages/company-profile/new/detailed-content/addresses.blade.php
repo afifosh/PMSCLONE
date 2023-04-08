@@ -8,7 +8,7 @@
           $address = transformModifiedData($address->modifications[0]->modifications) + $address->toArray();
         }
       @endphp
-      <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
+      <div class="col-sm-6 mb-md-3">
         <div class="form-check custom-option custom-option-basic">
           <label class="form-check-label custom-option-content">
             <span class="custom-option-header mb-2">
@@ -47,7 +47,7 @@
       @php
           $address = transformModifiedData($pending_addresse->modifications);
       @endphp
-      <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
+      <div class="col-sm-6 mb-md-3">
         <div class="form-check custom-option custom-option-basic">
           <label class="form-check-label custom-option-content">
             <span class="custom-option-header mb-2">
@@ -83,7 +83,7 @@
     @empty
     @endforelse
     @if (auth()->user()->company->isEditable())
-      <div class="col-lg-3 col-md-4 col-sm-6 mb-md-3">
+      <div class="col-sm-6 mb-md-3">
         <div class="form-check custom-option custom-option-basic h-100">
           <div class="d-flex justify-content-center align-items-center h-100">
             <button class="text-center btn btn-primary" data-toggle="ajax-modal" data-title="Add New Contact Person" data-href="{{ route('company.addresses.create') }}">Add New</button>

@@ -220,4 +220,48 @@ class Company extends BaseModel
   {
     return $this->approved_at == null && $this->approval_level == 0;
   }
+
+  public function getDetailsStatus()
+  {
+    $status = 'pending';
+    if($this->detail && !$this->POCDetail()->where('active', 1)->exists())
+      $status = 'approved';
+    if($this->POCDetail()->has('disapprovals')->exists())
+      $status = 'rejected';
+
+    return $status;
+  }
+
+  public function getAddressesStatus()
+  {
+    $status = 'pending';
+    if($this->addresses->count() && !$this->POCAddress()->where('active', 1)->exists())
+      $status = 'approved';
+    if($this->POCAddress()->has('disapprovals')->exists())
+      $status = 'rejected';
+
+    return $status;
+  }
+
+  public function getContactsStatus()
+  {
+    $status = 'pending';
+    if($this->contacts->count() && !$this->POCContact()->where('active', 1)->exists())
+      $status = 'approved';
+    if($this->POCContact()->has('disapprovals')->exists())
+      $status = 'rejected';
+
+    return $status;
+  }
+
+  public function getBankAccountsStatus()
+  {
+    $status = 'pending';
+    if($this->bankAccounts->count() && !$this->POCBankAccount()->where('active', 1)->exists())
+      $status = 'approved';
+    if($this->POCBankAccount()->where('active', 1)->has('disapprovals')->exists())
+      $status = 'rejected';
+
+    return $status;
+  }
 }

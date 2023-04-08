@@ -10,7 +10,9 @@
           //   $address = transformModifiedData($address->modifications[0]->modifications) + $address->toArray();
           // }
         @endphp
-        <div class="col-md-4 col-sm-6 mb-md-3">
+          <input id="approval-status-{{$loop->iteration}}" name="approval_status[{{$address['modification_id']}}]" type="hidden" value="1"/>
+        {!! Form::hidden('modification_ids[]', $address['modification_id']) !!}
+        <div class="col-sm-12 mb-md-3">
           <div class="form-check custom-option custom-option-basic">
             <label class="form-check-label custom-option-content">
               <span class="custom-option-header mb-2">
@@ -22,19 +24,34 @@
                 </span>
               </span>
               <span class="custom-option-body">
-                <small>
-                  <span> {{ @$address['address_line_1'] }} </span><br />
-                  <span> {{ @$address['address_line_2'] }} </span><br />
-                  <span> {{ @$address['address_line_3'] }}</span><br />
-                  <span class="fw-bold">Post Code :</span>  {{ @$address['postal_code'] }} <br />
-                  <span class="fw-bold">City : </span> {{ @$address['city'] }} <br />
-                  <span class="fw-bold">State : </span> {{ @$address['state'] }} <br />
-                  <span class="fw-bold">Country : </span> {{ $countries[@$address['country_id']] }} <br />
-                </small>
-                <hr class="my-2">
-                <span class="d-flex">
-                  <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Address" data-href="{{route('company.addresses.show', 1)}}">View</a>
-                </span>
+                <div class="row">
+                  @forelse ($fields as $field_title => $field_name)
+                      <div class="col-6 my-2">
+                          <div class="fw-bold">
+                            {{$field_title}}
+                          </div>
+                          <span class="fst-italic d-flex justify-content-between">
+                            <span>{{ substr(is_array(@$address[$field_name])? json_encode($address[$field_name]) : $address[$field_name],0 ,30) }}</span>
+                            <div class="me-5">
+                              <label class="switch switch-square">
+                                <input type="checkbox" class="switch-input" data-switch-toggle-in-all="#rr-{{$loop->parent->iteration}}" data-nset="#approval-status-{{$loop->parent->iteration}}" checked />
+                                <span class="switch-toggle-slider">
+                                  <span class="switch-on"><i class="ti ti-check"></i></span>
+                                  <span class="switch-off"><i class="ti ti-x"></i></span>
+                                </span>
+                              </label>
+                            </div>
+                          </span>
+                      </div>
+                  @empty
+                  @endforelse
+                  <div class="row d-none mt-2" id="rr-{{$loop->iteration}}">
+                    <div class="">
+                      <label class="form-label fw-bold">Rejection Reason</label>
+                      <textarea class="form-control" name="disapproval_reason[{{$address['modification_id']}}]" rows="3"></textarea>
+                    </div>
+                  </div>
+                </div>
               </span>
             </label>
           </div>
@@ -44,7 +61,7 @@
     </div>
     <div class="row">
       <div class="col-12 d-flex justify-content-between">
-        <button type="submit" class="btn btn-light">Previews</button>
+        <button type="button" class="btn btn-light">Previews</button>
         <button type="submit" class="btn btn-primary">Next</button>
       </div>
     </div>

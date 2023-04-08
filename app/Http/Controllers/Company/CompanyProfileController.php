@@ -21,9 +21,16 @@ class CompanyProfileController extends Controller
     $data['POCDetail'] = auth()->user()->company->POCDetail()->exists() ? auth()->user()->company->POCDetail()->with('approvals', 'disapprovals')->latest()->first() : null;
     $data['detail'] = $data['POCDetail'] ? $this->transformModifications($data['POCDetail']->modifications) : auth()->user()->company->detail()->with('modifications')->first() ?? null;
     $data['countries'] = Country::pluck('name', 'id');
+    $data['isHavingPendingProfile'] = auth()->user()->company->isHavingPendingProfile();
+    if(!$data['isHavingPendingProfile']){
+      $data['detailsStatus'] = auth()->user()->company->getDetailsStatus();
+      $data['contactsStatus'] = auth()->user()->company->getContactsStatus();
+      $data['addressesStatus'] = auth()->user()->company->getAddressesStatus();
+      $data['accountsStatus'] = auth()->user()->company->getBankAccountsStatus();
+    }
 
     return request()->ajax() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
-      : (auth()->user()->company->isHavingPendingProfile() ? view('pages.company-profile.edit', $data) : view('pages.company-profile.new.edit', $data));
+      : ($data['isHavingPendingProfile'] ? view('pages.company-profile.edit', $data) : view('pages.company-profile.new.edit', $data));
 
   }
 

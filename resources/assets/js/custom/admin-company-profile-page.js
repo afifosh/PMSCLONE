@@ -30,12 +30,14 @@ $('[data-switch-toggle-in]').on('click', function () {
 $('[data-switch-toggle-in-all]').on('click', function () {
   var target = $(this).data('switch-toggle-in-all');
   var hidden = true;
+  var unset = $(this).data('nset');
   $('[data-switch-toggle-in-all]').each(function () {
     if (!$(this).is(':checked')) {
       hidden = false;
     }
   });
-  !hidden ? $(target).removeClass('d-none') : $(target).addClass('d-none');
+  hidden ? $(unset).val(1) : $(unset).val('');
+  hidden ? $(target).addClass('d-none') : $(target).removeClass('d-none');
 });
 
 $('.save-draft').on('click', function () {

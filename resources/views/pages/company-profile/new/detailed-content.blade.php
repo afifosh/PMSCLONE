@@ -147,10 +147,10 @@
         @include('pages.company-profile.new.detailed-content.accounts')
       </div>
     </div>
-    <div class="card card-action mb-4">
+    {{-- <div class="card card-action mb-4">
       <div class="card-body d-flex justify-content-end">
         <a href="{{route('company.submitApprovalRequest')}}" class="btn btn-outline-light waves-effect bg-dark {{auth()->user()->company->canBeSentForApproval() ? '': 'disabled'}}" type="button"> <span class="align-middle d-sm-inline-block me-sm-1">Send for Approval</span></a>
       </div>
-    </div>
+    </div> --}}
 </div>
 @endsection

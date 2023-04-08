@@ -28,7 +28,7 @@ class ApprovalUpdateRequest extends FormRequest
             'modification_ids.*' => 'required|exists:modifications,id',
             'approval_status' => 'required|array',
             'approval_status.*' => 'nullable',
-            'disapproval_reason' => 'required|array',
+            'disapproval_reason' => 'array',
             'disapproval_reason.*' => 'required_if:approval_status.*,null',
         ];
     }

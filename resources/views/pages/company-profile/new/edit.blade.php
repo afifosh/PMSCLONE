@@ -40,23 +40,23 @@
                 </div>
                 <div class="border fw-bold mt-2 d-flex justify-content-between p-2">
                     <span> 1. Company Details </span>
-                    <span class="text-success"><i class="fa-regular fa-circle-check fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($detailsStatus) }}"><i class="{{getCompanyStatusIcon($detailsStatus)}} fa-lg"></i></span>
                 </div>
                 <div class="border fw-bold mt-2 d-flex justify-content-between p-2">
                     <span> 2. Contact Persons </span>
-                    <span class="text-success"><i class="fa-regular fa-circle-check fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($contactsStatus) }}"><i class="{{getCompanyStatusIcon($contactsStatus)}} fa-lg"></i></span>
                 </div>
                 <div class="border fw-bold mt-2 d-flex justify-content-between p-2">
                     <span> 3. Company Addresses </span>
-                    <span class="text-danger"><i class="fa-regular fa-circle-xmark fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($addressesStatus) }}"><i class="{{getCompanyStatusIcon($addressesStatus)}} fa-lg"></i></span>
                 </div>
                 <div class="border fw-bold mt-2 d-flex justify-content-between p-2">
                     <span> 4. Verification Documents </span>
-                    <span class="text-success"><i class="fa-regular fa-circle-check fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($addressesStatus) }}"><i class="{{getCompanyStatusIcon($addressesStatus)}} fa-lg"></i></span>
                 </div>
                 <div class="border fw-bold mt-2 d-flex justify-content-between p-2">
                     <span> 5. Bank Accounts </span>
-                    <span class="text-danger"><i class="fa-regular fa-circle-xmark fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($accountsStatus) }}"><i class="{{getCompanyStatusIcon($accountsStatus)}} fa-lg"></i></span>
                 </div>
             </div>
         </div>

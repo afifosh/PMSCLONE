@@ -69,12 +69,36 @@
       <p class="mb-0">Add files to new design folder</p>
     </div>
   </li>
+  <li class="timeline-item timeline-item-transparent">
+    <span class="timeline-point timeline-point-danger"></span>
+    <div class="timeline-event">
+      <div class="timeline-header">
+        <h6 class="mb-0">Modifications Rejected</h6>
+        <small class="text-muted">1 Day Ago</small>
+      </div>
+      <p class="mb-2">ABC rejected <img src="{{ asset('assets/img/avatars/4.png') }}" class="rounded-circle me-3" alt="avatar" height="24" width="24"></p>
+      <div class="d-flex flex-wrap gap-2 pt-1">
+        <a href="javascript:void(0)" class="me-3">
+          <img src="{{asset('assets/img/avatars/4.png') }}" alt="Document image" width="15" class="me-2">
+          <span class="fw-semibold text-heading">Company Name</span>
+        </a>
+        <a href="javascript:void(0)">
+          <img src="{{asset('assets/img/avatars/4.png') }}" alt="Excel image" width="15" class="me-2">
+          <span class="fw-semibold text-heading">Logo</span>
+        </a>
+        <a href="javascript:void(0)">
+          <img src="{{asset('assets/img/avatars/4.png') }}" alt="Excel image" width="15" class="me-2">
+          <span class="fw-semibold text-heading">Locality</span>
+        </a>
+      </div>
+    </div>
+  </li>
   <li class="timeline-item timeline-item-transparent border-0">
     <span class="timeline-point timeline-point-info"></span>
     <div class="timeline-event">
       <div class="timeline-header">
-        <h6 class="mb-0">Project status updated</h6>
-        <small class="text-muted">10 Day Ago</small>
+        <h6 class="mb-0">User ABC Added a new address. And looking for approval</h6>
+        <small class="text-muted">1 Day Ago</small>
       </div>
       <p class="mb-0">Woocommerce iOS App Completed</p>
     </div>
