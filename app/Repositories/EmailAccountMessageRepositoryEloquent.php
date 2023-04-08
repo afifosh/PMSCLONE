@@ -29,6 +29,7 @@ use App\Contracts\Repositories\EmailAccountFolderRepository;
 use App\Innoclapps\Contracts\MailClient\AttachmentInterface;
 use App\Contracts\Repositories\EmailAccountMessageRepository;
 use App\Support\Concerns\InteractsWithEmailMessageAssociations;
+use Exception;
 use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
 
 class EmailAccountMessageRepositoryEloquent extends AppRepository implements EmailAccountMessageRepository

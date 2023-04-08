@@ -13,6 +13,7 @@
 namespace App\MailClient;
 
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Str;
 use Google_Service_Exception;
 
@@ -44,6 +45,7 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
     */
     public function syncMessages() : void
     {
+
         foreach ($this->account->folders->active() as $folder) {
             // Perform check in the loop in case rate limit exceeded while looping through the folders
             if ($this->isAccountRateLimitExceeded()) {
@@ -64,6 +66,7 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
                 $this->syncAll($folder);
             }
         }
+
     }
 
     /**

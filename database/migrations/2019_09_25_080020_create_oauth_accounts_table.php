@@ -15,7 +15,7 @@ return new class extends Migration {
         Schema::create('oauth_accounts', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('admins');
             $table->string('oauth_user_id');
             $table->string('email')->nullable();
             $table->boolean('requires_auth')->default(false);

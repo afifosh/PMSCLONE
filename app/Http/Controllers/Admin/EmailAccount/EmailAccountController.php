@@ -50,9 +50,6 @@ class EmailAccountController extends Controller
     public function show($id)
     {
          $account = $this->repository->withResponseRelations()->find($id);
-
-         $this->authorize('view', $account);
-
          return response()->json($account);
     }
 
@@ -96,7 +93,6 @@ class EmailAccountController extends Controller
      */
     public function update($id, EmailAccountRequest $request)
     {
-         $this->authorize('update', $this->repository->find($id));
         // // The user is not allowed to update these fields after creation
          $except = ['email', 'connection_type', 'user_id', 'initial_sync_from','sent_folder_id','trash_folder_id'];
          $account = $this->repository->update($request->except($except), $id);
@@ -114,8 +110,6 @@ class EmailAccountController extends Controller
      */
     public function destroy($id)
     {
-         $this->authorize('delete', $this->repository->find($id));
-
          $this->repository->delete($id);
 
         return response("Account deleted successfully.");

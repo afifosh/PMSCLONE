@@ -41,7 +41,7 @@ class TableSettings implements Arrayable, JsonSerializable
     /**
      * Create new TableSettings instance.
      *
-     * @param \App\Models\User $user
+     * @param \App\Models\Admin $user
      */
     public function __construct(protected Table $table, protected Metable $user)
     {

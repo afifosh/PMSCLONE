@@ -74,7 +74,7 @@ class ContactFields
                 Email::make('email', __('fields.contacts.email'))
                 ->rules(['nullable', 'email', 'max:191'])
                 ->unique(Contact::class)
-                ->unique(\App\Models\User::class)
+                ->unique(\App\Models\Admin::class)
                 ->validationMessages([
                     'unique' => __('contact.validation.email.unique'),
                     ])

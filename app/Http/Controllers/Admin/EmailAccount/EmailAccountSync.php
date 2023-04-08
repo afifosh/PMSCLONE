@@ -39,18 +39,13 @@ class EmailAccountSync extends Controller
      */
     public function __invoke($accountId)
     {
-        $this->authorize('view', $this->repository->find($accountId));
-
+        \Log::info('syncing manually.');
         Artisan::call('concord:sync-email-accounts', [
             '--account'   => $accountId,
             '--broadcast' => false,
             '--manual'    => true,
         ]);
 
-        return $this->response(
-            new EmailAccountResource(
-                $this->repository->withResponseRelations()->find($accountId)
-            )
-        );
+        return response("Synchronization started.");
     }
 }

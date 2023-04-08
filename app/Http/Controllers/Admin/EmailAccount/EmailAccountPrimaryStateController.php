@@ -36,7 +36,7 @@ class EmailAccountPrimaryStateController extends Controller
     public function update($id)
     {
         $this->destroy();
-        $this->authorize('view', $account = $this->repository->find($id));
+        $account = $this->repository->find($id);
 
         $this->repository->markAsPrimary($account, auth()->user());
 

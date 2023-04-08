@@ -37,7 +37,7 @@ class User extends BelongsTo
     /**
      * The assigneer
      *
-     * @var \App\Models\User
+     * @var \App\Models\Admin
      */
     public static $assigneer;
 
@@ -91,7 +91,7 @@ class User extends BelongsTo
     /**
      * Set the user that perform the assignee
      *
-     * @param \App\Models\User $user
+     * @param \App\Models\Admin $user
      */
     public static function setAssigneer($user)
     {
@@ -243,7 +243,7 @@ class User extends BelongsTo
     /**
      * Create option for the front-end
      *
-     * @param \App\Models\User $user
+     * @param \App\Models\Admin $user
      *
      * @return array
      */

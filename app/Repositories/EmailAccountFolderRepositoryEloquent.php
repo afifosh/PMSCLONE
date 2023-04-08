@@ -21,6 +21,7 @@ use App\Innoclapps\MailClient\ConnectionType;
 use App\Innoclapps\MailClient\FolderCollection;
 use App\Innoclapps\Contracts\Repositories\MediaRepository;
 use App\Contracts\Repositories\EmailAccountFolderRepository;
+use Exception;
 
 class EmailAccountFolderRepositoryEloquent extends AppRepository implements EmailAccountFolderRepository
 {
@@ -47,6 +48,7 @@ class EmailAccountFolderRepositoryEloquent extends AppRepository implements Emai
      */
     public function persistForAccount(EmailAccount $account, array $folder) : EmailAccountFolder
     {
+         
         $parent = $this->updateOrCreate(
             $this->getUpdateOrCreateAttributes($account, $folder),
             array_merge($folder, [

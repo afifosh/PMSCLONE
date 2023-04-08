@@ -27,7 +27,7 @@ class Logging
     /**
      * Set the log causer
      *
-     * @param \App\Models\User|null $causer
+     * @param \App\Models\Admin|null $causer
      *
      * @return void
      */

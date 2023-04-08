@@ -12,7 +12,7 @@
 
 namespace App\Repositories;
 
-use App\Models\User;
+use App\Models\Admin;
 use App\Support\TransferUserData;
 use Illuminate\Http\UploadedFile;
 use App\Support\PurgesOAuthAccount;
@@ -53,7 +53,7 @@ class UserRepositoryEloquent extends AppRepository implements UserRepository
      */
     public static function model()
     {
-        return User::class;
+        return Admin::class;
     }
 
     /**
@@ -97,11 +97,11 @@ class UserRepositoryEloquent extends AppRepository implements UserRepository
      *
      * @param array $attributes
      *
-     * @return \App\Models\User
+     * @return \App\Models\Admin
      */
-    public function createViaInstall(array $attributes) : User
+    public function createViaInstall(array $attributes) : Admin
     {
-        return User::unguarded(function () use ($attributes) {
+        return Admin::unguarded(function () use ($attributes) {
             $attributes['super_admin'] = true;
             $attributes['access_api'] = true;
             $attributes['first_day_of_week'] = default_setting('first_day_of_week');
@@ -255,9 +255,9 @@ class UserRepositoryEloquent extends AppRepository implements UserRepository
      *
      * @param string $email
      *
-     * @return \App\Models\User|null
+     * @return \App\Models\Admin|null
      */
-    public function findByEmail(string $email) : ?User
+    public function findByEmail(string $email) : ?Admin
     {
         return $this->limit(1)->findByField('email', $email)->first();
     }
@@ -265,12 +265,12 @@ class UserRepositoryEloquent extends AppRepository implements UserRepository
     /**
      * Store the given user avatar
      *
-     * @param \App\Models\User $user
+     * @param \App\Models\Admin $user
      * @param \Illuminate\Http\UploadedFile $file
      *
      * @return void
      */
-    public function storeAvatar(User $user, UploadedFile $file) : User
+    public function storeAvatar(Admin $user, UploadedFile $file) : Admin
     {
         $this->removeAvatarImage($user);
 
@@ -282,11 +282,11 @@ class UserRepositoryEloquent extends AppRepository implements UserRepository
     /**
      * Delete user avatar
      *
-     * @param \App\Models\User $user
+     * @param \App\Models\Admin $user
      *
      * @return static
      */
-    public function removeAvatarImage(User $user) : static
+    public function removeAvatarImage(Admin $user) : static
     {
         if ($user->avatar) {
             Storage::disk('public')->delete($user->avatar);

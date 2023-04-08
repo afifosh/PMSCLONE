@@ -166,7 +166,7 @@ class Import extends DefaultValueBinder implements ToArray, WithHeadingRow, With
      * Initiate new import from the given file and start mapping the fields
      *
      * @param \Illuminate\Http\UploadedFile $file
-     * @param \App\Models\User $user
+     * @param \App\Models\Admin $user
      */
     public function upload(UploadedFile $file, $user) : ImportModel
     {

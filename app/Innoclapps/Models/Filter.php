@@ -51,7 +51,7 @@ class Filter extends Model implements Metable
      */
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(\App\Models\Admin::class);
     }
 
     /**

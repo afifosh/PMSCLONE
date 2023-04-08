@@ -36,7 +36,7 @@ class EmailAccountsForUserCriteria extends QueriesByUserCriteria
      * Apply the query for the criteria
      *
      * @param \Illumindata\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder $model
-     * @param \App\Models\User|int|null $user
+     * @param \App\Models\Admin|int|null $user
      * @param string $columnName
      *
      * @return \Illumindata\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder

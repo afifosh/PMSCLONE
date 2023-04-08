@@ -8,7 +8,7 @@ use App\Http\Controllers\Company\CompanyProfile\ContactController;
 use App\Http\Controllers\Company\CompanyProfileController;
 use App\Http\Controllers\Company\DashboardController;
 
-use App\Http\Controllers\company\InvitationController;
+use App\Http\Controllers\Company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
 use App\Http\Controllers\NotificationController;

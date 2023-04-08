@@ -12,7 +12,7 @@
 
 namespace App\Workflows\Actions;
 
-use App\Models\User;
+use App\Models\Admin;
 use ReflectionClass;
 use Illuminate\Support\Arr;
 use App\Innoclapps\Fields\Text;
@@ -269,7 +269,7 @@ class SendEmailAction extends Action implements ShouldQueue
         // The actual resource model is User, we don't associate
         // as the user is not associateable or if the TO is the same as the resource e.q. contact send to contact email
         // as the contact is already associated above
-        if ($resource::$model === User::class || $resource::$model === $this->model::class) {
+        if ($resource::$model === Admin::class || $resource::$model === $this->model::class) {
             return $associations;
         }
 
@@ -339,7 +339,7 @@ class SendEmailAction extends Action implements ShouldQueue
 
         // Same resource, e.q. company send email to company email
         if ($resource::$model === $this->model::class) { // or $this->to === 'self'
-            if ($model instanceof User) {
+            if ($model instanceof Admin) {
                 return $this->getEmailAddressWhenUserModel($model);
             } elseif (! $model::resource() instanceof HasEmail
                 || ! $address = $model->{$model::resource()->emailAddressField()}) {
@@ -347,7 +347,7 @@ class SendEmailAction extends Action implements ShouldQueue
             }
 
             return $this->createAddress($address, $model);
-        } elseif ($resource::$model === User::class) {
+        } elseif ($resource::$model === Admin::class) {
             // When using User, the To must be the relation name e.q. creator or user or any other relation name
             return $this->getEmailAddressWhenUserModel($this->model->{$this->to});
         }
@@ -358,7 +358,7 @@ class SendEmailAction extends Action implements ShouldQueue
     /**
      * Get email addresses when user model
      *
-     * @param \App\Models\User|null $user
+     * @param \App\Models\Admin|null $user
      *
      * @return array|null
      */

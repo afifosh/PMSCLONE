@@ -1,14 +1,4 @@
 <?php
-/**
- * Concord CRM - https://www.concordcrm.com
- *
- * @version   1.1.6
- *
- * @link      Releases - https://www.concordcrm.com/releases
- * @link      Terms Of Service - https://www.concordcrm.com/terms
- *
- * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
- */
 
 namespace App\Listeners;
 
@@ -21,6 +11,7 @@ use App\Innoclapps\MailClient\ClientManager;
 use App\Innoclapps\MailClient\ConnectionType;
 use App\Contracts\Repositories\EmailAccountRepository;
 use App\Innoclapps\MailClient\Exceptions\UnauthorizedException;
+use App\Models\EmailAccountMessage;
 
 class CreateEmailAccountViaOAuth
 {
@@ -106,13 +97,21 @@ class CreateEmailAccountViaOAuth
      */
     protected function createEmailAccount($oAuthAccount)
     {
+        $accounts=EmailAccount::where("email",'=',$oAuthAccount->email)->withTrashed();
+        if($accounts->count()>0){
+           $account=$accounts->first();
+            EmailAccountMessage::where(["email_account_id"=>$account->id])->withTrashed()->forceDelete();
+            $account->forceDelete();
+        }
+        
+
         $payload = [
             'connection_type' => $oAuthAccount->type == 'microsoft' ?
                 ConnectionType::Outlook :
                 ConnectionType::Gmail,
             'email' => $oAuthAccount->email,
         ];
-
+        
         // When initially connected an account e.q. Gmail, we will try to retrieve the folders
         // however, if the user did not enabled the Gmail API, will throw an error, catching the exception
         // below will make sure that the user will actually see an error message so he can take steps

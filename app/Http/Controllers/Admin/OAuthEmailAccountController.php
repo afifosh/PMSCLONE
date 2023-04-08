@@ -32,11 +32,11 @@ class OAuthEmailAccountController extends Controller
      */
     public function connect($type, $providerName, Request $request, OAuthManager $manager)
     {
-        abort_if(
-             EmailAccountType::from($type) === EmailAccountType::SHARED,
-            403,
-            'Unauthorized action.'
-        );
+        // abort_if(
+        //      EmailAccountType::from($type) === EmailAccountType::SHARED,
+        //     403,
+        //     'Unauthorized action.'
+        // );
         return redirect($manager->createProvider($providerName)
             ->getAuthorizationUrl(['state' => $this->createState($request, $type, $manager)]));
     }

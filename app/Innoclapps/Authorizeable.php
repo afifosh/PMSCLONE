@@ -79,7 +79,7 @@ trait Authorizeable
     /**
      * Check whether the user can see a specific item
      *
-     * @param \App\Models\User|null $user
+     * @param \App\Models\Admin|null $user
      *
      * @return boolean
      */

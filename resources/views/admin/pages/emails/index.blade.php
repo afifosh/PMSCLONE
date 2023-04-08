@@ -52,12 +52,24 @@
         success: function (response, status) {
           var folders=response.folders;
           var html='';
+          var isSync=false;
           for(var i=0; i<folders.length; i++){
+            if(folders[i].syncable){
+              isSync=true;
             html+=`<li class="d-flex justify-content-between folder-items" onclick="populateMessages(`+account_id+`,`+folders[i].id+`,1)" id="folder-`+folders[i].id+`">
             <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">`+folders[i].display_name+`</span>
             </a>
           </li>`;
+        }
+        if(!isSync){
+          $("#email-list-area").hide();
+          $("#no-folders-area").show();
+        }
+        else{
+          $("#email-list-area").show();
+          $("#no-folders-area").hide();          
+        }
 
           }
           $('#folders').html(html);
@@ -86,12 +98,16 @@
         success: function (response, status) {
           var messages=response.data;
            var html='';
+           if(messages.length==0){
+            html+="<li class='d-flex align-items-center'>No email available for this folder.</li>";
+           }
+           else{
            for(var i=0; i<messages.length; i++){
           html+=`
             <li class="email-list-item" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
               <div class="d-flex align-items-center">
                 <div class="form-check mb-0">
-                  <input class="email-list-item-input form-check-input" type="checkbox" id="email-`+messages[i].id+`">
+                  <input class="email-list-item-input form-check-input" data-id="`+messages[i].id+`" type="checkbox" id="email-`+messages[i].id+`">
                   <label class="form-check-label" for="email-`+messages[i].id+`"></label>
                 </div>
                 <div class="email-list-item-content ms-2 ms-sm-0 me-2">
@@ -99,20 +115,23 @@
                   <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
                 </div>
                 <div class="email-list-item-meta ms-auto d-flex align-items-center">
-                  <span class="email-list-item-label badge badge-dot bg-danger d-none d-md-inline-block me-2" data-label="private"></span>
                   <small class="email-list-item-time text-muted">`+new Date(messages[i].date).toLocaleTimeString()+`</small>
                 </div>
               </div>
             </li>`;
 
           }
+        }
            $('#email-list').html(html);
            $('#records-counter').html((response.from==null?0:response.from)+ "-"+ (response.to==null?0:response.to) +" of "+ response.total);
            if(page>1)
            $('#prev-page').attr("href", "javascript:populateMessages("+account_id+","+folder_id+","+(page-1)+")");
           if(page<response.last_page)
            $('#next-page').attr("href", "javascript:populateMessages("+account_id+","+folder_id+","+(page+1)+")");
-        },
+           $('.email-list-item-input').click(function(e) {
+    e.stopPropagation();
+});
+          },
         error: function (response) {
             var message = "";
             if
@@ -165,7 +184,7 @@
             <li class="email-list-item" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
               <div class="d-flex align-items-center">
                 <div class="form-check mb-0">
-                  <input class="email-list-item-input form-check-input" type="checkbox" id="email-`+messages[i].id+`">
+                  <input class="email-list-item-input form-check-input" type="checkbox" data-id="`+messages[i].id+`" id="email-`+messages[i].id+`">
                   <label class="form-check-label" for="email-`+messages[i].id+`"></label>
                 </div>
                 <div class="email-list-item-content ms-2 ms-sm-0 me-2">
@@ -195,6 +214,60 @@
             toastr.error(message);
         }
     });
+  }
+  function bulkAction(action){
+    var elements=$('.email-list-item-input:checked');
+    if(elements.length==0){
+      alert('No item selected');
+      return;
+    }
+    var ids=elements.map(function (idx, ele) {
+    return $(ele).data('id');
+    }).get();
+    if(action=='unread'){
+      $.ajax({
+        url: "{{url('admin/emails/bulkUnread')}}",
+        type: "GET",
+        data: {id:ids},
+        success: function (response, status) {
+          toastr.success(response);
+        },
+        error: function (response) {
+            var message = "";
+            if
+                (response.responseJSON.message == undefined) { message = errorMesage }
+            else { message = response.responseJSON.message }
+            toastr.error(message);
+        }
+    })  
+    }
+    if(action=='delete'){
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Are you sure you want to delete these messages?",
+        type: "warning",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        confirmButtonClass: "btn btn-primary",
+        buttonsStyling: !1
+    }).then(
+      $.ajax({
+        url: "{{url('admin/emails/bulkDelete')}}",
+        type: "GET",
+        data: {id:ids},
+        success: function (response, status) {
+          toastr.success(response);
+        },
+        error: function (response) {
+            var message = "";
+            if
+                (response.responseJSON.message == undefined) { message = errorMesage }
+            else { message = response.responseJSON.message }
+            toastr.error(message);
+        }
+    })
+    )
+  }
   }
 </script>
 @endsection
@@ -231,7 +304,7 @@
     <!--/ Email Sidebar -->
 
     <!-- Emails List -->
-    <div class="col app-emails-list">
+    <div id="email-list-area" style="display:none;" class="col app-emails-list">
       <div class="shadow-none border-0">
         <div class="emails-list-header p-3 py-lg-3 py-2">
           <!-- Email List: Search -->
@@ -255,7 +328,6 @@
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="emailsActions">
                   <button class="dropdown-item" onclick="editAccount();">Edit Email Account</button>
                   <a class="dropdown-item" href="{{url('/admin/mail/accounts/manage-accounts')}}">Manage Accounts</a>
-                  <button class="dropdown-item" data-bs-toggle="offcanvas" onclick="localStorage.setItem('acc_type','personal');" data-bs-target="#offcanvasAddUser" >Connect Personal Account</button>
                 </div>
               </div>
             </div>
@@ -268,47 +340,8 @@
                 <input class="form-check-input" type="checkbox" id="email-select-all">
                 <label class="form-check-label" for="email-select-all"></label>
               </div>
-              <i class="ti ti-trash email-list-delete cursor-pointer me-2"></i>
-              <i class="ti ti-mail-opened email-list-read cursor-pointer me-2"></i>
-              <div class="dropdown me-2">
-                <i class="ti ti-folder cursor-pointer" id="dropdownMenuFolder" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuFolder">
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="ti ti-info-circle ti-xs me-1"></i>
-                    <span class="align-middle">Spam</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="ti ti-file ti-xs me-1"></i>
-                    <span class="align-middle">Draft</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="ti ti-trash ti-xs me-1"></i>
-                    <span class="align-middle">Trash</span>
-                  </a>
-                </div>
-              </div>
-              <div class="dropdown">
-                <i class="ti ti-tag cursor-pointer" id="dropdownLabel" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                </i>
-                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLabel">
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="badge badge-dot bg-success me-1"></i>
-                    <span class="align-middle">Workshop</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="badge badge-dot bg-primary me-1"></i>
-                    <span class="align-middle">Company</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="badge badge-dot bg-info me-1"></i>
-                    <span class="align-middle">Important</span>
-                  </a>
-                  <a class="dropdown-item" href="javascript:void(0)">
-                    <i class="badge badge-dot bg-danger me-1"></i>
-                    <span class="align-middle">Private</span>
-                  </a>
-                </div>
-              </div>
+              <i class="ti ti-trash email-list-delete cursor-pointer me-2" onclick="bulkAction('delete');"></i>
+              <i class="ti ti-mail-opened email-list-read cursor-pointer me-2" onclick="bulkAction('unread');"></i>
             </div>
             <div class="email-pagination d-sm-flex d-none align-items-center flex-wrap justify-content-between justify-sm-content-end">
               <span class="d-sm-block d-none mx-3 text-muted" id="records-counter"></span>
@@ -328,6 +361,17 @@
       <div class="app-overlay"></div>
     </div>
     <!-- /Emails List -->
+
+    <div id="no-folders-area" style="display:none; margin:auto" class="col app-emails-list">
+    <div class="text-center mb-3">
+      <div class="card-body">
+        <i class="ti ti-xl ti-folder" style="font-size:3rem !important"></i>
+        <p class="card-text">This account has no active folders. Enable active folders by editing the mail account, the active folders will be the folders that will be synchronized to the application.</p>
+        <a href="javascript:editAccount();" id="activate-folders" class="btn btn-primary">Activate Folders</a>
+        <a href="{{url('/admin/mail/accounts/manage-accounts')}}" id="manage-accounts" class="btn btn-secondary">Manage Accounts</a>
+      </div>
+    </div>
+  </div>
 
     <!-- Email View -->
     <div class="col app-email-view flex-grow-0 bg-body" id="app-email-view">
@@ -542,7 +586,7 @@ Connect via IMAP, your Gmail or Outlook account.
 @endif
 @include('admin.pages.emails.partials.connect-account')
   <!-- Offcanvas to add new user -->
-  <div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="edit-account-modal" style="width:50%; background-color:white !important" aria-labelledby="editAccountModal">
+  <div class="offcanvas offcanvas-xxl offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="width:50%; background-color:white !important" aria-labelledby="editAccountModal">
 <div></div>
 </div>
 @endsection

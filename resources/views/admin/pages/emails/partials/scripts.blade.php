@@ -66,7 +66,11 @@
         }
         
           $('#folders-area').html(html);
-      }
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+       var form=document.getElementById("add-mail-account");
+            onerror(jqXHR,textStatus,errorThrown,form);
+        },
     })
     
     });

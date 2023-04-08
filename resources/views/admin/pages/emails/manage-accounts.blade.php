@@ -114,7 +114,7 @@ $configData = Helper::appClasses();
 
               <label class="switch">
               
-                <input type="checkbox" class="switch-input" @if($account->sync_state==App\Enums\SyncState::DISABLED) checked @endif onchange="disableSync(this,{{$account->id}});" name="disable_sync" />
+                <input type="checkbox" class="switch-input" @if($account->sync_state!=App\Enums\SyncState::ENABLED) checked @endif onchange="disableSync(this,{{$account->id}});" name="disable_sync" />
                 <span class="switch-toggle-slider">
                   <span class="switch-on"></span>
                   <span class="switch-off"></span>
@@ -136,7 +136,7 @@ $configData = Helper::appClasses();
   </div>
 </div>
 @include('admin.pages.emails.partials.connect-account')
-<div class="offcanvas offcanvas-xxl offcanvas-end" tabindex="-1" id="edit-account-modal" style="width:50%; background-color:white !important" aria-labelledby="editAccountModal">
+<div class="offcanvas offcanvas-xxl offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="width:50%; background-color:white !important" aria-labelledby="editAccountModal">
   <div></div>
 </div>
 @endsection

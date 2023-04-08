@@ -74,6 +74,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
      Route::get('/{providerName}/callback', [OAuthController::class, 'callback'])->where('providerName', 'microsoft|google');
      
      Route::prefix('emails')->group(function () {
+      Route::get('bulkDelete', [EmailAccountMessagesController::class, 'bulkDelete']);
+      Route::get('bulkUnread', [EmailAccountMessagesController::class, 'bulkUnread']);
       Route::post('{message}/read', [EmailAccountMessagesController::class, 'read']);
       Route::post('{message}/unread', [EmailAccountMessagesController::class, 'unread']);
       Route::delete('{message}', [EmailAccountMessagesController::class, 'destroy']);

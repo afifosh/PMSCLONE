@@ -26,7 +26,7 @@ class DateTimePlaceholder extends Placeholder
     /**
      * The user the date is intended for
      *
-     * @var null|\App\Models\User
+     * @var null|\App\Models\Admin
      */
     protected $user;
 
@@ -71,9 +71,9 @@ class DateTimePlaceholder extends Placeholder
     /**
      * The user the date is intended for
      *
-     * @param \App\Models\User $user
+     * @param \App\Models\Admin $user
      *
-     * @return null\App\Models\User
+     * @return null\App\Models\Admin
      */
     public function forUser($user)
     {

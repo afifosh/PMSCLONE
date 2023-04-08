@@ -40,7 +40,7 @@
             <div class="dropdown me-3">
               <i class="ti ti-folder cursor-pointer" id="dropdownMenuFolder" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               </i>
-              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuFolder">
+              <!-- <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuFolder">
                 <a class="dropdown-item" href="javascript:void(0)">
                   <i class="ti ti-info-circle ti-xs me-1"></i>
                   <span class="align-middle">Spam</span>
@@ -53,7 +53,7 @@
                   <i class="ti ti-trash ti-xs me-1"></i>
                   <span class="align-middle">Trash</span>
                 </a>
-              </div>
+              </div> -->
             </div>
         
           </div>
@@ -83,8 +83,6 @@
             </div>
             <div class="d-flex align-items-center">
               <p class="mb-0 me-3 text-muted">{{$message->date}}</p>
-              <i class="ti ti-paperclip cursor-pointer me-2"></i>
-              <i class="email-list-item-bookmark ti ti-star ti-xs cursor-pointer me-2"></i>
               <div class="dropdown me-3">
                 <i class="ti ti-dots-vertical cursor-pointer" id="dropdownEmail" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>

@@ -39,8 +39,6 @@ class EmailAccountSyncStateController extends Controller
     {
         $account = $this->repository->find($id);
 
-        $this->authorize('update', $account);
-
         if ($account->isSyncStoppedBySystem()) {
             abort(403, 'Synchronization for this account is stopped by system. [' . $account->sync_state_comment . ']');
         }
@@ -61,8 +59,6 @@ class EmailAccountSyncStateController extends Controller
     public function disable($id)
     {
         $account = $this->repository->find($id);
-
-        $this->authorize('update', $account);
 
         $this->repository->setSyncState(
             $account->id,

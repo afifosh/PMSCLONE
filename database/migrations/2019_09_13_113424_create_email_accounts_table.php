@@ -16,7 +16,7 @@ return new class extends Migration {
         Schema::create('email_accounts', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
-            $table->foreignId('user_id')->nullable()->constrained('users');
+            $table->foreignId('user_id')->nullable()->constrained('admins');
             $table->string('connection_type');
             $table->unsignedBigInteger('access_token_id')->nullable();
             $table->unsignedBigInteger('sent_folder_id')->nullable();
@@ -41,7 +41,7 @@ return new class extends Migration {
             $table->unsignedInteger('smtp_port')->nullable()->comment('IMAP');
             $table->string('smtp_encryption', 8)->nullable()->comment('IMAP');
 
-            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('created_by')->nullable()->constrained('admins');
             $table->timestamps();
         });
     }

@@ -63,7 +63,6 @@ class EmailAccountMessagesController extends Controller
      */
     public function index($accountId, $folderId, Request $request)
     {
-        $this->authorize('view', $this->accounts->find($accountId));
         if($request->has('term')){
             $messages = $this->messages->withResponseRelations()
             ->pushCriteria(new EmailAccountMessageCriteria($accountId, $folderId,$request->get('term')))
@@ -88,7 +87,7 @@ class EmailAccountMessagesController extends Controller
      */
     public function create($accountId, MessageRequest $request)
     {
-        $this->authorize('view', $account = $this->accounts->find($accountId));
+        $account = $this->accounts->find($accountId);
 
         $composer = new Message(
             $account->createClient(),
@@ -109,8 +108,6 @@ class EmailAccountMessagesController extends Controller
     public function reply($id, MessageRequest $request)
     {
         $message = $this->messages->with(['account', 'folders.account'])->find($id);
-
-        $this->authorize('view', $message->account);
 
         $composer = new MessageReply(
             $message->account->createClient(),
@@ -133,8 +130,6 @@ class EmailAccountMessagesController extends Controller
     public function forward($id, MessageRequest $request)
     {
         $message = $this->messages->with(['account', 'folders.account'])->find($id);
-
-        $this->authorize('view', $message->account);
 
         $composer = new MessageForward(
             $message->account->createClient(),
@@ -167,8 +162,6 @@ class EmailAccountMessagesController extends Controller
     {
         $message = $this->messages->find($id);
 
-        $this->authorize('view', $message->account);
-
         try {
             $this->messages->markAsRead($message->id, $folderId);
         } catch (MessageNotFoundException $e) {
@@ -196,12 +189,29 @@ class EmailAccountMessagesController extends Controller
     {
         $message = $this->messages->find($messageId);
 
-        $this->authorize('view', $message->account);
-
         $this->messages->deleteForAccount($message->id);
 
-        return response('deleted successfully.', 204);
+        return response('deleted successfully.', 200);
     }
+
+    public function bulkDelete(Request $request){
+        $ids = $request->input('id');
+        foreach($ids as $id){
+            $message = $this->messages->find($id);
+            $this->messages->deleteForAccount($message->id);
+        }
+        return response('Messages deleted successfully.', 200);
+    }
+
+    public function bulkUnread(Request $request){
+        $ids = $request->input('id');
+        foreach($ids as $id){
+            $this->messages->markAsUnread($id);
+        }
+        return response('Messages marked as unread');
+    }
+
+
 
     /**
      * Mark the given message as read

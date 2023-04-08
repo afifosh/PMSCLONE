@@ -12,7 +12,6 @@
 
 namespace App\Repositories;
 
-use App\Models\User;
 use App\Enums\SyncState;
 use App\Models\EmailAccount;
 use App\Models\EmailAccountMessage;
@@ -26,6 +25,7 @@ use App\Contracts\Repositories\EmailAccountFolderRepository;
 use App\Contracts\Repositories\EmailAccountMessageRepository;
 use App\Innoclapps\Contracts\Repositories\OAuthAccountRepository;
 use App\Models\Admin;
+use Exception;
 
 class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccountRepository
 {
@@ -71,7 +71,6 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
             'from_name_header',
             ($attributes['from_name_header'] ?? '') ?: EmailAccount::DEFAULT_FROM_NAME_HEADER
         );
-
         foreach ($attributes['folders'] ?? [] as $folder) {
             if(gettype($folder)=="string")
             {
@@ -108,15 +107,21 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
             $account->setMeta('from_name_header', $attributes['from_name_header']);
         }
 
-        $folders=$this->getFolderRepository()->getForAccount($account->id);
-        foreach($folders as $folder){
-            $this->getFolderRepository()->markAsNotSelectable($folder->id);
-        }
-        foreach ($attributes['folders'] ?? [] as $folder) {
+
+        if(isset($attributes['folders'])){
+            $folders=$this->getFolderRepository()->getForAccount($account->id);
+            foreach($folders as $folder){
+                $this->getFolderRepository()->markAsNotSelectable($folder->id);
+            }    
+        foreach ($attributes['folders'] as $folder) {
+            if(gettype($folder)=="string")
+            {
             $folder=json_decode($folder,true);
+            }
+
             $this->getFolderRepository()->persistForAccount($account, $folder);
         }
-
+    }
         return $account;
     }
 
@@ -155,7 +160,7 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
     /**
     * Count the unread messages for all accounts the given user can access
     */
-    public function countUnreadMessagesForUser(User|int $user) : int
+    public function countUnreadMessagesForUser(Admin|int $user) : int
     {
         /** @var int */
         $result = $this->columns('id')

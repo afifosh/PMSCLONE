@@ -12,7 +12,6 @@
 
 namespace App\Criteria;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Contracts\Repositories\UserRepository;
 use App\Innoclapps\Contracts\Repository\CriteriaInterface;
@@ -24,7 +23,7 @@ class QueriesByUserCriteria implements CriteriaInterface
     /**
      * The user for the query
      *
-     * @var \App\Models\User|int|null
+     * @var \App\Models\Admin|int|null
      */
     protected $user;
 
@@ -38,7 +37,7 @@ class QueriesByUserCriteria implements CriteriaInterface
     /**
      * Initialze QueriesByUserCriteria class
      *
-     * @param \App\Models\User|int|null $user
+     * @param \App\Models\Admin|int|null $user
      * @param string $columnName
      */
     public function __construct($user = null, $columnName = 'user_id')
@@ -64,7 +63,7 @@ class QueriesByUserCriteria implements CriteriaInterface
      * Apply the query for the criteria
      *
      * @param \Illumindata\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder $model
-     * @param \App\Models\User|int|null $user
+     * @param \App\Models\Admin|int|null $user
      * @param string $columnName
      *
      * @return \Illumindata\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder
@@ -79,7 +78,7 @@ class QueriesByUserCriteria implements CriteriaInterface
      *
      * @param mixed $user
      *
-     * @return \App\Models\User
+     * @return \App\Models\Admin
      */
     protected static function determineUser($user)
     {
