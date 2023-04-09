@@ -284,7 +284,7 @@ class EmailAccountMessagesController extends Controller
                 $this->messages->withResponseRelations()->find($dbMessage->id)
             );
 
-            return response('Message sent successfully.', 201);
+            return response('Message sent successfully.', 200);
         }
 
         return response('', 202);
@@ -313,7 +313,7 @@ class EmailAccountMessagesController extends Controller
     {
         if ($request->attachments_draft_id) {
             $attachments = $this->media->getByDraftId($request->attachments_draft_id);
-
+            \Log::info('attachemnts'.$attachments->count());
             foreach ($attachments as $pendingMedia) {
                 $composer->attachFromStorageDisk(
                     $pendingMedia->attachment->disk,

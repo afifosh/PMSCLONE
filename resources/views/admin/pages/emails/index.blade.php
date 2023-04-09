@@ -448,8 +448,8 @@
                   <button type="button" id="forward-email" onclick="forwardEmail(this,$(this).data('id'));" class="btn btn-primary " style="display:none !important"><i class="ti ti-send ti-xs me-1"></i>Forward</button>
                 
                 </div>
-                <label for="media"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
-                <input type="file" name="file" class="d-none" id="media">
+                <label for="file-input"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
+                <input type="file" name="attachments_draft_id" class="d-none" id="file-input">
               </div>
               <div class="d-flex align-items-center">
                 <div class="dropdown">
