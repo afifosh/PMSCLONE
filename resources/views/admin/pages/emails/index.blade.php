@@ -449,7 +449,7 @@
                 
                 </div>
                 <label for="file-input"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
-                <input type="file" name="attachments_draft_id" class="d-none" id="file-input">
+                <input type="file" name="attachments" class="d-none" id="file-input">
               </div>
               <div class="d-flex align-items-center">
                 <div class="dropdown">

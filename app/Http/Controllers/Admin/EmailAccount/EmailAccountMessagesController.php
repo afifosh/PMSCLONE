@@ -139,7 +139,7 @@ class EmailAccountMessagesController extends Controller
         );
 
         // Add the original selected message attachments
-        foreach ($message->attachments->find($request->forward_attachments ?? []) as $attachment) {
+        foreach ($message->attachments->find($request->attachments ?? []) as $attachment) {
             $composer->attachFromStorageDisk(
                 $attachment->disk,
                 $attachment->getDiskPath(),
@@ -311,8 +311,8 @@ class EmailAccountMessagesController extends Controller
      */
     protected function addPendingAttachments(AbstractComposer $composer, Request $request)
     {
-        if ($request->attachments_draft_id) {
-            $attachments = $this->media->getByDraftId($request->attachments_draft_id);
+        if ($request->attachments) {
+            $attachments = $this->media->getByDraftId($request->attachments);
             \Log::info('attachemnts'.$attachments->count());
             foreach ($attachments as $pendingMedia) {
                 $composer->attachFromStorageDisk(
