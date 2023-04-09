@@ -772,7 +772,7 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
         }
 
         $storedMedias      = [];
-        $allowedExtensions = config('mediable.allowed_extensions');
+        $allowedExtensions = config('app.allowed_extensions');
 
         foreach ($attachments as  $attachment) {
             $tmpFile = tmpfile();

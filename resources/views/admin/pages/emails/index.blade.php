@@ -286,7 +286,7 @@
           @endforeach
         </select>
         </div>
-        <button class="btn btn-primary btn-compose" onclick="doAction('compose');" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
+        <button class="btn btn-primary btn-compose" data-bs-backdrop="static" onclick="doAction('compose');" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
       </div>
       <!-- Email Filters -->
       <div class="email-filters py-2">
@@ -449,22 +449,7 @@
                 
                 </div>
                 <label for="file-input"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
-                <input type="file" name="attachments" class="d-none" id="file-input">
-              </div>
-              <div class="d-flex align-items-center">
-                <div class="dropdown">
-                  <i class="ti ti-dots-vertical cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMoreActions">
-                    <li><button type="button" class="dropdown-item">Add Label</button></li>
-                    <li><button type="button" class="dropdown-item">Plain text mode</button></li>
-                    <li>
-                      <hr class="dropdown-divider">
-                    </li>
-                    <li><button type="button" class="dropdown-item">Print</button></li>
-                    <li><button type="button" class="dropdown-item">Check Spelling</button></li>
-                  </ul>
-                </div>
-                <button type="reset" class="btn" data-bs-dismiss="modal" aria-label="Close"><i class="ti ti-trash"></i></button>
+                <input type="file" name="attachments" multiple class="d-none" id="file-input">
               </div>
             </div>
           </form>

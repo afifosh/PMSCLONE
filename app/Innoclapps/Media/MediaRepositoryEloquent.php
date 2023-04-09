@@ -99,7 +99,7 @@ class MediaRepositoryEloquent extends AppRepository implements MediaRepository
 
         $this->scopeQuery(function ($query) use ($ids, $mediable) {
             return $query->whereIn('id', fn ($query) => $query->select('media_id')
-                ->from(config('mediable.mediables_table'))
+                ->from(config('app.mediables_table'))
                 ->where('mediable_type', $mediable)
                 ->whereIn('mediable_id', $ids));
         })->get()->each->delete();

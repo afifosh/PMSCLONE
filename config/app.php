@@ -283,6 +283,34 @@ return [
         'scopes' => ['https://mail.google.com/', 'https://www.googleapis.com/auth/calendar'],
     ],
 
+    'allowed_mime_types' => [],
+
+    /*
+     * Only allow files with specific file extension(s) to be uploaded
+     */
+    'allowed_extensions' => [],
+    'model' => \App\Innoclapps\Models\Media::class,
+
+    /*
+     * Name to be used for mediables joining table
+     */
+    'mediables_table' => 'mediables',
+
+    /*
+     * Filesystem disk to use if none is specified
+     */
+    'default_disk' => env('MEDIA_DISK', 'local'),
+
+    /*
+     * Filesystems that can be used for media storage
+     *
+     * Uploader will throw an exception if a disk not in this list is selected
+     */
+    'allowed_disks' => [
+        'public',
+        'local',
+        's3',
+    ],
      /*
     |--------------------------------------------------------------------------
     | Application Currency

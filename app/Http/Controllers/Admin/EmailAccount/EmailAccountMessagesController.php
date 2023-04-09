@@ -140,7 +140,7 @@ class EmailAccountMessagesController extends Controller
         );
 
         // Add the original selected message attachments
-        foreach ($message->attachments->find($request->attachments ?? []) as $attachment) {
+        foreach ($message->attachments as $attachment) {
             $composer->attachFromStorageDisk(
                 $attachment->disk,
                 $attachment->getDiskPath(),
