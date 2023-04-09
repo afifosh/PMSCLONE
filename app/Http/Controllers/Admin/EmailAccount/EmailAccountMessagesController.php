@@ -32,6 +32,7 @@ use App\Support\Concerns\InteractsWithEmailMessageAssociations;
 use App\Innoclapps\Contracts\Repositories\PendingMediaRepository;
 use App\Innoclapps\MailClient\Exceptions\FolderNotFoundException;
 use App\Innoclapps\MailClient\Exceptions\MessageNotFoundException;
+use Plank\Mediable\Facades\MediaUploader;
 
 class EmailAccountMessagesController extends Controller
 {
@@ -312,15 +313,17 @@ class EmailAccountMessagesController extends Controller
     protected function addPendingAttachments(AbstractComposer $composer, Request $request)
     {
         if ($request->attachments) {
-            $attachments = $this->media->getByDraftId($request->attachments);
-            \Log::info('attachemnts'.$attachments->count());
-            foreach ($attachments as $pendingMedia) {
+            // $attachments = $this->media->getByDraftId($request->attachments);
+            $pendingMedia = MediaUploader::fromSource($request->attachments)
+            ->toDirectory('pending-attachments')
+            ->upload();
+            // foreach ($media as $pendingMedia) {
                 $composer->attachFromStorageDisk(
-                    $pendingMedia->attachment->disk,
-                    $pendingMedia->attachment->getDiskPath(),
-                    $pendingMedia->attachment->filename . '.' . $pendingMedia->attachment->extension
+                    $pendingMedia->disk,
+                    $pendingMedia->getDiskPath(),
+                    $pendingMedia->filename . '.' . $pendingMedia->extension
                 );
-            }
+            // }
         }
     }
 }
