@@ -40,6 +40,18 @@ $('[data-switch-toggle-in-all]').on('click', function () {
   hidden ? $(target).addClass('d-none') : $(target).removeClass('d-none');
 });
 
+$('[data-approve]').on('click', function () {
+  var target = $(this).data('approve');
+  $(target).val(1);
+  $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
+});
+
+$('[data-disapprove]').on('click', function () {
+  var target = $(this).data('disapprove');
+  $(target).val(0);
+  $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');
+});
+
 $('.save-draft').on('click', function () {
   $(this).closest('form').find('input[name="submit_type"]').val('draft');
   $(this).closest('form').find('[data-form="ajax-form"]').trigger('click');

@@ -34,21 +34,28 @@ class ApprovalRequestController extends Controller
 
   public function getCompanyReqeust($level, Company $company)
   {
-    $data['detail'] = $company->POCDetail()->count() ? $this->transformModificationsModel($company->POCDetail()->first()) : $company->detail;
-    $data['contacts'] = $this->transformModificationsModel($company->POCCOntact()->get());
-    $data['addresses'] = $this->transformModificationsModel($company->POCAddress()->get());
-    $data['bankAccounts'] = $this->transformModificationsModel($company->POCBankAccount()->get());
     $data['countries'] = Country::pluck('name', 'id');
     $data['company'] = $company;
+    $data['level'] = $level;
+    $data['detailsStatus'] = $company->getDetailsStatus($level);
+    $data['contactsStatus'] = $company->getContactsStatus($level);
+    $data['addressesStatus'] = $company->getAddressesStatus($level);
+    $data['accountsStatus'] = $company->getBankAccountsStatus($level);
     if(request()->tab == 'details' || request()->tab == null){
       request()->tab = 'details';
+      $data['detail'] = $company->POCDetail()->count() ? $company->POCDetail()->withCount('approvals', 'disapprovals')->first() : $company->detail;
       $data['fields'] = CompanyDetail::getFields();
     }elseif(request()->tab == 'contact-persons'){
+      $data['contacts'] = $company->POCCOntact()->withCount('approvals', 'disapprovals')->get();
+      $data['approved_contacts'] = $company->contacts()->get();
       $data['fields'] = CompanyContact::getFields();
-      // $data['fields'] = CompanyDetail::getFields();
     }elseif(request()->tab == 'addresses'){
+      $data['addresses'] = $company->POCAddress()->withCount('approvals', 'disapprovals')->get();
+      $data['approved_addresses'] = $company->addresses()->get();
       $data['fields'] = CompanyAddress::getFields();
     }elseif(request()->tab == 'bank-accounts'){
+      $data['bankAccounts'] = $company->POCBankAccount()->withCount('approvals', 'disapprovals')->get();
+      $data['approved_bank_accounts'] = $company->bankAccounts()->get();
       $data['fields'] = CompanyBankAccount::getFields();
     }elseif(request()->tab == 'documents'){
       $data['fields'] = [];
@@ -58,45 +65,22 @@ class ApprovalRequestController extends Controller
     return view('admin.pages.company.approval-request.show', $data);
   }
 
-  public function transformModificationsModel($model)
-  {
-    // check if the model is a collection or a single model
-    if ($model instanceof \Illuminate\Database\Eloquent\Collection) {
-      $modifications = [];
-      foreach ($model as $key => $value) {
-        $modifications[$key] = $this->transformModifications($value->modifications);
-        $modifications[$key]['modification_id'] = $value->id;
-      }
-      return $modifications;
-    } else {
-      return ['modification_id' => $model->id] + $this->transformModifications($model->modifications);
-    }
-  }
-
-  protected function transformModifications($modifications)
-  {
-    foreach ($modifications as $key => $value) {
-      $modifications[$key] = $value['modified'];
-    }
-    return $modifications;
-  }
-
   public function updateApprovalRequest($level, Company $company, ApprovalUpdateRequest $request)
   {
     foreach (array_unique($request->modification_ids) as $modification_id) {
       $mod = $company->POCmodifications()->whereId($modification_id)->first();
       abort_if($level != $company->approval_level || !$mod, 404);
       if ($request->boolean('approval_status.' . $modification_id)) {
-        auth()->user()->approve($mod);
+        auth()->user()->approve($mod, @$request->comment[$modification_id]);
+        $message = 'Approval Successfull';
       } else {
-        auth()->user()->disapprove($mod, @$request->disapproval_reason[$modification_id]);
-        $company->forceFill(['approval_status' => 3, 'approval_level' => 1]);
-        $company->save();
+        auth()->user()->disapprove($mod, @$request->comment[$modification_id]);
+        $message = 'Request Rejected';
       }
       $company->incApprovalLevelIfRequired();
     }
     $company->refresh();
-    return  $company->isApprovalRequiredForCurrentLevel($level) ? back()->with('success', 'Saved Successfully')
-      : redirect()->route('admin.approval-requests.index')->with('success', 'Saved Successfully');
+    return  $company->isApprovalRequiredForCurrentLevel($level) ? $this->sendRes($message, ['event' => 'page_reload', ])
+    : $this->sendRes('Saved Successfully', ['event' => 'redirect', 'url' => route('admin.approval-requests.index')]);
   }
 }

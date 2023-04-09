@@ -35,32 +35,28 @@
                 </div>
                 <a href="{{ route('admin.approval-requests.level.companies.show', ['level' => request()->level, 'company' => request()->company, 'tab' => 'details']) }}" class="border fw-bold mt-2 d-flex justify-content-between p-2 {{request()->tab == 'details' ? 'bg-label-primary' : ''}}">
                     <span> 1. Company Details </span>
-                    <span class="text-success"><i class="fa-regular fa-circle-check fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($detailsStatus) }}"><i class="{{getCompanyStatusIcon($detailsStatus)}} fa-lg"></i></span>
                 </a>
                 <a href="{{ route('admin.approval-requests.level.companies.show', ['level' => request()->level, 'company' => request()->company, 'tab' => 'contact-persons']) }}" class="border fw-bold mt-2 d-flex justify-content-between p-2 {{request()->tab == 'contact-persons' ? 'bg-label-primary' : ''}}">
                     <span> 2. Contact Persons </span>
-                    <span class="text-success"><i class="fa-regular fa-circle-check fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($contactsStatus) }}"><i class="{{getCompanyStatusIcon($contactsStatus)}} fa-lg"></i></span>
                 </a>
                 <a href="{{ route('admin.approval-requests.level.companies.show', ['level' => request()->level, 'company' => request()->company, 'tab' => 'addresses']) }}" class="border fw-bold mt-2 d-flex justify-content-between p-2 {{request()->tab == 'addresses' ? 'bg-label-primary' : ''}}">
                     <span> 3. Company Addresses </span>
-                    <span class="text-danger"><i class="fa-regular fa-circle-xmark fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($addressesStatus) }}"><i class="{{getCompanyStatusIcon($addressesStatus)}} fa-lg"></i></span>
                 </a>
                 <a href="{{ route('admin.approval-requests.level.companies.show', ['level' => request()->level, 'company' => request()->company, 'tab' => 'documents']) }}" class="border fw-bold mt-2 d-flex justify-content-between p-2 {{request()->tab == 'documents' ? 'bg-label-primary' : ''}}">
                     <span> 4. Verification Documents </span>
-                    <span class="text-success"><i class="fa-regular fa-circle-check fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($addressesStatus) }}"><i class="{{getCompanyStatusIcon($addressesStatus)}} fa-lg"></i></span>
                 </a>
                 <a href="{{ route('admin.approval-requests.level.companies.show', ['level' => request()->level, 'company' => request()->company, 'tab' => 'bank-accounts']) }}" class="border fw-bold mt-2 d-flex justify-content-between p-2 {{request()->tab == 'bank-accounts' ? 'bg-label-primary' : ''}}">
                     <span> 5. Bank Accounts </span>
-                    <span class="text-danger"><i class="fa-regular fa-circle-xmark fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($accountsStatus) }}"><i class="{{getCompanyStatusIcon($accountsStatus)}} fa-lg"></i></span>
                 </a>
             </div>
         </div>
-        <form action="{{route('admin.approval-requests.level.companies.update', ['company' => $company->id, 'level' => $company->approval_level])}}" method="post">
-          @if($errors->any())
-              {!! implode('', $errors->all('<div>:message</div>')) !!}
-          @endif
-          @csrf
+        <div>
           @include('admin.pages.company.approval-request.vertical.tabs.'.request()->tab)
-        </form>
+        </div>
     </div>
 @endsection

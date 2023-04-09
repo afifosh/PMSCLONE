@@ -30,6 +30,9 @@ class ApprovalRequestsDataTable extends DataTable
       ->editColumn('added_by', function ($company) {
         return $company->addedBy->email ?? '-';
       })
+      ->editColumn('approval_status', function ($row) {
+        return $this->makeApprovalStatus($row->approval_status);
+      })
       ->editColumn('status', function ($row) {
         return $this->makeStatus($row->status);
       })
@@ -39,7 +42,7 @@ class ApprovalRequestsDataTable extends DataTable
         });
       })
       ->setRowId('id')
-      ->rawColumns(['name', 'action', 'status']);
+      ->rawColumns(['name', 'action', 'status', 'approval_status']);
   }
 
   protected function makeStatus($status)
@@ -58,6 +61,26 @@ class ApprovalRequestsDataTable extends DataTable
 
       default:
         return '<span class="badge bg-label-warning">' . $b_status . '</span>';
+        break;
+    }
+  }
+
+  protected function makeApprovalStatus($status)
+  {
+    // $b_status = htmlspecialchars(ucwords($status), ENT_QUOTES, 'UTF-8');
+    switch ($status) {
+      case '1':
+        return '<span class="badge bg-label-success">Approved</span>';
+        break;
+      case '2':
+        return '<span class="badge bg-label-warning">Pending Approval</span>';
+        break;
+      case '3':
+        return '<span class="badge bg-label-danger">Rejected</span>';
+        break;
+
+      default:
+        return '<span class="badge bg-label-warning">Pending Info</span>';
         break;
     }
   }
@@ -119,10 +142,10 @@ class ApprovalRequestsDataTable extends DataTable
     return [
       // Column::make('id'),
       Column::make('name')->title(__('Bussines Legal Name')),
-      Column::make('website'),
       Column::make('source'),
       Column::make('added_by'),
       Column::make('approval_level'),
+      Column::make('approval_status'),
       Column::make('status'),
       Column::make('created_at'),
       Column::make('updated_at'),

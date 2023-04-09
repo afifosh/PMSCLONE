@@ -114,14 +114,29 @@ class Company extends BaseModel
     return !$is_inc;
   }
 
-  public function incApprovalLevelIfRequired()
+  public function incApprovalLevelIfRequired($level = '')
   {
+    $level = $level ? $level : $this->approval_level;
+    $reject = false;
     if (!$this->isApprovalRequiredForCurrentLevel()) {
       if ($this->approval_level >= ApprovalLevel::count())
         $this->forceFill(['approval_status' => 1, 'approved_at' => now()]); // Approved by all
-      else
-        $this->forceFill(['approval_level' => $this->approval_level + 1]);
+      else {
+        if ($this->POCmodifications()->count() > 0) {
+          foreach ($this->POCmodifications()->get() as $modification) {
+            if ($modification->disapprovals()->count() > 0) {
+              $reject = true;
+              break;
+            }
+          }
+        }
+        if ($reject)
+          $this->forceFill(['approval_status' => 3, 'approval_level' => 1]); // Rejected by at least one
+        else
+          $this->forceFill(['approval_level' => $this->approval_level + 1]); // increment approval level
+      }
       $this->save();
+
       return true;
     }
   }
@@ -221,46 +236,74 @@ class Company extends BaseModel
     return $this->approved_at == null && $this->approval_level == 0;
   }
 
-  public function getDetailsStatus()
+  public function getDetailsStatus($level = '')
   {
     $status = 'pending';
-    if($this->detail && !$this->POCDetail()->where('active', 1)->exists())
-      $status = 'approved';
-    if($this->POCDetail()->has('disapprovals')->exists())
+    if ($this->POCDetail()->has('disapprovals')->exists())
       $status = 'rejected';
+    elseif (!$level) {
+      if ($this->detail && !$this->POCDetail()->where('active', 1)->exists())
+        $status = 'approved';
+    } else {
+      if ($this->POCDetail()->has('approvals', '>=', $level)->exists())
+        $status = 'approved';
+      if ($this->POCDetail()->has('approvals', '<', $level)->exists())
+        $status = 'pending';
+    }
 
     return $status;
   }
 
-  public function getAddressesStatus()
+  public function getAddressesStatus($level = '')
   {
     $status = 'pending';
-    if($this->addresses->count() && !$this->POCAddress()->where('active', 1)->exists())
-      $status = 'approved';
-    if($this->POCAddress()->has('disapprovals')->exists())
+    if ($this->POCAddress()->has('disapprovals')->exists())
       $status = 'rejected';
+    elseif (!$level) {
+      if ($this->addresses->count() && !$this->POCAddress()->where('active', 1)->exists())
+        $status = 'approved';
+    } else {
+      if ($this->POCAddress()->has('approvals', '>=', $level)->count() >= $this->POCAddress()->count())
+        $status = 'approved';
+      if ($this->POCAddress()->has('approvals', '<', $level)->exists())
+        $status = 'pending';
+    }
 
     return $status;
   }
 
-  public function getContactsStatus()
+  public function getContactsStatus($level = '')
   {
     $status = 'pending';
-    if($this->contacts->count() && !$this->POCContact()->where('active', 1)->exists())
-      $status = 'approved';
-    if($this->POCContact()->has('disapprovals')->exists())
+    if ($this->POCContact()->has('disapprovals')->exists())
       $status = 'rejected';
+    elseif (!$level) {
+      if ($this->contacts->count() && !$this->POCContact()->where('active', 1)->exists())
+        $status = 'approved';
+    } else {
+      if ($this->POCContact()->has('approvals', '>=', $level)->count() >= $this->POCContact()->count())
+        $status = 'approved';
+      if ($this->POCContact()->has('approvals', '<', $level)->exists())
+        $status = 'pending';
+    }
 
     return $status;
   }
 
-  public function getBankAccountsStatus()
+  public function getBankAccountsStatus($level = '')
   {
     $status = 'pending';
-    if($this->bankAccounts->count() && !$this->POCBankAccount()->where('active', 1)->exists())
-      $status = 'approved';
-    if($this->POCBankAccount()->where('active', 1)->has('disapprovals')->exists())
+    if ($this->POCBankAccount()->has('disapprovals')->exists())
       $status = 'rejected';
+    elseif (!$level) {
+      if ($this->bankAccounts->count() && !$this->POCBankAccount()->where('active', 1)->exists())
+        $status = 'approved';
+    } else {
+      if ($this->POCBankAccount()->has('approvals', '>=', $level)->count() >= $this->POCBankAccount()->count())
+        $status = 'approved';
+      if ($this->POCBankAccount()->has('approvals', '<', $level)->exists())
+        $status = 'pending';
+    }
 
     return $status;
   }
