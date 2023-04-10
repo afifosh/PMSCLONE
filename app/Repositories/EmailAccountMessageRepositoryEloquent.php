@@ -1,4 +1,14 @@
 <?php
+/**
+ * Concord CRM - https://www.concordcrm.com
+ *
+ * @version   1.1.6
+ *
+ * @link      Releases - https://www.concordcrm.com/releases
+ * @link      Terms Of Service - https://www.concordcrm.com/terms
+ *
+ * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
+ */
 
 namespace App\Repositories;
 
@@ -21,7 +31,6 @@ use App\Contracts\Repositories\EmailAccountMessageRepository;
 use App\Support\Concerns\InteractsWithEmailMessageAssociations;
 use Exception;
 use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
-use Plank\Mediable\Facades\MediaUploader as FacadesMediaUploader;
 
 class EmailAccountMessageRepositoryEloquent extends AppRepository implements EmailAccountMessageRepository
 {
@@ -758,6 +767,7 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
      */
     protected function storeAttachments($attachments, $message, $tag)
     {
+
         if ($attachments instanceof AttachmentInterface) {
             $attachments = [$attachments];
         }
@@ -773,13 +783,10 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
             );
 
             try {
-                $storedMedias[] = $media = FacadesMediaUploader::fromSource($tmpFile)
+                $storedMedias[] = $media = MediaUploader::fromSource($tmpFile)
                     ->toDirectory($message->getMediaDirectory())
                     ->useFilename($filename = pathinfo($attachment->getFileName(), PATHINFO_FILENAME))
                     // Allow any extension
-                    ->setAllowedExtensions(array_unique(
-                        array_merge($allowedExtensions, [pathinfo($attachment->getFileName(), PATHINFO_EXTENSION)])
-                    ))
                     ->upload();
                 $message->attachMedia($media, [$tag]);
             } catch (MediaUploadException $e) {

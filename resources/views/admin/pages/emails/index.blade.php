@@ -27,6 +27,7 @@
 <script src="{{asset('assets/vendor/libs/quill/katex.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/quill/quill.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/tagify/tagify.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/moment/moment.js')}}"></script>
 <script src="{{asset('assets/js/app-email.js')}}"></script>
 <script src="{{asset('assets/js/helper.js')}}"></script>
 @endsection
@@ -113,11 +114,11 @@
                   <label class="form-check-label" for="email-`+messages[i].id+`"></label>
                 </div>
                 <div class="email-list-item-content ms-2 ms-sm-0 me-2">
-                  <span class="email-list-item-username me-2">`+messages[i].from.name+`</span>
+                  <span class="email-list-item-username me-2">`+(messages[i].from.name==null?messages[i].from.address:messages[i].from.name)+`</span>
                   <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
                 </div>
-                <div class="email-list-item-meta ms-auto d-flex align-items-center">
-                  <small class="email-list-item-time text-muted">`+new Date(messages[i].date).toLocaleTimeString()+`</small>
+                <div class="email-list-item-meta ms-auto d-flex align-items-center" >
+                  <small class="email-list-item-time text-muted" style="width: 140px;">`+moment(messages[i].date).format('MMMM D, YYYY h:mm A')+`</small>
                 </div>
               </div>
             </li>`;

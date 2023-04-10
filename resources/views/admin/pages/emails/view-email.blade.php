@@ -36,10 +36,20 @@
         <div class="d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
             <i class='ti ti-trash cursor-pointer me-3' onclick="deleteRecord('delete', '{{url('admin/emails/'.$message->id.'')}}', 'Message deleted successfully.')"></i>
-            <i class='ti ti-mail-opened cursor-pointer me-3'></i>
+           
+            @if($message->is_read)
+               <form id="markUnread2">
+                  <i onclick="saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/unread')}}','markUnread2','Please try again');" class="ti ti-mail cursor-pointer me-3"></i>
+               </form>
+@else
+<form id="markRead2">
+                  <i onclick="saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/read')}}','markRead2','Please try again');" class="ti ti-mail-opened cursor-pointer me-3"></i>
+</form>
+                @endif
+
             <div class="dropdown me-3">
-              <i class="ti ti-folder cursor-pointer" id="dropdownMenuFolder" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              </i>
+              <!-- <i class="ti ti-folder cursor-pointer" id="dropdownMenuFolder" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              </i> -->
               <!-- <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuFolder">
                 <a class="dropdown-item" href="javascript:void(0)">
                   <i class="ti ti-info-circle ti-xs me-1"></i>
@@ -130,7 +140,7 @@
          $("#to").val(message.reply_to[0].address);
          var dateStringFormatted = new Date(message.date).toLocaleString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}).replace(/,/g, '');
 
-         let wroteText = `On `+ dateStringFormatted + " "+message.reply_to[0].name+ " <" + message.reply_to[0].address + `> wrote:`;
+         let wroteText = `On `+ dateStringFormatted + " "+(message.reply_to[0].name==null?message.reply_to[0].address:message.reply_to[0].name)+ " <" + message.reply_to[0].address + `> wrote:`;
 
       var html=" <br /><div class='syncmail_attr'>" +
         wroteText +
@@ -161,9 +171,11 @@
          $('mail_type').val('forward');
 
           var html ="<br /><div class='syncmail_attr'>" +
-          '--------Forwarded message--------</br>'+
-            'From: '+ message.from.name +' '+ 
-            '&lt;'+message.from.address+'&gt;</br>'+
+          '--------Forwarded message--------</br>';
+            if(message.from.name==null){
+              html+='From: '+ message.from.name +' ';
+            } 
+            html+='&lt;'+message.from.address+'&gt;</br>'+
             'Date: '+dateStringFormatted +'</br>'+
             'Subject: '+ message.subject +'</br>'+
             `To: &lt;`+ message.to[0].address  +`&gt;</br>`+

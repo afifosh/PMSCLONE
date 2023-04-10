@@ -26,7 +26,7 @@ class SettingsManager extends Manager implements SettingsManagerContract
      */
     public function getDefaultDriver()
     {
-        return $this->config->get('settings.default', 'json');
+        return $this->config->get('setting.default', 'json');
     }
 
     /**

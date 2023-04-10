@@ -31,7 +31,7 @@ class SettingServiceProvider extends ServiceProvider
         });
 
         $this->app->extend(ManagerContract::class, function (ManagerContract $manager, $app) {
-            foreach ($app['config']->get('settings.drivers', []) as $driver => $params) {
+            foreach ($app['config']->get('setting.drivers', []) as $driver => $params) {
                 $manager->registerStore($driver, $params);
             }
 
@@ -44,9 +44,9 @@ class SettingServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (! Innoclapps::isAppInstalled()) {
-            return;
-        }
+        // if (! Innoclapps::isAppInstalled()) {
+        //     return;
+        // }
 
         $this->app[ManagerContract::class]->driver()->configureOverrides();
     }

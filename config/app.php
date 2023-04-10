@@ -98,44 +98,7 @@ return [
     */
 
     'fallback_locale' => 'en',
-  /* -----------------------------------------------------------------
-     |  Drivers
-     | -----------------------------------------------------------------
-     */
 
-   
-        'drivers' => [
-
-            'array' => [
-                'driver' => App\Innoclapps\Settings\Stores\ArrayStore::class,
-            ],
-    
-    
-            'database' => [
-                'driver' => \App\Innoclapps\Settings\Stores\DatabaseStore::class,
-    
-                'options' => [
-                    'table' => 'settings',
-                    'model' => \App\Innoclapps\Models\Setting::class,
-                ],
-            ],
-    
-            'redis' => [
-                'driver' => App\Innoclapps\Settings\Stores\RedisStore::class,
-    
-                'options' => [
-                    'client' => 'predis',
-    
-                    'default' => [
-                        'host'     => env('REDIS_HOST', '127.0.0.1'),
-                        'port'     => env('REDIS_PORT', 6379),
-                        'database' => env('REDIS_DB', 0),
-                    ],
-                ],
-            ],
-    
-        ],
-    
     /*
     |--------------------------------------------------------------------------
     | Faker Locale
@@ -288,7 +251,7 @@ return [
     /*
      * Only allow files with specific file extension(s) to be uploaded
      */
-    'allowed_extensions' => ['doc','docx','ppt','pptx','pdf','tmp','jpg','jpeg'],
+    'allowed_extensions' => [],
     'model' => \App\Innoclapps\Models\Media::class,
 
     /*
