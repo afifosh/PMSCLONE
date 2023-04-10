@@ -78,7 +78,7 @@ class EmailAccountController extends Controller
         $account->wasRecentlyCreated = true;
 
         return response(
-            "Account successfully",
+            "Account successfully created.",
             201
         );
     }
@@ -97,7 +97,7 @@ class EmailAccountController extends Controller
          $except = ['email', 'connection_type', 'user_id', 'initial_sync_from','sent_folder_id','trash_folder_id'];
          $account = $this->repository->update($request->except($except), $id);
 
-         return response("Updated successfully.");
+         return response("Account updated successfully.");
     }
 
     /**

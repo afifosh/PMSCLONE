@@ -54,7 +54,7 @@ trait HasMedia
     {
         $folder = Str::kebab(class_basename(get_called_class()));
 
-        return config('innoclapps.media.directory') . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $this->id;
+        return config('app.media.directory') . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $this->id;
     }
 
     /**

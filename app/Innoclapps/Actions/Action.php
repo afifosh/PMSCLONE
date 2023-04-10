@@ -119,7 +119,7 @@ abstract class Action implements JsonSerializable
          */
         if ($models->count() === 0) {
             return static::error(__('user.not_authorized'));
-        } elseif ($models->count() > (int) config('innoclapps.actions.disable_notifications_when_records_are_more_than')) {
+        } elseif ($models->count() > (int) config('app.actions.disable_notifications_when_records_are_more_than')) {
             Innoclapps::disableNotifications();
         }
 

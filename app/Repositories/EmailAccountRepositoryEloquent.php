@@ -72,11 +72,15 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
             ($attributes['from_name_header'] ?? '') ?: EmailAccount::DEFAULT_FROM_NAME_HEADER
         );
         foreach ($attributes['folders'] ?? [] as $folder) {
+
             if(gettype($folder)=="string")
             {
             $folder=json_decode($folder,true);
             }
-            $this->getFolderRepository()->persistForAccount($model, $folder);
+            
+            if(gettype($folder)=="array"){
+                $this->getFolderRepository()->persistForAccount($model, $folder);
+        }
         }
 
         foreach (['trash', 'sent'] as $folderType) {
@@ -118,8 +122,9 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
             {
             $folder=json_decode($folder,true);
             }
-
-            $this->getFolderRepository()->persistForAccount($account, $folder);
+            if(gettype($folder)=="array"){
+                $this->getFolderRepository()->persistForAccount($account, $folder);
+        }
         }
     }
         return $account;

@@ -21,9 +21,9 @@ class MessageRequest extends FormRequest
             'bcc' => 'bail|nullable|array',
             // If changing the validation for recipients
             // check the front-end too
-            'to.*.address'    => 'email',
-            'cc.*.address'    => 'email',
-            'bcc.*.address'   => 'email',
+            'to.*.value'    => 'email',
+            'cc.*.value'    => 'email',
+            'bcc.*.value'   => 'email',
             'subject'         => 'required|string|max:191',
             'via_resource'    => Rule::requiredIf($this->filled('task_date')),
             'via_resource_id' => Rule::requiredIf($this->filled('task_date')),
@@ -38,7 +38,7 @@ class MessageRequest extends FormRequest
     public function attributes()
     {
         return [
-            'to.*.address' => 'email address',
+            'to.*.value' => 'email address',
         ];
     }
 }

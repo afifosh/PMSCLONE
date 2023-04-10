@@ -16,7 +16,6 @@ use JsonSerializable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Innoclapps\Facades\Menu;
-use App\Innoclapps\Facades\Cards;
 use App\Innoclapps\Facades\Fields;
 use App\Innoclapps\ResolvesActions;
 use App\Innoclapps\ResolvesFilters;
@@ -479,7 +478,7 @@ abstract class Resource implements JsonSerializable
      */
     protected function registerCommonPermissions() : void
     {
-        if ($callable = config('innoclapps.resources.permissions.common')) {
+        if ($callable = config('app.resources.permissions.common')) {
             (new $callable)($this);
         }
     }

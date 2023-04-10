@@ -9,6 +9,15 @@ function saveRecord(buttonSelector,type, url, formId, errorMesage) {
     // data.append('file', fileInput.files);
 }
 var optdata=$(form).serialize();
+$.each($('#'+formId+' input[type=checkbox]')
+    .filter(function(idx){
+        return $(this).prop('checked') === false
+    }),
+    function(idx, el){
+        // attach matched element names to the formData with a chosen value.
+        optdata += '&' + $(el).attr('name') + '=' + 0;
+    }
+);
 if (isFile == true) {
     var data = new FormData(form);
 //     var keys = Object.keys(optdata);
@@ -31,26 +40,13 @@ if (isFile == true) {
             if (status == "success") {
                 toastr.success(response);
             }
+            if(response.data!=undefined){
+                return response.data;
+            }
             location.reload();
         },
         error : function(jqXHR, textStatus, errorThrown) {
-            try {
-                var response = JSON.parse(jqXHR.responseText);
-                if (typeof response == "object") {
-                    handleFail(response,form);
-                }
-                else {
-                    var msg = "A server side error occurred. Please try again after sometime.";
-
-                    if (textStatus == "timeout") {
-                        msg = "Connection timed out! Please check your internet connection";
-                    }
-                    toastr.error(msg);
-                }
-            }
-            catch (e) {
-
-            }
+            onerror(jqXHR,textStatus,errorThrown,form);
         },
           beforeSend : function() {
                 $(form).find(".has-error").each(function () {
@@ -66,7 +62,25 @@ if (isFile == true) {
             }
     });
 }
+function onerror(jqXHR,textStatus,errorThrown,form){
+    try {
+        var response = JSON.parse(jqXHR.responseText);
+        if (typeof response == "object") {
+            handleFail(response,form);
+        }
+        else {
+            var msg = "A server side error occurred. Please try again after sometime.";
 
+            if (textStatus == "timeout") {
+                msg = "Connection timed out! Please check your internet connection";
+            }
+            toastr.error(msg);
+        }
+    }
+    catch (e) {
+
+    }
+}
 function handleFail(response,container) {
     if (typeof response.errors != "undefined") {
         var keys = Object.keys(response.errors);
@@ -99,7 +113,7 @@ function handleFail(response,container) {
                     }
                 }
 
-                var grp = ele.closest(".form-group");
+                var grp = ele.closest(".mb-3");
                 $(grp).find(".help-block").remove();
 
                 var helpBlockContainer = $(grp).find("div:first");
@@ -117,7 +131,7 @@ function handleFail(response,container) {
                     helpBlockContainer = $(grp);
                 }
 
-                helpBlockContainer.append('<div class="help-block">' + response.errors[keys[i]] + '</div>');
+                helpBlockContainer.append('<div class="help-block text-danger">' + response.errors[keys[i]] + '</div>');
                 $(grp).addClass("has-error");
             }
 
@@ -195,6 +209,25 @@ function ajaxModal(url, modalId) {
 
 }
 
+function ajaxCanvas(url, modalId) {
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (response, status) {
+            $("#" + modalId).find("div").html(response);
+            $("#" + modalId).offcanvas("show");
+        },
+        error: function (response) {
+            var message = "";
+            if
+                (response.responseJSON.message == undefined) { message = errorMesage }
+            else { message = response.responseJSON.message }
+            toastr.error(message);
+        }
+    });
+
+}
+
 function loadView(url, divId) {
     $.ajax({
         url: url,
@@ -217,12 +250,9 @@ function deleteRecord(type, url, text) {
         title: "Are you sure?",
         text: text,
         type: "warning",
-        showCancelButton: !0,
         confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
         confirmButtonText: "Yes, delete it!",
         confirmButtonClass: "btn btn-primary",
-        cancelButtonClass: "btn btn-danger ml-1",
         buttonsStyling: !1
     }).then(
         function (t) {

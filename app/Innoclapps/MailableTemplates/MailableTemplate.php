@@ -166,7 +166,7 @@ abstract class MailableTemplate extends Mailable
      */
     public function getHtmlLayout()
     {
-        $default = config('innoclapps.mailables.layout');
+        $default = config('app.mailables.layout');
 
         if (file_exists($default)) {
             return file_get_contents($default);

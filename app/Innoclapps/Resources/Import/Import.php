@@ -121,7 +121,7 @@ class Import extends DefaultValueBinder implements ToArray, WithHeadingRow, With
      */
     public function __construct(protected Resource $resource)
     {
-        static::$maxRows = (int) config('innoclapps.import.max_rows');
+        static::$maxRows = (int) config('app.import.max_rows');
 
         $this->repository = app(ImportRepository::class);
     }

@@ -188,7 +188,7 @@ class Application
      */
     public static function favouriteColors() : array
     {
-        return config('innoclapps.colors');
+        return config('app.colors');
     }
 
     /**
@@ -539,7 +539,7 @@ class Application
      */
     public static function currency() : string
     {
-        return config('innoclapps.currency');
+        return config('app.currency');
     }
 
     /**

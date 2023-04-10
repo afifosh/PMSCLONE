@@ -38,7 +38,7 @@ class EmailAccountMessageCriteria implements CriteriaInterface
     public function apply($model, RepositoryInterface $repository)
     {
         if($this->term!=null){
-            $model= $model->where('subject','like','%'.$this->term.'%')->orWhere('html_body','like','%'.$this->term.'%');
+            $model= $model->where('subject','like','%'.$this->term.'%')->orWhere('html_body','like','%'.$this->term.'%')->orWhere('text_body','like','%'.$this->term.'%');
         }
         return $model->where('email_account_id', $this->accountId)
             ->whereHas('folders', function ($query) {

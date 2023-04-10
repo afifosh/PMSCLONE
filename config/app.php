@@ -288,7 +288,7 @@ return [
     /*
      * Only allow files with specific file extension(s) to be uploaded
      */
-    'allowed_extensions' => [],
+    'allowed_extensions' => ['doc','docx','ppt','pptx','pdf','tmp','jpg','jpeg'],
     'model' => \App\Innoclapps\Models\Media::class,
 
     /*

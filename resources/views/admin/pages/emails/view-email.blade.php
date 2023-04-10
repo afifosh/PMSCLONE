@@ -3,7 +3,7 @@
         <!-- Email View : Title  bar-->
         <div class="d-flex justify-content-between align-items-center py-2">
           <div class="d-flex align-items-center overflow-hidden">
-            <i class="ti ti-chevron-left ti-sm cursor-pointer me-2" onclick="$('#app-email-view').hide();"></i>
+            <i class="ti ti-chevron-left ti-sm cursor-pointer me-2" onclick="$('#app-email-view').removeClass('show');"></i>
             <h6 class="text-truncate mb-0 me-2">{{$message->subject}}</h6>
           </div>
           <!-- Email View : Action  bar-->
@@ -100,10 +100,24 @@
               </div>
             </div>
           </div>
-          <div class="card-body">
+          <div style="overflow-y: auto;" class="card-body">
+          @if($message->html_body==null || $message->html_body=="")
+          {!!$message->text_body!!}  
+          @else
           {!!$message->html_body!!}  
+          @endif
         <input type="hidden" id="mail_type" value="compose"/>
-        </div>
+      @if(count(json_decode(json_encode($message->attachments()),true))>0)
+        <hr>
+        @foreach($message->attachments as $attachment)
+      <p class="email-attachment-title mb-2">Attachments</p>
+      <div class="cursor-pointer">
+              <i class="ti ti-file"></i>
+              <span class="align-middle ms-1">{{$attachment->filename}}</span>
+            </div>
+            @endforeach
+            @endif  
+      </div>
         </div>
         
       </div>
@@ -120,9 +134,16 @@
 
       var html=" <br /><div class='syncmail_attr'>" +
         wroteText +
-        '</div><blockquote class="syncmail_quote">' +
-        message.html_body +
-        '</blockquote>';
+        '</div><blockquote class="syncmail_quote">';
+          if(message.html_body==null || message.html_body==""){
+           html+= message.text_body; 
+
+          }
+          else{
+           html+= message.html_body; 
+
+          }
+        html+='</blockquote>';
          $('.email-editor').html(html);
          $('mail_type').val('reply');
          var quill = new Quill('.email-editor');
@@ -147,9 +168,14 @@
             'Subject: '+ message.subject +'</br>'+
             `To: &lt;`+ message.to[0].address  +`&gt;</br>`+
           '</div>' +
-          '<br /><div>' +
-          message.html_body +
-          '</div>'
+          '<br /><div>';
+          if(message.html_body==null || message.html_body==""){
+           html+= message.text_body; 
+          }
+          else{
+           html+= message.html_body; 
+          } 
+          html+='</div>'
 
           $('.email-editor').html(html);
          

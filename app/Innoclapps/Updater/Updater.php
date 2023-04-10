@@ -302,7 +302,7 @@ class Updater
     public static function createInternalRequestUrl(string $endpoint, array $extra = []) : string
     {
         return $endpoint . '?' . http_build_query(array_merge([
-            'identification_key'      => config('innoclapps.key'),
+            'identification_key'      => config('app.key'),
             'app_url'                 => config('app.url'),
             'installed_version'       => \App\Innoclapps\Application::VERSION,
             'server_ip'               => settings('_server_ip'),

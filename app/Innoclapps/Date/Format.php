@@ -48,7 +48,7 @@ class Format
         return with($this->determineUser($user), function ($user) use ($value) {
             return $this->format(
                 $value,
-                $user ? $user->getLocalDateFormat() : config('innoclapps.date_format'),
+                $user ? $user->getLocalDateFormat() : config('app.date_format'),
                 $user
             );
         });
@@ -71,7 +71,7 @@ class Format
         return with($this->determineUser($user), function ($user) use ($value) {
             return $this->format(
                 $value,
-                $user ? $user->getLocalTimeFormat() : config('innoclapps.time_format'),
+                $user ? $user->getLocalTimeFormat() : config('app.time_format'),
                 $user
             );
         });

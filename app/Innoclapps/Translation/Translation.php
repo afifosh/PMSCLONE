@@ -25,7 +25,7 @@ class Translation
     public static function generateJsonLanguageFile() : void
     {
         (new JsonGenerator())->generateTo(
-            config('innoclapps.lang.json')
+            config('app.lang.json')
         );
     }
 

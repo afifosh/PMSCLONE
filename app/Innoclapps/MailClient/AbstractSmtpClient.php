@@ -397,7 +397,7 @@ abstract class AbstractSmtpClient implements SmtpInterface
      */
     public function createReplySubject($subject)
     {
-        return config('innoclapps.mail_client.reply_prefix') . trim(
+        return config('app.mail_client.reply_prefix') . trim(
             preg_replace($this->cleanupSubjectSearch(), '', $subject)
         );
     }
@@ -411,7 +411,7 @@ abstract class AbstractSmtpClient implements SmtpInterface
      */
     public function createForwardSubject($subject)
     {
-        return config('innoclapps.mail_client.forward_prefix') . trim(
+        return config('app.mail_client.forward_prefix') . trim(
             preg_replace($this->cleanupSubjectSearch(), '', $subject)
         );
     }

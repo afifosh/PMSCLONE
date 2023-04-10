@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/katex.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/editor.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-email.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/tagify/tagify.css')}}" />
 <style>
   #email-editor{
     max-height: 300px;
@@ -25,6 +26,7 @@
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/quill/katex.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/quill/quill.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/tagify/tagify.js')}}"></script>
 <script src="{{asset('assets/js/app-email.js')}}"></script>
 <script src="{{asset('assets/js/helper.js')}}"></script>
 @endsection
@@ -56,7 +58,7 @@
           for(var i=0; i<folders.length; i++){
             if(folders[i].syncable){
               isSync=true;
-            html+=`<li class="d-flex justify-content-between folder-items" onclick="populateMessages(`+account_id+`,`+folders[i].id+`,1)" id="folder-`+folders[i].id+`">
+            html+=`<li class="d-flex justify-content-between folder-items" onclick="populateMessages(`+account_id+`,`+folders[i].id+`,1);$('#app-email-view').removeClass('show');" id="folder-`+folders[i].id+`">
             <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">`+folders[i].display_name+`</span>
             </a>
@@ -104,14 +106,14 @@
            else{
            for(var i=0; i<messages.length; i++){
           html+=`
-            <li class="email-list-item" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
+            <li `+(messages[i].is_read? 'style="color:lightgrey !important"':'')+` class="email-list-item" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
               <div class="d-flex align-items-center">
                 <div class="form-check mb-0">
                   <input class="email-list-item-input form-check-input" data-id="`+messages[i].id+`" type="checkbox" id="email-`+messages[i].id+`">
                   <label class="form-check-label" for="email-`+messages[i].id+`"></label>
                 </div>
                 <div class="email-list-item-content ms-2 ms-sm-0 me-2">
-                  <span class="h6 email-list-item-username me-2">`+messages[i].from.name+`</span>
+                  <span class="email-list-item-username me-2">`+messages[i].from.name+`</span>
                   <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
                 </div>
                 <div class="email-list-item-meta ms-auto d-flex align-items-center">
@@ -270,6 +272,12 @@
   }
   }
 </script>
+<!-- <script>
+  var input = $('.tags');
+input.each(function(){
+  new Tagify(this);
+})
+</script> -->
 @endsection
 
 @section('content')
@@ -286,12 +294,12 @@
           @endforeach
         </select>
         </div>
-        <button class="btn btn-primary btn-compose" data-bs-backdrop="static" onclick="doAction('compose');" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
+        <button class="btn btn-primary btn-compose" onclick="doAction('compose');" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
       </div>
       <!-- Email Filters -->
       <div class="email-filters py-2">
         <!-- Email Filters: Folder -->
-        <ul id="folders" class="email-filter-folders list-unstyled mb-4">
+        <ul id="folders" style="overflow-y: auto;" class="email-filter-folders list-unstyled mb-4">
         <li class="d-flex justify-content-between">
             <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">        Loading...
@@ -352,8 +360,8 @@
         </div>
         <hr class="container-m-nx m-0">
         <!-- Email List: Items -->
-        <div  class="email-list pt-0">
-        <ul id="email-list" class="list-unstyled m-0">
+        <div style="overflow-y: auto !important;" class="email-list pt-0">
+        <ul id="email-list"  class="list-unstyled m-0">
 
         </ul>
         </div>
@@ -381,7 +389,7 @@
   </div>
 
   <!-- Compose Email -->
-  <div class="app-email-compose modal" id="emailComposeSidebar" tabindex="-1" aria-labelledby="emailComposeSidebarLabel" aria-hidden="true">
+  <div class="app-email-compose modal" data-bs-backdrop="static" id="emailComposeSidebar" tabindex="-1" aria-labelledby="emailComposeSidebarLabel" aria-hidden="true">
     <div class="modal-dialog m-0 me-md-4 mb-4 modal-lg">
       <div class="modal-content p-0">
         <div class="modal-header py-3 bg-body">
@@ -394,7 +402,7 @@
           <div class="email-compose-to d-flex justify-content-between align-items-center">
               <label class="form-label mb-0" for="emailContacts">To:</label>
               <div class="select2-primary border-0 shadow-none flex-grow-1 mx-2">
-              <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2" id="to" name="to" placeholder="someone@email.com">
+              <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2 tags" id="to" name="to" placeholder="someone@email.com">
                
               </div>
               <div class="email-compose-toggle-wrapper">
@@ -407,14 +415,14 @@
               <hr class="container-m-nx my-2">
               <div class="d-flex align-items-center">
                 <label for="cc" class="form-label mb-0">Cc: </label>
-                <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2" name="cc" id="cc" placeholder="someone@email.com">
+                <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2 tags" name="cc" id="cc" placeholder="someone@email.com">
               </div>
             </div>
             <div class="email-compose-bcc d-none">
               <hr class="container-m-nx my-2">
               <div class="d-flex align-items-center">
                 <label for="bcc" class="form-label mb-0">Bcc: </label>
-                <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2" id="bcc" name="bcc" placeholder="someone@email.com">
+                <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2 tags" id="bcc" name="bcc" placeholder="someone@email.com">
               </div>
             </div>
             <hr class="container-m-nx my-2">
