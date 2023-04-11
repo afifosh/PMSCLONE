@@ -92,12 +92,15 @@
         </div>
 <div class="mb-3">
   @foreach($account->folders as $folder)
+  @if(!is_null($folder->parent_id)) <div style="padding-left:5px"> @endif
   <div class="form-check">
             <input name="folders[]" onchange="folderChanged(this);" class="form-check-input" @if($folder->syncable) checked @endif type="checkbox" value="{{json_encode($folder)}}" id="defaultCheck-{{$folder->id}}">
             <label class="form-check-label" for="folder-{{$folder->id}}">
             {{$folder->display_name}}
             </label>
           </div>
+  @if(!is_null($folder->parent_id)) </div> @endif
+
   @endforeach
 </div>
     </div>
