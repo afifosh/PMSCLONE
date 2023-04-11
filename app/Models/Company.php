@@ -29,6 +29,7 @@ class Company extends BaseModel
   protected $fillable = ['name', 'email', 'status', 'added_by', 'website'];
 
   protected $casts = [
+    'verified_at' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
@@ -75,10 +76,36 @@ class Company extends BaseModel
     return $modificationClass::whereModifiableType(CompanyDetail::class)->whereJsonContains('modifications->company_id->modified', $this->id);
   }
 
+  public function COMDetail()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+
+    return $modificationClass::where(function ($q) {
+      $q->where(function ($q) {
+        $q->whereHas('modifiable', function ($q) {
+          $q->where('company_id', $this->id);
+        })->orWhereJsonContains('modifications->company_id->modified', $this->id);
+      });
+    })->whereModifiableType(CompanyDetail::class);
+  }
+
   public function POCContact()
   {
     $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
     return $modificationClass::whereModifiableType(CompanyContact::class)->whereJsonContains('modifications->company_id->modified', $this->id);
+  }
+
+  public function COMContact()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+
+    return $modificationClass::where(function ($q) {
+      $q->where(function ($q) {
+        $q->whereHas('modifiable', function ($q) {
+          $q->where('company_id', $this->id);
+        })->orWhereJsonContains('modifications->company_id->modified', $this->id);
+      });
+    })->whereModifiableType(CompanyContact::class);
   }
 
   public function POCAddress()
@@ -87,18 +114,44 @@ class Company extends BaseModel
     return $modificationClass::whereModifiableType(CompanyAddress::class)->whereJsonContains('modifications->company_id->modified', $this->id);
   }
 
+  public function COMAddress()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+
+    return $modificationClass::where(function ($q) {
+      $q->where(function ($q) {
+        $q->whereHas('modifiable', function ($q) {
+          $q->where('company_id', $this->id);
+        })->orWhereJsonContains('modifications->company_id->modified', $this->id);
+      });
+    })->whereModifiableType(CompanyAddress::class);
+  }
+
   public function POCBankAccount()
   {
     $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
     return $modificationClass::whereModifiableType(CompanyBankAccount::class)->whereJsonContains('modifications->company_id->modified', $this->id);
   }
 
+  public function COMBankAccount()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+
+    return $modificationClass::where(function ($q) {
+      $q->where(function ($q) {
+        $q->whereHas('modifiable', function ($q) {
+          $q->where('company_id', $this->id);
+        })->orWhereJsonContains('modifications->company_id->modified', $this->id);
+      });
+    })->whereModifiableType(CompanyBankAccount::class);
+  }
+
   public function POCmodifications()
   {
     $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
 
-    return $modificationClass::where(function($q){
-      $q->whereHas('modifiable', function($q){
+    return $modificationClass::where(function ($q) {
+      $q->whereHas('modifiable', function ($q) {
         $q->where('company_id', $this->id);
       })->orWhereJsonContains('modifications->company_id->modified', $this->id);
     });
@@ -197,14 +250,14 @@ class Company extends BaseModel
   public function getPOCLocalityType()
   {
     $locality_type = null;
-    if (auth()->user()->company->POCDetail()->where('is_update', 0)->exists()) {
-      $locality_type = @auth()->user()->company->POCDetail()->where('is_update', 0)->first()->modifications['locality_type']['modified'];
+    if ($this->POCDetail()->where('is_update', 0)->exists()) {
+      $locality_type = @$this->POCDetail()->where('is_update', 0)->first()->modifications['locality_type']['modified'];
     }
-    if (!$locality_type && auth()->user()->company->POCDetail()->where('is_update', 1)->exists()) {
-      $locality_type = @auth()->user()->company->POCDetail()->where('is_update', 1)->first()->modifications['locality_type']['modified'];
+    if (!$locality_type && $this->POCDetail()->where('is_update', 1)->exists()) {
+      $locality_type = @$this->POCDetail()->where('is_update', 1)->first()->modifications['locality_type']['modified'];
     }
-    if (!$locality_type && auth()->user()->company->detail && auth()->user()->company->detail->locality_type) {
-      $locality_type = auth()->user()->company->detail->locality_type;
+    if (!$locality_type && $this->detail && $this->detail->locality_type) {
+      $locality_type = $this->detail->locality_type;
     }
 
     return $locality_type;
@@ -213,14 +266,14 @@ class Company extends BaseModel
   public function getPOCLogo(): ?string
   {
     $logo = null;
-    if (auth()->user()->company->POCDetail()->where('is_update', 0)->exists()) {
-      $logo = @auth()->user()->company->POCDetail()->where('is_update', 0)->first()->modifications['logo']['modified'];
+    if ($this->POCDetail()->where('is_update', 0)->exists()) {
+      $logo = @$this->POCDetail()->where('is_update', 0)->first()->modifications['logo']['modified'];
     }
-    if (!$logo && auth()->user()->company->POCDetail()->where('is_update', 1)->exists()) {
-      $logo = @auth()->user()->company->POCDetail()->where('is_update', 1)->first()->modifications['logo']['modified'];
+    if (!$logo && $this->POCDetail()->where('is_update', 1)->exists()) {
+      $logo = @$this->POCDetail()->where('is_update', 1)->first()->modifications['logo']['modified'];
     }
-    if (!$logo && auth()->user()->company->detail && auth()->user()->company->detail->logo) {
-      $logo = auth()->user()->company->detail->logo;
+    if (!$logo && $this->detail && $this->detail->logo) {
+      $logo = $this->detail->logo;
     }
 
     return $logo;
@@ -231,8 +284,7 @@ class Company extends BaseModel
     $logo = $this->getPOCLogo();
     if ($logo && Storage::disk('public')->exists($logo))
       $logo = Storage::disk('public')->url($logo);
-
-    $logo = $logo ? $logo : auth()->user()->company->avatar;
+    $logo = $logo ? $logo : $this->avatar;
 
     return $logo;
   }
@@ -248,10 +300,10 @@ class Company extends BaseModel
     if ($this->POCDetail()->has('disapprovals')->exists())
       $status = 'rejected';
     elseif (!$level) {
-      if ($this->detail && !$this->POCDetail()->where('active', 1)->exists())
+      if ($this->detail && !$this->COMDetail()->exists())
         $status = 'approved';
     } else {
-      if ($this->POCDetail()->has('approvals', '>=', $level)->exists())
+      if ($this->POCDetail()->has('approvals', '>=', $level)->exists() || $this->POCDetail()->count() == 0)
         $status = 'approved';
       if ($this->POCDetail()->has('approvals', '<', $level)->exists())
         $status = 'pending';
@@ -263,15 +315,15 @@ class Company extends BaseModel
   public function getAddressesStatus($level = '')
   {
     $status = 'pending';
-    if ($this->POCAddress()->has('disapprovals')->exists())
+    if ($this->COMAddress()->has('disapprovals')->exists())
       $status = 'rejected';
     elseif (!$level) {
-      if ($this->addresses->count() && !$this->POCAddress()->where('active', 1)->exists())
+      if ($this->addresses->count() && !$this->COMAddress()->where('active', 1)->exists())
         $status = 'approved';
     } else {
-      if ($this->POCAddress()->has('approvals', '>=', $level)->count() >= $this->POCAddress()->count())
+      if ($this->COMAddress()->has('approvals', '>=', $level)->count() >= $this->COMAddress()->count())
         $status = 'approved';
-      if ($this->POCAddress()->has('approvals', '<', $level)->exists())
+      if ($this->COMAddress()->has('approvals', '<', $level)->exists())
         $status = 'pending';
     }
 
@@ -281,15 +333,15 @@ class Company extends BaseModel
   public function getContactsStatus($level = '')
   {
     $status = 'pending';
-    if ($this->POCContact()->has('disapprovals')->exists())
+    if ($this->COMContact()->has('disapprovals')->exists())
       $status = 'rejected';
     elseif (!$level) {
-      if ($this->contacts->count() && !$this->POCContact()->where('active', 1)->exists())
+      if ($this->contacts->count() && !$this->COMContact()->where('active', 1)->exists())
         $status = 'approved';
     } else {
-      if ($this->POCContact()->has('approvals', '>=', $level)->count() >= $this->POCContact()->count())
+      if ($this->COMContact()->has('approvals', '>=', $level)->count() >= $this->COMContact()->count())
         $status = 'approved';
-      if ($this->POCContact()->has('approvals', '<', $level)->exists())
+      if ($this->COMContact()->has('approvals', '<', $level)->exists())
         $status = 'pending';
     }
 
@@ -299,15 +351,15 @@ class Company extends BaseModel
   public function getBankAccountsStatus($level = '')
   {
     $status = 'pending';
-    if ($this->POCBankAccount()->has('disapprovals')->exists())
+    if ($this->COMBankAccount()->has('disapprovals')->exists())
       $status = 'rejected';
     elseif (!$level) {
-      if ($this->bankAccounts->count() && !$this->POCBankAccount()->where('active', 1)->exists())
+      if ($this->bankAccounts->count() && !$this->COMBankAccount()->where('active', 1)->exists())
         $status = 'approved';
     } else {
-      if ($this->POCBankAccount()->has('approvals', '>=', $level)->count() >= $this->POCBankAccount()->count())
+      if ($this->COMBankAccount()->has('approvals', '>=', $level)->count() >= $this->COMBankAccount()->count())
         $status = 'approved';
-      if ($this->POCBankAccount()->has('approvals', '<', $level)->exists())
+      if ($this->COMBankAccount()->has('approvals', '<', $level)->exists())
         $status = 'pending';
     }
 

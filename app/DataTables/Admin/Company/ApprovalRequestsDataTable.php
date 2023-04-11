@@ -143,17 +143,29 @@ class ApprovalRequestsDataTable extends DataTable
    */
   public function getColumns(): array
   {
-    return [
-      // Column::make('id'),
-      Column::make('name')->title(__('Bussines Legal Name')),
-      Column::make('source'),
-      Column::make('added_by'),
-      Column::make('approval_level'),
-      Column::make('approval_status'),
-      Column::make('status'),
-      Column::make('created_at'),
-      Column::make('updated_at'),
-    ];
+    if ($this->type != 'verified') {
+      return [
+        // Column::make('id'),
+        Column::make('name')->title(__('Bussines Legal Name')),
+        Column::make('source'),
+        Column::make('added_by'),
+        Column::make('approval_level'),
+        Column::make('approval_status'),
+        Column::make('status'),
+        Column::make('created_at'),
+        Column::make('updated_at'),
+      ];
+    } else {
+      return [
+        Column::make('name')->title(__('Bussines Legal Name')),
+        Column::make('source'),
+        Column::make('added_by'),
+        Column::make('approval_status'),
+        Column::make('verified_at'),
+        Column::make('created_at'),
+        Column::make('updated_at'),
+      ];
+    }
   }
 
   /**

@@ -31,7 +31,7 @@
               </small>
               <hr class="my-2">
               <span class="d-flex">
-                <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Address" data-href="{{route('company.addresses.show', $address['id'])}}">View</a>
+                {{-- <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Address" data-href="{{route('company.addresses.show', $address['id'])}}">View</a> --}}
                   @if(auth()->user()->company->isEditable())
                     <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Address" data-href="{{route('company.addresses.edit', $address['id'])}}">Edit</a>
                     <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.addresses.destroy', $address['id']) }}">Remove</a>
@@ -68,14 +68,14 @@
                 <span class="fw-bold">State : </span> {{ $address['state'] }} <br />
                 <span class="fw-bold">Country : </span> {{ $countries[$address['country_id']] }} <br />
               </small>
-              <hr class="my-2">
-              <span class="d-flex">
-                <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Address" data-href="{{route('company.addresses.show', ['address' => $pending_addresse->id, 'type' => 'pending_creation'])}}">View</a>
-                  @if(auth()->user()->company->isEditable())
-                    <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Address" data-href="{{route('company.addresses.edit', ['address' => $pending_addresse->id, 'type' => 'pending_creation'])}}">Edit</a>
-                    <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.addresses.destroy', ['address' => $pending_addresse->id, 'type' => 'pending_creation']) }}">Remove</a>
-                  @endif
-              </span>
+              @if(auth()->user()->company->isEditable())
+                <hr class="my-2">
+                <span class="d-flex">
+                  {{-- <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Address" data-href="{{route('company.addresses.show', ['address' => $pending_addresse->id, 'type' => 'pending_creation'])}}">View</a> --}}
+                  <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Address" data-href="{{route('company.addresses.edit', ['address' => $pending_addresse->id, 'type' => 'pending_creation'])}}">Edit</a>
+                  <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.addresses.destroy', ['address' => $pending_addresse->id, 'type' => 'pending_creation']) }}">Remove</a>
+                </span>
+              @endif
             </span>
           </label>
         </div>

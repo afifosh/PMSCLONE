@@ -25,12 +25,12 @@ class KycDocumentSeeder extends Seeder
                   "is_required": "0"
               },
               {
-                  "type": "text",
+                  "type": "date",
                   "label": "CR Issue Date",
                   "is_required": "0"
               },
               {
-                  "type": "text",
+                  "type": "date",
                   "label": "CR Expiry Date",
                   "is_required": "0"
               },

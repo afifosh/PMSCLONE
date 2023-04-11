@@ -33,7 +33,7 @@ class KycDocumentUpdateRequest extends FormRequest
     }
     foreach ($documents as $document) {
       foreach ($document->fields as $i => $field) {
-        $isRequired = [];
+        $isRequired = ['nullable'];
         if ($field['is_required'])
           $isRequired = ['required'];
         $rules['doc_' . $document->id . '_field_' . $i . '_' . $field['type']] = array_merge($isRequired, $avail_rules[$field['type']]);

@@ -24,7 +24,13 @@
                       @endif
                     </div>
                     <span class="fst-italic d-flex justify-content-between">
-                      <span>{{ substr(is_array(@$account[$field_name])? json_encode($account[$field_name]) : $account[$field_name],0 ,30) }}</span>
+                      <span>
+                        @if($field_name == 'country_id')
+                          {{@$countries[$account[$field_name]]}}
+                        @else
+                          {{$account[$field_name] ?? 'N/A'}}
+                        @endif
+                      </span>
                     </span>
                 </div>
             @empty

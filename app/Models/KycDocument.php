@@ -16,15 +16,16 @@ class KycDocument extends Model
     'fields',
   ];
 
-  public const TYPES = ['text', 'number', 'email', 'tel', 'textarea', 'file'];
+  public const TYPES = ['date', 'email', 'file', 'number', 'tel','text', 'textarea'];
 
   public const VALIDATIONS = [
-    'text' => ['string', 'max:255'],
-    'number' => ['numeric', 'max:255'],
+    'date' => ['date'],
     'email' => ['email', 'max:255'],
+    'file' => ['file', 'mimeTypes:image/*'],
+    'number' => ['numeric', 'max:255'],
     'tel' => ['numeric', 'max:255'],
-    'textarea' => ['string', 'max:255'],
-    'file' => ['file', 'mimeTypes:image/*']
+    'text' => ['string', 'max:255'],
+    'textarea' => ['string', 'max:255']
   ];
 
   protected $casts = [

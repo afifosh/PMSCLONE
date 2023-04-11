@@ -40,6 +40,11 @@ class CompanyContact extends Model
     }
   }
 
+  public static function getContactTypes()
+  {
+    return ['Owner', 'Employee'];
+  }
+
   public static function getFields()
   {
     return [
@@ -50,8 +55,8 @@ class CompanyContact extends Model
       'Position' => 'position',
       'Phone' => 'phone',
       'Mobile' => 'mobile',
-      'Fax' => 'email',
-      'Email' => 'fax',
+      'Fax' => 'fax',
+      'Email' => 'email',
       'POA Letter' => 'poa'
     ];
   }

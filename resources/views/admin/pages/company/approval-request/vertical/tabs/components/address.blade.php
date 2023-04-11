@@ -26,7 +26,25 @@
                       @endif
                     </div>
                     <span class="fst-italic d-flex justify-content-between">
-                      <span>{{ substr(is_array(@$address[$field_name])? json_encode($address[$field_name]) : $address[$field_name],0 ,30) }}</span>
+                      <span>
+                        @if ($field_name == 'address_type')
+                          @php
+                              $address[$field_name] = array_filter($address[$field_name], function($value) {
+                                  return $value !== null;
+                              });
+                              $array = array_map(function($element) use ($addressTypes) {
+                                  return $element != null ? $addressTypes[$element] : '';
+                              }, $address[$field_name]);
+                              $type = implode(", ", $array);
+                              $type = $type == '' ? 'N/A' : $type;
+                          @endphp
+                          {{$type}}
+                        @elseif ($field_name == 'country_id')
+                          {{ @$countries[$address[$field_name]] }}
+                        @else
+                          {{ is_array(@$address[$field_name])? json_encode($address[$field_name]) : $address[$field_name] }}
+                        @endif
+                      </span>
                     </span>
                 </div>
             @empty

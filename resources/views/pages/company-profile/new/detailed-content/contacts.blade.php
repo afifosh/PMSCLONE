@@ -31,7 +31,7 @@
               </small>
               <hr class="my-2">
               <span class="d-flex">
-                <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Contact Person" data-href="{{route('company.contacts.show', $contact['id'])}}">View</a>
+                {{-- <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Contact Person" data-href="{{route('company.contacts.show', $contact['id'])}}">View</a> --}}
                 @if(auth()->user()->company->isEditable())
                   <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Contact Person" data-href="{{route('company.contacts.edit', $contact['id'])}}">Edit</a>
                   <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.contacts.destroy', $contact['id']) }}">Remove</a>
@@ -68,14 +68,14 @@
                 <span class="fw-bold">Fax : </span> {{$contact['fax']}} <br />
                 <span class="fw-bold">Is Authorized Person : </span> {{@$contact['poa'] ? 'Yes' : 'No'}} <br />
               </small>
-              <hr class="my-2">
-              <span class="d-flex">
-                <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Contact Person" data-href="{{route('company.contacts.show', ['contact' => $pending_creation_contact->id, 'type' => 'pending_creation'])}}">View</a>
-                @if(auth()->user()->company->isEditable())
+              @if(auth()->user()->company->isEditable())
+                <hr class="my-2">
+                <span class="d-flex">
+                  {{-- <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Contact Person" data-href="{{route('company.contacts.show', ['contact' => $pending_creation_contact->id, 'type' => 'pending_creation'])}}">View</a> --}}
                   <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Contact Person" data-href="{{route('company.contacts.edit', ['contact' => $pending_creation_contact->id, 'type' => 'pending_creation'])}}">Edit</a>
                   <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.contacts.destroy', ['contact' => $pending_creation_contact->id, 'type' => 'pending_creation']) }}">Remove</a>
-                @endif
-              </span>
+                </span>
+              @endif
             </span>
           </label>
         </div>

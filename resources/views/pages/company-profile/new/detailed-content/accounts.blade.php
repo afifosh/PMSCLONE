@@ -30,7 +30,7 @@
               </small>
               <hr class="my-2">
               <span class="d-flex">
-                <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Bank Account" data-href="{{route('company.bank-accounts.show', $account['id'])}}">View</a>
+                {{-- <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Bank Account" data-href="{{route('company.bank-accounts.show', $account['id'])}}">View</a> --}}
                 @if(auth()->user()->company->isEditable())
                   <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Bank Account" data-href="{{route('company.bank-accounts.edit', $account['id'])}}">Edit</a>
                   <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.bank-accounts.destroy', $account['id']) }}">Remove</a>
@@ -66,14 +66,14 @@
                 <span class="fw-bold">State : </span> {{ $account['state'] }} <br />
                 <span class="fw-bold">Country : </span> {{ $countries[$account['country_id']] }} <br />
               </small>
-              <hr class="my-2">
-              <span class="d-flex">
-                <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Bank Account" data-href="{{route('company.bank-accounts.show', ['bank_account' => $pending_account->id, 'type' => 'pending_creation'])}}">View</a>
-                @if(auth()->user()->company->isEditable())
+              @if(auth()->user()->company->isEditable())
+                <hr class="my-2">
+                <span class="d-flex">
+                  {{-- <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Bank Account" data-href="{{route('company.bank-accounts.show', ['bank_account' => $pending_account->id, 'type' => 'pending_creation'])}}">View</a> --}}
                   <a class="me-2" href="javascript:void(0)" data-toggle="ajax-modal" data-title="Edit Bank Account" data-href="{{route('company.bank-accounts.edit', ['bank_account' => $pending_account->id, 'type' => 'pending_creation'])}}">Edit</a>
                   <a href="javascript:void(0)" data-toggle="ajax-delete" data-href="{{ route('company.bank-accounts.destroy', ['bank_account' => $pending_account->id, 'type' => 'pending_creation']) }}">Remove</a>
-                @endif
-              </span>
+                </span>
+              @endif
             </span>
           </label>
         </div>

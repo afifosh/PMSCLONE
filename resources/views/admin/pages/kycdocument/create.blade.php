@@ -58,7 +58,7 @@
                                     {!! Form::select('fields[][type]', array_combine($types, array_map('ucwords',$types)), $field['type'], ['class' => 'form-control']) !!}
                                   </div>
                                   <div>
-                                    {!! Form::select('fields[][is_required]', ['Required', 'Not Required'], $field['is_required'], ['class' => 'form-control']) !!}
+                                    {!! Form::select('fields[][is_required]', ['Not Required', 'Required',], $field['is_required'], ['class' => 'form-control']) !!}
                                   </div>
                                   <button type="button" class="btn btn-danger" data-repeater-delete>
                                       <i class="fas fa-times-circle"></i>

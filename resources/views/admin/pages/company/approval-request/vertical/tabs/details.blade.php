@@ -1,10 +1,12 @@
 @php
-    $isEditable = !@$detail['modifications']->isEmpty();
+    $isEditable = !@$detail['modifications'][0];
     $status = 'pending';
-    if(is_array($detail['modifications']) && !$detail['modifications']->isEmpty()){
+    if($detail instanceof \App\Models\Modification){
       $detail_original = $detail;
       $detail = transformModifiedData($detail->modifications);
       $detail['modification_id'] = $detail_original->id;
+    }else{
+      $isEditable = false;
     }
     if(!isset($detail_original))
       $status = 'approved';
@@ -16,6 +18,9 @@
           $status = 'rejected';
         }
     }
+    // if($detail instanceof \App\Models\CompanyDetail){
+    //   $detail->modifications
+    // }
 @endphp
 <div class="col-12">
   <div class="card h-100">
@@ -45,7 +50,31 @@
                         {{$field_title}}
                       </div>
                       <span class="fst-italic d-flex justify-content-between">
-                        <span>{{ substr(is_array(@$detail[$field_name])? json_encode(@$detail[$field_name]) : @$detail[$field_name],0 ,30) }}</span>
+                        <span>
+                          @if ($field_name == 'locality_type')
+                            {{@$localityTypes[$detail[$field_name]]}}
+                          @elseif ($field_name == 'no_of_employees')
+                            {{$NoOfEmployee[$detail[$field_name]]}}
+                          @elseif ($field_name == 'logo')
+                            <img src="{{$company->getPOCLogoUrl()}}" alt="" height="100px" width="100px">
+                          @elseif ($field_name == 'legal_form')
+                            {{@$legalForms[$detail[$field_name]]}}
+                          @elseif ($field_name == 'geographical_coverage')
+                            @php
+                              $detail[$field_name] = array_filter($detail[$field_name], function($value) {
+                                  return $value !== null;
+                              });
+                              $array = array_map(function($element) use ($countries) {
+                                  return $countries[$element];
+                              }, $detail[$field_name]);
+                              $geo_cov = implode(", ", $array);
+                              $geo_cov = $geo_cov == '' ? 'N/A' : $geo_cov;
+                            @endphp
+                            {{@$geo_cov ?? 'N/A'}}
+                          @else
+                            {{ (is_array(@$detail[$field_name])? json_encode(@$detail[$field_name]) :(@$detail[$field_name] ?? 'N/A')) }}
+                          @endif
+                        </span>
                       </span>
                   </div>
               @empty

@@ -35,6 +35,15 @@ class CompanyAddress extends Model
     'address_type' => 'array',
   ];
 
+  public static function getAddressTypes()
+  {
+    return [
+      'billing' => 'Billing',
+      'purchasing' => 'Shipping',
+      'rfp_only' => 'RFP Only',
+    ];
+  }
+
   public function company()
   {
     return $this->belongsTo(Company::class);

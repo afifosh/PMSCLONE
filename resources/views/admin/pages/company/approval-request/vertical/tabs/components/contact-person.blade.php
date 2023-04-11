@@ -30,7 +30,13 @@
                       @endif
                     </div>
                     <span class="fst-italic d-flex justify-content-between">
-                      <span>{{ is_array(@$contact[$field_name])? json_encode($contact[$field_name]) : $contact[$field_name] }}</span>
+                      <span>
+                        @if ($field_name == 'type')
+                          {{$contactTypes[$contact[$field_name]]}}
+                        @else
+                          {{ $contact[$field_name] ?? 'N/A'}}
+                        @endif
+                      </span>
                     </span>
                 </div>
             @empty

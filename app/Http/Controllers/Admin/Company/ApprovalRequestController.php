@@ -47,13 +47,18 @@ class ApprovalRequestController extends Controller
     $data['accountsStatus'] = $company->getBankAccountsStatus($level);
     if(request()->tab == 'details' || request()->tab == null){
       request()->tab = 'details';
+      $data['legalForms'] = CompanyDetail::LegalForms;
+      $data['localityTypes'] = CompanyDetail::LocalityTypes;
+      $data['NoOfEmployee'] = CompanyDetail::NoOfEmployee;
       $data['detail'] = $company->POCDetail()->count() ? $company->POCDetail()->withCount('approvals', 'disapprovals')->first() : $company->detail;
       $data['fields'] = CompanyDetail::getFields();
     }elseif(request()->tab == 'contact-persons'){
+      $data['contactTypes'] = CompanyContact::getContactTypes();
       $data['contacts'] = $company->POCCOntact()->withCount('approvals', 'disapprovals')->get();
       $data['approved_contacts'] = $company->contacts()->get();
       $data['fields'] = CompanyContact::getFields();
     }elseif(request()->tab == 'addresses'){
+      $data['addressTypes'] = CompanyAddress::getAddressTypes();
       $data['addresses'] = $company->POCAddress()->withCount('approvals', 'disapprovals')->get();
       $data['approved_addresses'] = $company->addresses()->get();
       $data['fields'] = CompanyAddress::getFields();
