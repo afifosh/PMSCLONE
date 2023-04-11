@@ -580,7 +580,7 @@ Connect via IMAP, your Gmail or Outlook account.
 @endif
 @include('admin.pages.emails.partials.connect-account')
   <!-- Offcanvas to add new user -->
-  <div class="offcanvas offcanvas-xxl offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="width:50%; background-color:white !important" aria-labelledby="editAccountModal">
+  <div class="offcanvas offcanvas-xxl offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="overflow-y:auto;width:50%; background-color:white !important" aria-labelledby="editAccountModal">
 <div></div>
 </div>
 @endsection

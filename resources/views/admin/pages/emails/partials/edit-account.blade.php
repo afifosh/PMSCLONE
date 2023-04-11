@@ -2,7 +2,7 @@
       <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Edit Email Account</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100" style="padding:20px; width:100%; display:block; overflow-y:scroll">
+    <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100" style="padding:20px; width:100%; display:block;">
       <form class="add-new-user pt-0" id="update-mail-account">
       @if($account->sync_state!=App\Enums\SyncState::ENABLED)
       <div class="mb-3 alert alert-warning">
