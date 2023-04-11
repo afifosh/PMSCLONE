@@ -298,9 +298,9 @@ input.each(function(){
         <button class="btn btn-primary btn-compose" onclick="doAction('compose');" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
       </div>
       <!-- Email Filters -->
-      <div class="email-filters py-2">
+      <div class="email-filters py-2" style="height:auto">
         <!-- Email Filters: Folder -->
-        <ul id="folders" class="email-filter-folders list-unstyled mb-4">
+        <ul id="folders" class="email-filter-folders list-unstyled mb-4" >
         <li class="d-flex justify-content-between">
             <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">        Loading...

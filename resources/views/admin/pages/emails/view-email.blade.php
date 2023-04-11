@@ -71,7 +71,7 @@
       </div>
       <hr class="m-0">
       <!-- Email View : Content-->
-      <div id="view-email" class="app-email-view-content py-4">
+      <div id="view-email" class="app-email-view-content py-4" style="overflow-y:auto">
         <div class="card mx-sm-4 mx-3">
           <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
             <div class="d-flex align-items-center mb-sm-0 mb-3">
