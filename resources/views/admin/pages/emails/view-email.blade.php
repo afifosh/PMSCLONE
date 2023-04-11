@@ -137,10 +137,10 @@
         $('#forward-email,#send-email').attr("style","display:none !important");
         $('#reply-email').attr('data-id',message.id);
           $("#subject").val("RE: "+message.subject);
-         $("#to").val(message.reply_to[0].address);
+         $("#to").val((message.reply_to==null?message.from.address:message.reply_to[0].address));
          var dateStringFormatted = new Date(message.date).toLocaleString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}).replace(/,/g, '');
 
-         let wroteText = `On `+ dateStringFormatted + " "+(message.reply_to[0].name==null?message.reply_to[0].address:message.reply_to[0].name)+ " <" + message.reply_to[0].address + `> wrote:`;
+         let wroteText = `On `+ dateStringFormatted + " "+(message.from.name==null?message.from.address:message.from.name)+ " <" + message.from.address + `> wrote:`;
 
       var html=" <br /><div class='syncmail_attr'>" +
         wroteText +

@@ -191,7 +191,7 @@
                   <label class="form-check-label" for="email-`+messages[i].id+`"></label>
                 </div>
                 <div class="email-list-item-content ms-2 ms-sm-0 me-2">
-                  <span class="h6 email-list-item-username me-2">`+messages[i].from.name+`</span>
+                  <span class="h6 email-list-item-username me-2">`+(messages[i].from.name==null?messages[i].from.address:messages[i].from.name)+`</span>
                   <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
                 </div>
                 <div class="email-list-item-meta ms-auto d-flex align-items-center">
@@ -286,7 +286,7 @@ input.each(function(){
 <div class="app-email card">
   <div class="row g-0">
     <!-- Email Sidebar -->
-    <div class="col app-email-sidebar border-end flex-grow-0" style="width:auto" id="app-email-sidebar">
+    <div class="col app-email-sidebar border-end flex-grow-0" style="width:auto;overflow-y: auto;" id="app-email-sidebar">
       <div class="btn-compost-wrapper d-grid">
         <div class="mb-3">
         <select id="select-account" class="select2 form-control" style="width:100%">
@@ -300,7 +300,7 @@ input.each(function(){
       <!-- Email Filters -->
       <div class="email-filters py-2">
         <!-- Email Filters: Folder -->
-        <ul id="folders" style="overflow-y: auto;" class="email-filter-folders list-unstyled mb-4">
+        <ul id="folders" class="email-filter-folders list-unstyled mb-4">
         <li class="d-flex justify-content-between">
             <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">        Loading...
@@ -580,7 +580,7 @@ Connect via IMAP, your Gmail or Outlook account.
 @endif
 @include('admin.pages.emails.partials.connect-account')
   <!-- Offcanvas to add new user -->
-  <div class="offcanvas offcanvas-xxl offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="overflow-y:auto;width:50%; background-color:white !important" aria-labelledby="editAccountModal">
+  <div class="offcanvas offcanvas-xxl offcanvas-end scrollable-container" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="overflow-y:auto;width:50%; background-color:white !important" aria-labelledby="editAccountModal">
 <div></div>
 </div>
 @endsection
