@@ -91,7 +91,7 @@
   </div>
 </div>
 <!--/ Navbar pills -->
-<div class="card">
+{{-- <div class="card">
   <div id="sticky-wrapper" class="sticky-wrapper is-sticky" style="height: 86.0833px;">
       <div style="width: 1392px; position: fixed; top: 69px; z-index: 9;"
           class="card-header sticky-element bg-label-warning ">
@@ -114,7 +114,7 @@
 
       </div>
   </div>
-</div>
+</div> --}}
 <div class="row">
   <div class="col-12">
     <div id="details-card" class="card card-action mb-4" data-href="{{ route('company.editDetails')}}">
@@ -147,10 +147,10 @@
         @include('pages.company-profile.new.detailed-content.accounts')
       </div>
     </div>
-    {{-- <div class="card card-action mb-4">
+    <div class="card card-action mb-4">
       <div class="card-body d-flex justify-content-end">
         <a href="{{route('company.submitApprovalRequest')}}" class="btn btn-outline-light waves-effect bg-dark {{auth()->user()->company->canBeSentForApproval() ? '': 'disabled'}}" type="button"> <span class="align-middle d-sm-inline-block me-sm-1">Send for Approval</span></a>
       </div>
-    </div> --}}
+    </div>
 </div>
 @endsection

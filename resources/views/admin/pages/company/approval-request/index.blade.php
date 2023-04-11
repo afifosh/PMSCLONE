@@ -26,7 +26,8 @@ $configData = Helper::appClasses();
 
 <div class="mt-3  col-12">
   <div class="card">
-    <h5 class="card-header">Search Filter</h5>
+    @if ($type == 'change' || $type == 'approval')
+      <h5 class="card-header">Search Filter</h5>
       <form class="js-datatable-filter-form">
         <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
           @isset($levels)
@@ -41,6 +42,7 @@ $configData = Helper::appClasses();
           @endisset
         </div>
       </form>
+    @endif
     <div class="card-body">
       {{$dataTable->table()}}
     </div>

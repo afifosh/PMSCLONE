@@ -1,7 +1,7 @@
 @php
-    $isEditable = @$detail['modifications'];
+    $isEditable = !@$detail['modifications']->isEmpty();
     $status = 'pending';
-    if(@$detail['modifications']){
+    if(is_array($detail['modifications']) && !$detail['modifications']->isEmpty()){
       $detail_original = $detail;
       $detail = transformModifiedData($detail->modifications);
       $detail['modification_id'] = $detail_original->id;
@@ -45,7 +45,7 @@
                         {{$field_title}}
                       </div>
                       <span class="fst-italic d-flex justify-content-between">
-                        <span>{{ substr(is_array(@$detail[$field_name])? json_encode($detail[$field_name]) : $detail[$field_name],0 ,30) }}</span>
+                        <span>{{ substr(is_array(@$detail[$field_name])? json_encode(@$detail[$field_name]) : @$detail[$field_name],0 ,30) }}</span>
                       </span>
                   </div>
               @empty

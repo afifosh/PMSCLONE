@@ -25,6 +25,7 @@ class ApprovalRequestsDataTable extends DataTable
     return (new EloquentDataTable($query))
       ->editColumn('name', function ($company) {
         $url = $company->approval_level > 0 ? route('admin.approval-requests.level.companies.show', ['level' => $company->approval_level, 'company' => $company->id]) : null;
+        $url = $this->type == 'verified' ? null : $url;
         return view('admin._partials.sections.company-avatar', compact('company', 'url'));
       })
       ->editColumn('added_by', function ($company) {
@@ -102,6 +103,9 @@ class ApprovalRequestsDataTable extends DataTable
     });
     $query->when($this->type == 'pending', function ($q) {
       return $q->whereNull('approved_at')->where('approval_level', 0);
+    });
+    $query->when($this->type == 'verified', function ($q) {
+      return $q->whereNotNull('approved_at');
     });
     $query->with('addedBy');
     return $query->applyRequestFilters();

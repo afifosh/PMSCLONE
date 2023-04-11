@@ -26,9 +26,13 @@ class ApprovalRequestController extends Controller
     }elseif(request()->route()->getName() == 'admin.pending-companies.index'){
       $dataTable->type = 'pending';
       $title = 'Pending Approval Companies';
+    }elseif(request()->route()->getName() == 'admin.verified-companies.index'){
+      $dataTable->type = 'verified';
+      $title = 'Verified Companies';
     }
     $levels = ApprovalLevel::pluck('name', 'id');
-    return $dataTable->render('admin.pages.company.approval-request.index', compact('levels', 'title'));
+    $type = $dataTable->type;
+    return $dataTable->render('admin.pages.company.approval-request.index', compact('levels', 'title', 'type'));
     // view('admin.pages.company.approval-request.index');
   }
 

@@ -70,4 +70,9 @@ class CompanyAddress extends Model
       'Address Type' => 'address_type'
     ];
   }
+
+  public function modifications()
+  {
+    return $this->morphMany(Modification::class, 'modifiable');
+  }
 }

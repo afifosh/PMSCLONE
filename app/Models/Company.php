@@ -96,7 +96,13 @@ class Company extends BaseModel
   public function POCmodifications()
   {
     $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
-    return $modificationClass::whereJsonContains('modifications->company_id->modified', $this->id);
+
+    return $modificationClass::where(function($q){
+      $q->whereHas('modifiable', function($q){
+        $q->where('company_id', $this->id);
+      })->orWhereJsonContains('modifications->company_id->modified', $this->id);
+    });
+    //return $modificationClass::whereJsonContains('modifications->company_id->modified', $this->id);
   }
 
   public function isApprovalRequiredForCurrentLevel($level = ''): bool
@@ -120,7 +126,7 @@ class Company extends BaseModel
     $reject = false;
     if (!$this->isApprovalRequiredForCurrentLevel()) {
       if ($this->approval_level >= ApprovalLevel::count())
-        $this->forceFill(['approval_status' => 1, 'approved_at' => now()]); // Approved by all
+        $this->forceFill(['approval_status' => 1, 'approved_at' => now(), 'verified_at' => now()]); // Approved by all
       else {
         if ($this->POCmodifications()->count() > 0) {
           foreach ($this->POCmodifications()->get() as $modification) {

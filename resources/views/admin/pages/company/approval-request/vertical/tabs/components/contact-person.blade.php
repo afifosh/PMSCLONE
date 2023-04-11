@@ -1,17 +1,3 @@
-@php
-    $isEditable = !@$contact['id'];
-    $status = 'pending';
-    if(!isset($contact_original))
-      $status = 'approved';
-    if(isset($contact_original) && ($contact_original->approvals_count >= $level || $contact_original->disapprovals_count)) {
-        $isEditable = false;
-        if($contact_original->approvals_count >= $level){
-          $status = 'approved';
-        }elseif ($contact_original->disapprovals_count) {
-          $status = 'rejected';
-        }
-    }
-@endphp
 @if ($isEditable)
   <form action="{{route('admin.approval-requests.level.companies.update', ['company' => $company->id, 'level' => $company->approval_level])}}" method="post">
     @csrf
@@ -39,6 +25,9 @@
                 <div class="col-6 my-1">
                     <div class="fw-bold">
                       {{$field_title}}
+                      @if(@$modifications[$field_name])
+                        <span class="text-warning"><i class="fa-solid fa-circle-exclamation fa-lg"></i></span>
+                      @endif
                     </div>
                     <span class="fst-italic d-flex justify-content-between">
                       <span>{{ is_array(@$contact[$field_name])? json_encode($contact[$field_name]) : $contact[$field_name] }}</span>

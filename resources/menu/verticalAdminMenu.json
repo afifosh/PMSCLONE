@@ -50,7 +50,7 @@
     {
       "name": "Companies",
       "icon": "menu-icon fas fa-building",
-      "slug": ["admin.companies.", "admin.company-roles", "admin.company-invitations.", "admin.company-users.", "admin.approval-requests.", "admin.change-requests", "admin.pending-companies"],
+      "slug": ["admin.companies.", "admin.company-roles", "admin.company-invitations.", "admin.company-users.", "admin.approval-requests.", "admin.change-requests", "admin.pending-companies", "admin.verified-companies"],
       "permission" : ["read company role"],
       "submenu": [
         {
@@ -79,7 +79,7 @@
         },
         {
           "name": "Approval",
-          "slug": ["admin.approval-requests.", "admin.change-requests", "admin.pending-companies"],
+          "slug": ["admin.approval-requests.", "admin.change-requests", "admin.pending-companies", "admin.verified-companies"],
           "submenu": [
             {
               "url": "/admin/approval-requests",
@@ -95,6 +95,11 @@
               "url": "/admin/pending-companies",
               "name": "Pending Companies",
               "slug": "admin.pending-companies.index"
+            },
+            {
+              "url": "/admin/verified-companies",
+              "name": "Verified Companies",
+              "slug": "admin.verified-companies.index"
             }
           ]
         }

@@ -1,7 +1,26 @@
+@php
+  $detail_original = $detail;
+  $modifications = [];
+  if (!is_array($detail) && $detail_original && $detail->modifications->count()) {
+    $modifications = transformModifiedData($detail->modifications[0]->modifications);
+    $detail = $modifications + $detail->toArray();
+  }
+  $status_color = (is_array($detail_original) || !$detail_original) ? 'warning' : ($detail_original->modifications->count() ? 'warning' : 'success');
+  $status = (is_array($detail_original) || !$detail_original) ? 'Pending Approval' : ($detail_original->modifications->count() ? 'Partial Approved' : 'Approved');
+@endphp
 <div class="card-body pt-0">
+  <hr>
   <form action="{{route('company.updateDetails')}}" method="post">
     @csrf
-    <div class="card-body">
+    @if($POCDetail && $POCDetail->disapprovals->count())
+      @forelse ($POCDetail->disapprovals as $disapproval)
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{$disapproval->reason}}</strong>
+      </div>
+      @empty
+      @endforelse
+    @endif
+    <div class="d-flex justify-content-between">
       <div class="d-flex align-items-start align-items-sm-center gap-4">
         <img src="{{ auth()->user()->company->getPOCLogoUrl() }}" data-default="{{ auth()->user()->company->getPOCLogoUrl() }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" />
         <div class="button-wrapper">
@@ -17,6 +36,9 @@
           <input name="logo" type="file" id="upload" class="account-file-input" hidden accept="image/png, image/jpeg" />
         </div>
       </div>
+      <span class="badge bg-label-{{$status_color}} align-self-center">
+        {{$status}}
+      </span>
     </div>
     <hr>
     <div class="row g-3">

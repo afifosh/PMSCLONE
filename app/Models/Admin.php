@@ -106,11 +106,15 @@ class Admin extends Authenticatable implements MustVerifyEmail, Auditable
     public function authorizedToApproveOrDisapprove(\Approval\Models\Modification $mod) : bool
     {
       if(isset($mod->modifications['company_id']['modified'])){
-        $company = Company::where('id', $mod->modifications['company_id']['modified'])->first();
+        $company_id = $mod->modifications['company_id']['modified'];
+      }else{
+        $company_id = $mod->modifiable->company_id;
       }
-        $level = ApprovalLevel::pluck('id')->toArray()[$company->approval_level - 1]; // get the current level id
-        $approver = ApprovalLevelApprover::where('workflow_level_id', $level)->where('user_id', auth()->id())->first();
-        return $approver ? true : false;
+      $company = Company::find($company_id);
+      $level = ApprovalLevel::pluck('id')->toArray()[$company->approval_level - 1]; // get the current level id
+      $approver = ApprovalLevelApprover::where('workflow_level_id', $level)->where('user_id', auth()->id())->first();
+
+      return $approver ? true : false;
     }
 
     protected function authorizedToApprove(\Approval\Models\Modification $mod) : bool

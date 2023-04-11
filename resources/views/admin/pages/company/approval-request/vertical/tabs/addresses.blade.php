@@ -4,12 +4,43 @@
       <hr>
     <div class="row">
       @forelse ($approved_addresses as $address)
+      @php
+        $address_original = $address;
+        $modifications = [];
+        $isEditable = false;
+        $status = 'approved';
+        if ($address->modifications->count()) {
+          if($address_original->modifications[0]->approvals->count() < $level && !$address_original->modifications[0]->disapprovals->count()){
+            $isEditable = true;
+            $status = 'partially approved';
+            $modifications = transformModifiedData($address_original->modifications[0]->modifications);
+            $address['modification_id'] = $address_original->modifications[0]->id;
+          }
+          $address = transformModifiedData($address_original->modifications[0]->modifications) + $address->toArray();
+        }
+        if ($address_original->modifications->count() && $address_original->modifications[0]->disapprovals->count()) {
+          $status = 'rejected';
+        }
+      @endphp
       @include('admin.pages.company.approval-request.vertical.tabs.components.address', ['address' => $address])
+      @php
+          unset($modifications, $address, $address_original);
+      @endphp
       @empty
       @endforelse
       @forelse ($addresses as $address)
         @php
           $address_original = $address;
+          $isEditable = true;
+          $status = 'pending';
+          if(isset($address) && ($address->approvals_count >= $level || $address->disapprovals_count)) {
+              $isEditable = false;
+              if($address->approvals_count >= $level){
+                $status = 'approved';
+              }elseif ($address->disapprovals_count) {
+                $status = 'rejected';
+              }
+          }
           $address = transformModifiedData($address->modifications);
           $address['modification_id'] = $address_original->id;
         @endphp

@@ -4,13 +4,44 @@
       <hr>
     <div class="row">
       @forelse ($approved_bank_accounts as $account)
+      @php
+        $account_original = $account;
+        $modifications = [];
+        $isEditable = false;
+        $status = 'approved';
+        if ($account->modifications->count()) {
+          if($account_original->modifications[0]->approvals->count() < $level && !$account_original->modifications[0]->disapprovals->count()){
+            $isEditable = true;
+            $status = 'partially approved';
+            $modifications = transformModifiedData($account_original->modifications[0]->modifications);
+            $account['modification_id'] = $account_original->modifications[0]->id;
+          }
+          $account = transformModifiedData($account_original->modifications[0]->modifications) + $account->toArray();
+        }
+        if ($account_original->modifications->count() && $account_original->modifications[0]->disapprovals->count()) {
+          $status = 'rejected';
+        }
+      @endphp
       @include('admin.pages.company.approval-request.vertical.tabs.components.bank-account', ['account' => $account])
+      @php
+          unset($modifications, $account, $account_original);
+      @endphp
       @empty
       @endforelse
 
       @forelse ($bankAccounts as $account)
         @php
           $account_original = $account;
+          $isEditable = true;
+          $status = 'pending';
+          if(isset($account) && ($account->approvals_count >= $level || $account->disapprovals_count)) {
+              $isEditable = false;
+              if($account->approvals_count >= $level){
+                $status = 'approved';
+              }elseif ($account->disapprovals_count) {
+                $status = 'rejected';
+              }
+          }
           $account = transformModifiedData($account->modifications);
           $account['modification_id'] = $account_original->id;
         @endphp

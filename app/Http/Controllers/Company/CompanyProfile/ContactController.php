@@ -70,11 +70,12 @@ class ContactController extends Controller
       auth()->user()->company->contacts()->create($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
       $cont->delete();
     } else {
-      $cont = auth()->user()->company->contacts()->findOrFail($contact)->modifications();
+      $cont = auth()->user()->company->contacts()->findOrFail($contact)->modifications;
       if($request->hasFile('poa') || !$request->is_authorized)
-        @$cont[0]->modifications['poa']['modified'] ? ImageTrait::deleteImage($cont->modifications['poa']['modified'], 'public') : '';
-      auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
-      $cont->delete();
+      (!$cont->isEmpty() && @$cont[0]->modifications['poa']['modified']) ? ImageTrait::deleteImage($cont->modifications['poa']['modified'], 'public') : '';
+      $t = (!$cont->isEmpty() && @$cont[0]->modifications['poa']['modified']) ? ['poa' => @$cont->modifications['poa']['modified']] : [];
+      auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($this->uploadPOA($request, $fileRepository) + $t);
+      // $cont->delete();
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
   }
