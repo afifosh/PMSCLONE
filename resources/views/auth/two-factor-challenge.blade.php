@@ -49,7 +49,8 @@
                         @if (session('status'))
                             <p class="text-success mb-3">{{ session('status') }}</p>
                         @endif
-                        <form id="formAuthentication" action="{{ route('two-factor.login') }}" method="POST">
+                        {{ Session::get('login.authenticate_via')  }}
+                        <form id="formAuthentication"  action="{{ Session::get('login.authenticate_via') == 'email' ? route('check_code') : route('two-factor.login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label" for="eamil">Authentication code</label>

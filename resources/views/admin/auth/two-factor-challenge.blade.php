@@ -25,6 +25,74 @@
 
 @section('page-script')
     <script src="{{ asset('assets/js/pages-auth.js') }}"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        const button = document.querySelector('#resendotp');
+       // const button = document.querySelector('#otp');
+        let sec = 60;
+        let countdown = null;
+
+        const updateButton = () => {
+        var RemainingText = `Wait ${sec}s`;
+        $("#otp").css("color", "#a8aaae");
+        $("#resendEmailOTPCode").css("color", "#a8aaae");
+        $("#resendEmailOTPCode").css("pointer-events", "none");     
+        $("#otp").text(RemainingText);
+         if (sec === 0) {
+          clearInterval(countdown);
+          sec = 60;
+          $("#otp").text("Resend Code");
+          $("#otp").css("color", "");
+          $("#resendEmailOTPCode").css("color", "");          
+          $("#resendEmailOTPCode").css("pointer-events", "");             
+          return;
+         } 
+
+         sec--;
+        }
+
+//         button.onclick = () => {
+//             event.preventDefault();
+//         button.disabled = true;
+//          updateButton();
+//          countdown = setInterval(function() {
+//            updateButton();
+//          }, 1000);
+// }
+        
+        $('a#resendEmailOTPCode').on('click', function () {
+          event.preventDefault();
+           
+          $.ajax({
+                          type: "GET",
+                          dataType: "json",
+                          url: "{{ route('admin.send.email.otp') }}",
+                          success: function(response) {
+                              
+                              console.log(response);
+      
+                              toastr['success']('', response.message, {
+                                rtl: isRtl
+                              });
+                              updateButton();
+                             countdown = setInterval(function() {
+                                 updateButton();
+                             }, 1000);
+                           },
+                           error: function(response) {
+                            var jsonResponse = JSON.parse(response.responseText);
+                              console.log(jsonResponse);
+      
+                              toastr['error']('', jsonResponse.message, {
+                                rtl: isRtl
+                              });
+
+                           }
+                      });    
+                           
+        });
+    });
+      </script>
 @endsection
 
 @section('content')
@@ -49,8 +117,9 @@
                         @if (session('status'))
                             <p class="text-success mb-3">{{ session('status') }}</p>
                         @endif
-                        <form id="formAuthentication" action="{{ route('admin.two-factor.login') }}" method="POST">
-                            @csrf
+                        {{ Session::get('login.authenticate_via')  }}
+                        <form id="formAuthentication"  action="{{ Session::get('login.authenticate_via') == 'email' ? route('admin.check_code') : route('admin.two-factor.login') }}" method="POST">
+                            @csrf                        
                             <div class="mb-3">
                                 <label class="form-label" for="eamil">Authentication code</label>
                                 <div class="input-group input-group-merge">
@@ -64,6 +133,7 @@
                                     @enderror
                                 </div>
                             </div>
+
                             <button class="btn btn-primary d-grid w-100 mb-3">
                                Submit
                             </button>
@@ -72,10 +142,18 @@
                                     <i class="ti ti-chevron-left scaleX-n1-rtl"></i>
                                     Cancel
                                 </a>
+                                @if ( Session::get('login.authenticate_via') == 'google_authenticator')
                                 <a href="{{ route('admin.two-factor.login', ['type' => 'recovery-code']) }}">
                                   Use Recover Code
                                   <i class="ti ti-chevron-right scaleX-n1-rtl"></i>
-                              </a>
+                                 </a>
+                                 @else
+                                 {{-- <button class="btn rounded-pill btn-outline-secondary waves-effect " id="resendotp">Resend OTP</button> --}}
+                                 <a  href="javascript:;" id="resendEmailOTPCode">
+                                    <span id="otp">Resend Code</span>
+                                    <i class="ti ti-chevron-right scaleX-n1-rtl"></i>
+                                   </a>
+                                 @endif
                             </div>
                         </form>
                     </div>

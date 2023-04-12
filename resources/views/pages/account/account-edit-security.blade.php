@@ -56,7 +56,10 @@ btnCopy.on('click', function () {
     rtl: isRtl
   });
 });
-             });
+
+
+
+ });
 </script>
 @endsection
 

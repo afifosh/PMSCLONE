@@ -18,28 +18,56 @@ use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticationController;
 use Laravel\Fortify\Http\Controllers\TwoFactorQrCodeController;
 use Laravel\Fortify\Http\Controllers\TwoFactorSecretKeyController;
 use Laravel\Fortify\Http\Controllers\VerifyEmailController;
+use Laravel\Fortify\Features;
+use App\Http\Controllers\Admin\AdminUsersController;
+use App\Http\Controllers\Auth\RedirectToMailOTP as RedirectToTwoFactorMailOTPAuthentication;
 
-// Admin Routes
+//'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class
+
+Route::post('check-code', [RedirectToTwoFactorMailOTPAuthentication::class, 'verify'])
+->middleware(array_filter([
+    'guest:web',
+]))->name('check_code');
+
+
+
+
+
 Route::prefix('admin')->middleware('guest:web')->group(function () {
-    // Route::get('/company', [PagesController::class, 'company_page'])->middleware(['auth:admin', 'adminVerified']);
-    // Route::get('/dashboard', [PagesController::class, 'admin_dashboard'])->middleware(['auth:admin', 'adminVerified']);
+    Route::name('admin.')->group(function () {     
+    $enableViews = config('fortify.views', true);
 
-    Route::name('admin.')->group(function () {
-        Route::view('login', 'admin.auth.login', ['pageConfigs' => ['myLayout' => 'blank']])->middleware(['guest:admin'])->name('login');
-
-        Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-            ->middleware(['guest:admin']);
-
-        Route::any('/logout', [AuthenticatedSessionController::class, 'destroy'])
-            ->name('logout');
-
-        Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
+    // Authentication...
+    if ($enableViews) {
+        Route::get('/login', [AuthenticatedSessionController::class, 'create'])
             ->middleware(['guest:admin'])
-            ->name('password.request');
+            ->name('login');
+    }
 
-        Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
-            ->middleware(['guest:admin'])
-            ->name('password.reset');
+    $limiter = config('fortify.limiters.login');
+    $twoFactorLimiter = config('fortify.limiters.two-factor');
+    $verificationLimiter = config('fortify.limiters.verification', '6,1');
+
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware(array_filter([
+            'guest:admin',
+            $limiter ? 'throttle:'.$limiter : null,
+        ]));
+
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->name('logout');
+
+    // Password Reset...
+    if (Features::enabled(Features::resetPasswords())) {
+        if ($enableViews) {
+            Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
+                ->middleware(['guest:admin'])
+                ->name('password.request');
+
+            Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
+                ->middleware(['guest:admin'])
+                ->name('password.reset');
+        }
 
         Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
             ->middleware(['guest:admin'])
@@ -48,59 +76,111 @@ Route::prefix('admin')->middleware('guest:web')->group(function () {
         Route::post('/reset-password', [NewPasswordController::class, 'store'])
             ->middleware(['guest:admin'])
             ->name('password.update');
+    }
 
-        // Route::get('/register', [RegisteredUserController::class, 'create'])
-        //     ->middleware(['guest:admin'])
-        //     ->name('register');
-        // Route::post('/register', [RegisteredUserController::class, 'store'])
-        //     ->middleware(['guest:admin']);
+    // Registration...
+    if (Features::enabled(Features::registration())) {
+        if ($enableViews) {
+            Route::get('/sign-up', [RegisteredUserController::class, 'create'])
+                ->middleware(['guest:admin'])
+                ->name('register');
+        }
 
-        // Email Verification...
-        Route::get('/email/verify', [EmailVerificationPromptController::class, '__invoke'])
-            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
-            ->name('verification.notice');
+        Route::post('/sign-up', [RegisteredUserController::class, 'store'])
+            ->middleware(['guest:admin']);
+    }
+
+    // Email Verification...
+    if (Features::enabled(Features::emailVerification())) {
+        if ($enableViews) {
+            Route::get('/email/verify', [EmailVerificationPromptController::class, '__invoke'])
+                ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
+                ->name('verification.notice');
+        }
 
         Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
-            ->middleware([config('fortify.auth_middleware', 'auth').':admin', 'signed'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin', 'signed', 'throttle:'.$verificationLimiter])
             ->name('verification.verify');
 
         Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
+            ->middleware([config('fortify.auth_middleware', 'auth').':admin', 'throttle:'.$verificationLimiter])
             ->name('verification.send');
+    }
 
-        // Profile Information...
+    // Profile Information...
+    if (Features::enabled(Features::updateProfileInformation())) {
         Route::put('/user/profile-information', [ProfileInformationController::class, 'update'])
             ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
             ->name('user-profile-information.update');
+    }
 
-        // Passwords...
+    // Passwords...
+    if (Features::enabled(Features::updatePasswords())) {
         Route::put('/user/password', [PasswordController::class, 'update'])
             ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
             ->name('user-password.update');
+    }
 
-        // Password Confirmation...
+
+    // Password Confirmation...
+    if ($enableViews) {
         Route::get('/user/confirm-password', [ConfirmablePasswordController::class, 'show'])
-            ->middleware([config('fortify.auth_middleware', 'auth').':admin']);
+            ->middleware('auth:admin');
+    }
 
-        Route::get('/user/confirmed-password-status', [ConfirmedPasswordStatusController::class, 'show'])
-            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
-            ->name('password.confirmation');
 
-        Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store'])
-            ->middleware([config('fortify.auth_middleware', 'auth').':admin'])
-            ->name('password.confirm');
+    Route::get('/user/confirmed-password-status', [ConfirmedPasswordStatusController::class, 'show'])
+        ->middleware('auth:admin')
+        ->name('password.confirmation');
 
-        // Two Factor Authentication...
-        Route::get('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'create'])
-            ->middleware(['guest:admin'])
-            ->name('two-factor.login');
+    Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store'])
+        ->middleware('auth:admin')
+        ->name('password.confirm');
 
-        Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
+
+    // Two Factor Authentication...
+    if (Features::enabled(Features::twoFactorAuthentication())) {
+        if ($enableViews) {
+            Route::get('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'create'])
+                ->middleware(['guest:admin'])
+                ->name('two-factor.login');
+        }
+       
+       // Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
+        Route::post('/two-factor-challenge', [RedirectToTwoFactorMailOTPAuthentication::class, 'store'])
             ->middleware(array_filter([
                 'guest:admin',
+                $twoFactorLimiter ? 'throttle:'.$twoFactorLimiter : null,
             ]));
 
-        $twoFactorMiddleware = 'auth:admin';
+            Route::get('/user/send-email-otp', [AdminUsersController::class, 'resendCode'])
+            ->name('send.email.otp');
+
+            Route::post('/user/confirmed-two-factor-email-authentication', [AdminUsersController::class, 'verifyCode'])
+            ->middleware('auth:admin')
+            ->name('two-factor-email.confirm');
+            
+            // Route::delete('/user/two-factor-email-authentication', [TwoFactorAuthenticationController::class, 'destroy'])
+            // ->middleware('auth:admin')
+            // ->name('two-factor-email.disable');     
+            
+            Route::post('/user/two-factor-email-authentication', [AdminUsersController::class, 'confirmPassword'])
+            ->middleware('auth:admin')
+            ->name('two-factor-email.disable');   
+
+            Route::post('/user/security/setting', [AdminUsersController::class, 'securitySetting'])
+            ->middleware('auth:admin')
+            ->name('security.setting');   
+
+            // Route::post('/user/two-factor-email-authentication', [AdminUsersController::class, 'twoFactorGoogle'])
+            // ->middleware('auth:admin')
+            // ->name('two-factor-email.disable');  
+            //->name('two-factor-google.enable');               
+
+        $twoFactorMiddleware = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
+            ? [config('fortify.auth_middleware', 'auth').':'.config('fortify.guard'), 'password.confirm:admin.password.confirm']
+            : [config('fortify.auth_middleware', 'auth').':'.config('fortify.guard')];
+
 
         Route::post('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'store'])
             ->middleware($twoFactorMiddleware)
@@ -109,7 +189,7 @@ Route::prefix('admin')->middleware('guest:web')->group(function () {
         Route::post('/user/confirmed-two-factor-authentication', [ConfirmedTwoFactorAuthenticationController::class, 'store'])
             ->middleware($twoFactorMiddleware)
             ->name('two-factor.confirm');
-
+            
         Route::delete('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'destroy'])
             ->middleware($twoFactorMiddleware)
             ->name('two-factor.disable');
@@ -128,7 +208,15 @@ Route::prefix('admin')->middleware('guest:web')->group(function () {
 
         Route::post('/user/two-factor-recovery-codes', [RecoveryCodeController::class, 'store'])
             ->middleware($twoFactorMiddleware);
+    }
 
-        // Route::resource('users', UsersController::class);
-    });
+    Route::post('check-code', [RedirectToTwoFactorMailOTPAuthentication::class, 'verify'])
+->middleware(array_filter([
+    'guest:admin',
+]))->name('check_code');
+
+
+    
+});
+
 });
