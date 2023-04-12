@@ -88,7 +88,7 @@
         <h5 class="mb-3 font-medium text-neutral-700 dark:text-neutral-100">From Header</h5>
         <div class="mb-3">
           <label class="form-label" for="from_name_header">From Name</label>
-          <input type="text" id="from_name_header" class="form-control" name="from_name_header" />
+          <input type="text" id="from_name_header" value="{{$account->from_name_header}}" class="form-control" name="from_name_header" />
         </div>
 <div class="mb-3">
   @foreach($account->folders as $folder)
