@@ -91,11 +91,8 @@ class OAuthController extends Controller
                         ($responseBody['error_description'] ?? $responseBody['error'] ?? json_encode($responseBody)) :
                         $responseBody . ']';
                 }
-                \Log::info('errror'.$message);
                 return redirect($this->onErrorRedirectTo)->withErrors($message);
             } catch (\Exception $e) {
-                \Log::info('exception.'.$e->getMessage());
-throw $e;
                 return redirect($this->onErrorRedirectTo)->withErrors($e->getMessage());
             }
 

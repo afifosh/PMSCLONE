@@ -136,7 +136,7 @@ $configData = Helper::appClasses();
   </div>
 </div>
 @include('admin.pages.emails.partials.connect-account')
-<div class="offcanvas offcanvas-xxl offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="width:50%; background-color:white !important" aria-labelledby="editAccountModal">
+<div class="offcanvas offcanvas-xxl offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="overflow-y:auto;width:50%; background-color:white !important" aria-labelledby="editAccountModal">
   <div></div>
 </div>
 @endsection

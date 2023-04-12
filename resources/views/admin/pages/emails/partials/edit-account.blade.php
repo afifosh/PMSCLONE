@@ -90,7 +90,26 @@
           <label class="form-label" for="from_name_header">From Name</label>
           <input type="text" id="from_name_header" value="{{$account->from_name_header}}" class="form-control" name="from_name_header" />
         </div>
+        <div class="mb-3">
+          <label class="form-label" for="from_name_header">Select Sent Folder</label>
+          <select id="sent_folder_id" class="form-control" name="sent_folder_id" >
+          @foreach($account->folders as $folder)
+          <option @if($account->sent_folder_id==$folder->id) selected @endif value="{{$folder->id}}">{{$folder->display_name}}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="from_name_header">Select Trash Folder</label>
+          <select  id="trash_folder_id" class="form-control" name="trash_folder_id" >
+            @foreach($account->folders as $folder)
+          <option @if($account->trash_folder_id==$folder->id) selected @endif value="{{$folder->id}}">{{$folder->display_name}}</option>
+            @endforeach
+          </select>
+
+        </div>
 <div class="mb-3">
+<h6 class="mb-2 font-medium text-neutral-700 dark:text-neutral-100">Active Folders</h6>
+
   @foreach($account->folders as $folder)
   @if(!is_null($folder->parent_id)) <div style="padding-left:5px"> @endif
   <div class="form-check">

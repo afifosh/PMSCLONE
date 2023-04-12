@@ -115,8 +115,11 @@
           <label class="form-label" for="from_name_header">From Name</label>
           <input type="text" id="from_name_header" class="form-control" name="from_name_header" />
         </div>
-      <div id="folders-area">
+      <div class="mb-3" id="folders-area">
       
+      </div>
+      <div id="errors" style="display:none" class="mb-3 alert alert-danger">
+
       </div>
     </div>
     <div style="padding-top:30px; border-top:1px solid #ddd">

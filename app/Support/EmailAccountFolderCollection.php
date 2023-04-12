@@ -18,6 +18,7 @@ use App\Innoclapps\MailClient\FolderType;
 use Illuminate\Database\Eloquent\Collection;
 use App\Innoclapps\MailClient\FolderIdentifier;
 use App\Http\Resources\EmailAccountFolderResource;
+use App\Models\EmailAccountFolder;
 
 class EmailAccountFolderCollection extends Collection
 {
@@ -154,6 +155,10 @@ class EmailAccountFolderCollection extends Collection
     public function sortByType()
     {
         return $this->sortBy(function ($folder) {
+            if (!is_null($folder->parent_id)) {
+                $parentFolder = EmailAccountFolder::firstWhere('id', $folder->parent_id);
+            return self::ORDER_MAP[$parentFolder->type] ?? 50;
+            }
             return self::ORDER_MAP[$folder->type] ?? 50;
         })->values();
     }

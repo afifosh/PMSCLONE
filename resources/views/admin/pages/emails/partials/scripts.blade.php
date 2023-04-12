@@ -26,12 +26,14 @@
 
         }
         else if($('#connection_type').find(':selected').val()==='Imap'){
+          $("#errors").hide();
           saveRecord(this,"POST","{{url('/admin/mail/accounts')}}","add-mail-account","Please try again");
 
         }
     });
 
     $("#test-connection").on('click',function(){
+      $("#errors").hide();
       var data=$("#add-mail-account").serialize();
       $.ajax({
       url:'{{url('/admin/mail/accounts/connection')}}',

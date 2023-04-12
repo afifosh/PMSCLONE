@@ -59,11 +59,17 @@
           for(var i=0; i<folders.length; i++){
             if(folders[i].syncable){
               isSync=true;
-            html+=`<li class="d-flex justify-content-between folder-items" onclick="populateMessages(`+account_id+`,`+folders[i].id+`,1);$('#app-email-view').removeClass('show');" id="folder-`+folders[i].id+`">
-            <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
+            html+=`<li class="d-flex justify-content-between folder-items" onclick="populateMessages(`+account_id+`,`+folders[i].id+`,1);$('#app-email-view').removeClass('show');" id="folder-`+folders[i].id+`">`;
+           if(folders[i].parent_id!=null){
+            html+='<div style="padding-left:5px">';
+           }
+            html+=`<a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">`+folders[i].display_name+`</span>
-            </a>
-          </li>`;
+            </a>`+(folders[i].unread_count!=0?'<span style="position:relative; padding:4px;transform:translate(0px, -10px);" class="badge bg-info rounded-pill badge-notifications notification-bell">'+folders[i].unread_count+'</span>':"")+``;
+            if(folders[i].parent_id!=null){
+            html+='</div>';
+           }
+            html+=`</li>`;
         }
         if(!isSync){
           $("#email-list-area").hide();

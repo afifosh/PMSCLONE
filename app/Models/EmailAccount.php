@@ -184,7 +184,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      */
     public function folders()
     {
-        return $this->hasMany(\App\Models\EmailAccountFolder::class);
+        return $this->hasMany(\App\Models\EmailAccountFolder::class)->orderBy('email_account_folders.id');
     }
 
     /**

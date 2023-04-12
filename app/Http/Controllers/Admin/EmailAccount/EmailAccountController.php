@@ -94,7 +94,7 @@ class EmailAccountController extends Controller
     public function update($id, EmailAccountRequest $request)
     {
         // // The user is not allowed to update these fields after creation
-         $except = ['email', 'connection_type', 'user_id', 'initial_sync_from','sent_folder_id','trash_folder_id'];
+         $except = ['email', 'connection_type', 'user_id', 'initial_sync_from'];
          $account = $this->repository->update($request->except($except), $id);
 
          return response("Account updated successfully.");

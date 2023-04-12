@@ -152,6 +152,8 @@ function handleFail(response,container) {
         if(response.message=="CSRF token mismatch."){
             location.reload();
         }
+        $("#errors").html(response.message);
+        $("#errors").show();
     }
 }
 
