@@ -15,8 +15,8 @@
               <span>
                 <h6 class="fw-semibold mb-0">{{ $address['name'] }}</h6>
               </span>
-              <span class="badge bg-label-{{(!$address_original->modifications->count() && $address['id']) ? 'success' : 'warning'}}">
-                {{$address['id'] ? ($address_original->modifications->count() ? 'Partially Approved' : 'Approved') : 'Pending Approval'}}
+              <span class="badge bg-label-{{(!$address_original->modifications->count() && $address['id']) ? 'success' : (($address_original->modifications->count() && $address_original->modifications[0]->disapprovals->count()) ? 'danger' : 'warning')}}">
+                {{$address['id'] ? ($address_original->modifications->count() ? (($address_original->modifications->count() && $address_original->modifications[0]->disapprovals->count()) ? 'Rejected' : 'Partial Approved') : 'Approved') : 'Pending Approval'}}
               </span>
             </span>
             <span class="custom-option-body">

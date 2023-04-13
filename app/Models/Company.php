@@ -48,6 +48,7 @@ class Company extends BaseModel
     $completed += $this->POCContact()->exists() || $this->contacts->count() ? 1 : 0;
     $completed += $this->POCAddress()->exists() || $this->addresses->count() ? 1 : 0;
     $completed += $this->POCBankAccount()->exists() || $this->bankAccounts->count() ? 1 : 0;
+    $completed += $this->POCKycDoc()->exists() || $this->kycDocs->count() ? 1 : 0;
     return $completed;
   }
 
@@ -146,6 +147,25 @@ class Company extends BaseModel
     })->whereModifiableType(CompanyBankAccount::class);
   }
 
+  public function POCKycDoc()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+    return $modificationClass::whereModifiableType(CompanyKycDoc::class)->whereJsonContains('modifications->company_id->modified', $this->id);
+  }
+
+  public function COMKycDoc()
+  {
+    $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
+
+    return $modificationClass::where(function ($q) {
+      $q->where(function ($q) {
+        $q->whereHas('modifiable', function ($q) {
+          $q->where('company_id', $this->id);
+        })->orWhereJsonContains('modifications->company_id->modified', $this->id);
+      });
+    })->whereModifiableType(CompanyKycDoc::class);
+  }
+
   public function POCmodifications()
   {
     $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
@@ -225,6 +245,11 @@ class Company extends BaseModel
     return $this->hasMany(CompanyContact::class);
   }
 
+  public function kycDocs()
+  {
+    return $this->hasMany(CompanyKycDoc::class);
+  }
+
   public function scopeApplyRequestFilters($query)
   {
     $query->when(request()->has('filter_levels') && is_array(request()->filter_levels), function ($q) {
@@ -235,10 +260,11 @@ class Company extends BaseModel
   public function canBeSentForApproval()
   {
     return $this->approval_status != 2 // not already sent for approval
-      && ($this->POCAddress()->exists() || $this->addresses->count()) // has changed address or approved address
-      && ($this->POCDetail()->exists() || $this->detail) // has changed detail or approved detail
-      && ($this->POCContact()->exists() || $this->contacts->count()) // has changed contact or approved contact
-      && ($this->POCBankAccount()->exists() || $this->bankAccounts->count()) // has changed bank account or approved bank account
+      && ($this->POCAddress()->exists() || $this->addresses()->doesntHave('modifications.disapprovals')->count()) // has changed address or approved address
+      && ($this->POCDetail()->exists() || $this->detail()->doesntHave('modifications.disapprovals')->count()) // has changed detail or approved detail
+      && ($this->POCContact()->exists() || $this->contacts()->doesntHave('modifications.disapprovals')->count()) // has changed contact or approved contact
+      && ($this->POCBankAccount()->exists() || $this->bankAccounts()->doesntHave('modifications.disapprovals')->count()) // has changed bank account or approved bank account
+      // && ($this->POCKycDoc()->exists() || $this->kycDocs()->doesntHave('modifications.disapprovals')->count()) // has changed kyc doc or approved kyc doc
       && $this->POCmodifications()->count(); // has changed something
   }
 
@@ -297,15 +323,15 @@ class Company extends BaseModel
   public function getDetailsStatus($level = '')
   {
     $status = 'pending';
-    if ($this->POCDetail()->has('disapprovals')->exists())
+    if ($this->COMDetail()->has('disapprovals')->exists())
       $status = 'rejected';
     elseif (!$level) {
       if ($this->detail && !$this->COMDetail()->exists())
         $status = 'approved';
     } else {
-      if ($this->POCDetail()->has('approvals', '>=', $level)->exists() || $this->POCDetail()->count() == 0)
+      if ($this->COMDetail()->has('approvals', '>=', $level)->exists() || $this->COMDetail()->count() == 0)
         $status = 'approved';
-      if ($this->POCDetail()->has('approvals', '<', $level)->exists())
+      if ($this->COMDetail()->has('approvals', '<', $level)->exists())
         $status = 'pending';
     }
 

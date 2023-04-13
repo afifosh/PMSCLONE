@@ -45,7 +45,7 @@ class BankAccountController extends Controller
     if (request()->type == 'pending_creation') {
       $data['bank_account'] = auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account);
     } else {
-      $data['bank_account'] = auth()->user()->company->bankAccounts()->findOrFail($bank_account);
+      $data['bank_account'] = auth()->user()->company->bankAccounts()->with('modifications.disapprovals')->findOrFail($bank_account);
     }
     $data['countries'] = Country::pluck('name', 'id');
     $data['options'] = ['disabled' => 'disabled'];
@@ -55,7 +55,7 @@ class BankAccountController extends Controller
   public function edit($bank_account)
   {
     $data['bank_account'] = request()->type == 'pending_creation' ? auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)
-      : auth()->user()->company->bankAccounts()->findOrFail($bank_account);
+      : auth()->user()->company->bankAccounts()->with('modifications.disapprovals')->findOrFail($bank_account);
     $data['countries'] = Country::pluck('name', 'id');
 
     return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.bank-accounts.create', $data)->render()]);

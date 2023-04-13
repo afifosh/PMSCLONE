@@ -8,6 +8,7 @@
   $modifications = [];
   if (!is_array($contact->modifications) && $contact->modifications->count()) {
     $modifications = transformModifiedData($contact->modifications[0]->modifications);
+    $cont_original = $contact;
     $contact = $modifications + $contact->toArray();
   }
 @endphp
@@ -32,6 +33,15 @@
   @empty
   @endforelse
 @endisset
+
+@if (@$cont_original->modifications[0]->disapprovals && $cont_original->modifications[0]->disapprovals->count())
+    @forelse ($cont_original->modifications[0]->disapprovals as $disapproval)
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>{{$disapproval->reason}}</strong>
+    </div>
+    @empty
+    @endforelse
+@endif
 
 <div class="row">
   <div class="form-group col-6">

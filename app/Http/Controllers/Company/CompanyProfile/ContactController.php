@@ -44,7 +44,7 @@ class ContactController extends Controller
     if (request()->type == 'pending_creation') {
       $data['contact'] = auth()->user()->company->POCContact()->where('is_update', false)->with('approvals', 'disapprovals')->findOrFail($contact);
     } else {
-      $data['contact'] = auth()->user()->company->contacts()->findOrFail($contact);
+      $data['contact'] = auth()->user()->company->contacts()->with('modifications.disapprovals')->findOrFail($contact);
     }
     $data['options'] = ['disabled' => 'disabled'];
     return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.create', $data)->render()]);
@@ -55,7 +55,7 @@ class ContactController extends Controller
     if (request()->type == 'pending_creation') {
       $data['contact'] = auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact);
     } else {
-      $data['contact'] = auth()->user()->company->contacts()->with('modifications')->findOrFail($contact);
+      $data['contact'] = auth()->user()->company->contacts()->with('modifications.disapprovals')->findOrFail($contact);
     }
 
     return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.contacts.create', $data)->render()]);
@@ -75,7 +75,7 @@ class ContactController extends Controller
       (!$cont->isEmpty() && @$cont[0]->modifications['poa']['modified']) ? ImageTrait::deleteImage($cont->modifications['poa']['modified'], 'public') : '';
       $t = (!$cont->isEmpty() && @$cont[0]->modifications['poa']['modified']) ? ['poa' => @$cont->modifications['poa']['modified']] : [];
       auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($this->uploadPOA($request, $fileRepository) + $t);
-      // $cont->delete();
+      isset($cont[0]) ? $cont[0]->delete() : '';
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
   }

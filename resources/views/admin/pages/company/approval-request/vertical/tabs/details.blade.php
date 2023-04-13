@@ -1,26 +1,14 @@
 @php
-    $isEditable = !@$detail['modifications'][0];
-    $status = 'pending';
-    if($detail instanceof \App\Models\Modification){
-      $detail_original = $detail;
-      $detail = transformModifiedData($detail->modifications);
-      $detail['modification_id'] = $detail_original->id;
-    }else{
-      $isEditable = false;
-    }
-    if(!isset($detail_original))
-      $status = 'approved';
-    if(isset($detail_original) && ($detail_original->approvals_count >= $level || $detail_original->disapprovals_count)) {
-        $isEditable = false;
-        if($detail_original->approvals_count >= $level){
-          $status = 'approved';
-        }elseif ($detail_original->disapprovals_count) {
-          $status = 'rejected';
-        }
-    }
-    // if($detail instanceof \App\Models\CompanyDetail){
-    //   $detail->modifications
-    // }
+  $detail_original = $detail;
+  $modifications = [];
+  if (!is_array($detail) && $detail_original && $detail->modifications->count()) {
+    $modifications = transformModifiedData($detail->modifications[0]->modifications);
+    $detail = $modifications + $detail->toArray();
+    $detail['modification_id'] = $detail_original->modifications[0]->id;
+  }
+  $status = $detailsStatus;
+  $status_color = getCompanyStatusColor($status);
+  $isEditable = $status_color == 'warning';
 @endphp
 <div class="col-12">
   <div class="card h-100">
@@ -28,7 +16,7 @@
         <div class="d-flex">
           <h5>Company Details</h5>
           <div class="ms-auto">
-            <span class="badge bg-label-{{ getCompanyStatusColor($status) }}">{{ucwords($status)}}</span>
+            <span class="badge bg-label-{{ $status_color }}">{{ucwords($status)}}</span>
           </div>
         </div>
         <hr>
@@ -48,6 +36,9 @@
                   <div class="col-6 my-2">
                       <div class="fw-bold">
                         {{$field_title}}
+                        @if(@$modifications[$field_name])
+                          <span class="text-warning"><i class="fa-solid fa-circle-exclamation fa-lg"></i></span>
+                        @endif
                       </div>
                       <span class="fst-italic d-flex justify-content-between">
                         <span>
@@ -71,6 +62,8 @@
                               $geo_cov = $geo_cov == '' ? 'N/A' : $geo_cov;
                             @endphp
                             {{@$geo_cov ?? 'N/A'}}
+                          @elseif ($field_name == 'subsidiaries')
+                            {{is_array(@$detail[$field_name]) ? @implode(", ", @$detail[$field_name]) : 'N/A'}}
                           @else
                             {{ (is_array(@$detail[$field_name])? json_encode(@$detail[$field_name]) :(@$detail[$field_name] ?? 'N/A')) }}
                           @endif

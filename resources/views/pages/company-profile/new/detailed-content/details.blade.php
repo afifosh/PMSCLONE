@@ -5,8 +5,8 @@
     $modifications = transformModifiedData($detail->modifications[0]->modifications);
     $detail = $modifications + $detail->toArray();
   }
-  $status_color = (is_array($detail_original) || !$detail_original) ? 'warning' : ($detail_original->modifications->count() ? 'warning' : 'success');
-  $status = (is_array($detail_original) || !$detail_original) ? 'Pending Approval' : ($detail_original->modifications->count() ? 'Partial Approved' : 'Approved');
+  $status_color = (is_array($detail_original) || !$detail_original) ? 'warning' : ($detail_original->modifications->count() ? ($detail_original->modifications[0]->disapprovals->count() ? 'danger' : 'warning') : 'success');
+  $status = (is_array($detail_original) || !$detail_original) ? 'Pending Approval' : ($detail_original->modifications->count() ? ($detail_original->modifications[0]->disapprovals->count() ? 'Rejected' : 'Partial Approved') : 'Approved');
 @endphp
 <div class="card-body pt-0">
   <hr>
@@ -14,6 +14,14 @@
     @csrf
     @if($POCDetail && $POCDetail->disapprovals->count())
       @forelse ($POCDetail->disapprovals as $disapproval)
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{$disapproval->reason}}</strong>
+      </div>
+      @empty
+      @endforelse
+    @endif
+    @if(!is_array($detail_original) && $detail_original->modifications->count() && $detail_original->modifications[0]->disapprovals->count())
+      @forelse ($detail_original->modifications[0]->disapprovals as $disapproval)
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <strong>{{$disapproval->reason}}</strong>
       </div>
@@ -34,6 +42,7 @@
           </button>
           <div class="text-muted">Allowed JPG, GIF or PNG. Max size of 800K</div>
           <input name="logo" type="file" id="upload" class="account-file-input" hidden accept="image/png, image/jpeg" />
+          @modificationAlert(@$modifications['logo'])
         </div>
       </div>
       <span class="badge bg-label-{{$status_color}} align-self-center">
@@ -55,10 +64,12 @@
       <div class="col-sm-6">
         <label>Locality Type <span class="text-danger">*</span></label>
         {!! Form::select('locality_type', \App\Models\CompanyDetail::LocalityTypes, @$detail['locality_type'], ['class' => 'form-control select2']) !!}
+        @modificationAlert(@$modifications['locality_type'])
       </div>
       <div class="col-sm-6">
         <label class="form-label">Geographical Coverage</label>
         {!! Form::select('geographical_coverage[]', $countries, @$detail['geographical_coverage'], ['class' => 'form-controll select2', 'multiple']) !!}
+        @modificationAlert(@$modifications['geographical_coverage'])
       </div>
       <div class="col-sm-6">
         <label class="form-label">Year Founded <span class="text-danger">*</span></label>
@@ -73,14 +84,17 @@
       <div class="col-sm-6">
         <label for="no-of-employee">Number Of Employees <span class="text-danger">*</span></label>
         {!! Form::select('no_of_employees', \App\Models\CompanyDetail::NoOfEmployee, @$detail['no_of_employees'], ['class' => 'form-control select2']) !!}
+        @modificationAlert(@$modifications['no_of_employees'])
       </div>
       <div class="col-sm-6">
         <label>Company Legal Form <span class="text-danger">*</span></label>
         {!! Form::select('legal_form', \App\Models\CompanyDetail::LegalForms, @$detail['legal_form'], ['class' => 'form-control select2']) !!}
+        @modificationAlert(@$modifications['legal_form'])
       </div>
       <div class="mb-3 col-12">
         <label for="company_desc" class="form-label">Company Description</label>
         <textarea class="form-control" name="description" id="company_desc" rows="3"> {{ @$detail['description'] }}</textarea>
+        @modificationAlert(@$modifications['description'])
       </div>
       <hr>
       <div class="col-sm-6">
@@ -132,6 +146,7 @@
         <label class="form-label">Please Provide Subsidiary Company(s)</label>
         {!! Form::select('subsidiaries[]', @$detail['subsidiaries'][0] ? array_combine(@$detail['subsidiaries'], @$detail['subsidiaries']) : [],
           @$detail['subsidiaries'], ['class' => 'form-select select2', 'multiple', 'data-tags' => 'true']) !!}
+          @modificationAlert(@$modifications['subsidiaries'])
       </div>
       <input class="d-none" type="text" name="submit_type">
       <div class="d-flex justify-content-between">

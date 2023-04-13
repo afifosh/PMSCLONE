@@ -22,7 +22,7 @@ class KycDocument extends Model
     'date' => ['date'],
     'email' => ['email', 'max:255'],
     'file' => ['file', 'mimeTypes:image/*'],
-    'number' => ['numeric', 'max:255'],
+    'number' => ['digits_between:0,255'],
     'tel' => ['numeric', 'max:255'],
     'text' => ['string', 'max:255'],
     'textarea' => ['string', 'max:255']

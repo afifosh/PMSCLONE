@@ -16,8 +16,8 @@
                 <h6 class="fw-semibold mb-0">{{$contact['first_name']}} {{$contact['last_name']}}</h6>
                 <small>{{$contact['position']}}</small>
               </span>
-              <span class="badge bg-label-{{(!$contact_original->modifications->count() && $contact['id']) ? 'success' : 'warning'}}">
-                {{$contact['id'] ? ($contact_original->modifications->count() ? 'Partially Approved' : 'Approved') : 'Pending Approval'}}
+              <span class="badge bg-label-{{(!$contact_original->modifications->count() && $contact['id']) ? 'success' : (($contact_original->modifications->count() && $contact_original->modifications[0]->disapprovals->count()) ? 'danger' : 'warning')}}">
+                {{$contact['id'] ? ($contact_original->modifications->count() ? (($contact_original->modifications->count() && $contact_original->modifications[0]->disapprovals->count()) ? 'Rejected' : 'Partial Approved') : 'Approved') : 'Pending Approval'}}
               </span>
             </span>
             <span class="custom-option-body">

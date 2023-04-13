@@ -29,7 +29,8 @@ class CompanyProfileController extends Controller
       $data['accountsStatus'] = auth()->user()->company->getBankAccountsStatus();
     }
 
-    return request()->ajax() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
+    return request()->ajax() ? (auth()->user()->company->isHavingPendingProfile() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
+    : $this->sendRes('success', ['view_data' =>  view('pages.company-profile.new.detailed-content.details', $data)->render()]))
       : ($data['isHavingPendingProfile'] ? view('pages.company-profile.edit', $data) : view('pages.company-profile.new.edit', $data));
 
   }
@@ -73,8 +74,7 @@ class CompanyProfileController extends Controller
       auth()->user()->company->detail()->create($att);
     }
 
-    return $request->submit_type == 'submit' ? $this->sendRes('Added Successfully', ['event' => 'functionCall', 'function' => 'triggerNext'])
-      : $this->sendRes('Saved As Draft', []);
+    return $this->sendRes('Added Successfully', ['event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 1]);
   }
 
   protected function makeData($request, $fileRepo)

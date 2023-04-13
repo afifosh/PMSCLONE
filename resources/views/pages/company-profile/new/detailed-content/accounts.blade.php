@@ -13,8 +13,8 @@
           <label class="form-check-label custom-option-content">
             <span class="custom-option-header mb-2">
               <h6 class="fw-semibold mb-0">{{$account['name']}}</h6>
-              <span class="badge bg-label-{{(!$account_original->modifications->count() && $account['id']) ? 'success' : 'warning'}}">
-                {{$account['id'] ? ($account_original->modifications->count() ? 'Partially Approved' : 'Approved') : 'Pending Approval'}}
+              <span class="badge bg-label-{{(!$account_original->modifications->count() && $account['id']) ? 'success' : (($account_original->modifications->count() && $account_original->modifications[0]->disapprovals->count()) ? 'danger' : 'warning')}}">
+                {{$account['id'] ? ($account_original->modifications->count() ? (($account_original->modifications->count() && $account_original->modifications[0]->disapprovals->count()) ? 'Rejected' : 'Partial Approved') : 'Approved') : 'Pending Approval'}}
               </span>
             </span>
             <span class="custom-option-body">

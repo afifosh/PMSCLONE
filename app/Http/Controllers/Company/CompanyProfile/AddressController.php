@@ -46,7 +46,7 @@ class AddressController extends Controller
     if(request()->type == 'pending_creation'){
       $data['address'] = auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address);
     }else{
-      $data['address'] = auth()->user()->company->addresses()->findOrFail($address);
+      $data['address'] = auth()->user()->company->addresses()->with('modifications.disapprovals')->findOrFail($address);
     }
     $data['countries'] = Country::pluck('name', 'id');
     $data['options'] = ['disabled' => 'disabled'];
@@ -56,7 +56,7 @@ class AddressController extends Controller
   public function edit($address)
   {
     $data['address'] = request()->type == 'pending_creation' ? auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address)
-      : auth()->user()->company->addresses()->findOrFail($address);
+      : auth()->user()->company->addresses()->with('modifications.disapprovals')->findOrFail($address);
     $data['countries'] = Country::pluck('name', 'id');
 
     return $this->sendRes('success', ['view_data' =>  view('pages.company-profile.addresses.create', $data)->render()]);

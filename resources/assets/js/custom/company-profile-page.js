@@ -88,6 +88,7 @@ $(document).on('click', '.account-image-reset', function () {
   window.triggerStep = function (step) {
     if(wizardElm){
       companyProfileStepper.to(0);
+      step = step == 1 ? 2 : step;
       companyProfileStepper.to(step);
     }else if(step === 1){
       reload_company_details();
@@ -104,6 +105,15 @@ $(document).on('click', '.account-image-reset', function () {
     const url = $('#details-card').data('href');
     getData(url).then(function (resp) {
       $('#details-card').find('.collapse').html(resp.data.view_data);
+      $('#details-card').find('.select2').each(function () {
+        if (!$(this).data('select2')) {
+          var $this = $(this);
+          $this.wrap('<div class="position-relative"></div>');
+          $this.select2({
+            dropdownParent: $this.parent()
+          });
+        }
+      });
     });
   }
 
