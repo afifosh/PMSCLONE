@@ -264,7 +264,7 @@ class Company extends BaseModel
       && ($this->POCDetail()->exists() || $this->detail()->doesntHave('modifications.disapprovals')->count()) // has changed detail or approved detail
       && ($this->POCContact()->exists() || $this->contacts()->doesntHave('modifications.disapprovals')->count()) // has changed contact or approved contact
       && ($this->POCBankAccount()->exists() || $this->bankAccounts()->doesntHave('modifications.disapprovals')->count()) // has changed bank account or approved bank account
-      // && ($this->POCKycDoc()->exists() || $this->kycDocs()->doesntHave('modifications.disapprovals')->count()) // has changed kyc doc or approved kyc doc
+      && ($this->POCKycDoc()->exists() || $this->kycDocs()->doesntHave('modifications.disapprovals')->count()) // has changed kyc doc or approved kyc doc
       && $this->POCmodifications()->count(); // has changed something
   }
 
@@ -386,6 +386,24 @@ class Company extends BaseModel
       if ($this->COMBankAccount()->has('approvals', '>=', $level)->count() >= $this->COMBankAccount()->count())
         $status = 'approved';
       if ($this->COMBankAccount()->has('approvals', '<', $level)->exists())
+        $status = 'pending';
+    }
+
+    return $status;
+  }
+
+  public function getKycDocsStatus($level = '')
+  {
+    $status = 'pending';
+    if ($this->COMKycDoc()->has('disapprovals')->exists())
+      $status = 'rejected';
+    elseif (!$level) {
+      if ($this->kycDocs->count() && !$this->COMKycDoc()->where('active', 1)->exists())
+        $status = 'approved';
+    } else {
+      if ($this->COMKycDoc()->has('approvals', '>=', $level)->count() >= $this->COMKycDoc()->count())
+        $status = 'approved';
+      if ($this->COMKycDoc()->has('approvals', '<', $level)->exists())
         $status = 'pending';
     }
 

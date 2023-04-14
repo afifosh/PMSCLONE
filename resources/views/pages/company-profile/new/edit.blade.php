@@ -52,7 +52,7 @@
                 </div>
                 <div class="border fw-bold mt-2 d-flex justify-content-between p-2">
                     <span> 4. Verification Documents </span>
-                    <span class="text-{{ getCompanyStatusColor($addressesStatus) }}"><i class="{{getCompanyStatusIcon($addressesStatus)}} fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($kycDocsStatus) }}"><i class="{{getCompanyStatusIcon($kycDocsStatus)}} fa-lg"></i></span>
                 </div>
                 <div class="border fw-bold mt-2 d-flex justify-content-between p-2">
                     <span> 5. Bank Accounts </span>

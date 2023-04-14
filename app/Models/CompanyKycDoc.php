@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompanyKycDoc extends Model
 {
-    use HasFactory;
-    //  CompanyApprovalBaseLogic;
+    use HasFactory, CompanyApprovalBaseLogic;
 
     protected $fillable = [
         'company_id',

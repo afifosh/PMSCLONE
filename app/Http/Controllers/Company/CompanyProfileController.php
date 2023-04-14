@@ -27,6 +27,7 @@ class CompanyProfileController extends Controller
       $data['contactsStatus'] = auth()->user()->company->getContactsStatus();
       $data['addressesStatus'] = auth()->user()->company->getAddressesStatus();
       $data['accountsStatus'] = auth()->user()->company->getBankAccountsStatus();
+      $data['kycDocsStatus'] = auth()->user()->company->getKycDocsStatus();
     }
 
     return request()->ajax() ? (auth()->user()->company->isHavingPendingProfile() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
@@ -50,7 +51,9 @@ class CompanyProfileController extends Controller
     if(!$locality_type){
       return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
     }
-    $data['documents'] = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->get();
+    $data['requestable_documents'] = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->get();
+    $data['POC_documents'] = auth()->user()->company->POCKycDoc()->withCount('approvals', 'disapprovals')->get();
+    $data['approved_documents'] = auth()->user()->company->kycDocs()->with('modifications.approvals', 'modifications.disapprovals')->get();
 
     return view('pages.company-profile.new.detailed-content', $data);
   }

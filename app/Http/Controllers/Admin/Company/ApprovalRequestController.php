@@ -11,7 +11,9 @@ use App\Models\CompanyAddress;
 use App\Models\CompanyBankAccount;
 use App\Models\CompanyContact;
 use App\Models\CompanyDetail;
+use App\Models\CompanyKycDoc;
 use App\Models\Country;
+use App\Models\KycDocument;
 
 class ApprovalRequestController extends Controller
 {
@@ -45,6 +47,7 @@ class ApprovalRequestController extends Controller
     $data['contactsStatus'] = $company->getContactsStatus($level);
     $data['addressesStatus'] = $company->getAddressesStatus($level);
     $data['accountsStatus'] = $company->getBankAccountsStatus($level);
+    $data['kycDocStatus'] = $company->getKycDocsStatus($level);
     if (request()->tab == 'details' || request()->tab == null) {
       request()->tab = 'details';
       $data['legalForms'] = CompanyDetail::LegalForms;
@@ -75,9 +78,13 @@ class ApprovalRequestController extends Controller
       $data['approved_bank_accounts'] = $company->bankAccounts()->get();
       $data['fields'] = CompanyBankAccount::getFields();
     } elseif (request()->tab == 'documents') {
-      $data['fields'] = [];
+      $data['documents'] = $company->POCKycDoc()->withCount('approvals', 'disapprovals')->get();
+      $data['approved_documents'] = $company->kycDocs()->get();
+      $data['requestedDocs'] = KycDocument::whereIn('required_from', [3, $company->getPOCLocalityType()])->where('status', 1)->get();
+      $data['docModel'] = new CompanyKycDoc ();
     }
 
+    // dd($data);
     return view('admin.pages.company.approval-request.vertical.show', $data);
     return view('admin.pages.company.approval-request.show', $data);
   }

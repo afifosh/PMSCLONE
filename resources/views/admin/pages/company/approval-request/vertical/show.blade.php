@@ -47,7 +47,7 @@
                 </a>
                 <a href="{{ route('admin.approval-requests.level.companies.show', ['level' => request()->level, 'company' => request()->company, 'tab' => 'documents']) }}" class="border fw-bold mt-2 d-flex justify-content-between p-2 {{request()->tab == 'documents' ? 'bg-label-primary' : ''}}">
                     <span> 4. Verification Documents </span>
-                    <span class="text-{{ getCompanyStatusColor($addressesStatus) }}"><i class="{{getCompanyStatusIcon($addressesStatus)}} fa-lg"></i></span>
+                    <span class="text-{{ getCompanyStatusColor($kycDocStatus) }}"><i class="{{getCompanyStatusIcon($kycDocStatus)}} fa-lg"></i></span>
                 </a>
                 <a href="{{ route('admin.approval-requests.level.companies.show', ['level' => request()->level, 'company' => request()->company, 'tab' => 'bank-accounts']) }}" class="border fw-bold mt-2 d-flex justify-content-between p-2 {{request()->tab == 'bank-accounts' ? 'bg-label-primary' : ''}}">
                     <span> 5. Bank Accounts </span>
@@ -55,7 +55,7 @@
                 </a>
             </div>
         </div>
-        <div>
+        <div class="w-100">
           @include('admin.pages.company.approval-request.vertical.tabs.'.request()->tab)
         </div>
     </div>
