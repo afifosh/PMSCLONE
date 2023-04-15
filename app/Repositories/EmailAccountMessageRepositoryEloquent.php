@@ -785,7 +785,7 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
             try {
                 $storedMedias[] = $media = MediaUploader::fromSource($tmpFile)
                     ->toDirectory($message->getMediaDirectory())
-                    ->useFilename($filename = pathinfo($attachment->getFileName(), PATHINFO_FILENAME))
+                    ->useFilename($filename = $attachment->getFileName())
                     // Allow any extension
                     ->upload();
                 $message->attachMedia($media, [$tag]);

@@ -42,6 +42,7 @@ use App\Http\Controllers\Admin\EmailAccount\EmailAccountSync;
 use App\Http\Controllers\Admin\EmailAccount\SharedEmailAccountController;
 use App\Http\Controllers\Admin\EmailAccount\EmailAccountMessagesController;
 use App\Http\Controllers\Admin\EmailAccount\EmailAccountController;
+use App\Http\Controllers\Admin\MediaViewController;
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','adminVerified' , 'mustBeActive', CheckForLockMode::class)->group(function () {
   Route::get('/mail/accounts/{type}/{provider}/connect', [OAuthEmailAccountController::class, 'connect']);
@@ -204,6 +205,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
   });
 });
+Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
 
 Route::any('update-file/{file}', [OnlyOfficeController::class, 'updateFile'])->name('update-file');
 

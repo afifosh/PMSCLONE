@@ -21,6 +21,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Innoclapps\MailClient\ClientManager;
 use App\Innoclapps\MailClient\ConnectionType;
 use App\Contracts\Repositories\EmailAccountRepository;
+use App\Models\EmailAccountMessage;
 
 class EmailAccountRequest extends FormRequest
 {
@@ -69,6 +70,14 @@ class EmailAccountRequest extends FormRequest
      */
     protected function getEmailFieldRules()
     {
+        if(!$this->isMethod('PUT') && $this->isImapConnectionType()){
+            
+        $accounts=EmailAccount::where("email",'=',$this->email)->onlyTrashed()->get();
+        if($accounts->count()>0){
+           $account=$accounts->first();
+            EmailAccountMessage::where(["email_account_id"=>$account->id])->onlyTrashed()->forceDelete();
+            $account->forceDelete();
+        }}
         return  [
            'email',
            'max:191',

@@ -97,10 +97,10 @@ class CreateEmailAccountViaOAuth
      */
     protected function createEmailAccount($oAuthAccount)
     {
-        $accounts=EmailAccount::where("email",'=',$oAuthAccount->email)->withTrashed();
+        $accounts=EmailAccount::where("email",'=',$oAuthAccount->email)->onlyTrashed();
         if($accounts->count()>0){
            $account=$accounts->first();
-            EmailAccountMessage::where(["email_account_id"=>$account->id])->withTrashed()->forceDelete();
+            EmailAccountMessage::where(["email_account_id"=>$account->id])->onlyTrashed()->forceDelete();
             $account->forceDelete();
         }
         

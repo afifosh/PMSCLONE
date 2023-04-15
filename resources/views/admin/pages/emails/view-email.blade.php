@@ -119,11 +119,11 @@
         <input type="hidden" id="mail_type" value="compose"/>
       @if(count(json_decode(json_encode($message->attachments()),true))>0)
         <hr>
-        @foreach($message->attachments as $attachment)
       <p class="email-attachment-title mb-2">Attachments</p>
+        @foreach($message->attachments as $attachment)
       <div class="cursor-pointer">
               <i class="ti ti-file"></i>
-              <span class="align-middle ms-1">{{$attachment->filename}}</span>
+              <a href="{{$attachment->getDownloadUrl()}}" class="align-middle ms-1">{{$attachment->filename}}</a>
             </div>
             @endforeach
             @endif  

@@ -113,7 +113,7 @@
            else{
            for(var i=0; i<messages.length; i++){
           html+=`
-            <li `+(messages[i].is_read? 'style="color:lightgrey !important"':'')+` class="email-list-item" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
+            <li  class="email-list-item `+(messages[i].is_read? 'email-marked-read"':'')+`" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
               <div class="d-flex align-items-center">
                 <div class="form-check mb-0">
                   <input class="email-list-item-input form-check-input" data-id="`+messages[i].id+`" type="checkbox" id="email-`+messages[i].id+`">
@@ -126,8 +126,23 @@
                 <div class="email-list-item-meta ms-auto d-flex align-items-center" >`;
                 if(messages[i].attachments.length>0){
                   html+=`<span class="email-list-item-attachment ti ti-paperclip ti-xs cursor-pointer me-2 float-end float-sm-none"></span>`
-                } 
-                html+= `<small class="email-list-item-time text-muted" style="width: 140px;">`+moment(messages[i].date).format('MMMM D, YYYY h:mm A')+`</small>
+                }
+                const messageDate = moment(messages[i].date);
+const today = moment().startOf('day');
+const yesterday = moment().subtract(1, 'day').startOf('day');
+
+let displayDate;
+if (messageDate.isSame(today, 'd')) {
+  // If the message date is the same as today, show only the time
+  displayDate = messageDate.format('h:mm A');
+} else if (messageDate.isSame(yesterday, 'd')) {
+  // If the message date is yesterday, show 'Yesterday'
+  displayDate = 'Yesterday';
+} else {
+  // Otherwise, show the full date and time
+  displayDate = messageDate.format('MMMM D, YYYY h:mm A');
+} 
+                html+= `<small class="email-list-item-time text-muted" style="width: 170px; whitespace:nowrap; display:inline-block !important">`+displayDate+`</small>
                 </div>
               </div>
             </li>`;
