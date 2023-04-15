@@ -115,7 +115,6 @@ class EmailAccountsSyncCommand extends Command
     protected function getAccounts($repository)
     {
         $accounts = $repository->with(['oAuthAccount', 'folders'])->getSyncable();
-        \Log::info('accounts'.json_encode($accounts));
         if ($this->option('account')) {
             $accounts = $accounts->filter(function ($account) {
                 return $account->id === (int) $this->option('account');

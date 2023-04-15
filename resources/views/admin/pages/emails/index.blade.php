@@ -65,7 +65,7 @@
            }
             html+=`<a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">`+folders[i].display_name+`</span>
-            </a>`+(folders[i].unread_count!=0?'<span style="position:relative; padding:4px;transform:translate(0px, -10px);" class="badge bg-info rounded-pill badge-notifications notification-bell">'+folders[i].unread_count+'</span>':"")+``;
+            </a>`+(folders[i].unread_count!=0?'<div class="badge bg-label-primary rounded-pill badge-center">'+folders[i].unread_count+'</div>':"")+``;
             if(folders[i].parent_id!=null){
             html+='</div>';
            }
@@ -123,8 +123,11 @@
                   <span class="email-list-item-username me-2">`+(messages[i].from.name==null?messages[i].from.address:messages[i].from.name)+`</span>
                   <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
                 </div>
-                <div class="email-list-item-meta ms-auto d-flex align-items-center" >
-                  <small class="email-list-item-time text-muted" style="width: 140px;">`+moment(messages[i].date).format('MMMM D, YYYY h:mm A')+`</small>
+                <div class="email-list-item-meta ms-auto d-flex align-items-center" >`;
+                if(messages[i].attachments.length>0){
+                  html+=`<span class="email-list-item-attachment ti ti-paperclip ti-xs cursor-pointer me-2 float-end float-sm-none"></span>`
+                } 
+                html+= `<small class="email-list-item-time text-muted" style="width: 140px;">`+moment(messages[i].date).format('MMMM D, YYYY h:mm A')+`</small>
                 </div>
               </div>
             </li>`;

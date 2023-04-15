@@ -141,7 +141,6 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
     protected function syncAll($folder)
     {
         $remoteFolder = $this->findFolder($folder);
-        \Log::info('folder'.json_encode($remoteFolder));
         // Trash and spam folders are not synced on the initial sync
         // But we need to get the first history id from the first message so
         // we can store the history id in database as it was synced
