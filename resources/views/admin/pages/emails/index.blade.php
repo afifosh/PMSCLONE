@@ -11,6 +11,12 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-email.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/tagify/tagify.css')}}" />
 <style>
+  .selected-image-tag{
+    background-color: #f2f2f2;
+    padding: 5px;
+    border-radius: 5px;
+    margin:3px;
+  }
   #email-editor{
     max-height: 300px;
     overflow: auto;
@@ -297,6 +303,48 @@ if (messageDate.isSame(today, 'd')) {
   }
   }
 </script>
+<script>
+const fileInput = document.getElementById('file-input');
+const selectedImagesContainer = document.getElementById('selected-images');
+
+fileInput.addEventListener('change', (event) => {
+  // Remove all existing tags and cross signs from the container
+  selectedImagesContainer.innerHTML = '';
+
+  // Get the selected files from the input field
+  const files = event.target.files;
+
+  // Loop through the selected files
+  for (const file of files) {
+    // Create a new tag element
+    const tag = document.createElement('span');
+    tag.innerText = file.name;
+    tag.classList.add('selected-image-tag');
+
+    // Create a new cross sign element
+    const crossSign = document.createElement('i');
+    crossSign.classList.add('ti', 'ti-trash', 'cursor-pointer', 'ms-2');
+    crossSign.addEventListener('click', () => {
+      // Remove the tag from the container
+      selectedImagesContainer.removeChild(tag);
+
+      // Remove the corresponding file from the input field
+      const newFiles = Array.from(fileInput.files).filter((f) => f !== file);
+      const dataTransfer = new DataTransfer();
+      newFiles.forEach((f) => {
+        dataTransfer.items.add(f);
+      });
+      fileInput.files = dataTransfer.files;
+    });
+
+    // Add the tag and cross sign to the container
+    tag.appendChild(crossSign);
+
+    selectedImagesContainer.appendChild(tag);
+  }
+});
+
+</script>
 <!-- <script>
   var input = $('.tags');
 input.each(function(){
@@ -483,6 +531,7 @@ input.each(function(){
                 </div>
                 <label for="file-input"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
                 <input type="file" name="attachments" multiple class="d-none" id="file-input">
+                <div id="selected-images"></div>
               </div>
             </div>
           </form>
