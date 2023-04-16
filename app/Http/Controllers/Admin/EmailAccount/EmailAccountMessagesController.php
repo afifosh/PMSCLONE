@@ -314,7 +314,8 @@ class EmailAccountMessagesController extends Controller
     {
         if ($request->attachments) {
             // $attachments = $this->media->getByDraftId($request->attachments);
-            $pendingMedia = MediaUploader::fromSource($request->attachments)
+            foreach($request->attachments as $attachment){
+            $pendingMedia = MediaUploader::fromSource($attachment)
             ->toDirectory('pending-attachments')
             ->upload();
             // foreach ($media as $pendingMedia) {
@@ -323,6 +324,7 @@ class EmailAccountMessagesController extends Controller
                     $pendingMedia->getDiskPath(),
                     $pendingMedia->filename . '.' . $pendingMedia->extension
                 );
+            }
             // }
         }
     }

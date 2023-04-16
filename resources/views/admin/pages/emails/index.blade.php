@@ -523,14 +523,14 @@ input.each(function(){
             <hr class="container-m-nx mt-0 mb-2">
             <div class="email-compose-actions d-flex justify-content-between align-items-center mt-3 mb-3">
               <div class="d-flex align-items-center">
-                <div class="btn-group">
+                <div class="">
                   <button type="button" id="send-email" class="btn btn-primary"><i class="ti ti-send ti-xs me-1"></i>Send</button>
                   <button type="button" id="reply-email" onclick="replyEmail(this,$(this).data('id'));" class="btn btn-primary " style="display:none !important"><i class="ti ti-send ti-xs me-1"></i>Reply</button>
                   <button type="button" id="forward-email" onclick="forwardEmail(this,$(this).data('id'));" class="btn btn-primary " style="display:none !important"><i class="ti ti-send ti-xs me-1"></i>Forward</button>
                 
                 </div>
                 <label for="file-input"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
-                <input type="file" name="attachments" multiple class="d-none" id="file-input">
+                <input type="file" name="attachments[]" multiple class="d-none" id="file-input">
                 <div id="selected-images"></div>
               </div>
             </div>
