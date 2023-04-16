@@ -48,8 +48,30 @@ class Company extends BaseModel
     $completed += $this->POCContact()->exists() || $this->contacts->count() ? 1 : 0;
     $completed += $this->POCAddress()->exists() || $this->addresses->count() ? 1 : 0;
     $completed += $this->POCBankAccount()->exists() || $this->bankAccounts->count() ? 1 : 0;
-    $completed += $this->POCKycDoc()->exists() || $this->kycDocs->count() ? 1 : 0;
+    $completed += $this->isMendatoryKycDocsSubmitted() ? 1 : 0;
+
     return $completed;
+  }
+
+  public function isMendatoryKycDocsSubmitted()
+  {
+    return $this->getSubmittedMendatoryDocsCount() >= count($this->getMendatoryKycDocs());
+  }
+
+  public function getSubmittedMendatoryDocsCount()
+  {
+    $count = 0;
+    foreach ($this->getMendatoryKycDocs() as $i => $doc_id) {
+      $this->POCKycDoc()->whereJsonContains('modifications->kyc_doc_id->modified', $doc_id)->count() || $this->kycDocs->where('kyc_doc_id', $doc_id)->count() ? $count++ : '';
+    }
+
+    return $count;
+  }
+
+  public function getMendatoryKycDocs()
+  {
+    $locality_type = $this->getPOCLocalityType();
+    return KycDocument::whereIn('required_from', [3, $locality_type])->where('is_mendatory', 1)->where('status', 1)->pluck('id')->toArray();
   }
 
   public function addedBy()
@@ -264,7 +286,7 @@ class Company extends BaseModel
       && ($this->POCDetail()->exists() || $this->detail()->doesntHave('modifications.disapprovals')->count()) // has changed detail or approved detail
       && ($this->POCContact()->exists() || $this->contacts()->doesntHave('modifications.disapprovals')->count()) // has changed contact or approved contact
       && ($this->POCBankAccount()->exists() || $this->bankAccounts()->doesntHave('modifications.disapprovals')->count()) // has changed bank account or approved bank account
-      && ($this->POCKycDoc()->exists() || $this->kycDocs()->doesntHave('modifications.disapprovals')->count()) // has changed kyc doc or approved kyc doc
+      && ($this->POCKycDoc()->exists() || $this->kycDocs()->doesntHave('modifications.disapprovals')->count()) && $this->isMendatoryKycDocsSubmitted() // has changed kyc doc or approved kyc doc
       && $this->POCmodifications()->count(); // has changed something
   }
 
@@ -406,6 +428,23 @@ class Company extends BaseModel
       if ($this->COMKycDoc()->has('approvals', '<', $level)->exists())
         $status = 'pending';
     }
+
+    return $status;
+  }
+
+  public function getOverallStatus($level)
+  {
+    $status = 0;
+    if ($this->getDetailsStatus($level) != 'pending')
+      $status += 1;
+    if ($this->getAddressesStatus($level) != 'pending')
+      $status += 1;
+    if ($this->getContactsStatus($level) != 'pending')
+      $status += 1;
+    if ($this->getBankAccountsStatus($level) != 'pending')
+      $status += 1;
+    if ($this->getKycDocsStatus($level) != 'pending')
+      $status += 1;
 
     return $status;
   }

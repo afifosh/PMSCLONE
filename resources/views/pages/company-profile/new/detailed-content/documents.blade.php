@@ -1,8 +1,11 @@
 <div class="card-body pt-0">
   <hr>
-  <div class="row">
+  {{-- <div class="row">
     {!! Form::open(['route' => ['company.kyc-documents.update', 'kyc_document' => 0],'files' => true, 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
-    @forelse ($requestable_documents as $document)
+    @php
+        request()->document_id = request()->document_id ?? $requestable_documents[0]->id;
+    @endphp
+    @forelse ($requestable_documents->where('id', request()->document_id) as $document)
     @php
       $doc = $approved_documents->where('kyc_doc_id', $document->id)->first();
       $disapprovals = [];
@@ -53,20 +56,23 @@
         @empty
         @endforelse
       </div>
-        @foreach ($document->fields as $index => $field)
-            @if ($field['type'] == 'textarea')
-                <div class="form-group col-6 mt-2">
-                    <label for="fields_{{ $loop->index }}" class="required">{{ $field['label'] }}</label>
-                    <textarea name="doc_{{$document->id}}_field_{{$loop->index}}_{{$field['type']}}" id="fields_{{ $loop->index }}" class="form-control h-25" required></textarea>
-                </div>
-            @else
-                <div class="form-group col-6 mt-2">
-                    <label for="fields_{{ $loop->index }}" class="required">{{ $field['label'] }}</label>
-                    <input type="{{ $field['type'] }}" name="doc_{{$document->id}}_field_{{$loop->index}}_{{$field['type']}}" id="fields_{{ $loop->index }}"
-                        class="form-control" @if ($field['type'] == 'file') accept=".jpg,.jpeg,.png" @endif value="{{$doc['fields']['doc_'.$document->id.'_field_'.$index.'_'.$field['type']]}}" required>
-                    @modificationAlert(@$modifications['fields']['doc_'.$document->id.'_field_'.$index.'_'.$field['type']] != @$doc_org['fields']['doc_'.$document->id.'_field_'.$index.'_'.$field['type']])
-                </div>
+        @foreach ($document->fields as $field)
+         @foreach($doc['fields'] as $doc_field)
+            @if($field['id'] == $doc_field['id'])
+              @if ($field['type'] == 'textarea')
+                  <div class="form-group col-12 mt-2">
+                      <label for="fields_{{ $loop->index }}" class="required">{{ $doc_field['label'] }}</label>
+                      <textarea name="doc_{{$document->id}}_field_{{$loop->index}}_{{$field['type']}}" id="fields_{{ $loop->index }}" class="form-control h-25" required></textarea>
+                  </div>
+              @else
+                  <div class="form-group col-12 mt-2">
+                      <label for="fields_{{ $loop->index }}" class="required">{{ $doc_field['label'] }}</label>
+                      <input type="{{ $field['type'] }}" name="doc_{{$document->id}}_field_{{$loop->index}}_{{$field['type']}}" id="fields_{{ $loop->index }}"
+                          class="form-control" @if ($field['type'] == 'file') accept=".jpg,.jpeg,.png" @endif value="{{$doc_field['value']}}" required>
+                  </div>
+              @endif
             @endif
+            @endforeach
         @endforeach
     </div>
     @empty
@@ -80,5 +86,8 @@
       </div>
     @endif
     {!! Form::close() !!}
+  </div> --}}
+  <div id="company-documents">
+    @include('pages.company-profile.document.create')
   </div>
 </div>

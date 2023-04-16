@@ -48,6 +48,7 @@ class ApprovalRequestController extends Controller
     $data['addressesStatus'] = $company->getAddressesStatus($level);
     $data['accountsStatus'] = $company->getBankAccountsStatus($level);
     $data['kycDocStatus'] = $company->getKycDocsStatus($level);
+    $data['overAllStatus'] = $company->getOverallStatus($level);
     if (request()->tab == 'details' || request()->tab == null) {
       request()->tab = 'details';
       $data['legalForms'] = CompanyDetail::LegalForms;
@@ -84,7 +85,6 @@ class ApprovalRequestController extends Controller
       $data['docModel'] = new CompanyKycDoc ();
     }
 
-    // dd($data);
     return view('admin.pages.company.approval-request.vertical.show', $data);
     return view('admin.pages.company.approval-request.show', $data);
   }
@@ -94,6 +94,8 @@ class ApprovalRequestController extends Controller
     foreach (array_unique($request->modification_ids) as $modification_id) {
       $mod = $company->POCmodifications()->whereId($modification_id)->first();
       abort_if($level != $company->approval_level || !$mod, 404);
+      if(!$mod->isApprovable($level))
+         return $this->sendErr('Unauthorized');
       if ($request->boolean('approval_status.' . $modification_id)) {
         auth()->user()->approve($mod, @$request->comment[$modification_id]);
         $message = 'Approval Successfull';

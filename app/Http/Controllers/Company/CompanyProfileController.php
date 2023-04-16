@@ -38,6 +38,10 @@ class CompanyProfileController extends Controller
 
   public function detailedContent()
   {
+    $locality_type = auth()->user()->company->getPOCLocalityType();
+    if(!$locality_type){
+      return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
+    }
     $data['countries'] = Country::pluck('name', 'id');
     $data['POCDetail'] = auth()->user()->company->POCDetail()->exists() ? auth()->user()->company->POCDetail()->with('approvals', 'disapprovals')->latest()->first() : null;
     $data['detail'] = $data['POCDetail'] ? $this->transformModifications($data['POCDetail']->modifications) : auth()->user()->company->detail()->with('modifications')->first() ?? null;
@@ -47,13 +51,14 @@ class CompanyProfileController extends Controller
     $data['pending_addresses'] = auth()->user()->company->POCAddress()->where('is_update', false)->get();
     $data['bankAccounts'] = auth()->user()->company->bankAccounts;
     $data['pending_creation_accounts'] = auth()->user()->company->POCBankAccount()->where('is_update', false)->get();
-    $locality_type = auth()->user()->company->getPOCLocalityType();
-    if(!$locality_type){
-      return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
-    }
-    $data['requestable_documents'] = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->get();
+    $data['requestable_documents'] = $data['documents'] = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->get();
     $data['POC_documents'] = auth()->user()->company->POCKycDoc()->withCount('approvals', 'disapprovals')->get();
     $data['approved_documents'] = auth()->user()->company->kycDocs()->with('modifications.approvals', 'modifications.disapprovals')->get();
+    $data['isPendingProfile'] = auth()->user()->company->isHavingPendingProfile();
+    request()->document_id = request()->document_id ?? $data['requestable_documents'][0]->id;
+    // $data['requestable_documents'] = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->get();
+    // $data['POC_documents'] = auth()->user()->company->POCKycDoc()->withCount('approvals', 'disapprovals')->get();
+    // $data['approved_documents'] = auth()->user()->company->kycDocs()->with('modifications.approvals', 'modifications.disapprovals')->get();
 
     return view('pages.company-profile.new.detailed-content', $data);
   }

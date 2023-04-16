@@ -209,6 +209,14 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
   e.preventDefault();
   var current = $(this);
   current.addClass('disabled');
+  current.prepend('<span class="spinner-border me-1" role="status" aria-hidden="true"></span>');
+  current.closest('form').find('[data-form="ajax-form"]').addClass('disabled');
+  const preAjaxAction = current.attr('data-preAjaxAction');
+  if (typeof window[preAjaxAction] == "function") {
+    const params = current.attr('data-preAjaxParams');
+    console.log(params);
+    window[preAjaxAction](params);
+  }
   var form = $(this).closest('form');
   var url = form.attr('action');
 
@@ -266,7 +274,8 @@ for (const input of inputs) {
               : null;
           }
           //console.log(current.closest('.modal').modal("hide"));
-          current.removeClass('disabled');
+          current.closest('form').find('[data-form="ajax-form"]').removeClass('disabled');
+          current.find('.spinner-border').remove();
           if(data.data.close == 'globalModal'){
             $('#globalModal').modal('hide');
           }else if(data.data.close == 'modal'){
@@ -279,11 +288,10 @@ for (const input of inputs) {
           toast_danger(data.message);
         }
       }
-
-      current.removeClass('disabled');
     },
     error: function (error) {
-      current.removeClass('disabled');
+      current.closest('form').find('[data-form="ajax-form"]').removeClass('disabled');
+      current.find('.spinner-border').remove();
       // toast_danger(error.statusText);
       if(error.responseJSON && error.responseJSON.errors)
       {

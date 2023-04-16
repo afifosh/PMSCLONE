@@ -18,6 +18,11 @@ return new class extends Migration
           $table->string('title');
           $table->string('required_from');
           $table->boolean('status');
+          $table->boolean('is_mendatory')->default(false);
+          $table->string('description')->nullable();
+          $table->boolean('is_expirable')->default(false);
+          $table->string('expiry_date_title')->nullable();
+          $table->boolean('is_expiry_date_required')->default(false);
           $table->json('fields')->nullable();
           $table->timestamps();
         });

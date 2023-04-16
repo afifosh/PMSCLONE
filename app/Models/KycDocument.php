@@ -13,6 +13,11 @@ class KycDocument extends Model
     'title',
     'required_from',
     'status',
+    'is_mendatory',
+    'description',
+    'is_expirable',
+    'expiry_date_title',
+    'is_expiry_date_required',
     'fields',
   ];
 
@@ -29,6 +34,9 @@ class KycDocument extends Model
   ];
 
   protected $casts = [
+    'is_expirable' => 'boolean',
+    'is_mendatory' => 'boolean',
+    'is_expiry_date_required' => 'boolean',
     'fields' => 'array',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',

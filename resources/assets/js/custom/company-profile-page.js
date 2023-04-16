@@ -138,6 +138,23 @@ $(document).on('click', '.account-image-reset', function () {
     });
   }
 
+  $(document).on('click', '[data-toggle-view]', function () {
+    const target = $(this).data('toggle-view');
+    const url = $(this).data('href');
+    getData(url).then(function (resp) {
+      $(target).html(resp.data.view_data);
+      $(target).find('.select2').each(function () {
+        if (!$(this).data('select2')) {
+          var $this = $(this);
+          $this.wrap('<div class="position-relative"></div>');
+          $this.select2({
+            dropdownParent: $this.parent()
+          });
+        }
+      });
+    });
+  });
+
   function getData(url) {
     return $.ajax({
       url: url,

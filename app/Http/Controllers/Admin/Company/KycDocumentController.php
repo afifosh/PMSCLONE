@@ -24,7 +24,9 @@ class KycDocumentController extends Controller
 
   public function store(KycDocumentUpdateRequest $request)
   {
-    KycDocument::create($request->only(['title', 'status', 'required_from', 'fields']));
+    $data['fields'] = $this->addIDs($request->fields);
+    $data['is_expirable'] = $request->boolean('is_expirable');
+    KycDocument::create($data + $request->validated());
 
     return $this->sendRes(__('Kyc Document Added Successfully'), ['event' => 'redirect', 'url' => route('admin.kyc-documents.index')]);
   }
@@ -38,8 +40,19 @@ class KycDocumentController extends Controller
 
   public function update(KycDocumentUpdateRequest $request, KycDocument $kyc_document)
   {
-    $kyc_document->update($request->only(['title', 'status', 'required_from', 'fields']));
+    $data['fields'] = $this->addIDs($request->fields);
+    $data['is_expirable'] = $request->boolean('is_expirable');
+    $kyc_document->update($data + $request->validated());
 
     return $this->sendRes(__('Kyc Document Updated Successfully'), ['event' => 'redirect', 'url' => route('admin.kyc-documents.index')]);
+  }
+
+  protected function addIDs($fields)
+  {
+    foreach ($fields as $key => $field) {
+      $fields[$key]['id'] = @$fields[$key]['id'] ?? uniqid();
+    }
+
+    return $fields;
   }
 }

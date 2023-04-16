@@ -29,6 +29,34 @@
                             <label for="status" class="required">{{ __('Status:') }}</label>
                             {!! Form::select('status', ['1' => 'Active', '0' => 'Inactive'], null, ['class' => 'form-control select2']) !!}
                         </div>
+                        <div class="form-group mb-2">
+                            <label for="is_mendatory" class="required">{{ __('Is Mendatory:') }}</label>
+                            {!! Form::select('is_mendatory', ['1' => 'Yes', '0' => 'No'], null, ['class' => 'form-control select2']) !!}
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="description" class="required">{{ __('Description:') }}</label>
+                            {!! Form::textarea('description', null, ['class' => 'form-control', 'rows' => 2]) !!}
+                        </div>
+                        <div class="col-12 my-2">
+                          <label class="switch">
+                            {{ Form::checkbox('is_expirable', 1, $kyc_document->is_expirable,['class' => 'switch-input'])}}
+                            <span class="switch-toggle-slider">
+                              <span class="switch-on"></span>
+                              <span class="switch-off"></span>
+                            </span>
+                            <span class="switch-label">Is having Exipiry date?</span>
+                          </label>
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label class="required">{{ __('Expiry Date Title:') }}</label>
+                            {!! Form::text('expiry_date_title', null, ['class' => 'form-control', 'rows' => 2]) !!}
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label for="is_expiry_date_required" class="required">{{ __('Is Expiry Date Required:') }}</label>
+                            {!! Form::select('is_expiry_date_required', ['0' => 'No', '1' => 'Yes'], null, ['class' => 'form-control select2']) !!}
+                        </div>
 
                         <button class="btn btn-primary basicbtn float-right" data-form="ajax-form">
                             <i class="fas fa-save"></i>
@@ -53,6 +81,7 @@
                               <div class="input-group d-flex flex-nowrap flex-row">
                                   <div class="form">
                                     {!! Form::text('fields[][label]', $field['label'], ['class' => 'form-control']) !!}
+                                    {!! Form::hidden('fields[][id]', @$field['id'], ['class' => 'form-control']) !!}
                                   </div>
                                   <div>
                                     {!! Form::select('fields[][type]', array_combine($types, array_map('ucwords',$types)), $field['type'], ['class' => 'form-control']) !!}
