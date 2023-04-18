@@ -8,7 +8,8 @@ use App\Http\Controllers\Company\CompanyProfile\ContactController;
 use App\Http\Controllers\Company\CompanyProfile\DocumentController;
 use App\Http\Controllers\Company\CompanyProfileController;
 use App\Http\Controllers\Company\DashboardController;
-use App\Http\Controllers\company\InvitationController;
+
+use App\Http\Controllers\Company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
 use App\Http\Controllers\NotificationController;
@@ -16,6 +17,9 @@ use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+
+
+use App\Http\Controllers\MailTrackerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +53,9 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
 
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
+    Route::get('mt/o/{hash}', [MailTrackerController::class, 'opens'])->name('mail-tracker.open');
+Route::get('mt/l', [MailTrackerController::class, 'link'])->name('mail-tracker.link');
+
 
     Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
       Route::get('/', 'editDetails')->name('editDetails');

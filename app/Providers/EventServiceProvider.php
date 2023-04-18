@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\EmailAccountMessageCreated;
+use App\Innoclapps\OAuth\Events\OAuthAccountConnected;
 use App\Listeners\BouncedEmail;
+use App\Listeners\CreateEmailAccountViaOAuth;
 use App\Listeners\EmailDelivered;
 use App\Listeners\EmailLinkClicked;
 use App\Listeners\EmailSent;
@@ -23,6 +26,13 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        OAuthAccountConnected::class => [
+            CreateEmailAccountViaOAuth::class,
+        ],
+        // EmailAccountMessageCreated::class => [
+        //     CreateContactFromEmailAccountMessage::class,
+        //     AttachEmailAccountMessageToContact::class,
+        // ],
         'jdavidbakr\MailTracker\Events\EmailSentEvent' => [
             EmailSent::class,
         ],

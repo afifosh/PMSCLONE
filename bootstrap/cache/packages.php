@@ -1,4 +1,11 @@
 <?php return array (
+  'akaunting/laravel-money' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Akaunting\\Money\\Provider',
+    ),
+  ),
   'barryvdh/laravel-debugbar' => 
   array (
     'providers' => 
@@ -158,6 +165,25 @@
     'providers' => 
     array (
       0 => 'Pion\\Laravel\\ChunkUpload\\Providers\\ChunkUploadServiceProvider',
+    ),
+  ),
+  'plank/laravel-mediable' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Plank\\Mediable\\MediableServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'MediaUploader' => 'Plank\\Mediable\\Facades\\MediaUploader',
+      'ImageManipulator' => 'Plank\\Mediable\\Facades\\ImageManipulator',
+    ),
+  ),
+  'plank/laravel-metable' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Plank\\Metable\\MetableServiceProvider',
     ),
   ),
   'rappasoft/laravel-authentication-log' => 
