@@ -5,8 +5,9 @@
     $modifications = transformModifiedData($detail->modifications[0]->modifications);
     $detail = $modifications + $detail->toArray();
   }
-  $status_color = (is_array($detail_original) || !$detail_original) ? 'warning' : ($detail_original->modifications->count() ? ($detail_original->modifications[0]->disapprovals->count() ? 'danger' : 'warning') : 'success');
-  $status = (is_array($detail_original) || !$detail_original) ? 'Pending Approval' : ($detail_original->modifications->count() ? ($detail_original->modifications[0]->disapprovals->count() ? 'Rejected' : 'Partial Approved') : 'Approved');
+  //$status_color = (is_array($detail_original) || !$detail_original) ? 'warning' : ($detail_original->modifications->count() ? ($detail_original->modifications[0]->disapprovals->count() ? 'danger' : 'warning') : 'success');
+  $status = $detailsStatus;//(is_array($detail_original) || !$detail_original) ? 'Pending Approval' : ($detail_original->modifications->count() ? ($detail_original->modifications[0]->disapprovals->count() ? 'Rejected' : 'Partial Approved') : 'Approved');
+  $status_color = getCompanyStatusColor($status);
 @endphp
 <div class="card-body pt-0">
   <hr>
@@ -46,7 +47,7 @@
         </div>
       </div>
       <span class="badge bg-label-{{$status_color}} align-self-center">
-        {{$status}}
+        {{ucwords($status)}}
       </span>
     </div>
     <hr>

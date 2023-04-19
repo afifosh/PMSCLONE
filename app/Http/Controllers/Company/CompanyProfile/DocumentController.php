@@ -8,9 +8,19 @@ use App\Models\CompanyKycDoc;
 use App\Models\KycDocument;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
+use Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException;
+use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
+use Throwable;
 
 class DocumentController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('companyMustBeEditable:true')->except(['index', 'show']);
+  }
+
   public function index(Request $request)
   {
     $locality_type = auth()->user()->company->getPOCLocalityType();
@@ -22,8 +32,13 @@ class DocumentController extends Controller
     $data['approved_documents'] = auth()->user()->company->kycDocs()->with('modifications.approvals', 'modifications.disapprovals')->get();
     $data['isPendingProfile'] = auth()->user()->company->isHavingPendingProfile();
     request()->document_id = request()->document_id ?? $data['requestable_documents'][0]->id;
-    $view_data = $data['isPendingProfile'] ? view('pages.company-profile.document.create', $data)->render()
-      : view('pages.company-profile.new.detailed-content.documents', $data)->render();
+    if($request->fields_only){
+      $data['document'] = $data['documents']->where('id', $request->document_id)->first();
+      $view_data = view('pages.company-profile.document.fields', $data)->render();
+    }else{
+      $view_data = view('pages.company-profile.document.create', $data)->render();
+    }
+      // : view('pages.company-profile.new.detailed-content.documents', $data)->render();
 
     return $this->sendRes('success', ['view_data' => $view_data]);
   }
@@ -40,7 +55,8 @@ class DocumentController extends Controller
     foreach ($document->fields as $field) {
       if ($field['type'] == 'file') {
         $path = CompanyKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
-        $field['value'] = $path . '/' . $fileRepository->addAttachment($request->file('fields.'.$field['id']), $path, 'public');
+        Storage::move(KycDocument::TEMP_PATH.'/'.auth()->user()->company_id.'/'.$request->{'fields.' . $field['id']}, $path . '/'.$request->{'fields.' . $field['id']});
+        $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
       } else {
         $field['value'] = $request->{'fields.' . $field['id']};
       }
@@ -65,15 +81,16 @@ class DocumentController extends Controller
     if ($document) {
       $final_fields = [];
       $data = [];
-      foreach ($document->fields as $i => $field) {
+      foreach ($document->fields as $field) {
         if ($field['type'] == 'file') {
           $path = CompanyKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
-          $field['value'] = $path . '/' . $fileRepository->addAttachment($request->file('fields.'.$field['id']), $path, 'public');
+          Storage::move(KycDocument::TEMP_PATH.'/'.auth()->user()->company_id.'/'.$request->{'fields.' . $field['id']}, $path . '/'.$request->{'fields.' . $field['id']});
+          $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
         } else {
           $field['value'] = $request->{'fields.' . $field['id']};
         }
+        $final_fields[] = $field;
       }
-      $final_fields[] = $field;
       if($document->is_expirable){
         $data['expiry_date'] = $request->expiry_date;
       }
@@ -93,6 +110,45 @@ class DocumentController extends Controller
   protected function triggerNextDoc($message, $locality_type, $request)
   {
     $documents = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->where('id', '!=', $request->document_id)->get();
-    return $this->sendRes($message, ['event' => 'functionCall', 'function' => 'triggerNextDoc', 'params' => @$documents[0]->id ?? 0]);
+
+    return $this->sendRes($message, ['event' => 'functionCall', 'function' => 'triggerNextDoc', 'function_params' => @$documents[0]->id ?? -1]);
+  }
+
+  public function uploadDocument(Request $request, FileUploadRepository $file_repo){
+    $request->validate([
+      'file' => 'required|mimetypes:text/plain,application/*,image/*,video/*,audio/*'
+    ]);
+
+    $receiver = new FileReceiver("file", $request, HandlerFactory::classFromRequest($request));
+    // check if the upload is success, throw exception or return response you need
+    if ($receiver->isUploaded() === false) {
+      throw new UploadMissingFileException();
+    }
+    // receive the file
+    $save = $receiver->receive();
+
+    // check if the upload has finished (in chunk mode it will send smaller files)
+    if ($save->isFinished()) {
+      // save the file and return any response you need, current example uses `move` function. If you are
+      // not using move, you need to manually delete the file by unlink($save->getFile()->getPathname())
+      return $this->saveFile($save->getFile(), $file_repo);
+    }
+
+    // we are in chunk mode, lets send the current progress
+    /** @var AbstractHandler $handler */
+    $handler = $save->handler();
+
+    return response()->json([
+      "done" => $handler->getPercentageDone(),
+      'status' => true
+    ]);
+  }
+
+  public function saveFile($file, FileUploadRepository $file_repo)
+  {
+    $path = KycDocument::TEMP_PATH . DIRECTORY_SEPARATOR . auth()->user()->company_id;
+    $file_path = $file_repo->addAttachment($file, $path);
+
+    return $this->sendRes('Uploaded Successfully', ['file_path' => $file_path]);
   }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Mime\MimeTypeExtensionGuesser;
 
 if (!function_exists('formatDateTime')) {
@@ -46,6 +47,17 @@ if(!function_exists('transformModifiedData')) { // Get modified data from modidi
   }
 }
 
+function collectModifiedFields($modifications)
+{
+  $mods = [];
+  foreach ($modifications['fields']['modified'] as $key => $modified_field) {
+    // dd($modified_field['value'], $modifications['fields']['original'][$key]['value']);
+    if($modified_field['value'] != $modifications['fields']['original'][$key]['value'])
+    $mods['fields'][$modified_field['id']] = $modified_field;
+  }
+
+  return $mods;
+}
 function getCompanyStatusIcon($status)
 {
   switch ($status) {
@@ -81,3 +93,34 @@ function getCompanyStatusColor($status)
       break;
   }
 }
+
+function array_diff_assoc_recursive($array1, $array2)
+  {
+    $difference=array();
+    foreach($array1 as $key => $value)
+    {
+      if( is_array($value) )
+      {
+        if( !isset($array2[$key]) || !is_array($array2[$key]) )
+        {
+          $difference[$key] = $value;
+        }
+        else
+        {
+          $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+          if( !empty($new_diff) )
+            $difference[$key] = $new_diff;
+        }
+      }
+      elseif( !array_key_exists($key,$array2) || $array2[$key] !== $value )
+      {
+        $difference[$key] = $value;
+      }
+    }
+    return $difference;
+  }
+
+  function getAssetUrl($path)
+  {
+    return Storage::url($path);
+  }

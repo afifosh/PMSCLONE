@@ -16,6 +16,7 @@ use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use League\CommonMark\Node\Block\Document;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
     Route::prefix('company-profile')->name('company.')->group(function (){
       Route::resource('contacts', ContactController::class);
       Route::resource('addresses', AddressController::class);
+      Route::post('kyc-documents/upload-doc', [DocumentController::class, 'uploadDocument'])->name('kyc-documents.upload-doc');
       Route::resource('kyc-documents', DocumentController::class);
       Route::resource('bank-accounts', BankAccountController::class);
     });

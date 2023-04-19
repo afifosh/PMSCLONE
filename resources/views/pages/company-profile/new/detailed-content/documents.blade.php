@@ -1,11 +1,12 @@
 <div class="card-body pt-0">
-  <hr>
-  {{-- <div class="row">
-    {!! Form::open(['route' => ['company.kyc-documents.update', 'kyc_document' => 0],'files' => true, 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
+  <hr class="test">
+  <div class="row">
+    {{-- {{dd('t')}} --}}
+    {{-- {!! Form::open(['route' => ['company.kyc-documents.update', 'kyc_document' => 0],'files' => true, 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
     @php
         request()->document_id = request()->document_id ?? $requestable_documents[0]->id;
-    @endphp
-    @forelse ($requestable_documents->where('id', request()->document_id) as $document)
+    @endphp --}}
+    {{-- @forelse ($requestable_documents->where('id', request()->document_id) as $document)
     @php
       $doc = $approved_documents->where('kyc_doc_id', $document->id)->first();
       $disapprovals = [];
@@ -84,9 +85,9 @@
           <button type="button" data-form="ajax-form" class="d-none"></button>
         </div>
       </div>
-    @endif
-    {!! Form::close() !!}
-  </div> --}}
+    @endif --}}
+    {{-- {!! Form::close() !!} --}}
+  </div>
   <div id="company-documents">
     @include('pages.company-profile.document.create')
   </div>

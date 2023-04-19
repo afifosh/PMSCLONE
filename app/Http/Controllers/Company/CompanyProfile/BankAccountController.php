@@ -64,6 +64,11 @@ class BankAccountController extends Controller
   public function update(BankAccountUpdateRequest $request, $bank_account)
   {
     if (request()->model_type == 'pending_creation') {
+      $account = transformModifiedData(auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->modifications);
+      unset($account['company_id']);
+      if(empty(array_diff_assoc($account, $request->validated()))){
+        return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
+      }
       auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->delete();
       auth()->user()->company->bankAccounts()->create($request->validated());
     } else {

@@ -45,6 +45,7 @@ class CompanyProfileController extends Controller
     $data['countries'] = Country::pluck('name', 'id');
     $data['POCDetail'] = auth()->user()->company->POCDetail()->exists() ? auth()->user()->company->POCDetail()->with('approvals', 'disapprovals')->latest()->first() : null;
     $data['detail'] = $data['POCDetail'] ? $this->transformModifications($data['POCDetail']->modifications) : auth()->user()->company->detail()->with('modifications')->first() ?? null;
+    $data['detailsStatus'] = auth()->user()->company->getDetailsStatus();
     $data['contacts'] = auth()->user()->company->contacts()->with('modifications', 'modifications.disapprovals')->get();
     $data['pending_creation_contacts'] = auth()->user()->company->POCContact()->where('is_update', false)->with('disapprovals')->get();
     $data['addresses'] = auth()->user()->company->addresses;
@@ -78,7 +79,17 @@ class CompanyProfileController extends Controller
       auth()->user()->company->detail->modifications()->delete();
       auth()->user()->company->detail->updateIfDirty($att);
     }else{
-      auth()->user()->company->POCDetail()->delete();
+      $detail = auth()->user()->company->POCDetail()->first();
+      if($detail){
+        $detail_mod = transformModifiedData($detail->modifications);
+        unset($detail_mod['company_id']);
+        // compare both associative arrays of arrays and return the difference
+        $diff = array_diff_assoc_recursive($detail_mod, $att);
+        if(empty($diff)){
+          return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
+        }
+        auth()->user()->company->POCDetail()->delete();
+      }
       auth()->user()->company->detail()->create($att);
     }
 
@@ -100,6 +111,8 @@ class CompanyProfileController extends Controller
       $att['subsidiaries'] = null;
     if (!$request->boolean('is_sa_available'))
       $att['sa_company_name'] = null;
+
+    unset($att['submit_type']);
 
     return $att;
   }

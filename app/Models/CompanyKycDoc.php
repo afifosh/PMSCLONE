@@ -14,10 +14,12 @@ class CompanyKycDoc extends Model
         'company_id',
         'kyc_doc_id',
         'fields',
+        'expiry_date',
     ];
 
     protected $casts = [
         'fields' => 'array',
+        'expiry_date' => 'datetime:d M, Y',
     ];
 
     public const FILE_PATH = 'kyc-docs/company';
