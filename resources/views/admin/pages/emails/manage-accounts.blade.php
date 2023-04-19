@@ -124,6 +124,9 @@ $configData = Helper::appClasses();
             <td>
               <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></button>
               <div class="dropdown-menu dropdown-menu-end m-0 show" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(425px, 47px);" data-popper-placement="bottom-end" data-popper-reference-hidden="" data-popper-escaped="">
+                @if($account->isShared())
+                <a href="javascript:ajaxModal('{{url('/admin/mail/accounts/'.$account->id.'/share')}}','share-account-modal');" class="dropdown-item">Share</a>
+                @endif
                 <a href="javascript:ajaxCanvas('{{url('/admin/mail/accounts/'.$account->id.'/edit')}}','edit-account-modal');" class="dropdown-item">Edit</a>
                 <a href="javascript:deleteRecord('delete','{{url('/admin/mail/accounts/'.$account->id.'/delete')}}','');" class="dropdown-item">Delete</a>
               </div>
@@ -139,6 +142,13 @@ $configData = Helper::appClasses();
 <div class="offcanvas offcanvas-xxl offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="edit-account-modal" style="overflow-y:auto;width:50%; background-color:white !important" aria-labelledby="editAccountModal">
   <div></div>
 </div>
+ <!-- Share Account Modal -->
+ <div class="modal fade" id="share-account-modal" tabindex="-1" aria-hidden="true">
+ <div class="modal-dialog modal-lg modal-simple modal-enable-otp modal-dialog-centered">
+                  <div class="modal-content p-3 p-md-5">
+                  </div>
+</div>
+ </div>
 @endsection
 @push('scripts')
 @endpush

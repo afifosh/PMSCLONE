@@ -21,9 +21,11 @@ use Avatar;
 use Illuminate\Support\Facades\Storage;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use OwenIt\Auditing\Contracts\Auditable;
+use Spatie\Permission\Traits\HasPermissions;
+
 class Admin extends Authenticatable implements MustVerifyEmail,  Metable,Auditable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs,HasPermissions;
     use \OwenIt\Auditing\Auditable;
     use HasMeta,ApprovesChanges;
     /**
@@ -132,6 +134,11 @@ class Admin extends Authenticatable implements MustVerifyEmail,  Metable,Auditab
     public function programs()
     {
       return $this->belongsToMany(Program::class, ProgramUser::class, 'admin_id', 'program_id')->withTimestamps();
+    }
+
+    public function emailAccounts()
+    {
+        return $this->belongsToMany(EmailAccount::class, 'user_email_accounts','email_account_id');
     }
 
     public function designation()

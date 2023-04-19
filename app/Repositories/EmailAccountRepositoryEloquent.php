@@ -61,9 +61,9 @@ class EmailAccountRepositoryEloquent extends AppRepository implements EmailAccou
         if (isset($attributes['user_id'])) {
             $model->forceFill(['user_id' => $attributes['user_id']]);
         }
-        else{
-            $model->forceFill(['user_id' => auth()->user()->id]);
-        }
+        // else{
+        //     $model->forceFill(['user_id' => auth()->user()->id]);
+        // }
 
         parent::performInsert($model, $attributes);
 

@@ -27,13 +27,17 @@ use App\Innoclapps\MailClient\ConnectionType;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Traits\HasPermissions;
 
 class EmailAccount extends Model implements Metable, Primaryable
 {
     use HasMeta,
+        HasPermissions,
         HasCreator,
         HasFactory,
-        EmailAccountImap,SoftDeletes;
+        EmailAccountImap,
+        SoftDeletes;
 
     /**
      * Indicates the primary meta key for user
@@ -62,10 +66,10 @@ class EmailAccount extends Model implements Metable, Primaryable
     ];
 
     /**
-    * The attributes that should be cast to native types.
-    *
-    * @var array
-    */
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
     protected $casts = [
         'create_contact'    => 'boolean',
         'initial_sync_from' => 'datetime',
@@ -113,7 +117,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return boolean
      */
-    public function isSyncDisabled() : bool
+    public function isSyncDisabled(): bool
     {
         return $this->sync_state === SyncState::DISABLED;
     }
@@ -123,7 +127,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return boolean
      */
-    public function isSyncStoppedBySystem() : bool
+    public function isSyncStoppedBySystem(): bool
     {
         return $this->sync_state === SyncState::STOPPED;
     }
@@ -133,9 +137,9 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return boolean
      */
-    public function isInitialSyncPerformed() : bool
+    public function isInitialSyncPerformed(): bool
     {
-        return ! empty($this->last_sync_at);
+        return !empty($this->last_sync_at);
     }
 
     /**
@@ -150,11 +154,22 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    public function requiresAuth() : Attribute
+    public function requiresAuth(): Attribute
     {
         return Attribute::get(function ($value) {
             return is_null($this->oAuthAccount) ? (bool) $value : $this->oAuthAccount->requires_auth;
         });
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(Admin::class, 'user_email_accounts', 'email_account_id', 'user_id')
+        ->withPivot(['permission_id']);
+    }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'user_email_accounts');
     }
 
     /**
@@ -212,7 +227,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return boolean
      */
-    public function isShared() : bool
+    public function isShared(): bool
     {
         return is_null($this->user_id);
     }
@@ -222,9 +237,9 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return boolean
      */
-    public function isPersonal() : bool
+    public function isPersonal(): bool
     {
-        return ! $this->isShared();
+        return !$this->isShared();
     }
 
     /**
@@ -234,7 +249,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    public function type() : Attribute
+    public function type(): Attribute
     {
         return Attribute::get(
             fn () => $this->isShared() ? EmailAccountType::SHARED : EmailAccountType::PERSONAL
@@ -246,7 +261,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return boolean
      */
-    public function isPrimary() : bool
+    public function isPrimary(): bool
     {
         return ((int) auth()->user()->getMeta(self::PRIMARY_META_KEY) === $this->id);
     }
@@ -254,7 +269,7 @@ class EmailAccount extends Model implements Metable, Primaryable
     /**
      * Mark the account as primary for the given user
      */
-    public function markAsPrimary(Metable & Admin $user) : static
+    public function markAsPrimary(Metable & Admin $user): static
     {
         $user->setMeta(self::PRIMARY_META_KEY, $this->id);
 
@@ -264,17 +279,17 @@ class EmailAccount extends Model implements Metable, Primaryable
     /**
      * Unmark the account as primary for the given user
      */
-    public static function unmarkAsPrimary(Metable & Admin $user) : void
+    public static function unmarkAsPrimary(Metable & Admin $user): void
     {
         $user->removeMeta(self::PRIMARY_META_KEY);
     }
 
     /**
-    * Get the account form name header option
-    *
-    * @return \Illuminate\Database\Eloquent\Casts\Attribute
-    */
-    public function fromNameHeader() : Attribute
+     * Get the account form name header option
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    public function fromNameHeader(): Attribute
     {
         return Attribute::get(function () {
             $meta = $this->getMeta('from_name_header');
@@ -288,7 +303,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    public function formattedFromNameHeader() : Attribute
+    public function formattedFromNameHeader(): Attribute
     {
         return Attribute::get(function () {
             // When running the synchronization command via the console
@@ -315,9 +330,9 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return boolean
      */
-    public function canSendMails() : bool
+    public function canSendMails(): bool
     {
-        return ! ($this->requires_auth || $this->isSyncStoppedBySystem());
+        return !($this->requires_auth || $this->isSyncStoppedBySystem());
     }
 
     /**
@@ -325,7 +340,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return \App\Innoclapps\MailClient\Client
      */
-    public function createClient() : Client
+    public function createClient(): Client
     {
         if ($this->oAuthAccount) {
             $client = ClientManager::createClient(
@@ -351,9 +366,9 @@ class EmailAccount extends Model implements Metable, Primaryable
      *
      * @return \App\Innoclapps\MailClient\Client
      */
-    public function getClient() : Client
+    public function getClient(): Client
     {
-        if (! $this->clientInstance) {
+        if (!$this->clientInstance) {
             $this->clientInstance = $this->createClient();
         }
 
