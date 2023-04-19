@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Spatie\Permission\Models\Permission;
 
-class UserEmailAccount extends Model
+class UserEmailAccount extends Pivot
 {
-    use HasFactory;
+    protected $table = 'user_email_accounts';
 }

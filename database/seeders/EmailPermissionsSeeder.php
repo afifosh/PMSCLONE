@@ -39,7 +39,7 @@ class EmailPermissionsSeeder extends Seeder
       return [
         'admin' => [
           ['module' => 'Email Accounts', 'permissions' => ['Personal Mailbox', 'Shared Mailbox']],
-          ['module' => 'Mailbox', 'permissions' => ['Full access', 'Contribute without delete', 'Reviewer']],
+          ['module' => 'Mailbox', 'permissions' => ['Owner', 'Reviewer', 'Editor','Contributor']],
         ]
       ];
     }

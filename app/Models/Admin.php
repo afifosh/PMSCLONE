@@ -21,6 +21,7 @@ use Avatar;
 use Illuminate\Support\Facades\Storage;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use OwenIt\Auditing\Contracts\Auditable;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasPermissions;
 
 class Admin extends Authenticatable implements MustVerifyEmail,  Metable,Auditable
@@ -138,15 +139,35 @@ class Admin extends Authenticatable implements MustVerifyEmail,  Metable,Auditab
 
     public function emailAccounts()
     {
-        return $this->belongsToMany(EmailAccount::class, 'user_email_accounts','user_id','email_account_id');
+        return $this->belongsToMany(EmailAccount::class, 'user_email_accounts','user_id','email_account_id')
+        ->withPivot('permission_id');
     }
 
-    public function hasDirectPermission($permission, $account)
-    {
-    return $this->emailAccounts->contains(function ($emailAccount) use ($permission, $account) {
-        return $emailAccount->pivot->permission_id == $permission->id && $emailAccount->id == $account->email_account_id;
+    // public function hasPermission($permission_name, $account)
+    // {
+    //   $permission=Permission::where('name',$permission_name)->first();
+    // $hasPermission= $this->emailAccounts->contains(function ($emailAccount) use ($permission, $account) {
+    //     return $emailAccount->pivot->permission_id == $permission->id && $emailAccount->id == $account->id;
+    // });
+    // if($hasPermission || $account->created_by==$this->id){
+    //   return true;
+    // }
+    // return false;
+    // }
+
+    public function hasPermission(array $permission_names, $account)
+{
+    $permissions = Permission::whereIn('name', $permission_names)->get();
+    \Log::info("message".json_encode($permission_names));
+    \Log::info("message".json_encode($permissions));
+    $hasPermission = $this->emailAccounts->contains(function ($emailAccount) use ($permissions, $account) {
+        return $permissions->pluck('id')->contains($emailAccount->pivot->permission_id) && $emailAccount->id == $account->id;
     });
+    if ($hasPermission || $account->created_by == $this->id) {
+        return true;
     }
+    return false;
+}
 
     public function designation()
     {

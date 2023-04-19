@@ -91,6 +91,7 @@ $configData = Helper::appClasses();
         </thead>
         <tbody>
           @foreach($accounts as $account)
+          @if(auth()->user()->hasPermission(['Owner','Reviewer','Editor','Contributor'],$account))
           <tr>
             <td style="text-align:left">
               <a>{{$account->email}}</a>
@@ -124,14 +125,19 @@ $configData = Helper::appClasses();
             <td>
               <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></button>
               <div class="dropdown-menu dropdown-menu-end m-0 show" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(425px, 47px);" data-popper-placement="bottom-end" data-popper-reference-hidden="" data-popper-escaped="">
-                @if($account->isShared())
+                @if($account->isShared() && $account->created_by==auth()->user()->id)
                 <a href="javascript:ajaxModal('{{url('/admin/mail/accounts/'.$account->id.'/share')}}','share-account-modal');" class="dropdown-item">Share</a>
                 @endif
+                @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
                 <a href="javascript:ajaxCanvas('{{url('/admin/mail/accounts/'.$account->id.'/edit')}}','edit-account-modal');" class="dropdown-item">Edit</a>
+                @if(!auth()->user()->hasPermission(['Contributor'],$account))
                 <a href="javascript:deleteRecord('delete','{{url('/admin/mail/accounts/'.$account->id.'/delete')}}','');" class="dropdown-item">Delete</a>
+                @endif
+                @endif
               </div>
             </td>
           </tr>
+          @endif
           @endforeach
         </tbody>
       </table>

@@ -26,21 +26,15 @@ class EmailAccountController extends Controller
 
     public function index(Request $request)
     {
-        // $accounts = EmailAccount::where('user_id',\Auth::user()->id)->get();
-        $accounts = $this->repository->withResponseRelations()
-        ->pushCriteria(new EmailAccountsForUserCriteria(\Auth::user()))
-        ->all();
-
+        $accounts = $this->getAccounts();
         return view('admin.pages.emails.index',compact('accounts'));
     }
-
+    private function getAccounts(){
+       return EmailAccount::whereNull('user_id')->orWhere('created_by',\Auth::user()->id)->get();
+    }
     public function manageAccounts(Request $request)
     {
-        $accounts = EmailAccount::where('created_by',\Auth::user()->id)->get();
-        // $accounts = $this->repository->withResponseRelations()
-        // ->where(new EmailAccountsForUserCriteria(\Auth::user(),'created_by'))
-        // ->all();
-
+        $accounts = $this->getAccounts();
         return view('admin.pages.emails.manage-accounts',compact('accounts'));
     }
 
@@ -53,14 +47,17 @@ class EmailAccountController extends Controller
      */
     public function show($id)
     {
-         $account = $this->repository->withResponseRelations()->find($id);
+         $account = $this->getAccount($id);
          return response()->json($account);
     }
 
+    private function getAccount($id){
+       return $this->repository->withResponseRelations()->find($id);
+    }
 
     public function edit($id)
     {
-         $account = $this->repository->withResponseRelations()->find($id);
+         $account = $this->getAccount($id);
 
          return view('admin.pages.emails.partials.edit-account',compact('account'))->render();
     }
@@ -71,7 +68,7 @@ class EmailAccountController extends Controller
          $module = Module::where('name','=','Mailbox')->whereHas('permissions', function ($q) {
             $q->where('guard_name', 'admin');
           })->with('permissions')->first();
-         $account = $this->repository->withResponseRelations()->find($id);
+         $account = $this->getAccount($id);
          return view('admin.pages.emails.partials.shared-account-access',compact('account','users','module'))->render();
     }
 
@@ -83,44 +80,22 @@ class EmailAccountController extends Controller
     }
 
     private function createPermission($id,$request){
-        $module = Module::where('name','=','Mailbox')->whereHas('permissions', function ($q) {
-            $q->where('guard_name', 'admin');
-          })->with('permissions')->first();
-        //   foreach($module->permissions as $permission){
-        //     UserEmailAccount::where([['user_id', '=', $request->user_id],
-        //     ['permission_id', '=', $permission->id],
-        //     ['email_account_id', '=', $id]
-        //   ])->delete();
-        //   }
-          if($request->permission_id!=0){
+        // $module = Module::where('name','=','Mailbox')->whereHas('permissions', function ($q) {
+        //     $q->where('guard_name', 'admin');
+        //   })->with('permissions')->first();
             $user=Admin::find($request->user_id);
+        if($request->permission_id!=0){
             $user->emailAccounts()->syncWithoutDetaching([
                 $id=>[
                     'permission_id'=>$request->permission_id
                 ]
-            ]
+            ]);
+        }
+        else{
+            $user->emailAccounts()->detach([
+                $id
+            ]);
 
-            );
-            // $emailAccountB = EmailAccount::find(5);
-
-            // $user->givePermissionTo($request->permission_id, $emailAccountA);
-
-            // if($user->can('full access',$emailAccountA)){
-            //     \Log::info('have permission');
-            // }
-            // if($user->can('full access',$emailAccountB)){
-            //     \Log::info("message");
-            // }
-            // $user->emailAccounts()->attach(
-            //     $emailAccountA , [
-            //         'permission_id' => $request->permission_id,
-            //         'user_id'=>$user->id,
-            //     ]);
-        //     $user_email_account=new UserEmailAccount();
-        //   $user_email_account->user_id=$request->user_id;
-        //   $user_email_account->permission_id=$request->permission_id;
-        //   $user_email_account->email_account_id=$id;
-        //   $user_email_account->save();
         }
         }
 
@@ -142,10 +117,7 @@ class EmailAccountController extends Controller
 
         $account->wasRecentlyCreated = true;
 
-        return response(
-            "Account successfully created.",
-            201
-        );
+        return response("Account successfully created.");
     }
 
     /**

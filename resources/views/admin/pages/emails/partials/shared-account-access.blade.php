@@ -13,6 +13,7 @@
                         class="form-select form-select-lg share-project-select"
                         data-allow-clear="true"
                       >
+                      <option>Select User</option>
                     @foreach($users as $user)
                       <option value="{{$user->id}}" data-name="{{$user->first_name. ' ' . $user->last_name}}">
                           {{$user->first_name. ' ' . $user->last_name}}
@@ -40,7 +41,7 @@
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                     >
-                        <span id="button-{{$user->id}}" class="text-muted fw-normal me-2 d-none d-sm-inline-block">Revoked</span>
+                        <span id="button-{{$user->id}}" class="text-muted fw-normal me-2 d-none d-sm-inline-block">{{$account->permission_id}}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                     <li>

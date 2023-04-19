@@ -164,7 +164,7 @@ class EmailAccount extends Model implements Metable, Primaryable
     public function users()
     {
         return $this->belongsToMany(Admin::class, 'user_email_accounts', 'email_account_id', 'user_id')
-        ->withPivot(['permission_id']);
+        ->withPivot('permission_id');
     }
 
     public function permissions()

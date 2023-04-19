@@ -363,11 +363,15 @@ input.each(function(){
         <div class="mb-3">
         <select id="select-account" class="select2 form-control" style="width:100%">
           @foreach($accounts as $account)
+          @if(auth()->user()->hasPermission(['Owner','Reviewer','Editor','Contributor'],$account))
           <option @if($account->isprimary()) selected @endif value="{{$account->id}}"> {{$account->email}}</option>
+          @endif
           @endforeach
         </select>
         </div>
+        @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
         <button class="btn btn-primary btn-compose" onclick="doAction('compose');" data-bs-toggle="modal" data-bs-target="#emailComposeSidebar">Compose</button>
+        @endif
       </div>
       <!-- Email Filters -->
       <div class="email-filters py-2" style="height:auto">
@@ -421,7 +425,9 @@ input.each(function(){
                 <input class="form-check-input" type="checkbox" id="email-select-all">
                 <label class="form-check-label" for="email-select-all"></label>
               </div>
+          @if(auth()->user()->hasPermission(['Owner','Editor'],$account))
               <i class="ti ti-trash email-list-delete cursor-pointer me-2" onclick="bulkAction('delete');"></i>
+          @endif
               <i class="ti ti-mail-opened email-list-read cursor-pointer me-2" onclick="bulkAction('unread');"></i>
             </div>
             <div class="email-pagination d-sm-flex d-none align-items-center flex-wrap justify-content-between justify-sm-content-end">
