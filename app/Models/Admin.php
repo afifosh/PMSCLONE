@@ -138,7 +138,14 @@ class Admin extends Authenticatable implements MustVerifyEmail,  Metable,Auditab
 
     public function emailAccounts()
     {
-        return $this->belongsToMany(EmailAccount::class, 'user_email_accounts','email_account_id');
+        return $this->belongsToMany(EmailAccount::class, 'user_email_accounts','user_id','email_account_id');
+    }
+
+    public function hasDirectPermission($permission, $account)
+    {
+    return $this->emailAccounts->contains(function ($emailAccount) use ($permission, $account) {
+        return $emailAccount->pivot->permission_id == $permission->id && $emailAccount->id == $account->email_account_id;
+    });
     }
 
     public function designation()

@@ -94,7 +94,13 @@ class EmailAccountController extends Controller
         //   }
           if($request->permission_id!=0){
             $user=Admin::find($request->user_id);
-            $emailAccountA = EmailAccount::find($id);
+            $user->emailAccounts()->syncWithoutDetaching([
+                $id=>[
+                    'permission_id'=>$request->permission_id
+                ]
+            ]
+
+            );
             // $emailAccountB = EmailAccount::find(5);
 
             // $user->givePermissionTo($request->permission_id, $emailAccountA);
@@ -110,11 +116,11 @@ class EmailAccountController extends Controller
             //         'permission_id' => $request->permission_id,
             //         'user_id'=>$user->id,
             //     ]);
-            $user_email_account=new UserEmailAccount();
-          $user_email_account->user_id=$request->user_id;
-          $user_email_account->permission_id=$request->permission_id;
-          $user_email_account->email_account_id=$id;
-          $user_email_account->save();
+        //     $user_email_account=new UserEmailAccount();
+        //   $user_email_account->user_id=$request->user_id;
+        //   $user_email_account->permission_id=$request->permission_id;
+        //   $user_email_account->email_account_id=$id;
+        //   $user_email_account->save();
         }
         }
 
