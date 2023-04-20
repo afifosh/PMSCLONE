@@ -28,10 +28,18 @@ Route::post('check-code', [RedirectToTwoFactorMailOTPAuthentication::class, 'ver
 ->middleware(array_filter([
     'guest:web',
 ]))->name('check_code');
+Route::post('/user/confirmed-two-factor-email-authentication', [AdminUsersController::class, 'verifyCode'])
+->middleware('auth:web')
+->name('user.two-factor-email.confirm');
+
+Route::post('/user/security/setting', [AdminUsersController::class, 'securitySetting'])
+->middleware('auth:web')
+->name('user.security.setting');   
 
 
-
-
+Route::get('/user/send-email-otp', [AdminUsersController::class, 'resendCode'])
+//   ->middleware('auth:admin')
+   ->name('user.send.email.otp'); //->middleware('throttle:1,60');
 
 Route::prefix('admin')->middleware('guest:web')->group(function () {
     Route::name('admin.')->group(function () {     
@@ -154,7 +162,8 @@ Route::prefix('admin')->middleware('guest:web')->group(function () {
             ]));
 
             Route::get('/user/send-email-otp', [AdminUsersController::class, 'resendCode'])
-            ->name('send.email.otp');
+         //   ->middleware('auth:admin')
+            ->name('send.email.otp'); //->middleware('throttle:1,60');
 
             Route::post('/user/confirmed-two-factor-email-authentication', [AdminUsersController::class, 'verifyCode'])
             ->middleware('auth:admin')

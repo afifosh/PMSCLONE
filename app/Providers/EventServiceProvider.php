@@ -52,6 +52,11 @@ class EventServiceProvider extends ServiceProvider
         Failed::class => [
             IncrementDeviceAuthorizationAttempts::class,
         ],
+
+        'Illuminate\Auth\Events\Authenticated' => [
+            'App\Listeners\AfterAuthenticatedListener',
+        ],
+        
         TwoFactorCodeEvent::class => [TwoFactorCodeListener::class],
     ];
 

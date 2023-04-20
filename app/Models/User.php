@@ -104,15 +104,6 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
         $this->notify(new UserResetPassword($token));
     }
 
-    /**
-     * User has many morph fields of password history
-     *
-     * @return MorphMany
-     */
-    public function passwordHistories()
-    {
-      return $this->morphMany(PasswordHistory::class, 'authable');
-    }
 
     /**
      * User has many morph fields of Device Authorized 
@@ -122,6 +113,75 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
     public function deviceAuthorizations()
     {
       return $this->morphMany(DeviceAuthorization::class, 'authenticatable');
+    }
+
+
+    public function addDeviceAuthorization(array $attributes)
+    {
+
+        $ip          = $attributes['ip_address'];
+        $userAgent   = $attributes['user_agent'];   
+        $fingerprint = $attributes['fingerprint'];
+
+        $deviceAuthorization = $this->deviceAuthorizations()
+          ->where('fingerprint', $fingerprint)
+          ->whereIpAddress($ip)
+          ->whereUserAgent($userAgent)
+          ->whereFingerprint($fingerprint)
+          ->latest('created_at')
+            ->firstOrNew();
+    
+        if ($deviceAuthorization->exists) {
+            if ($deviceAuthorization->isDeviceAuthorized()) {
+                $deviceAuthorization->attempts += 1;
+                $deviceAuthorization->updated_at = now();
+               //$deviceAuthorization->fill($attributes);
+               $deviceAuthorization->safe = true;
+                $deviceAuthorization->save();
+            } else {
+                $deviceAuthorization->safe = false;
+                $deviceAuthorization->save();
+                return false;
+            }
+        } else {
+            $deviceAuthorization->fill($attributes);
+            $deviceAuthorization->safe = true;            
+            $deviceAuthorization->save();
+        }
+    
+        return true;
+    }
+
+    public function shouldSkipTwoFactor($ip,$userAgent,$fingerprint)
+    {
+       
+        $deviceAuthorization = $this->deviceAuthorizations()
+            ->where('fingerprint', $fingerprint)
+            ->whereIpAddress($ip)
+            ->whereUserAgent($userAgent)
+            ->whereFingerprint($fingerprint)
+            ->latest('created_at')
+            ->first();
+    
+        if (!$deviceAuthorization) {
+            return false;
+        }
+    
+        $safe = $deviceAuthorization->safe;
+        $lastLogin = $deviceAuthorization->updated_at;
+        $expiration = now()->subDays(30);
+    
+        return $safe && $lastLogin->gt($expiration);
+    }
+            
+    /**
+     * User has many morph fields of password history
+     *
+     * @return MorphMany
+     */
+    public function passwordHistories()
+    {
+      return $this->morphMany(PasswordHistory::class, 'authable');
     }
 
     public function generateTwoFactorCode()
@@ -138,5 +198,5 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
         $this->two_factor_code = null;
         $this->two_factor_expires_at = null;
         $this->save();
-    }  
+    }
 }

@@ -408,7 +408,7 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                       </div>
                   </div>
 
-                </div>
+         
               </div>
               <!--end::Item-->
 
