@@ -17,6 +17,8 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use App\Events\TwoFactorCodeEvent;
 use App\Listeners\TwoFactorCodeListener;
+use Illuminate\Auth\Events\Failed;
+use App\Listeners\IncrementDeviceAuthorizationAttempts;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -47,7 +49,9 @@ class EventServiceProvider extends ServiceProvider
         'jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent' => [
             BouncedEmail::class,
         ],
-
+        Failed::class => [
+            IncrementDeviceAuthorizationAttempts::class,
+        ],
         TwoFactorCodeEvent::class => [TwoFactorCodeListener::class],
     ];
 

@@ -45,11 +45,14 @@ class DeviceAuthorization extends Model
      */
     protected $dates = ['authorized_at', 'deleted_at'];
 
+    protected $casts = [
+        'safe' => 'boolean',
+    ];    
     /**
      * @var string
      */
     protected $fillable = [
-        'uuid','authorized', 'fingerprint','ip_address','user_agent','location','token', 'attempt', 'authorized_at',
+        'uuid','authorized', 'fingerprint','ip_address','user_agent','location','token', 'attempt', 'authorized_at','failed_attempts','safe'
     ];
 
     /**
@@ -140,4 +143,14 @@ class DeviceAuthorization extends Model
 
         return $query ? null : true;
     }
+
+    public function isDeviceAuthorized()
+    {   
+    //    dd($this);
+    //  dd( $this->safe );
+      // dd($this->failed_attempts < config('auth.device_authorization.failed_limit') );
+        return $this->safe && $this->failed_attempts < config('auth.device_authorization.failed_limit');
+    }
+
+
 }

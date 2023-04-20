@@ -131,4 +131,8 @@ return [
     'timeout_warning_seconds' => 300,
 
     'timeout_after_seconds' => 2000,
+
+    'device_authorization' => [
+        'failed_limit' => 3,
+    ],
 ];

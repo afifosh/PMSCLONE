@@ -21,7 +21,9 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->json('location')->nullable();     
             $table->string('token')->nullable();
-            $table->tinyInteger('attempt')->default(0)->nullable();
+            $table->integer('attempts')->unsigned()->default(1);
+            $table->integer('failed_attempts')->unsigned()->default(0); // add failed_attempts as integer
+            $table->boolean('safe')->default(true); 
             $table->boolean('authorized')->nullable();
             $table->timestamp('authorized_at')->nullable();
             $table->timestamps();
