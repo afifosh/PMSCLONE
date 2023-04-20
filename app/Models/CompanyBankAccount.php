@@ -20,8 +20,11 @@ class CompanyBankAccount extends Model
     'post_code',
     'account_no',
     'iban_no',
-    'swift_code'
+    'swift_code',
+    'bank_letter'
   ];
+
+  public const BANK_LETTER_PATH = 'bank-letters';
 
   public function company()
   {

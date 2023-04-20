@@ -244,7 +244,7 @@ $(document).on('click', '.account-image-reset', function () {
       if(step != -1){
         verticalStepper.to(step);
       }else{
-        triggerNext.next();
+        triggerNext();
       }
 
     }

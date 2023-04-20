@@ -109,9 +109,9 @@ class DocumentController extends Controller
 
   protected function triggerNextDoc($message, $locality_type, $request)
   {
-    $documents = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->where('id', '!=', $request->document_id)->get();
+    $documents = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->where('id', '>', $request->document_id)->first();
 
-    return $this->sendRes($message, ['event' => 'functionCall', 'function' => 'triggerNextDoc', 'function_params' => @$documents[0]->id ?? -1]);
+    return $this->sendRes($message, ['event' => 'functionCall', 'function' => 'triggerNextDoc', 'function_params' => @$documents->id ?? -1]);
   }
 
   public function uploadDocument(Request $request, FileUploadRepository $file_repo){

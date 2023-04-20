@@ -28,6 +28,7 @@ class CompanyProfileController extends Controller
       $data['addressesStatus'] = auth()->user()->company->getAddressesStatus();
       $data['accountsStatus'] = auth()->user()->company->getBankAccountsStatus();
       $data['kycDocsStatus'] = auth()->user()->company->getKycDocsStatus();
+      $data['stepsApprovedCount'] = auth()->user()->company->getStepApprovedCountAttribute();
     }
 
     return request()->ajax() ? (auth()->user()->company->isHavingPendingProfile() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])

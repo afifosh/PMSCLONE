@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Company\CompanyProfile;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BankAccountUpdateRequest extends FormRequest
 {
@@ -34,6 +35,10 @@ class BankAccountUpdateRequest extends FormRequest
             'account_no' => 'required|string|max:30',
             'iban_no' => 'required|string|max:30',
             'swift_code' => 'required|string|max:30',
+            'is_authorized' => 'string|nullable',
+            'poa' => Rule::requiredIf(function () {
+              return $this->is_authorized && !request()->bank_account;
+            }),
         ];
     }
 

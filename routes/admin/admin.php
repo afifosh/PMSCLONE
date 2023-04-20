@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
 use App\Models\RFPFile;
+use Illuminate\Http\Request;
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','adminVerified' , 'mustBeActive', CheckForLockMode::class)->group(function () {
 
@@ -153,6 +154,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
   });
+
+  Route::get('refresh-csrf', function(Request $request){
+    $request->session()->regenerateToken();
+    return csrf_token();
+  })->name('refresh-csrf');
+
 });
 
 Route::any('update-file/{file}', [OnlyOfficeController::class, 'updateFile'])->name('update-file');

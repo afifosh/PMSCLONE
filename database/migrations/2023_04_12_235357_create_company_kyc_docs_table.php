@@ -17,7 +17,7 @@ return new class extends Migration
       $table->id();
       $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete()->cascadeOnUpdate();
       $table->foreignId('kyc_doc_id')->constrained('kyc_documents')->cascadeOnDelete()->cascadeOnUpdate();
-      $table->timestamp('expiry_date')->nullable();
+      $table->string('expiry_date')->nullable();
       $table->json('fields')->nullable();
       $table->timestamps();
     });

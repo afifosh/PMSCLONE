@@ -20,10 +20,14 @@
             @forelse ($doc['fields'] as $field)
                 <div class="col-6 my-1">
                     <div class="fw-semibold">
+                      @if(@$modifications)
+                      {{dd($modifications)}}
+                      @endif
                       {{ $field['label'] }}
                       {{-- {{ $requestedDocs->where('id', $doc['kyc_doc_id'])->first()->fields[explode('_', $key)[3]]['label'] }} --}}
                     </div>
                     <span class="fst-italic d-flex justify-content-between">
+                      {{-- {{dd($field)}} --}}
                       @if($field['type'] == 'file' && $field['value'])
                         <a href="{{ Storage::url($field['value']) }}" target="_blank" class="text-decoration-none">
                           <i class="fa-solid fa-file fa-lg me-1"></i>

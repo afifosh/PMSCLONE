@@ -15,7 +15,7 @@ trait FileHandler
     protected string $storagePrefix = 'public';
     protected bool $isOriginalName = false;
 
-    private function getDirectoryVisibility() 
+    private function getDirectoryVisibility()
     {
         // if storage prefix is public that means that the public disk is being used
         // & we will make use of the storage symlink.
@@ -29,7 +29,7 @@ trait FileHandler
 
         $file->storeAs("{$this->storagePrefix}/{$folder}", $name);
 
-        return Storage::url($folder . '/' . $name);
+        return Storage::disk('local')->url($folder . '/' . $name);
     }
 
     private function generateUploadingFileName(UploadedFile $file): string
@@ -58,7 +58,7 @@ trait FileHandler
             return null;
         $file = $this->saveImage($uploadedFile, $folder, $height);
         if ($file->success)
-            return Storage::url($file->path);
+            return Storage::disk('local')->url($file->path);
         return null;
     }
 
@@ -66,7 +66,7 @@ trait FileHandler
     {
         try {
             $file_path = $subdirectory . '/' . uniqid() . '.' . $file->getClientOriginalExtension();
-            Storage::put($this->storagePrefix . '/' . $file_path, $this->makeImage($file, $height)->__toString(), [
+            Storage::disk('local')->put($this->storagePrefix . '/' . $file_path, $this->makeImage($file, $height)->__toString(), [
                 'directory_visibility' => $this->getDirectoryVisibility(),
                 'visibility' => 'public', // file visibility
             ]);
@@ -96,7 +96,7 @@ trait FileHandler
     {
         $path = $this->removeStorage($path);
         if ($this->isFile($path))
-            return Storage::delete("{$this->storagePrefix}/{$path}");
+            return Storage::disk('local')->delete("{$this->storagePrefix}/{$path}");
         return false;
     }
 
@@ -107,7 +107,7 @@ trait FileHandler
 
     public function isFile(string $path = null): bool
     {
-        return Storage::exists("{$this->storagePrefix}/{$path}");
+        return Storage::disk('local')->exists("{$this->storagePrefix}/{$path}");
     }
 
 
@@ -124,7 +124,7 @@ trait FileHandler
     {
         $path = $this->removeStorage($path);
         if ($this->isFile($path))
-            return Storage::url("{$this->storagePrefix}/{$path}");
+            return Storage::disk('local')->url("{$this->storagePrefix}/{$path}");
         return null;
     }
 

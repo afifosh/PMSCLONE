@@ -31,6 +31,20 @@
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
 
+<script>
+  setInterval(function() {
+    console.log('Refreshing CSRF Token');
+    $.ajax({
+        url: '{{ route("admin.refresh-csrf") }}',
+        type: 'get'
+    }).done(function (data) {
+        $('[name="_token"]').val(data);
+    }).fail(function () {
+        console.log('Could not refresh CSRF token');
+    });
+}, 1000 * 55 * {{ config('session.lifetime') }});
+</script>
+
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->
 @stack('pricing-script')

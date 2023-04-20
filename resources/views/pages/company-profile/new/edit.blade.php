@@ -29,13 +29,13 @@
         <div class="card ms-md-2 col-md-3">
             <div class="card-body">
                 <div class="d-flex justify-content-center align-items-center">
-                    <img src="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo/assets/img/avatars/7.png"alt="Avatar"
+                    <img src="{{ auth()->user()->company->verified_at ? asset('assets/img/company/verified.png') : asset('assets/img/company/p-verified.png') }}" alt="Avatar" height="150"
                         class="rounded-circle">
                 </div>
                 <h5 class="card-title mb-0 mt-1 text-center">Verification Status</h5>
                 <p class="card-text text-center">Add Info In all the five forms</p>
                 <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0"
+                    <div class="progress-bar" role="progressbar" style="width: {{($stepsApprovedCount*100)/5}}%" aria-valuenow="{{($stepsApprovedCount*100)/5}}" aria-valuemin="0"
                         aria-valuemax="100"></div>
                 </div>
                 <div class="border fw-bold mt-2 d-flex justify-content-between p-2">

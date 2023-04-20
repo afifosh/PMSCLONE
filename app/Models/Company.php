@@ -53,6 +53,18 @@ class Company extends BaseModel
     return $completed;
   }
 
+  public function getStepApprovedCountAttribute()
+  {
+    $completed = 0;
+    $completed += $this->detail && !$this->detail->has('modifications')->exists() ? 1 : 0;
+    $completed += $this->addresses()->exists() && !$this->addresses()->has('modifications')->exists() ? 1 : 0;
+    $completed += $this->contacts()->exists() && !$this->contacts()->has('modifications')->exists() ? 1 : 0;
+    $completed += $this->bankAccounts()->exists() && !$this->bankAccounts()->has('modifications')->exists() ? 1 : 0;
+    $completed += $this->kycDocs()->exists() && !$this->kycDocs()->has('modifications')->exists() ? 1 : 0;
+
+    return $completed;
+  }
+
   public function isMendatoryKycDocsSubmitted()
   {
     return $this->getSubmittedMendatoryDocsCount() >= count($this->getMendatoryKycDocs());

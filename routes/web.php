@@ -13,6 +13,7 @@ use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\CheckForLockMode;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
@@ -73,5 +74,8 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
 
   });
 });
-
+Route::get('refresh-csrf', function(Request $request){
+  $request->session()->regenerateToken();
+  return csrf_token();
+})->name('refresh-csrf');
 require __DIR__.'/admin/admin.php';
