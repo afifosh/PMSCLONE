@@ -109,7 +109,7 @@ class ApprovalRequestsDataTable extends DataTable
       return $q->whereNotNull('approved_at');
     });
     $query->with('addedBy');
-    return $query->applyRequestFilters();
+    return $query->applyRequestFilters()->orderBy('verified_at', 'DESC');
   }
 
   /**
@@ -161,7 +161,6 @@ class ApprovalRequestsDataTable extends DataTable
         Column::make('name')->title(__('Bussines Legal Name')),
         Column::make('source'),
         Column::make('added_by'),
-        Column::make('approval_status'),
         Column::make('verified_at'),
         Column::make('created_at'),
         Column::make('updated_at'),

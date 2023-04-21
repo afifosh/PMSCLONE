@@ -34,7 +34,7 @@ class KycDocumentUpdateRequest extends FormRequest
         return $value != null;
     });
 
-    if (!request()->expiry_date && empty($att)) {
+    if (!request()->expiry_date && empty($att) && !$document->is_mendatory) {
       request()->escapedRules = true;
       return [];
     }
