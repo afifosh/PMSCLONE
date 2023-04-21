@@ -47,15 +47,16 @@
                             <span class="switch-label">Is having Exipiry date?</span>
                           </label>
                         </div>
+                        <div id="expirable_c" style="{{$kyc_document->is_expirable ? '' : 'display:none'}}">
+                          <div class="form-group mb-2">
+                              <label class="required">{{ __('Expiry Date Title:') }}</label>
+                              {!! Form::text('expiry_date_title', null, ['class' => 'form-control', 'rows' => 2]) !!}
+                          </div>
 
-                        <div class="form-group mb-2">
-                            <label class="required">{{ __('Expiry Date Title:') }}</label>
-                            {!! Form::text('expiry_date_title', null, ['class' => 'form-control', 'rows' => 2]) !!}
-                        </div>
-
-                        <div class="form-group mb-2">
-                            <label for="is_expiry_date_required" class="required">{{ __('Is Expiry Date Required:') }}</label>
-                            {!! Form::select('is_expiry_date_required', ['0' => 'No', '1' => 'Yes'], null, ['class' => 'form-control select2']) !!}
+                          <div class="form-group mb-2">
+                              <label for="is_expiry_date_required" class="required">{{ __('Is Expiry Date Required:') }}</label>
+                              {!! Form::select('is_expiry_date_required', ['0' => 'No', '1' => 'Yes'], null, ['class' => 'form-control select2']) !!}
+                          </div>
                         </div>
 
                         <button class="btn btn-primary basicbtn float-right" data-form="ajax-form">
@@ -131,4 +132,9 @@
 @section('page-script')
     <script src="{{ asset('assets/js/scripts/repeater.js') }}"></script>
     <script src="{{ asset('assets/js/custom/select2.js') }}"></script>
+    <script>
+      $(document).on('click', '[name="is_expirable"]', function() {
+        $('#expirable_c').toggle();
+      });
+    </script>
 @endsection
