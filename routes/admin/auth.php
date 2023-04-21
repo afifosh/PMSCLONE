@@ -27,7 +27,7 @@ use App\Http\Controllers\Auth\RedirectToMailOTP as RedirectToTwoFactorMailOTPAut
 Route::post('check-code', [RedirectToTwoFactorMailOTPAuthentication::class, 'verify'])
 ->middleware(array_filter([
     'guest:web',
-]))->name('check_code');
+]))->name('user.check_code');
 Route::post('/user/confirmed-two-factor-email-authentication', [AdminUsersController::class, 'verifyCode'])
 ->middleware('auth:web')
 ->name('user.two-factor-email.confirm');
@@ -62,9 +62,9 @@ Route::prefix('admin')->middleware('guest:web')->group(function () {
             $limiter ? 'throttle:'.$limiter : null,
         ]));
 
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
-
+    // Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    //     ->name('logout');
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
     // Password Reset...
     if (Features::enabled(Features::resetPasswords())) {
         if ($enableViews) {
