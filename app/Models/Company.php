@@ -214,36 +214,22 @@ class Company extends BaseModel
 
   public function isApprovalRequiredForCurrentLevel($level = ''): bool
   {
-    $is_inc = true;
     $level = $level ? $level : $this->approval_level;
-    if ($this->POCmodifications()->count() > 0) {
-      foreach ($this->POCmodifications()->get() as $modification) {
-        if (($level > $modification->approvals()->count()) && $modification->disapprovals()->count() == 0) {
-          $is_inc = false;
-          break;
-        }
-      }
+    if ($this->POCmodifications()->has('approvals', '<', $level)->doesntHave('disapprovals')->exists()) {
+      return true;
     }
-    return !$is_inc;
+
+    return false;
   }
 
   public function incApprovalLevelIfRequired($level = '')
   {
     $level = $level ? $level : $this->approval_level;
-    $reject = false;
     if (!$this->isApprovalRequiredForCurrentLevel()) {
-      if ($this->approval_level >= ApprovalLevel::count())
+      if ($this->approval_level >= ApprovalLevel::count() && !$this->POCmodifications()->has('disapprovals')->exists())
         $this->forceFill(['approval_status' => 1, 'approved_at' => now(), 'verified_at' => now()]); // Approved by all
       else {
-        if ($this->POCmodifications()->count() > 0) {
-          foreach ($this->POCmodifications()->get() as $modification) {
-            if ($modification->disapprovals()->count() > 0) {
-              $reject = true;
-              break;
-            }
-          }
-        }
-        if ($reject)
+        if ($this->POCmodifications()->has('disapprovals')->exists())
           $this->forceFill(['approval_status' => 3, 'approval_level' => 1]); // Rejected by at least one
         else
           $this->forceFill(['approval_level' => $this->approval_level + 1]); // increment approval level
