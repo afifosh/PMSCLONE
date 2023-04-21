@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Company\CompanyProfile;
 
+use App\Http\Controllers\Company\CompanyProfile\DocumentController;
 use App\Models\KycDocument;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -28,6 +29,16 @@ class KycDocumentUpdateRequest extends FormRequest
     $rules = [];
     $document = KycDocument::whereIn('required_from', [3, $locality])->where('status', 1)->findOrFail(request()->document_id);
     $avail_rules = KycDocument::VALIDATIONS;
+
+    $att = array_filter(request()->fields, function($value) {
+        return $value != null;
+    });
+
+    if (!request()->expiry_date && empty($att)) {
+      request()->escapedRules = true;
+      return [];
+    }
+
     if (!$document) {
       return $rules;
     }

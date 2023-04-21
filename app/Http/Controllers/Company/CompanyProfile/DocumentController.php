@@ -43,12 +43,13 @@ class DocumentController extends Controller
     return $this->sendRes('success', ['view_data' => $view_data]);
   }
 
-  public function store(KycDocumentUpdateRequest $request, FileUploadRepository $fileRepository)
+  public function store(KycDocumentUpdateRequest $request)
   {
     $locality_type = auth()->user()->company->getPOCLocalityType();
-    if (!$locality_type) {
+    if (!$locality_type)
       return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
-    }
+    if(request()->escapedRules)
+      return $this->triggerNextDoc('', $locality_type, $request);
     $document = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->findOrFail($request->document_id);
     $final_fields = [];
     $data = [];
@@ -71,12 +72,14 @@ class DocumentController extends Controller
     // return $this->sendRes('Added Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 5]);
   }
 
-  public function update($kyc_document, KycDocumentUpdateRequest $request, FileUploadRepository $fileRepository)
+  public function update($kyc_document, KycDocumentUpdateRequest $request)
   {
     $locality_type = auth()->user()->company->getPOCLocalityType();
     if (!$locality_type) {
       return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
     }
+    if(request()->escapedRules)
+      return $this->triggerNextDoc('', $locality_type, $request);
     $document = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->findOrFail($request->document_id);
     if ($document) {
       $final_fields = [];
@@ -107,7 +110,7 @@ class DocumentController extends Controller
     // return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 5]);
   }
 
-  protected function triggerNextDoc($message, $locality_type, $request)
+  public function triggerNextDoc($message, $locality_type, $request)
   {
     $documents = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->where('id', '>', $request->document_id)->first();
 
