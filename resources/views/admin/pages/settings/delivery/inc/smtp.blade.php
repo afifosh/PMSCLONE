@@ -31,7 +31,7 @@
         <label for="smtp_encryption" class="form-label fs-6 mb-2 fw-semibold">
             @lang('Encryption type')
         </label>
-        <select name="encryption" id="smtp_encryption" class="selectpicker w-100" data-style="btn-default" data-live-search="true">
+        <select name="encryption" id="smtp_encryption" class="form-select w-100" data-style="btn-default" data-live-search="true">
             <option value="">@lang('Choose one')</option>
             <option value="tls" {{ isset($settings['encryption']) && $settings['encryption'] === 'tls' ? 'selected' : '' }}>
                 @lang('TLS')
