@@ -61,7 +61,19 @@
         url: url,
         type: "GET",
         success: function (response, status) {
-          var folders=response.folders;
+          var permission=response.permission;
+          if(permission=='Viewer'){
+            $("#activate-folders").hide();
+            $("#manage-accounts").hide();
+            $('.btn-compose').hide();
+          }
+          else if(permission=='Contributor'){
+            $('.btn-compose').show();
+            $("#activate-folders").show();
+            $("#manage-accounts").show();
+
+          }
+          var folders=response.account.folders;
           var html='';
           var isSync=false;
           for(var i=0; i<folders.length; i++){
@@ -432,7 +444,9 @@ input.each(function(){
           @if(auth()->user()->hasPermission(['Owner','Editor'],$account))
               <i class="ti ti-trash email-list-delete cursor-pointer me-2" onclick="bulkAction('delete');"></i>
           @endif
+          @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
               <i class="ti ti-mail-opened email-list-read cursor-pointer me-2" onclick="bulkAction('unread');"></i>
+            @endif
             </div>
             <div class="email-pagination d-sm-flex d-none align-items-center flex-wrap justify-content-between justify-sm-content-end">
               <span class="d-sm-block d-none mx-3 text-muted" id="records-counter"></span>
@@ -552,6 +566,7 @@ input.each(function(){
   <!-- /Compose Email -->
 </div>
 @else
+@can(['Personal Mailbox','Shared Mailbox'])
 <div class="col-md-12 mb-4">
   <div class="row justify-content-center py-5">
     <div class="col-md-8 col-lg-6 mt-4">
@@ -644,8 +659,12 @@ Connect via IMAP, your Gmail or Outlook account.
        
       </div>
       <div class="d-flex justify-content-center flex-wrap gap-4 mt-2">
+      @can('Shared Mailbox')
         <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
+       @endcan
+        @can('Personal Mailbox')
         <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','personal');" class="btn btn-primary">Connect Personal Account</button>
+        @endcan
       </div>
     </div>
   </div>
@@ -659,7 +678,14 @@ Connect via IMAP, your Gmail or Outlook account.
 
 
 </div>
-
+@else
+<div class="col-md-12 mb-4">
+  <div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-6 mt-4">
+      <h4 class="text-center">You dont have sufficient permissions.</h4>
+      <p class="mb-3 text-center"> You dont have sufficient to add accounts. </p>
+    </div></div></div>
+@endcan
 @endif
 @include('admin.pages.emails.partials.connect-account')
   <!-- Offcanvas to add new user -->

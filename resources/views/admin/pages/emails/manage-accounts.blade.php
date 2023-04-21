@@ -82,11 +82,14 @@ $configData = Helper::appClasses();
 
             </td>
             <td>
-
-              <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
-            </td>
+            @can('Shared Mailbox')
+            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
+            @endcan
+          </td>
             <td>
+            @can('Personal Mailbox')
               <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','personal');" class="btn btn-primary">Connect Personal Account</button>
+              @endcan
             </td>
           </tr>
         </thead>

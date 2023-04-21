@@ -48,7 +48,12 @@ class EmailAccountController extends Controller
     public function show($id)
     {
          $account = $this->getAccount($id);
-         return response()->json($account);
+         $permission=auth()->user()->getPermission($account);
+         $data = array(
+            'account' => $account,
+            'permission' => $permission
+        );
+          return response()->json($data);
     }
 
     private function getAccount($id){
@@ -83,7 +88,7 @@ class EmailAccountController extends Controller
         // $module = Module::where('name','=','Mailbox')->whereHas('permissions', function ($q) {
         //     $q->where('guard_name', 'admin');
         //   })->with('permissions')->first();
-            $user=Admin::find($request->user_id);
+        $user=Admin::find($request->user_id);
         if($request->permission_id!=0){
             $user->emailAccounts()->syncWithoutDetaching([
                 $id=>[
