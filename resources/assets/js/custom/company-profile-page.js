@@ -296,6 +296,7 @@ $(document).on('click', '.account-image-reset', function () {
         },
         success: function(file, response) {
           $($($this).data('response')).val(response.data.file_path);
+          $($($this).data('response')+'is_new').val(1);
             console.log(response);
         },
         init: function(){
@@ -310,6 +311,21 @@ $(document).on('click', '.account-image-reset', function () {
             /* Called before the file is being sent */
             this.on("sending", function(file){
             });
+
+            this.on("addedfile", function() {
+              if (this.files[1]!=null){
+                this.removeFile(this.files[0]);
+              }
+            });
+
+            this.on("removedfile", function() {
+              $($($this).data('response')).val('');
+            });
+
+            this.on("maxfilesexceeded", function(file){
+                alert("No more files please!");
+            });
+
             this.on("error", function(file, errorMessage, xhr){
               // Check if the response is a validation error
               if (xhr.status === 422) {
@@ -327,14 +343,45 @@ $(document).on('click', '.account-image-reset', function () {
         }
       });
       if($($this).data('file-path')){
-        var img = document.createElement("img");
-        img.src = $($this).data('file-path');
-        dropzone.emit("addedfile", img);
-        dropzone.emit("thumbnail", img, $($this).data('file-path'));
-        dropzone.emit("complete", img);
-        dropzone.files.push(img);
-        img.classList.add('dz-success');
-        img.classList.add('dz-complete');
+        var imageUrl = $($this).data('file-path');
+        fetch(imageUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          var fileName = $($this).data('file-path').split("/").pop();
+          var fileSize = blob.size;
+
+          // Create a file object
+          var file = new File([blob], fileName, { type: blob.type });
+
+          // Add the file to the Dropzone
+          // dropzone.addFile(file);
+
+          // Create a thumbnail from the URL
+          // dropzone.createThumbnailFromUrl(file, imageUrl, function() {
+          //   // Do something when the thumbnail is created
+          // });
+          dropzone.emit("addedfile", file);
+          if(blob.type.includes('image')){
+            dropzone.emit("thumbnail", file, $($this).data('file-path'));
+          }
+          dropzone.emit("complete", file);
+          dropzone.files.push(file);
+          // file.classList.add('dz-success');
+          // file.classList.add('dz-complete');
+
+          // Tell Dropzone that the file has finished uploading
+          // dropzone.emit("complete", file);
+        });
+
+        // var img = document.createElement("img");
+        // img.src = $($this).data('file-path');
+        // console.log(img);
+        // dropzone.emit("addedfile", img);
+        // dropzone.emit("thumbnail", img, $($this).data('file-path'));
+        // dropzone.emit("complete", img);
+        // dropzone.files.push(img);
+        // img.classList.add('dz-success');
+        // img.classList.add('dz-complete');
       }
     });
   }

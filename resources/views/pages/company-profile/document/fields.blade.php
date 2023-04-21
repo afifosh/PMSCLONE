@@ -89,6 +89,7 @@
         </div>
       </div>
       {!! Form::hidden('fields['.$field['id'].']', @$field['value'] ?? null, ['id' => 'fields_'.$field['id']]) !!}
+      {!! Form::hidden('field_is_new['.$field['id'].']', null, ['id' => 'fields_'.$field['id'].'is_new']) !!}
       @modificationAlert(@$modifications['modified_fields']['fields'][$field['id']])
       @else
         <div class="form-group col-12 mt-2">

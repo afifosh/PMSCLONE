@@ -36,7 +36,7 @@ class BankAccountUpdateRequest extends FormRequest
             'iban_no' => 'required|string|max:30',
             'swift_code' => 'required|string|max:30',
             'is_authorized' => 'string|nullable',
-            'poa' => Rule::requiredIf(function () {
+            'bank_letter' => Rule::requiredIf(function () {
               return $this->is_authorized && !request()->bank_account;
             }),
         ];

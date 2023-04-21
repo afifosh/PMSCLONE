@@ -19,9 +19,7 @@
         <span class="custom-option-body">
           <div class="row">
             @forelse ($fields as $field_title => $field_name)
-            @if ($field_name == 'poa')
-              @continue
-            @endif
+              @if ($field_name != 'poa')
                 <div class="col-6 my-1">
                     <div class="fw-bold">
                       {{$field_title}}
@@ -39,6 +37,22 @@
                       </span>
                     </span>
                 </div>
+              @else
+                <div class="col-6 my-1">
+                  <div class="fw-bold">
+                    {{$field_title}}
+                    @if(@$modifications[$field_name])
+                      <span class="text-warning"><i class="fa-solid fa-circle-exclamation fa-lg"></i></span>
+                    @endif
+                  </div>
+                  <span class="fst-italic d-flex justify-content-between">
+                    <a href="{{@$contact[$field_name] ? Storage::url($contact[$field_name]) : '#'}}" target="_blank" class="text-decoration-none">
+                      <i class="fa-solid fa-file fa-lg me-1"></i>
+                      Attachment
+                    </a>
+                  </span>
+                </div>
+              @endif
             @empty
             @endforelse
             @if ($isEditable)

@@ -82,7 +82,7 @@ class DocumentController extends Controller
       $final_fields = [];
       $data = [];
       foreach ($document->fields as $field) {
-        if ($field['type'] == 'file') {
+        if ($field['type'] == 'file' && Storage::exists(KycDocument::TEMP_PATH.'/'.auth()->user()->company_id.'/'.$request->{'fields.' . $field['id']})) {
           $path = CompanyKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
           Storage::move(KycDocument::TEMP_PATH.'/'.auth()->user()->company_id.'/'.$request->{'fields.' . $field['id']}, $path . '/'.$request->{'fields.' . $field['id']});
           $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
