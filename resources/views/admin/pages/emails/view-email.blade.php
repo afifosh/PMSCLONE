@@ -35,36 +35,21 @@
         <hr class="app-email-view-hr mx-n3 mb-2">
         <div class="d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
-            <i class='ti ti-trash cursor-pointer me-3' onclick="deleteRecord('delete', '{{url('admin/emails/'.$message->id.'')}}', 'Message deleted successfully.')"></i>
-           
+         @if(auth()->user()->hasPermission(['Owner','Editor'],$message->account()))
+          <i class='ti ti-trash cursor-pointer me-3' onclick="deleteRecord('delete', '{{url('admin/emails/'.$message->id.'')}}', 'Message deleted successfully.')"></i>
+           @endif
+         @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account()))
             @if($message->is_read)
                <form id="markUnread2">
                   <i onclick="saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/unread')}}','markUnread2','Please try again');" class="ti ti-mail cursor-pointer me-3"></i>
                </form>
-@else
-<form id="markRead2">
+        @else
+      <form id="markRead2">
                   <i onclick="saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/read')}}','markRead2','Please try again');" class="ti ti-mail-opened cursor-pointer me-3"></i>
-</form>
+      </form>
+                @endif
                 @endif
 
-            <div class="dropdown me-3">
-              <!-- <i class="ti ti-folder cursor-pointer" id="dropdownMenuFolder" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              </i> -->
-              <!-- <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuFolder">
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-info-circle ti-xs me-1"></i>
-                  <span class="align-middle">Spam</span>
-                </a>
-                <a class="dropdown-item" href="javascript:void(0)">
-                  <i class="ti ti-pencil ti-xs me-1"></i>
-                  <span class="align-middle">Draft</span>
-                </a>
-                <a class="dropdown-item" href="javascript:deleteRecord('delete', {{url('admin/emails/'.$message->id.'')}}, 'Message deleted successfully.')">
-                  <i class="ti ti-trash ti-xs me-1"></i>
-                  <span class="align-middle">Trash</span>
-                </a>
-              </div> -->
-            </div>
         
           </div>
         </div>

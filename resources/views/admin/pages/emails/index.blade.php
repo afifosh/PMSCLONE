@@ -45,7 +45,9 @@
     var account_id=$("#select-account").find(":selected").val();
     populateFolders(account_id);
   });
-  @if($accounts->count()>0)
+  @if($accounts->filter(function ($account) {
+    return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributor'], $account);
+})->count()>0)
   $(function(){
     var account_id=$("#select-account").find(":selected").val();
     populateFolders(account_id);
@@ -354,7 +356,9 @@ input.each(function(){
 @endsection
 
 @section('content')
-@if($accounts->count()>0)
+@if($accounts->filter(function ($account) {
+    return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributor'], $account);
+})->count()>0)
 <div class="app-email card">
   <div class="row g-0">
     <!-- Email Sidebar -->

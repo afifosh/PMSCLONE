@@ -66,6 +66,7 @@ $configData = Helper::appClasses();
     });
   }
 </script>
+
 @endsection
 @section('content')
 <div class="mt-3  col-12">
@@ -130,7 +131,7 @@ $configData = Helper::appClasses();
                 @endif
                 @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
                 <a href="javascript:ajaxCanvas('{{url('/admin/mail/accounts/'.$account->id.'/edit')}}','edit-account-modal');" class="dropdown-item">Edit</a>
-                @if(!auth()->user()->hasPermission(['Contributor'],$account))
+                @if(auth()->user()->hasPermission(['Owner','Editor'],$account))
                 <a href="javascript:deleteRecord('delete','{{url('/admin/mail/accounts/'.$account->id.'/delete')}}','');" class="dropdown-item">Delete</a>
                 @endif
                 @endif
@@ -149,7 +150,7 @@ $configData = Helper::appClasses();
   <div></div>
 </div>
  <!-- Share Account Modal -->
- <div class="modal fade" id="share-account-modal" tabindex="-1" aria-hidden="true">
+ <div class="modal fade" id="share-account-modal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
  <div class="modal-dialog modal-lg modal-simple modal-enable-otp modal-dialog-centered">
                   <div class="modal-content p-3 p-md-5">
                   </div>
