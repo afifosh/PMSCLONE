@@ -55,7 +55,8 @@ class CheckDeviceAuthorization extends RedirectIfTwoFactorAuthenticatable
         // ->where( 'updated_at', '>', Carbon::now()->subDays(30))->first();
 
         $known = $user->shouldSkipTwoFactor($ip,$userAgent,$fingerPrint);   
-        //  dd(  $known );
+
+
         if($request->has('fingerprint')   &&  $known  ) {
 
             return app(\Illuminate\Pipeline\Pipeline::class)->send($request)

@@ -25,7 +25,7 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 */
 Route::get('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitation.accept')->middleware('guest' ,'guest:admin', 'guest:web');
 Route::post('/invitations/{token}/confirm', [InvitationController::class, 'acceptConfirm'])->name('invitation.confirm')->middleware('guest' ,'guest:admin', 'guest:web');
-// Route::any('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
+Route::any('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
 Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->group(function () {
 
     Route::post('/keep-alive', fn() => response()->json(['status' => __('success')]))->name('alive');

@@ -101,7 +101,7 @@ class RedirectToMailOTP extends RedirectIfTwoFactorAuthenticatable
                     return  app(\Illuminate\Pipeline\Pipeline::class)->send($request)
                     ->through([
                         RedirectIfTwoFactorAuthenticatable::class,
-                        CaptchaValidations::class,
+                     // CaptchaValidations::class,
                     ])->thenReturn();
             } else {
                     return  app(\Illuminate\Pipeline\Pipeline::class)->send($request)
@@ -239,7 +239,7 @@ class RedirectToMailOTP extends RedirectIfTwoFactorAuthenticatable
         //     ]);
         // }
 
-   // dd($user);
+   //dd($user);
 
         if (Fortify::confirmsTwoFactorAuthentication()) {
             if (optional($user)->two_factor_email_confirmed &&
@@ -287,7 +287,7 @@ class RedirectToMailOTP extends RedirectIfTwoFactorAuthenticatable
      */
     protected function twoFactorChallengeResponse($request, $user)
     {
-
+        //   dd("afif");
         
         $request->session()->put([
             'login.id' => $user->getKey(),

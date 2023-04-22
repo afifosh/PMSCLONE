@@ -101,7 +101,7 @@ class CaptchaValidations  extends RedirectIfTwoFactorAuthenticatable
                 }
         }
   
-
+       // return $next($request);
 
     //    $user = $request->challengedUser();  
     //    $this->guard->login($user, $request->remember());

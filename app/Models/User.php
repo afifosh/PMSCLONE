@@ -170,8 +170,8 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
         $safe = $deviceAuthorization->safe;
         $lastLogin = $deviceAuthorization->updated_at;
         $expiration = now()->subDays(30);
-    
-        return $safe && $lastLogin->gt($expiration);
+
+        return $safe && $lastLogin->gt($expiration) &&  $deviceAuthorization->failed_attempts < config('auth.device_authorization.failed_limit');
     }
             
     /**
