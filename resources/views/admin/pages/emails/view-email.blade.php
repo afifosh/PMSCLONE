@@ -8,11 +8,11 @@
           </div>
           <!-- Email View : Action  bar-->
           <div class="d-flex">
+          @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account))
             <div class="dropdown ms-3">
               <i class="ti ti-dots-vertical cursor-pointer" id="dropdownMoreOptions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               </i>
               <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMoreOptions">
-              @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account))
               @if($message->is_read)
                <form id="markUnread">
                <a class="dropdown-item" href="javascript:saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/unread')}}','markUnread','Please try again');">
@@ -28,9 +28,10 @@
                 </a>
 </form>
                 @endif
-@endif
               </div>
             </div>
+            @endif
+
           </div>
         </div>
         <hr class="app-email-view-hr mx-n3 mb-2">
@@ -100,9 +101,9 @@
           </div>
           <div style="overflow-y: auto;" class="card-body">
           @if($message->html_body==null || $message->html_body=="")
-          {!!$message->text_body!!}  
+          <iframe srcdoc="{!! $message->text_body !!}"></iframe>
           @else
-          {!!$message->html_body!!}  
+          <iframe src="{!! $message->html_body !!}"></iframe>  
           @endif
         <input type="hidden" id="mail_type" value="compose"/>
       @if(count(json_decode(json_encode($message->attachments()),true))>0)

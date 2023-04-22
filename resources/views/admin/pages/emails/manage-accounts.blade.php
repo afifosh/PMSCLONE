@@ -114,7 +114,7 @@ $configData = Helper::appClasses();
               <span class="switch-label">Primary Account </span>
 
               <label class="switch">
-                <input type="radio" class="switch-input" @if($account->isprimary()) checked @endif onchange="makePrimary({{$account->id}});" name="make_primary" />
+                <input type="radio" class="switch-input"  @if($account->isprimary()) checked @endif onchange="makePrimary({{$account->id}});" @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account)) @else disabled @endif name="make_primary" />
                 <span class="switch-toggle-slider">
                   <span class="switch-on"></span>
                   <span class="switch-off"></span>
@@ -126,7 +126,7 @@ $configData = Helper::appClasses();
 
               <label class="switch">
               
-                <input type="checkbox" class="switch-input" @if($account->sync_state!=App\Enums\SyncState::ENABLED) checked @endif onchange="disableSync(this,{{$account->id}});" name="disable_sync" />
+                <input type="checkbox" @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account)) @else disabled @endif class="switch-input" @if($account->sync_state!=App\Enums\SyncState::ENABLED) checked @endif onchange="disableSync(this,{{$account->id}});" name="disable_sync" />
                 <span class="switch-toggle-slider">
                   <span class="switch-on"></span>
                   <span class="switch-off"></span>
@@ -134,18 +134,19 @@ $configData = Helper::appClasses();
               </label>
             </td>
             <td>
+            @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
               <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></button>
               <div class="dropdown-menu dropdown-menu-end m-0 show" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(425px, 47px);" data-popper-placement="bottom-end" data-popper-reference-hidden="" data-popper-escaped="">
                 @if($account->isShared() && $account->created_by==auth()->user()->id)
                 <a href="javascript:ajaxModal('{{url('/admin/mail/accounts/'.$account->id.'/share')}}','share-account-modal');" class="dropdown-item">Share</a>
                 @endif
-                @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
+
                 <a href="javascript:ajaxCanvas('{{url('/admin/mail/accounts/'.$account->id.'/edit')}}','edit-account-modal');" class="dropdown-item">Edit</a>
                 @if(auth()->user()->hasPermission(['Owner','Editor'],$account))
                 <a href="javascript:deleteRecord('delete','{{url('/admin/mail/accounts/'.$account->id.'/delete')}}','');" class="dropdown-item">Delete</a>
                 @endif
-                @endif
               </div>
+              @endif
             </td>
           </tr>
           @endif

@@ -69,7 +69,7 @@ class EmailAccountController extends Controller
 
     public function share($id)
     {
-         $users=Admin::all();
+         $users=Admin::where('id', '!=', auth()->user()->id)->get();
          $module = Module::where('name','=','Mailbox')->whereHas('permissions', function ($q) {
             $q->where('guard_name', 'admin');
           })->with('permissions')->first();

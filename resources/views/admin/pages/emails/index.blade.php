@@ -66,11 +66,13 @@
             $("#activate-folders").hide();
             $("#manage-accounts").hide();
             $('.btn-compose').hide();
+            $('.email-list-item-input').hide();
           }
-          else if(permission=='Contributor'){
+          else{
             $('.btn-compose').show();
             $("#activate-folders").show();
             $("#manage-accounts").show();
+            $('.email-list-item-input').show();
 
           }
           var folders=response.account.folders;
@@ -85,7 +87,7 @@
            }
             html+=`<a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">`+folders[i].display_name+`</span>
-            </a>`+(folders[i].unread_count!=0?'<div class="badge bg-label-primary rounded-pill badge-center">'+folders[i].unread_count+'</div>':"")+``;
+            </a>`+(folders[i].unread_count!=0?'<div class="badge bg-label-danger rounded-pill badge-center ms-auto" style="width:auto">'+folders[i].unread_count+'</div>':"")+``;
             if(folders[i].parent_id!=null){
             html+='</div>';
            }
@@ -133,7 +135,7 @@
            else{
            for(var i=0; i<messages.length; i++){
           html+=`
-            <li  class="email-list-item `+(messages[i].is_read? 'email-marked-read"':'')+`" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
+            <li  class="email-list-item `+(messages[i].is_read? '':'email-marked-read')+`" data-12="true" data-bs-toggle="sidebar" onclick="showMessage(`+folder_id+`,`+messages[i].id+`);" data-id="#`+messages[i].id+`">
               <div class="d-flex align-items-center">
                 <div class="form-check mb-0">
                   <input class="email-list-item-input form-check-input" data-id="`+messages[i].id+`" type="checkbox" id="email-`+messages[i].id+`">
@@ -162,7 +164,7 @@ if (messageDate.isSame(today, 'd')) {
   // Otherwise, show the full date and time
   displayDate = messageDate.format('MMMM D, YYYY h:mm A');
 } 
-                html+= `<small class="email-list-item-time text-muted" style="width: 170px; whitespace:nowrap; display:inline-block !important">`+displayDate+`</small>
+                html+= `<small class="email-list-item-time text-muted" style="width: auto; whitespace:nowrap; display:inline-block !important">`+displayDate+`</small>
                 </div>
               </div>
             </li>`;
@@ -427,7 +429,9 @@ input.each(function(){
                 <i class="ti ti-dots-vertical cursor-pointer" id="emailsActions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="emailsActions">
+                @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
                   <button class="dropdown-item" onclick="editAccount();">Edit Email Account</button>
+                @endif
                   <a class="dropdown-item" href="{{url('/admin/mail/accounts/manage-accounts')}}">Manage Accounts</a>
                 </div>
               </div>
@@ -437,10 +441,16 @@ input.each(function(){
           <!-- Email List: Actions -->
           <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-              <div class="form-check mb-0 me-2">
+            @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
+            <div class="form-check mb-0 me-2">
                 <input class="form-check-input" type="checkbox" id="email-select-all">
                 <label class="form-check-label" for="email-select-all"></label>
               </div>
+            @else
+            <style>
+              .form-check{display: none;}
+            </style>
+            @endif
           @if(auth()->user()->hasPermission(['Owner','Editor'],$account))
               <i class="ti ti-trash email-list-delete cursor-pointer me-2" onclick="bulkAction('delete');"></i>
           @endif
@@ -472,7 +482,9 @@ input.each(function(){
       <div class="card-body">
         <i class="ti ti-xl ti-folder" style="font-size:3rem !important"></i>
         <p class="card-text">This account has no active folders. Enable active folders by editing the mail account, the active folders will be the folders that will be synchronized to the application.</p>
+        @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
         <a href="javascript:editAccount();" id="activate-folders" class="btn btn-primary">Activate Folders</a>
+        @endif
         <a href="{{url('/admin/mail/accounts/manage-accounts')}}" id="manage-accounts" class="btn btn-secondary">Manage Accounts</a>
       </div>
     </div>
