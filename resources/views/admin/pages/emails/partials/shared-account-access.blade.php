@@ -9,13 +9,13 @@
                     <div class="mb-4 pb-2">
                       <label for="select2Basic" class="form-label">Add Users</label>
                       <select
-                        id="select2Basic"
-                        class="form-select form-select-lg share-project-select"
+                        id="select2Basic" onchange="addUser(this);"
+                        class="form-select select2 form-select-lg share-project-select"
                         data-allow-clear="true"
                       >
                       <option>Select User</option>
                     @foreach($users as $user)
-                      <option value="{{$user->id}}" data-avatar="{{$user->avatar}}" data-email="{{$user->email}}" data-name="{{$user->first_name. ' ' . $user->last_name}}">
+                      <option value="{{$user->id}}" data-user-id="{{$user->id}}" data-avatar="{{$user->avatar}}" data-email="{{$user->email}}" data-name="{{$user->first_name. ' ' . $user->last_name}}">
                           {{$user->first_name. ' ' . $user->last_name}}
                         </option>
                         @endforeach
@@ -64,15 +64,16 @@
     // Get the select element and members list
     const select = document.getElementById('select2Basic');
     const membersList = document.getElementById('members-list');
+    debugger;
     
     // Add a change event listener to the select element
-    select.addEventListener('change', function(event) {
+     function addUser(event) {
         // Get the selected option and its data attributes
         const option = select.options[select.selectedIndex];
         const name = option.dataset.name;
         const email = option.dataset.email;
         const avatar = option.dataset.avatar;
-        const userId = event.target.value;
+        const userId = option.dataset.userId;
        
         const isUserAdded = [...membersList.children].some((li) => {
         const userIdAttr = li.getAttribute('data-user-id');
@@ -118,7 +119,7 @@
         // Append the new li element to the members list
         membersList.appendChild(li);
     }
-    });
+    }//);
     function permissionChanged(permission,user_id,permission_id){
       $('#button-'+user_id).html(permission);
         var url="{{url('/admin/mail/accounts/:accountId/setPermission')}}";
@@ -136,6 +137,7 @@
     );
     
     }
+    $('.select2').select2();
 </script>
 
             

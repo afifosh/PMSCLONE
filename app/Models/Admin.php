@@ -178,6 +178,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     ->join('user_email_accounts', 'user_email_accounts.permission_id', '=', 'permissions.id')
     ->join('admins', 'admins.id', '=', 'user_email_accounts.user_id')
     ->join('email_accounts', 'email_accounts.id', '=', 'user_email_accounts.email_account_id')
+    ->where('admins.id',$this->id)
     ->select('permissions.name')
     ->first();
       return $permission->name;

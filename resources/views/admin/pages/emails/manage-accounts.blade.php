@@ -9,12 +9,19 @@ $configData = Helper::appClasses();
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
 @endsection
-
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
+<style>
+  .light-style .select2-dropdown{
+    z-index: 100000;
+  }
+</style>
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
 @endsection
 <script src="{{asset('assets/js/helper.js')}}"></script>
 @section('page-script')
+<script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+
 @include('admin.pages.emails.partials.scripts')
 <script>
   function disableSync(elem, account_id) {

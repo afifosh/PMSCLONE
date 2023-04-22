@@ -566,7 +566,7 @@ input.each(function(){
   <!-- /Compose Email -->
 </div>
 @else
-@can(['Personal Mailbox','Shared Mailbox'])
+@if(auth()->user()->can('Personal Mailbox') || auth()->user()->can('Shared Mailbox'))
 <div class="col-md-12 mb-4">
   <div class="row justify-content-center py-5">
     <div class="col-md-8 col-lg-6 mt-4">
@@ -685,7 +685,7 @@ Connect via IMAP, your Gmail or Outlook account.
       <h4 class="text-center">You dont have sufficient permissions.</h4>
       <p class="mb-3 text-center"> You dont have sufficient to add accounts. </p>
     </div></div></div>
-@endcan
+@endif
 @endif
 @include('admin.pages.emails.partials.connect-account')
   <!-- Offcanvas to add new user -->

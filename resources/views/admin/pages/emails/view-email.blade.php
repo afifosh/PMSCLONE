@@ -12,7 +12,8 @@
               <i class="ti ti-dots-vertical cursor-pointer" id="dropdownMoreOptions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               </i>
               <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMoreOptions">
-               @if($message->is_read)
+              @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account))
+              @if($message->is_read)
                <form id="markUnread">
                <a class="dropdown-item" href="javascript:saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/unread')}}','markUnread','Please try again');">
                   <i class="ti ti-mail ti-xs me-1"></i>
@@ -27,7 +28,7 @@
                 </a>
 </form>
                 @endif
-
+@endif
               </div>
             </div>
           </div>
@@ -35,10 +36,10 @@
         <hr class="app-email-view-hr mx-n3 mb-2">
         <div class="d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
-         @if(auth()->user()->hasPermission(['Owner','Editor'],$message->account()))
+         @if(auth()->user()->hasPermission(['Owner','Editor'],$message->account))
           <i class='ti ti-trash cursor-pointer me-3' onclick="deleteRecord('delete', '{{url('admin/emails/'.$message->id.'')}}', 'Message deleted successfully.')"></i>
            @endif
-         @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account()))
+         @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account))
             @if($message->is_read)
                <form id="markUnread2">
                   <i onclick="saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/unread')}}','markUnread2','Please try again');" class="ti ti-mail cursor-pointer me-3"></i>
@@ -78,6 +79,7 @@
             </div>
             <div class="d-flex align-items-center">
               <p class="mb-0 me-3 text-muted">{{$message->date}}</p>
+              @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account))
               <div class="dropdown me-3">
                 <i class="ti ti-dots-vertical cursor-pointer" id="dropdownEmail" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>
@@ -93,6 +95,7 @@
               
                 </div>
               </div>
+              @endif
             </div>
           </div>
           <div style="overflow-y: auto;" class="card-body">
