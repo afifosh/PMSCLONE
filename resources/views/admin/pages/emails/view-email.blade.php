@@ -101,9 +101,9 @@
           </div>
           <div style="overflow-y: auto;" class="card-body">
           @if($message->html_body==null || $message->html_body=="")
-          <iframe srcdoc="{!! $message->text_body !!}"></iframe>
+          <iframe srcdoc="{!! htmlspecialchars($message->text_body) !!}" onload=" var iframeBody = $(this).contents().find('body');$(this).height(iframeBody.height());" width="100%"></iframe>
           @else
-          <iframe src="{!! $message->html_body !!}"></iframe>  
+          <iframe srcdoc="{!! htmlspecialchars($message->html_body) !!}" width="100%" onload=" var iframeBody = $(this).contents().find('body');$(this).height(iframeBody.height()+100);"></iframe>  
           @endif
         <input type="hidden" id="mail_type" value="compose"/>
       @if(count(json_decode(json_encode($message->attachments()),true))>0)
