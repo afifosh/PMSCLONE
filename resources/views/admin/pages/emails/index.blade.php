@@ -83,13 +83,14 @@
               isSync=true;
             html+=`<li class="d-flex justify-content-between folder-items" onclick="populateMessages(`+account_id+`,`+folders[i].id+`,1);$('#app-email-view').removeClass('show');" id="folder-`+folders[i].id+`">`;
            if(folders[i].parent_id!=null){
-            html+='<div style="padding-left:5px">';
-           }
+            html+=`<a href="javascript:void(0);" class="d-flex flex-wrap align-items-center ps-1git">
+              <span class="align-middle ms-2">`+folders[i].display_name+`</span>
+            </a>`+(folders[i].unread_count!=0?'<div class="badge bg-label-danger rounded-pill badge-center ms-auto" style="width:auto">'+folders[i].unread_count+'</div>':"")+``;
+
+           }else{
             html+=`<a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">`+folders[i].display_name+`</span>
             </a>`+(folders[i].unread_count!=0?'<div class="badge bg-label-danger rounded-pill badge-center ms-auto" style="width:auto">'+folders[i].unread_count+'</div>':"")+``;
-            if(folders[i].parent_id!=null){
-            html+='</div>';
            }
             html+=`</li>`;
         }
