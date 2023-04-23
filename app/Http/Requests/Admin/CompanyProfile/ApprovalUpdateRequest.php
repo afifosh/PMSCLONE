@@ -29,6 +29,15 @@ class ApprovalUpdateRequest extends FormRequest
             'approval_status' => 'required|array',
             'approval_status.*' => 'nullable',
             'comment' => 'array',
+            'comment.*' => 'required_if:approval_status.*,0|max:255',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'modification_ids.required' => 'Please select at least one modification.',
+            'comment.*.required_if' => 'Please enter a comment.',
         ];
     }
 }

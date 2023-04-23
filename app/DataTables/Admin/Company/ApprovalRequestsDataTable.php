@@ -29,22 +29,23 @@ class ApprovalRequestsDataTable extends DataTable
         // $url = $this->type == 'verified' ? null : $url;
         return view('admin._partials.sections.company-avatar', compact('company', 'url'));
       })
-      ->editColumn('added_by', function ($company) {
-        return $company->addedBy->email ?? '-';
-      })
       ->editColumn('approval_status', function ($row) {
         return $this->makeApprovalStatus($row->approval_status);
+      })
+      ->addColumn('pending',function($com){
+        return view('admin._partials.sections.progressBar', ['perc' => $com->profilePendingApprovalPercentage(), 'color' => 'warning']);
+      })
+      ->addColumn('approved', function ($com) {
+        return view('admin._partials.sections.progressBar', ['perc' => $com->profileApprovedPercentage(), 'color' => 'success']);
+      })
+      ->addColumn('rejected', function ($com) {
+        return view('admin._partials.sections.progressBar', ['perc' => $com->profileRejectedPercentage(), 'color' => 'danger']);
       })
       ->editColumn('status', function ($row) {
         return $this->makeStatus($row->status);
       })
-      ->filterColumn('added_by', function ($query, $keyword) {
-        return $query->whereHas('addedBy', function ($q) use ($keyword) {
-          return $q->where('email', 'like', '%' . $keyword . '%');
-        });
-      })
       ->setRowId('id')
-      ->rawColumns(['name', 'action', 'status', 'approval_status']);
+      ->rawColumns(['name', 'action', 'pending', 'approved', 'rejected', 'status', 'approval_status']);
   }
 
   protected function makeStatus($status)
@@ -108,7 +109,7 @@ class ApprovalRequestsDataTable extends DataTable
     $query->when($this->type == 'verified', function ($q) {
       return $q->whereNotNull('approved_at');
     });
-    $query->with('addedBy');
+
     return $query->applyRequestFilters()->orderBy('verified_at', 'DESC');
   }
 
@@ -131,10 +132,15 @@ class ApprovalRequestsDataTable extends DataTable
       >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->orderBy(0, 'DESC')
-      ->parameters([
-        'buttons' => $buttons,
-        "scrollX" => true
-      ]);
+      ->parameters(
+        [
+          'buttons' => $buttons,
+          "scrollX" => true,
+          "drawCallback" => "function (settings) {
+            $('[data-bs-toggle=\"tooltip\"]').tooltip();
+          }"
+        ]
+      );
   }
 
   /**
@@ -148,8 +154,9 @@ class ApprovalRequestsDataTable extends DataTable
       return [
         // Column::make('id'),
         Column::make('name')->title(__('Bussines Legal Name')),
-        Column::make('source'),
-        Column::make('added_by'),
+        Column::make('pending'),
+        Column::make('approved'),
+        Column::make('rejected'),
         Column::make('approval_level'),
         Column::make('approval_status'),
         Column::make('status'),
@@ -159,8 +166,6 @@ class ApprovalRequestsDataTable extends DataTable
     } else {
       return [
         Column::make('name')->title(__('Bussines Legal Name')),
-        Column::make('source'),
-        Column::make('added_by'),
         Column::make('verified_at'),
         Column::make('created_at'),
         Column::make('updated_at'),

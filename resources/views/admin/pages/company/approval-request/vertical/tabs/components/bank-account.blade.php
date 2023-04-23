@@ -52,6 +52,7 @@
               @endif
             @empty
             @endforelse
+            @include('admin.pages.company.approval-request.vertical.tabs.components.approval-timeline')
             @if ($isEditable)
               <div class="row mt-2">
                 <div class="">

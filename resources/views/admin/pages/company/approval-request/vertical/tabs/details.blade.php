@@ -1,6 +1,8 @@
 @php
   $detail_original = $detail;
   $modifications = [];
+  $approvals = $POCDetail ? $POCDetail->approvals : (@$detail->modifications[0] ? $detail->modifications[0]->approvals : []);
+  $disapprovals = $POCDetail ? $POCDetail->disapprovals : (@$detail->modifications[0] ? $detail->modifications[0]->disapprovals : []);
   if (!is_array($detail) && $detail_original && $detail->modifications->count()) {
     $modifications = transformModifiedData($detail->modifications[0]->modifications);
     $detail = $modifications + $detail->toArray();
@@ -72,6 +74,7 @@
                   </div>
               @empty
               @endforelse
+              @include('admin.pages.company.approval-request.vertical.tabs.components.approval-timeline')
               @if ($isEditable)
                 <div class="row mt-2">
                   <div class="">

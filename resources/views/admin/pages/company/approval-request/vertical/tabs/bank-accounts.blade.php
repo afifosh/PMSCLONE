@@ -9,6 +9,8 @@
         $modifications = [];
         $isEditable = false;
         $status = 'approved';
+        $approvals = @$account_original->modifications[0]->approvals ?? [];
+        $disapprovals = @$account_original->modifications[0]->disapprovals ?? [];
         if ($account->modifications->count()) {
           if($account_original->modifications[0]->approvals->count() < $level && !$account_original->modifications[0]->disapprovals->count()){
             $isEditable = true;
@@ -34,6 +36,8 @@
           $account_original = $account;
           $isEditable = true;
           $status = 'pending';
+          $approvals = $account_original->approvals;
+          $disapprovals = $account_original->disapprovals;
           if(isset($account) && ($account->approvals_count >= $level || $account->disapprovals_count)) {
               $isEditable = false;
               if($account->approvals_count >= $level){
