@@ -266,6 +266,51 @@ class EmailAccountMessage extends Model implements Presentable
             || ! is_null($this->headers->firstWhere('name', 'references'));
     }
 
+
+    public function getParent(){
+            $parent=$this->headers->firstWhere('name', 'in-reply-to');
+            if($parent!=null){
+            return EmailAccountMessage::where('message_id',$parent->value)->first();
+        }
+        else{
+            return [];
+        }
+    }
+
+    public function getThread(){
+        // $threadMessage = [];
+
+        // // Keep looping until we find a message that is not a reply
+        // $parent = $this->getParent();
+        // while ($parent && $parent->isReply()) {
+        //     $threadMessage[] = $parent;
+        //     $parent = $parent->getParent();
+        // }
+    
+        // // If we found a message that is not a reply, add it to the thread
+        // if ($parent) {
+        //     $threadMessage[] = $parent;
+        // }
+    
+        // return $threadMessage;
+
+        $threadMessage = collect();
+
+        // Keep looping until we find a message that is not a reply
+        $parent = $this->getParent();
+        while ($parent && $parent->isReply()) {
+            $threadMessage->prepend($parent);
+            $parent = $parent->getParent();
+        }
+        
+        // If we found a message that is not a reply, add it to the thread
+        if ($parent) {
+            $threadMessage->prepend($parent);
+        }
+        
+        return $threadMessage;
+    }
+
     /**
      * Get the previewText attribute
      *
@@ -331,4 +376,6 @@ class EmailAccountMessage extends Model implements Presentable
     {
         return 'email';
     }
+
+ 
 }
