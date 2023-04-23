@@ -70,7 +70,7 @@
       "app/Helpers/Helpers.php",
       "app/Helpers/helper.php",
       "app/Helpers/onlyofficeHelpers.php",
-      "app/Support/helpers.php"
+      "app/Support/Helpers.php"
     ]
   },
   "autoload-dev": {
