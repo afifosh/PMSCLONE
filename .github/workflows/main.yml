@@ -28,18 +28,18 @@ jobs:
               rm .env -f
               cp .env.server .env
               composer update
-              php artisan key:generate
-              php artisan storage:link --force
-              php artisan migrate:fresh --force
-              php artisan db:seed --class=CountriesTableSeeder --force
-              php artisan db:seed --class=ModuleSeeder --force
-              php artisan db:seed --class=AdminRolesPermissionsSeeder --force
-              php artisan db:seed --class=UserRolesPermissionsSeeder --force
-              php artisan db:seed --class=AdminSeeder --force
-              php artisan db:seed --class=HRSeeder --force
-              php artisan db:seed --class=CompanySeeder --force
-              php artisan db:seed --class=ProgramSeeder --force
-              php artisan db:seed --class=WorkflowSeeder --force
-              php artisan db:seed --class=KycDocumentSeeder --force
+              php -d  memory_limit=-1 artisan key:generate
+              php -d  memory_limit=-1 artisan storage:link --force
+              php -d  memory_limit=-1 artisan migrate:fresh --force
+              php -d  memory_limit=-1 artisan db:seed --class=CountriesTableSeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=ModuleSeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=AdminRolesPermissionsSeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=UserRolesPermissionsSeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=AdminSeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=HRSeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=CompanySeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=ProgramSeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=WorkflowSeeder --force
+              php -d  memory_limit=-1 artisan db:seed --class=KycDocumentSeeder --force
               nvm use 16 && yarn
               yarn dev
