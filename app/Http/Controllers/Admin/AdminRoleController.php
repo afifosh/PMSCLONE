@@ -33,7 +33,7 @@ class AdminRoleController extends Controller
 
   public function create()
   {
-    $modules = Module::whereHas('permissions', function ($q) {
+    $modules = Module::where('name','!=','Mailbox')->whereHas('permissions', function ($q) {
       $q->where('guard_name', 'admin');
     })->with('permissions')->get();
     return view('admin._partials.sections.add-role', compact('modules'))->render();
@@ -59,7 +59,7 @@ class AdminRoleController extends Controller
   {
     $data['role'] = Role::where('guard_name', 'admin')->where('id', $role)->firstOrFail();
     $data['allowed_permissions'] = $data['role']->permissions()->pluck('id')->toArray();
-    $data['modules'] = Module::whereHas('permissions', function ($q) {
+    $data['modules'] = Module::where('name','!=','Mailbox')->whereHas('permissions', function ($q) {
       $q->where('guard_name', 'admin');
     })->with('permissions')->get();
 

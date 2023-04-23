@@ -112,6 +112,12 @@
       "slug": "admin.programs.index"
     },
     {
+      "url": "/admin/mail/accounts",
+      "name": "Emails",
+      "icon": "menu-icon tf-icons ti ti-mail",
+      "slug": "admin.mail.index"
+    },
+    {
       "url": "/admin/draft-rfps",
       "name": "Draft RFPs",
       "icon": "menu-icon tf-icons ti ti-color-swatch",

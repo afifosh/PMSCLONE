@@ -4,7 +4,7 @@ namespace App\Services\Core\Setting\Broadcast\ProviderConfiguration;
 
 use App\Services\Core\Contracts\BootConfiguration;
 
-class Pusher implements BootConfiguration
+class Ajax implements BootConfiguration
 {
     public function load($configurations)
     {

@@ -29,5 +29,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ProgramSeeder::class);
         $this->call(WorkflowSeeder::class);
         $this->call(KycDocumentSeeder::class);
+        $this->call(EmailPermissionsSeeder::class);
     }
 }
