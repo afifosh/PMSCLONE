@@ -92,13 +92,25 @@ class BankAccountController extends Controller
     } else {
       // auth()->user()->company->bankAccounts()->findOrFail($bank_account)->modifications()->delete();
       // auth()->user()->company->bankAccounts()->findOrFail($bank_account)->updateIfDirty($request->validated());
+      $ba = @auth()->user()->company->contacts()->with('modifications')->findOrFail($bank_account);
+      $mod = transformModifiedData(@$ba->modifications[0]->modifications ?? []) + $ba->toArray();
+      if($mod['bank_letter'] == null)
+        unset($mod['bank_letter']);
+      unset($mod['company_id'], $mod['id'], $mod['created_at'], $mod['updated_at'], $mod['is_update'], $mod['modifications'], $mod['status']);
 
-      $acc = auth()->user()->company->contacts()->findOrFail($bank_account)->modifications;
+      $modifications = $ba->modifications;
+
       if($request->hasFile('bank_letter') || !$request->is_authorized)
-      (!$acc->isEmpty() && @$acc[0]->modifications['bank_letter']['modified']) ? ImageTrait::deleteImage($acc->modifications['bank_letter']['modified'], 'public') : '';
-      $t = (!$acc->isEmpty() && @$acc[0]->modifications['bank_letter']['modified']) ? ['bank_letter' => @$acc->modifications['bank_letter']['modified']] : [];
-      auth()->user()->company->bankAccounts()->findOrFail($bank_account)->updateIfDirty($this->uploadBankLetter($request, $fileRepository) + $t);
-      isset($acc[0]) ? $acc[0]->delete() : '';
+      (!$modifications->isEmpty() && @$modifications[0]->modifications['bank_letter']['modified']) ? ImageTrait::deleteImage($modifications[0]->modifications['bank_letter']['modified'], 'public') : '';
+      $t = (!$modifications->isEmpty() && @$modifications[0]->modifications['bank_letter']['modified']) ? ['bank_letter' => @$modifications[0]->modifications['bank_letter']['modified']] : [];
+
+      $new_att = $this->uploadBankLetter($request, $fileRepository) + $t;
+      if(empty(array_diff_assoc_recursive($mod, $new_att))){
+        return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
+      }
+
+      $ba->updateIfDirty($new_att);
+      isset($modifications[0]) ? $modifications[0]->delete() : '';
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 5]);
   }

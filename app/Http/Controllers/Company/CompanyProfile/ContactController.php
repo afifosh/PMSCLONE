@@ -78,12 +78,24 @@ class ContactController extends Controller
       auth()->user()->company->contacts()->create($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
       $cont->delete();
     } else {
-      $cont = auth()->user()->company->contacts()->findOrFail($contact)->modifications;
+      $cont = @auth()->user()->company->contacts()->with('modifications')->findOrFail($contact);
+      $mod = transformModifiedData(@$cont->modifications[0]->modifications ?? []) + $cont->toArray();
+      if($mod['poa'] == null)
+        unset($mod['poa']);
+      unset($mod['company_id'], $mod['id'], $mod['created_at'], $mod['updated_at'], $mod['is_update'], $mod['modifications'], $mod['status']);
+
+      $modifications = $cont->modifications;
       if($request->hasFile('poa') || !$request->is_authorized)
-      (!$cont->isEmpty() && @$cont[0]->modifications['poa']['modified']) ? ImageTrait::deleteImage($cont->modifications['poa']['modified'], 'public') : '';
-      $t = (!$cont->isEmpty() && @$cont[0]->modifications['poa']['modified']) ? ['poa' => @$cont->modifications['poa']['modified']] : [];
-      auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($this->uploadPOA($request, $fileRepository) + $t);
-      isset($cont[0]) ? $cont[0]->delete() : '';
+      (!$modifications->isEmpty() && @$modifications[0]->modifications['poa']['modified']) ? ImageTrait::deleteImage($modifications[0]->modifications['poa']['modified'], 'public') : '';
+      $t = (!$modifications->isEmpty() && @$modifications[0]->modifications['poa']['modified']) ? ['poa' => @$modifications[0]->modifications['poa']['modified']] : [];
+
+      $new_att = $this->uploadPOA($request, $fileRepository) + $t;
+      if(empty(array_diff_assoc_recursive($mod, $new_att))){
+        return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
+      }
+
+      auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($new_att);
+      isset($modifications[0]) ? $modifications[0]->delete() : '';
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
   }

@@ -73,8 +73,14 @@ class AddressController extends Controller
       auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address)->delete();
       auth()->user()->company->addresses()->create($request->validated());
     }else{
-      auth()->user()->company->addresses()->findOrFail($address)->modifications()->delete();
-      auth()->user()->company->addresses()->findOrFail($address)->updateIfDirty($request->validated());
+      $addr = @auth()->user()->company->addresses()->with('modifications')->findOrFail($address);
+      $mod = transformModifiedData(@$addr->modifications[0]->modifications ?? []) + $addr->toArray();
+      unset($mod['company_id'], $mod['id'], $mod['created_at'], $mod['updated_at'], $mod['is_update'], $mod['modifications'], $mod['status']);
+      if(empty(array_diff_assoc_recursive($mod, $request->validated()))){
+        return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
+      }
+      $addr->modifications()->delete();
+      $addr->updateIfDirty($request->validated());
     }
 
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 3]);
