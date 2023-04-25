@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'default' => ENV('SETTINGS_DRIVER', 'array'),
+    'default' => ENV('SETTINGS_DRIVER', 'json'),
 
     /* -----------------------------------------------------------------
      |  Drivers
