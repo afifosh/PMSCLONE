@@ -15,6 +15,7 @@ namespace App\Models;
 use App\Innoclapps\Models\Model;
 use App\Innoclapps\Media\HasMedia;
 use App\Innoclapps\Concerns\HasAvatar;
+use App\Repositories\EmailAccountMessageRepositoryEloquent;
 use App\Support\EmailAccountMessageBody;
 use App\Innoclapps\Contracts\Presentable;
 use App\Innoclapps\Timeline\Timelineable;
@@ -288,7 +289,10 @@ class EmailAccountMessage extends Model implements Presentable
     
         // If a parent ID was found, retrieve the parent email
         if ($parentId) {
-            return EmailAccountMessage::where('message_id', $parentId)->first();
+            $message= EmailAccountMessage::where('message_id', $parentId)->first();
+            $messages=new EmailAccountMessageRepositoryEloquent;
+            $message->loadMissing($messages->getResponseRelations());
+            return $message;
         }
     
         // If no parent ID was found, return null

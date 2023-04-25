@@ -142,9 +142,10 @@
                   <input class="email-list-item-input form-check-input" data-id="`+messages[i].id+`" type="checkbox" id="email-`+messages[i].id+`">
                   <label class="form-check-label" for="email-`+messages[i].id+`"></label>
                 </div>
-                <div class="email-list-item-content ms-2 ms-sm-0 me-2">
-                  <span class="email-list-item-username me-2">`+(messages[i].from.name==null?messages[i].from.address:messages[i].from.name)+`</span>
-                  <span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
+                <div class="email-list-item-content ms-2 ms-sm-0 me-2">`;
+                // html+=`<span class="email-list-item-username me-2">`+(messages[i].from.name==null?messages[i].from.address:messages[i].from.name)+`</span>`;
+                html+=` <span class="email-list-item-username me-2">`+(messages[i].from.name==null?messages[i].from.address:messages[i].from.name)+`</span>`;
+                  html+=`<span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
                 </div>
                 <div class="email-list-item-meta ms-auto d-flex align-items-center" >`;
                 if(messages[i].attachments.length>0){
