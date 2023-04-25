@@ -134,7 +134,6 @@ if (! function_exists('settings')) {
 
         if ($driver) {
             if (is_array($driver)) {
-                \Log::info('driver'.json_encode($driver));
                 return tap($manager->set($driver), fn ($instance) => $save && $instance->save());
             }
 
