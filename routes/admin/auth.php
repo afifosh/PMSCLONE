@@ -21,7 +21,7 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\Auth\RedirectToMailOTP as RedirectToTwoFactorMailOTPAuthentication;
-
+use App\Http\Controllers\Auth\LostRecoveryCodeController;
 //'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class
 
 Route::post('check-code', [RedirectToTwoFactorMailOTPAuthentication::class, 'verify'])
@@ -85,6 +85,15 @@ Route::prefix('admin')->middleware('guest:web')->group(function () {
             ->middleware(['guest:admin'])
             ->name('password.update');
     }
+
+
+    Route::get('/lost-recovery-codes', [LostRecoveryCodeController::class, 'view'])
+    ->middleware(['guest:admin'])
+    ->name('lost.recoverycode.view');
+    
+    Route::post('/lost-recovery-codes', [LostRecoveryCodeController::class, 'sendRecoveryCodes'])
+    ->middleware(['guest:admin'])
+    ->name('lost.recoverycode.send');
 
     // Registration...
     if (Features::enabled(Features::registration())) {

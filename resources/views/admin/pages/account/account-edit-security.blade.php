@@ -357,8 +357,9 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                         @if (auth()->user()->two_factor_secret)
                         @if (auth()->user()->two_factor_confirmed_at)
                         <button type="button" class="btn btn-primary" data-action="disable" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Disable</button>
-                             <button class="btn btn-danger">Download Recovery Codes</button>
-                             <button class="btn btn-danger">Regenerate Recovery Codes</button>
+                        <button type="button" class="btn btn-danger" data-action="download_code" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Download Recovery Codes</button>
+                        <button type="button" class="btn btn-danger" data-action="regenerate_code" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Regenerate Recovery Codes</button>
+  
 
 
                                     @else
@@ -403,7 +404,7 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                           @if (Auth::user()->two_factor_email_confirmed)
                           <button type="button" class="btn btn-primary"  data-action="disable" data-endpoint="two-factor-email-authentication" data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Disable</button>
                           @else
-                          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#enableEmailOTP">Enable</button>           
+                          <button type="button" class="btn btn-primary"  data-action="enable" data-endpoint="two-factor-email-authentication"  data-bs-toggle="modal" data-bs-target="#enableEmailOTP">Enable</button>           
                           @endif
                       </div>
                   </div>
@@ -430,7 +431,7 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
     <!--/ Two-steps verification -->
 
     <!-- Create an API key -->
-   <div class="card mb-4">
+   {{-- <div class="card mb-4">
       <h5 class="card-header">Create an API key</h5>
       <div class="row">
         <div class="col-md-5 order-md-0 order-1">
@@ -466,7 +467,7 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
           </div>
         </div>
       </div>
-    </div>
+    </div> --}}
     <!--/ Create an API key -->
 
     <!-- Recent Devices -->

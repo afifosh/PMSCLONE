@@ -9,7 +9,7 @@
           <p>Please enter your password to confirm this change</p>
         </div>
         {{-- <form class="row g-3" action="{{route('admin.two-factor-email.disable')}}" method="POST"> --}}
-          <form class="row g-3" action="{{route('user.security.setting',['active_tab'=>'two-factor-authentication']) }}" method="POST">          
+          <form id="enableOTPForm" class="row g-3" action="{{route('user.security.setting',['active_tab'=>'two-factor-authentication']) }}" method="POST">          
           @csrf
           <input type="hidden" id="two-factor-action" name="action" value="">
           <input type="hidden" id="two-factor-endpoint" name="endpoint" value="">

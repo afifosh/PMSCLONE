@@ -148,7 +148,11 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
 
   modal.find('.modal-body input#two-factor-action').val(action)
   modal.find('.modal-body input#two-factor-endpoint').val(endpoint)
-
+  // if(action == "download_code" ){
+  //  // modal.find('.modal-body .btn.btn-primary').attr("data-form", "no-ajax-form");
+  // }else{
+  //  // modal.find('.modal-body .btn.btn-primary').attr('form',"ajax-form"); //setter
+  // }
 })
 
 });
@@ -220,71 +224,6 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
     </div>
     <!--/ Change Password -->
 
-    <!-- Two-steps verification -->
-    <div class="card mb-4">
-      <h5 class="card-header">Two-steps verification</h5>
-      <div class="card-body">
-        @if (session('status') == 'two-factor-authentication-enabled')
-            <div class="alert alert-warning" role="alert">
-                Two factor Authentication has been enabled, Please confirm it.
-            </div>
-        @endif
-        @if (session('status') == 'two-factor-authentication-confirmed')
-            <div class="alert alert-success" role="alert">
-                Two factor authentication confirmed and enabled successfully.
-            </div>
-        @endif
-        <form method="POST" action="{{request()->is('admin/*') ? '/admin/user/two-factor-authentication' : '/user/two-factor-authentication'}}">
-            @csrf
-            @if (auth()->user()->two_factor_secret)
-                @method('DElETE')
-                @if (auth()->user()->two_factor_confirmed_at)
-                <div class="col-md-12">
-      
-            <div class="mb-3 position-relative">
-              <div class="d-flex align-items-center mb-3">
-                <h5 class="mb-0 me-3">Recovery Codes</h5>
-              </div>
-
-        <p>The recovery codes that you saved or printed during setup can be used if you ever lose your authenticator device, if you remove the application, or you remove your site’s entry by mistake. Make sure that you store these codes in a safe place.</p>
-        <div class="row">
-          <div class="col-md-12">
-          @foreach (json_decode(decrypt(auth()->user()->two_factor_recovery_codes)) as $code)
-            <div class="bg-lighter rounded p-3 position-relative mb-1">
-              <div class="dropdown api-key-actions">
-                <a class="btn text-muted hide-arrow p-0"><span class="text-muted cursor-pointer"><i id ="{{ $loop->index }}" class="ti ti-copy ti-sm"></i></span></a>
-              </div>
-              <div class="d-flex align-items-center ">
-              <p class="mb-0 fw-semibold" id="ti-copy-{{ $loop->index }}">{{ $code }}</p>
-              </div>
-            </div>
-            @endforeach
-          </div>
-        </div>
-
-            </div>
-
-          </div>                
-                  <div>
-                  </div>
-                  <button class="btn btn-danger">Disable 2-step verification</button>
-                @else
-                <h6 class="fw-semibold mb-3">Two factor authentication is not Confirmed yet.</h6>
-                <p class="w-50">Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to log in.
-                  <a href="javascript:void(0);">Learn more.</a>
-                </p>
-                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#enableOTP">Confirm Two Factor Auth</button>
-                @endif
-            @else
-              <h6 class="fw-semibold mb-3">Two factor authentication is not enabled yet.</h6>
-                <p class="w-50">Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to log in.
-                  <a href="javascript:void(0);">Learn more.</a>
-                </p>
-              <button class="btn btn-primary mt-2">Enable two-factor authentication</button>
-            @endif
-        </form>
-      </div>
-    </div>
 <!----------------------------------------------------------------------->
 
    <!-- Two-steps verification -->
@@ -425,8 +364,8 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                       @if (auth()->user()->two_factor_secret)
                       @if (auth()->user()->two_factor_confirmed_at)
                       <button type="button" class="btn btn-primary" data-action="disable" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Disable</button>
-                           <button class="btn btn-danger">Download Recovery Codes</button>
-                           <button class="btn btn-danger">Regenerate Recovery Codes</button>
+                      <button type="button" class="btn btn-danger" data-action="download_code" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Download Recovery Codes</button>
+                      <button type="button" class="btn btn-danger" data-action="regenerate_code" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Regenerate Recovery Codes</button>
 
 
                                   @else
@@ -471,7 +410,7 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                         @if (Auth::user()->two_factor_email_confirmed)
                         <button type="button" class="btn btn-primary"  data-action="disable" data-endpoint="two-factor-email-authentication" data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Disable</button>
                         @else
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#enableEmailOTP">Enable</button>           
+                        <button type="button" class="btn btn-primary"  data-action="enable" data-endpoint="two-factor-email-authentication"  data-bs-toggle="modal" data-bs-target="#enableEmailOTP">Enable</button>           
                         @endif
                     </div>
                 </div>

@@ -150,10 +150,17 @@ class CustomRedirectIfTwoFactorAuthenticatable extends RedirectIfTwoFactorAuthen
      */
     protected function twoFactorChallengeResponse($request, $user)
     {
+        // $request->session()->put([
+        //     'login.id' => $user->getKey(),
+        //     'login.remember' => $request->filled('remember'),
+        // ]);
+
         $request->session()->put([
             'login.id' => $user->getKey(),
             'login.remember' => $request->filled('remember'),
+            'login.authenticate_via' => 'google_authenticator',
         ]);
+
 
         TwoFactorAuthenticationChallenged::dispatch($user);
 

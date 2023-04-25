@@ -17,6 +17,7 @@ use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Actions\AttemptToAuthenticate;
 use Laravel\Fortify\Features;
 use App\Actions\Fortify\CheckDeviceAuthorization;
+use App\Actions\Fortify\CustomRedirectIfTwoFactorAuthenticatable;
 // use App\Actions\Fortify\CaptchaValidations;
 // use App\Actions\Fortify\TwoFactorEmailOTP;
 // Custom created file
@@ -54,7 +55,7 @@ class FortifyServiceProvider extends ServiceProvider
             config('fortify.limiters.login') ? null : EnsureLoginIsNotThrottled::class,
             CheckDeviceAuthorization::class,
             RedirectToMailOTP::class,
-            Features::enabled(Features::twoFactorAuthentication()) ? RedirectIfTwoFactorAuthenticatable::class : null,
+            Features::enabled(Features::twoFactorAuthentication()) ? CustomRedirectIfTwoFactorAuthenticatable::class : null,
             // TwoFactorEmailOTP::class,
             // CaptchaValidation::class,
             // CaptchaValidations::class,

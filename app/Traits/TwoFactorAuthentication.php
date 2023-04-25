@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Traits;
-
 use Illuminate\Support\Str;
 use App\Events\TwoFactorCodeEvent;
 Use \Carbon\Carbon;
@@ -19,7 +18,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-
+use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
+use Illuminate\Http\Response;
 trait TwoFactorAuthentication
 {
 
@@ -82,35 +82,35 @@ trait TwoFactorAuthentication
     }
   
 
-    public function VerifyCode(Request $request)
-    {   
+  //   public function VerifyCode(Request $request)
+  //   {   
 
        
-    $user = $request->user();
+  //   $user = $request->user();
   
   
-    $request->validate([
-      'code' => 'required|numeric|digits:6',
-    ],[
-      'code.required' => 'code is required',
-      'code.numeric' => 'code must be numeric from 0 to 9',
-    ]);
+  //   $request->validate([
+  //     'code' => 'required|numeric|digits:6',
+  //   ],[
+  //     'code.required' => 'code is required',
+  //     'code.numeric' => 'code must be numeric from 0 to 9',
+  //   ]);
   
-        if ($user->two_factor_code != $request->code || Carbon::parse($user->two_factor_expires_at)->lt(Carbon::now())) {
-          $message = __('The provided two factor authentication code was invalid.');
-          return response()->json([ 'message' =>  $message, 'errors'=>array('code'=> [$message])], 422);
-        }
+  //       if ($user->two_factor_code != $request->code || Carbon::parse($user->two_factor_expires_at)->lt(Carbon::now())) {
+  //         $message = __('The provided two factor authentication code was invalid.');
+  //         return response()->json([ 'message' =>  $message, 'errors'=>array('code'=> [$message])], 422);
+  //       }
   
   
        
-        $user->forceFill([
-          'two_factor_email_confirmed' => 1,
-          'two_factor_email_confirmed_at' => now(),
-        ])->save();
+  //       $user->forceFill([
+  //         'two_factor_email_confirmed' => 1,
+  //         'two_factor_email_confirmed_at' => now(),
+  //       ])->save();
 
 
-        return $this->sendRes('Email OTP Successfully Enabled', ['event' => 'redirect', 'url' => route('admin.admin-account.edit', ['admin_account' => auth()->id(), 't' => 'security'])]);
-   }
+  //       return $this->sendRes('Email OTP Successfully Enabled', ['event' => 'redirect', 'url' => route('admin.admin-account.edit', ['admin_account' => auth()->id(), 't' => 'security'])]);
+  //  }
   
   
       /**
@@ -161,7 +161,9 @@ trait TwoFactorAuthentication
   
       public function two_factor_authentication($user, $request)
       {
-          if($request->action == 'enable' || $request->action == 'disable'){
+
+
+          if($request->action == 'enable' || $request->action == 'disable' || $request->action == 'regenerate_code' || $request->action == 'download_code'){
             $request->validate([
               'action' => 'required',    
               'password' => ['required', 'string'],
@@ -177,10 +179,13 @@ trait TwoFactorAuthentication
                  return $this->confirmTwoFactorAuthentication($user,$request);
                   break;                
               case 'regenerate_code':
-                  $this->regenerateRecoveryCodes($user);
+                return $this->regenerateRecoveryCodes($user);
                   break;
+              case 'download_code':
+                return $this->downloadRecoveryCodes($user);
+                  break;              
               case 'show_code':
-                  $this->showRecoveryCodes();
+                return $this->showRecoveryCodes();
                   break;
               case 'disable':
                 return $this->disableTwoFactorAuthentication($user);
@@ -190,8 +195,79 @@ trait TwoFactorAuthentication
                   break;
           }
       }
+ 
+     /**
+     * Download recovery codes for the user.
+     *
+     * @param  \Laravel\Fortify\Actions\GenerateNewRecoveryCodes  $generate
+     * @return void
+     */ 
+      public function downloadRecoveryCodes($user)
+      {
+       
+          // Prepare content
+          $codes = json_decode(decrypt($user->two_factor_recovery_codes));
   
+          $content = '';
   
+          foreach ($codes as $code) {
+              $content .= $code;
+              $content .= "\n";
+          }
+  
+          // File name that will be used in the download
+          $fileName = 'codes.txt';
+  
+          $headers = ['Content-type' => 'text/plain', 'Content-Disposition' => sprintf('attachment; filename="%s"', $fileName),'Content-Length' => strlen($content)];
+        //  dd($content);
+    //     $headers = [
+    //       'Content-type' => 'application/octet-stream',
+    //       'Content-Disposition' => sprintf('attachment; filename="%s"', $fileName),
+    //   ];
+
+    //    // Generate the file and force it to be downloaded
+    //    $headers = [
+    //     'Content-type' => 'application/octet-stream',
+    //     'Content-Disposition' => sprintf('attachment; filename="%s"', $fileName),
+    //     'Content-Length' => strlen($content),
+    // ];
+
+  //  return response($content)->withHeaders($headers);
+    // return response()->streamDownload(function() use ($content) {
+    //     echo $content;
+    // }, $fileName, $headers);
+
+    // $content = "ZmJzaFppVkMxWS1RSDNqdDllcXo3CjlkOGNnUTRDN2stMnd6T2l1WFpqNwpGVjZENHZzMUhhLWdyeW9UR1BscWUKTkNnOWlyTWJJdC1MMXZCVExPM05hClJQVTduZENvQmstbUhkS3l6NnNsYQo0aHJjaUdCZkprLVJqRGFaS0J6aWsKeWxVdmR0UzhRMC1CaWwwUk84ZVZVCkdLTHh4VlBGZUMtUXZQWmFFR1lPRQo";
+        
+    //offer the content of txt as a download (logs.txt)
+
+//     return response()->make( $content, 200, [
+//       'Content-Type' => 'text/plain',
+//       'Content-Disposition' => 'attachment; filename="my-file.txt"',
+// ]);
+
+        // Generate the HTTP response
+       return response($content)->withHeaders($headers);
+
+      }      
+     /**
+     * Generate new recovery codes for the user.
+     *
+     * @param  \Laravel\Fortify\Actions\GenerateNewRecoveryCodes  $generate
+     * @return void
+     */
+    public function regenerateRecoveryCodes($user)
+    {
+        $twoFaProvider = App::make('Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider');
+        $generate = new GenerateNewRecoveryCodes($twoFaProvider);
+        $generate($user);
+
+        $guard = $this->getUserGuard();
+           
+        return $this->sendRes('Successfully Recovery Code Regenerated', ['event' => 'redirect', 'url' => route($guard.'.'.$guard.'-account.edit', [$guard.'_account' => auth()->id(), 't' => 'security'])]);
+                      
+
+    } 
       public function two_factor_email_authentication($user, $request)
       {
   
@@ -222,8 +298,10 @@ trait TwoFactorAuthentication
           $confirm = new ConfirmTwoFactorAuthentication($twoFaProvider);
           $confirm($user, $request->input('code'));
           
-          return $this->sendRes('Two Factor Authentication Successfully Activated', ['event' => 'redirect', 'url' => route('admin.admin-account.edit', ['admin_account' => auth()->id(), 't' => 'security'])]);
+          $guard = $this->getUserGuard();
            
+          return $this->sendRes('Two Factor Authentication Successfully Activated', ['event' => 'redirect', 'url' => route($guard.'.'.$guard.'-account.edit', [$guard.'_account' => auth()->id(), 't' => 'security'])]);
+                      
 
       }    
       /**
