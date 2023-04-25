@@ -61,7 +61,7 @@
       <!-- Email View : Content-->
       <div id="view-email" class="app-email-view-content py-4" style="overflow-y:auto">
       @if(count($message->getThread())>0)
-      <p  class="email-earlier-msgs text-center text-muted cursor-pointer mb-5">{{$message->getThread()->count()}} Earlier Message</p>
+      <p onclick="$('.email-card-prev').toggle();$(this).toggle();" class="email-earlier-msgs text-center text-muted cursor-pointer mb-5">{{$message->getThread()->count()}} Earlier Message</p>
       @foreach($message->getThread() as $msg)
       <div class="card email-card-prev mx-sm-4 mx-3">
           <div class="card-header d-flex justify-content-between align-items-center flex-wrap">

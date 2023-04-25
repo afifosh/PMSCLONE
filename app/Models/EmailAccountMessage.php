@@ -267,33 +267,38 @@ class EmailAccountMessage extends Model implements Presentable
     }
 
 
-    public function getParent(){
-            $parent=$this->headers->firstWhere('name', 'in-reply-to');
-            if($parent!=null){
-            return EmailAccountMessage::where('message_id',$parent->value)->first();
+    public function getParent()
+    {
+        $parentId = null;
+    
+        // First, check the "In-Reply-To" header
+        $inReplyToHeader = $this->headers->firstWhere('name', 'in-reply-to');
+        if ($inReplyToHeader) {
+            $parentId = $inReplyToHeader->value;
         }
-        else{
-            return [];
+    
+        // If the "In-Reply-To" header is not present or empty, check the "References" header
+        if (! $parentId) {
+            $referencesHeader = $this->headers->firstWhere('name', 'references');
+            if ($referencesHeader) {
+                $referenceIds = explode(',', $referencesHeader->value);
+                $parentId = end($referenceIds); // Get the last message ID in the References header
+            }
         }
+    
+        // If a parent ID was found, retrieve the parent email
+        if ($parentId) {
+            return EmailAccountMessage::where('message_id', $parentId)->first();
+        }
+    
+        // If no parent ID was found, return null
+        return null;
     }
+    
+        
 
     public function getThread(){
-        // $threadMessage = [];
-
-        // // Keep looping until we find a message that is not a reply
-        // $parent = $this->getParent();
-        // while ($parent && $parent->isReply()) {
-        //     $threadMessage[] = $parent;
-        //     $parent = $parent->getParent();
-        // }
-    
-        // // If we found a message that is not a reply, add it to the thread
-        // if ($parent) {
-        //     $threadMessage[] = $parent;
-        // }
-    
-        // return $threadMessage;
-
+       
         $threadMessage = collect();
 
         // Keep looping until we find a message that is not a reply
