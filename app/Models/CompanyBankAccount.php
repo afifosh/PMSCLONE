@@ -20,8 +20,11 @@ class CompanyBankAccount extends Model
     'post_code',
     'account_no',
     'iban_no',
-    'swift_code'
+    'swift_code',
+    'bank_letter'
   ];
+
+  public const BANK_LETTER_PATH = 'bank-letters';
 
   public function company()
   {
@@ -48,7 +51,8 @@ class CompanyBankAccount extends Model
       'Post Code' => 'post_code',
       'Account No' => 'account_no',
       'IBAN No' => 'iban_no',
-      'Swift Code' => 'swift_code'
+      'Swift Code' => 'swift_code',
+      'Bank Letter' => 'bank_letter'
     ];
   }
 }

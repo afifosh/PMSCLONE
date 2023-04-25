@@ -83,7 +83,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-9">
-                                    <select name="timezone" id="timezon" class="selectpicker w-100 dropup" data-style="btn-default" data-live-search="true">
+                                    <select name="timezone" id="timezon" class="form-select w-100 dropup" data-style="btn-default" data-live-search="true">
                                         <option value="" selected>{{ __('Choose your preferred timezone') }}</option>
                                         @foreach (timezone_identifiers_list() as $timezone)
                                         <option value="{{ $timezone }}" {{ $timezone == ($setting['timezone'] ?? config('app.timezone')) ? 'selected' : '' }}>

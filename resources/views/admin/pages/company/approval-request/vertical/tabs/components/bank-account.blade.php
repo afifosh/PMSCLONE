@@ -16,6 +16,7 @@
         <span class="custom-option-body">
           <div class="row">
             @forelse ($fields as $field_title => $field_name)
+              @if($field_name != 'bank_letter')
                 <div class="col-6 my-1">
                     <div class="fw-bold">
                       {{$field_title}}
@@ -33,8 +34,25 @@
                       </span>
                     </span>
                 </div>
+              @else
+                <div class="col-6 my-1">
+                  <div class="fw-bold">
+                    {{$field_title}}
+                    @if(@$modifications[$field_name])
+                      <span class="text-warning"><i class="fa-solid fa-circle-exclamation fa-lg"></i></span>
+                    @endif
+                  </div>
+                  <span class="fst-italic d-flex justify-content-between">
+                    <a href="{{@$account[$field_name] ? Storage::url($account[$field_name]) : '#'}}" target="_blank" class="text-decoration-none">
+                      <i class="fa-solid fa-file fa-lg me-1"></i>
+                      Attachment
+                    </a>
+                  </span>
+                </div>
+              @endif
             @empty
             @endforelse
+            @include('admin.pages.company.approval-request.vertical.tabs.components.approval-timeline')
             @if ($isEditable)
               <div class="row mt-2">
                 <div class="">
@@ -42,9 +60,8 @@
                   <textarea class="form-control" name="comment[{{$account['modification_id']}}]" rows="3"></textarea>
                   <div class="d-flex justify-content-end">
                     <div class="mt-2">
-                      <button type="button" data-disapprove="#approval-status-{{$loop->iteration}}" class="btn btn-outline-danger"><i class="fa-solid fa-xmark fa-lg me-1"></i> Reject</button>
-                      <button type="button" data-approve="#approval-status-{{$loop->iteration}}" class="btn btn-outline-success"><i class="fa-solid fa-check fa-lg me-1"></i> Approve</button>
-                      <button type="submit" class="d-none" data-form="ajax-form"></button>
+                      <button type="button" data-form="ajax-form" data-preAjaxAction="setApprovalStatus" data-preAjaxParams='{"target" : "#approval-status-{{$loop->iteration}}", "val" : 0}' class="btn btn-outline-danger"><i class="fa-solid fa-xmark fa-lg me-1"></i> Reject</button>
+                      <button type="button" data-form="ajax-form" data-preAjaxAction="setApprovalStatus" data-preAjaxParams='{"target" : "#approval-status-{{$loop->iteration}}", "val" : 1}' class="btn btn-outline-success"><i class="fa-solid fa-check fa-lg me-1"></i> Approve</button>
                     </div>
                   </div>
                 </div>

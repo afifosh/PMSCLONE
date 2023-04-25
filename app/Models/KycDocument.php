@@ -9,10 +9,17 @@ class KycDocument extends Model
 {
   use HasFactory;
 
+  public const TEMP_PATH = 'kyc-docs/temp';
+
   protected $fillable = [
     'title',
     'required_from',
     'status',
+    'is_mendatory',
+    'description',
+    'is_expirable',
+    'expiry_date_title',
+    'is_expiry_date_required',
     'fields',
   ];
 
@@ -21,7 +28,7 @@ class KycDocument extends Model
   public const VALIDATIONS = [
     'date' => ['date'],
     'email' => ['email', 'max:255'],
-    'file' => ['file', 'mimeTypes:image/*'],
+    'file' => ['string', 'max:255'],
     'number' => ['digits_between:0,255'],
     'tel' => ['numeric', 'max:255'],
     'text' => ['string', 'max:255'],
@@ -29,6 +36,9 @@ class KycDocument extends Model
   ];
 
   protected $casts = [
+    'is_expirable' => 'boolean',
+    'is_mendatory' => 'boolean',
+    'is_expiry_date_required' => 'boolean',
     'fields' => 'array',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',

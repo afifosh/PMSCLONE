@@ -72,7 +72,7 @@ $enum = $user::getPossibleEnumValues('status');
 <div class="form-group col-6">
   <label class="switch d-flex flex-column">
     {{ Form::label('email_verified_at', __('Verified'), ['class' => 'col-form-label']) }}
-    {{ Form::checkbox('email_verified_at', $user->email_verified_at, $user->email_verified_at,['class' => 'switch-input is-invalid'])}}
+    {{ Form::checkbox('email_verified_at', 1, $user->email_verified_at,['class' => 'switch-input is-invalid'])}}
     {{-- <input type="checkbox" class="switch-input is-invalid" checked /> --}}
     <span class="switch-toggle-slider position-relative mt-2">
       <span class="switch-on"></span>

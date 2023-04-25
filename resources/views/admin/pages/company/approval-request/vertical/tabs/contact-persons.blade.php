@@ -9,7 +9,11 @@
           $modifications = [];
           $isEditable = false;
           $status = 'approved';
+          $approvals = [];
+          $disapprovals = [];
           if ($contact->modifications->count()) {
+            $approvals = $contact_original->modifications[0]->approvals;
+            $disapprovals = $contact_original->modifications[0]->disapprovals;
             if($contact_original->modifications[0]->approvals->count() < $level && !$contact_original->modifications[0]->disapprovals->count()){
               $isEditable = true;
               $status = 'partially approved';
@@ -34,6 +38,8 @@
             $contact_original = $contact;
             $isEditable = true;
             $status = 'pending';
+            $approvals = $contact_original->approvals;
+            $disapprovals = $contact_original->disapprovals;
             if(isset($contact) && ($contact->approvals_count >= $level || $contact->disapprovals_count)) {
                 $isEditable = false;
                 if($contact->approvals_count >= $level){

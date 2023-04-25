@@ -82,7 +82,7 @@ let updateElement = (id, newValue) => {
 // general settings below
 let bootGeneralSetting = () => {
     const form = document.getElementById('general-setting-form')
-    
+
     if(! form) {
         return
     }
@@ -98,7 +98,7 @@ let onFileInputClick = (e) => {
     const imgHolder = e.target.closest('.img-holder')
 
     const img = imgHolder.getElementsByTagName('img')
-    
+
     const fileInput = imgHolder.nextElementSibling
 
     // if the file input / img is not found return from function

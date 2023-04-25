@@ -9,6 +9,8 @@
         $modifications = [];
         $isEditable = false;
         $status = 'approved';
+        $approvals = @$address_original->modifications[0]->approvals ?? [];
+        $disapprovals = @$address_original->modifications[0]->disapprovals ?? [];
         if ($address->modifications->count()) {
           if($address_original->modifications[0]->approvals->count() < $level && !$address_original->modifications[0]->disapprovals->count()){
             $isEditable = true;
@@ -32,6 +34,8 @@
         @php
           $address_original = $address;
           $isEditable = true;
+          $approvals = $address_original->approvals;
+          $disapprovals = $address_original->disapprovals;
           $status = 'pending';
           if(isset($address) && ($address->approvals_count >= $level || $address->disapprovals_count)) {
               $isEditable = false;

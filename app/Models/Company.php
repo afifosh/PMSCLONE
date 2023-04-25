@@ -48,8 +48,103 @@ class Company extends BaseModel
     $completed += $this->POCContact()->exists() || $this->contacts->count() ? 1 : 0;
     $completed += $this->POCAddress()->exists() || $this->addresses->count() ? 1 : 0;
     $completed += $this->POCBankAccount()->exists() || $this->bankAccounts->count() ? 1 : 0;
-    $completed += $this->POCKycDoc()->exists() || $this->kycDocs->count() ? 1 : 0;
+    $completed += $this->isMendatoryKycDocsSubmitted() ? 1 : 0;
+
     return $completed;
+  }
+
+  public function getStepApprovedCountAttribute()
+  {
+    $completed = 0;
+    $completed += $this->detail && !$this->detail->has('modifications')->exists() ? 1 : 0;
+    $completed += $this->addresses()->exists() && !$this->addresses()->has('modifications')->exists() ? 1 : 0;
+    $completed += $this->contacts()->exists() && !$this->contacts()->has('modifications')->exists() ? 1 : 0;
+    $completed += $this->bankAccounts()->exists() && !$this->bankAccounts()->has('modifications')->exists() ? 1 : 0;
+    $completed += $this->kycDocs()->exists() && !$this->kycDocs()->has('modifications')->exists() ? 1 : 0;
+
+    return $completed;
+  }
+
+  public function profileModelsCount()
+  {
+    $total = 1 //detail
+      + $this->contacts()->count() + $this->POCContact()->count()
+      + $this->bankAccounts()->count() + $this->POCBankAccount()->count()
+      + $this->addresses()->count() + $this->POCAddress()->count()
+      + $this->kycDocs()->count() + $this->POCKycDoc()->count();
+
+    return $total;
+  }
+
+  public function profileApprovedPercentage($level = '')
+  {
+    $level = $level ? $level : $this->approval_level;
+    $total = $this->profileModelsCount();
+    $comp = $this->withCount(
+      [
+        'bankAccounts as bank_account_count' => function ($q) {
+          $q->has('modifications', 0);
+        },
+        'addresses as address_count' => function ($q) {
+          $q->has('modifications', 0);
+        },
+        'kycDocs as kyc_doc_count' => function ($q) {
+          $q->has('modifications', 0);
+        },
+        'contacts as contact_count' => function ($q) {
+          $q->has('modifications', 0);
+        },
+        'detail as detail_count' => function ($q) {
+          $q->has('modifications', 0);
+        },
+      ]
+    )->find($this->id);
+    $approved_count = $comp->detail_count
+      + $comp->contact_count
+      + $comp->bank_account_count
+      + $comp->address_count
+      + $comp->kyc_doc_count;
+
+    $approved_count +=$this->POCmodifications()->has('approvals', '>=', $level)->count();
+    return round(($approved_count / $total) * 100, 1);
+  }
+
+  public function profileRejectedPercentage($level = '')
+  {
+    $total = $this->profileModelsCount();
+    $rejected_count = $this->POCmodifications()->has('disapprovals')->count();
+    return round(($rejected_count / $total) * 100, 1);
+  }
+
+  public function profilePendingApprovalPercentage($level = '')
+  {
+    $level = $level ? $level : $this->approval_level;
+    $total = $this->profileModelsCount();
+    $pending_count = $this->POCmodifications()->where(function ($q) use ($level) {
+      $q->has('approvals', '<', $level)->doesntHave('disapprovals');
+    })->count();
+    return round(($pending_count / $total) * 100, 1);
+  }
+
+  public function isMendatoryKycDocsSubmitted()
+  {
+    return $this->getSubmittedMendatoryDocsCount() >= count($this->getMendatoryKycDocs());
+  }
+
+  public function getSubmittedMendatoryDocsCount()
+  {
+    $count = 0;
+    foreach ($this->getMendatoryKycDocs() as $i => $doc_id) {
+      $this->POCKycDoc()->whereJsonContains('modifications->kyc_doc_id->modified', $doc_id)->count() || $this->kycDocs->where('kyc_doc_id', $doc_id)->count() ? $count++ : '';
+    }
+
+    return $count;
+  }
+
+  public function getMendatoryKycDocs()
+  {
+    $locality_type = $this->getPOCLocalityType();
+    return KycDocument::whereIn('required_from', [3, $locality_type])->where('is_mendatory', 1)->where('status', 1)->pluck('id')->toArray();
   }
 
   public function addedBy()
@@ -180,36 +275,22 @@ class Company extends BaseModel
 
   public function isApprovalRequiredForCurrentLevel($level = ''): bool
   {
-    $is_inc = true;
     $level = $level ? $level : $this->approval_level;
-    if ($this->POCmodifications()->count() > 0) {
-      foreach ($this->POCmodifications()->get() as $modification) {
-        if (($level > $modification->approvals()->count()) && $modification->disapprovals()->count() == 0) {
-          $is_inc = false;
-          break;
-        }
-      }
+    if ($this->POCmodifications()->has('approvals', '<', $level)->doesntHave('disapprovals')->exists()) {
+      return true;
     }
-    return !$is_inc;
+
+    return false;
   }
 
   public function incApprovalLevelIfRequired($level = '')
   {
     $level = $level ? $level : $this->approval_level;
-    $reject = false;
     if (!$this->isApprovalRequiredForCurrentLevel()) {
-      if ($this->approval_level >= ApprovalLevel::count())
+      if ($this->approval_level >= ApprovalLevel::count() && !$this->POCmodifications()->has('disapprovals')->exists())
         $this->forceFill(['approval_status' => 1, 'approved_at' => now(), 'verified_at' => now()]); // Approved by all
       else {
-        if ($this->POCmodifications()->count() > 0) {
-          foreach ($this->POCmodifications()->get() as $modification) {
-            if ($modification->disapprovals()->count() > 0) {
-              $reject = true;
-              break;
-            }
-          }
-        }
-        if ($reject)
+        if ($this->POCmodifications()->has('disapprovals')->exists())
           $this->forceFill(['approval_status' => 3, 'approval_level' => 1]); // Rejected by at least one
         else
           $this->forceFill(['approval_level' => $this->approval_level + 1]); // increment approval level
@@ -260,12 +341,13 @@ class Company extends BaseModel
   public function canBeSentForApproval()
   {
     return $this->approval_status != 2 // not already sent for approval
-      && ($this->POCAddress()->exists() || $this->addresses()->doesntHave('modifications.disapprovals')->count()) // has changed address or approved address
-      && ($this->POCDetail()->exists() || $this->detail()->doesntHave('modifications.disapprovals')->count()) // has changed detail or approved detail
-      && ($this->POCContact()->exists() || $this->contacts()->doesntHave('modifications.disapprovals')->count()) // has changed contact or approved contact
-      && ($this->POCBankAccount()->exists() || $this->bankAccounts()->doesntHave('modifications.disapprovals')->count()) // has changed bank account or approved bank account
-      && ($this->POCKycDoc()->exists() || $this->kycDocs()->doesntHave('modifications.disapprovals')->count()) // has changed kyc doc or approved kyc doc
-      && $this->POCmodifications()->count(); // has changed something
+      // && $this->POCmodifications()->doesntHave('disapprovals')->exists(); //  has changed something but not rejected
+      && ($this->POCAddress()->exists() || $this->addresses()->doesntHave('modifications.disapprovals')->exists()) // has changed address or approved address
+      && ($this->POCDetail()->exists() || $this->detail()->doesntHave('modifications.disapprovals')->exists()) // has changed detail or approved detail
+      && ($this->POCContact()->exists() || $this->contacts()->doesntHave('modifications.disapprovals')->exists()) // has changed contact or approved contact
+      && ($this->POCBankAccount()->exists() || $this->bankAccounts()->doesntHave('modifications.disapprovals')->exists()) // has changed bank account or approved bank account
+      && ($this->POCKycDoc()->exists() || $this->kycDocs()->doesntHave('modifications.disapprovals')->exists()) && $this->isMendatoryKycDocsSubmitted() // has changed kyc doc or approved kyc doc
+      && $this->POCmodifications()->doesntHave('disapprovals')->exists(); // has changed something
   }
 
   public function isEditable()  //user can make changes if not sent for approval
@@ -406,6 +488,23 @@ class Company extends BaseModel
       if ($this->COMKycDoc()->has('approvals', '<', $level)->exists())
         $status = 'pending';
     }
+
+    return $status;
+  }
+
+  public function getOverallStatus($level)
+  {
+    $status = 0;
+    if ($this->getDetailsStatus($level) != 'pending')
+      $status += 1;
+    if ($this->getAddressesStatus($level) != 'pending')
+      $status += 1;
+    if ($this->getContactsStatus($level) != 'pending')
+      $status += 1;
+    if ($this->getBankAccountsStatus($level) != 'pending')
+      $status += 1;
+    if ($this->getKycDocsStatus($level) != 'pending')
+      $status += 1;
 
     return $status;
   }

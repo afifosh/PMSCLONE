@@ -7,6 +7,7 @@
 @section('vendor-style')
     <link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css')}}" />
+
 @endsection
 
 @section('page-style')

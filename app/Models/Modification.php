@@ -11,4 +11,9 @@ class Modification extends BaseModification
   protected $casts = [
     'modifications' => 'array',
   ];
+
+  public function isApprovable($level)
+  {
+    return $level > $this->approvals()->count() && !$this->disapprovals()->count();
+  }
 }

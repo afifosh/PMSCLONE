@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Company\CompanyProfile;
 
+use App\Http\Controllers\Company\CompanyProfile\DocumentController;
 use App\Models\KycDocument;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -26,18 +27,29 @@ class KycDocumentUpdateRequest extends FormRequest
   {
     $locality = auth()->user()->company->getPOCLocalityType();
     $rules = [];
-    $documents = KycDocument::whereIn('required_from', [3, $locality])->where('status', 1)->get();
+    $document = KycDocument::whereIn('required_from', [3, $locality])->where('status', 1)->findOrFail(request()->document_id);
     $avail_rules = KycDocument::VALIDATIONS;
-    if ($documents->count() == 0) {
+
+    $att = array_filter(request()->fields, function($value) {
+        return $value != null;
+    });
+
+    if (!request()->expiry_date && empty($att) && !$document->is_mendatory) {
+      request()->escapedRules = true;
+      return [];
+    }
+
+    if (!$document) {
       return $rules;
     }
-    foreach ($documents as $document) {
-      foreach ($document->fields as $i => $field) {
-        $isRequired = ['nullable'];
-        if ($field['is_required'])
-          $isRequired = ['required'];
-        $rules['doc_' . $document->id . '_field_' . $i . '_' . $field['type']] = array_merge($isRequired, $avail_rules[$field['type']]);
-      }
+    foreach ($document->fields as $i => $field) {
+      $isRequired = ['nullable'];
+      if ($field['is_required'])
+        $isRequired = ['required'];
+      $rules['fields.' . $field['id']] = array_merge($isRequired, $avail_rules[$field['type']]);
+    }
+    if($document->is_expirable && $document->is_expiry_date_required){
+      $rules['expiry_date'] = ['required', 'date'];
     }
 
     return $rules;
@@ -47,21 +59,12 @@ class KycDocumentUpdateRequest extends FormRequest
   {
     $messages = [];
     $locality = auth()->user()->company->getPOCLocalityType();
-    $documents = KycDocument::whereIn('required_from', [3, $locality])->where('status', 1)->get();
-    if ($documents->count() == 0) {
+    $document = KycDocument::whereIn('required_from', [3, $locality])->where('status', 1)->findOrFail(request()->document_id);
+    if (!$document) {
       return $messages;
     }
-    foreach ($documents as $document) {
-      foreach ($document->fields as $i => $field) {
-        $messages['doc_' . $document->id . '_field_' . $i . '_' . $field['type'] . '.required'] = 'The ' . $field['label'] . ' field is required.';
-        $messages['doc_' . $document->id . '_field_' . $i . '_' . $field['type'] . '.string'] = 'The ' . $field['label'] . ' must be a string.';
-        $messages['doc_' . $document->id . '_field_' . $i . '_' . $field['type'] . '.numeric'] = 'The ' . $field['label'] . ' must be a number.';
-        $messages['doc_' . $document->id . '_field_' . $i . '_' . $field['type'] . '.email'] = 'The ' . $field['label'] . ' must be a valid email address.';
-        $messages['doc_' . $document->id . '_field_' . $i . '_' . $field['type'] . '.max'] = 'The ' . $field['label'] . ' may not be greater than 255 characters.';
-        $messages['doc_' . $document->id . '_field_' . $i . '_' . $field['type'] . '.file'] = 'The ' . $field['label'] . ' must be a file.';
-        $messages['doc_' . $document->id . '_field_' . $i . '_' . $field['type'] . '.mimetypes'] = 'The ' . $field['label'] . ' must be a image file.';
-      }
-    }
+    $messages['*.required'] = 'This field is required';
+    $messages['*.*.required'] = 'This field is required';
 
     return $messages;
   }

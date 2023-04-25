@@ -94,6 +94,18 @@
     {!! Form::text('swift_code', $bank_account['swift_code'], $options + ['class' => 'form-control', 'placeholder' => __('Swift Code')]) !!}
     @modificationAlert(@$modifications['swift_code'])
   </div>
+  <hr class="mt-3">
+  <div class="form-check form-switch col-sm-6 mt-3">
+    {!! Form::checkbox('is_authorized', 'on', @$bank_account['bank_letter'], $options + ['class' => 'form-check-input', 'data-switch-toggle' => '#bank_letter', 'id' => 'is_authorized']) !!}
+    <label class="form-check-label" for="is_authorized">Is Authorized</label>
+  </div>
+  <div class="form-group col-6 mt-0 {{ @$bank_account['bank_letter'] && !$options ? '' : 'd-none'}}" id="bank_letter">
+    {{ Form::label('bank_letter', __('Please Provide Bank Letter'), ['class' => 'col-form-label mt-0']) }}
+    {!! Form::file('bank_letter', $options + ['class' => 'form-control mt-0']) !!}
+    @if (@$bank_account['bank_letter'])
+      <a href="{{Storage::url($bank_account['bank_letter'])}}" target="_blank">Download Bank Letter Letter</a>
+    @endif
+  </div>
 </div>
 <div class="mt-3">
     <div class="btn-flt float-end">

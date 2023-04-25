@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('iban_no')->nullable();
             $table->string('swift_code')->nullable();
             $table->integer('status')->default(0);
+            $table->string('bank_letter')->nullable();
             $table->timestamps();
         });
     }

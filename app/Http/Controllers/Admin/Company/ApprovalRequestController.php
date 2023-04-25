@@ -48,43 +48,43 @@ class ApprovalRequestController extends Controller
     $data['addressesStatus'] = $company->getAddressesStatus($level);
     $data['accountsStatus'] = $company->getBankAccountsStatus($level);
     $data['kycDocStatus'] = $company->getKycDocsStatus($level);
+    $data['overAllStatus'] = $company->getOverallStatus($level);
     if (request()->tab == 'details' || request()->tab == null) {
       request()->tab = 'details';
       $data['legalForms'] = CompanyDetail::LegalForms;
       $data['localityTypes'] = CompanyDetail::LocalityTypes;
       $data['NoOfEmployee'] = CompanyDetail::NoOfEmployee;
       // $data['detail'] = $company->POCDetail()->count() ? $company->POCDetail()->withCount('approvals', 'disapprovals')->first() : $company->detail;
-      $data['POCDetail'] = $company->POCDetail()->exists() ? $company->POCDetail()->with('approvals', 'disapprovals')->latest()->first() : null;
+      $data['POCDetail'] = $company->POCDetail()->exists() ? $company->POCDetail()->with('approvals.approver', 'disapprovals.disapprover')->latest()->first() : null;
       if($data['POCDetail']){
         $data['detail'] = transformModifiedData($data['POCDetail']->modifications);
         $data['detail']['modification_id'] = $data['POCDetail']->id;
       }else{
-        $data['detail'] = $company->detail()->with('modifications')->first() ?? null;
+        $data['detail'] = $company->detail()->with('modifications.approvals.approver', 'modifications.disapprovals.disapprover')->first() ?? null;
       }
       // $data['detail'] = $data['POCDetail'] ? transformModifiedData($data['POCDetail']->modifications) : $company->detail()->with('modifications')->first() ?? null;
       $data['fields'] = CompanyDetail::getFields();
     } elseif (request()->tab == 'contact-persons') {
       $data['contactTypes'] = CompanyContact::getContactTypes();
-      $data['contacts'] = $company->POCCOntact()->withCount('approvals', 'disapprovals')->get();
-      $data['approved_contacts'] = $company->contacts()->get();
+      $data['contacts'] = $company->POCCOntact()->with('approvals.approver', 'disapprovals.disapprover')->withCount('approvals', 'disapprovals')->get();
+      $data['approved_contacts'] = $company->contacts()->with('modifications.approvals.approver', 'modifications.disapprovals.disapprover')->get();
       $data['fields'] = CompanyContact::getFields();
     } elseif (request()->tab == 'addresses') {
       $data['addressTypes'] = CompanyAddress::getAddressTypes();
-      $data['addresses'] = $company->POCAddress()->withCount('approvals', 'disapprovals')->get();
-      $data['approved_addresses'] = $company->addresses()->get();
+      $data['addresses'] = $company->POCAddress()->with('approvals.approver', 'disapprovals.disapprover')->withCount('approvals', 'disapprovals')->get();
+      $data['approved_addresses'] = $company->addresses()->with('modifications.approvals.approver', 'modifications.disapprovals.disapprover')->get();
       $data['fields'] = CompanyAddress::getFields();
     } elseif (request()->tab == 'bank-accounts') {
-      $data['bankAccounts'] = $company->POCBankAccount()->withCount('approvals', 'disapprovals')->get();
-      $data['approved_bank_accounts'] = $company->bankAccounts()->get();
+      $data['bankAccounts'] = $company->POCBankAccount()->with('approvals.approver', 'disapprovals.disapprover')->withCount('approvals', 'disapprovals')->get();
+      $data['approved_bank_accounts'] = $company->bankAccounts()->with('modifications.approvals.approver', 'modifications.disapprovals.disapprover')->get();
       $data['fields'] = CompanyBankAccount::getFields();
     } elseif (request()->tab == 'documents') {
-      $data['documents'] = $company->POCKycDoc()->withCount('approvals', 'disapprovals')->get();
-      $data['approved_documents'] = $company->kycDocs()->get();
+      $data['documents'] = $company->POCKycDoc()->with('approvals.approver', 'disapprovals.disapprover')->withCount('approvals', 'disapprovals')->get();
+      $data['approved_documents'] = $company->kycDocs()->with('modifications.approvals.approver', 'modifications.disapprovals.disapprover')->get();
       $data['requestedDocs'] = KycDocument::whereIn('required_from', [3, $company->getPOCLocalityType()])->where('status', 1)->get();
       $data['docModel'] = new CompanyKycDoc ();
     }
 
-    // dd($data);
     return view('admin.pages.company.approval-request.vertical.show', $data);
     return view('admin.pages.company.approval-request.show', $data);
   }
@@ -94,6 +94,8 @@ class ApprovalRequestController extends Controller
     foreach (array_unique($request->modification_ids) as $modification_id) {
       $mod = $company->POCmodifications()->whereId($modification_id)->first();
       abort_if($level != $company->approval_level || !$mod, 404);
+      if(!$mod->isApprovable($level))
+         return $this->sendErr('Unauthorized');
       if ($request->boolean('approval_status.' . $modification_id)) {
         auth()->user()->approve($mod, @$request->comment[$modification_id]);
         $message = 'Approval Successfull';

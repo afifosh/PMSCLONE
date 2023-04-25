@@ -30,7 +30,7 @@ class DetailsUpdateRequest extends FormRequest
       'logo' => Rule::requiredIf(function () {
         return $this->submit_type == 'submit' && !@auth()->user()->company->getPOCLogo();
       }),
-      'website' => 'required_if:submit_type,submit|nullable|url|max:255',
+      'website' => 'required_if:submit_type,submit|nullable|max:255',
       'locality_type' => 'required_if:submit_type,submit|nullable|integer',
       'geographical_coverage' => 'nullable|array',
       'date_founded' => 'required_if:submit_type,submit|nullable|date',

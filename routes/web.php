@@ -14,9 +14,11 @@ use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\CheckForLockMode;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use League\CommonMark\Node\Block\Document;
 
 
 use App\Http\Controllers\MailTrackerController;
@@ -67,6 +69,7 @@ Route::get('mt/l', [MailTrackerController::class, 'link'])->name('mail-tracker.l
     Route::prefix('company-profile')->name('company.')->group(function (){
       Route::resource('contacts', ContactController::class);
       Route::resource('addresses', AddressController::class);
+      Route::post('kyc-documents/upload-doc', [DocumentController::class, 'uploadDocument'])->name('kyc-documents.upload-doc');
       Route::resource('kyc-documents', DocumentController::class);
       Route::resource('bank-accounts', BankAccountController::class);
     });
@@ -78,5 +81,8 @@ Route::get('mt/l', [MailTrackerController::class, 'link'])->name('mail-tracker.l
 
   });
 });
-
+Route::get('refresh-csrf', function(Request $request){
+  $request->session()->regenerateToken();
+  return csrf_token();
+})->name('refresh-csrf');
 require __DIR__.'/admin/admin.php';

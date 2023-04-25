@@ -40,7 +40,7 @@
                                 <label for="provider" class="form-label fs-6 mb-2 fw-semibold">
                                     @lang('Supported mail services')
                                 </label>
-                                <select id="provider" data-tokens="{{ route('admin.setting.delivery.show') }}" data-attr="{{ $settings['provider'] ?? '' }}" class="selectpicker w-100" data-style="btn-default" data-live-search="true">
+                                <select id="provider" data-tokens="{{ route('admin.setting.delivery.show') }}" data-attr="{{ $settings['provider'] ?? '' }}" class="form-select" {{--selectpicker--}} data-style="btn-default" data-live-search="true">
                                     @foreach($deliveryServices as $key => $service)
                                     <option value="{{ $key }}" data-tokens="{{ $key }}" {{ isset($settings['provider']) && $settings['provider'] === $key ? 'selected' : '' }}>
                                         {{ __($service) }}

@@ -65,6 +65,11 @@ class AddressController extends Controller
   public function update(AddressUpdateRequest $request, $address)
   {
     if(request()->model_type == 'pending_creation'){
+      $addr = transformModifiedData(auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address)->modifications);
+      unset($addr['company_id']);
+      if(empty(array_diff_assoc_recursive($addr, $request->validated()))){
+        return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
+      }
       auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address)->delete();
       auth()->user()->company->addresses()->create($request->validated());
     }else{

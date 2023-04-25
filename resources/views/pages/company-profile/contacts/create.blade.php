@@ -94,15 +94,12 @@
     {!! Form::checkbox('is_authorized', 'on', @$contact['poa'], $options + ['class' => 'form-check-input', 'data-switch-toggle' => '#poa_letter', 'id' => 'is_authorized']) !!}
     <label class="form-check-label" for="is_authorized">Is Authorized</label>
   </div>
-
-  @if ($options && @$contact['poa'])
-    <div class="form-group col-6 mt-3">
-      <a href="{{Storage::url($contact['poa'])}}" download>Download POA Letter</a>
-    </div>
-  @endif
   <div class="form-group col-6 mt-0 {{ @$contact['poa'] && !$options ? '' : 'd-none'}}" id="poa_letter">
     {{ Form::label('poa', __('Please Provide POA Letter'), ['class' => 'col-form-label mt-0']) }}
     {!! Form::file('poa', $options + ['class' => 'form-control mt-0']) !!}
+    @if (@$contact['poa'])
+      <a href="{{Storage::url($contact['poa'])}}" target="_blank">Download POA Letter</a>
+    @endif
   </div>
 </div>
 <div class="mt-3">

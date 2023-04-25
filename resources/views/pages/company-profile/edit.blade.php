@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
 @endsection
 
 @section('vendor-script')
@@ -17,6 +18,7 @@
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/jquery-repeater/jquery-repeater.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
 @endsection
 
 @section('page-script')

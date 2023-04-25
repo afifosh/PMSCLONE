@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
 use App\Models\RFPFile;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\EmailAccount\PersonalEmailAccountController;
 use App\Http\Controllers\Admin\EmailAccount\EmailAccountSyncStateController;
 use App\Http\Controllers\Admin\EmailAccount\EmailAccountPrimaryStateController;
@@ -56,27 +57,27 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
    Route::get('unread', [EmailAccountController::class, 'unread']);
    Route::get('{account}/share', [EmailAccountController::class, 'share']);
    Route::post('{account}/setPermission', [EmailAccountController::class, 'setPermission']);
- 
+
    // The GET route for all shared accounts
    Route::get('shared', SharedEmailAccountController::class)->middleware('permission:access shared inbox');
- 
+
    // The GET route for all logged in user personal mail accounts
    Route::get('personal', PersonalEmailAccountController::class);
- 
+
    // Test connection route
    Route::post('connection', [EmailAccountConnectionTestController::class, 'handle']);
- 
+
    Route::put('{account}/primary', [EmailAccountPrimaryStateController::class, 'update']);
    Route::delete('primary', [EmailAccountPrimaryStateController::class, 'destroy']);
    Route::post('{account}/sync/enable', [EmailAccountSyncStateController::class, 'enable']);
    Route::post('{account}/sync/disable', [EmailAccountSyncStateController::class, 'disable']);
  });
- 
-     
+
+
     //  Route::resource('emails', EmailAccountController::class);
      Route::get('/{providerName}/connect', [OAuthController::class, 'connect'])->where('providerName', 'microsoft|google');
      Route::get('/{providerName}/callback', [OAuthController::class, 'callback'])->where('providerName', 'microsoft|google');
-     
+
      Route::prefix('emails')->group(function () {
       Route::get('bulkDelete', [EmailAccountMessagesController::class, 'bulkDelete']);
       Route::get('bulkUnread', [EmailAccountMessagesController::class, 'bulkUnread']);
@@ -89,12 +90,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     });
     Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class,'manageAccounts']);
     Route::resource('/mail/accounts', EmailAccountController::class);
- 
+
     Route::prefix('inbox')->group(function () {
       Route::get('emails/folders/{folder_id}/{message}', [EmailAccountMessagesController::class, 'show']);
       Route::post('emails/{account_id}', [EmailAccountMessagesController::class, 'create']);
       Route::get('emails/{account_id}/{folder_id}', [EmailAccountMessagesController::class, 'index']);
-    });   
+    });
   Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]))->name('alive');
   Route::prefix('auth')->name('auth.')->group(function() {
     Route::get('lock', [LockModeController::class, 'lock'])->name('lock');
@@ -213,6 +214,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
   });
+
+  Route::get('refresh-csrf', function(Request $request){
+    $request->session()->regenerateToken();
+    return csrf_token();
+  })->name('refresh-csrf');
+
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
 

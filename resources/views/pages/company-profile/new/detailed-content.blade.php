@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
 @endsection
 
 <!-- Page -->
@@ -24,11 +25,13 @@
 <script src="{{asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
 @endsection
 
 @section('page-script')
 <script src="{{asset('assets/js/pages-profile.js')}}"></script>
 <script src="{{asset('assets/js/custom/company-profile-page.js')}}"></script>
+<script src="{{asset('assets/js/custom/toastr-helpers.js')}}"></script>
 @endsection
 
 @section('content')

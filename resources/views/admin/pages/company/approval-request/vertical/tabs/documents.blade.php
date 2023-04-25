@@ -9,6 +9,8 @@
           $modifications = [];
           $isEditable = false;
           $status = 'approved';
+          $approvals = @$doc_original->modifications[0]->approvals ?? [];
+          $disapprovals = @$doc_original->modifications[0]->disapprovals ?? [];
           if ($doc->modifications->count()) {
             if($doc_original->modifications[0]->approvals->count() < $level && !$doc_original->modifications[0]->disapprovals->count()){
               $isEditable = true;
@@ -31,6 +33,8 @@
             $doc_original = $doc;
             $isEditable = true;
             $status = 'pending';
+            $approvals = $doc_original->approvals;
+            $disapprovals = $doc_original->disapprovals;
             if(isset($doc) && ($doc->approvals_count >= $level || $doc->disapprovals_count)) {
                 $isEditable = false;
                 if($doc->approvals_count >= $level){

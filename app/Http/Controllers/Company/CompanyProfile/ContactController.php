@@ -67,6 +67,14 @@ class ContactController extends Controller
       $cont = auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact);
       if($request->hasFile('poa') || !$request->is_authorized)
         @$cont->modifications['poa']['modified'] ? ImageTrait::deleteImage($cont->modifications['poa']['modified'], 'public') : '';
+      $att = $this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']];
+      unset($att['is_authorized']);
+      if($att['poa'] == null)
+        unset($att['poa']);
+      $cont_modifications = transformModifiedData($cont->modifications);
+      if(empty(array_diff_assoc_recursive($att, $cont_modifications))){
+        return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
+      }
       auth()->user()->company->contacts()->create($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
       $cont->delete();
     } else {
