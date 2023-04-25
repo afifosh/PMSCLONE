@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
           ->withoutOverlapping(30)
           ->before(fn () => EmailAccountsSyncCommand::setLock())
           ->after(fn ()  => EmailAccountsSyncCommand::removeLock());
-        $schedule->command(EmailAccountsSyncCommand::class);
+        // $schedule->command(EmailAccountsSyncCommand::class);
     }
 
     protected function syncMethodFromConfigValue($value)
