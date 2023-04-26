@@ -14,6 +14,13 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\Events\TwoFactorCodeEvent;
+use App\Listeners\TwoFactorCodeListener;
+use App\Listeners\SuccessfulLoginListener;
+use Laravel\Fortify\Events\TwoFactorLogin;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
+use App\Listeners\IncrementDeviceAuthorizationAttempts;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -63,6 +70,17 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\GeneralSettingUpdated' => [
             'App\Listeners\CacheSetting'
         ],
+        Failed::class => [
+            IncrementDeviceAuthorizationAttempts::class,
+        ],
+
+        'Illuminate\Auth\Events\Authenticated' => [
+            'App\Listeners\AfterAuthenticatedListener',
+        ],
+
+        TwoFactorCodeEvent::class => [TwoFactorCodeListener::class],
+
+        Login::class => [SuccessfulLoginListener::class],
     ];
 
     /**
@@ -71,7 +89,7 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $observers = [
-        // 
+        //
     ];
 
     /**

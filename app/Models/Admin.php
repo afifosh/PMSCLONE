@@ -129,6 +129,90 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     return $this->authorizedToApproveOrDisapprove($mod);
   }
 
+    /**
+     * User has many morph fields of Device Authorized
+     *
+     * @return MorphMany
+     */
+    public function deviceAuthorizations()
+    {
+      return $this->morphMany(DeviceAuthorization::class, 'authenticatable');
+    }
+
+
+    public function addDeviceAuthorization(array $attributes)
+    {
+
+        $ip          = $attributes['ip_address'];
+        $userAgent   = $attributes['user_agent'];
+        $fingerprint = $attributes['fingerprint'];
+
+        $deviceAuthorization = $this->deviceAuthorizations()
+          ->where('fingerprint', $fingerprint)
+          ->whereIpAddress($ip)
+          ->whereUserAgent($userAgent)
+          ->whereFingerprint($fingerprint)
+          ->whereSafe(true)
+          ->latest('created_at')
+            ->firstOrNew();
+
+        if ($deviceAuthorization->exists) {
+            if ($deviceAuthorization->isDeviceAuthorized()) {
+                $deviceAuthorization->attempts += 1;
+                $deviceAuthorization->updated_at = now();
+               //$deviceAuthorization->fill($attributes);
+               $deviceAuthorization->safe = true;
+                $deviceAuthorization->save();
+            } else {
+                $deviceAuthorization->safe = false;
+                $deviceAuthorization->save();
+                return false;
+            }
+        } else {
+            $deviceAuthorization->fill($attributes);
+            $deviceAuthorization->safe = true;
+            $deviceAuthorization->save();
+        }
+
+        return true;
+    }
+
+    public function shouldSkipTwoFactor($ip,$userAgent,$fingerprint)
+    {
+
+        $deviceAuthorization = $this->deviceAuthorizations()
+            ->where('fingerprint', $fingerprint)
+            ->whereIpAddress($ip)
+            ->whereUserAgent($userAgent)
+            ->whereFingerprint($fingerprint)
+            ->latest('created_at')
+            ->first();
+
+        if (!$deviceAuthorization) {
+            return false;
+        }
+
+        $safe = $deviceAuthorization->safe;
+        $lastLogin = $deviceAuthorization->updated_at;
+        $expiration = now()->subDays(30);
+
+        return $safe && $lastLogin->gt($expiration) &&  $deviceAuthorization->failed_attempts < config('auth.device_authorization.failed_limit');
+    }
+
+    /**
+     * Admin has many morph fields of password history
+     *
+     * @return MorphMany
+     */
+    // public function passwordHistories()
+    // {
+    //   return $this->morphMany(PasswordHistory::class, 'authable');
+    // }
+    // public function leadingDepartments()
+    // {
+    //   return $this->hasMany(CompanyDepartment::class, 'head_id', 'id');
+    // }
+
   protected function authorizedToDisapprove(\Approval\Models\Modification $mod): bool
   {
     return $this->authorizedToApproveOrDisapprove($mod);
@@ -253,4 +337,20 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     }
     return $levels;
   }
+
+    public function generateTwoFactorCode()
+    {
+        $this->timestamps = false;
+        $this->two_factor_code = rand(100000, 999999);
+        $this->two_factor_expires_at = now()->addMinutes(10);
+        $this->save();
+    }
+
+    public function resetTwoFactorCode()
+    {
+        $this->timestamps = false;
+        $this->two_factor_code = null;
+        $this->two_factor_expires_at = null;
+        $this->save();
+    }
 }

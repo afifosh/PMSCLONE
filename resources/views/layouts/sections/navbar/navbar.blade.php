@@ -71,7 +71,7 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
                 </ul>
               </li>
               <li class="dropdown-menu-footer border-top view-more-li load-more">
-                <a href="{{ route('user-account.edit', ['user_account' => auth()->id(), 't' => 'notifications']) }}" class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center">
+                <a href="{{ route('user.user-account.edit', ['user_account' => auth()->id(), 't' => 'notifications']) }}" class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center">
                   @lang('View all')
                 </a>
               </li>
@@ -116,11 +116,17 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
                 <div class="dropdown-divider"></div>
               </li>
               <li>
-                <a class="dropdown-item" href="{{ route('user-account.edit', ['user_account' => auth()->id()]) }}">
+                <a class="dropdown-item" href="{{ route('user.user-account.edit', ['user_account' => auth()->id()]) }}">
                   <i class="ti ti-user-check me-2 ti-sm"></i>
                   <span class="align-middle">My Profile</span>
                 </a>
               </li>
+              <li>
+                <a class="dropdown-item" href="{{ route('user.user-account.edit', ['user_account' => auth()->id(), 't' => 'security'])}}">
+                  <i class="ti-xs ti ti-lock me-1 ti-sm"></i>
+                  <span class="align-middle">Security</span>
+                </a>
+              </li>                    
               <li>
                 <a class="dropdown-item" href="{{ route('auth.lock') }}">
                   <span class="d-flex align-items-center align-middle">

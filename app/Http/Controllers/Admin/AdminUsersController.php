@@ -14,8 +14,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use App\Events\TwoFactorCodeEvent;
+Use \Carbon\Carbon;
+use Illuminate\Support\Facades\RateLimiter;
+use Session;
+use Laravel\Fortify\Http\Controllers\TwoFactorAuthenticationController;
+use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
+use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
+use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
+use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
+use Laravel\Fortify\Actions\ConfirmPassword;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
+use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
+use App\Traits\TwoFactorAuthentication;
+
 class AdminUsersController extends Controller
 {
+
+  use TwoFactorAuthentication;
 
   function __construct()
   {
@@ -163,4 +183,5 @@ class AdminUsersController extends Controller
 
     return back()->with('success', 'Impersonation Removed');
   }
+
 }

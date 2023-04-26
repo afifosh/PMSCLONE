@@ -120,11 +120,17 @@ return [
     |
     */
 
-    'password_timeout' => 10800,
+    // 'password_timeout' => 10800,
+
+    'password_timeout' => 100,
 
     'password_expire_days' => 30,
 
     'timeout_warning_seconds' => 300,
 
     'timeout_after_seconds' => 2000,
+
+    'device_authorization' => [
+        'failed_limit' => 3,
+    ],
 ];

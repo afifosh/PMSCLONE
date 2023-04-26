@@ -51,8 +51,11 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
 
     Route::middleware('passwordMustNotBeExpired')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('pages-home');
-        Route::resource('user-account', UserAccountController::class);
-
+      //  Route::resource('user/user-account', UserAccountController::class);
+      Route::name('user.')->group(function(){
+        Route::resource('user/user-account', UserAccountController::class)->only('edit');
+        
+      });
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
     Route::get('mt/o/{hash}', [MailTrackerController::class, 'opens'])->name('mail-tracker.open');
