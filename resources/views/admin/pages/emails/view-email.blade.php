@@ -61,7 +61,7 @@
       <!-- Email View : Content-->
       <div id="view-email" class="app-email-view-content py-4" style="overflow-y:auto">
       @if(count($message->getThread())>0)
-      <p onclick="$('.email-card-prev').toggle();$('iframe').load();" class="email-earlier-msgs text-center text-muted cursor-pointer mb-5">{{$message->getThread()->count()}} Earlier Message</p>
+      <p onclick="$('.email-card-prev').toggle();$(this).toggle();" class="email-earlier-msgs text-center text-muted cursor-pointer mb-5">{{$message->getThread()->count()}} Earlier Message</p>
       @foreach($message->getThread() as $msg)
       <div class="card email-card-prev mx-sm-4 mx-3">
           <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -104,11 +104,7 @@
             </div>
           </div>
           <div style="overflow-y: auto;" class="card-body">
-          @if($msg->html_body==null || $msg->html_body=="")
-          <iframe srcdoc="{!! htmlspecialchars($msg->text_body) !!}" onload=" var iframeBody = $(this).contents().find('body');$(this).height(iframeBody.height());" width="100%"></iframe>
-          @else
-          <iframe srcdoc="{!! htmlspecialchars($msg->html_body) !!}" width="100%" onload=" var iframeBody = $(this).contents().find('body');$(this).height(iframeBody.height()+100);"></iframe>  
-          @endif
+          {!! $msg->preview_text !!}
         <input type="hidden" id="mail_type" value="compose"/>
       @if($msg->attachments->count()>0)
         <hr>
@@ -142,8 +138,13 @@
 </svg>  
             </div>
               <div class="flex-grow-1 ms-1">
+                @if($message->folders->first()->type=='sent')
+                <h6 class="m-0">To:</h6>
+                <small class="text-muted">{{$message->to->first()->address}}</small>
+                @else
                 <h6 class="m-0">{{$message->from->name}}</h6>
                 <small class="text-muted">{{$message->from->address}}</small>
+                @endif
               </div>
             </div>
             <div class="d-flex align-items-center">
@@ -168,11 +169,7 @@
             </div>
           </div>
           <div style="overflow-y: auto;" class="card-body">
-          @if($message->html_body==null || $message->html_body=="")
-          <iframe srcdoc="{!! htmlspecialchars($message->text_body) !!}" onload=" var iframeBody = $(this).contents().find('body');$(this).height(iframeBody.height());" width="100%"></iframe>
-          @else
-          <iframe srcdoc="{!! htmlspecialchars($message->html_body) !!}" width="100%" onload=" var iframeBody = $(this).contents().find('body');$(this).height(iframeBody.height()+100);"></iframe>  
-          @endif
+          {!! $message->preview_text !!}
         <input type="hidden" id="mail_type" value="compose"/>
       @if($message->attachments->count()>0)
         <hr>
@@ -194,7 +191,12 @@
         $('#forward-email,#send-email').attr("style","display:none !important");
         $('#reply-email').attr('data-id',message.id);
           $("#subject").val("RE: "+message.subject);
+          if(message.reply_to!=undefined){
          $("#to").val((message.reply_to.length==0?message.from.address:message.reply_to[0].address));
+          }
+          else{
+         $("#to").val(message.from.address);
+          }
          var dateStringFormatted = new Date(message.date).toLocaleString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}).replace(/,/g, '');
 
          let wroteText = `On `+ dateStringFormatted + " "+(message.from.name==null?message.from.address:message.from.name)+ " <" + message.from.address + `> wrote:`;
