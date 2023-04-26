@@ -11,11 +11,11 @@ class BaseCacheService
 {
     /**
      * Updates the cache
-     * 
+     *
      * @param string $cacheKey
      * @param string $provider
      * @param string $service
-     * 
+     *
      * @return bool
      */
     public static function update(string $cacheKey, string $provider, string $service): bool
@@ -35,10 +35,10 @@ class BaseCacheService
 
     /**
      * Get default delivery setting
-     * 
+     *
      * @param $provider
      * @param $service
-     * 
+     *
      * @return array
      */
     protected function getDefault($provider, $service): array
@@ -53,7 +53,7 @@ class BaseCacheService
 
     /**
      * Get cached settings
-     * 
+     *
      * @return mixed
      */
     protected function cachedSettings(string $key): mixed
@@ -65,18 +65,17 @@ class BaseCacheService
 
     /**
      * Loads up default provider in config
-     * 
+     *
      * @param $configurations
      * @param $providers
      * @param $default
      * @param $key
-     * 
+     *
      * @return void
      */
     protected function loadProvider($configurations, $providers, $provider, $key): void
     {
         $provider = $this->resolveProvider($configurations, $providers, $provider, $key);
-
         try {
             app($providers[$provider])->load($configurations);
         } catch (Exception $e) {
@@ -86,12 +85,12 @@ class BaseCacheService
 
     /**
      * Resolve the provider & if it does not exist defaults to smtp
-     * 
+     *
      * @param $configurations
      * @param $providers
      * @param $default
      * @param $key
-     * 
+     *
      * @return string
      */
     protected function resolveProvider($configurations, $providers, $default, $key): string

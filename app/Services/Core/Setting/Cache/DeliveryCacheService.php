@@ -10,28 +10,28 @@ class DeliveryCacheService extends BaseCacheService implements CachesConfigurati
 {
     /**
      * Name of cached key
-     * 
+     *
      * @var string
      */
     protected static $CACHE_KEY = 'app-delivery-settings';
 
     /**
      * Name of default provider
-     * 
+     *
      * @var string
      */
     protected static $PROVIDER = 'default_mail';
 
     /**
-     * Name of default driver 
-     * 
+     * Name of default driver
+     *
      * @var string
      */
     protected static $DRIVER = 'default_mail_email_name';
 
     /**
      * List of available providers
-     * 
+     *
      * @var array
      */
     protected $providers = [
@@ -44,7 +44,7 @@ class DeliveryCacheService extends BaseCacheService implements CachesConfigurati
 
     /**
      * Cache updated settings
-     * 
+     *
      * @return void
      */
     public static function handle(): void
@@ -54,7 +54,7 @@ class DeliveryCacheService extends BaseCacheService implements CachesConfigurati
 
     /**
      * Loads up delivery configurations
-     * 
+     *
      * @return void
      */
     public function load()
@@ -74,13 +74,13 @@ class DeliveryCacheService extends BaseCacheService implements CachesConfigurati
 
     /**
      * Loads delivery address such as name and email
-     * 
+     *
      * @param $configurations
      * @return void
      */
     protected function loadAddress($configurations): void
     {
-        // config()->set('mail.default', $configurations['provider'] ?? config('mail.default'));
+        config()->set('mail.default', $configurations['provider'] ?? config('mail.default'));
         config()->set('mail.from.address', $configurations['from_email'] ?? config('mail.from.address'));
         config()->set('mail.from.name', $configurations['from_name'] ?? config('mail.from.name'));
     }
