@@ -32,13 +32,13 @@ class DocumentController extends Controller
     $data['approved_documents'] = auth()->user()->company->kycDocs()->with('modifications.approvals', 'modifications.disapprovals')->get();
     $data['isPendingProfile'] = auth()->user()->company->isHavingPendingProfile();
     request()->document_id = request()->document_id ?? $data['requestable_documents'][0]->id;
-    if($request->fields_only){
+    if ($request->fields_only) {
       $data['document'] = $data['documents']->where('id', $request->document_id)->first();
       $view_data = view('pages.company-profile.document.fields', $data)->render();
-    }else{
+    } else {
       $view_data = view('pages.company-profile.document.create', $data)->render();
     }
-      // : view('pages.company-profile.new.detailed-content.documents', $data)->render();
+    // : view('pages.company-profile.new.detailed-content.documents', $data)->render();
 
     return $this->sendRes('success', ['view_data' => $view_data]);
   }
@@ -48,7 +48,7 @@ class DocumentController extends Controller
     $locality_type = auth()->user()->company->getPOCLocalityType();
     if (!$locality_type)
       return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
-    if(request()->escapedRules)
+    if (request()->escapedRules)
       return $this->triggerNextDoc('', $locality_type, $request);
     $document = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->findOrFail($request->document_id);
     $final_fields = [];
@@ -56,14 +56,14 @@ class DocumentController extends Controller
     foreach ($document->fields as $field) {
       if ($field['type'] == 'file') {
         $path = CompanyKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
-        Storage::move(KycDocument::TEMP_PATH.'/'.auth()->user()->company_id.'/'.$request->{'fields.' . $field['id']}, $path . '/'.$request->{'fields.' . $field['id']});
+        Storage::move(KycDocument::TEMP_PATH . '/' . auth()->user()->company_id . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
         $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
       } else {
         $field['value'] = $request->{'fields.' . $field['id']};
       }
       $final_fields[] = $field;
     }
-    if($document->is_expirable){
+    if ($document->is_expirable) {
       $data['expiry_date'] = $request->expiry_date;
     }
     auth()->user()->company->kycDocs()->create($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
@@ -78,31 +78,36 @@ class DocumentController extends Controller
     if (!$locality_type) {
       return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
     }
-    if(request()->escapedRules)
+    if (request()->escapedRules)
       return $this->triggerNextDoc('', $locality_type, $request);
     $document = KycDocument::whereIn('required_from', [3, $locality_type])->where('status', 1)->findOrFail($request->document_id);
     if ($document) {
       $final_fields = [];
       $data = [];
       foreach ($document->fields as $field) {
-        if ($field['type'] == 'file' && Storage::exists(KycDocument::TEMP_PATH.'/'.auth()->user()->company_id.'/'.$request->{'fields.' . $field['id']})) {
+        if ($field['type'] == 'file' && Storage::exists(KycDocument::TEMP_PATH . '/' . auth()->user()->company_id . '/' . $request->{'fields.' . $field['id']})) {
           $path = CompanyKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
-          Storage::move(KycDocument::TEMP_PATH.'/'.auth()->user()->company_id.'/'.$request->{'fields.' . $field['id']}, $path . '/'.$request->{'fields.' . $field['id']});
+          Storage::move(KycDocument::TEMP_PATH . '/' . auth()->user()->company_id . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
           $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
         } else {
           $field['value'] = $request->{'fields.' . $field['id']};
         }
         $final_fields[] = $field;
       }
-      if($document->is_expirable){
+      if ($document->is_expirable) {
         $data['expiry_date'] = $request->expiry_date;
       }
-      if($request->has('doc_id_' . $document->id) && $request->input('doc_id_' . $document->id)){
+      if ($request->has('doc_id_' . $document->id) && $request->input('doc_id_' . $document->id)) {
         auth()->user()->company->kycDocs()->findOrFail($request->input('doc_id_' . $document->id))->modifications()->delete();
         auth()->user()->company->kycDocs()->findOrFail($request->input('doc_id_' . $document->id))->update($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
-      }elseif($request->has('modification_id_' . $document->id) && $request->input('modification_id_' . $document->id)){
-        auth()->user()->company->POCKycDoc()->where('is_update', false)->findOrFail($request->input('modification_id_' . $document->id))->delete();
-        auth()->user()->company->kycDocs()->create($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
+      } elseif ($request->has('modification_id_' . $document->id) && $request->input('modification_id_' . $document->id)) {
+        auth()->user()->company
+          ->POCKycDoc()
+          ->where('is_update', false)
+          ->findOrFail($request->input('modification_id_' . $document->id))
+          ->updateModifications($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
+        // auth()->user()->company->POCKycDoc()->where('is_update', false)->findOrFail($request->input('modification_id_' . $document->id))->delete();
+        // auth()->user()->company->kycDocs()->create($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
       }
     }
 
@@ -117,7 +122,8 @@ class DocumentController extends Controller
     return $this->sendRes($message, ['event' => 'functionCall', 'function' => 'triggerNextDoc', 'function_params' => @$documents->id ?? -1]);
   }
 
-  public function uploadDocument(Request $request, FileUploadRepository $file_repo){
+  public function uploadDocument(Request $request, FileUploadRepository $file_repo)
+  {
     $request->validate([
       'file' => 'required|mimetypes:text/plain,application/*,image/*,video/*,audio/*'
     ]);

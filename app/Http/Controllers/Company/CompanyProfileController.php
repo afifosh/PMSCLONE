@@ -22,7 +22,7 @@ class CompanyProfileController extends Controller
     $data['detail'] = $data['POCDetail'] ? $this->transformModifications($data['POCDetail']->modifications) : auth()->user()->company->detail()->with('modifications')->first() ?? null;
     $data['countries'] = Country::pluck('name', 'id');
     $data['isHavingPendingProfile'] = auth()->user()->company->isHavingPendingProfile();
-    if(!$data['isHavingPendingProfile']){
+    if (!$data['isHavingPendingProfile']) {
       $data['detailsStatus'] = auth()->user()->company->getDetailsStatus();
       $data['contactsStatus'] = auth()->user()->company->getContactsStatus();
       $data['addressesStatus'] = auth()->user()->company->getAddressesStatus();
@@ -32,15 +32,14 @@ class CompanyProfileController extends Controller
     }
 
     return request()->ajax() ? (auth()->user()->company->isHavingPendingProfile() ? $this->sendRes('success', ['view_data' =>  view('pages.company-profile.detail.index', $data)->render()])
-    : $this->sendRes('success', ['view_data' =>  view('pages.company-profile.new.detailed-content.details', $data)->render()]))
+      : $this->sendRes('success', ['view_data' =>  view('pages.company-profile.new.detailed-content.details', $data)->render()]))
       : ($data['isHavingPendingProfile'] ? view('pages.company-profile.edit', $data) : view('pages.company-profile.new.edit', $data));
-
   }
 
   public function detailedContent()
   {
     $locality_type = auth()->user()->company->getPOCLocalityType();
-    if(!$locality_type){
+    if (!$locality_type) {
       return $this->sendRes('Please update your company profile first', ['event' => 'functionCall', 'function' => 'triggerNext', 'params' => '1']);
     }
     $data['countries'] = Country::pluck('name', 'id');
@@ -76,22 +75,24 @@ class CompanyProfileController extends Controller
   public function updateDetails(DetailsUpdateRequest $request, FileUploadRepository $fileRepo)
   {
     $att = $this->makeData($request, $fileRepo);
-    if(auth()->user()->company->detail){
+    if (auth()->user()->company->detail) {
       auth()->user()->company->detail->modifications()->delete();
       auth()->user()->company->detail->updateIfDirty($att);
-    }else{
+    } else {
       $detail = auth()->user()->company->POCDetail()->first();
-      if($detail){
+      if ($detail) {
         $detail_mod = transformModifiedData($detail->modifications);
         unset($detail_mod['company_id']);
         // compare both associative arrays of arrays and return the difference
         $diff = array_diff_assoc_recursive($detail_mod, $att);
-        if(empty($diff)){
+        if (empty($diff)) {
           return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
         }
-        auth()->user()->company->POCDetail()->delete();
+        $detail->updateModifications($att);
+        // auth()->user()->company->POCDetail()->delete();
+      } else {
+        auth()->user()->company->detail()->create($att);
       }
-      auth()->user()->company->detail()->create($att);
     }
 
     return $this->sendRes('Added Successfully', ['event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 1]);
@@ -105,7 +106,7 @@ class CompanyProfileController extends Controller
     }
     $att = isset($logo) ? ['logo' => $logo] + $request->validated() : $request->validated();
     if (!isset($logo))
-      $att['logo']= auth()->user()->company->getPOCLogo();
+      $att['logo'] = auth()->user()->company->getPOCLogo();
     if (!$request->boolean('is_subsidory'))
       $att['parent_company'] = null;
     if (!$request->boolean('is_parent'))

@@ -64,33 +64,36 @@ class ContactController extends Controller
   public function update(ContactsUpdateRequest $request, $contact, FileUploadRepository $fileRepository)
   {
     if (request()->model_type == 'pending_creation') {
-      $cont = auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact);
-      if($request->hasFile('poa') || !$request->is_authorized)
+      $cont = auth()->user()->company->POCContact()->where('is_update', false)->withCount('disapprovals')->findOrFail($contact);
+      if ($request->hasFile('poa') || !$request->is_authorized)
         @$cont->modifications['poa']['modified'] ? ImageTrait::deleteImage($cont->modifications['poa']['modified'], 'public') : '';
       $att = $this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']];
       unset($att['is_authorized']);
-      if($att['poa'] == null)
+      if ($att['poa'] == null)
         unset($att['poa']);
       $cont_modifications = transformModifiedData($cont->modifications);
-      if(empty(array_diff_assoc_recursive($att, $cont_modifications))){
+      if (empty(array_diff_assoc_recursive($att, $cont_modifications))) {
         return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       }
-      auth()->user()->company->contacts()->create($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
-      $cont->delete();
+      if (@$cont->disapprovals_count > 0) {
+        auth()->user()->company->contacts()->create($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
+        $cont->delete();
+      } else {
+        $cont->updateModifications($this->uploadPOA($request, $fileRepository) + ['poa' => @$cont->modifications['poa']['modified']]);
+      }
     } else {
       $cont = @auth()->user()->company->contacts()->with('modifications')->findOrFail($contact);
       $mod = transformModifiedData(@$cont->modifications[0]->modifications ?? []) + $cont->toArray();
-      if($mod['poa'] == null)
+      if ($mod['poa'] == null)
         unset($mod['poa']);
       unset($mod['company_id'], $mod['id'], $mod['created_at'], $mod['updated_at'], $mod['is_update'], $mod['modifications'], $mod['status']);
 
       $modifications = $cont->modifications;
-      if($request->hasFile('poa') || !$request->is_authorized)
-      (!$modifications->isEmpty() && @$modifications[0]->modifications['poa']['modified']) ? ImageTrait::deleteImage($modifications[0]->modifications['poa']['modified'], 'public') : '';
+      if ($request->hasFile('poa') || !$request->is_authorized) (!$modifications->isEmpty() && @$modifications[0]->modifications['poa']['modified']) ? ImageTrait::deleteImage($modifications[0]->modifications['poa']['modified'], 'public') : '';
       $t = (!$modifications->isEmpty() && @$modifications[0]->modifications['poa']['modified']) ? ['poa' => @$modifications[0]->modifications['poa']['modified']] : [];
 
       $new_att = $this->uploadPOA($request, $fileRepository) + $t;
-      if(empty(array_diff_assoc_recursive($mod, $new_att))){
+      if (empty(array_diff_assoc_recursive($mod, $new_att))) {
         return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       }
 
@@ -117,8 +120,8 @@ class ContactController extends Controller
     if ($request->hasFile('poa')) {
       $path = CompanyContact::POA_PATH . '/' . auth()->user()->company_id;
       $poa['poa'] = $path . '/' . $fileRepository->addAttachment($request->file('poa'), $path, 'public');
-    }else{
-      if(!$request->is_authorized){
+    } else {
+      if (!$request->is_authorized) {
         unset($all['poa']);
       }
     }

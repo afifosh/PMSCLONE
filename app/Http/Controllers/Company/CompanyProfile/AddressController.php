@@ -43,9 +43,9 @@ class AddressController extends Controller
 
   public function show($address)
   {
-    if(request()->type == 'pending_creation'){
+    if (request()->type == 'pending_creation') {
       $data['address'] = auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address);
-    }else{
+    } else {
       $data['address'] = auth()->user()->company->addresses()->with('modifications.disapprovals')->findOrFail($address);
     }
     $data['countries'] = Country::pluck('name', 'id');
@@ -64,19 +64,24 @@ class AddressController extends Controller
 
   public function update(AddressUpdateRequest $request, $address)
   {
-    if(request()->model_type == 'pending_creation'){
-      $addr = transformModifiedData(auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address)->modifications);
-      unset($addr['company_id']);
-      if(empty(array_diff_assoc_recursive($addr, $request->validated()))){
+    if (request()->model_type == 'pending_creation') {
+      $addr = auth()->user()->company->POCAddress()->where('is_update', false)->withCount('disapprovals')->findOrFail($address);
+      $modifications = transformModifiedData($addr->modifications);
+      unset($modifications['company_id']);
+      if (empty(array_diff_assoc_recursive($modifications, $request->validated()))) {
         return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       }
-      auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address)->delete();
-      auth()->user()->company->addresses()->create($request->validated());
-    }else{
+      if ($addr->disapprovals_count > 0) {
+        $addr->delete();
+        auth()->user()->company->addresses()->create($request->validated());
+      } else {
+        $addr->updateModifications($request->validated());
+      }
+    } else {
       $addr = @auth()->user()->company->addresses()->with('modifications')->findOrFail($address);
       $mod = transformModifiedData(@$addr->modifications[0]->modifications ?? []) + $addr->toArray();
       unset($mod['company_id'], $mod['id'], $mod['created_at'], $mod['updated_at'], $mod['is_update'], $mod['modifications'], $mod['status']);
-      if(empty(array_diff_assoc_recursive($mod, $request->validated()))){
+      if (empty(array_diff_assoc_recursive($mod, $request->validated()))) {
         return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       }
       $addr->modifications()->delete();
@@ -88,9 +93,9 @@ class AddressController extends Controller
 
   public function destroy($address)
   {
-    if(request()->type == 'pending_creation'){
+    if (request()->type == 'pending_creation') {
       auth()->user()->company->POCAddress()->where('is_update', false)->findOrFail($address)->delete();
-    }else{
+    } else {
       auth()->user()->company->addresses()->findOrFail($address)->delete();
     }
 

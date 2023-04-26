@@ -35,6 +35,11 @@ class CompanyAddress extends Model
     'address_type' => 'array',
   ];
 
+  public function getFillables()
+  {
+    return $this->fillable;
+  }
+
   public static function getAddressTypes()
   {
     return [

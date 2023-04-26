@@ -105,7 +105,7 @@ class Company extends BaseModel
       + $comp->address_count
       + $comp->kyc_doc_count;
 
-    $approved_count +=$this->POCmodifications()->has('approvals', '>=', $level)->count();
+    $approved_count += $this->POCmodifications()->has('approvals', '>=', $level)->count();
     return round(($approved_count / $total) * 100, 1);
   }
 
@@ -342,12 +342,12 @@ class Company extends BaseModel
   {
     return $this->approval_status != 2 // not already sent for approval
       // && $this->POCmodifications()->doesntHave('disapprovals')->exists(); //  has changed something but not rejected
-      && ($this->POCAddress()->exists() || $this->addresses()->doesntHave('modifications.disapprovals')->exists()) // has changed address or approved address
-      && ($this->POCDetail()->exists() || $this->detail()->doesntHave('modifications.disapprovals')->exists()) // has changed detail or approved detail
-      && ($this->POCContact()->exists() || $this->contacts()->doesntHave('modifications.disapprovals')->exists()) // has changed contact or approved contact
-      && ($this->POCBankAccount()->exists() || $this->bankAccounts()->doesntHave('modifications.disapprovals')->exists()) // has changed bank account or approved bank account
-      && ($this->POCKycDoc()->exists() || $this->kycDocs()->doesntHave('modifications.disapprovals')->exists()) && $this->isMendatoryKycDocsSubmitted() // has changed kyc doc or approved kyc doc
-      && $this->POCmodifications()->doesntHave('disapprovals')->exists(); // has changed something
+      && ($this->POCAddress()->exists() || !$this->addresses()->has('modifications.disapprovals')->exists()) // has changed address or approved address
+      && ($this->POCDetail()->exists() || !$this->detail()->has('modifications.disapprovals')->exists()) // has changed detail or approved detail
+      && ($this->POCContact()->exists() || !$this->contacts()->has('modifications.disapprovals')->exists()) // has changed contact or approved contact
+      && ($this->POCBankAccount()->exists() || !$this->bankAccounts()->has('modifications.disapprovals')->exists()) // has changed bank account or approved bank account
+      && ($this->POCKycDoc()->exists() || !$this->kycDocs()->has('modifications.disapprovals')->exists()) && $this->isMendatoryKycDocsSubmitted() // has changed kyc doc or approved kyc doc
+      && !$this->POCmodifications()->has('disapprovals')->exists(); // has changed something
   }
 
   public function isEditable()  //user can make changes if not sent for approval

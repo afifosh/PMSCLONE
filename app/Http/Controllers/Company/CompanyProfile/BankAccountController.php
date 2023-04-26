@@ -66,46 +66,49 @@ class BankAccountController extends Controller
   public function update(BankAccountUpdateRequest $request, $bank_account, FileUploadRepository $fileRepository)
   {
     if (request()->model_type == 'pending_creation') {
-      $account = transformModifiedData(auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->modifications);
-      unset($account['company_id']);
-      // if(empty(array_diff_assoc($account, $request->validated()))){
+      $account = auth()->user()->company->POCBankAccount()->where('is_update', false)->withCount('disapprovals')->findOrFail($bank_account);
+      $PModifications = transformModifiedData($account->modifications);
+      unset($PModifications['company_id']);
+      // if(empty(array_diff_assoc($PModifications, $request->validated()))){
       //   return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       // }
-      auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->delete();
-      auth()->user()->company->bankAccounts()->create($request->validated());
+      // auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->delete();
+      // auth()->user()->company->bankAccounts()->create($request->validated());
 
       // $cont = auth()->user()->company->POCContact()->where('is_update', false)->findOrFail($contact);
-      if($request->hasFile('bank_letter') || !$request->is_authorized)
-        @$account['bank_letter'] ? ImageTrait::deleteImage($account['bank_letter'], 'public') : '';
-      $att = $this->uploadBankLetter($request, $fileRepository) + ['bank_letter' => @$account['bank_letter']];
+      if ($request->hasFile('bank_letter') || !$request->is_authorized)
+        @$PModifications['bank_letter'] ? ImageTrait::deleteImage($PModifications['bank_letter'], 'public') : '';
+      $att = $this->uploadBankLetter($request, $fileRepository) + ['bank_letter' => @$PModifications['bank_letter']];
       unset($att['is_authorized']);
-      if($att['bank_letter'] == null)
+      if ($att['bank_letter'] == null)
         unset($att['bank_letter']);
       // $cont_modifications = transformModifiedData($cont->modifications);
-      if(empty(array_diff_assoc_recursive($att, $account))){
+      if (empty(array_diff_assoc_recursive($att, $PModifications))) {
         return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       }
-      auth()->user()->company->POCBankAccount()->where('is_update', false)->findOrFail($bank_account)->delete();
-      // auth()->user()->company->bankAccounts()->create($request->validated());
-      auth()->user()->company->bankAccounts()->create($this->uploadBankLetter($request, $fileRepository) + ['bank_letter' => @$account['bank_letter']]);
+      if ($account->disapprovals_count > 0) {
+        $account->delete();
+        auth()->user()->company->bankAccounts()->create($this->uploadBankLetter($request, $fileRepository) + ['bank_letter' => @$account['bank_letter']]);
+      } else {
+        $account->updateModifications($this->uploadBankLetter($request, $fileRepository) + ['bank_letter' => @$account['bank_letter']]);
+      }
       // $cont->delete();
     } else {
       // auth()->user()->company->bankAccounts()->findOrFail($bank_account)->modifications()->delete();
       // auth()->user()->company->bankAccounts()->findOrFail($bank_account)->updateIfDirty($request->validated());
       $ba = @auth()->user()->company->contacts()->with('modifications')->findOrFail($bank_account);
       $mod = transformModifiedData(@$ba->modifications[0]->modifications ?? []) + $ba->toArray();
-      if($mod['bank_letter'] == null)
+      if ($mod['bank_letter'] == null)
         unset($mod['bank_letter']);
       unset($mod['company_id'], $mod['id'], $mod['created_at'], $mod['updated_at'], $mod['is_update'], $mod['modifications'], $mod['status']);
 
       $modifications = $ba->modifications;
 
-      if($request->hasFile('bank_letter') || !$request->is_authorized)
-      (!$modifications->isEmpty() && @$modifications[0]->modifications['bank_letter']['modified']) ? ImageTrait::deleteImage($modifications[0]->modifications['bank_letter']['modified'], 'public') : '';
+      if ($request->hasFile('bank_letter') || !$request->is_authorized) (!$modifications->isEmpty() && @$modifications[0]->modifications['bank_letter']['modified']) ? ImageTrait::deleteImage($modifications[0]->modifications['bank_letter']['modified'], 'public') : '';
       $t = (!$modifications->isEmpty() && @$modifications[0]->modifications['bank_letter']['modified']) ? ['bank_letter' => @$modifications[0]->modifications['bank_letter']['modified']] : [];
 
       $new_att = $this->uploadBankLetter($request, $fileRepository) + $t;
-      if(empty(array_diff_assoc_recursive($mod, $new_att))){
+      if (empty(array_diff_assoc_recursive($mod, $new_att))) {
         return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       }
 
@@ -132,8 +135,8 @@ class BankAccountController extends Controller
     if ($request->hasFile('bank_letter')) {
       $path = CompanyBankAccount::BANK_LETTER_PATH . '/' . auth()->user()->company_id;
       $bank_letter['bank_letter'] = $path . '/' . $fileRepository->addAttachment($request->file('bank_letter'), $path, 'public');
-    }else{
-      if(!$request->is_authorized){
+    } else {
+      if (!$request->is_authorized) {
         unset($all['bank_letter']);
       }
     }
