@@ -127,4 +127,10 @@ class CompanyProfileController extends Controller
     }
     return redirect()->back()->with('error', 'Please fill all the required fields');
   }
+
+  public function showActivityTimeline()
+  {
+    $data['logs'] = auth()->user()->company->profileActivityTimeline()->latest()->paginate(5);
+    return view('pages.company-profile.new.detailed-content.activity-logs', $data);
+  }
 }

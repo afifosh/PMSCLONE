@@ -97,8 +97,15 @@ class ContactController extends Controller
         return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       }
 
-      auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($new_att);
-      isset($modifications[0]) ? $modifications[0]->delete() : '';
+      if ($cont->modifications->isNotEmpty() && $cont->modifications[0]->disapprovals->isEmpty()) {
+        $cont->modifications[0]->updateModifications($new_att);
+      } else {
+        $cont->modifications()->delete();
+        $cont->updateIfDirty($new_att);
+      }
+
+      // auth()->user()->company->contacts()->findOrFail($contact)->updateIfDirty($new_att);
+      // isset($modifications[0]) ? $modifications[0]->delete() : '';
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 2]);
   }

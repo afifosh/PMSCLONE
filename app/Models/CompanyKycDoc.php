@@ -24,11 +24,6 @@ class CompanyKycDoc extends Model
 
     public const FILE_PATH = 'kyc-docs/company';
 
-    public function getFillables()
-    {
-      return $this->fillable;
-    }
-
     public function company()
     {
         return $this->belongsTo(Company::class);

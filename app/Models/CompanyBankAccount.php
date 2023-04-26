@@ -26,11 +26,6 @@ class CompanyBankAccount extends Model
 
   public const BANK_LETTER_PATH = 'bank-letters';
 
-  public function getFillables()
-  {
-    return $this->fillable;
-  }
-
   public function company()
   {
     return $this->belongsTo(Company::class);

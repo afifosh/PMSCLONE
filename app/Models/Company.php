@@ -347,7 +347,7 @@ class Company extends BaseModel
       && ($this->POCContact()->exists() || !$this->contacts()->has('modifications.disapprovals')->exists()) // has changed contact or approved contact
       && ($this->POCBankAccount()->exists() || !$this->bankAccounts()->has('modifications.disapprovals')->exists()) // has changed bank account or approved bank account
       && ($this->POCKycDoc()->exists() || !$this->kycDocs()->has('modifications.disapprovals')->exists()) && $this->isMendatoryKycDocsSubmitted() // has changed kyc doc or approved kyc doc
-      && !$this->POCmodifications()->has('disapprovals')->exists(); // has changed something
+      && ($this->POCmodifications()->exists() && !$this->POCmodifications()->has('disapprovals')->exists()); // has changed something
   }
 
   public function isEditable()  //user can make changes if not sent for approval
@@ -507,5 +507,12 @@ class Company extends BaseModel
       $status += 1;
 
     return $status;
+  }
+
+  public function profileActivityTimeline()
+  {
+    return $this->POCmodifications()
+      ->with('approvals.approver', 'disapprovals.disapprover', 'modifiable')
+      ->withTrashed();
   }
 }

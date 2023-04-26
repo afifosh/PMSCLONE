@@ -24,4 +24,51 @@ trait CompanyApprovalBaseLogic
     // should update immediately without approval.
     return true;
   }
+
+  /**
+   * Apply modification to model.
+   *
+   * @return void
+   */
+  public function applyModificationChanges(\Approval\Models\Modification $modification, bool $approved)
+  {
+    if ($approved && $this->updateWhenApproved) {
+      $this->setForcedApprovalUpdate(true);
+
+      foreach ($modification->modifications as $key => $mod) {
+        $this->{$key} = $mod['modified'];
+      }
+
+      $this->save();
+
+      // update modification to reflect the model that was updated
+      $modification->modifiable_type = get_class($this);
+      $modification->modifiable_id = $this->id;
+      $modification->save();
+
+      if ($this->deleteWhenApproved) {
+        $modification->delete();
+      } else {
+        $modification->active = false;
+        $modification->save();
+      }
+    } elseif ($approved === false) {
+      if ($this->deleteWhenDisapproved) {
+        $modification->delete();
+      } else {
+        $modification->active = false;
+        $modification->save();
+      }
+    }
+  }
+
+  /**
+   * Get fillable Fields.
+   *
+   * @return array
+   */
+  public function getFillables()
+  {
+    return $this->fillable;
+  }
 }

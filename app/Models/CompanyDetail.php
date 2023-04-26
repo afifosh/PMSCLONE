@@ -59,11 +59,6 @@ class CompanyDetail extends Model
     '2' => 'Local',
   ];
 
-  public function getFillables()
-  {
-    return $this->fillable;
-  }
-
   public function company()
   {
     return $this->belongsTo(Company::class);
