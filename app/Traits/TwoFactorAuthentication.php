@@ -44,6 +44,7 @@ trait TwoFactorAuthentication
 
         //$guard = request()->is('admin/*') ? 'admin' : 'web';
         $guard = config('fortify.guard');
+        //dd($guard);
         $id = Session::get('login.id');
      
         if ($id) {

@@ -17,7 +17,10 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use App\Events\TwoFactorCodeEvent;
 use App\Listeners\TwoFactorCodeListener;
+use App\Listeners\SuccessfulLoginListener;
+use Laravel\Fortify\Events\TwoFactorLogin;
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
 use App\Listeners\IncrementDeviceAuthorizationAttempts;
 
 class EventServiceProvider extends ServiceProvider
@@ -58,6 +61,8 @@ class EventServiceProvider extends ServiceProvider
         ],
         
         TwoFactorCodeEvent::class => [TwoFactorCodeListener::class],
+
+        Login::class => [SuccessfulLoginListener::class],        
     ];
 
     /**

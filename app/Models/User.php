@@ -128,6 +128,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
           ->whereIpAddress($ip)
           ->whereUserAgent($userAgent)
           ->whereFingerprint($fingerprint)
+          ->whereSafe(true)
           ->latest('created_at')
             ->firstOrNew();
     
@@ -170,7 +171,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
         $safe = $deviceAuthorization->safe;
         $lastLogin = $deviceAuthorization->updated_at;
         $expiration = now()->subDays(30);
-
+//dd($deviceAuthorization->failed_attempts < config('auth.device_authorization.failed_limit'));
         return $safe && $lastLogin->gt($expiration) &&  $deviceAuthorization->failed_attempts < config('auth.device_authorization.failed_limit');
     }
             

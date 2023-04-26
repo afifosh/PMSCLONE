@@ -122,7 +122,7 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="{{ route('admin.admin-account.edit', ['admin_account' => auth()->id(), 't' => 'security'])}}">
+                <a class="dropdown-item" href="{{ route('user.user-account.edit', ['user_account' => auth()->id(), 't' => 'security'])}}">
                   <i class="ti-xs ti ti-lock me-1 ti-sm"></i>
                   <span class="align-middle">Security</span>
                 </a>

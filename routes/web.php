@@ -44,6 +44,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
       //  Route::resource('user/user-account', UserAccountController::class);
       Route::name('user.')->group(function(){
         Route::resource('user/user-account', UserAccountController::class)->only('edit');
+        
       });
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);

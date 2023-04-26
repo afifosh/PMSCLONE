@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Fortify\Actions\AttemptToAuthenticate;
 use Laravel\Fortify\Actions\PrepareAuthenticatedSession;
 use App\Actions\Fortify\CaptchaValidations;
+use App\Actions\Fortify\CustomRedirectIfTwoFactorAuthenticatable;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Events\RecoveryCodeReplaced;
 
@@ -91,18 +92,22 @@ class RedirectToMailOTP extends RedirectIfTwoFactorAuthenticatable
         }
 
 
-        $request->session()->forget('login.authenticate_via');
+       $request->session()->forget('login.authenticate_via');
 
 
         if (Fortify::confirmsTwoFactorAuthentication()) {
             if (optional($user)->two_factor_secret &&
                 ! is_null(optional($user)->two_factor_confirmed_at) &&
                 in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
-                    return  app(\Illuminate\Pipeline\Pipeline::class)->send($request)
-                    ->through([
-                        RedirectIfTwoFactorAuthenticatable::class,
-                     // CaptchaValidations::class,
-                    ])->thenReturn();
+
+                    return $this->twoFactorGoogleChallengeResponse($request, $user);
+
+                    // return  app(\Illuminate\Pipeline\Pipeline::class)->send($request)
+                    // ->through([
+                    //    // RedirectIfTwoFactorAuthenticatable::class,
+                    //     CustomRedirectIfTwoFactorAuthenticatable::class,
+                    //   CaptchaValidations::class,
+                    // ])->thenReturn();
             } else {
                     return  app(\Illuminate\Pipeline\Pipeline::class)->send($request)
                     ->through([
@@ -142,76 +147,6 @@ class RedirectToMailOTP extends RedirectIfTwoFactorAuthenticatable
 
         // return app(TwoFactorLoginResponse::class);
     }
-
-    public function verifysss(TwoFactorLoginRequest $request)
-    {  
-        // dd(session()->all());
-        //       dd($request);
-        $request->session()->forget('login.authenticate_via');
-        return  app(\Illuminate\Pipeline\Pipeline::class)->send($request)
-        ->through([
-           CaptchaValidations::class,
-            // AttemptToAuthenticate::class,
-        
-            // PrepareAuthenticatedSession::class,
-        //   RedirectIfTwoFactorAuthenticatable::class,
-            
-        ])->thenReturn();
-        $user = $request->challengedUser();  
-
-        $request->validate([
-            'code' => 'required|numeric|digits:6',
-          ],[
-            'code.required' => 'code is required',
-            'code.numeric' => 'code must be numeric from 0 to 9',
-        ]);
-
-        if ($user->two_factor_code != $request->code || Carbon::parse($user->two_factor_expires_at)->lt(Carbon::now())) {
-            return app(FailedTwoFactorLoginResponse::class);
-        }
-
-        if (Fortify::confirmsTwoFactorAuthentication()) {
-            if (optional($user)->two_factor_secret &&
-                ! is_null(optional($user)->two_factor_confirmed_at) &&
-                in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
-
-                    $request->session()->put([
-                        'login.id' => $user->getKey(),
-                        'login.remember' => $request->filled('remember'),
-                        'login.authenticate_via' => 'google_authenticator',
-                    ]);
-
-                    if($request->is('admin/*')){
-                        return $request->wantsJson()
-                        ? response()->json(['two_factor' => true,
-                        'authenticate_via' => "google_authenticator" ])
-                        : redirect()->route('admin.two-factor.login');
-                    }
-            
-                    return $request->wantsJson()
-                                ? response()->json(['two_factor' => true,
-                                'authenticate_via' => "google_authenticator" ])
-                                : redirect()->route('two-factor.login');
-            } else {
-                    $this->guard->login($user, $request->remember());
-
-                    $request->session()->regenerate();
-
-                    return app(TwoFactorLoginResponse::class);
-            }
-        }             
-
-
-
-        // if($request->is('admin/*')){
-        //     return $request->wantsJson()
-        //     ? response()->json(['two_factor' => false,
-        //     'authenticate_via' => "google_authenticator" ])
-        //     : redirect()->route('admin.two-factor.login');
-        // }   
-             
-       // return redirect()->back()->withStatus('Phone number verified successfully.');
-    }   
 
     public function handle($request, $next)
     {
@@ -307,4 +242,34 @@ class RedirectToMailOTP extends RedirectIfTwoFactorAuthenticatable
                     'authenticate_via' => "email" ])
                     : redirect()->route('two-factor.login')->with('success', "Code sent to {$user->email}");
     }
+
+    /**
+     * Get the two factor authentication enabled response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function twoFactorGoogleChallengeResponse($request, $user)
+    {
+        //   dd("afif");
+        
+        $request->session()->put([
+            'login.id' => $user->getKey(),
+            'login.remember' => $request->filled('remember'),
+            'login.authenticate_via' => 'google_authenticator',
+        ]);
+
+        if($request->is('admin/*')){
+            return $request->wantsJson()
+            ? response()->json(['two_factor' => true,
+            'authenticate_via' => "google_authenticator" ])
+            : redirect()->route('admin.two-factor.login');
+        }
+
+        return $request->wantsJson()
+                    ? response()->json(['two_factor' => true,
+                    'authenticate_via' => "google_authenticator" ])
+                    : redirect()->route('two-factor.login');
+    }    
 }

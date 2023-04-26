@@ -49,19 +49,19 @@ class CheckDeviceAuthorization extends RedirectIfTwoFactorAuthenticatable
             'login.fingerprint' => $fingerPrint,
         ]);
             
-        // $known = $user->deviceAuthorizations()->whereIpAddress($ip)
-        // ->whereUserAgent($userAgent)
-        // ->whereFingerprint($fingerPrint)
-        // ->where( 'updated_at', '>', Carbon::now()->subDays(30))->first();
+        $known = $user->deviceAuthorizations()->whereIpAddress($ip)
+        ->whereUserAgent($userAgent)
+        ->whereFingerprint($fingerPrint)
+        ->where( 'updated_at', '>', Carbon::now()->subDays(30))->first();
 
-        $known = $user->shouldSkipTwoFactor($ip,$userAgent,$fingerPrint);   
-
+      $known = $user->shouldSkipTwoFactor($ip,$userAgent,$fingerPrint);   
+// dd( $known);
 
         if($request->has('fingerprint')   &&  $known  ) {
 
             return app(\Illuminate\Pipeline\Pipeline::class)->send($request)
             ->through([
-                CaptchaValidations::class,
+               // CaptchaValidations::class,
                 AttemptToAuthenticate::class,
                 PrepareAuthenticatedSession::class,
             ])->then(function ($request) use ($next) {

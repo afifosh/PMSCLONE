@@ -2,7 +2,7 @@
     $customizerHidden = 'customizer-hide';
     $pageConfigs = ['myLayout' => 'blank'];
 @endphp
-@extends('admin.layouts/layoutMaster' , ['body_class' => 'authentication'])
+@extends('layouts/layoutMaster' , ['body_class' => 'authentication'])
 
 @section('title', 'Forgot Password')
 
@@ -27,20 +27,20 @@
 @endsection
 
 @section('content')
-@include('admin._partials.auth-section')
+@include('_partials.auth-section')
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
             <div class="authentication-inner py-4">
                 <!-- Forgot Password -->
                 <div class="card">
                   <!-- Start Header -->
-                  @include('admin._partials.auth-svg-top')
+                  @include('_partials.auth-svg-top')
                  <!-- End Header -->                    
                     <div class="card-body">
                         <!-- Logo -->
                         <div class="app-brand justify-content-center mb-4 mt-2">
                             <a href="{{ url('/') }}" class="app-brand-link gap-2">
-                                <span class="app-brand-mainlogo demo">@include('admin._partials.mainlogo', ['height' => 150, 'withbg' => 'fill: #000;'])</span>
+                                <span class="app-brand-mainlogo demo">@include('_partials.mainlogo', ['height' => 150, 'withbg' => 'fill: #000;'])</span>
                             </a>
                         </div>
                         <!-- /Logo -->                   
@@ -49,7 +49,7 @@
                         @if (session('status'))
                             <p class="text-success mb-3">{{ session('status') }}</p>
                         @endif
-                        <form id="formAuthentication" class="mb-3" action="{{ route('admin.lost.recoverycode.send') }}" method="POST">
+                        <form id="formAuthentication" class="mb-3" action="{{ route('lost.recoverycode.send') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
@@ -64,15 +64,15 @@
                             <button class="btn btn-primary d-grid w-100">Send Recovery Codes</button>
                         </form>
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('admin.login') }}">
+                            <a href="{{ route('login') }}">
                                 <i class="ti ti-chevron-left scaleX-n1-rtl"></i>
                                 Back to login
                             </a>
-                            <a href="{{ route('admin.two-factor.login', ['type' => 'recovery-code']) }}">
+                            <a href="{{ route('two-factor.login', ['type' => 'recovery-code']) }}">
                               Use Recovery Code
                               <i class="ti ti-chevron-right scaleX-n1-rtl"></i>
                              </a>
-                        </div>
+                        </div>                        
                     </div>
                 </div>
                 <!-- /Forgot Password -->

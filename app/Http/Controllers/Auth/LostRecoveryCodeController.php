@@ -6,9 +6,18 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Models\User;
 use App\Models\Admin;
-use App\Events\TwoFactorCodeEvent;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Validation\ValidationException;
+use Laravel\Fortify\Events\TwoFactorAuthenticationChallenged;
+use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
+use Laravel\Fortify\Fortify;
+use Laravel\Fortify\LoginRateLimiter;
+Use \Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Session;
+
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use App\Jobs\SendLostRecoveryCodeNotification;
 class LostRecoveryCodeController extends Controller
 {
 
@@ -65,10 +74,14 @@ class LostRecoveryCodeController extends Controller
         if($guard == "admin"){
             $validator = Validator::make($request->all(), [
                 'email' => 'required|exists:admins',
+            ], [
+                'email.exists' => 'We can\'t find a user with that email address.',
             ]);
         }else{
             $validator = Validator::make($request->all(), [
                 'email' => 'required|exists:users',
+            ], [
+                'email.exists' => 'We can\'t find a user with that email address.',
             ]);
         }
 
@@ -87,10 +100,24 @@ class LostRecoveryCodeController extends Controller
             $user = User::where('email',$email)->first();
         }
 
-        $user->generateTwoFactorCode();
-        event(new TwoFactorCodeEvent($user));
-        session()->flash('status','We have emailed your recovery codes!');
-        return redirect()->back()->with('success', "Email OTP Code Sent to   {$user->email}");
+
+
+
+    if (optional($user)->two_factor_secret &&
+        ! is_null(optional($user)->two_factor_confirmed_at) &&
+        in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {    
+            dispatch(new SendLostRecoveryCodeNotification($user));
+            return redirect()->back()->with('status', 'We have emailed your recovery codes!');
+        }else{
+           return redirect()->back()->withErrors([
+            'email' => 'You are not allowed to perform this action.'
+        ]);
+        }
+
+       // $user->generateTwoFactorCode();
+      //  event(new TwoFactorCodeEvent($user));
+    //   dd($user);
+
     }    
 
 

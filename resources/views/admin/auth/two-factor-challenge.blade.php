@@ -144,7 +144,7 @@
                                 </a>
                                 @if ( Session::get('login.authenticate_via') == 'google_authenticator')
                                 <a href="{{ route('admin.two-factor.login', ['type' => 'recovery-code']) }}">
-                                  Use Recover Code
+                                  Use Recovery Code
                                   <i class="ti ti-chevron-right scaleX-n1-rtl"></i>
                                  </a>
                                  @else

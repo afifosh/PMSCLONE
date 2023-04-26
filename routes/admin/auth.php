@@ -24,6 +24,15 @@ use App\Http\Controllers\Auth\RedirectToMailOTP as RedirectToTwoFactorMailOTPAut
 use App\Http\Controllers\Auth\LostRecoveryCodeController;
 //'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class
 
+
+Route::get('/lost-recovery-codes', [LostRecoveryCodeController::class, 'view'])
+->name('lost.recoverycode.view');
+
+Route::post('/lost-recovery-codes', [LostRecoveryCodeController::class, 'sendRecoveryCodes'])
+->middleware(['guest:web'])
+->name('lost.recoverycode.send');
+
+
 Route::post('check-code', [RedirectToTwoFactorMailOTPAuthentication::class, 'verify'])
 ->middleware(array_filter([
     'guest:web',

@@ -36,33 +36,22 @@ class CaptchaValidations  extends RedirectIfTwoFactorAuthenticatable
         }
 
         return $next($request);
-        
-        // The validation passed, continue with the rest of the logic
 
-        // return $next($request);
-
-        // Validator::make($request->all(), 
-        //     [ 
-        //         'g-recaptcha-response' => 'required|captcha' 
-        //     ],
-        //     [
-        //         'required' => 'Captcha verification faild, try again!',
-        //         'captcha'  => 'Captcha verification faild, try again!'
-        //     ]
-        // )->validate();
-
-        // return $next($request);
-
-        // return $this->challengedUser = $user;
-
-        // if ( true ) {
-        //     return back()->withErrors( "Errorrrrrrrrrrrrrrrrrrrrr");
-        // }
-           //   $request['afifosh'] =  "northleb northleb";
     
     }
 
     public function handle($request, $next)
+    {
+            $user = method_exists($request, 'challengedUser') ? $request->challengedUser() : $this->validateCredentials($request);  
+         //   $user = $request->challengedUser() ? $request->challengedUser() : $this->validateCredentials($request);  
+            if ($request->session()->has('login.fingerprint')) {
+                $this->guard->login($user);
+                $request->session()->regenerate();
+                return app(TwoFactorLoginResponse::class);
+            }
+    }    
+
+    public function handle2($request, $next)
     {
         $user = method_exists($request, 'challengedUser') ? $request->challengedUser() : $this->validateCredentials($request);  
      //   $user = $request->challengedUser() ? $request->challengedUser() : $this->validateCredentials($request);  
@@ -73,7 +62,7 @@ class CaptchaValidations  extends RedirectIfTwoFactorAuthenticatable
                     'fingerprint'  => $request->session()->get('login.fingerprint'),
                     'user_agent'   => $request->session()->get('login.browser'),
                     'ip_address'   => $request->session()->get('login.ip'),
-                    'verify_token' => Str::random(40),
+                    'token' => Str::random(40),
                     'verified_at'  =>  now(),
                 ]);
                // dd($validate);
@@ -85,20 +74,22 @@ class CaptchaValidations  extends RedirectIfTwoFactorAuthenticatable
                     $this->guard->login($user);
                     $request->session()->regenerate();
                     return app(TwoFactorLoginResponse::class);
-                }else{
-                    $deviceAuthorization = $user->deviceAuthorizations()->create([
-                        'uuid'         => Str::uuid(),
-                        'fingerprint'  => $request->session()->get('login.fingerprint'),
-                        'user_agent'   => $request->session()->get('login.browser'),
-                        'ip_address'   => $request->session()->get('login.ip'),
-                        'verify_token' => Str::random(40),
-                        'verified_at'  =>  now(),
-                    ]);     
-                    $deviceAuthorization->safe = true;
-                    $this->guard->login($user);
-                    $request->session()->regenerate();
-                    return app(TwoFactorLoginResponse::class);
                 }
+                
+                // else{
+                //     $deviceAuthorization = $user->deviceAuthorizations()->create([
+                //         'uuid'         => Str::uuid(),
+                //         'fingerprint'  => $request->session()->get('login.fingerprint'),
+                //         'user_agent'   => $request->session()->get('login.browser'),
+                //         'ip_address'   => $request->session()->get('login.ip'),
+                //         'verify_token' => Str::random(40),
+                //         'verified_at'  =>  now(),
+                //     ]);     
+                //     $deviceAuthorization->safe = true;
+                //     $this->guard->login($user);
+                //     $request->session()->regenerate();
+                //     return app(TwoFactorLoginResponse::class);
+                // }
         }
   
        // return $next($request);
@@ -108,6 +99,6 @@ class CaptchaValidations  extends RedirectIfTwoFactorAuthenticatable
 
     //    $request->session()->regenerate();
     //    return app(TwoFactorLoginResponse::class);
-     //  return $next($request);
+      return $next($request);
     }
 }

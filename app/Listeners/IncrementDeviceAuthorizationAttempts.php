@@ -23,6 +23,7 @@ class IncrementDeviceAuthorizationAttempts
         $userAgent         = $request->userAgent();
 
         $user = $event->user;
+        
         if ($user) {
                 $deviceAuthorization = $user->deviceAuthorizations()
                 ->where('fingerprint', $fingerprint)
