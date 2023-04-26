@@ -63,7 +63,7 @@
       @if(count($message->getThread())>0)
       <p onclick="$('.email-card-prev').toggle();$(this).toggle();" class="email-earlier-msgs text-center text-muted cursor-pointer mb-5">{{$message->getThread()->count()}} Earlier Message</p>
       @foreach($message->getThread() as $msg)
-      <div class="card email-card-prev mx-sm-4 mx-3">
+      <div class="card email-card-prev mx-sm-4 mx-3  mt-4">
           <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
             <div class="d-flex align-items-center mb-sm-0 mb-3">
               <div alt="user-avatar" class="flex-shrink-0 rounded-circle me-3" >
