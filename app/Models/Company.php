@@ -287,13 +287,16 @@ class Company extends BaseModel
   {
     $level = $level ? $level : $this->approval_level;
     if (!$this->isApprovalRequiredForCurrentLevel()) {
-      if ($this->approval_level >= ApprovalLevel::count() && !$this->POCmodifications()->has('disapprovals')->exists())
+      if ($this->approval_level >= ApprovalLevel::count() && !$this->POCmodifications()->has('disapprovals')->exists()) {
         $this->forceFill(['approval_status' => 1, 'approved_at' => now(), 'verified_at' => now()]); // Approved by all
-      else {
-        if ($this->POCmodifications()->has('disapprovals')->exists())
-          $this->forceFill(['approval_status' => 3, 'approval_level' => 1]); // Rejected by at least one
-        else
+        $this->approvalRequests()->where('status', 0)->update(['status' => 1]);
+      } else {
+        if ($this->POCmodifications()->has('disapprovals')->exists()) {
+          $this->forceFill(['approval_status' => 3, 'approval_level' => 1]); // Rejected by at least one approver so reset approval level to 1 and set status to rejected
+          $this->approvalRequests()->where('status', 0)->update(['status' => 3]);
+        } else {
           $this->forceFill(['approval_level' => $this->approval_level + 1]); // increment approval level
+        }
       }
       $this->save();
 
@@ -342,11 +345,11 @@ class Company extends BaseModel
   {
     return $this->approval_status != 2 // not already sent for approval
       // && $this->POCmodifications()->doesntHave('disapprovals')->exists(); //  has changed something but not rejected
-      && ($this->POCAddress()->exists() || !$this->addresses()->has('modifications.disapprovals')->exists()) // has changed address or approved address
-      && ($this->POCDetail()->exists() || !$this->detail()->has('modifications.disapprovals')->exists()) // has changed detail or approved detail
-      && ($this->POCContact()->exists() || !$this->contacts()->has('modifications.disapprovals')->exists()) // has changed contact or approved contact
-      && ($this->POCBankAccount()->exists() || !$this->bankAccounts()->has('modifications.disapprovals')->exists()) // has changed bank account or approved bank account
-      && ($this->POCKycDoc()->exists() || !$this->kycDocs()->has('modifications.disapprovals')->exists()) && $this->isMendatoryKycDocsSubmitted() // has changed kyc doc or approved kyc doc
+      && ($this->POCAddress()->exists() || $this->addresses()->exists()) // has changed address or approved address
+      && ($this->POCDetail()->exists() || $this->detail()->exists()) // has changed detail or approved detail
+      && ($this->POCContact()->exists() || $this->contacts()->exists()) // has changed contact or approved contact
+      && ($this->POCBankAccount()->exists() || $this->bankAccounts()->exists()) // has changed bank account or approved bank account
+      && ($this->POCKycDoc()->exists() || $this->kycDocs()->exists()) && $this->isMendatoryKycDocsSubmitted() // has changed kyc doc or approved kyc doc
       && ($this->POCmodifications()->exists() && !$this->POCmodifications()->has('disapprovals')->exists()); // has changed something
   }
 
@@ -514,5 +517,10 @@ class Company extends BaseModel
     return $this->POCmodifications()
       ->with('approvals.approver', 'disapprovals.disapprover', 'modifiable')
       ->withTrashed();
+  }
+
+  public function approvalRequests()
+  {
+    return $this->hasMany(CompanyApprovalRequest::class, 'company_id');
   }
 }

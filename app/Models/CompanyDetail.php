@@ -99,4 +99,9 @@ class CompanyDetail extends Model
       'Subsidiaries' => 'subsidiaries',
     ];
   }
+
+  public static function getModelName()
+  {
+    return 'Company Details';
+  }
 }

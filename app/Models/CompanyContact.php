@@ -60,4 +60,9 @@ class CompanyContact extends Model
       'POA Letter' => 'poa'
     ];
   }
+
+  public static function getModelName()
+  {
+    return 'Company Contact';
+  }
 }

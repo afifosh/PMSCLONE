@@ -8,29 +8,34 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompanyKycDoc extends Model
 {
-    use HasFactory, CompanyApprovalBaseLogic;
+  use HasFactory, CompanyApprovalBaseLogic;
 
-    protected $fillable = [
-        'company_id',
-        'kyc_doc_id',
-        'fields',
-        'expiry_date',
-    ];
+  protected $fillable = [
+    'company_id',
+    'kyc_doc_id',
+    'fields',
+    'expiry_date',
+  ];
 
-    protected $casts = [
-        'fields' => 'array',
-        'expiry_date' => 'date',
-    ];
+  protected $casts = [
+    'fields' => 'array',
+    'expiry_date' => 'date',
+  ];
 
-    public const FILE_PATH = 'kyc-docs/company';
+  public const FILE_PATH = 'kyc-docs/company';
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
+  public function company()
+  {
+    return $this->belongsTo(Company::class);
+  }
 
-    public function kycDoc()
-    {
-        return $this->belongsTo(KycDocument::class);
-    }
+  public function kycDoc()
+  {
+    return $this->belongsTo(KycDocument::class);
+  }
+
+  public static function getModelName()
+  {
+    return 'KYC Doc';
+  }
 }

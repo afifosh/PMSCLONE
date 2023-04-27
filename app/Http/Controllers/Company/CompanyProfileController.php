@@ -122,6 +122,8 @@ class CompanyProfileController extends Controller
   public function submitApprovalRequest()
   {
     if (auth()->user()->company->canBeSentForApproval()) {
+      $appReq = auth()->user()->company->approvalRequests()->create();
+      $appReq->modifications()->sync(auth()->user()->company->POCModifications()->pluck('id'));
       auth()->user()->company->forceFill(['approval_status' => 2, 'approval_level' => 1])->save();
       return redirect()->back()->with('success', 'Approval Request Submitted Successfully');
     }

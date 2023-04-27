@@ -84,4 +84,9 @@ class CompanyAddress extends Model
   {
     return $this->morphMany(Modification::class, 'modifiable');
   }
+
+  public static function getModelName()
+  {
+    return 'Company Address';
+  }
 }

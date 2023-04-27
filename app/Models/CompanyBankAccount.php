@@ -55,4 +55,9 @@ class CompanyBankAccount extends Model
       'Bank Letter' => 'bank_letter'
     ];
   }
+
+  public static function getModelName()
+  {
+    return 'Bank Account';
+  }
 }
