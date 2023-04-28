@@ -12,6 +12,7 @@
 
 namespace App\MailClient;
 
+use App\Jobs\Admin\ProcessMessagesJob;
 use App\Models\EmailAccountFolder;
 
 class OutlookEmailAccountSynchronization extends EmailAccountIdBasedSynchronization
@@ -41,8 +42,8 @@ class OutlookEmailAccountSynchronization extends EmailAccountIdBasedSynchronizat
         foreach ($folders as $folder) {
             if (array_key_exists($folder->id, $messages)) {
                 $this->info(sprintf('Performing sync for folder %s via delta link.', $folder->name));
-
-                $this->processMessages($messages[$folder->id]);
+                ProcessMessagesJob::dispatch($messages[$folder->id]);
+                // $this->processMessages($messages[$folder->id]);
             }
         }
     }

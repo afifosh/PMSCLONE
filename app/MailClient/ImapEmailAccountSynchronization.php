@@ -13,6 +13,7 @@
 namespace App\MailClient;
 
 use App\Enums\SyncState;
+use App\Jobs\Admin\ProcessMessagesJob;
 use Illuminate\Support\Str;
 use Ddeboer\Imap\Exception\UnexpectedEncodingException;
 use Ddeboer\Imap\Exception\UnsupportedCharsetException;
@@ -103,12 +104,12 @@ class ImapEmailAccountSynchronization extends EmailAccountSynchronization
 
             $messages = $remoteFolder->getMessagesFrom($this->account->initial_sync_from->format('Y-m-d H:i:s'));
         }
-
-        try {
-            $this->processMessages($messages, $folder);
-        } catch (UnexpectedEncodingException|UnsupportedCharsetException $e) {
-            $this->error('Mail message was skipped from import because of ' . Str::of($e::class)->headline()->lower() . ' exception.');
-        }
+        ProcessMessagesJob::dispatch($messages, $folder);
+        // try {
+        //     $this->processMessages($messages, $folder);
+        // } catch (UnexpectedEncodingException|UnsupportedCharsetException $e) {
+        //     $this->error('Mail message was skipped from import because of ' . Str::of($e::class)->headline()->lower() . ' exception.');
+        // }
 
         // Sync the flags only if it's not initial sync
         if ($lastUid) {

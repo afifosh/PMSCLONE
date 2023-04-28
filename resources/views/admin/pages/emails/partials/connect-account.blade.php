@@ -33,6 +33,14 @@
             <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="initial_sync_from4" value="{{date('Y-m-d H:i:s', strtotime('-6 month', strtotime(date('Y-m-d H:i:s'))))}}">
             <label class="form-check-label" for="initial_sync_from4">6 months ago</label>
           </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="initial_sync_from5" value="{{date('Y-m-d H:i:s', strtotime('-1 year', strtotime(date('Y-m-d H:i:s'))))}}">
+            <label class="form-check-label" for="initial_sync_from5">1 year ago</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input initial_sync_from" type="radio" name="initial_sync_from" id="initial_sync_from6" >
+            <label class="form-check-label" for="initial_sync_from6">All time</label>
+          </div>
     </div>
     <div id="imap-area" style="filter:blur(4px); padding-bottom:30px;">
         <div class="mb-3">
