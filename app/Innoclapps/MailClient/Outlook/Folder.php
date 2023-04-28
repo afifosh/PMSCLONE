@@ -122,7 +122,7 @@ class Folder extends AbstractFolder
              *
              * @link https://docs.microsoft.com/en-us/graph/api/message-delta?view=graph-rest-1.0&tabs=http#odata-query-parameters
              */
-
+            $startFrom=$startFrom->format('Y-m-d H:i:s');
             $startFrom = (new \DateTime($startFrom))->format('Y-m-d\TH:i:s\Z');
             // $endpoint .= '&' . urlencode("\$filter=receivedDateTime ge '$startFrom'");
             $endpoint .= '&$filter=receivedDateTime ge ' . $startFrom;

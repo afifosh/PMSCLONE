@@ -130,13 +130,13 @@ class CreateEmailAccountViaOAuth
 
             return;
         }
-
+        if(OAuthState::getParameter('period')!='on')
         $payload['initial_sync_from'] = OAuthState::getParameter('period');
 
         if ($this->isPersonal()) {
             $payload['user_id'] = $this->request->user()->id;
         }
-
+        \Log::info('payload is'.json_encode($payload));
         return $this->repository->create($payload);
     }
 

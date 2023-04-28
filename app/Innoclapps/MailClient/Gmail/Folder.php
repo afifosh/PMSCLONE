@@ -103,12 +103,22 @@ class Folder extends AbstractFolder
     public function getMessagesFrom($dateTime, $limit = 50)
     {
         try {
-            return Client::message()
+            if(!is_null($dateTime)){
+                $dateTime= $dateTime->format('Y-m-d H:i:s');
+                return Client::message()
                 ->withLabels($this->getId())
                 ->preload(Message::class)
                 ->after(strtotime($dateTime))
                 ->take($limit)
                 ->all();
+            }
+          else{
+            return Client::message()
+            ->withLabels($this->getId())
+            ->preload(Message::class)
+            ->take($limit)
+            ->all();
+          }
         } catch (Google_Service_Exception $e) {
             if ($e->getCode() == 401) {
                 throw new ConnectionErrorException($e->getMessage(), $e->getCode(), $e);

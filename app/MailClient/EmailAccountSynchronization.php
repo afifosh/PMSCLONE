@@ -252,7 +252,7 @@ abstract class EmailAccountSynchronization extends EmailAccountSynchronizationMa
      *
      * @return void
      */
-    protected function processMessages($messages, ?EmailAccountFolder $folder = null) : void
+    public function processMessages($messages, ?EmailAccountFolder $folder = null) : void
     {
         $count     = 0;
         $processed = 0;

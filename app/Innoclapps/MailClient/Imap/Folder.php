@@ -69,12 +69,22 @@ class Folder extends AbstractFolder
      * @return \Illuminate\Support\Collection
      */
     public function getMessagesFrom($dateTime)
-    {
+    {   
+        if(!is_null($dateTime)){
+            $dateTime=$dateTime->format('Y-m-d H:i:s');
         return $this->getMessages(
             $this->createSinceFilter($dateTime),
             \SORTDATE, // Sort criteria
             true // Descending order
         );
+    }
+    else{
+        return $this->getMessages(
+            null,
+            \SORTDATE, // Sort criteria
+            true // Descending order
+        );
+    }
     }
 
     /**

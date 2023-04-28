@@ -102,9 +102,9 @@ class ImapEmailAccountSynchronization extends EmailAccountSynchronization
         } else {
             $this->info(sprintf('Performing initial sync for folder %s.', $folder->name));
 
-            $messages = $remoteFolder->getMessagesFrom($this->account->initial_sync_from->format('Y-m-d H:i:s'));
+            $messages = $remoteFolder->getMessagesFrom($this->account->initial_sync_from);
         }
-        ProcessMessagesJob::dispatch($messages, $folder);
+        ProcessMessagesJob::dispatch($this->accounts,$this->messages,$this->folders,$this->account,'Imap',$messages, $folder);
         // try {
         //     $this->processMessages($messages, $folder);
         // } catch (UnexpectedEncodingException|UnsupportedCharsetException $e) {

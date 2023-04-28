@@ -101,7 +101,7 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
             // We will fetch each unique message via batch request so we can perform update or insert with the new data
             // The batch will also check for any messages which are not found and will remove them from the array
            
-            ProcessMessagesJob::dispatch($this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered)));
+            ProcessMessagesJob::dispatch($this->accounts,$this->messages,$this->folders,$this->account,'Gmail',$this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered)));
            
             // $this->processMessages(
             //     $this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered))
@@ -182,7 +182,7 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
                     /** @var \App\Innoclapps\Google\Services\MessageCollection */
                     $result = $nextPageResult;
                 }
-                ProcessMessagesJob::dispatch($this->excludeSystemMailables($result));
+                ProcessMessagesJob::dispatch($this->accounts,$this->messages,$this->folders,$this->account,'Gmail',$this->excludeSystemMailables($result));
                 // $this->processMessages($this->excludeSystemMailables($result));
             } catch (Google_Service_Exception $e) {
                 if ($this->isRateLimitExceededException($e)) {
@@ -264,7 +264,7 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
     protected function getInitialMessages($folder, $limit = null)
     {
         return $folder->getMessagesFrom(
-            $this->account->initial_sync_from->format('Y-m-d H:i:s'),
+            $this->account->initial_sync_from,
             $limit ?? $this->limit
         );
     }

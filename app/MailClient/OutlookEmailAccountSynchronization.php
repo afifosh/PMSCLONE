@@ -42,7 +42,7 @@ class OutlookEmailAccountSynchronization extends EmailAccountIdBasedSynchronizat
         foreach ($folders as $folder) {
             if (array_key_exists($folder->id, $messages)) {
                 $this->info(sprintf('Performing sync for folder %s via delta link.', $folder->name));
-                ProcessMessagesJob::dispatch($messages[$folder->id]);
+                ProcessMessagesJob::dispatch($this->accounts,$this->messages,$this->folders,$this->account,'Outlook',$messages[$folder->id]);
                 // $this->processMessages($messages[$folder->id]);
             }
         }
@@ -69,7 +69,7 @@ class OutlookEmailAccountSynchronization extends EmailAccountIdBasedSynchronizat
              */
             $messages = $remoteFolder->getDeltaMessages(
                 $folder->getMeta(static::DELTA_META_KEY), // current delta link
-                $this->account->initial_sync_from->format('Y-m-d H:i:s')
+                $this->account->initial_sync_from
             );
 
             $newDeltaLink = $messages->getDeltaLink();
