@@ -104,7 +104,8 @@ class ImapEmailAccountSynchronization extends EmailAccountSynchronization
 
             $messages = $remoteFolder->getMessagesFrom($this->account->initial_sync_from);
         }
-        ProcessMessagesJob::dispatch($this->accounts,$this->messages,$this->folders,$this->account,'Imap',$messages, $folder);
+        $obj=new GmailEmailAccountSynchronization($this->accounts,$this->messages,$this->folders,$this->account);
+        ProcessMessagesJob::dispatch($obj,'Imap',$messages, $folder);
         // try {
         //     $this->processMessages($messages, $folder);
         // } catch (UnexpectedEncodingException|UnsupportedCharsetException $e) {
@@ -270,13 +271,13 @@ class ImapEmailAccountSynchronization extends EmailAccountSynchronization
      */
     protected function updateReadAndUnreadMessages($remoteFolder, $folderId)
     {
-        $remoteFolder->getSeenIds($this->account->initial_sync_from->format('Y-m-d H:i:s'))
+        $remoteFolder->getSeenIds($this->account->initial_sync_from)
             ->chunk(500)
             ->each(function ($ids) use ($folderId) {
                 $this->messages->markAsReadByRemoteIds($folderId, $ids->all());
             });
 
-        $remoteFolder->getUnseenIds($this->account->initial_sync_from->format('Y-m-d H:i:s'))
+        $remoteFolder->getUnseenIds($this->account->initial_sync_from)
             ->chunk(500)
             ->each(function ($ids) use ($folderId) {
                 $this->messages->markAsUnreadByRemoteIds($folderId, $ids->all());

@@ -42,7 +42,8 @@ class OutlookEmailAccountSynchronization extends EmailAccountIdBasedSynchronizat
         foreach ($folders as $folder) {
             if (array_key_exists($folder->id, $messages)) {
                 $this->info(sprintf('Performing sync for folder %s via delta link.', $folder->name));
-                ProcessMessagesJob::dispatch($this->accounts,$this->messages,$this->folders,$this->account,'Outlook',$messages[$folder->id]);
+                $obj=new GmailEmailAccountSynchronization($this->accounts,$this->messages,$this->folders,$this->account);
+                ProcessMessagesJob::dispatch($obj,'Outlook',$messages[$folder->id]);
                 // $this->processMessages($messages[$folder->id]);
             }
         }

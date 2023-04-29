@@ -204,7 +204,7 @@ class Folder extends AbstractFolder
     /**
      * Get all unseen message UID's
      *
-     * @param string|null $since
+     * @param mixed $since
      *
      * @return \Illuminate\Support\Collection
      */
@@ -214,6 +214,7 @@ class Folder extends AbstractFolder
         $search->addCondition(new Unseen);
 
         if ($since) {
+            $since=$since->format('Y-m-d H:i:s');
             $this->addSinceSearchExpression($search, $since);
         }
 
@@ -230,7 +231,7 @@ class Folder extends AbstractFolder
     /**
      * Get all seen message UID's
      *
-     * @param string|null $since
+     * @param mixed $since
      *
      * @return \Illuminate\Support\Collection
      */
@@ -240,6 +241,7 @@ class Folder extends AbstractFolder
         $search->addCondition(new Seen);
 
         if ($since) {
+            $since=$since->format('Y-m-d H:i:s');
             $this->addSinceSearchExpression($search, $since);
         }
 

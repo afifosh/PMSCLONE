@@ -100,8 +100,8 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
 
             // We will fetch each unique message via batch request so we can perform update or insert with the new data
             // The batch will also check for any messages which are not found and will remove them from the array
-           
-            ProcessMessagesJob::dispatch($this->accounts,$this->messages,$this->folders,$this->account,'Gmail',$this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered)));
+            $obj=new GmailEmailAccountSynchronization($this->accounts,$this->messages,$this->folders,$this->account);
+            ProcessMessagesJob::dispatch($obj,'Gmail',$this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered)));
            
             // $this->processMessages(
             //     $this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered))
@@ -182,7 +182,8 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
                     /** @var \App\Innoclapps\Google\Services\MessageCollection */
                     $result = $nextPageResult;
                 }
-                ProcessMessagesJob::dispatch($this->accounts,$this->messages,$this->folders,$this->account,'Gmail',$this->excludeSystemMailables($result));
+                $obj=new GmailEmailAccountSynchronization($this->accounts,$this->messages,$this->folders,$this->account);
+                ProcessMessagesJob::dispatch($obj,'Gmail',$this->excludeSystemMailables($result));
                 // $this->processMessages($this->excludeSystemMailables($result));
             } catch (Google_Service_Exception $e) {
                 if ($this->isRateLimitExceededException($e)) {

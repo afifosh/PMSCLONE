@@ -18,43 +18,35 @@ class ProcessMessagesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $messages;
-    public $folder;
-    public $provider;
-    public $accounts;
-    public $msgRepo;
-    public $folders;
-    public $account;
-    public function __construct($accounts,$msgRepo,$folders,$account,$provider, $messages, $folder = null)
+    protected $messages;
+    protected $folder;
+    protected $provider;
+    protected $obj;
+
+    public function __construct(GmailEmailAccountSynchronization $obj,$provider, $messages, $folder = null)
     {
         $this->messages = $messages;
         $this->folder = $folder;
         $this->provider = $provider;
-        $this->accounts=$accounts;
-        $this->msgRepo=$msgRepo;
-        $this->folders=$folders;
-        $this->account=$account;
+        $this->obj=$obj;
     }
 
     public function handle()
     {
-      
+      \Log::info('in handle');
         switch ($this->provider) {
             case 'Imap':
                 try {
-                    $imapSync = new ImapEmailAccountSynchronization($this->accounts,$this->msgRepo,$this->folders,$this->account);
-                    $imapSync->processMessages($this->messages, $this->folder);
+                    $this->obj->processMessages($this->messages, $this->folder);
                 } catch (UnexpectedEncodingException | UnsupportedCharsetException $e) {
-                    $imapSync->error('Mail message was skipped from import because of ' . Str::of($e::class)->headline()->lower() . ' exception.');
+                    $this->obj->error('Mail message was skipped from import because of ' . Str::of($e::class)->headline()->lower() . ' exception.');
                 }
                 break;
             case 'Outlook':
-                $outlookSync = new OutlookEmailAccountSynchronization($this->accounts,$this->msgRepo,$this->folders,$this->account);
-                $outlookSync->processMessages($this->messages);
+                $this->obj->processMessages($this->messages);
                 break;
             default:
-                $gmailSync = new GmailEmailAccountSynchronization($this->accounts,$this->msgRepo,$this->folders,$this->account);
-                $gmailSync->processMessages($this->messages);
+                $this->obj->processMessages($this->messages);
                 break;
         }
 
