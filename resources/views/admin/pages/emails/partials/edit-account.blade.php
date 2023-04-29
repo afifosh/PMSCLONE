@@ -28,34 +28,35 @@
             </label>
           </div>
         </div>
-@if($account->connection_type=='Imap')
+
+@if($account->connection_type==\App\Innoclapps\MailClient\ConnectionType::Imap)
         <div class="mb-3">
           <label class="form-label" for="password">Password</label>
-          <input type="password" id="password" class="form-control" name="password" />
+          <input type="password" id="password" value="{{$account->password}}" class="form-control" name="password" />
         </div>
         <div class="mb-3">
           <label class="form-label" for="username">Username(Optional)</label>
-          <input type="text" id="username" class="form-control" name="username" />
+          <input type="text" id="username" value="{{$account->username}}" class="form-control" name="username" />
         </div>
         <h5 class="mb-3 font-medium text-neutral-700 dark:text-neutral-100">Incomming Mail (Imap)</h5>
         <div class="mb-3">
           <label class="form-label" for="imap_server">Server</label>
-          <input type="text" id="imap_server" class="form-control" name="imap_server" />
+          <input type="text" id="imap_server" class="form-control" value="{{$account->imap_server}}" name="imap_server" />
         </div>
 <div class="row">
     <div class="col-md-5">
     <div class="mb-3">
     <label class="form-label" for="imap_port">Port</label>
-          <input type="number" value="993" id="imap_port" class="form-control" name="imap_port" />
+          <input type="number" value="{{$account->imap_port}}" id="imap_port" class="form-control" name="imap_port" />
           </div>
     </div>
           <div class="col-md-7">
         <div class="mb-3">
 <label class="form-label" for="imap_encryption">Encryption</label>
-          <select id="imap_encryption" class="form-select">
-            <option value="ssl">ssl</option>
-            <option value="tls">tls</option>
-            <option value="starttls">starttls</option>
+          <select id="imap_encryption" name="imap_encryption" class="form-select">
+            <option @if($account->imap_encryption=='ssl') selected @endif value="ssl">ssl</option>
+            <option @if($account->imap_encryption=='tls') selected @endif value="tls">tls</option>
+            <option @if($account->imap_encryption=='starttls') selected @endif value="starttls">starttls</option>
 </select>
 </div>
 </div>
@@ -63,23 +64,23 @@
         <h5 class="mb-3 font-medium text-neutral-700 dark:text-neutral-100">Outgoing Mail (SMTP)</h5>
         <div class="mb-3">
           <label class="form-label" for="smtp_server">Server</label>
-          <input type="text" id="smtp_server" class="form-control" name="smtp_server" />
+          <input type="text" id="smtp_server" value="{{$account->smtp_server}}" class="form-control" name="smtp_server" />
         </div>
 
 <div class="row">
     <div class="col-md-5">
     <div class="mb-3">
 <label class="form-label" for="smtp_port">Port</label>
-          <input type="number" value="465" id="smtp_port" class="form-control" name="smtp_port" />
+          <input type="number" id="smtp_port" value="{{$account->smtp_port}}" class="form-control" name="smtp_port" />
           </div>
     </div>
           <div class="col-md-7">  
           <div class="mb-3">
           <label class="form-label" for="smtp_encryption">Encryption</label>
-          <select id="smtp_encryption" class="form-select">
-            <option value="ssl">ssl</option>
-            <option value="tls">tls</option>
-            <option value="starttls">starttls</option>
+          <select id="smtp_encryption" name="smtp_encryption"  class="form-select">
+            <option @if($account->smtp_encryption=='ssl') selected @endif value="ssl">ssl</option>
+            <option @if($account->smtp_encryption=='tls') selected @endif value="tls">tls</option>
+            <option @if($account->smtp_encryption=='starttls') selected @endif value="starttls">starttls</option>
 </select>
 </div>
 </div>
