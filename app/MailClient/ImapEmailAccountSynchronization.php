@@ -104,13 +104,11 @@ class ImapEmailAccountSynchronization extends EmailAccountSynchronization
 
             $messages = $remoteFolder->getMessagesFrom($this->account->initial_sync_from);
         }
-        $obj=new GmailEmailAccountSynchronization($this->accounts,$this->messages,$this->folders,$this->account);
-        ProcessMessagesJob::dispatch($obj,'Imap',$messages, $folder);
-        // try {
-        //     $this->processMessages($messages, $folder);
-        // } catch (UnexpectedEncodingException|UnsupportedCharsetException $e) {
-        //     $this->error('Mail message was skipped from import because of ' . Str::of($e::class)->headline()->lower() . ' exception.');
-        // }
+        try {
+            $this->processMessages($messages, $folder);
+        } catch (UnexpectedEncodingException|UnsupportedCharsetException $e) {
+            $this->error('Mail message was skipped from import because of ' . Str::of($e::class)->headline()->lower() . ' exception.');
+        }
 
         // Sync the flags only if it's not initial sync
         if ($lastUid) {

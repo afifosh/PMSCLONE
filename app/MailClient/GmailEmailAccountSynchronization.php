@@ -14,9 +14,11 @@ namespace App\MailClient;
 
 use App\Jobs\Admin\ProcessMessagesJob;
 use Carbon\Carbon;
+use Closure;
 use Exception;
 use Illuminate\Support\Str;
 use Google_Service_Exception;
+use Opis\Closure\SerializableClosure;
 
 class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronization
 {
@@ -100,12 +102,10 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
 
             // We will fetch each unique message via batch request so we can perform update or insert with the new data
             // The batch will also check for any messages which are not found and will remove them from the array
-            $obj=new GmailEmailAccountSynchronization($this->accounts,$this->messages,$this->folders,$this->account);
-            ProcessMessagesJob::dispatch($obj,'Gmail',$this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered)));
            
-            // $this->processMessages(
-            //     $this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered))
-            // );
+            $this->processMessages(
+                $this->excludeSystemMailables($this->getImapClient()->batchGetMessages($filtered))
+            );
 
             if (isset($newHistoryId)) {
                 $folder->setMeta(static::HISTORY_META_KEY, $newHistoryId);
@@ -182,9 +182,18 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
                     /** @var \App\Innoclapps\Google\Services\MessageCollection */
                     $result = $nextPageResult;
                 }
-                $obj=new GmailEmailAccountSynchronization($this->accounts,$this->messages,$this->folders,$this->account);
-                ProcessMessagesJob::dispatch($obj,'Gmail',$this->excludeSystemMailables($result));
-                // $this->processMessages($this->excludeSystemMailables($result));
+                // $msgs=$this->excludeSystemMailables($result);
+
+                // $msgs = $msgs->map(function ($item) {
+                //     if (is_callable($item)) {
+                //         return serialize(new SerializableClosure($item));
+                //     } else {
+                //         return $item; // Return non-closure objects as is
+                //     }
+                // });
+                // \Log::info('ok');
+                // ProcessMessagesJob::dispatch('Gmail',$msgs);
+                $this->processMessages($this->excludeSystemMailables($result));
             } catch (Google_Service_Exception $e) {
                 if ($this->isRateLimitExceededException($e)) {
                     $retryAfter = $this->setAccountSyncAfterFlag($e);
