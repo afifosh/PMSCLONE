@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\Setting\BroadcastSettingController;
 use App\Http\Controllers\Admin\Setting\DeliverySettingController;
 use App\Http\Controllers\Admin\Setting\GeneralSettingController;
 use App\Http\Controllers\Admin\Setting\SecuritySettingController;
+use App\Http\Controllers\Admin\Setting\OnlyOfficeSettingController;
 use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
@@ -208,6 +209,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
         Route::get('', 'index')->name('index');
         Route::put('', 'update')->name('update');
       });
+
+      Route::prefix('onlyoffice')->name('onlyoffice.')->controller(OnlyOfficeSettingController::class)->group(function() {
+        Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+      });      
+
     });
 
 

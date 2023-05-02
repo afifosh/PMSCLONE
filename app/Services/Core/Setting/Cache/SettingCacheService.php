@@ -15,7 +15,11 @@ class SettingCacheService extends BaseCacheService
         'security' => [
             'key' => 'app-security-settings',
             'handler' => \App\Services\Core\Setting\ConfigManager\Security::class,
-        ]
+        ],
+        'onlyoffice' => [
+            'key' => 'app-onlyoffice-settings',
+            'handler' => \App\Services\Core\Setting\ConfigManager\OnlyOffice::class,
+        ]        
     ];
 
     /**

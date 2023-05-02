@@ -79,6 +79,7 @@ return [
         'brand',
         'role',
         'template',
+        'onlyoffice',
     ],
     'time_format' => [
         'h',
