@@ -5,6 +5,7 @@ $urls = [
     'security' => 'admin.setting.security.index',
     'email' => 'admin.setting.delivery.index',
     'broadcast' => 'admin.setting.broadcast.index',
+    'onlyoffice' => 'admin.setting.onlyoffice.index',    
 ];
 $active = Request::route()->getName();
 @endphp
@@ -36,6 +37,12 @@ $active = Request::route()->getName();
                     <span class="align-middle ms-2">@lang('Email Setup')</span>
                 </a>
             </li>
+            <li class="{{ $active === $urls['onlyoffice'] ? 'active' : '' }} d-flex py-3" data-target="onlyoffice">
+                <a href="{{ route($urls['onlyoffice']) }}" class="d-flex flex-wrap align-items-center">
+                    <!-- <i class="ti ti-mail"></i> -->
+                    <span class="align-middle ms-2">@lang('OnlyOffice Setup')</span>
+                </a>
+            </li>            
         </ul>
     </div>
 </div>
