@@ -33,9 +33,7 @@ class SecuritySettingController extends Controller
         return $this->sendRes(
             'Updated security settings',
             [
-                'view_data' => view(
-                    'admin.pages.settings.security.index',
-                )->render()
+                'event' => 'page_reload'
             ]
         );
     }

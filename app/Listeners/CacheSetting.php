@@ -9,18 +9,6 @@ use Illuminate\Queue\InteractsWithQueue;
 
 class CacheSetting
 {
-    private $context;
-
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct($context = 'app')
-    {
-        $this->context = $context;
-    }
-
     /**
      * Handle the event.
      *
@@ -29,6 +17,6 @@ class CacheSetting
      */
     public function handle($event)
     {
-        SettingCacheService::handle($this->context);
+        SettingCacheService::handle($event->context);
     }
 }

@@ -14,14 +14,16 @@ class SecuritySettingUpdated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $context;
+
     /**
-     * Create a new event instance.
+     * Create the event listener.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($context = 'app')
     {
-        //
+        $this->context = $context;
     }
 
     /**

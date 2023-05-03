@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 
 class SettingCacheService extends BaseCacheService
 {
-    private $cacheManager = [
+    private static $cacheManager = [
         'app' => [
             'key' => 'app-general-settings',
             'handler' => \App\Services\Core\Setting\ConfigManager\General::class,
@@ -33,7 +33,7 @@ class SettingCacheService extends BaseCacheService
             return;
         }
 
-        static::update($context, static::$cacheManager[$context]);
+        static::update($context, static::$cacheManager[$context]['key']);
     }
 
     /**
@@ -44,23 +44,23 @@ class SettingCacheService extends BaseCacheService
     public function load($contexts): void
     {
         foreach ($contexts as $context) {
-            if (!array_key_exists($context, $this->cacheManager)) {
+            if (!array_key_exists($context, static::$cacheManager)) {
                 continue;
             }
 
-            $cacheKey = $this->cacheManager[$context]['key'];
+            $cacheKey = static::$cacheManager[$context]['key'];
 
             $cached = $this->cachedSettings($cacheKey);
 
             if (is_null($cached)) {
-                if (!$this->update($cacheKey, $context)) {
+                if (!self::update($cacheKey, $context)) {
                     continue;
                 }
 
                 $cached = $this->cachedSettings($cacheKey);
             }
 
-            app($this->cacheManager[$context]['handler'])->load($cached);
+            app(static::$cacheManager[$context]['handler'])->load($cached);
         }
     }
 
