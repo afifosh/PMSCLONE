@@ -3,7 +3,7 @@
 namespace App\DataTables\Admin;
 
 use App\Models\Admin;
-use App\Services\Core\Setting\General\SettingService;
+use App\Services\Core\Setting\SettingService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
@@ -61,7 +61,7 @@ class AdminsDataTable extends DataTable
       ->addColumn('pwd_expires', function ($row) {
         $security = app(SettingService::class)->getFormattedSettings('security');
         $passwordChangedAt = new Carbon(($row->password_changed_at) ? $row->password_changed_at : $row->created_at);
-        
+
         $passwordExpiresInDays = $security['password_expire_days'] ?? config('auth.password_expire_days');
 
         $days = $passwordExpiresInDays - Carbon::now()->diffInDays($passwordChangedAt);

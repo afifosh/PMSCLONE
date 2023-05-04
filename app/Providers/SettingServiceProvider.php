@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Services\Core\Setting\Cache\BroadcastCacheService;
-use App\Services\Core\Setting\Cache\DeliveryCacheService;
+// use App\Services\Core\Setting\Cache\DeliveryCacheService;
 use App\Services\Core\Setting\Cache\SettingCacheService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
@@ -34,18 +34,11 @@ class SettingServiceProvider extends ServiceProvider
 
     /**
      * Loads cache into config
-     * 
+     *
      * @return void
      */
     private function cacheSettings(): void
     {
-        Collection::make([
-            DeliveryCacheService::class,
-            BroadcastCacheService::class
-        ])->each(fn ($service) => app($service)->load());
-
-        app(SettingCacheService::class)->load(
-            ['app', 'security']
-        );
+        app(BroadcastCacheService::class)->load();
     }
 }

@@ -122,7 +122,7 @@ class CompanyProfileController extends Controller
   public function submitApprovalRequest()
   {
     if (auth()->user()->company->canBeSentForApproval()) {
-      $appReq = auth()->user()->company->approvalRequests()->create();
+      $appReq = auth()->user()->company->approvalRequests()->create(['sent_by' => auth()->id()]);
       $appReq->modifications()->sync(auth()->user()->company->POCModifications()->pluck('id'));
       auth()->user()->company->forceFill(['approval_status' => 2, 'approval_level' => 1])->save();
       return redirect()->back()->with('success', 'Approval Request Submitted Successfully');
@@ -130,9 +130,10 @@ class CompanyProfileController extends Controller
     return redirect()->back()->with('error', 'Please fill all the required fields');
   }
 
-  public function showActivityTimeline()
+  public function showActivityTimeline($approval_request = '')
   {
-    $data['logs'] = auth()->user()->company->profileActivityTimeline()->latest()->paginate(5);
+    $data['logs'] = auth()->user()->company->profileActivityTimeline($approval_request)->latest()->paginate(15);
+
     return view('pages.company-profile.new.detailed-content.activity-logs', $data);
   }
 }

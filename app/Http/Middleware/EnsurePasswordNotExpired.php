@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\Core\Setting\General\SettingService;
+use App\Services\Core\Setting\SettingService;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;

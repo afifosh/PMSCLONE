@@ -3,7 +3,7 @@
         <label for="ses_host" class="form-label fs-6 mb-2 fw-semibold">
             @lang('Host name')
         </label>
-        <input value="{{ $settings['host'] ?? '' }}" name="host" type="text" class="form-control" id="ses_host" placeholder="@lang('Type host name')" aria-describedby="ses_host" />
+        <input value="{{ $settings['hostname'] ?? '' }}" name="hostname" type="text" class="form-control" id="ses_host" placeholder="@lang('Type host name')" aria-describedby="ses_host" />
     </div>
 
     <div class="col-md-6 mb-4">

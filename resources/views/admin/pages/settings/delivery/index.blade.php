@@ -19,7 +19,7 @@
                     'mailgun' => 'Mailgun',
                     'smtp' => 'SMTP',
                     'sendmail' => 'Sendmail',
-                    'mailtrap' => 'Mailtrap',
+                    // 'mailtrap' => 'Mailtrap',
                     ];
                     @endphp
                     <div class="setting-item">
@@ -40,7 +40,7 @@
                                 <label for="provider" class="form-label fs-6 mb-2 fw-semibold">
                                     @lang('Supported mail services')
                                 </label>
-                                <select id="provider" data-tokens="{{ route('admin.setting.delivery.show') }}" data-attr="{{ $settings['provider'] ?? '' }}" class="form-select" {{--selectpicker--}} data-style="btn-default" data-live-search="true">
+                                <select id="provider" data-tokens="{{ route('admin.core.settings.view_delivery') }}" data-attr="{{ $settings['provider'] ?? '' }}" class="form-select" {{--selectpicker--}} data-style="btn-default" data-live-search="true">
                                     @foreach($deliveryServices as $key => $service)
                                     <option value="{{ $key }}" data-tokens="{{ $key }}" {{ isset($settings['provider']) && $settings['provider'] === $key ? 'selected' : '' }}>
                                         {{ __($service) }}
@@ -74,11 +74,11 @@
                             )
                         </x-admin.settings.delivery.delivery-form>
                         <!-- MAILTRAP -->
-                        <x-admin.settings.delivery.delivery-form identifier="mailtrapService" provider="mailtrap" :$settings>
+                        {{-- <x-admin.settings.delivery.delivery-form identifier="mailtrapService" provider="mailtrap" :$settings>
                             @include('admin.pages.settings.delivery.inc.mailtrap',
                             ['settings' => isset($settings['provider']) && $settings['provider'] === 'mailtrap' ? $settings : null]
                             )
-                        </x-admin.settings.delivery.delivery-form>
+                        </x-admin.settings.delivery.delivery-form> --}}
                     </div>
                 </div>
             </div>

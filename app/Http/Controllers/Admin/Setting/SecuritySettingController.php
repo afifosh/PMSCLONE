@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Setting;
 
-use App\Events\SecuritySettingUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Setting\SecurityRequest;
-use App\Services\Core\Setting\General\SettingService;
+use App\Services\Core\Setting\SettingService;
 use Illuminate\Http\Request;
 
 class SecuritySettingController extends Controller
@@ -28,22 +27,13 @@ class SecuritySettingController extends Controller
     {
         $this->service->update('security');
 
-        SecuritySettingUpdated::dispatch('security');
-
-        return $this->sendRes(
-            'Updated security settings',
-            [
-                'view_data' => view(
-                    'admin.pages.settings.security.index',
-                )->render()
-            ]
-        );
+        return $this->sendRes('Updated security settings', ['event' => 'page_reload']);
     }
 
     public function destroy()
     {
         if ($this->service->delete('security')) {
-            // 
+            //
         }
     }
 }

@@ -9,6 +9,11 @@ use Illuminate\Routing\Controller as BaseController;
 
 class Controller extends BaseController
 {
+    /**
+     * @var BaseService
+     */
+    protected $service;
+
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public function sendRes($message = 'Success', $data = [], $http_code = 200)

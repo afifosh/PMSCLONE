@@ -194,16 +194,16 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
         Route::put('', 'update')->name('update');
     });
 
-      Route::prefix('general')->name('general.')->controller(GeneralSettingController::class)->group(function() {
-        Route::get('', 'index')->name('index');
-        Route::put('', 'update')->name('update');
-      });
+      // Route::prefix('general')->name('general.')->controller(GeneralSettingController::class)->group(function() {
+      //   Route::get('', 'index')->name('index');
+      //   Route::put('', 'update')->name('update');
+      // });
 
-      Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {
-        Route::get('', 'index')->name('index');
-        Route::get('show', 'show')->name('show');
-        Route::put('', 'update')->name('update');
-      });
+      // Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {
+      //   Route::get('', 'index')->name('index');
+      //   Route::get('show', 'show')->name('show');
+      //   Route::put('', 'update')->name('update');
+      // });
 
       Route::prefix('broadcast')->name('broadcast.')->controller(BroadcastSettingController::class)->group(function() {
         Route::get('', 'index')->name('index');
@@ -213,7 +213,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
       Route::prefix('onlyoffice')->name('onlyoffice.')->controller(OnlyOfficeSettingController::class)->group(function() {
         Route::get('', 'index')->name('index');
         Route::put('', 'update')->name('update');
-      });      
+      });
 
     });
 

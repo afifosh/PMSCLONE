@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\ExpiredPasswordController;
 use App\Http\Controllers\Auth\LockModeController;
+use App\Http\Controllers\Company\ApprovalRequestController;
 use App\Http\Controllers\Company\CompanyProfile\AddressController;
 use App\Http\Controllers\Company\CompanyProfile\BankAccountController;
 use App\Http\Controllers\Company\CompanyProfile\ContactController;
@@ -65,12 +66,13 @@ Route::get('mt/l', [MailTrackerController::class, 'link'])->name('mail-tracker.l
     Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
       Route::get('/', 'editDetails')->name('editDetails');
       Route::get('/detailed-content', 'detailedContent')->name('profile.detailedContent');
-      Route::get('/detailed-content/activity', 'showActivityTimeline')->name('profile.activityTimeline');
+      Route::get('/detailed-content/activity/{approval_request?}', 'showActivityTimeline')->name('profile.activityTimeline');
       Route::post('/', 'updateDetails')->name('updateDetails');
       Route::any('/submit-request', 'submitApprovalRequest')->name('submitApprovalRequest');
     });
 
     Route::prefix('company-profile')->name('company.')->group(function (){
+      Route::resource('approval-requests', ApprovalRequestController::class);
       Route::resource('contacts', ContactController::class);
       Route::resource('addresses', AddressController::class);
       Route::post('kyc-documents/upload-doc', [DocumentController::class, 'uploadDocument'])->name('kyc-documents.upload-doc');
@@ -90,3 +92,4 @@ Route::get('refresh-csrf', function(Request $request){
   return csrf_token();
 })->name('refresh-csrf');
 require __DIR__.'/admin/admin.php';
+require __DIR__.'/core/app.php';

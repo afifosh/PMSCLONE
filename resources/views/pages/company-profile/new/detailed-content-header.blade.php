@@ -44,12 +44,13 @@
 <div class="row">
   <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-      <li class="nav-item"><a class="nav-link {{$tab != 'activity-logs' ? 'active' : ''}}" href="javascript:void(0);"><i class='ti-xs ti ti-user-check me-1'></i> Details</a></li>
+      <li class="nav-item"><a class="nav-link {{$tab != 'activity-logs' && $tab != 'approval-requests' ? 'active' : ''}}" href="javascript:void(0);"><i class='ti-xs ti ti-user-check me-1'></i> Details</a></li>
       <li class="nav-item"><a class="nav-link" href="#contact-persons-card"><i class='ti-xs ti ti-users me-1'></i> Contact Persons</a></li>
       <li class="nav-item"><a class="nav-link" href="#addresses-card"><i class='ti-xs ti ti-layout-grid me-1'></i> Addresses</a></li>
       <li class="nav-item"><a class="nav-link" href="#documents-card"><i class='ti-xs ti ti-link me-1'></i> Documents</a></li>
       <li class="nav-item"><a class="nav-link" href="#accounts-card"><i class='ti-xs ti ti-link me-1'></i> Bank Accounts</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'activity-logs' ? 'active' : ''}}" href="{{route('company.profile.activityTimeline')}}"><i class='ti-xs ti ti-link me-1'></i> Activity Timeline</a></li>
+      <li class="nav-item"><a class="nav-link {{$tab == 'approval-requests' ? 'active' : ''}}" href="{{route('company.approval-requests.index')}}"><i class='ti-xs ti ti-link me-1'></i> Approval Requests</a></li>
     </ul>
   </div>
 </div>

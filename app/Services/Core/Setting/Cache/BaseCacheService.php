@@ -3,7 +3,7 @@
 namespace App\Services\Core\Setting\Cache;
 
 use App\Repositories\SettingRepository;
-use App\Services\Core\Setting\Delivery\DeliverySettingService;
+use App\Services\Core\Setting\DeliverySettingService;
 use Exception;
 use Illuminate\Support\Facades\Schema;
 

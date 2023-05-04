@@ -1,11 +1,11 @@
 <!-- Settings Sidebar -->
 @php
 $urls = [
-    'general' => 'admin.setting.general.index',
+    'general' => 'admin.core.settings.index',
     'security' => 'admin.setting.security.index',
-    'email' => 'admin.setting.delivery.index',
+    'email' => 'admin.core.settings.view-delivery',
     'broadcast' => 'admin.setting.broadcast.index',
-    'onlyoffice' => 'admin.setting.onlyoffice.index',    
+    'onlyoffice' => 'admin.setting.onlyoffice.index',
 ];
 $active = Request::route()->getName();
 @endphp
@@ -42,7 +42,7 @@ $active = Request::route()->getName();
                     <!-- <i class="ti ti-mail"></i> -->
                     <span class="align-middle ms-2">@lang('OnlyOffice Setup')</span>
                 </a>
-            </li>            
+            </li>
         </ul>
     </div>
 </div>

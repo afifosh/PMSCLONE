@@ -142,10 +142,10 @@
       "slug": "admin.kyc-documents.index"
     },
     {
-      "url": "/admin/settings/general",
+      "url": "admin/app/settings",
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": "admin.settings.general"
+      "slug": "admin.core.settings.index"
     }
   ]
 }

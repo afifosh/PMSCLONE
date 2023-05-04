@@ -16,9 +16,9 @@
                 <div class="setting pt-0 px-4">
                     <div class="setting-item" data-general="true" data-bs-toggle="sidebar">
                         <!-- form -->
-                        <form enctype="multipart/form-data" method="POST" action="{{ route('admin.setting.general.update') }}" class="mt-3" id="general-setting-form">
-                            @csrf
-                            @method('PUT')
+                        <form enctype="multipart/form-data" method="POST" action="{{ route('admin.core.settings.index') }}" class="mt-3" id="general-setting-form">
+                            {{-- @csrf --}}
+                            {{-- @method('PUT') --}}
                             <div class="row">
                                 @if ($errors->any())
                                 <div class="col-md-12 mb-4">
@@ -83,10 +83,10 @@
                                     </label>
                                 </div>
                                 <div class="col-md-9">
-                                    <select name="timezone" id="timezon" class="form-select w-100 dropup" data-style="btn-default" data-live-search="true">
+                                    <select name="time_zone" id="timezon" class="form-select w-100 dropup" data-style="btn-default" data-live-search="true">
                                         <option value="" selected>{{ __('Choose your preferred timezone') }}</option>
                                         @foreach (timezone_identifiers_list() as $timezone)
-                                        <option value="{{ $timezone }}" {{ $timezone == ($setting['timezone'] ?? config('app.timezone')) ? 'selected' : '' }}>
+                                        <option value="{{ $timezone }}" {{ $timezone == ($setting['time_zone'] ?? config('app.timezone')) ? 'selected' : '' }}>
                                             @lang($timezone)
                                         </option>
                                         @endforeach

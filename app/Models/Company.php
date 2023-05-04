@@ -512,11 +512,17 @@ class Company extends BaseModel
     return $status;
   }
 
-  public function profileActivityTimeline()
+  public function profileActivityTimeline($approval_request = '')
   {
-    return $this->POCmodifications()
+    $query = $this->POCmodifications()
       ->with('approvals.approver', 'disapprovals.disapprover', 'modifiable')
       ->withTrashed();
+    if ($approval_request){
+      $modificationIds = $this->approvalRequests()->findOrFail($approval_request)->getModificationIds();
+      $query->whereIn('id', $modificationIds);
+    }
+
+    return $query;
   }
 
   public function approvalRequests()

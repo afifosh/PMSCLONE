@@ -127,7 +127,7 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    
+
     /*
     |--------------------------------------------------------------------------
     | Synchronization config
@@ -479,6 +479,7 @@ return [
         App\Innoclapps\Settings\SettingServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
+        App\Providers\HelperServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,

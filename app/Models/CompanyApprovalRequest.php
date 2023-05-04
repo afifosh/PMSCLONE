@@ -2,12 +2,25 @@
 
 namespace App\Models;
 
+use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CompanyApprovalRequest extends Model
 {
-  use HasFactory;
+  use HasFactory, Tenantable;
+
+  protected $fillable = ['sent_by'];
+
+  protected $casts = [
+    'created_at' => 'datetime:d M, Y',
+    'updated_at' => 'datetime:d M, Y',
+  ];
+
+  public function sentBy()
+  {
+    return $this->belongsTo(User::class, 'sent_by');
+  }
 
   public function company()
   {
@@ -18,5 +31,10 @@ class CompanyApprovalRequest extends Model
   {
     // return $this->belongsToMany(Modification::class, 'approval_request_modifications', 'company_approval_request_id', 'modification_id');
     return $this->belongsToMany(Modification::class, ApprovalRequestModification::class, 'approval_request_id', 'modification_id');
+  }
+
+  public function getModificationIds()
+  {
+    return $this->modifications->pluck('id')->toArray();
   }
 }

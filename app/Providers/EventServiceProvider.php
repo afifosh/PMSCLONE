@@ -58,18 +58,6 @@ class EventServiceProvider extends ServiceProvider
         'jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent' => [
             BouncedEmail::class,
         ],
-        'App\Events\DeliverySettingUpdated' => [
-            'App\Listeners\CacheDeliverySetting'
-        ],
-        'App\Events\BroadcastSettingUpdated' => [
-            'App\Listeners\CacheBroadcastSetting'
-        ],
-        'App\Events\SecuritySettingUpdated' => [
-            'App\Listeners\CacheSetting'
-        ],
-        'App\Events\GeneralSettingUpdated' => [
-            'App\Listeners\CacheSetting'
-        ],
         Failed::class => [
             IncrementDeviceAuthorizationAttempts::class,
         ],
