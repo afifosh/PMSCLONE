@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sent_by')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->integer('type')->default(1)->comment('0: verification request, 1: update request');
             $table->integer('status')->default(0)->comment('0: Pending, 1: Approved, 3: Rejected');
             $table->timestamps();
         });

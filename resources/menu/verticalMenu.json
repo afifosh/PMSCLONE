@@ -18,6 +18,12 @@
       "name": "Company Profile",
       "icon": "menu-icon tf-icons ti ti-profile",
       "slug": "company.editDetails"
+    },
+    {
+      "url": "/company-profile/approval-requests",
+      "name": "Approval Requests",
+      "icon": "menu-icon tf-icons ti ti-profile",
+      "slug": "company.approval-requests.index"
     }
   ]
 }

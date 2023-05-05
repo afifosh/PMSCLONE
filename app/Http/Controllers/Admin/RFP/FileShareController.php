@@ -57,7 +57,7 @@ class FileShareController extends Controller
       'expires_at' => 'nullable|date|after:yesterday|date_format:Y-m-d',
     ]);
     try {
-      foreach ($request->users as $user) {
+      foreach (array_unique($request->users) as $user) {
         $file_share = $file->shares()->create([
           'user_id' => $user,
           'permission' => $request->permission,

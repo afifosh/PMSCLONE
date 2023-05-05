@@ -31,17 +31,16 @@ class SetMailConfig
                 ]);
         });
         if ($mailSettings) {
-
             Config::set('mail.default', $mailSettings['provider']);
             Config::set('mail.from.address', $mailSettings['from_email']);
             Config::set('mail.from.name', $mailSettings['from_name']);
 
             if ($mailSettings['provider'] == 'smtp') {
-                Config::set('mail.host', $mailSettings['smtp_host']);
-                Config::set('mail.port', $mailSettings['smtp_port']);
-                Config::set('mail.encryption', $mailSettings['encryption_type']);
-                Config::set('mail.username', $mailSettings['smtp_user_name']);
-                Config::set('mail.password', $mailSettings['email_password']);
+                Config::set('mail.mailers.smtp.host', $mailSettings['host']);
+                Config::set('mail.mailers.smtp.port', $mailSettings['port']);
+                Config::set('mail.mailers.smtp.encryption', $mailSettings['encryption']);
+                Config::set('mail.mailers.smtp.username', $mailSettings['username']);
+                Config::set('mail.mailers.smtp.password', $mailSettings['password']);
 
             } elseif ($mailSettings['provider'] == 'mailgun') {
 

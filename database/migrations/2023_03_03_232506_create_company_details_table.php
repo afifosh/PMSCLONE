@@ -33,6 +33,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('parent_company')->nullable();
             $table->json('subsidiaries')->nullable();
+            $table->json('industries')->nullable();
             $table->integer('status')->default(0);
             $table->timestamps();
         });

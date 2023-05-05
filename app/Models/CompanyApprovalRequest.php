@@ -10,7 +10,7 @@ class CompanyApprovalRequest extends Model
 {
   use HasFactory, Tenantable;
 
-  protected $fillable = ['sent_by'];
+  protected $fillable = ['sent_by', 'type'];
 
   protected $casts = [
     'created_at' => 'datetime:d M, Y',
@@ -36,5 +36,26 @@ class CompanyApprovalRequest extends Model
   public function getModificationIds()
   {
     return $this->modifications->pluck('id')->toArray();
+  }
+
+  public function modificationsPendingApprovalPercentage()
+  {
+    $total = $this->modifications()->count();
+    $pending_count = $this->modifications()->doesntHave('approvals')->doesntHave('disapprovals')->count();
+    return round(($pending_count / $total) * 100, 1);
+  }
+
+  public function modificationsApprovedPercentage()
+  {
+    $total = $this->modifications()->count();
+    $approved_count = $this->modifications()->has('approvals' , '>=', ApprovalLevel::count())->count();
+    return round(($approved_count / $total) * 100, 1);
+  }
+
+  public function modificationsRejectedPercentage()
+  {
+    $total = $this->modifications()->count();
+    $rejected_count = $this->modifications()->has('disapprovals')->count();
+    return round(($rejected_count / $total) * 100, 1);
   }
 }

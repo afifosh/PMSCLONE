@@ -97,7 +97,7 @@ class AdminUsersController extends Controller
     $att['email_verified_at'] = $request->boolean('email_verified_at') ? now() : null;
     $user = Admin::create($att);
     $user->notify(new WelcomeNotification($password));
-    $user->syncRoles($request->roles);
+    $user->syncRoles(array_unique($request->roles));
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
   }
 
@@ -155,7 +155,7 @@ class AdminUsersController extends Controller
     }else if(!$request->boolean('email_verified_at')){
       $att['email_verified_at'] = null;
     }
-    $user->syncRoles($request->roles);
+    $user->syncRoles(array_unique($request->roles));
     if ($user->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
     }

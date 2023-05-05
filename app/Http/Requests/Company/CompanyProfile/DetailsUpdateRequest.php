@@ -43,6 +43,8 @@ class DetailsUpdateRequest extends FormRequest
       'linkedin_url' => 'nullable|url|max:255',
       'youtube_url' => 'nullable|url|max:255',
       'is_sa_available' => 'nullable|string',
+      'industries' => 'required|array',
+      'industries.*' => 'required|integer',
       'sa_company_name' => Rule::requiredIf(function () {
         return $this->is_sa_available && $this->submit_type == 'submit';
       }),

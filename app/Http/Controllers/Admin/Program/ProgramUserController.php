@@ -33,7 +33,15 @@ class ProgramUserController extends Controller
       'users' => 'required|array',
       'users.*' => 'exists:admins,id',
     ]);
-    $program->users()->attach($request->users, ['added_by' => auth()->id()]);
+
+    $isAlreadyAdded = ProgramUser::where(function ($q) use ($program) {
+      $q->where('program_id', $program->id)->orWhere('program_id', $program->parent_id);
+    })->whereIn('admin_id', $att['users'])->exists();
+    if ($isAlreadyAdded) {
+      return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'User Already Added To This Program']);
+    }
+    $program->users()->attach(array_unique($request->users), ['added_by' => auth()->id()]);
+
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => ProgramUser::DT_ID, 'close' => 'globalModal']);
   }
 

@@ -27,7 +27,7 @@ class ApprovalWorkflowUpdateRequest extends FormRequest
           'workflow_name' => 'required|string',
           'level.*.name' => 'required|string',
           'level.*.approvers' => 'required|array',
-          'level.*.approvers.*' => 'required||exists:admins,id',
+          'level.*.approvers.*' => 'required|exists:admins,id',
         ];
     }
 

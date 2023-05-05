@@ -29,11 +29,13 @@ class CompanyDetail extends Model
     'sa_company_name',
     'parent_company',
     'subsidiaries',
+    'industries'
   ];
 
   protected $casts = [
     'geographical_coverage' => 'array',
     'subsidiaries' => 'array',
+    'industries' => 'array',
   ];
 
   public const LegalForms = [
@@ -57,6 +59,40 @@ class CompanyDetail extends Model
   public const LocalityTypes = [
     '1' => 'Foreign/International',
     '2' => 'Local',
+  ];
+
+  public const Industries = [
+    'Contruction &amp; Trades',
+    'Creative Professional',
+    'Marketing, Communications &amp; Media',
+    'Development &amp; Programming',
+    'Management Consulting',
+    'Information Technology and Support',
+    'Accounting and Finance',
+    'Automotive and Transport',
+    'Health &amp; Wellness',
+    'Food Services',
+    'Administration',
+    'Agriculture',
+    'Architecture',
+    'Arts &amp; Entertainment',
+    'Education',
+    'Engineering',
+    'Environment',
+    'Event Planning',
+    'Fashion &amp; Beauty',
+    'Hospitality, Travel and Tourism',
+    'Human Resources and Staffing',
+    'Legal',
+    'Non-Profit and Volunteer Management',
+    'Print Management',
+    'Project Management',
+    'Real Estate and Property Management',
+    'Retail',
+    'Sales and Business Development',
+    'Telecommunications',
+    'Webhosting',
+    'Other',
   ];
 
   public function company()
@@ -89,6 +125,7 @@ class CompanyDetail extends Model
       'DUNS Number' => 'duns_number',
       'No. Of Employees' => 'no_of_employees',
       'Legal Form' => 'legal_form',
+      'Industries' => 'industries',
       'Description' => 'description',
       'Facebook URL' => 'facebook_url',
       'Twitter URL' => 'twitter_url',

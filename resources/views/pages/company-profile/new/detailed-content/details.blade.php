@@ -92,6 +92,11 @@
         {!! Form::select('legal_form', \App\Models\CompanyDetail::LegalForms, @$detail['legal_form'], ['class' => 'form-control select2']) !!}
         @modificationAlert(@$modifications['legal_form'])
       </div>
+      <div class="col-sm-12">
+        <label>What does your business do? <span class="text-danger">*</span></label>
+        {!! Form::select('industries[]', \App\Models\CompanyDetail::Industries, @$detail['industries'], ['class' => 'form-control select2', 'multiple']) !!}
+        @modificationAlert(@$modifications['industries'])
+      </div>
       <div class="mb-3 col-12">
         <label for="company_desc" class="form-label">Company Description</label>
         <textarea class="form-control" name="description" id="company_desc" rows="3"> {{ @$detail['description'] }}</textarea>

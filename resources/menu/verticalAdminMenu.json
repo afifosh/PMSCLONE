@@ -100,6 +100,11 @@
               "url": "/admin/verified-companies",
               "name": "Verified Companies",
               "slug": "admin.verified-companies.index"
+            },
+            {
+              "url": "/admin/approval-requests/history",
+              "name": "Requests History",
+              "slug": "admin.approval-requests.indexHistory"
             }
           ]
         }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Company;
 
+use App\DataTables\Admin\Company\ApprovalHistoryRequestsDataTable;
 use App\DataTables\Admin\Company\ApprovalRequestsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CompanyProfile\ApprovalUpdateRequest;
@@ -109,5 +110,11 @@ class ApprovalRequestController extends Controller
     return  $company->isApprovalRequiredForCurrentLevel($level) ? $this->sendRes($message, ['event' => 'page_reload',])
       : ($company->verified_at ? $this->sendRes('Saved Successfully', ['event' => 'redirect', 'url' => route('admin.verified-companies.index')])
         : $this->sendRes('Saved Successfully', ['event' => 'redirect', 'url' => route('admin.approval-requests.index')]));
+  }
+
+  public function indexHistory(ApprovalHistoryRequestsDataTable $dataTable)
+  {
+    return $dataTable->render('admin.pages.company.approval-request.indexHistory');
+    // return view('admin.pages.company.approval-request.indexHistory');
   }
 }

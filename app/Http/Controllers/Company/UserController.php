@@ -62,7 +62,7 @@ class UserController extends Controller
       unset($att['password']);
     }
     $user = User::create($att);
-    $user->syncRoles($request->roles);
+    $user->syncRoles(array_unique($request->roles));
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalModal']);
   }
 
@@ -115,7 +115,7 @@ class UserController extends Controller
     }else{
       unset($att['password']);
     }
-    $user->syncRoles($request->roles);
+    $user->syncRoles(array_unique($request->roles));
     if ($user->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalModal']);
     }

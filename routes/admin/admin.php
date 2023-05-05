@@ -185,6 +185,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('pending-companies', [ApprovalRequestController::class, 'index'])->name('pending-companies.index');
     Route::get('verified-companies', [ApprovalRequestController::class, 'index'])->name('verified-companies.index');
     Route::get('change-requests', [ApprovalRequestController::class, 'index'])->name('change-requests.index');
+    Route::get('approval-requests/history', [ApprovalRequestController::class, 'indexHistory'])->name('approval-requests.indexHistory');
     Route::resource('approval-requests', ApprovalRequestController::class)->only(['index', 'show', 'update']);
 
     // Route::resource('companies.invitations', InvitationController::class);

@@ -1,16 +1,19 @@
 <?php
 
-namespace App\DataTables\Company\Profile;
+namespace App\DataTables\Admin\Company;
 
+use App\Models\ApprovalHistoryRequest;
 use App\Models\CompanyApprovalRequest;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
+use Yajra\DataTables\Html\Editor\Editor;
+use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class ApprovalRequestsDataTable extends DataTable
+class ApprovalHistoryRequestsDataTable extends DataTable
 {
   /**
    * Build DataTable class.
@@ -40,7 +43,7 @@ class ApprovalRequestsDataTable extends DataTable
         return $this->makeApprovalType($row->type);
       })
       ->addColumn('action', function ($approvalRequest) {
-        return view('pages.company-profile.approval-requests.action', compact('approvalRequest'));
+        return 'view';//view('pages.company-profile.approval-requests.action', compact('approvalRequest'));
       })
       ->rawColumns(['status', 'pending', 'approved', 'rejected', 'type']);
   }
@@ -66,8 +69,8 @@ class ApprovalRequestsDataTable extends DataTable
 
   public function makeApprovalType($type)
   {
-    if($type == 0){
-     return '<span class="badge bg-label-warning">Approval Request</span>';
+    if ($type == 0) {
+      return '<span class="badge bg-label-warning">Approval Request</span>';
     }
     return '<span class="badge bg-label-success">Modification Request</span>';
   }
@@ -75,7 +78,7 @@ class ApprovalRequestsDataTable extends DataTable
   /**
    * Get query source of dataTable.
    *
-   * @param \App\Models\ApprovalRequest $model
+   * @param \App\Models\ApprovalHistoryRequest $model
    * @return \Illuminate\Database\Eloquent\Builder
    */
   public function query(CompanyApprovalRequest $model): QueryBuilder
@@ -130,6 +133,6 @@ class ApprovalRequestsDataTable extends DataTable
    */
   protected function filename(): string
   {
-    return 'ApprovalRequests_' . date('YmdHis');
+    return 'ApprovalHistoryRequests_' . date('YmdHis');
   }
 }
