@@ -35,11 +35,6 @@ class CompanyAddress extends Model
     'address_type' => 'array',
   ];
 
-  public function getFillables()
-  {
-    return $this->fillable;
-  }
-
   public static function getAddressTypes()
   {
     return [
@@ -88,5 +83,10 @@ class CompanyAddress extends Model
   public function modifications()
   {
     return $this->morphMany(Modification::class, 'modifiable');
+  }
+
+  public static function getModelName()
+  {
+    return 'Company Address';
   }
 }

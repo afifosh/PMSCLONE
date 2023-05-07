@@ -96,9 +96,9 @@ class BankAccountController extends Controller
     } else {
       // auth()->user()->company->bankAccounts()->findOrFail($bank_account)->modifications()->delete();
       // auth()->user()->company->bankAccounts()->findOrFail($bank_account)->updateIfDirty($request->validated());
-      $ba = @auth()->user()->company->contacts()->with('modifications')->findOrFail($bank_account);
+      $ba = @auth()->user()->company->bankAccounts()->with('modifications.disapprovals')->findOrFail($bank_account);
       $mod = transformModifiedData(@$ba->modifications[0]->modifications ?? []) + $ba->toArray();
-      if ($mod['bank_letter'] == null)
+      if (@$mod['bank_letter'] == null)
         unset($mod['bank_letter']);
       unset($mod['company_id'], $mod['id'], $mod['created_at'], $mod['updated_at'], $mod['is_update'], $mod['modifications'], $mod['status']);
 
@@ -112,8 +112,15 @@ class BankAccountController extends Controller
         return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'Please Make Some Changes']);
       }
 
-      $ba->updateIfDirty($new_att);
-      isset($modifications[0]) ? $modifications[0]->delete() : '';
+      if ($ba->modifications->isNotEmpty() && $ba->modifications[0]->disapprovals->isEmpty()) {
+        $ba->modifications[0]->updateModifications($new_att);
+      } else {
+        $ba->modifications()->delete();
+        $ba->updateIfDirty($new_att);
+      }
+
+      // $ba->updateIfDirty($new_att);
+      // isset($modifications[0]) ? $modifications[0]->delete() : '';
     }
     return $this->sendRes('Updated Successfully', ['close' => 'globalModal', 'event' => 'functionCall', 'function' => 'triggerStep', 'function_params' => 5]);
   }

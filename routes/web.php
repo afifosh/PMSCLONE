@@ -54,7 +54,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
       //  Route::resource('user/user-account', UserAccountController::class);
       Route::name('user.')->group(function(){
         Route::resource('user/user-account', UserAccountController::class)->only('edit');
-        
+
       });
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
@@ -65,6 +65,7 @@ Route::get('mt/l', [MailTrackerController::class, 'link'])->name('mail-tracker.l
     Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
       Route::get('/', 'editDetails')->name('editDetails');
       Route::get('/detailed-content', 'detailedContent')->name('profile.detailedContent');
+      Route::get('/detailed-content/activity', 'showActivityTimeline')->name('profile.activityTimeline');
       Route::post('/', 'updateDetails')->name('updateDetails');
       Route::any('/submit-request', 'submitApprovalRequest')->name('submitApprovalRequest');
     });

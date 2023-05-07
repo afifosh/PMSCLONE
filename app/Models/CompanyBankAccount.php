@@ -26,11 +26,6 @@ class CompanyBankAccount extends Model
 
   public const BANK_LETTER_PATH = 'bank-letters';
 
-  public function getFillables()
-  {
-    return $this->fillable;
-  }
-
   public function company()
   {
     return $this->belongsTo(Company::class);
@@ -59,5 +54,10 @@ class CompanyBankAccount extends Model
       'Swift Code' => 'swift_code',
       'Bank Letter' => 'bank_letter'
     ];
+  }
+
+  public static function getModelName()
+  {
+    return 'Bank Account';
   }
 }

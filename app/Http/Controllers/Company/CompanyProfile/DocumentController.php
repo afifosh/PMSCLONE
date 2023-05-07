@@ -98,8 +98,18 @@ class DocumentController extends Controller
         $data['expiry_date'] = $request->expiry_date;
       }
       if ($request->has('doc_id_' . $document->id) && $request->input('doc_id_' . $document->id)) {
-        auth()->user()->company->kycDocs()->findOrFail($request->input('doc_id_' . $document->id))->modifications()->delete();
-        auth()->user()->company->kycDocs()->findOrFail($request->input('doc_id_' . $document->id))->update($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
+        $docOld = auth()->user()->company
+          ->kycDocs()
+          ->with('modifications.disapprovals')
+          ->findOrFail($request->input('doc_id_' . $document->id));
+        if ($docOld->modifications->isNotEmpty() && $docOld->modifications[0]->disapprovals->isEmpty()) {
+          $docOld->modifications[0]->updateModifications($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
+        } else {
+          $docOld->modifications()->delete();
+          $docOld->update($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
+        }
+        // auth()->user()->company->kycDocs()->with('modifications.disapprovals')->findOrFail($request->input('doc_id_' . $document->id))->modifications()->delete();
+        // auth()->user()->company->kycDocs()->findOrFail($request->input('doc_id_' . $document->id))->update($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
       } elseif ($request->has('modification_id_' . $document->id) && $request->input('modification_id_' . $document->id)) {
         auth()->user()->company
           ->POCKycDoc()

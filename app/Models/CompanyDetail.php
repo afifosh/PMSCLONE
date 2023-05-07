@@ -59,11 +59,6 @@ class CompanyDetail extends Model
     '2' => 'Local',
   ];
 
-  public function getFillables()
-  {
-    return $this->fillable;
-  }
-
   public function company()
   {
     return $this->belongsTo(Company::class);
@@ -103,5 +98,10 @@ class CompanyDetail extends Model
       'Parent Company Name' => 'parent_company',
       'Subsidiaries' => 'subsidiaries',
     ];
+  }
+
+  public static function getModelName()
+  {
+    return 'Company Details';
   }
 }

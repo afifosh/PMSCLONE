@@ -34,6 +34,7 @@ class Modification extends BaseModification
 
     foreach ($this->getModelFillables() as $fileable) {
       $mergedModifications[$fileable]['modified'] = @$modifications[$fileable] ? @$modifications[$fileable] : $mergedModifications[$fileable]['modified'] ?? null;
+      $mergedModifications[$fileable]['original'] = @$mergedModifications[$fileable]['original'] ?? null;
     }
 
     $this->modifications = $mergedModifications;

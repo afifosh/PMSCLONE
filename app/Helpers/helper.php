@@ -112,7 +112,7 @@ function array_diff_assoc_recursive($array1, $array2)
             $difference[$key] = $new_diff;
         }
       }
-      elseif( !array_key_exists($key,$array2) || $array2[$key] != $value )
+      elseif( !array_key_exists($key,$array2) || $array2[$key] !== $value )
       {
         $difference[$key] = $value;
       }

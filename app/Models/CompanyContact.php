@@ -27,11 +27,6 @@ class CompanyContact extends Model
 
   public const POA_PATH = 'poa-letters/company';
 
-  public function getFillables()
-  {
-    return $this->fillable;
-  }
-
   public function company()
   {
     return $this->belongsTo(Company::class);
@@ -64,5 +59,10 @@ class CompanyContact extends Model
       'Email' => 'email',
       'POA Letter' => 'poa'
     ];
+  }
+
+  public static function getModelName()
+  {
+    return 'Company Contact';
   }
 }
