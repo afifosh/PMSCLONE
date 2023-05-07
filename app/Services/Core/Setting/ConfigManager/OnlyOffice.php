@@ -11,8 +11,10 @@ class OnlyOffice implements BootConfiguration
      * 
      * @param $configurations
      */
+
     public function load($configurations)
     {
+        dd($configurations);
         config()->set(
             'onlyoffice.secret',
             $configurations['secret'] ?? config('onlyoffice.secret')
