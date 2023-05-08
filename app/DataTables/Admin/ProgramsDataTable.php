@@ -22,7 +22,7 @@ class ProgramsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('name', function ($row) {
-        return '<a href="'.route('admin.programs.show', $row).'">'.htmlspecialchars(substr($row->name, 0, 15), ENT_QUOTES, 'UTF-8').'</a>';
+        return '<a href="'.route('admin.programs.show', $row).'">'.htmlspecialchars(substr($row->name, 0, 100), ENT_QUOTES, 'UTF-8').'</a>';
       })
       ->addColumn('parent', function (Program $program) {
         return @$program->parent->name ?? '-';
