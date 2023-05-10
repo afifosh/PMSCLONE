@@ -24,4 +24,16 @@ class ProgramFactory extends Factory
       'description' => $this->faker->text()
     ];
   }
+
+  /**
+   * Set the predefined values for the model.
+   *
+   * @param array $values
+   * @return $this
+   */
+  public function predefinedValues(array $values)
+  {
+    return $this->state($values);
+  }
+    
 }

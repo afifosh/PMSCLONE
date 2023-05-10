@@ -1,6 +1,6 @@
 @extends('admin/layouts/layoutMaster')
 
-@include('admin.pages.settings.inc.header', ['title' => 'Broadcast Setup'])
+@include('admin.pages.settings.inc.header', ['title' => 'Only Office Setup'])
 
 @section('content')
 <h4 class="fw-semibold mb-4">@lang('Settings')</h4>
@@ -91,6 +91,9 @@
                                 </div>
                                 <div class="col-md-8">
                                     <input name="supported_files" value="{{ $setting['supported_files'] ?? '' }}" type="text" class="form-control" id="docAllowedFileTypes" placeholder="{{ __('secret key') }}" aria-describedby="docAllowedFileTypes" />
+                                    <textarea type="text" name="allowed_file_types" id="allowed_file_types"
+                                    placeholder="e.g. application/x-zip-compressed"
+                                    class="form-control f-14">{{ $setting['supported_files'] ?? '' }}</textarea>
                                 </div>
                             </div>
                             
