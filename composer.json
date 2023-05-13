@@ -45,6 +45,7 @@
     "stephenlake/laravel-approval": "^1.1",
     "torann/geoip": "^3.0",
     "willdurand/email-reply-parser": "^2.10",
+    "xemlock/htmlpurifier-html5": "^0.1.11",
     "yajra/laravel-datatables": "^9.0",
     "yajra/laravel-datatables-buttons": "^9.1",
     "yajra/laravel-datatables-editor": "^1.25",

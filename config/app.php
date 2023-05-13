@@ -477,6 +477,7 @@ return [
          */
         App\Innoclapps\InnoclappsServiceProvider::class,
         App\Innoclapps\Settings\SettingServiceProvider::class,
+        App\Innoclapps\PurifierServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,

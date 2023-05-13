@@ -45,6 +45,8 @@ use App\Http\Controllers\Admin\EmailAccount\SharedEmailAccountController;
 use App\Http\Controllers\Admin\EmailAccount\EmailAccountMessagesController;
 use App\Http\Controllers\Admin\EmailAccount\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
+use App\Http\Controllers\Admin\Setting\MailableController;
+use App\Http\Controllers\Admin\Setting\PredefinedMailTemplateController;
 
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','adminVerified' , 'mustBeActive', CheckForLockMode::class)->group(function () {
   Route::get('/mail/accounts/{type}/{provider}/connect', [OAuthEmailAccountController::class, 'connect']);
@@ -196,6 +198,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
       Route::prefix('general')->name('general.')->controller(GeneralSettingController::class)->group(function() {
         Route::get('', 'index')->name('index');
         Route::put('', 'update')->name('update');
+      });
+
+      Route::prefix('email-templates')->name('email-templates.')->group(function() {
+        Route::get('/', [MailableController::class, 'index'])->name('index');
+        Route::get('{locale}/locale', [MailableController::class, 'forLocale']);
+        Route::get('{template}', [MailableController::class, 'show']);
+        Route::put('{template}', [MailableController::class, 'update']);
       });
 
       Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {

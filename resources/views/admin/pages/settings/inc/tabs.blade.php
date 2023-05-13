@@ -5,6 +5,7 @@ $urls = [
     'security' => 'admin.setting.security.index',
     'email' => 'admin.setting.delivery.index',
     'broadcast' => 'admin.setting.broadcast.index',
+    'email-templates' => 'admin.setting.email-templates.index',
 ];
 $active = Request::route()->getName();
 @endphp
@@ -34,6 +35,12 @@ $active = Request::route()->getName();
                 <a href="{{ route($urls['email']) }}" class="d-flex flex-wrap align-items-center">
                     <!-- <i class="ti ti-mail"></i> -->
                     <span class="align-middle ms-2">@lang('Email Setup')</span>
+                </a>
+            </li>
+            <li class="{{ $active === $urls['email-templates'] ? 'active' : '' }} d-flex py-3" data-target="email-templates">
+                <a href="{{ route($urls['email-templates']) }}" class="d-flex flex-wrap align-items-center">
+                    <!-- <i class="ti ti-mail"></i> -->
+                    <span class="align-middle ms-2">@lang('Email Templates')</span>
                 </a>
             </li>
         </ul>
