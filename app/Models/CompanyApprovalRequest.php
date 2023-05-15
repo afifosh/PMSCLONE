@@ -42,6 +42,8 @@ class CompanyApprovalRequest extends Model
   {
     $total = $this->modifications()->count();
     $pending_count = $this->modifications()->doesntHave('approvals')->doesntHave('disapprovals')->count();
+    if($total == 0)
+      return 0;
     return round(($pending_count / $total) * 100, 1);
   }
 
@@ -49,6 +51,8 @@ class CompanyApprovalRequest extends Model
   {
     $total = $this->modifications()->count();
     $approved_count = $this->modifications()->has('approvals' , '>=', ApprovalLevel::count())->count();
+    if($total == 0)
+      return 0;
     return round(($approved_count / $total) * 100, 1);
   }
 
@@ -56,6 +60,8 @@ class CompanyApprovalRequest extends Model
   {
     $total = $this->modifications()->count();
     $rejected_count = $this->modifications()->has('disapprovals')->count();
+    if($total == 0)
+      return 0;
     return round(($rejected_count / $total) * 100, 1);
   }
 }

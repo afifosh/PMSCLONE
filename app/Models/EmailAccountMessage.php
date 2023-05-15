@@ -127,7 +127,7 @@ class EmailAccountMessage extends Model implements Presentable
         );
     }
 
-  
+
     /**
      * A message from address
      *
@@ -271,38 +271,39 @@ class EmailAccountMessage extends Model implements Presentable
     public function getParent()
     {
         $parentId = null;
-    
+
         // First, check the "In-Reply-To" header
         $inReplyToHeader = $this->headers->firstWhere('name', 'in-reply-to');
         if ($inReplyToHeader) {
             $parentId = $inReplyToHeader->value;
         }
-    
+
         // If the "In-Reply-To" header is not present or empty, check the "References" header
-        if (! $parentId) {
+        if (!$parentId) {
             $referencesHeader = $this->headers->firstWhere('name', 'references');
             if ($referencesHeader) {
                 $referenceIds = explode(',', $referencesHeader->value);
                 $parentId = end($referenceIds); // Get the last message ID in the References header
             }
         }
-    
+
         // If a parent ID was found, retrieve the parent email
         if ($parentId) {
             $message= EmailAccountMessage::where('message_id', $parentId)->first();
             $messages=new EmailAccountMessageRepositoryEloquent;
+            if($message)
             $message->loadMissing($messages->getResponseRelations());
             return $message;
         }
-    
+
         // If no parent ID was found, return null
         return null;
     }
-    
-        
+
+
 
     public function getThread(){
-       
+
         $threadMessage = collect();
 
         // Keep looping until we find a message that is not a reply
@@ -311,12 +312,12 @@ class EmailAccountMessage extends Model implements Presentable
             $threadMessage->prepend($parent);
             $parent = $parent->getParent();
         }
-        
+
         // If we found a message that is not a reply, add it to the thread
         if ($parent) {
             $threadMessage->prepend($parent);
         }
-        
+
         return $threadMessage;
     }
 
@@ -386,5 +387,5 @@ class EmailAccountMessage extends Model implements Presentable
         return 'email';
     }
 
- 
+
 }

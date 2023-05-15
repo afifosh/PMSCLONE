@@ -68,6 +68,7 @@ class KycDocumentsDataTable extends DataTable
         ->setTableId('kycdocuments-table')
         ->columns($this->getColumns())
         ->minifiedAjax($url = '', $script = '', $data = [])
+        ->responsive(true)
         ->dom(
           '
           <"row mx-2"<"col-md-2"<"me-3"l>>

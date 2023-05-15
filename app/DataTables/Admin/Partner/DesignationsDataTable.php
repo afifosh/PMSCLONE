@@ -87,6 +87,7 @@ class DesignationsDataTable extends DataTable
     return $this->builder()
       ->setTableId(CompanyDesignation::DT_ID)
       ->columns($this->getColumns())
+      ->responsive(true)
       ->minifiedAjax()
       ->dom(
         '

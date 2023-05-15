@@ -57,6 +57,7 @@ class WorkflowsDataTable extends DataTable
       ->columns($this->getColumns())
       ->addAction(['width' => '80px'])
       ->minifiedAjax()
+      ->responsive(true)
       ->orderBy(1);
   }
 

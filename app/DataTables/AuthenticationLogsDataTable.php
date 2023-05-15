@@ -38,11 +38,11 @@ class AuthenticationLogsDataTable extends DataTable
                 // return $agent->platform() . ' ' . $agent->version($agent->platform()). ' - ' . $agent->browser();
 
 
-                
+
 						$device = $this->userAgentDetails($row->user_agent);
 						$return = '
 						<strong class="p-2 strong" title="' . $row->header . '">
-							<i title="' . $device['os'] . '" class="' . $device['p_icon'] . '"></i> 
+							<i title="' . $device['os'] . '" class="' . $device['p_icon'] . '"></i>
                             <strong>' . $device['browser'] . ' on ' . $device['os'] . '</strong>
 						</strong>';
 						return $return;
@@ -104,6 +104,7 @@ class AuthenticationLogsDataTable extends DataTable
             ->minifiedAjax()
             //->dom('Bfrtip')
             ->orderBy(1)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

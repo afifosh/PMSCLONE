@@ -28,6 +28,11 @@
 </head>
 
 <body>
+  <style>
+    div.dataTables_scrollBody.dropdown-visible {
+    overflow: visible !important;
+  }
+  </style>
 
 
   <!-- Layout Content -->
@@ -41,7 +46,16 @@
   <!-- Include Scripts -->
   @include('layouts/sections/scripts')
   @stack('scripts')
-
+  <script>
+    $(document).ready(function () {
+      $('.table.dataTable').on('show.bs.dropdown', function () {
+        $('.dataTables_scrollBody').addClass('dropdown-visible');
+      })
+      .on('hide.bs.dropdown', function () {
+        $('.dataTables_scrollBody').removeClass('dropdown-visible');
+      });
+    });
+  </script>
 </body>
 
 </html>

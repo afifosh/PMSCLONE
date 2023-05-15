@@ -92,6 +92,7 @@ class SharedFilesDataTable extends DataTable
       ->minifiedAjax()
       //->dom('Bfrtip')
       ->orderBy(1)
+      ->responsive(true)
       ->addAction(['width' => '80px'])
       // ->selectStyleSingle()
       ->buttons([

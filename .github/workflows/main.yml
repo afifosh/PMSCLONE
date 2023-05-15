@@ -28,7 +28,6 @@ jobs:
               rm .env -f
               cp .env.server .env
               composer update
-              php -d  memory_limit=128M artisan key:generate
               php -d  memory_limit=128M artisan storage:link --force
               php -d  memory_limit=128M artisan migrate:fresh --force
               php -d  memory_limit=128M artisan db:seed --class=CountriesTableSeeder --force

@@ -67,7 +67,7 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
               </li>
               <li class="dropdown-notifications-list scrollable-container">
                 <ul class="dropdown-notifications-ul-list list-group list-group-flush">
-                  
+
                 </ul>
               </li>
               <li class="dropdown-menu-footer border-top view-more-li load-more">
@@ -83,7 +83,7 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
           <li class="nav-item navbar-dropdown dropdown-user dropdown">
             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
               <div class="avatar avatar-online">
-                <img src="{{ Auth::user() ? Auth::user()->avatar : asset('assets/img/avatars/1.png') }}" alt class="w-px-40 h-auto rounded-circle">
+                <img src="{{ Auth::user() ? Auth::user()->avatar : asset('assets/img/avatars/1.png') }}" alt class="w-px-40 rounded-circle">
               </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
@@ -92,7 +92,7 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
                   <div class="d-flex">
                     <div class="flex-shrink-0 me-3">
                       <div class="avatar avatar-online">
-                        <img src="{{ Auth::user() ? Auth::user()->avatar : asset('assets/img/avatars/1.png') }}" alt class="w-px-40 h-auto rounded-circle">
+                        <img src="{{ Auth::user() ? Auth::user()->avatar : asset('assets/img/avatars/1.png') }}" alt class="w-px-40 rounded-circle">
                       </div>
                     </div>
                     <div class="flex-grow-1">
@@ -126,7 +126,7 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
                   <i class="ti-xs ti ti-lock me-1 ti-sm"></i>
                   <span class="align-middle">Security</span>
                 </a>
-              </li>                    
+              </li>
               <li>
                 <a class="dropdown-item" href="{{ route('auth.lock') }}">
                   <span class="d-flex align-items-center align-middle">

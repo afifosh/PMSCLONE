@@ -80,6 +80,7 @@ class CompaniesDataTable extends DataTable
       ->setTableId(PartnerCompany::DT_ID)
       ->columns($this->getColumns())
       ->minifiedAjax()
+      ->responsive(true)
       ->dom(
         '
       <"row mx-2"<"col-md-2"<"me-3"l>>

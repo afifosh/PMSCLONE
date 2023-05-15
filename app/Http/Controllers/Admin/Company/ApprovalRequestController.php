@@ -41,6 +41,9 @@ class ApprovalRequestController extends Controller
 
   public function getCompanyReqeust($level, Company $company)
   {
+    if(!$company->approvalRequests()->where('status', 0)->exists() || $level != $company->approval_level){
+      return back()->with('error', 'Request Not found');
+    }
     $data['countries'] = Country::pluck('name', 'id');
     $data['company'] = $company;
     $data['level'] = $level;

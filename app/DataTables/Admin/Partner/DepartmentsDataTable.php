@@ -105,6 +105,7 @@ class DepartmentsDataTable extends DataTable
     return $this->builder()
       ->setTableId(CompanyDepartment::DT_ID)
       ->columns($this->getColumns())
+      ->responsive(true)
       ->minifiedAjax()
       ->dom(
         '

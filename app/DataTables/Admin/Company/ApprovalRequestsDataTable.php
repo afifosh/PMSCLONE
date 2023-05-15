@@ -24,8 +24,8 @@ class ApprovalRequestsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('name', function ($company) {
-        // $company->approval_level > 0 ?
-        $url = route('admin.approval-requests.level.companies.show', ['level' => $company->approval_level, 'company' => $company->id]);// : null;
+        $url = $company->approval_level > 0 ?
+         route('admin.approval-requests.level.companies.show', ['level' => $company->approval_level, 'company' => $company->id]) : null;
         // $url = $this->type == 'verified' ? null : $url;
         return view('admin._partials.sections.company-avatar', compact('company', 'url'));
       })
@@ -125,6 +125,7 @@ class ApprovalRequestsDataTable extends DataTable
       ->setTableId(Company::DT_ID)
       ->columns($this->getColumns())
       ->minifiedAjax()
+      ->responsive(true)
       ->dom(
         '
       <"row mx-2"<"col-md-2"<"me-3"l>>

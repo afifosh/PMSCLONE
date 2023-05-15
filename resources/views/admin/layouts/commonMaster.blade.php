@@ -26,6 +26,11 @@
 </head>
 
 <body style="overflow-x: hidden;"  class="{{ !empty($body_class) ? $body_class : '' }}">
+  <style>
+    div.dataTables_scrollBody.dropdown-visible {
+    overflow: visible !important;
+  }
+  </style>
 
   <!-- Layout Content -->
   @yield('layoutContent')
@@ -42,6 +47,16 @@
 
   @stack('scripts')
 
+  <script>
+    $(document).ready(function () {
+      $('.table.dataTable').on('show.bs.dropdown', function () {
+        $('.dataTables_scrollBody').addClass('dropdown-visible');
+      })
+      .on('hide.bs.dropdown', function () {
+        $('.dataTables_scrollBody').removeClass('dropdown-visible');
+      });
+    });
+  </script>
 </body>
 
 </html>

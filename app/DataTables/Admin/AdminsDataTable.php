@@ -162,6 +162,7 @@ class AdminsDataTable extends DataTable
       )
       ->addAction(['width' => '80px'])
       ->orderBy(0, 'DESC')
+      ->responsive(true)
       ->parameters([
         'buttons' => $buttons,
         "scrollX" => true

@@ -401,7 +401,7 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
      *
      * @return boolean
      */
-    public function markAsUnread($id, $folderId=null)
+    public function markAsUnread($id, $folderId)
     {
         $message = $this->find($id);
 
@@ -785,7 +785,7 @@ class EmailAccountMessageRepositoryEloquent extends AppRepository implements Ema
             try {
                 $storedMedias[] = $media = MediaUploader::fromSource($tmpFile)
                     ->toDirectory($message->getMediaDirectory())
-                    ->useFilename($filename = $attachment->getFileName())
+                    ->useFilename($filename = $attachment->getFileName() ?? 'Untitled-Attachement')
                     // Allow any extension
                     ->upload();
                 $message->attachMedia($media, [$tag]);
