@@ -24,13 +24,6 @@
       0 => 'BeyondCode\\QueryDetector\\QueryDetectorServiceProvider',
     ),
   ),
-  'fruitcake/laravel-cors' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Fruitcake\\Cors\\CorsServiceProvider',
-    ),
-  ),
   'imanghafoori/laravel-password-history' => 
   array (
     'providers' => 
@@ -109,18 +102,6 @@
       0 => 'Laravel\\Tinker\\TinkerServiceProvider',
     ),
   ),
-  'laravelcollective/html' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Collective\\Html\\HtmlServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Form' => 'Collective\\Html\\FormFacade',
-      'Html' => 'Collective\\Html\\HtmlFacade',
-    ),
-  ),
   'laravolt/avatar' => 
   array (
     'providers' => 
@@ -130,6 +111,17 @@
     'aliases' => 
     array (
       'Avatar' => 'Laravolt\\Avatar\\Facade',
+    ),
+  ),
+  'livewire/livewire' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Livewire\\LivewireServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Livewire' => 'Livewire\\Livewire',
     ),
   ),
   'nesbot/carbon' => 
@@ -241,6 +233,13 @@
     'providers' => 
     array (
       0 => 'Yajra\\DataTables\\EditorServiceProvider',
+    ),
+  ),
+  'yajra/laravel-datatables-export' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Yajra\\DataTables\\ExportServiceProvider',
     ),
   ),
   'yajra/laravel-datatables-fractal' => 
