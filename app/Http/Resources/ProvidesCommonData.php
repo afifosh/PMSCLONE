@@ -34,7 +34,7 @@ trait ProvidesCommonData
      *
      * @return array
      */
-    protected function withCommonData($data, $request)
+    protected function withCommonData(array $data, $request): array
     {
         $data = parent::withCommonData($data, $request);
 

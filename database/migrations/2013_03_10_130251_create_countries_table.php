@@ -13,14 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('countries', function (Blueprint $table) {
-          $table->id();
-          $table->string('sortname');
-          $table->string('name');
-          $table->string('papulation');
-          $table->string('rate_per');
-          $table->integer('phonecode');
-      });
+      //   Schema::create('countries', function (Blueprint $table) {
+      //     $table->id();
+      //     $table->string('sortname');
+      //     $table->string('name');
+      //     $table->string('papulation');
+      //     $table->string('rate_per');
+      //     $table->integer('phonecode');
+      // });
     }
 
     /**
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('countries');
+        // Schema::dropIfExists('countries');
     }
 };

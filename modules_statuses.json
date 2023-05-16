@@ -1,0 +1,6 @@
+{
+    "Posts": true,
+    "MailClient": true,
+    "Core": true,
+    "Activities": true
+}

@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('media', function (Blueprint $table) {
-            $table->string('token',36);
-        });
+        // Schema::table('media', function (Blueprint $table) {
+        //     $table->string('token',36);
+        // });
     }
 
     /**
