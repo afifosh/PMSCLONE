@@ -66,12 +66,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
    Route::get('personal', PersonalEmailAccountController::class);
 
    // Test connection route
-   Route::post('connection', [EmailAccountConnectionTestController::class, 'handle']);
+  //  Route::post('connection', [EmailAccountConnectionTestController::class, 'handle']);
 
    Route::put('{account}/primary', [EmailAccountPrimaryStateController::class, 'update']);
    Route::delete('primary', [EmailAccountPrimaryStateController::class, 'destroy']);
-   Route::post('{account}/sync/enable', [EmailAccountSyncStateController::class, 'enable']);
-   Route::post('{account}/sync/disable', [EmailAccountSyncStateController::class, 'disable']);
+  //  Route::post('{account}/sync/enable', [EmailAccountSyncStateController::class, 'enable']);
+  //  Route::post('{account}/sync/disable', [EmailAccountSyncStateController::class, 'disable']);
  });
 
 
@@ -84,10 +84,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
       Route::get('bulkUnread', [EmailAccountMessagesController::class, 'bulkUnread']);
       Route::post('{message}/read', [EmailAccountMessagesController::class, 'read']);
       Route::post('{message}/unread', [EmailAccountMessagesController::class, 'unread']);
-      Route::delete('{message}', [EmailAccountMessagesController::class, 'destroy']);
+      // Route::delete('{message}', [EmailAccountMessagesController::class, 'destroy']);
       // reply method is used to check in MessageRequest
-      Route::post('{message}/reply', [EmailAccountMessagesController::class, 'reply']);
-      Route::post('{message}/forward', [EmailAccountMessagesController::class, 'forward']);
+      // Route::post('{message}/reply', [EmailAccountMessagesController::class, 'reply']);
+      // Route::post('{message}/forward', [EmailAccountMessagesController::class, 'forward']);
     });
     Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class,'manageAccounts']);
     Route::resource('/mail/accounts', EmailAccountController::class);

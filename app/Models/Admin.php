@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use App\Innoclapps\Concerns\HasMeta;
-use App\Innoclapps\Contracts\Metable;
+// use App\Innoclapps\Concerns\HasMeta;
+// use App\Innoclapps\Contracts\Metable;
+use Modules\Core\Concerns\HasMeta;
+use Modules\Core\Contracts\Metable;
 use App\Notifications\Admin\VerifyEmail;
 use App\Notifications\Admin\ResetPassword;
 use App\Traits\AuthLogs;
@@ -76,6 +78,11 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
   public static function GET_LOCK_KEY()
   {
     return 'VUEXY_ADMIN_LOCK_KEY';
+  }
+
+  public function isSuperAdmin(): bool
+  {
+    return $this->id == 1;
   }
 
   /**

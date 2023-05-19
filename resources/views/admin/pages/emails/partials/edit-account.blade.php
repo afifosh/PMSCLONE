@@ -73,7 +73,7 @@
           <input type="number" value="465" id="smtp_port" class="form-control" name="smtp_port" />
           </div>
     </div>
-          <div class="col-md-7">  
+          <div class="col-md-7">
           <div class="mb-3">
           <label class="form-label" for="smtp_encryption">Encryption</label>
           <select id="smtp_encryption" class="form-select">
@@ -113,8 +113,9 @@
   @foreach($account->folders as $folder)
   @if(!is_null($folder->parent_id)) <div style="padding-left:5px"> @endif
   <div class="form-check">
-            <input name="folders[]" onchange="folderChanged(this);" class="form-check-input" @if($folder->syncable) checked @endif type="checkbox" value="{{json_encode($folder)}}" id="defaultCheck-{{$folder->id}}">
-            <label class="form-check-label" for="folder-{{$folder->id}}">
+            <input type="hidden" id="folder-{{$folder->id}}" name="folders_raw[]" value="{{json_encode($folder)}}">
+            <input name="folders_check[]" onchange="folderChanged();" class="form-check-input" @if($folder->syncable) checked @endif type="checkbox" value="0" data-folder-check="{{$folder->id}}" id="folder-check-{{$folder->id}}">
+            <label class="form-check-label" for="folder-check-{{$folder->id}}">
             {{$folder->display_name}}
             </label>
           </div>
@@ -124,21 +125,14 @@
 </div>
     </div>
     <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
-        <button type="button" id="update-account" onclick="updateAccount({{$account->id}});" class="btn btn-primary me-sm-3 me-1 data-submit">Update Account</button>
+        <button type="button" id="update-account" onclick="updateAccount('{{$account->id}}');" class="btn btn-primary me-sm-3 me-1 data-submit">Update Account</button>
       </form>
     </div>
     <script>
           function updateAccount(account_id){
-      var url="{{url('/admin/mail/accounts/:id/update')}}";
+      var url="{{url('/admin/mailclient/api/mail/accounts/:id')}}";
       url=url.replace(':id',account_id);
-      saveRecord(this,"PUT",url,"update-mail-account","Please try again");
+      saveFoldersRecord(this,"PUT",url,"update-mail-account","Please try again");
 
     }
-    function folderChanged(elem) {
-  var jsonValue = $(elem).val();
-  var objValue = JSON.parse(jsonValue);
-  objValue.syncable = elem.checked ? true : false;
-  var newJsonValue = JSON.stringify(objValue);
-  $(elem).val(newJsonValue);
-}
   </script>

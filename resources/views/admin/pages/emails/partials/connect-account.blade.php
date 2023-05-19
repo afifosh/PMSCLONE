@@ -37,7 +37,7 @@
     <div id="imap-area" style="filter:blur(4px); padding-bottom:30px;">
         <div class="mb-3">
           <label class="form-label" for="add-user-email">Email Address</label>
-          <input type="email" id="add-user-email" class="form-control" placeholder="john.doe@example.com" aria-label="john.doe@example.com" name="email" />
+          <input type="email" value="mail@afifjabado.com" id="add-user-email" class="form-control" placeholder="john.doe@example.com" aria-label="john.doe@example.com" name="email" />
         </div>
         <div class="mb-3">
         <div class="form-check">
@@ -49,7 +49,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label" for="password">Password</label>
-          <input type="password" id="password" class="form-control" name="password" />
+          <input type="password" id="password" class="form-control" value="GOcXK7~wfU$w" name="password" />
         </div>
         <div class="mb-3">
           <label class="form-label" for="username">Username(Optional)</label>
@@ -58,7 +58,7 @@
         <h5 class="mb-3 font-medium text-neutral-700 dark:text-neutral-100">Incomming Mail (Imap)</h5>
         <div class="mb-3">
           <label class="form-label" for="imap_server">Server</label>
-          <input type="text" id="imap_server" class="form-control" name="imap_server" />
+          <input type="text" id="imap_server" class="form-control" value="mail.afifjabado.com" name="imap_server" />
         </div>
 <div class="row">
     <div class="col-md-5">
@@ -81,7 +81,7 @@
         <h5 class="mb-3 font-medium text-neutral-700 dark:text-neutral-100">Outgoing Mail (SMTP)</h5>
         <div class="mb-3">
           <label class="form-label" for="smtp_server">Server</label>
-          <input type="text" id="smtp_server" class="form-control" name="smtp_server" />
+          <input type="text" id="smtp_server" class="form-control" value="mail.afifjabado.com" name="smtp_server" />
         </div>
 
 <div class="row">
@@ -91,7 +91,7 @@
           <input type="number" value="465" id="smtp_port" class="form-control" name="smtp_port" />
           </div>
     </div>
-          <div class="col-md-7">  
+          <div class="col-md-7">
           <div class="mb-3">
           <label class="form-label" for="smtp_encryption">Encryption</label>
           <select id="smtp_encryption" name="smtp_encryption" class="form-select">
@@ -116,7 +116,7 @@
           <input type="text" id="from_name_header" class="form-control" name="from_name_header" />
         </div>
       <div class="mb-3" id="folders-area">
-      
+
       </div>
       <div id="errors" style="display:none" class="mb-3 alert alert-danger">
 

@@ -35,9 +35,9 @@ class EmailAccountConnectionTestController extends ApiController
      */
     public function handle(Request $request, RequirementsChecker $requirementsChecker): JsonResponse
     {
-        if ($requirementsChecker->fails('imap')) {
-            abort(409, 'In order to use IMAP account type, you will need to enable the PHP extension "imap".');
-        }
+        // if ($requirementsChecker->fails('imap')) {
+        //     abort(409, 'In order to use IMAP account type, you will need to enable the PHP extension "imap".');
+        // }
 
         if (! function_exists('imap_open')) {
             abort(409, 'The PHP "imap" extension is enabled, but the "imap_open" PHP function is disabled, remove all the imap_* related PHP functions from the php.ini "disable_functions" configuration directive.');
@@ -61,7 +61,7 @@ class EmailAccountConnectionTestController extends ApiController
                 $validator,
                 [
                     'username' => $request->input('username'),
-                    'validate_cert' => $request->input('validate_cert'),
+                    'validate_cert' => $request->boolean('validate_cert'),
                     'email' => $request->input('email'),
                     'password' => $this->getPassword($request),
                     'imap_server' => $request->input('imap_server'),
@@ -70,7 +70,7 @@ class EmailAccountConnectionTestController extends ApiController
                 ],
                 [
                     'username' => $request->input('username'),
-                    'validate_cert' => $request->input('validate_cert'),
+                    'validate_cert' => $request->boolean('validate_cert'),
                     'email' => $request->input('email'),
                     'password' => $this->getPassword($request),
                     'smtp_server' => $request->input('smtp_server'),

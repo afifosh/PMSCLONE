@@ -26,18 +26,23 @@ $configData = Helper::appClasses();
 <script>
   function disableSync(elem, account_id) {
     var url = '';
+    var disableAction = false;
     if ($(elem).prop('checked') == true) {
-      var url = "{{url('/admin/mail/accounts/:accountId/sync/disable')}}";
+      var disableAction = true;
+      var url = "{{url('/admin/mailclient/api/mail/accounts/:accountId/sync/disable')}}";
     } else {
-      var url = "{{url('/admin/mail/accounts/:accountId/sync/enable')}}";
+      var url = "{{url('/admin/mailclient/api/mail/accounts/:accountId/sync/enable')}}";
     }
     url = url.replace(':accountId', account_id);
     $.ajax({
       url: url,
       method: 'post',
       success: function(response, status) {
-        toastr.success(response);
-
+        if(disableAction){
+          toastr.success('Sync Disabled');
+        }else{
+          toastr.success('Sync Enabled');
+        }
       },
       error: function(response) {
         var message = "";
@@ -52,7 +57,7 @@ $configData = Helper::appClasses();
   }
 
   function makePrimary(account_id) {
-    var url = "{{url('/admin/mail/accounts/:accountId/primary')}}";
+    var url = "{{url('/admin/mailclient/api/mail/accounts/:accountId/primary')}}";
     url = url.replace(':accountId', account_id);
     $.ajax({
       url: url,
@@ -114,7 +119,7 @@ $configData = Helper::appClasses();
               <span class="switch-label">Primary Account </span>
 
               <label class="switch">
-                <input type="radio" class="switch-input"  @if($account->isprimary()) checked @endif onchange="makePrimary({{$account->id}});" @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account)) @else disabled @endif name="make_primary" />
+                <input type="checkbox" class="switch-input"  @if($account->isprimary()) checked @endif onchange="makePrimary({{$account->id}});" @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account)) @else disabled @endif name="make_primary" />
                 <span class="switch-toggle-slider">
                   <span class="switch-on"></span>
                   <span class="switch-off"></span>
@@ -125,7 +130,7 @@ $configData = Helper::appClasses();
               <span class="switch-label">Disable Sync </span>
 
               <label class="switch">
-              
+
                 <input type="checkbox" @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account)) @else disabled @endif class="switch-input" @if($account->sync_state!=App\Enums\SyncState::ENABLED) checked @endif onchange="disableSync(this,{{$account->id}});" name="disable_sync" />
                 <span class="switch-toggle-slider">
                   <span class="switch-on"></span>
@@ -138,12 +143,12 @@ $configData = Helper::appClasses();
               <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical"></i></button>
               <div class="dropdown-menu dropdown-menu-end m-0 show" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(425px, 47px);" data-popper-placement="bottom-end" data-popper-reference-hidden="" data-popper-escaped="">
                 @if($account->isShared() && $account->created_by==auth()->user()->id)
-                <a href="javascript:ajaxModal('{{url('/admin/mail/accounts/'.$account->id.'/share')}}','share-account-modal');" class="dropdown-item">Share</a>
+                <a href="javascript:ajaxModal('{{url('/admin/mailclient/api/mail/accounts/'.$account->id.'/share')}}','share-account-modal');" class="dropdown-item">Share</a>
                 @endif
 
-                <a href="javascript:ajaxCanvas('{{url('/admin/mail/accounts/'.$account->id.'/edit')}}','edit-account-modal');" class="dropdown-item">Edit</a>
+                <a href="javascript:ajaxCanvas('{{url('/admin/mailclient/api/mail/accounts/'.$account->id.'/edit')}}','edit-account-modal');" class="dropdown-item">Edit</a>
                 @if(auth()->user()->hasPermission(['Owner','Editor'],$account))
-                <a href="javascript:deleteRecord('delete','{{url('/admin/mail/accounts/'.$account->id.'/delete')}}','');" class="dropdown-item">Delete</a>
+                <a href="javascript:deleteRecord('delete','{{url('/admin/mailclient/api/mail/accounts/'.$account->id.'/delete')}}','');" class="dropdown-item">Delete</a>
                 @endif
               </div>
               @endif

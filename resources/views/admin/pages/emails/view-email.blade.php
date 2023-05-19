@@ -15,14 +15,14 @@
               <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMoreOptions">
               @if($message->is_read)
                <form id="markUnread">
-               <a class="dropdown-item" href="javascript:saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/unread')}}','markUnread','Please try again');">
+               <a class="dropdown-item" href="javascript:saveRecord(this,'POST','{{url('/admin/mailclient/api/emails/'.$message->id.'/unread')}}','markUnread','Please try again');">
                   <i class="ti ti-mail ti-xs me-1"></i>
                   <span class="align-middle">Mark as unread</span>
                 </a>
                </form>
 @else
 <form id="markRead">
-               <a class="dropdown-item" href="javascript:saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/read')}}','markRead','Please try again');">
+               <a class="dropdown-item" href="javascript:saveRecord(this,'POST','{{url('/admin/mailclient/api/emails/'.$message->id.'/read')}}','markRead','Please try again');">
                   <i class="ti ti-mail-opened ti-xs me-1"></i>
                   <span class="align-middle">Mark as unread</span>
                 </a>
@@ -38,16 +38,16 @@
         <div class="d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
          @if(auth()->user()->hasPermission(['Owner','Editor'],$message->account))
-          <i class='ti ti-trash cursor-pointer me-3' onclick="deleteRecord('delete', '{{url('admin/emails/'.$message->id.'')}}', 'Message deleted successfully.')"></i>
+          <i class='ti ti-trash cursor-pointer me-3' onclick="deleteRecord('delete', '{{url('admin/mailclient/api/emails/'.$message->id.'')}}', 'Message deleted successfully.')"></i>
            @endif
          @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account))
             @if($message->is_read)
                <form id="markUnread2">
-                  <i onclick="saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/unread')}}','markUnread2','Please try again');" class="ti ti-mail cursor-pointer me-3"></i>
+                  <i onclick="saveRecord(this,'POST','{{url('/admin/mailclient/api/emails/'.$message->id.'/unread')}}','markUnread2','Please try again');" class="ti ti-mail cursor-pointer me-3"></i>
                </form>
         @else
       <form id="markRead2">
-                  <i onclick="saveRecord(this,'POST','{{url('/admin/emails/'.$message->id.'/read')}}','markRead2','Please try again');" class="ti ti-mail-opened cursor-pointer me-3"></i>
+                  <i onclick="saveRecord(this,'POST','{{url('/admin/mailclient/api/emails/'.$message->id.'/read')}}','markRead2','Please try again');" class="ti ti-mail-opened cursor-pointer me-3"></i>
       </form>
                 @endif
                 @endif
@@ -226,7 +226,7 @@
         $('#send-email,#reply-email').attr("style","display:none !important");
           $("#subject").val('FW: '+message.subject);
           var dateStringFormatted = new Date(message.date).toLocaleString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}).replace(/,/g, '');
-          debugger;
+          // debugger;
          $('mail_type').val('forward');
 
           var html ="<br /><div class='syncmail_attr'>" +

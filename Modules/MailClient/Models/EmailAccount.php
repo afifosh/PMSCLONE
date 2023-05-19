@@ -293,6 +293,7 @@ class EmailAccount extends Model implements Metable, Primaryable
                 return $agent;
             }
 
+            return $this->fromNameHeader;
             return $this->formatFromNameHeader($this->fromNameHeader, $agent);
         });
     }

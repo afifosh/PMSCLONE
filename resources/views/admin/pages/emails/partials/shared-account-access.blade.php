@@ -52,7 +52,7 @@
                             <a class="dropdown-item" href="javascript:permissionChanged('{{$permission->name}}',{{$user->id}},{{$permission->id}});">{{$permission->name}}</a>
                         </li>
                     @endforeach
-                    
+
                     </ul>
                 </div>
             </div>
@@ -64,8 +64,8 @@
     // Get the select element and members list
     const select = document.getElementById('select2Basic');
     const membersList = document.getElementById('members-list');
-    debugger;
-    
+    // debugger;
+
     // Add a change event listener to the select element
      function addUser(event) {
         // Get the selected option and its data attributes
@@ -74,7 +74,7 @@
         const email = option.dataset.email;
         const avatar = option.dataset.avatar;
         const userId = option.dataset.userId;
-       
+
         const isUserAdded = [...membersList.children].some((li) => {
         const userIdAttr = li.getAttribute('data-user-id');
          return userIdAttr && userIdAttr === userId;
@@ -115,7 +115,7 @@
                 </div>
             </div>
         `;
-        
+
         // Append the new li element to the members list
         membersList.appendChild(li);
     }
@@ -135,10 +135,9 @@
         toastr.error(errorThrown);
     }}
     );
-    
+
     }
     $('.select2').select2();
 </script>
 
-            
-           
+

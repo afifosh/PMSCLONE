@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.1.6
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -12,25 +12,28 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Support\Collection;
-use Modules\Activities\Contracts\Attendeeable;
-use Modules\Activities\Http\Resources\ActivityResource;
-use Modules\Activities\Models\Activity;
-use Modules\Billable\Contracts\BillableResource as BillableResourceContract;
-use Modules\Billable\Http\Resources\BillableResource;
-use Modules\Core\Facades\Innoclapps;
+use App\Contracts\Attendeeable;
+use App\Innoclapps\Facades\Innoclapps;
+use App\Contracts\BillableResource as BillableResourceContract;
 
-trait ProvidesCommonData
+trait ProvidesCommonDataBack
+
 {
     /**
-     * The created follow up task for the resource.
+     * The created follow up task for the resource
+     *
+     * @var \App\Models\Activity|null
      */
-    protected static ?Activity $createdActivity = null;
+    protected static $createdActivity;
 
     /**
-     * Add common data to the resource.
+     * Add common data to the resource
      *
-     * @param  \Modules\Core\Resource\Http\ResourceRequest|\Illuminate\Http\Request  $request
+     * @param array $data
+     *
+     * @param \App\Innoclapps\Resources\Http\ResourceRequest|\Illuminate\Http\Request $request
+     *
+     * @return array
      */
     protected function withCommonData(array $data, $request): array
     {
@@ -40,20 +43,20 @@ trait ProvidesCommonData
             'createdActivity' => new ActivityResource(static::$createdActivity),
         ]);
 
-        static::withActivity(null);
+        static::createdFollowUpTask(null);
 
         if (! $request->isZapier()) {
             $resourceInstance = Innoclapps::resourceByModel($this->resource);
 
             if ($resourceInstance instanceof BillableResourceContract && $this->relationLoaded('billable')) {
                 $data[] = $this->merge([
-                    'billable' => new BillableResource($this->billable),
-                ]);
+                   'billable' => new BillableResource($this->billable),
+               ]);
             }
 
             if ($this->resource instanceof Attendeeable) {
                 $data[] = $this->merge([
-                    'guest_email' => $this->getGuestEmail(),
+                    'guest_email'        => $this->getGuestEmail(),
                     'guest_display_name' => $this->getGuestDisplayName(),
                 ]);
             }
@@ -69,38 +72,41 @@ trait ProvidesCommonData
     }
 
     /**
-     * Set the follow up activity which was created to merge in the resource
+     * Set the follow up task which was created to merge in the resource
+     *
+     * @param \App\Models\Activity|null $task
+     *
+     * @return void
      */
-    public static function withActivity(?Activity $task): void
+    public static function createdFollowUpTask($task)
     {
         static::$createdActivity = $task;
     }
 
     /**
      * Get the resource associations
+     *
+     * @return Collection|array
      */
-    protected function prepareAssociationsForResponse(): Collection
+    protected function prepareAssociationsForResponse()
     {
+        if (! $this->shouldMergeAssociations()) {
+            return [];
+        }
+
         return collect($this->resource->associatedResources())
-            ->map(function ($resourceRecords) {
-                return $resourceRecords->map(function ($record) {
-                    // Only included needed data for the front-end
-                    // if needed via API, users can use the ?with= parameter to load associated resources
-                    return [
-                        'id' => $record->id,
-                        'display_name' => $record->display_name,
-                        'path' => $record->path,
-                    ];
-                });
+            ->map(function ($resourceRecords, $resourceName) {
+                return Innoclapps::resourceByName($resourceName)->createJsonResource($resourceRecords);
             });
     }
 
     /**
      * Check whether a resource has associations and should be merged
-     *
      * Associations are merged only if they are previously eager loaded
+     *
+     * @return boolean
      */
-    protected function shouldMergeAssociations(): bool
+    protected function shouldMergeAssociations()
     {
         if (! method_exists($this->resource, 'associatedResources')) {
             return false;

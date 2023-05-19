@@ -62,6 +62,79 @@ if (isFile == true) {
             }
     });
 }
+function saveFoldersRecord(buttonSelector,type, url, formId, errorMesage) {
+    var form = $('#'+formId);
+    var fd = new FormData(form[0]);
+    var parent_folders = [];
+    var rawFolders = fd.getAll('folders_raw[]');
+    // iterate over the raw folders
+    rawFolders.forEach(function(rawFolder) {
+      var folder = JSON.parse(rawFolder);
+      if (folder.parent_id == null) {
+        parent_folders.push(folder);
+      }
+    });
+    // iterate over the raw folders again and add the children, children have parent_id
+    rawFolders.forEach(function(rawFolder) {
+      var folder = JSON.parse(rawFolder);
+      if (folder.parent_id) {
+        var parent = parent_folders.find(function(parent) {
+          return parent.id === folder.parent_id;
+        });
+        if (!parent.children) {
+          parent.children = [];
+        }
+        parent.children.push(folder);
+      }
+    });
+
+    var object = formDataToJson(fd);
+    object.folders = parent_folders;
+
+    $.ajax({
+        url: url,
+        type: type,
+        data: object,
+        success: function (response, status) {
+            toastr.success('Saved Successfully');
+            location.reload();
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            onerror(jqXHR,textStatus,errorThrown,form);
+        },
+          beforeSend : function() {
+                $(form).find(".has-error").each(function () {
+                    $(this).find(".help-block").text("");
+                    $(this).removeClass("has-error");
+                });
+                $(form).find("#alert").html("");
+                    loadingButton(buttonSelector,form);
+            },
+
+            complete : function (jqXHR, textStatus) {
+                    unloadingButton(buttonSelector,form)
+            }
+    });
+}
+
+function formDataToJson(formData) {
+  const jsonObject = {};
+
+  for (const [key, value] of formData.entries()) {
+    if (jsonObject.hasOwnProperty(key)) {
+      if (Array.isArray(jsonObject[key])) {
+        jsonObject[key].push(value);
+      } else {
+        jsonObject[key] = [jsonObject[key], value];
+      }
+    } else {
+      jsonObject[key] = value;
+    }
+  }
+
+  return jsonObject;
+}
+
 function onerror(jqXHR,textStatus,errorThrown,form){
     try {
         var response = JSON.parse(jqXHR.responseText);

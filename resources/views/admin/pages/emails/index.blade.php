@@ -51,7 +51,7 @@
   $(function(){
     var account_id=$("#select-account").find(":selected").val();
     populateFolders(account_id);
-    
+
   });
   @endif
   function populateFolders(account_id){
@@ -100,7 +100,7 @@
         }
         else{
           $("#email-list-area").show();
-          $("#no-folders-area").hide();          
+          $("#no-folders-area").hide();
         }
 
           }
@@ -165,7 +165,7 @@ if (messageDate.isSame(today, 'd')) {
 } else {
   // Otherwise, show the full date and time
   displayDate = messageDate.format('MMMM D, YYYY h:mm A');
-} 
+}
                 html+= `<small class="email-list-item-time text-muted" style="width: auto; whitespace:nowrap; display:inline-block !important">`+displayDate+`</small>
                 </div>
               </div>
@@ -277,7 +277,7 @@ if (messageDate.isSame(today, 'd')) {
     }).get();
     if(action=='unread'){
       $.ajax({
-        url: "{{url('admin/emails/bulkUnread')}}",
+        url: "{{url('admin/mailclient/api/emails/bulkUnread')}}",
         type: "GET",
         data: {id:ids},
         success: function (response, status) {
@@ -290,7 +290,7 @@ if (messageDate.isSame(today, 'd')) {
             else { message = response.responseJSON.message }
             toastr.error(message);
         }
-    })  
+    })
     }
     if(action=='delete'){
       Swal.fire({
@@ -303,7 +303,7 @@ if (messageDate.isSame(today, 'd')) {
         buttonsStyling: !1
     }).then(
       $.ajax({
-        url: "{{url('admin/emails/bulkDelete')}}",
+        url: "{{url('admin/mailclient/api/emails/bulkDelete')}}",
         type: "GET",
         data: {id:ids},
         success: function (response, status) {
@@ -494,7 +494,7 @@ input.each(function(){
 
     <!-- Email View -->
     <div class="col app-email-view flex-grow-0 bg-body" id="app-email-view">
-      
+
     </div>
     <!-- Email View -->
   </div>
@@ -509,12 +509,12 @@ input.each(function(){
         </div>
         <div class="modal-body flex-grow-1 pb-sm-0 p-4 py-2">
           <form class="email-compose-form" id="email-compose-form" enctype="multipart/form-data">
-          @csrf  
+          @csrf
           <div class="email-compose-to d-flex justify-content-between align-items-center">
               <label class="form-label mb-0" for="emailContacts">To:</label>
               <div class="select2-primary border-0 shadow-none flex-grow-1 mx-2">
-              <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2 tags" id="to" name="to" placeholder="someone@email.com">
-               
+              <input type="text" class="form-control border-0 shadow-none flex-grow-1 mx-2 tags" id="to" name="to[]" placeholder="someone@email.com">
+
               </div>
               <div class="email-compose-toggle-wrapper">
                 <a class="email-compose-toggle-cc" href="javascript:void(0);">Cc |</a>
@@ -565,7 +565,7 @@ input.each(function(){
                   <button type="button" id="send-email" class="btn btn-primary"><i class="ti ti-send ti-xs me-1"></i>Send</button>
                   <button type="button" id="reply-email" onclick="replyEmail(this,$(this).data('id'));" class="btn btn-primary " style="display:none !important"><i class="ti ti-send ti-xs me-1"></i>Reply</button>
                   <button type="button" id="forward-email" onclick="forwardEmail(this,$(this).data('id'));" class="btn btn-primary " style="display:none !important"><i class="ti ti-send ti-xs me-1"></i>Forward</button>
-                
+
                 </div>
                 <label for="file-input"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
                 <input type="file" name="attachments[]" multiple class="d-none" id="file-input">
@@ -596,7 +596,7 @@ input.each(function(){
               </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
               <p class="mb-0 ms-3">2-way email sync with your email provider. </p>
-              
+
             </div>
           </li>
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
@@ -606,7 +606,7 @@ input.each(function(){
               </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
               <p class="mb-0 ms-3">2-way email sync with your email provider. </p>
-              
+
             </div>
           </li>
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
@@ -619,19 +619,19 @@ input.each(function(){
 
 Associate emails to many Contacts, Companies and Deals.
 </p>
-              
+
             </div>
           </li>
-          
-          
-          
+
+
+
         </ul>
         </div>
         <div class="col-md-6">
         <ul class="p-0 m-0">
-          
-          
-          
+
+
+
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
             <div class="badge bg-label-primary rounded p-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="h-6 w-6 text-primary-600" style="width: 20px;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z">
@@ -639,7 +639,7 @@ Associate emails to many Contacts, Companies and Deals.
               </svg></div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
               <p class="mb-0 ms-3">Save time by making use of predefined templates. </p>
-              
+
             </div>
           </li>
           <li class="mb-4 pb-1 d-flex justify-content-between align-items-center">
@@ -652,7 +652,7 @@ Associate emails to many Contacts, Companies and Deals.
 
 Add customized signature for a more professional look.
 </p>
-              
+
             </div>
           </li>
           <li class="d-flex justify-content-between align-items-center">
@@ -665,12 +665,12 @@ Add customized signature for a more professional look.
 
 Connect via IMAP, your Gmail or Outlook account.
 </p>
-              
+
             </div>
           </li>
         </ul>
         </div>
-       
+
       </div>
       <div class="d-flex justify-content-center flex-wrap gap-4 mt-2">
       @can('Shared Mailbox')
