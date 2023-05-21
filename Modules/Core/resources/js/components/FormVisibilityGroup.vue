@@ -67,7 +67,7 @@
 </template>
 <script setup>
 import { computed } from 'vue'
-import { useTeams } from '~/Users/resources/js/composables/useTeams'
+// import { useTeams } from '~/Users/resources/js/composables/useTeams'
 import { useApp } from '~/Core/resources/js/composables/useApp'
 
 const emit = defineEmits(['update:type', 'update:dependsOn'])
@@ -76,7 +76,7 @@ const props = defineProps({ disabled: Boolean, dependsOn: Array, type: String })
 
 const { users } = useApp()
 
-const { teamsByName: teams } = useTeams()
+// const { teamsByName: teams } = useTeams()
 
 const usersWithoutAdministrators = computed(() =>
   users.value.filter(user => !user.super_admin)

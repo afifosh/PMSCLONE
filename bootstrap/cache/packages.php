@@ -135,6 +135,17 @@
       'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
     ),
   ),
+  'mavinoo/laravel-batch' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Mavinoo\\Batch\\BatchServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Batch' => 'Mavinoo\\Batch\\BatchFacade',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 
@@ -205,6 +216,13 @@
     'providers' => 
     array (
       0 => 'Rappasoft\\LaravelAuthenticationLog\\LaravelAuthenticationLogServiceProvider',
+    ),
+  ),
+  'spatie/laravel-activitylog' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\Activitylog\\ActivitylogServiceProvider',
     ),
   ),
   'spatie/laravel-ignition' => 

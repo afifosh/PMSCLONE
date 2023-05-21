@@ -15,7 +15,7 @@ import isString from 'lodash/isString'
 let TwilioSDKDevice
 ;(async () => {
   await import('@twilio/voice-sdk/dist/twilio.min.js')
-  TwilioSDKDevice = window['Twilio'].Device
+  // TwilioSDKDevice = window['Twilio'].Device
 })()
 
 class Twilio extends Device {

@@ -15,7 +15,7 @@ return [
      *
      * Should extend `Plank\Mediable\Media`
      */
-    'model' => \App\Innoclapps\Models\Media::class,
+    'model' => \Modules\Core\Models\Media::class,
 
     /*
      * Name to be used for mediables joining table
@@ -197,15 +197,15 @@ return [
         ],
         Plank\Mediable\Media::TYPE_PRESENTATION => [
             'mime_types' => [
-                    'application/vnd.ms-powerpoint',
-                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                    'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
-                ],
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+            ],
             'extensions' => [
-                    'ppt',
-                    'pptx',
-                    'ppsx',
-                ],
+                'ppt',
+                'pptx',
+                'ppsx',
+            ],
         ],
     ],
 
@@ -217,12 +217,12 @@ return [
     'source_adapters' => [
         'class' => [
             Symfony\Component\HttpFoundation\File\UploadedFile::class => Plank\Mediable\SourceAdapters\UploadedFileAdapter::class,
-            Symfony\Component\HttpFoundation\File\File::class         => Plank\Mediable\SourceAdapters\FileAdapter::class,
-            Psr\Http\Message\StreamInterface::class                   => Plank\Mediable\SourceAdapters\StreamAdapter::class,
+            Symfony\Component\HttpFoundation\File\File::class => Plank\Mediable\SourceAdapters\FileAdapter::class,
+            Psr\Http\Message\StreamInterface::class => Plank\Mediable\SourceAdapters\StreamAdapter::class,
         ],
         'pattern' => [
-            '^https?://'     => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
-            '^/'             => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
+            '^https?://' => Plank\Mediable\SourceAdapters\RemoteUrlAdapter::class,
+            '^/' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
             '^[a-zA-Z]:\\\\' => Plank\Mediable\SourceAdapters\LocalPathAdapter::class,
         ],
     ],
@@ -233,7 +233,7 @@ return [
      */
     'url_generators' => [
         'local' => Plank\Mediable\UrlGenerators\LocalUrlGenerator::class,
-        's3'    => Plank\Mediable\UrlGenerators\S3UrlGenerator::class,
+        's3' => Plank\Mediable\UrlGenerators\S3UrlGenerator::class,
     ],
 
     /**

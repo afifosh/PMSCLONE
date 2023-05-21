@@ -1,22 +1,29 @@
 <?php
+/**
+ * Concord CRM - https://www.concordcrm.com
+ *
+ * @version   1.1.9
+ *
+ * @link      Releases - https://www.concordcrm.com/releases
+ * @link      Terms Of Service - https://www.concordcrm.com/terms
+ *
+ * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
+ */
 
 namespace App\Installer;
 
 class RequirementsChecker
 {
     /**
-     * Check the requirements
-     *
-     * @return array
+     * Check the installer requirements
      */
-    public function check()
+    public function check(): array
     {
-        $results      = $this->createEmptyResultSet();
-        $requirements = config('app.requirements');
+        $results = $this->createEmptyResultSet();
+        $requirements = config('installer.requirements');
 
         foreach ($requirements as $type => $requirement) {
             switch ($type) {
-
                 case 'php':
                     $checks = $this->checkPHPRequirements($requirements[$type]);
 
@@ -26,7 +33,7 @@ class RequirementsChecker
                         $results['errors'] = true;
                     }
 
-                break;
+                    break;
 
                 case 'functions':
                     $checks = $this->checkPHPFunctions($requirements[$type]);
@@ -37,7 +44,7 @@ class RequirementsChecker
                         $results['errors'] = true;
                     }
 
-                break;
+                    break;
 
                 case 'apache':
                     foreach ($requirements[$type] as $requirement) {
@@ -56,8 +63,9 @@ class RequirementsChecker
                     break;
                 case 'recommended':
                     $results['recommended']['php'] = $this->checkPHPRequirements($requirements[$type]['php']);
+                    $results['recommended']['functions'] = $this->checkPHPFunctions($requirements[$type]['functions']);
 
-                break;
+                    break;
             }
         }
 
@@ -66,12 +74,8 @@ class RequirementsChecker
 
     /**
      * Check whether the given PHP requirement passes
-     *
-     * @param string $requirement
-     *
-     * @return boolean
      */
-    public function passes($requirement)
+    public function passes(string $requirement): bool
     {
         $requirements = $this->check();
 
@@ -83,13 +87,17 @@ class RequirementsChecker
     }
 
     /**
-     * Check the php requirements
-     *
-     * @param array $requirements
-     *
-     * @return array
+     * Check whether the given PHP requirement fails
      */
-    protected function checkPHPRequirements($requirements)
+    public function fails(string $requirement): bool
+    {
+        return ! $this->passes($requirement);
+    }
+
+    /**
+     * Check the php requirements
+     */
+    protected function checkPHPRequirements(array $requirements): array
     {
         $results = [];
 
@@ -102,12 +110,8 @@ class RequirementsChecker
 
     /**
      * Check the PHP functions requirements
-     *
-     * @param array $functions
-     *
-     * @return array
      */
-    protected function checkPHPFunctions($functions)
+    protected function checkPHPFunctions(array $functions): array
     {
         $results = [];
 
@@ -120,66 +124,54 @@ class RequirementsChecker
 
     /**
      * Determine if all checks fails
-     *
-     * @param array $checks
-     *
-     * @return boolean
      */
-    protected function determineIfFails($checks)
+    protected function determineIfFails(array $checks): bool
     {
         return count(array_filter($checks)) !== count($checks);
     }
 
     /**
      * Check PHP version requirement.
-     *
-     * @return array
      */
-    public function checkPHPversion()
+    public function checkPHPversion(): array
     {
-        $minVersionPhp     = config('installer.core.minPhpVersion');
+        $minVersionPhp = config('installer.core.minPhpVersion');
         $currentPhpVersion = static::getPhpVersionInfo();
-        $supported         = version_compare($currentPhpVersion['version'], $minVersionPhp) >= 0;
+        $supported = version_compare($currentPhpVersion['version'], $minVersionPhp) >= 0;
 
-        $status = [
-            'full'      => $currentPhpVersion['full'],
-            'current'   => $currentPhpVersion['version'],
-            'minimum'   => $minVersionPhp,
+        return [
+            'full' => $currentPhpVersion['full'],
+            'current' => $currentPhpVersion['version'],
+            'minimum' => $minVersionPhp,
             'supported' => $supported,
         ];
-
-        return $status;
     }
 
     /**
      * Get current Php version information.
-     *
-     * @return array
      */
-    protected static function getPhpVersionInfo()
+    protected static function getPhpVersionInfo(): array
     {
         $currentVersionFull = PHP_VERSION;
         preg_match("#^\d+(\.\d+)*#", $currentVersionFull, $filtered);
         $currentVersion = $filtered[0];
 
         return [
-            'full'    => $currentVersionFull,
+            'full' => $currentVersionFull,
             'version' => $currentVersion,
         ];
     }
 
     /**
      * Create empty result set
-     *
-     * @return array
      */
-    protected function createEmptyResultSet() : array
+    protected function createEmptyResultSet(): array
     {
         return [
             'results' => [
-                'php'       => [],
+                'php' => [],
                 'functions' => [],
-                'apache'    => [],
+                'apache' => [],
             ],
             'recommended' => [
                 'php' => [],

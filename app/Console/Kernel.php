@@ -22,18 +22,6 @@ class Kernel extends ConsoleKernel
             settings()->save();
         })->everyMinute();
 
-        // $schedule->command('inspire')->hourly();
-        $schedule->command('queue:work --tries=3 --max-time=300 --stop-when-empty')
-          ->everyMinute()
-          ->withoutOverlapping();
-
-          $schedule->command(EmailAccountsSyncCommand::class, ['--broadcast'])
-          ->{$this->syncMethodFromConfigValue(config('app.mail_client.sync.every'))}()
-          ->withoutOverlapping(30)
-          ->before(fn () => EmailAccountsSyncCommand::setLock())
-          ->after(fn ()  => EmailAccountsSyncCommand::removeLock())
-          ->sendOutputTo(storage_path('logs/email-accounts-sync.log'));
-
         $schedule->command('queue:flush')->weekly();
     }
 

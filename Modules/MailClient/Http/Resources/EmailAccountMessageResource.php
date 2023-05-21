@@ -57,9 +57,9 @@ class EmailAccountMessageResource extends JsonResource
             'display_name' => $this->display_name,
             'path' => $this->path,
             'folders' => EmailAccountFolderResource::collection($this->whenLoaded('folders')),
-            'contacts' => ContactResource::collection($this->whenLoaded('contacts')),
-            'companies' => CompanyResource::collection($this->whenLoaded('companies')),
-            'deals' => DealResource::collection($this->whenLoaded('deals')),
+            // 'contacts' => ContactResource::collection($this->whenLoaded('contacts')),
+            // 'companies' => CompanyResource::collection($this->whenLoaded('companies')),
+            // 'deals' => DealResource::collection($this->whenLoaded('deals')),
             'account_active_folders_tree' => $this->when(
                 $this->relationLoaded('account') && $this->account->relationLoaded('folders'),
                 function () use ($request) {

@@ -1,18 +1,27 @@
 <?php
+/**
+ * Concord CRM - https://www.concordcrm.com
+ *
+ * @version   1.1.9
+ *
+ * @link      Releases - https://www.concordcrm.com/releases
+ * @link      Terms Of Service - https://www.concordcrm.com/terms
+ *
+ * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
+ */
 
-use Akaunting\Money\Money;
 use Akaunting\Money\Currency;
-use App\Support\DefaultSettings;
-use App\Innoclapps\Facades\Innoclapps;
-use App\Innoclapps\Settings\Contracts\Manager as SettingsManager;
+use Akaunting\Money\Money;
+use Illuminate\Support\Str;
+use Modules\Core\Facades\Innoclapps;
+use Modules\Core\Settings\Contracts\Manager as SettingsManager;
 
 if (! function_exists('format_bytes')) {
     /**
      * Format the given bytes in a proper human readable format
      *
-     * @param int|float $bytes
-     * @param integer $precision
-     *
+     * @param  int|float  $bytes
+     * @param  int  $precision
      * @return string
      */
     function format_bytes($bytes, $precision = 2)
@@ -20,12 +29,12 @@ if (! function_exists('format_bytes')) {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
         $bytes = max($bytes, 0);
-        $pow   = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow   = min($pow, count($units) - 1);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
 
         $bytes /= pow(1024, $pow);
 
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }
 
@@ -33,7 +42,7 @@ if (! function_exists('timezone')) {
     /**
      * Helper timezone function
      *
-     * @return \App\Innoclapps\Timezone
+     * @return \Modules\Core\Timezone
      */
     function timezone()
     {
@@ -45,7 +54,7 @@ if (! function_exists('tz')) {
     /**
      * Alias to timezone() function
      *
-     * @return \App\Innoclapps\Timezone
+     * @return \Modules\Core\Timezone
      */
     function tz()
     {
@@ -57,14 +66,19 @@ if (! function_exists('get_generated_lang')) {
     /**
      * Get the application generate language
      *
-     * @param null|string $locale
-     *
+     * @param  null|string  $locale
      * @return \stdClass
      */
     function get_generated_lang($locale = null)
     {
+        $path = config('translator.json');
+
+        if (! is_file($path)) {
+            return [];
+        }
+
         $content = json_decode(
-            file_get_contents(config('app.lang.json'))
+            file_get_contents($path)
         );
 
         if (is_null($locale)) {
@@ -87,6 +101,20 @@ if (! function_exists('get_generated_lang')) {
     }
 }
 
+if (! function_exists('clone_prefix')) {
+    /**
+     * Add clone prefix to the given string
+     *
+     * Can be used when cloning models, to generaet unique name/title etc...
+     */
+    function clone_prefix(string $to): string
+    {
+        $title = preg_replace('/\s-\sCopy\([a-zA-Z0-9]{6}+\)/', '', $to);
+
+        return $title.' - Copy('.Str::random(6).')';
+    }
+}
+
 if (! function_exists('privacy_url')) {
     /**
      * Application privacy policy url
@@ -99,33 +127,12 @@ if (! function_exists('privacy_url')) {
     }
 }
 
-if (! function_exists('default_setting')) {
-    /**
-     * Get application default setting
-     *
-     * @param mixed $setting The setting name
-     *
-     * @return string|array|\App\Support\DefaultSettings
-     */
-    function default_setting($setting = null)
-    {
-        $class = resolve(DefaultSettings::class);
-
-        if (! is_null($setting)) {
-            return $class->get($setting);
-        }
-
-        return $class;
-    }
-}
-
 if (! function_exists('settings')) {
     /**
      * Get the settings manager instance.
      *
-     * @param string|array|null $driver
-     * @param bool $save
-     *
+     * @param  string|array|null  $driver
+     * @param  bool  $save
      * @return mixed
      */
     function settings($driver = null, $save = true)
@@ -137,12 +144,11 @@ if (! function_exists('settings')) {
                 return tap($manager->set($driver), fn ($instance) => $save && $instance->save());
             }
 
-            if (in_array($driver, array_keys(config('setting.drivers')))) {
+            if (in_array($driver, array_keys(config('settings.drivers')))) {
                 return $manager->driver($driver);
             }
 
-
-            return $manager->get('array');
+            return $manager->get($driver);
         }
 
         return $manager;
@@ -153,9 +159,8 @@ if (! function_exists('clean')) {
     /**
      * Clean the given string
      *
-     * @param string $dirty
-     * @param mixed $config
-     *
+     * @param  string  $dirty
+     * @param  mixed  $config
      * @return string
      */
     function clean($dirty, $config = null)
@@ -163,7 +168,6 @@ if (! function_exists('clean')) {
         return app('purifier')->clean($dirty, $config);
     }
 }
-
 
 if (! function_exists('get_current_process_user')) {
     /**
@@ -196,13 +200,10 @@ if (! function_exists('forgot_password_is_disabled')) {
 }
 
 if (! function_exists('to_money')) {
-
     /**
      * Create new Money instance
      *
-     * @param string|int|float $value
-     * @param string|\Akaunting\Money\Currency|null $currency
-     *
+     * @param  string|int|float  $value
      * @return \Akaunting\Money\Money
      */
     function to_money($value, string|Currency $currency = null)
@@ -218,5 +219,42 @@ if (! function_exists('to_money')) {
         }
 
         return new Money($value, $currency, true);
+    }
+}
+
+if (! function_exists('set_alert')) {
+    /**
+     * Set web alert
+     *
+     * @param  string|null  $message
+     * @param  string  $variant
+     * @return void
+     */
+    function set_alert($message, $variant)
+    {
+        session()->flash($variant, $message);
+    }
+}
+
+if (! function_exists('get_current_alert')) {
+    /**
+     * Get the alert in session
+     */
+    function get_current_alert(): ?array
+    {
+        if ($message = session()->get('success')) {
+            return ['variant' => 'success', 'message' => $message];
+        }
+        if ($message = session()->get('error')) {
+            return ['variant' => 'danger', 'message' => $message];
+        }
+        if ($message = session()->get('warning')) {
+            return ['variant' => 'warning', 'message' => $message];
+        }
+        if ($message = session()->get('info')) {
+            return ['variant' => 'info', 'message' => $message];
+        }
+
+        return null;
     }
 }

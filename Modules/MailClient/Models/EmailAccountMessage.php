@@ -424,9 +424,9 @@ class EmailAccountMessage extends Model implements Presentable
             'account.folders' => fn ($query) => $query->withCount([
                 'messages as unread_count' => fn ($query) => $query->where('is_read', false),
             ]),
-            'contacts.nextActivity',
-            'companies.nextActivity',
-            'deals.nextActivity',
+            // 'contacts.nextActivity',
+            // 'companies.nextActivity',
+            // 'deals.nextActivity',
         ]);
     }
 

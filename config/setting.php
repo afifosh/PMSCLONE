@@ -7,45 +7,6 @@ return [
      |  Drivers
      | -----------------------------------------------------------------
      */
-
-    'drivers' => [
-
-        'array' => [
-            'driver' => App\Innoclapps\Settings\Stores\ArrayStore::class,
-        ],
-
-        'json' => [
-            'driver' => App\Innoclapps\Settings\Stores\JsonStore::class,
-
-            'options' => [
-                'path' => storage_path('settings.json'),
-            ],
-        ],
-
-        'database' => [
-            'driver' => \App\Innoclapps\Settings\Stores\DatabaseStore::class,
-
-            'options' => [
-                'table' => 'settings',
-                'model' => \App\Innoclapps\Models\Setting::class,
-            ],
-        ],
-
-        'redis' => [
-            'driver' => App\Innoclapps\Settings\Stores\RedisStore::class,
-
-            'options' => [
-                'client' => 'predis',
-
-                'default' => [
-                    'host'     => env('REDIS_HOST', '127.0.0.1'),
-                    'port'     => env('REDIS_PORT', 6379),
-                    'database' => env('REDIS_DB', 0),
-                ],
-            ],
-        ],
-
-    ],
     'app' => [
         ['name' => 'company_name', 'value' => 'Pipex', 'context' => 'app', 'autoload' => 0, 'public' => 1],
         ['name' => 'company_logo', 'value' => '/images/logo.png', 'context' => 'app', 'autoload' => 0, 'public' => 1],

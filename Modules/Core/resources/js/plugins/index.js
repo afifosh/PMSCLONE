@@ -8,4 +8,4 @@
  *
  * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
  */
-import './moment'
+// import './moment'

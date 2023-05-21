@@ -196,9 +196,9 @@ class ActivitiesServiceProvider extends ServiceProvider
     {
         $tab = Tab::make('activities', 'activities-tab')->panel('activities-tab-panel')->order(15);
 
-        ContactViewComponent::registerTab($tab);
-        CompanyViewComponent::registerTab($tab);
-        DealViewComponent::registerTab($tab);
+        // ContactViewComponent::registerTab($tab);
+        // CompanyViewComponent::registerTab($tab);
+        // DealViewComponent::registerTab($tab);
     }
 
     /**

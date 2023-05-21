@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Helpers\CRM\Traits\SetAppSecurityConfig;
-use App\Innoclapps\Facades\Innoclapps;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +13,17 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
 use App\Services\CRM\Settings\SettingsService;
+use App\Console\Commands\ClearCacheCommand;
+use App\Console\Commands\OptimizeCommand;
+use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Vite;
+use Modules\Core\Console\Commands\ClearUpdaterTmpPathCommand;
+use Modules\Core\Facades\Innoclapps;
+use Modules\Core\Settings\DefaultSettings;
+use Modules\Translator\Console\Commands\GenerateJsonLanguageFileCommand;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,12 +46,17 @@ class AppServiceProvider extends ServiceProvider
    */
   public function boot(UrlGenerator $url)
   {
+    // Vite::useScriptTagAttributes(fn (string $src, string $url, array|null $chunk, array|null $manifest) => [
+    //   'onload' => $src === 'resources/js/app.js' ? 'bootApplication()' : false,
+    // ]);
+    Vite::useScriptTagAttributes(function(string $src, string $url, array|null $chunk, array|null $manifest){
+      dd($src);
+    });
     Paginator::useBootstrap();
     if (config('app.force_https')) {
       \URL::forceScheme('https');
       $url->formatScheme('https');
     }
-    Innoclapps::resourcesIn(app_path('Resources'));
 
     Schema::defaultStringLength(191);
     /*
@@ -69,6 +84,15 @@ class AppServiceProvider extends ServiceProvider
       }
     } catch (\Exception $exception) {
     }
+    JsonResource::withoutWrapping();
+
+    $this->configureUpdater();
+
+    Innoclapps::whenInstalled($this->configureBroadcasting(...));
+
+    DefaultSettings::add('disable_password_forgot', false);
+
+    View::composer('*', \Modules\Core\Http\View\Composers\AppComposer::class);
 
     try {
       SetMailConfig::new(true)
@@ -98,4 +122,36 @@ class AppServiceProvider extends ServiceProvider
     } catch (\Exception $exception) {
     }
   }
+
+   /**
+     * Set the broadcasting driver
+     */
+    protected function configureBroadcasting(): void
+    {
+        if (Innoclapps::hasBroadcastingConfigured()) {
+            $this->app['config']->set('broadcasting.default', 'pusher');
+        }
+    }
+
+  /**
+     * Configure the core updater.
+     */
+    protected function configureUpdater(): void
+    {
+        $this->app['config']->set('updater.optimize', OptimizeCommand::class);
+
+        $this->app['config']->set('updater.commands.post_update', [
+            ClearCacheCommand::class,
+            ClearUpdaterTmpPathCommand::class,
+            [
+                'class' => MigrateCommand::class,
+                'params' => ['--force' => true],
+            ],
+        ]);
+
+        $this->app['config']->set('updater.commands.finalize', [
+            ClearCacheCommand::class,
+            GenerateJsonLanguageFileCommand::class,
+        ]);
+    }
 }

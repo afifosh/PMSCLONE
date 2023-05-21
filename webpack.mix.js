@@ -132,6 +132,15 @@ mixAssetsDir('img/**/*.*', (src, dest) => mix.copy(src, dest));
 // laravel working crud app related js
 mix.js('resources/js/laravel-user-management.js', 'public/js/');
 
+mix.alias({
+  '@': path.join(__dirname, 'resources/js'),
+  '~': path.join(__dirname, 'Modules'),
+  vue: path.join(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js'),
+});
+
+/* Bind Vuejs */
+mix.js('resources/js/mail-client/mail-client.js', 'public/js/mail-client/').vue();
+
 mix.copy('node_modules/@fortawesome/fontawesome-free/webfonts/*', 'public/assets/vendor/fonts/fontawesome');
 mix.copy('node_modules/katex/dist/fonts/*', 'public/assets/vendor/libs/quill/fonts');
 

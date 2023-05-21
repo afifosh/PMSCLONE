@@ -4,7 +4,7 @@ return [
     /*
      * Model class to use for Meta.
      */
-    'model' => \App\Innoclapps\Models\Metable::class,
+    'model' => \Modules\Core\Models\Metable::class,
 
     /*
      * List of handlers for recognized data types.

@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Events\EmailAccountMessageCreated;
-use App\Innoclapps\OAuth\Events\OAuthAccountConnected;
 use App\Listeners\BouncedEmail;
 use App\Listeners\CreateEmailAccountViaOAuth;
 use App\Listeners\EmailDelivered;
@@ -32,9 +31,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
-        ],
-        OAuthAccountConnected::class => [
-            CreateEmailAccountViaOAuth::class,
         ],
         // EmailAccountMessageCreated::class => [
         //     CreateContactFromEmailAccountMessage::class,

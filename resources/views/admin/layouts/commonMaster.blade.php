@@ -23,6 +23,7 @@
 
   <!-- Include Scripts for customizer, helper, analytics, config -->
   @include('admin/layouts/sections/scriptsIncludes')
+  @yield('head')
 </head>
 
 <body style="overflow-x: hidden;"  class="{{ !empty($body_class) ? $body_class : '' }}">

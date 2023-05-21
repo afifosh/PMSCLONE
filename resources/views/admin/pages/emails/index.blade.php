@@ -55,7 +55,7 @@
   });
   @endif
   function populateFolders(account_id){
-    var url='{{url("/admin/mail/accounts/:accountId")}}';
+    var url='{{url("/admin/mailclient/api/mail/accounts/:accountId")}}';
     url=url.replace(':accountId',account_id);
     $.ajax({
         url: url,
@@ -75,7 +75,7 @@
             $('.email-list-item-input').show();
 
           }
-          var folders=response.account.folders;
+          var folders=response.folders;
           var html='';
           var isSync=false;
           for(var i=0; i<folders.length; i++){
@@ -117,7 +117,7 @@
     });
   }
   function populateMessages(account_id,folder_id,page){
-    var url='{{url("/admin/inbox/emails/:accountId/:folderId?page=")}}'+page;
+    var url='{{url("/admin/mailclient/api/inbox/emails/:accountId/:folderId?page=")}}'+page;
     url=url.replace(':accountId',account_id);
     url=url.replace(':folderId',folder_id);
     $("#mail-search").attr('data-account',account_id);
@@ -148,7 +148,7 @@
                   html+=`<span class="email-list-item-subject d-xl-inline-block d-block"> `+messages[i].subject+`</span>
                 </div>
                 <div class="email-list-item-meta ms-auto d-flex align-items-center" >`;
-                if(messages[i].attachments.length>0){
+                if(messages[i].attachments && messages[i].attachments.length>0){
                   html+=`<span class="email-list-item-attachment ti ti-paperclip ti-xs cursor-pointer me-2 float-end float-sm-none"></span>`
                 }
                 const messageDate = moment(messages[i].date);
@@ -194,7 +194,7 @@ if (messageDate.isSame(today, 'd')) {
   }
 
   function showMessage(folder_id,message_id){
-    var url='{{url("/admin/inbox/emails/folders/:folderId/:messageId}")}}';
+    var url='{{url("/admin/mailclient/api/inbox/emails/folders/:folderId/:messageId}")}}';
     url=url.replace(':folderId',folder_id);
     url=url.replace(':messageId',message_id);
 
@@ -219,7 +219,7 @@ if (messageDate.isSame(today, 'd')) {
     var term=$(elem).val();
     var account_id=$(elem).data('account');
     var folder_id=$(elem).data('folder');
-    var url='{{url("/admin/inbox/emails/:accountId/:folderId")}}?term='+term;
+    var url='{{url("/admin/mailclient/api/inbox/emails/:accountId/:folderId")}}?term='+term;
     url=url.replace(':accountId',account_id);
     url=url.replace(':folderId',folder_id);
     $(".folder-items").removeClass('active');

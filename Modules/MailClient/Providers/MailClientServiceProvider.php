@@ -65,10 +65,6 @@ class MailClientServiceProvider extends ServiceProvider
         $this->app['events']->listen(OAuthAccountDeleting::class, StopRelatedOAuthEmailAccounts::class);
         $this->app['events']->listen(TransferringUserData::class, TransferMailClientUserData::class);
 
-        $this->commands([
-            EmailAccountsSyncCommand::class,
-        ]);
-
         $this->app->booted(function () {
             Innoclapps::whenReadyForServing($this->bootModule(...));
         });
@@ -82,6 +78,9 @@ class MailClientServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+        $this->commands([
+            EmailAccountsSyncCommand::class,
+        ]);
     }
 
     /**
@@ -235,9 +234,9 @@ class MailClientServiceProvider extends ServiceProvider
     {
         $tab = Tab::make('emails', 'emails-tab')->panel('emails-tab-panel')->order(20);
 
-        ContactViewComponent::registerTab($tab);
-        CompanyViewComponent::registerTab($tab);
-        DealViewComponent::registerTab($tab);
+        // ContactViewComponent::registerTab($tab);
+        // CompanyViewComponent::registerTab($tab);
+        // DealViewComponent::registerTab($tab);
     }
 
     /**

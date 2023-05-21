@@ -176,11 +176,11 @@ class ActivityFields
                 ->exceptOnForms(fn () => ! app(ResourceRequest::class)->viaResource())
                 ->excludeFromSettings(),
 
-            Deals::make()
-                ->hideFromIndex()
-                ->excludeFromIndex()
-                ->exceptOnForms(fn () => ! app(ResourceRequest::class)->viaResource())
-                ->excludeFromSettings(),
+            // Deals::make()
+            //     ->hideFromIndex()
+            //     ->excludeFromIndex()
+            //     ->exceptOnForms(fn () => ! app(ResourceRequest::class)->viaResource())
+            //     ->excludeFromSettings(),
 
             DateTime::make('reminded_at', __('activities::activity.reminder_sent_date'))
                 ->strictlyForIndex()

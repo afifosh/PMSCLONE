@@ -52,7 +52,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapApiRoutes(): void
     {
         // Route::prefix(\Modules\Core\Application::API_PREFIX)
-        Route::prefix('admin/mailclient/api')
+        Route::prefix('api')
             ->middleware('web')
             ->namespace($this->moduleNamespace)
             ->group(module_path('MailClient', 'routes/api.php'));

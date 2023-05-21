@@ -102,7 +102,7 @@
   @if($accounts->count()>0)
             $('#send-email').on('click', function() {
               var account_id=$("#select-account").find(":selected").val();
-              var url="{{url('/admin/inbox/emails/:accountId')}}";
+              var url="{{url('/admin/mailclient/api/inbox/emails/:accountId')}}";
               url=url.replace(":accountId",account_id);
               var quill = new Quill('.email-editor');
               $("#message").val(quill.root.innerHTML);

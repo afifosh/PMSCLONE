@@ -54,7 +54,7 @@ class UpdateFinalizer
      */
     public function getCachedCurrentVersion(): string
     {
-        return settings('_version') ?: ($_SERVER['_VERSION'] ?? '1.0.7');
+        return settings('_version') ?: ($_SERVER['_VERSION'] ?? '1.1.9');
     }
 
     /**

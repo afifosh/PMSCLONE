@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use App\Innoclapps\Concerns\HasMeta;
-// use App\Innoclapps\Contracts\Metable;
 use Modules\Core\Concerns\HasMeta;
 use Modules\Core\Contracts\Metable;
 use App\Notifications\Admin\VerifyEmail;
@@ -26,8 +24,9 @@ use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasPermissions;
+use Modules\Core\Contracts\Localizeable;
 
-class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditable
+class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditable, Localizeable
 {
   use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs, HasPermissions;
   use \OwenIt\Auditing\Auditable;
@@ -69,6 +68,30 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
   protected $casts = [
     'email_verified_at' => 'datetime',
   ];
+
+  /**
+     * Get the user time format
+     */
+    public function getLocalTimeFormat(): string
+    {
+        return $this->time_format ? $this->time_format : 'H:i';
+    }
+
+    /**
+     * Get the user date format
+     */
+    public function getLocalDateFormat(): string
+    {
+        return $this->date_format ? $this->date_format : 'F j, Y';
+    }
+
+    /**
+     * Get the user timezone
+     */
+    public function getUserTimezone(): string
+    {
+        return $this->timezone ? $this->timezone : 'Asia/Karachi';
+    }
 
   /**
    * Get admin guard key
