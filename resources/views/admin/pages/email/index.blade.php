@@ -65,7 +65,7 @@
     @endforeach
 
     <script defer>
-      bootApplication();
+      // bootApplication();
         function bootApplication() {
             window.Innoclapps = CreateApplication(config, Innoclapps.bootingCallbacks)
             Innoclapps.start();

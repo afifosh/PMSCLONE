@@ -1,19 +1,59 @@
-// app.use(routes)
-// app.mount('#app')
+// import { createApp } from 'vue';
+// import ExampleComponent from './components/ExampleComponent.vue';
 
+// const app = createApp({});
+// app.component('example-component', ExampleComponent);
+// app.mount('#app');
+
+
+
+
+/**
+ * Concord CRM - https://www.concordcrm.com
+ *
+ * @version   1.1.9
+ *
+ * @link      Releases - https://www.concordcrm.com/releases
+ * @link      Terms Of Service - https://www.concordcrm.com/terms
+ *
+ * @copyright Copyright (c) 2022-2023 KONKORD DIGITAL
+ */
+// import 'unfonts.css'
+// import '../css/app.css'
 import get from 'lodash/get'
 import { createApp } from 'vue'
-// import registerComponents from '~/Core/resources/js/components'
+import registerComponents from '~/Core/resources/js/components'
 import registerFields from '~/Core/resources/js/fields'
-// import registerDirectives from '~/Core/resources/js/directives'
+import registerDirectives from '~/Core/resources/js/directives'
 import Broadcast from '~/Core/resources/js/services/Broadcast'
-// import VoIP from '~/Core/resources/js/services/VoIP'
+import VoIP from '~/Core/resources/js/services/VoIP'
 import i18n from '~/Core/resources/js/i18n'
 import store from '@/store'
-import HTTP from './composables/Core/services/HTTP'
+import HTTP from '~/Core/resources/js/services/HTTP'
 import mitt from 'mitt'
 import router from '@/router'
 import Mousetrap from 'mousetrap'
+
+import '~/Core/resources/js/element-prototypes'
+import '~/Core/resources/js/plugins'
+
+import '~/Core/resources/js/app.js'
+
+// import '~/Activities/resources/js/app.js'
+// import '~/Billable/resources/js/app.js'
+// import '~/Brands/resources/js/app.js'
+// import '~/Calls/resources/js/app.js'
+// import '~/Comments/resources/js/app.js'
+// import '~/Contacts/resources/js/app.js'
+import '~/Core/resources/js/app.js'
+// import '~/Deals/resources/js/app.js'
+// import '~/Documents/resources/js/app.js'
+import '~/MailClient/resources/js/app.js'
+// import '~/Notes/resources/js/app.js'
+// import '~/Translator/resources/js/app.js'
+// import '~/Users/resources/js/app.js'
+// import '~/WebForms/resources/js/app.js'
+// import '~/ThemeStyle/resources/js/app.js'
 
 window.CreateApplication = (config, callbacks = []) =>
   new Application(config).booting(callbacks)
@@ -122,23 +162,23 @@ export default class Application {
     bootApplicationConfig(this.appConfig)
 
     // Register component and directives
-    // registerDirectives(app)
-    // registerComponents(app)
+    registerDirectives(app)
+    registerComponents(app)
     registerFields(app)
 
     // Boot app
     this.boot(app, router)
 
     // Voip
-    // if (
-    //   this.appConfig.hasOwnProperty('voip') &&
-    //   this.appConfig.voip.client &&
-    //   app.config.globalProperties.$gate.userCan('use voip')
-    // ) {
-    //   const VoIPInstance = new VoIP(this.appConfig.voip.client)
-    //   app.config.globalProperties.$voip = VoIPInstance
-    //   app.component('CallComponent', VoIPInstance.callComponent)
-    // }
+    if (
+      this.appConfig.hasOwnProperty('voip') &&
+      this.appConfig.voip.client &&
+      app.config.globalProperties.$gate.userCan('use voip')
+    ) {
+      const VoIPInstance = new VoIP(this.appConfig.voip.client)
+      app.config.globalProperties.$voip = VoIPInstance
+      app.component('CallComponent', VoIPInstance.callComponent)
+    }
 
     // Handle router
     router.beforeEach((to, from, next) => beforeEachRoute(to, from, next, app))
