@@ -44,7 +44,7 @@ use App\Http\Controllers\Admin\OAuthEmailAccountController;
 use App\Http\Controllers\Admin\EmailAccount\EmailAccountSync;
 use App\Http\Controllers\Admin\EmailAccount\SharedEmailAccountController;
 use App\Http\Controllers\Admin\EmailAccount\EmailAccountMessagesController;
-use App\Http\Controllers\Admin\EmailAccount\EmailAccountController;
+use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use Modules\Core\Http\Controllers\ApplicationController;
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
@@ -90,8 +90,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
       // Route::post('{message}/reply', [EmailAccountMessagesController::class, 'reply']);
       // Route::post('{message}/forward', [EmailAccountMessagesController::class, 'forward']);
     // });
-    // Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class,'manageAccounts']);
-    // Route::resource('/mail/accounts', EmailAccountController::class);
+    Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class,'index'])->name('mail.accounts.manage');
+    Route::resource('/mail/accounts', EmailAccountController::class);
 
     // Route::prefix('inbox')->group(function () {
     //   Route::get('emails/folders/{folder_id}/{message}', [EmailAccountMessagesController::class, 'show']);

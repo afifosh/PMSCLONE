@@ -31,35 +31,37 @@ if (isFile == true) {
 }
 
     $.ajax({
-        url: url,
-        type: (isFile)?'POST':type,
-        data: optdata,
-        contentType: (isFile)?false:"application/x-www-form-urlencoded; charset=UTF-8",
-        processData : !isFile,
-        success: function (response, status) {
-            if (status == "success") {
-                toastr.success(response);
-            }
-            if(response.data!=undefined){
-                return response.data;
-            }
-            location.reload();
-        },
-        error : function(jqXHR, textStatus, errorThrown) {
-            onerror(jqXHR,textStatus,errorThrown,form);
-        },
-          beforeSend : function() {
-                $(form).find(".has-error").each(function () {
-                    $(this).find(".help-block").text("");
-                    $(this).removeClass("has-error");
-                });
-                $(form).find("#alert").html("");
-                    loadingButton(buttonSelector,form);
-            },
-
-            complete : function (jqXHR, textStatus) {
-                    unloadingButton(buttonSelector,form)
-            }
+      url: url,
+      type: isFile ? 'POST' : type,
+      data: optdata,
+      contentType: isFile ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
+      processData: !isFile,
+      success: function (response, status) {
+        if (status == 'success') {
+          toastr.success(response);
+        }
+        if (response.data != undefined) {
+          return response.data;
+        }
+        location.reload();
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        onerror(jqXHR, textStatus, errorThrown, form);
+        unloadingButton(buttonSelector, form);
+      },
+      beforeSend: function () {
+        $(form)
+          .find('.has-error')
+          .each(function () {
+            $(this).find('.help-block').text('');
+            $(this).removeClass('has-error');
+          });
+        $(form).find('#alert').html('');
+        loadingButton(buttonSelector, form);
+      },
+      complete: function (jqXHR, textStatus) {
+        unloadingButton(buttonSelector, form);
+      }
     });
 }
 function saveFoldersRecord(buttonSelector,type, url, formId, errorMesage) {
@@ -90,6 +92,9 @@ function saveFoldersRecord(buttonSelector,type, url, formId, errorMesage) {
 
     var object = formDataToJson(fd);
     object.folders = parent_folders;
+    if(form.find('#validate_cert').length && !form.find('#validate_cert').is(':checked')){
+        object.validate_cert = 0;
+    }
 
     $.ajax({
         url: url,
@@ -233,34 +238,27 @@ function handleFail(response,container) {
 function loadingButton(selector,form) {
     var button = $(form).find(selector);
 
-    var text = "Submitting...";
-
-    if (button.width() < 20) {
-        text = "...";
-    }
-
     if (!button.is("input")) {
-        button.attr("data-prev-text", button.html());
-        button.text(text);
-        button.prop("disabled", true);
+        button.addClass('disabled');
+        button.prepend('<span class="spinner-border me-1" role="status" aria-hidden="true"></span>');
     }
     else {
         button.attr("data-prev-text", button.val());
         button.val(text);
-        button.prop("disabled", true);
+        button.addClass("disabled");
     }
 }
 
 function unloadingButton(selector,form) {
+  console.log('form');
     var button = $(form).find(selector);
 
     if (!button.is("input")) {
-        button.html(button.attr("data-prev-text"));
-        button.prop("disabled", false);
+        button.removeClass("disabled");
+        button.find('.spinner-border').remove();
     }
     else {
-        button.val(button.attr("data-prev-text"));
-        button.prop("disabled", false);
+        button.removeClass("disabled");
     }
 }
 

@@ -160,6 +160,7 @@ class EmailAccountMessagesController extends ApiController
         $message->load(['account' => function ($query) {
             $query->withResponseRelations();
         }]);
+        return view('admin.pages.emails.view-email',compact('message'))->render();
 
         return $this->response((new EmailAccountMessageResource($message))->withActions(
             $message::resource()->resolveActions(

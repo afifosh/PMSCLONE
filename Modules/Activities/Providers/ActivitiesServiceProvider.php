@@ -132,25 +132,25 @@ class ActivitiesServiceProvider extends ServiceProvider
      */
     protected function scheduleTasks(): void
     {
-        $schedule = $this->app->make(Schedule::class);
+        // $schedule = $this->app->make(Schedule::class);
 
-        $schedule->call(function () {
-            (new SyncNextActivity)->__invoke();
-        })
-            ->name('sync-next-activity')
-            ->everyFiveMinutes()
-            ->withoutOverlapping(5);
+        // $schedule->call(function () {
+        //     (new SyncNextActivity)->__invoke();
+        // })
+        //     ->name('sync-next-activity')
+        //     ->everyFiveMinutes()
+        //     ->withoutOverlapping(5);
 
-        if (function_exists('proc_open') && function_exists('proc_close')) {
-            $schedule->command('activities:due-notifications')->everyMinute()->withoutOverlapping(5);
-        } else {
-            $schedule->call(function () {
-                Artisan::call('activities:due-notifications');
-            })
-                ->everyMinute()
-                ->name('notify-due-activities')
-                ->withoutOverlapping(5);
-        }
+        // if (function_exists('proc_open') && function_exists('proc_close')) {
+        //     $schedule->command('activities:due-notifications')->everyMinute()->withoutOverlapping(5);
+        // } else {
+        //     $schedule->call(function () {
+        //         Artisan::call('activities:due-notifications');
+        //     })
+        //         ->everyMinute()
+        //         ->name('notify-due-activities')
+        //         ->withoutOverlapping(5);
+        // }
     }
 
     /**

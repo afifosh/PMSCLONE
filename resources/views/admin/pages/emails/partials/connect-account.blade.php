@@ -104,7 +104,7 @@
         </div>
         <div class="mb-3">
         <div class="form-check">
-            <input name="validate_cert" class="form-check-input" type="checkbox" value="0" id="validate_cert">
+            <input name="validate_cert" class="form-check-input" type="checkbox" value="1" id="validate_cert">
             <label class="form-check-label" for="validate_cert">
             Allow non secure certificate.
             </label>

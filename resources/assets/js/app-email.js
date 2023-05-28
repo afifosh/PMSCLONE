@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
         Helpers._toggleClass(document.querySelector('.email-compose-cc'), 'd-block', 'd-none');
       });
     }
-
+    if(emailCompose)
     // Empty compose email message inputs when modal is hidden
     emailCompose.addEventListener('hidden.bs.modal', event => {
       document.querySelector('.email-editor .ql-editor').innerHTML = '';

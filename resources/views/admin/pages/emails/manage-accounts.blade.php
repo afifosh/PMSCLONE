@@ -95,7 +95,7 @@ $configData = Helper::appClasses();
             </td>
             <td>
             @can('Shared Mailbox')
-            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
+            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary">Connect Shared Account</button>
             @endcan
           </td>
             <td>
@@ -148,7 +148,7 @@ $configData = Helper::appClasses();
 
                 <a href="javascript:ajaxCanvas('{{url('/admin/mailclient/api/mail/accounts/'.$account->id.'/edit')}}','edit-account-modal');" class="dropdown-item">Edit</a>
                 @if(auth()->user()->hasPermission(['Owner','Editor'],$account))
-                <a href="javascript:deleteRecord('delete','{{url('/admin/mailclient/api/mail/accounts/'.$account->id.'/delete')}}','');" class="dropdown-item">Delete</a>
+                <a href="javascript:deleteRecord('delete','{{url('/admin/mailclient/api/mail/accounts/'.$account->id)}}','');" class="dropdown-item">Delete</a>
                 @endif
               </div>
               @endif

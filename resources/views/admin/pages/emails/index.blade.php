@@ -174,7 +174,7 @@ if (messageDate.isSame(today, 'd')) {
           }
         }
            $('#email-list').html(html);
-           $('#records-counter').html((response.from==null?0:response.from)+ "-"+ (response.to==null?0:response.to) +" of "+ response.total);
+           $('#records-counter').html((response.meta.from==null?0:response.meta.from)+ "-"+ (response.meta.to==null?0:response.meta.to) +" of "+ response.meta.total);
            if(page>1)
            $('#prev-page').attr("href", "javascript:populateMessages("+account_id+","+folder_id+","+(page-1)+")");
           if(page<response.last_page)
@@ -324,7 +324,7 @@ if (messageDate.isSame(today, 'd')) {
 <script>
 const fileInput = document.getElementById('file-input');
 const selectedImagesContainer = document.getElementById('selected-images');
-
+if(fileInput)
 fileInput.addEventListener('change', (event) => {
   // Remove all existing tags and cross signs from the container
   selectedImagesContainer.innerHTML = '';
@@ -504,7 +504,7 @@ input.each(function(){
     <div class="modal-dialog m-0 me-md-4 mb-4 modal-lg">
       <div class="modal-content p-0">
         <div class="modal-header py-3 bg-body">
-          <h5 class="modal-title fs-5">Compose Mail</h5>
+          <h5 class="modal-title fs-5">Compose Mailll</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body flex-grow-1 pb-sm-0 p-4 py-2">
@@ -674,7 +674,7 @@ Connect via IMAP, your Gmail or Outlook account.
       </div>
       <div class="d-flex justify-content-center flex-wrap gap-4 mt-2">
       @can('Shared Mailbox')
-        <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary" data-toggle="ajax-modal">Connect Shared Account</button>
+        <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary">Connect Shared Account</button>
        @endcan
         @can('Personal Mailbox')
         <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser" onclick="localStorage.setItem('acc_type','personal');" class="btn btn-primary">Connect Personal Account</button>

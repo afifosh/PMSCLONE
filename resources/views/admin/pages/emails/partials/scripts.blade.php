@@ -1,15 +1,14 @@
-<script src="{{asset('assets/js/custom/company-profile-page.js')}}"></script>
 <script>
     $('#connection_type').on('change',function(){
         if($(this).find(':selected').val()==='Imap'){
             $("#imap-area").css("filter","none");
-            $('#save-account').prop('disabled',true);
+            $('#save-account').addClass('disabled');
             $('#test-connection').show();
         }
         else{
             $("#imap-area").css("filter","blur(4px)");
             $('#test-connection').attr('style', 'display: none !important');
-            $('#save-account').prop('disabled',false);
+            $('#save-account').removeClass('disabled');
 
         }
     });
@@ -33,6 +32,9 @@
 
     $("#test-connection").on('click',function(){
       $("#errors").hide();
+      var current = $(this);
+      current.addClass('disabled');
+      current.prepend('<span class="spinner-border me-1" role="status" aria-hidden="true"></span>');
       var data=$("#add-mail-account").serialize();
       $.ajax({
       url:'{{url('/admin/mailclient/api/mail/accounts/connection')}}',
@@ -62,7 +64,7 @@
          html+="</div>";
         }
         $("#test-connection").hide();
-        $("#save-account").prop('disabled',false);
+        $("#save-account").removeClass('disabled');
         }
 
           $('#folders-area').html(html);
@@ -71,7 +73,11 @@
       error : function(jqXHR, textStatus, errorThrown) {
        var form=document.getElementById("add-mail-account");
             onerror(jqXHR,textStatus,errorThrown,form);
-        },
+      },
+      complete: function() {
+        current.removeClass('disabled');
+        current.find('.spinner-border').remove();
+      }
     })
 
     });

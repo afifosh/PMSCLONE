@@ -25,6 +25,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasPermissions;
 use Modules\Core\Contracts\Localizeable;
+use Modules\MailClient\Models\EmailAccount;
 
 class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditable, Localizeable
 {
