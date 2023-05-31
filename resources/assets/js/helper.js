@@ -1,69 +1,117 @@
-function saveRecord(buttonSelector,type, url, formId, errorMesage) {
-    var form = document.getElementById(formId);
-    var fileInput = document.getElementById('file-input');
-    var data = new FormData(form);
-    var isFile=false;
-    if(fileInput!=null)
-    {
-        isFile=true;
-    // data.append('file', fileInput.files);
-}
-var optdata=$(form).serialize();
-$.each($('#'+formId+' input[type=checkbox]')
-    .filter(function(idx){
-        return $(this).prop('checked') === false
-    }),
-    function(idx, el){
-        // attach matched element names to the formData with a chosen value.
-        optdata += '&' + $(el).attr('name') + '=' + 0;
-    }
-);
-if (isFile == true) {
-    var data = new FormData(form);
-//     var keys = Object.keys(optdata);
-
-//     for(var i=0; i<keys.length;i++) {
-//         data.append(keys[i], optdata[keys[i]]);
+// function saveRecord(buttonSelector,type, url, formId, errorMesage) {
+//     var form = document.getElementById(formId);
+//     var fileInput = document.getElementById('file-input');
+//     var data = new FormData(form);
+//     var isFile=false;
+//     if(fileInput!=null)
+//     {
+//         isFile=true;
+//     // data.append('file', fileInput.files);
+// }
+// var optdata=$(form).serialize();
+// $.each($('#'+formId+' input[type=checkbox]')
+//     .filter(function(idx){
+//         return $(this).prop('checked') === false
+//     }),
+//     function(idx, el){
+//         // attach matched element names to the formData with a chosen value.
+//         optdata += '&' + $(el).attr('name') + '=' + 0;
 //     }
-//  data.append('file[]', fileInput.files);
- data.append('_method', type);
-    optdata = data;
+// );
+// if (isFile == true) {
+//     var data = new FormData(form);
+// //     var keys = Object.keys(optdata);
+
+// //     for(var i=0; i<keys.length;i++) {
+// //         data.append(keys[i], optdata[keys[i]]);
+// //     }
+// //  data.append('file[]', fileInput.files);
+//  data.append('_method', type);
+//     optdata = data;
+// }
+
+// console.log(optdata);
+
+//     $.ajax({
+//       url: url,
+//       type: isFile ? 'POST' : type,
+//       data: optdata,
+//       contentType: isFile ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
+//       processData: !isFile,
+//       success: function (response, status) {
+//         if (status == 'success') {
+//           toastr.success(response);
+//         }
+//         if (response.data != undefined) {
+//           return response.data;
+//         }
+//         location.reload();
+//       },
+//       error: function (jqXHR, textStatus, errorThrown) {
+//         onerror(jqXHR, textStatus, errorThrown, form);
+//         unloadingButton(buttonSelector, form);
+//       },
+//       beforeSend: function () {
+//         $(form)
+//           .find('.has-error')
+//           .each(function () {
+//             $(this).find('.help-block').text('');
+//             $(this).removeClass('has-error');
+//           });
+//         $(form).find('#alert').html('');
+//         loadingButton(buttonSelector, form);
+//       },
+//       complete: function (jqXHR, textStatus) {
+//         unloadingButton(buttonSelector, form);
+//       }
+//     });
+// }
+
+function saveRecord(buttonSelector,type, url, formId, errorMesage) {
+  var form = document.getElementById(formId);
+  var formData = $('#'+formId).serializeArray();
+console.log(formData);
+  // Convert form data to JSON object
+  var jsonObject = {};
+  $.each(formData, function(index, field){
+    jsonObject[field.name] = field.value;
+  });
+  console.log(jsonObject);
+  $.ajax({
+    url: url,
+    type: type,
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify(jsonObject),
+    success: function (response, status) {
+      if (status == 'success') {
+        toastr.success(response);
+      }
+      if (response.data != undefined) {
+        return response.data;
+      }
+      location.reload();
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      onerror(jqXHR, textStatus, errorThrown, form);
+      unloadingButton(buttonSelector, form);
+    },
+    beforeSend: function () {
+      $(form)
+        .find('.has-error')
+        .each(function () {
+          $(this).find('.help-block').text('');
+          $(this).removeClass('has-error');
+        });
+      $(form).find('#alert').html('');
+      loadingButton(buttonSelector, form);
+    },
+    complete: function (jqXHR, textStatus) {
+      unloadingButton(buttonSelector, form);
+    }
+  });
 }
 
-    $.ajax({
-      url: url,
-      type: isFile ? 'POST' : type,
-      data: optdata,
-      contentType: isFile ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
-      processData: !isFile,
-      success: function (response, status) {
-        if (status == 'success') {
-          toastr.success(response);
-        }
-        if (response.data != undefined) {
-          return response.data;
-        }
-        location.reload();
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        onerror(jqXHR, textStatus, errorThrown, form);
-        unloadingButton(buttonSelector, form);
-      },
-      beforeSend: function () {
-        $(form)
-          .find('.has-error')
-          .each(function () {
-            $(this).find('.help-block').text('');
-            $(this).removeClass('has-error');
-          });
-        $(form).find('#alert').html('');
-        loadingButton(buttonSelector, form);
-      },
-      complete: function (jqXHR, textStatus) {
-        unloadingButton(buttonSelector, form);
-      }
-    });
-}
 function saveFoldersRecord(buttonSelector,type, url, formId, errorMesage) {
     var form = $('#'+formId);
     var fd = new FormData(form[0]);

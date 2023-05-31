@@ -58,7 +58,8 @@ use Modules\Core\Http\Controllers\Api\ZapierHookController;
 Route::post('/voip/events', [VoIPController::class, 'events'])->name('voip.events');
 Route::post('/voip/call', [VoIPController::class, 'newCall'])->name('voip.call');
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
+  Route::middleware('auth:admin')->group(function () {
     Route::post('/zapier/hooks/{resourceName}/{action}', [ZapierHookController::class, 'store']);
     Route::delete('/zapier/hooks/{hookId}', [ZapierHookController::class, 'destroy']);
 

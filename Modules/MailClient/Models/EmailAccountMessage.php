@@ -374,7 +374,8 @@ class EmailAccountMessage extends Model implements Presentable
      */
     public function purge(): void
     {
-        foreach (['deals', 'contacts', 'companies', 'folders'] as $relation) {
+        // foreach (['deals', 'contacts', 'companies', 'folders'] as $relation) {
+        foreach (['contacts', 'folders'] as $relation) {
             tap($this->{$relation}(), function ($query) {
                 if ($query->getModel()->usesSoftDeletes()) {
                     $query->withTrashed();

@@ -255,34 +255,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Refresh Mails
 
-    if (refreshEmails && emailList) {
-      let emailListJq = $('.email-list'),
-        emailListInstance = new PerfectScrollbar(emailList, {
-          wheelPropagation: false,
-          suppressScrollX: true
-        });
-      // ? Using jquery vars due to BlockUI jQuery dependency
-      refreshEmails.addEventListener('click', e => {
-        emailListJq.block({
-          message: '<div class="spinner-border text-primary" role="status"></div>',
-          timeout: 1000,
-          css: {
-            backgroundColor: 'transparent',
-            border: '0'
-          },
-          overlayCSS: {
-            backgroundColor: '#000',
-            opacity: 0.1
-          },
-          onBlock: function () {
-            emailListInstance.settings.suppressScrollY = true;
-          },
-          onUnblock: function () {
-            emailListInstance.settings.suppressScrollY = false;
-          }
-        });
-      });
-    }
+    // if (refreshEmails && emailList) {
+    //   let emailListJq = $('.email-list'),
+    //     emailListInstance = new PerfectScrollbar(emailList, {
+    //       wheelPropagation: false,
+    //       suppressScrollX: true
+    //     });
+    //   // ? Using jquery vars due to BlockUI jQuery dependency
+    //   refreshEmails.addEventListener('click', e => {
+    //     emailListJq.block({
+    //       message: '<div class="spinner-border text-primary" role="status"></div>',
+    //       timeout: 1000,
+    //       css: {
+    //         backgroundColor: 'transparent',
+    //         border: '0'
+    //       },
+    //       overlayCSS: {
+    //         backgroundColor: '#000',
+    //         opacity: 0.1
+    //       },
+    //       onBlock: function () {
+    //         emailListInstance.settings.suppressScrollY = true;
+    //       },
+    //       onUnblock: function () {
+    //         emailListInstance.settings.suppressScrollY = false;
+    //       }
+    //     });
+    //   });
+    // }
 
     // Earlier msgs
     // ? Using jquery vars due to jQuery animation (slideToggle) dependency

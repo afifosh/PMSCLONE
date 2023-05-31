@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('approval_status')->default(0)->comment('0:pending info, 1:approved, 2: ready for Approval, 3: need to be updated');
             $table->integer('approval_level')->default(0);
             $table->enum('source', ['Self Enrolled', 'Self Registered'])->default('Self Enrolled');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
     }

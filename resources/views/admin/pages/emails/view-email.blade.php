@@ -38,12 +38,12 @@
         <div class="d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
          @if(auth()->user()->hasPermission(['Owner','Editor'],$message->account))
-          <i class='ti ti-trash cursor-pointer me-3' onclick="deleteRecord('delete', '{{url('admin/mailclient/api/emails/'.$message->id.'')}}', 'Message deleted successfully.')"></i>
+          <i class='ti ti-trash cursor-pointer me-3' onclick="bulkAction('delete', '{{$message->id}}');"></i>
            @endif
          @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$message->account))
             @if($message->is_read)
                <form id="markUnread2">
-                  <i onclick="saveRecord(this,'POST','{{url('/admin/mailclient/api/emails/'.$message->id.'/unread')}}','markUnread2','Please try again');" class="ti ti-mail cursor-pointer me-3"></i>
+                  <i onclick="bulkAction('unread', '{{$message->id}}');" class="ti ti-mail cursor-pointer me-3"></i>
                </form>
         @else
       <form id="markRead2">
@@ -192,7 +192,8 @@
         $('#reply-email').attr('data-id',message.id);
           $("#subject").val("RE: "+message.subject);
           if(message.reply_to!=undefined){
-         $("#to").val((message.reply_to.length==0?message.from.address:message.reply_to[0].address));
+            console.log(message.reply_to);
+         $("#to").val(JSON.stringify(message.reply_to)).trigger('change');
           }
           else{
          $("#to").val(message.from.address);

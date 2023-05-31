@@ -1,4 +1,24 @@
+<script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 <script>
+  $(document).ajaxStart(function () {
+    $('.app-email').block({
+        message:
+          '<div class="ms-5 sk-fold sk-primary"><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div></div><h5>LOADING...</h5>',
+
+        css: {
+          backgroundColor: 'transparent',
+          border: '0'
+        },
+        overlayCSS: {
+          backgroundColor: $('html').hasClass('dark-style') ? '#000' : '#fff',
+          opacity: 0.55
+        }
+      });
+    });
+    $(document).ajaxComplete(function (event, request, set) {
+      $('.app-email').unblock();
+    });
+
     $('#connection_type').on('change',function(){
         if($(this).find(':selected').val()==='Imap'){
             $("#imap-area").css("filter","none");
@@ -144,6 +164,9 @@
       method:'GET',
       success:function(response){
         toastr.success(response);
+      },
+      error:function(response){
+        toastr.error(response.responseJSON.message);
       }
     })
 
