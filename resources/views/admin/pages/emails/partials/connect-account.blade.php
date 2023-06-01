@@ -16,7 +16,7 @@
           </select>
         </div>
       <div class="mb-3">
-      <label class="form-label d-block" for="initial_sync_from">Sync emails from</label>
+      <label class="form-label d-block">Sync emails from</label>
         <div class="form-check form-check-inline">
             <input class="form-check-input initial_sync_from" checked type="radio" name="initial_sync_from" id="initial_sync_from1" value="{{date('Y-m-d H:i:s')}}">
             <label class="form-check-label" for="initial_sync_from1">Now</label>

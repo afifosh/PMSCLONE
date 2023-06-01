@@ -25,6 +25,7 @@ trait LogsPivotEvents
      */
     protected static function shouldLogPivotEvents($relationName)
     {
+      return false;
         return property_exists(static::class, 'logPivotEventsOn')
             && isset(static::$logPivotEventsOn[$relationName]);
     }

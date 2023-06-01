@@ -1,6 +1,7 @@
 <script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 <script>
   $(document).ajaxStart(function () {
+    if(!($('.modal:visible').length > 0))
     $('.app-email').block({
         message:
           '<div class="ms-5 sk-fold sk-primary"><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div></div><h5>LOADING...</h5>',

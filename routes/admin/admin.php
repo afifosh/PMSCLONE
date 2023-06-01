@@ -57,8 +57,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
   //  Route::put('{account}/update', [EmailAccountController::class, 'update']);
   //  Route::delete('{account}/delete', [EmailAccountController::class, 'destroy']);
   //  Route::get('unread', [EmailAccountController::class, 'unread']);
-  //  Route::get('{account}/share', [EmailAccountController::class, 'share']);
-  //  Route::post('{account}/setPermission', [EmailAccountController::class, 'setPermission']);
+   Route::get('{account}/share', [EmailAccountController::class, 'share']);
+   Route::post('{account}/setPermission', [EmailAccountController::class, 'setPermission']);
 
    // The GET route for all shared accounts
   //  Route::get('shared', SharedEmailAccountController::class)->middleware('permission:access shared inbox');

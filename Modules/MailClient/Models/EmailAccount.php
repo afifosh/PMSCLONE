@@ -35,6 +35,9 @@ use Modules\MailClient\Database\Factories\EmailAccountFactory;
 use Modules\MailClient\Enums\EmailAccountType;
 // use Modules\Users\Models\User;
 use App\Models\Admin as User;
+use App\Models\Admin;
+use Modules\Core\Models\Permission;
+
 class EmailAccount extends Model implements Metable, Primaryable
 {
     use HasMeta,
@@ -164,6 +167,17 @@ class EmailAccount extends Model implements Metable, Primaryable
         return Attribute::get(function ($value) {
             return is_null($this->oAuthAccount) ? (bool) $value : $this->oAuthAccount->requires_auth;
         });
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(Admin::class, 'user_email_accounts', 'email_account_id', 'user_id')
+        ->withPivot('permission_id');
+    }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'user_email_accounts');
     }
 
     /**

@@ -160,8 +160,8 @@ class ContactsServiceProvider extends ServiceProvider
     public function registerWorkflowTriggers(): void
     {
         Workflows::triggers([
-            \Modules\Contacts\Workflow\Triggers\CompanyCreated::class,
-            \Modules\Contacts\Workflow\Triggers\ContactCreated::class,
+            // \Modules\Contacts\Workflow\Triggers\CompanyCreated::class,
+            // \Modules\Contacts\Workflow\Triggers\ContactCreated::class,
         ]);
     }
 

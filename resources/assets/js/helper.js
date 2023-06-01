@@ -72,8 +72,23 @@ function saveRecord(buttonSelector,type, url, formId, errorMesage) {
   var formData = $('#'+formId).serializeArray();
 console.log(formData);
   // Convert form data to JSON object
-  var jsonObject = {};
+  var jsonObject = {
+    to: [],
+    cc: [],
+    bcc: [],
+    associations : {
+      companies: [],
+      contacts: []
+    }
+  };
   $.each(formData, function(index, field){
+    if(field.name == 'to[]')
+      jsonObject.to.push({address: field.value});
+    else if(field.name == 'cc[]')
+      jsonObject.cc.push({address: field.value});
+    else if(field.name == 'bcc[]')
+      jsonObject.bcc.push({address: field.value});
+    else
     jsonObject[field.name] = field.value;
   });
   console.log(jsonObject);
@@ -367,32 +382,41 @@ function loadView(url, divId) {
 
 }
 function deleteRecord(type, url, text) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: text,
-        type: "warning",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-        confirmButtonClass: "btn btn-primary",
-        buttonsStyling: !1
-    }).then(
-        function (t) {
-            $.ajax({
-                url: url,
-                type: type,
-                success: function (response, status) {
-                    if (status == "success") {
-                        toastr.success(response);
-                    }
-                    location.reload();
-                },
-                error: function (response) {
-                    var message = "";
-                    if
-                        (response.responseJSON.message == undefined) { message = errorMesage }
-                    else { message = response.responseJSON.message }
-                    toastr.error(message);
-                }
-            });
-        });
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Are you sure you want to delete?',
+    confirmButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    customClass: {
+      confirmButton: 'btn btn-primary me-3',
+      cancelButton: 'btn btn-label-secondary'
+    },
+    buttonsStyling: false,
+    showLoaderOnConfirm: true
+  }).then(function (result) {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: url,
+        type: type,
+        success: function (response, status) {
+          if (status == 'success') {
+            toastr.success(response);
+          }
+          location.reload();
+        },
+        error: function (response) {
+          var message = '';
+          if (response.responseJSON.message == undefined) {
+            message = errorMesage;
+          } else {
+            message = response.responseJSON.message;
+          }
+          toastr.error(message);
+        }
+      });
+    }
+  });
 }

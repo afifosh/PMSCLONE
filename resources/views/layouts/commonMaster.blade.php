@@ -25,15 +25,14 @@
 
   <!-- Include Scripts for customizer, helper, analytics, config -->
   @include('layouts/sections/scriptsIncludes')
-</head>
-
-<body>
   <style>
     div.dataTables_scrollBody.dropdown-visible {
     overflow: visible !important;
   }
   </style>
+</head>
 
+<body>
 
   <!-- Layout Content -->
   @yield('layoutContent')

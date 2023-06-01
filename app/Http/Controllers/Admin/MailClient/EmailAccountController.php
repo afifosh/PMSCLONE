@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin\MailClient;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
+use App\Models\Module;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\MailClient\Http\Requests\EmailAccountRequest;
@@ -47,59 +49,48 @@ class EmailAccountController extends Controller
     return view('admin.pages.emails.partials.edit-account', compact('account'))->render();
   }
 
-  /**
-   * Store a newly created email account in storage.
-   */
-  public function store(EmailAccountRequest $request, EmailAccountService $service): JsonResponse
-  {
-    $model = $service->create($request->all());
 
-    $account = EmailAccount::withResponseRelations()->find($model->id);
 
-    $account->wasRecentlyCreated = true;
 
-    return $this->response(
-      new EmailAccountResource($account),
-      201
-    );
-  }
+    private function getAccount($id){
+       return EmailAccount::withResponseRelations()->findOrFail($id);
+    }
 
-  /**
-   * Update the specified account in storage.
-   */
-  public function update(string $id, EmailAccountRequest $request, EmailAccountService $service): JsonResponse
-  {
-    $this->authorize('update', $account = EmailAccount::find($id));
+    public function share($id)
+    {
+         $users=Admin::where('id', '!=', auth()->user()->id)->get();
+         $module = Module::where('name','=','Mailbox')->whereHas('permissions', function ($q) {
+            $q->where('guard_name', 'admin');
+          })->with('permissions')->first();
+         $account = $this->getAccount($id);
+         return view('admin.pages.emails.partials.shared-account-access',compact('account','users','module'))->render();
+    }
 
-    // The user is not allowed to update these fields after creation
-    $except = ['email', 'connection_type', 'user_id', 'initial_sync_from'];
+    public function setPermission($id, Request $request){
+            $this->createPermission($id,$request);
+            return response(
+            "Permission successfully saved."
+        );
+    }
 
-    $service->update($account, $request->except($except));
+    private function createPermission($id,$request){
+        // $module = Module::where('name','=','Mailbox')->whereHas('permissions', function ($q) {
+        //     $q->where('guard_name', 'admin');
+        //   })->with('permissions')->first();
+        $user=Admin::find($request->user_id);
+        if($request->permission_id!=0){
+            $user->emailAccounts()->syncWithoutDetaching([
+                $id=>[
+                    'permission_id'=>$request->permission_id
+                ]
+            ]);
+        }
+        else{
+            $user->emailAccounts()->detach([
+                $id
+            ]);
 
-    return $this->response(
-      new EmailAccountResource(EmailAccount::withResponseRelations()->find($account->id))
-    );
-  }
+        }
+        }
 
-  /**
-   * Remove the specified account from storage.
-   */
-  public function destroy(string $id, Request $request): JsonResponse
-  {
-    $this->authorize('delete', $account = EmailAccount::findOrFail($id));
-
-    $account->delete();
-
-    return $this->response([
-      'unread_count' => EmailAccount::countUnreadMessagesForUser($request->user()),
-    ]);
-  }
-
-  /**
-   * Get all shared accounts unread messages.
-   */
-  public function unread(Request $request): int
-  {
-    return EmailAccount::countUnreadMessagesForUser($request->user());
-  }
 }

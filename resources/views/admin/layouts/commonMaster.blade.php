@@ -24,14 +24,14 @@
   <!-- Include Scripts for customizer, helper, analytics, config -->
   @include('admin/layouts/sections/scriptsIncludes')
   @yield('head')
-</head>
-
-<body style="overflow-x: hidden;"  class="{{ !empty($body_class) ? $body_class : '' }}">
   <style>
     div.dataTables_scrollBody.dropdown-visible {
     overflow: visible !important;
   }
   </style>
+</head>
+
+<body style="overflow-x: hidden;"  class="{{ !empty($body_class) ? $body_class : '' }}">
 
   <!-- Layout Content -->
   @yield('layoutContent')

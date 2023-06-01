@@ -5,7 +5,6 @@
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/katex.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/quill/editor.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-email.css')}}" />
@@ -23,15 +22,16 @@
     max-height: 300px;
     overflow: auto;
   }
+  .form-check {
+    display: none;
+  }
+  .st0{fill:#FFFFFF;}
 </style>
 @endsection
 
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/quill/katex.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/quill/quill.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/tagify/tagify.js')}}"></script>
@@ -107,6 +107,7 @@
 
         }
         $('#folders').html(html);
+        updateFoldersModel(folders);
         populateMessages(account_id, active_folder_id ? active_folder_id : folders[0].id, 1);
       },
       error: function (response) {
@@ -117,6 +118,20 @@
         toastr.error(message);
       }
     });
+  }
+  function updateFoldersModel(folders)
+  {
+    $('#move_to_folder').empty();
+    for (var i = 0; i < folders.length; i++) {
+      if (folders[i].syncable)
+      $('#move_to_folder').append('<option value="' + folders[i].id + '">' + folders[i].display_name + '</option>');
+    }
+    if(!$('#move_to_folder').hasClass('select2-hidden-accessible')) {
+      $('#move_to_folder').select2({
+        dropdownParent: "#move-messages-modal",
+      });
+    }
+    $('#move_to_folder').trigger('change');
   }
   function populateMessages(account_id, folder_id, page) {
     var url = '{{url("/admin/mailclient/api/inbox/emails/:accountId/:folderId?page=")}}' + page;
@@ -208,6 +223,7 @@
       success: function (response, status) {
         $('#app-email-view').html(response);
         $('#app-email-view').addClass("show");
+        $('.stp').tooltip();
         initLocSelect2();
         populateFolders(window.active_account_id, window.active_folder_id);
       },
@@ -220,6 +236,9 @@
       }
     });
   }
+  $(document).ready(function () {
+    initLocSelect2();
+  });
   function initLocSelect2(){
     $('.locSelect2').select2({
       dropdownParent: "#emailComposeSidebar",
@@ -229,19 +248,11 @@
         var email = $.trim(params.term);
         if (isValidEmail(email)) {
           return {
-            id: JSON.stringify({ address: email, name: null }),
-            text: email,
-            isNew: true
+            id: email,
+            text: email
           };
         }
         return null; // Return null to prevent creating the tag
-      },
-      templateSelection: function (option) {
-        if (option.id) {
-          var data = JSON.parse(option.id);
-          return data.address;
-        }
-        return option.text;
       }
     });
   }
@@ -316,9 +327,11 @@
         return $(ele).data('id');
       }).get();
     }
-    if (action == 'unread') {
+    if (action == 'unread' || action == 'read') {
+      var unread_url = "{{url('admin/core/api/emails/actions/email-account-message-mark-as-unread/run')}}";
+      var read_url = "{{url('admin/core/api/emails/actions/email-account-message-mark-as-read/run')}}";
       $.ajax({
-        url: "{{url('admin/core/api/emails/actions/email-account-message-mark-as-unread/run')}}",
+        url: action == 'unread' ? unread_url : read_url,
         type: "Post",
         data: {
           account_id: window.active_account_id,
@@ -326,7 +339,8 @@
           ids: ids
         },
         success: function (response, status) {
-          toastr.success('Messages marked as unread');
+          toastr.success('Marked as ' + action);
+          populateFolders(window.active_account_id, window.active_folder_id);
           populateMessages(window.active_account_id, window.active_folder_id, 1);
         },
         error: function (response) {
@@ -364,6 +378,7 @@
               ids: ids
             },
             success: function (response, status) {
+              populateFolders(window.active_account_id, window.active_folder_id);
               populateMessages(window.active_account_id, window.active_folder_id, 1);
               $('#app-email-view').removeClass('show');
               toastr.success('Messages deleted successfully');
@@ -380,6 +395,50 @@
         }
       })
     }
+  }
+  function showMoveMessagesModal(id = null){
+    var elements = $('.email-list-item-input:checked');
+    if (elements.length == 0 && id == null) {
+      alert('No item selected');
+      return;
+    }
+    var ids = id ? [id] : elements.map(function (idx, ele) {
+      return $(ele).data('id');
+    }).get();
+    $('#move-messages-modal').modal('show');
+    $('#move-messages-modal').find('#move-messages-submit').attr('onclick', 'moveMessagesSubmit('+JSON.stringify(ids)+')');
+  }
+
+  function moveMessagesSubmit(ids){
+    if($('#move_to_folder').val() == ''){
+      toastr.error('Please select a folder');
+      return;
+    }
+    $('#move-messages-modal').modal('hide');
+    $.ajax({
+      type: "POST",
+      url: "{{url('admin/core/api/emails/actions/email-account-message-move/run')}}",
+      data: {
+        account_id: window.active_account_id,
+        folder_id: window.active_folder_id,
+        ids: ids,
+        move_to_folder_id: $('#move_to_folder').val()
+      },
+      success: function (response) {
+        populateFolders(window.active_account_id, window.active_folder_id);
+        populateMessages(window.active_account_id, window.active_folder_id, 1);
+        $('#app-email-view').removeClass('show');
+        toastr.success('Moved successfully');
+      },
+      error: function (response) {
+        var message = "";
+        if
+          (response.responseJSON.message == undefined) { message = errorMesage }
+        else { message = response.responseJSON.message }
+        toastr.error(message);
+        return true;
+      }
+    });
   }
 </script>
 <script>
@@ -517,17 +576,14 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
                 <label class="form-check-label" for="email-select-all"></label>
               </div>
               @else
-              <style>
-                .form-check {
-                  display: none;
-                }
-              </style>
               @endif
               @if(auth()->user()->hasPermission(['Owner','Editor'],$account))
-              <i class="ti ti-trash email-list-delete cursor-pointer me-2" onclick="bulkAction('delete');"></i>
+              <i class="ti ti-trash email-list-delete cursor-pointer me-2" onclick="bulkAction('delete');" data-bs-toggle="tooltip" title="Delete Selected"></i>
               @endif
               @if(auth()->user()->hasPermission(['Owner','Editor','Contributor'],$account))
-              <i class="ti ti-mail-opened email-list-read cursor-pointer me-2" onclick="bulkAction('unread');"></i>
+              <i class="menu-icon ti fa-lg ti-mail cursor-pointer me-2" onclick="bulkAction('unread');" data-bs-toggle="tooltip" title="Mark As Unread"></i>
+              <i class="ti ti-mail-opened cursor-pointer me-2" onclick="bulkAction('read');" data-bs-toggle="tooltip" title="Mark As Read"></i>
+              <i class="fa fa-lg fa-retweet cursor-pointer me-2" onclick="showMoveMessagesModal();" data-bs-toggle="tooltip" title="Move To"></i>
               @endif
             </div>
             <div
@@ -540,7 +596,7 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
         </div>
         <hr class="container-m-nx m-0">
         <!-- Email List: Items -->
-        <div style="overflow-y: auto !important;" class="email-list pt-0">
+        <div class="email-list pt-0">
           <ul id="email-list" class="list-unstyled m-0">
 
           </ul>
@@ -578,7 +634,7 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
     <div class="modal-dialog m-0 me-md-4 mb-4 modal-lg">
       <div class="modal-content p-0">
         <div class="modal-header py-3 bg-body">
-          <h5 class="modal-title fs-5">Compose Mai</h5>
+          <h5 class="modal-title fs-5">Compose Mail</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body flex-grow-1 pb-sm-0 p-4 py-2">
@@ -773,7 +829,6 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
             </li>
           </ul>
         </div>
-
       </div>
       <div class="d-flex justify-content-center flex-wrap gap-4 mt-2">
         @can('Shared Mailbox')
@@ -788,15 +843,6 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
       </div>
     </div>
   </div>
-
-
-
-
-
-
-
-
-
 </div>
 @else
 <div class="col-md-12 mb-4">
@@ -812,8 +858,34 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
 @include('admin.pages.emails.partials.connect-account')
 <!-- Offcanvas to add new user -->
 <div class="offcanvas offcanvas-xxl offcanvas-end scrollable-container" data-bs-backdrop="static" tabindex="-1"
-  id="edit-account-modal" style="overflow-y:auto;width:50%; background-color:white !important"
-  aria-labelledby="editAccountModal">
+  id="edit-account-modal" style="overflow-y:auto;width:50%; background-color:white !important">
   <div></div>
+</div>
+
+{{-- Move messages to other folder Model --}}
+<div class="modal fade" id="move-messages-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-body">
+        <div>
+          <form class="row g-3" action="#">
+            @csrf
+            <div class="form-group">
+              <label>Move To</label>
+              <select class="select2 form-control" id="move_to_folder" name="move_to">
+              </select>
+              <input type="hidden" name="message_id">
+            </div>
+            <div class="col-12 text-end mt-4">
+              <button type="button" id="move-messages-submit" class="btn btn-primary me-1">Move</button>
+              <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+            </div>
+          </form>
+          <!--/ Add role form -->
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 @endsection
