@@ -24,6 +24,7 @@ use Modules\Core\Console\Commands\ClearUpdaterTmpPathCommand;
 use Modules\Core\Facades\Innoclapps;
 use Modules\Core\Settings\DefaultSettings;
 use Modules\Translator\Console\Commands\GenerateJsonLanguageFileCommand;
+use Illuminate\Contracts\Foundation\Application;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -121,6 +122,10 @@ class AppServiceProvider extends ServiceProvider
         ->configSet();
     } catch (\Exception $exception) {
     }
+
+    $this->app->booted(function (Application $app) {
+      $app->register(ModulesConfigServiceProvider::class);
+    });
   }
 
    /**

@@ -20,6 +20,10 @@
           <label class="form-label" for="add-user-email">Email Address</label>
           <input type="email" disabled id="add-user-email" value="{{$account->email}}" class="form-control" placeholder="john.doe@example.com" aria-label="john.doe@example.com" name="email" />
         </div>
+        <div class="mb-3 {{$account->connection_type->value != 'Imap' ? 'd-none' : ''}}">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" placeholder="************" name="password" />
+        </div>
         <div class="mb-3">
         <div class="form-check">
             <input name="create_contact" class="form-check-input" checked="{{$account->create_contact}}" type="checkbox" value="1" id="defaultCheck1">

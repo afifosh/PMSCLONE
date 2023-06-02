@@ -22,7 +22,7 @@ class SetOnlyOfficeConfig
     public function configSet()
     {
         $default = resolve(SettingService::class)->getFormattedSettings('onlyoffice');
-        
+
         if ($default) {
                 Config::set('onlyoffice.secret', $default['secret']);
                 Config::set('onlyoffice.doc_server_url', $default['doc_server_url']);

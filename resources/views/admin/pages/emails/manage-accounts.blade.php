@@ -25,7 +25,7 @@
         function disableSync(elem, account_id) {
             var url = '';
             var disableAction = false;
-            if ($(elem).prop('checked') == true) {
+            if (!$(elem).prop('checked')) {
                 var disableAction = true;
                 var url = "{{ url('/admin/mailclient/api/mail/accounts/:accountId/sync/disable') }}";
             } else {
@@ -54,15 +54,15 @@
             });
         }
 
-        function makePrimary(account_id) {
-            var url = "{{ url('/admin/mailclient/api/mail/accounts/:accountId/primary') }}";
+        function makePrimary(account_id, elm) {
+            var isChecked = elm.checked;
+            var url = isChecked ? "{{ url('/admin/mailclient/api/mail/accounts/:accountId/primary') }}" : "{{ url('/admin/mailclient/api/mail/accounts/primary') }}";
             url = url.replace(':accountId', account_id);
             $.ajax({
                 url: url,
-                method: 'put',
+                method: isChecked ? 'put' : 'delete',
                 success: function(response, status) {
-                    toastr.success(response);
-
+                    toastr.success(isChecked ? 'Primary Account Set' : 'Primary Account Removed');
                 },
                 error: function(response) {
                     var message = "";
@@ -121,7 +121,7 @@
                                         <label class="switch">
                                             <input type="checkbox" class="switch-input"
                                                 @if ($account->isprimary()) checked @endif
-                                                onchange="makePrimary({{ $account->id }});"
+                                                onchange="makePrimary({{ $account->id }}, this);"
                                                 @if (auth()->user()->hasPermission(['Owner', 'Editor', 'Contributor'], $account)) @else disabled @endif
                                                 name="make_primary" />
                                             <span class="switch-toggle-slider">
@@ -131,10 +131,10 @@
                                         </label>
                                     </td>
                                     <td>
-                                        <span class="switch-label">Disable Sync </span>
+                                        <span class="switch-label">Sync Account</span>
                                         <label class="switch">
                                             <input type="checkbox" @if (auth()->user()->hasPermission(['Owner', 'Editor', 'Contributor'], $account)) @else disabled @endif
-                                                class="switch-input" @if ($account->sync_state != App\Enums\SyncState::ENABLED) checked @endif
+                                                class="switch-input" @if ($account->sync_state->value == App\Enums\SyncState::ENABLED->value) checked @endif
                                                 onchange="disableSync(this,{{ $account->id }});" name="disable_sync" />
                                             <span class="switch-toggle-slider">
                                                 <span class="switch-on"></span>

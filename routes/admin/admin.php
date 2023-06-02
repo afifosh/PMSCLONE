@@ -25,8 +25,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RFP\RFPDraftController;
 use App\Http\Controllers\Admin\RFP\RFPFileController;
 use App\Http\Controllers\Admin\Setting\BroadcastSettingController;
-use App\Http\Controllers\Admin\Setting\DeliverySettingController;
-use App\Http\Controllers\Admin\Setting\GeneralSettingController;
 use App\Http\Controllers\Admin\Setting\SecuritySettingController;
 use App\Http\Controllers\Admin\Setting\OnlyOfficeSettingController;
 use App\Http\Controllers\Admin\SharedFileController;
@@ -34,22 +32,17 @@ use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
 use App\Models\RFPFile;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Admin\EmailAccount\PersonalEmailAccountController;
-use App\Http\Controllers\Admin\EmailAccount\EmailAccountSyncStateController;
-use App\Http\Controllers\Admin\EmailAccount\EmailAccountPrimaryStateController;
-use App\Http\Controllers\Admin\EmailAccount\EmailAccountConnectionTestController;
-use App\Http\Controllers\Admin\OAuthController;
-use App\Http\Controllers\Admin\OAuthEmailAccountController;
-
-use App\Http\Controllers\Admin\EmailAccount\EmailAccountSync;
-use App\Http\Controllers\Admin\EmailAccount\SharedEmailAccountController;
-use App\Http\Controllers\Admin\EmailAccount\EmailAccountMessagesController;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
+use App\Http\Controllers\Admin\Setting\OauthGoogleController;
+use App\Http\Controllers\Admin\Setting\OauthMicrosoftController;
 use Modules\Core\Http\Controllers\ApplicationController;
+use Modules\Core\Http\Controllers\OAuthController;
+use Modules\MailClient\Http\Controllers\OAuthEmailAccountController;
+
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','adminVerified' , 'mustBeActive', CheckForLockMode::class)->group(function () {
-  // Route::get('/mail/accounts/{type}/{provider}/connect', [OAuthEmailAccountController::class, 'connect']);
+  Route::get('/mail/accounts/{type}/{provider}/connect', [OAuthEmailAccountController::class, 'connect']);
   // Email accounts routes
   Route::prefix('mail/accounts')->group(function () {
    // Email accounts management
@@ -77,27 +70,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
 
     //  Route::resource('emails', EmailAccountController::class);
-    //  Route::get('/{providerName}/connect', [OAuthController::class, 'connect'])->where('providerName', 'microsoft|google');
-    //  Route::get('/{providerName}/callback', [OAuthController::class, 'callback'])->where('providerName', 'microsoft|google');
+     Route::get('/{providerName}/connect', [OAuthController::class, 'connect'])->where('providerName', 'microsoft|google');
+     Route::get('/{providerName}/callback', [OAuthController::class, 'callback'])->where('providerName', 'microsoft|google');
 
-    //  Route::prefix('emails')->group(function () {
-    //   Route::get('bulkDelete', [EmailAccountMessagesController::class, 'bulkDelete']);
-    //   Route::get('bulkUnread', [EmailAccountMessagesController::class, 'bulkUnread']);
-    //   Route::post('{message}/read', [EmailAccountMessagesController::class, 'read']);
-    //   Route::post('{message}/unread', [EmailAccountMessagesController::class, 'unread']);
-      // Route::delete('{message}', [EmailAccountMessagesController::class, 'destroy']);
-      // reply method is used to check in MessageRequest
-      // Route::post('{message}/reply', [EmailAccountMessagesController::class, 'reply']);
-      // Route::post('{message}/forward', [EmailAccountMessagesController::class, 'forward']);
-    // });
     Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class,'index'])->name('mail.accounts.manage');
     Route::resource('/mail/accounts', EmailAccountController::class);
-
-    // Route::prefix('inbox')->group(function () {
-    //   Route::get('emails/folders/{folder_id}/{message}', [EmailAccountMessagesController::class, 'show']);
-    //   Route::post('emails/{account_id}', [EmailAccountMessagesController::class, 'create']);
-    //   Route::get('emails/{account_id}/{folder_id}', [EmailAccountMessagesController::class, 'index']);
-    // });
+    
   Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]))->name('alive');
   Route::prefix('auth')->name('auth.')->group(function() {
     Route::get('lock', [LockModeController::class, 'lock'])->name('lock');
@@ -219,6 +197,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
         Route::put('', 'update')->name('update');
       });
 
+      Route::resource('oauth-google', OauthGoogleController::class)->only(['create', 'store']);
+      Route::resource('oauth-microsoft', OauthMicrosoftController::class)->only(['create', 'store']);
     });
 
 

@@ -1,7 +1,7 @@
 <script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 <script>
   $(document).ajaxStart(function () {
-    if(!($('.modal:visible').length > 0))
+    if(!($('.modal:visible').length > 0 ) && $('.offcanvas.show').length == 0)
     $('.app-email').block({
         message:
           '<div class="ms-5 sk-fold sk-primary"><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div></div><h5>LOADING...</h5>',
@@ -35,12 +35,12 @@
     });
     $('#save-account').on('click',function(){
       if($('#connection_type').find(':selected').val()==='Gmail'){
-       var url="{{url('/admin/mailclient/api/mail/accounts/:accType/google/connect')}}?period="+$('input[name=initial_sync_from]:checked').val();
+       var url="{{url('/admin/mail/accounts/:accType/google/connect')}}?period="+$('input[name=initial_sync_from]:checked').val();
        url=url.replace(':accType',localStorage.getItem('acc_type'));
         window.location=(url);
         }
         else if($('#connection_type').find(':selected').val()==='Outlook'){
-            var url="{{url('/admin/mailclient/api/mail/accounts/:accType/microsoft/connect')}}?period="+$('input[name=initial_sync_from]:checked').val();
+            var url="{{url('/admin/mail/accounts/:accType/microsoft/connect')}}?period="+$('input[name=initial_sync_from]:checked').val();
             url=url.replace(':accType',localStorage.getItem('acc_type'));
             window.location=(url);
 

@@ -6,6 +6,8 @@ $urls = [
     'email' => 'admin.core.settings.view-delivery',
     'broadcast' => 'admin.setting.broadcast.index',
     'onlyoffice' => 'admin.setting.onlyoffice.index',
+    'oauth-google' => 'admin.setting.oauth-google.create',
+    'oauth-microsoft' => 'admin.setting.oauth-microsoft.create',
 ];
 $active = Request::route()->getName();
 @endphp
@@ -42,6 +44,16 @@ $active = Request::route()->getName();
                     <!-- <i class="ti ti-mail"></i> -->
                     <span class="align-middle ms-2">@lang('OnlyOffice Setup')</span>
                 </a>
+            </li>
+            <li class="{{ $active === $urls['oauth-google'] ? 'active' : '' }} d-flex py-3" data-target="oauth-google">
+              <a href="{{ route($urls['oauth-google']) }}" class="d-flex flex-wrap align-items-center">
+                  <span class="align-middle ms-2">@lang('Google Oauth Setup')</span>
+              </a>
+            </li>
+            <li class="{{ $active === $urls['oauth-microsoft'] ? 'active' : '' }} d-flex py-3" data-target="oauth-microsoft">
+              <a href="{{ route($urls['oauth-microsoft']) }}" class="d-flex flex-wrap align-items-center">
+                  <span class="align-middle ms-2">@lang('Microsoft Oauth Setup')</span>
+              </a>
             </li>
         </ul>
     </div>

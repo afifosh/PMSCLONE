@@ -415,6 +415,7 @@
       return;
     }
     $('#move-messages-modal').modal('hide');
+    $('#move-messages-modal').hide();
     $.ajax({
       type: "POST",
       url: "{{url('admin/core/api/emails/actions/email-account-message-move/run')}}",

@@ -159,6 +159,10 @@ function saveFoldersRecord(buttonSelector,type, url, formId, errorMesage) {
         object.validate_cert = 0;
     }
 
+    if(object.password == ''){
+        delete object.password;
+    }
+
     $.ajax({
         url: url,
         type: type,
@@ -352,6 +356,7 @@ function ajaxCanvas(url, modalId) {
         success: function (response, status) {
             $("#" + modalId).find("div").html(response);
             $("#" + modalId).offcanvas("show");
+            folderChanged();
         },
         error: function (response) {
             var message = "";
