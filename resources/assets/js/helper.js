@@ -100,7 +100,7 @@ console.log(formData);
     data: JSON.stringify(jsonObject),
     success: function (response, status) {
       if (status == 'success') {
-        toastr.success(response);
+        toastr.success('Success');
       }
       if (response.data != undefined) {
         return response.data;

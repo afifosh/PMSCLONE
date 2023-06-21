@@ -75,7 +75,7 @@ return [
     /*
      * Only allow files with specific file extension(s) to be uploaded
      */
-    'allowed_extensions' => [],
+    'allowed_extensions' => ['jpg', 'jpeg', 'png', 'gif', 'svg', 'pdf', 'aac', 'ogg', 'oga', 'mp3', 'wav', 'mp4', 'm4v','mov', 'ogv', 'webm', 'zip', 'rar', 'doc', 'docx', 'txt', 'text', 'xml', 'json', 'xls', 'xlsx', 'odt', 'csv', 'ppt', 'pptx', 'ppsx', 'ics', 'eml'],
 
     /*
      * Only allow files matching specific aggregate type(s) to be uploaded

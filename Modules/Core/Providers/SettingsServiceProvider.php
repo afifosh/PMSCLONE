@@ -97,10 +97,10 @@ class SettingsServiceProvider extends ServiceProvider
     protected function setUserDefinedExtensionsInConfig(): void
     {
         // Replace dots with empty in case the user add dot in the extension name
-        $this->app['config']->set('mediable.allowed_extensions', array_map(
-            fn ($extension) => trim(Str::replaceFirst('.', '', $extension)),
-            // use the get method because of 1.0.6 changes in settings function, fails on update if not used
-            explode(',', settings()->get('allowed_extensions'))
-        ));
+        // $this->app['config']->set('mediable.allowed_extensions', array_map(
+        //     fn ($extension) => trim(Str::replaceFirst('.', '', $extension)),
+        //     // use the get method because of 1.0.6 changes in settings function, fails on update if not used
+        //     explode(',', settings()->get('allowed_extensions'))
+        // ));
     }
 }

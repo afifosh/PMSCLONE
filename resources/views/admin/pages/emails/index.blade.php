@@ -445,16 +445,21 @@
 <script>
   const fileInput = document.getElementById('file-input');
   const selectedImagesContainer = document.getElementById('selected-images');
+  const uploadedFiles = [];
+  $(function () {
+    reGenerateDraftId();
+  });
   if (fileInput)
     fileInput.addEventListener('change', (event) => {
       // Remove all existing tags and cross signs from the container
-      selectedImagesContainer.innerHTML = '';
+      // selectedImagesContainer.innerHTML = '';
 
       // Get the selected files from the input field
       const files = event.target.files;
 
       // Loop through the selected files
-      for (const file of files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         // Create a new tag element
         const tag = document.createElement('span');
         tag.innerText = file.name;
@@ -475,12 +480,54 @@
           });
           fileInput.files = dataTransfer.files;
         });
-
+        const divEl = document.createElement('div');
+        divEl.classList.add('mt-2');
         // Add the tag and cross sign to the container
         tag.appendChild(crossSign);
-
-        selectedImagesContainer.appendChild(tag);
+        divEl.appendChild(tag);
+        selectedImagesContainer.appendChild(divEl);
+        // uploaded newly added files
+        if (!uploadedFiles.includes(file)) {
+          uploadFile(file);
+          uploadedFiles.push(file);
+        }
       }
+    });
+
+    function uploadFile(file, draftId = null) {
+      draftId = draftId ? draftId : window.draftId;
+      const formData = new FormData();
+      formData.append('file', file);
+      $.ajax({
+        url: "/admin/core/api/media/pending/"+draftId,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response, status) {
+          toastr.success('File uploaded successfully');
+        },
+        error: function (response) {
+          var message = "";
+          if
+            (response.responseJSON.message == undefined) { message = errorMesage }
+          else { message = response.responseJSON.message }
+          toastr.error(message);
+          return true;
+        }
+      })
+    }
+
+    function reGenerateDraftId(){
+      const timestamp = Date.now();
+      const randomValue = Math.random().toString(36).substring(2);
+      window.draftId = timestamp.toString() + randomValue;
+      $('#attachments_draft_id').val(window.draftId);
+    }
+
+    $('#emailComposeSidebar').on('show.bs.modal', function (e) {
+      $('#selected-images').html('');
+      reGenerateDraftId();
     });
 
 </script>
@@ -694,6 +741,10 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
               <input type="hidden" name="message" id="message" />
             </div>
             <hr class="container-m-nx mt-0 mb-2">
+            <input type="hidden" name="attachments_draft_id" id="attachments_draft_id">
+            <div id="selected-images" class="d-flex flex-column">
+              {{-- Images here --}}
+            </div>
             <div class="email-compose-actions d-flex justify-content-between align-items-center mt-3 mb-3">
               <div class="d-flex align-items-center">
                 <div class="">
@@ -709,7 +760,6 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
                 </div>
                 <label for="file-input"><i class="ti ti-paperclip cursor-pointer ms-2"></i></label>
                 <input type="file" name="attachments[]" multiple class="d-none" id="file-input">
-                <div id="selected-images"></div>
               </div>
             </div>
           </form>
@@ -720,7 +770,7 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
   <!-- /Compose Email -->
 </div>
 @else
-@if(auth()->user()->can('Personal Mailbox') || auth()->user()->can('Shared Mailbox'))
+@if(auth()->user()->can('Personal Mailbox') || auth()->user()->can('access shared inbox'))
 <div class="col-md-12 mb-4">
   <div class="row justify-content-center py-5">
     <div class="col-md-8 col-lg-6 mt-4">
@@ -832,7 +882,7 @@ return auth()->user()->hasPermission(['Owner', 'Reviewer', 'Editor', 'Contributo
         </div>
       </div>
       <div class="d-flex justify-content-center flex-wrap gap-4 mt-2">
-        @can('Shared Mailbox')
+        @can('access shared inbox')
         <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser"
           onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary">Connect Shared Account</button>
         @endcan

@@ -91,7 +91,7 @@
                             <td>
                             </td>
                             <td>
-                                @can('Shared Mailbox')
+                                @can('access shared inbox')
                                     <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser"
                                         onclick="localStorage.setItem('acc_type','shared');" class="btn btn-primary">Connect
                                         Shared Account</button>

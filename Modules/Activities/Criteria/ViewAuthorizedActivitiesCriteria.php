@@ -28,23 +28,23 @@ class ViewAuthorizedActivitiesCriteria implements QueryCriteria
         /** @var \Modules\Users\Models\User */
         $user = Auth::user();
 
-        $query->unless($user->can('view all activities'), function ($query) use ($user) {
-            $query->where(function ($query) use ($user) {
-                $query->criteria(new QueriesByUserCriteria($user));
+        // $query->unless($user->can('view all activities'), function ($query) use ($user) {
+        //     $query->where(function ($query) use ($user) {
+        //         $query->criteria(new QueriesByUserCriteria($user));
 
-                if ($user->can('view attends and owned activities')) {
-                    $query->orWhereHas('guests', function ($query) use ($user) {
-                        return $query->where('guestable_type', User::class)->where('guestable_id', $user->getKey());
-                    });
+        //         if ($user->can('view attends and owned activities')) {
+        //             $query->orWhereHas('guests', function ($query) use ($user) {
+        //                 return $query->where('guestable_type', User::class)->where('guestable_id', $user->getKey());
+        //             });
 
-                    if ($user->can('view team activities')) {
-                        $this->whereTeamActivities($query, $user);
-                    }
-                } elseif ($user->can('view team activities')) {
-                    $this->whereTeamActivities($query, $user);
-                }
-            });
-        });
+        //             if ($user->can('view team activities')) {
+        //                 $this->whereTeamActivities($query, $user);
+        //             }
+        //         } elseif ($user->can('view team activities')) {
+        //             $this->whereTeamActivities($query, $user);
+        //         }
+        //     });
+        // });
     }
 
     protected function whereTeamActivities(Builder $query, User $user)

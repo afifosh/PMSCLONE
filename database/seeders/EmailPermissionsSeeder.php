@@ -38,7 +38,7 @@ class EmailPermissionsSeeder extends Seeder
     {
       return [
         'admin' => [
-          ['module' => 'Email Accounts', 'permissions' => ['Personal Mailbox', 'Shared Mailbox']],
+          ['module' => 'Email Accounts', 'permissions' => ['Personal Mailbox', 'access shared inbox']],
           ['module' => 'Mailbox', 'permissions' => ['Owner', 'Reviewer', 'Editor','Contributor']],
         ]
       ];
