@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\DataTables\AuthenticationLogsDataTable;
 use App\DataTables\NotificationsDataTable;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Admin;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Http\JsonResponse;
@@ -77,7 +78,7 @@ class AdminAccountController extends Controller
     return $dataTable->render('admin.pages.account.auth-logs');
   }
 
-  public function updateProfilePic(Request $request, UpdatesUserProfileInformation $updater, FileUploadRepository $file_repo)
+  public function updateProfilePic(ProfileUpdateRequest $request, UpdatesUserProfileInformation $updater, FileUploadRepository $file_repo)
   {
     $request->validate([
       'profile' => 'sometimes|mimetypes:image/*',

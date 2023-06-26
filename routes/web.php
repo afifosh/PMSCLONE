@@ -45,7 +45,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
         Route::post('unlock', [LockModeController::class ,'unlock'])->name('unlock');
     });
 
-    Route::prefix('password')->name('password.expired.')->group(function () {
+    Route::prefix('password')->middleware(['passwordMustBeExpired'])->name('password.expired.')->group(function () {
         Route::view('expired', 'auth.expired-password');
         Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
     });
@@ -60,7 +60,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
     Route::get('mt/o/{hash}', [MailTrackerController::class, 'opens'])->name('mail-tracker.open');
-Route::get('mt/l', [MailTrackerController::class, 'link'])->name('mail-tracker.link');
+    Route::get('mt/l', [MailTrackerController::class, 'link'])->name('mail-tracker.link');
 
 
     Route::prefix('company-profile')->name('company.')->controller(CompanyProfileController::class)->group(function () {
@@ -88,7 +88,7 @@ Route::get('mt/l', [MailTrackerController::class, 'link'])->name('mail-tracker.l
   });
 });
 Route::get('refresh-csrf', function(Request $request){
-  $request->session()->regenerateToken();
+  // $request->session()->regenerateToken();
   return csrf_token();
 })->name('refresh-csrf');
 require __DIR__.'/admin/admin.php';

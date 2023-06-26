@@ -4,8 +4,9 @@ namespace App\Actions\Fortify;
 
 use App\Models\Admin;
 use App\Models\User;
+use App\Rules\ForbiddenPasswordRule;
+use Illuminate\Validation\Rules\Password;
 use Imanghafoori\PasswordHistory\Rules\NotBeInPasswordHistory;
-use Laravel\Fortify\Rules\Password;
 
 trait PasswordValidationRules
 {
@@ -16,18 +17,23 @@ trait PasswordValidationRules
      */
     protected function passwordRules(): array
     {
-        $rules = ['required', 'string', new Password, 'confirmed'];
+        $rules = [
+          'required',
+          'confirmed',
+          Password::min(8)->mixedCase()->uncompromised()->letters()->numbers()->symbols()
+        ];
 
-        $user = $this->getUser();
+        $user = $this->guessUser();
 
         if ($user) {
             $rules[] = NotBeInPasswordHistory::ofUser($user);
+            $rules[] = new ForbiddenPasswordRule($user);
         }
 
         return $rules;
     }
 
-    private function getUser()
+    private function guessUser()
     {
         if (! is_null(auth()->user())) {
             return auth()->user();

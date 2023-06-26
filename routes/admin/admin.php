@@ -103,7 +103,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::post('unlock', [LockModeController::class ,'unlock'])->name('unlock');
   });
 
-  Route::prefix('password')->name('password.expired.')->group(function () {
+  Route::prefix('password')->middleware(['passwordMustBeExpired'])->name('password.expired.')->group(function () {
     Route::view('expired', 'admin.auth.expired-password');
     Route::post('expired', [ExpiredPasswordController::class, 'resetPassword'])->name('reset');
   });
@@ -222,11 +222,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
   });
-
-  Route::get('refresh-csrf', function(Request $request){
-    $request->session()->regenerateToken();
-    return csrf_token();
-  })->name('refresh-csrf');
 
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

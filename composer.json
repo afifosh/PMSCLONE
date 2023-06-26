@@ -27,6 +27,7 @@
     "laravel/sanctum": "^3.2",
     "laravel/telescope": "^4.14",
     "laravel/tinker": "^2.7",
+    "laravelcollective/html": "^6.4",
     "laravolt/avatar": "^5.0",
     "league/oauth2-google": "^4.0",
     "microsoft/microsoft-graph": "^1.97",

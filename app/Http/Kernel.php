@@ -69,6 +69,7 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'mustBeActive' => \App\Http\Middleware\UserAndCompanyMustActive::class,
         'passwordMustNotBeExpired' => \App\Http\Middleware\EnsurePasswordNotExpired::class,
+        'passwordMustBeExpired' => \App\Http\Middleware\PasswordMustBeExpired::class,
         'companyMustBeEditable' => \App\Http\Middleware\EnsureCompanyIsEditable::class,
     ];
 }
