@@ -4198,6 +4198,11 @@ interpret@^2.2.0:
   resolved "https://registry.npmjs.org/interpret/-/interpret-2.2.0.tgz"
   integrity sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==
 
+intl-tel-input@^18.1.7:
+  version "18.1.7"
+  resolved "https://registry.yarnpkg.com/intl-tel-input/-/intl-tel-input-18.1.7.tgz#d7bb634a13dc53fd8784f3c303a56b793cca73bd"
+  integrity sha512-pmo83RQ8oZex96sKsuOnjQo0v/oGl1JdZKjxIIG0J/SsHRA14pI9NpnjK6cUyJASvsJJYl9Av4RjQo/etw5BNg==
+
 ipaddr.js@1.9.1:
   version "1.9.1"
   resolved "https://registry.npmjs.org/ipaddr.js/-/ipaddr.js-1.9.1.tgz"

@@ -26,29 +26,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     }
     public function updateUser(User $user, array $input): void
     {
-        Validator::make($input, [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
-        ])->validateWithBag('updateProfileInformation');
-
         if ($input['email'] !== $user->email &&
             $user instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);
         } else {
-            $user->forceFill([
-                'first_name' => $input['first_name'],
-                'last_name' => $input['last_name'],
-                'phone' => @$input['phone'],
-                'email' => $input['email'],
-            ])->save();
+            $user->forceFill($input)->save();
         }
     }
 
@@ -59,42 +41,18 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     protected function updateVerifiedUser(User $user, array $input): void
     {
-        $user->forceFill([
-            'first_name' => $input['first_name'],
-            'last_name' => $input['last_name'],
-            'phone' => $input['phone'],
-            'email' => $input['email'],
-            'email_verified_at' => null,
-        ])->save();
+        $user->forceFill(['email_verified_at' => null] + $input)->save();
 
         $user->sendEmailVerificationNotification();
     }
 
     public function updateAdmin(Admin $user, array $input): void
     {
-        Validator::make($input, [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('admins')->ignore($user->id),
-            ],
-        ])->validateWithBag('updateProfileInformation');
-
         if ($input['email'] !== $user->email &&
             $user instanceof MustVerifyEmail) {
             $this->updateVerifiedAdmin($user, $input);
         } else {
-            $user->forceFill([
-                'first_name' => $input['first_name'],
-                'last_name' => $input['last_name'],
-                'phone' => @$input['phone'],
-                'email' => $input['email'],
-            ])->save();
+            $user->forceFill($input)->save();
         }
     }
 
@@ -105,13 +63,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     protected function updateVerifiedAdmin(Admin $user, array $input): void
     {
-        $user->forceFill([
-            'first_name' => $input['first_name'],
-            'last_name' => $input['last_name'],
-            'phone' => $input['phone'],
-            'email' => $input['email'],
-            'email_verified_at' => null,
-        ])->save();
+        $user->forceFill(['email_verified_at' => null] + $input)->save();
 
         $user->sendEmailVerificationNotification();
     }

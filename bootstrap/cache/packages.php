@@ -190,6 +190,13 @@
       0 => 'Plank\\Metable\\MetableServiceProvider',
     ),
   ),
+  'propaganistas/laravel-phone' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Propaganistas\\LaravelPhone\\PhoneServiceProvider',
+    ),
+  ),
   'rappasoft/laravel-authentication-log' => 
   array (
     'providers' => 

@@ -54,8 +54,7 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
         Route::get('/', [DashboardController::class, 'index'])->name('pages-home');
       //  Route::resource('user/user-account', UserAccountController::class);
       Route::name('user.')->group(function(){
-        Route::resource('user/user-account', UserAccountController::class)->only('edit');
-
+        Route::resource('user/user-account', UserAccountController::class)->only('edit', 'update');
       });
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);
     Route::resource('users', UserController::class);
