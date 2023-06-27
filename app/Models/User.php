@@ -19,6 +19,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Avatar;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
@@ -39,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
         'email',
         'password',
         'status',
+        'avatar',
         'password_changed_at',
         'email_verified_at',
     ];
@@ -81,9 +83,9 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
 
     public function getAvatarAttribute($value)
     {
-      if(!$value)
+      if (!$value)
       return Avatar::create($this->full_name)->toBase64();
-      return $value;
+    return @Storage::url($value);
     }
 
     public function getFullNameAttribute()
