@@ -20,6 +20,10 @@ class DeliverySettingRequest extends BaseRequest
             return $this->mailgunRules();
         elseif ($this->provider == 'amazon_ses')
             return $this->amazonSesRules();
+        elseif ($this->provider == 'smtp')
+            return $this->smtpRules();
+        elseif ($this->provider == 'sendmail')
+            return $this->sendmailRules();
         else
             return [ 'provider' => 'required' ];
     }

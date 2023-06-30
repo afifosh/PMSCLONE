@@ -27,7 +27,14 @@ class SecurityRequest extends FormRequest
             'password_history_depth' => 'required|numeric|min:1|max:10',
             'password_expire_days' => 'required|numeric|gt:1',
             'timeout_warning_seconds' => 'required|numeric',
-            'timeout_after_seconds' => 'required|numeric|gte:3',
+            'timeout_after_seconds' => 'required|numeric|gte:3|gt:timeout_warning_seconds',
         ];
+    }
+
+    public function messages()
+    {
+      return [
+        'timeout_after_seconds.gt' => 'The timeout after must be greater than or equal to timeout warning.',
+      ];
     }
 }

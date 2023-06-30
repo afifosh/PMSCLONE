@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Core\Setting;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Core\Setting\DeliverySettingRequest as Request;
+use App\Http\Requests\Core\Setting\DeliverySettingRequest;
 use App\Mail\TestMail;
 use App\Services\Core\Setting\DeliverySettingService;
 use Illuminate\Http\Request as HttpRequest;
@@ -28,7 +28,7 @@ class DeliverySettingController extends Controller
     return view('admin.pages.settings.delivery.index', ['settings' => $deliverySettings]);
   }
 
-  public function update(Request $request)
+  public function update(DeliverySettingRequest $request)
   {
     $context = $request->get('provider');
 
@@ -48,7 +48,7 @@ class DeliverySettingController extends Controller
     return $this->sendRes('Updated delivery settings');
   }
 
-  public function show(Request $request)
+  public function show(DeliverySettingRequest $request)
   {
     $request->validate(['provider' => 'required']);
 

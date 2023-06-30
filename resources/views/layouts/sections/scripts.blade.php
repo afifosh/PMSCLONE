@@ -56,7 +56,7 @@
     }).fail(function () {
         console.log('Could not refresh CSRF token');
     });
-}, 1000 * 55 * {{ config('session.lifetime') }});
+}, 1000 * 55 * {{ config('session.lifetime') > session_cache_expire() ? session_cache_expire() : config('session.lifetime') }});
 </script>
 
 <!-- END: Theme JS-->

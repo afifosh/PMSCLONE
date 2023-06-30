@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\Auth;
 
-use Imanghafoori\PasswordHistory\Rules\NotBeInPasswordHistory;
+use App\Actions\Fortify\PasswordValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
 class PasswordExpiredRequest extends FormRequest
 {
+    use PasswordValidationRules;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -25,12 +25,9 @@ class PasswordExpiredRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'current_password' => 'required',
-            'password' => [
-                'required', 'confirmed', NotBeInPasswordHistory::ofUser(auth()->user()),
-                Password::min(6)->letters()->numbers()->mixedCase()->uncompromised(),
-            ],
-        ];
+      return [
+        'current_password' => 'required',
+        'password' => $this->passwordRules()
+      ];
     }
 }

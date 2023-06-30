@@ -19,6 +19,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Avatar;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
@@ -26,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
     use \OwenIt\Auditing\Auditable;
 
     public const DT_ID = 'users_dataTable';
+    public const AVATAR_PATH = 'admins-avatars';
     /**
      * The attributes that are mass assignable.
      *
@@ -38,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
         'email',
         'password',
         'status',
+        'avatar',
         'password_changed_at',
         'email_verified_at',
     ];
@@ -80,9 +83,9 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
 
     public function getAvatarAttribute($value)
     {
-      if(!$value)
+      if (!$value)
       return Avatar::create($this->full_name)->toBase64();
-      return $value;
+    return @Storage::url($value);
     }
 
     public function getFullNameAttribute()
@@ -106,7 +109,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
 
 
     /**
-     * User has many morph fields of Device Authorized 
+     * User has many morph fields of Device Authorized
      *
      * @return MorphMany
      */
@@ -120,7 +123,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
     {
 
         $ip          = $attributes['ip_address'];
-        $userAgent   = $attributes['user_agent'];   
+        $userAgent   = $attributes['user_agent'];
         $fingerprint = $attributes['fingerprint'];
 
         $deviceAuthorization = $this->deviceAuthorizations()
@@ -131,7 +134,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
           ->whereSafe(true)
           ->latest('created_at')
             ->firstOrNew();
-    
+
         if ($deviceAuthorization->exists) {
             if ($deviceAuthorization->isDeviceAuthorized()) {
                 $deviceAuthorization->attempts += 1;
@@ -146,16 +149,16 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
             }
         } else {
             $deviceAuthorization->fill($attributes);
-            $deviceAuthorization->safe = true;            
+            $deviceAuthorization->safe = true;
             $deviceAuthorization->save();
         }
-    
+
         return true;
     }
 
     public function shouldSkipTwoFactor($ip,$userAgent,$fingerprint)
     {
-       
+
         $deviceAuthorization = $this->deviceAuthorizations()
             ->where('fingerprint', $fingerprint)
             ->whereIpAddress($ip)
@@ -163,18 +166,18 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
             ->whereFingerprint($fingerprint)
             ->latest('created_at')
             ->first();
-    
+
         if (!$deviceAuthorization) {
             return false;
         }
-    
+
         $safe = $deviceAuthorization->safe;
         $lastLogin = $deviceAuthorization->updated_at;
         $expiration = now()->subDays(30);
 //dd($deviceAuthorization->failed_attempts < config('auth.device_authorization.failed_limit'));
         return $safe && $lastLogin->gt($expiration) &&  $deviceAuthorization->failed_attempts < config('auth.device_authorization.failed_limit');
     }
-            
+
     /**
      * User has many morph fields of password history
      *

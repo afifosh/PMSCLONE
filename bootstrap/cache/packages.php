@@ -102,6 +102,18 @@
       0 => 'Laravel\\Tinker\\TinkerServiceProvider',
     ),
   ),
+  'laravelcollective/html' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Collective\\Html\\HtmlServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Form' => 'Collective\\Html\\FormFacade',
+      'Html' => 'Collective\\Html\\HtmlFacade',
+    ),
+  ),
   'laravolt/avatar' => 
   array (
     'providers' => 
@@ -209,6 +221,13 @@
     'providers' => 
     array (
       0 => 'Plank\\Metable\\MetableServiceProvider',
+    ),
+  ),
+  'propaganistas/laravel-phone' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Propaganistas\\LaravelPhone\\PhoneServiceProvider',
     ),
   ),
   'rappasoft/laravel-authentication-log' => 
