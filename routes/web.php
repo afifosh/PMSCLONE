@@ -52,8 +52,10 @@ Route::middleware('auth', 'verified', 'mustBeActive', CheckForLockMode::class)->
 
     Route::middleware('passwordMustNotBeExpired')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('pages-home');
-      //  Route::resource('user/user-account', UserAccountController::class);
       Route::name('user.')->group(function(){
+        Route::put('user/user-account/email', [UserAccountController::class, 'updateEmail'])->name('account.update-email');
+        Route::delete('user/user-account/email', [UserAccountController::class, 'removePendingMail'])->name('account.update-email.destroy');
+        Route::post('user/user-account/email/resend', [UserAccountController::class, 'resendVerificationEmail'])->name('account.resend-verification-email');
         Route::resource('user/user-account', UserAccountController::class)->only('edit', 'update');
       });
     Route::get('users/roles/{role}', [UserController::class, 'showRole']);

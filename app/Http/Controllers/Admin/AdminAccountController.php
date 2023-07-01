@@ -100,6 +100,40 @@ class AdminAccountController extends Controller
       : back()->with('status', 'profile-information-updated');
   }
 
+  public function updateEmail()
+  {
+    request()->validate([
+      'email' => 'required|email|unique:admins,email',
+      'password' => 'required',
+    ]);
+    if(!Hash::check(request()->password, auth()->user()->password))
+      return response()->json(['errors' => ['password' => ['The provided password does not match your current password.']]], 422);
+
+    auth()->user()->newEmail(request()->email);
+
+    return $this->sendRes('Verification link sent to your new email address.', ['message' => '', 'event' => 'page_reload']);
+  }
+
+  public function resendVerificationEmail()
+  {
+    if (!auth()->user()->getPendingEmail())
+      return $this->sendErr('Your email is already verified.');
+
+    auth()->user()->resendPendingEmailVerificationMail();
+
+    return $this->sendRes('Verification link sent to your email address.');
+  }
+
+  public function removePendingMail()
+  {
+    if (!auth()->user()->getPendingEmail())
+      return $this->sendErr('Your email is already verified.');
+
+    auth()->user()->clearPendingEmail();
+
+    return $this->sendRes('Email removed.', ['event' => 'page_reload']);
+  }
+
   /**
    * Update the specified resource in storage.
    *

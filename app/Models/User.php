@@ -20,11 +20,14 @@ use Avatar;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Support\Facades\Storage;
+use Modules\Core\Contracts\Localizeable;
+use ProtoneMedia\LaravelVerifyNewEmail\MustVerifyNewEmail;
 
-class User extends Authenticatable implements MustVerifyEmail, Auditable
+class User extends Authenticatable implements MustVerifyEmail, Auditable, Localizeable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, HasEnum, AuthenticationLoggable, AuthLogs, TenancyScope;
     use \OwenIt\Auditing\Auditable;
+    use MustVerifyNewEmail;
 
     public const DT_ID = 'users_dataTable';
     public const AVATAR_PATH = 'admins-avatars';
@@ -86,6 +89,35 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
       if (!$value)
       return Avatar::create($this->full_name)->toBase64();
     return @Storage::url($value);
+    }
+
+    public function isSuperAdmin()
+    {
+      return false;
+    }
+
+    /**
+     * Get the user time format
+     */
+    public function getLocalTimeFormat(): string
+    {
+        return $this->time_format ? $this->time_format : 'H:i';
+    }
+
+    /**
+     * Get the user date format
+     */
+    public function getLocalDateFormat(): string
+    {
+        return $this->date_format ? $this->date_format : 'F j, Y';
+    }
+
+    /**
+     * Get the user timezone
+     */
+    public function getUserTimezone(): string
+    {
+        return $this->timezone ? $this->timezone : 'Asia/Karachi';
     }
 
     public function getFullNameAttribute()

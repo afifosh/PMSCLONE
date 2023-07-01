@@ -23,7 +23,7 @@ class EmailAccountsForUserCriteria implements QueryCriteria
     /**
      * Initialize new EmailAccountsForUserCriteria instance.
      */
-    public function __construct(protected ?User $user = null)
+    public function __construct(protected $user = null)
     {
     }
 

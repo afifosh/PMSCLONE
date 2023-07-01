@@ -41,6 +41,7 @@
     "plank/laravel-metable": "^5.4",
     "predis/predis": "^2.1",
     "propaganistas/laravel-phone": "^5.0",
+    "protonemedia/laravel-verify-new-email": "^1.8",
     "ralouphie/mimey": "^1.0",
     "rappasoft/laravel-authentication-log": "^3.0",
     "spatie/laravel-activitylog": "^4.7",

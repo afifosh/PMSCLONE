@@ -75,7 +75,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
     Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class,'index'])->name('mail.accounts.manage');
     Route::resource('/mail/accounts', EmailAccountController::class);
-    
+
   Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]))->name('alive');
   Route::prefix('auth')->name('auth.')->group(function() {
     Route::get('lock', [LockModeController::class, 'lock'])->name('lock');
@@ -90,9 +90,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
   Route::middleware('passwordMustNotBeExpired')->group(function () {
     Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/emailN', ApplicationController::class);
-
     Route::post('/admin-account/update-profile-pic', [AdminAccountController::class, 'updateProfilePic'])->name('admin-account.update-profile');
+    Route::put('/admin-account/email', [AdminAccountController::class, 'updateEmail'])->name('account.update-email');
+    Route::delete('/admin-account/email', [AdminAccountController::class, 'removePendingMail'])->name('account.update-email.destroy');
+    Route::post('/admin-account/email/resend', [AdminAccountController::class, 'resendVerificationEmail'])->name('account.resend-verification-email');
 
     Route::resource('admin-account', AdminAccountController::class)->only('edit');
     Route::get('admin-account-auth-logs', [AdminAccountController::class, 'authLogs'])->name('auth-logs');

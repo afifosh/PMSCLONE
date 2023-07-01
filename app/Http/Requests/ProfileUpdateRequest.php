@@ -25,12 +25,6 @@ class ProfileUpdateRequest extends FormRequest
           'profile' => 'sometimes|mimetypes:image/*',
           'first_name' => 'required|string|max:255',
           'last_name' => 'required|string|max:255',
-          'email' => [
-            'required',
-            'email',
-            'max:255',
-            request()->path('admin/*') ? 'unique:admins,email,'. auth()->id() : 'unique:users,email,'. auth()->id()
-          ],
           'phone' => 'phone',
           'phone_country' => 'required_with:phone',
           'address' => 'required|string|max:255',

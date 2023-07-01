@@ -210,14 +210,14 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
   var current = $(this);
   current.addClass('disabled');
   current.prepend('<span class="spinner-border me-1" role="status" aria-hidden="true"></span>');
-  current.closest('form').find('[data-form="ajax-form"]').addClass('disabled');
+  // current.closest('form').find('[data-form="ajax-form"]').addClass('disabled');
+  current.addClass('disabled');
   const preAjaxAction = current.attr('data-preAjaxAction');
   if (typeof window[preAjaxAction] == "function") {
     const params = current.attr('data-preAjaxParams');
-    console.log(params);
     window[preAjaxAction](params);
   }
-  var form = $(this).closest('form');
+  var form = current.data('form-id') ? $('#'+current.data('form-id')) : current.closest('form');
   var url = form.attr('action');
   var fd = new FormData(form[0]);
 
@@ -242,8 +242,8 @@ for (const input of inputs) {
 
     success: function (data, textStatus, xhr) {
       // remove any validation messages
-      current.closest('form').find('.invalid').removeClass('invalid');
-      current.closest('form').find('.validation-error').remove();
+      form.find('.invalid').removeClass('invalid');
+      form.find('.validation-error').remove();
 
       // check for a filename
       var filename = "";
@@ -312,7 +312,7 @@ for (const input of inputs) {
               : null;
           }
           //console.log(current.closest('.modal').modal("hide"));
-          current.closest('form').find('[data-form="ajax-form"]').removeClass('disabled');
+          current.removeClass('disabled');
           current.find('.spinner-border').remove();
           if(data.data.close == 'globalModal'){
             $('#globalModal').modal('hide');
@@ -328,13 +328,13 @@ for (const input of inputs) {
       }
     },
     error: function (error) {
-      current.closest('form').find('[data-form="ajax-form"]').removeClass('disabled');
+      current.removeClass('disabled');
       current.find('.spinner-border').remove();
       // toast_danger(error.statusText);
       if(error.responseJSON && error.responseJSON.errors)
       {
-        current.closest('form').find('.invalid').removeClass('invalid');
-        current.closest('form').find('.validation-error').remove();
+        form.find('.invalid').removeClass('invalid');
+        form.find('.validation-error').remove();
         $.each(error.responseJSON.errors, function (ind, val) {
           const error = '<div class="text-danger validation-error">'+ val[0] +'</div>'
 
@@ -349,28 +349,27 @@ for (const input of inputs) {
           var t = ts2;
           var ts3 = t.replace(/\[\d+\]$/, '[]');
 
-          if($(current.closest('form').find('[name="'+ind+'"]')).length){
-            var target = $(current.closest('form').find('[name="'+ind+'"]'));
-          }else if($(current.closest('form').find('[name="'+ind+'[]"]')).length){
-            var target = $(current.closest('form').find('[name="'+ind+'[]"]'));
-          }else if($(current.closest('form').find('[name="'+ind+'['+ind+']"]')).length){
-            var target = $(current.closest('form').find('[name="'+ind+'['+ind+']"]'));
-          }else if($(current.closest('form').find('[name="'+tsname+'"]')).length){
-            var target = $(current.closest('form').find('[name="'+tsname+'"]'));
-          }else if($(current.closest('form').find('[name="'+tsname+'[]"]')).length){
-            var target = $(current.closest('form').find('[name="'+tsname+'[]"]'));
-          }else if($(current.closest('form').find('[name="'+transformedName+'"]')).length){
-            var target = $(current.closest('form').find('[name="'+transformedName+'"]'));
-          }else if($(current.closest('form').find('[name="'+transformedName+'[]"]')).length){
-            var target = $(current.closest('form').find('[name="'+transformedName+'[]"]'));
-          }else if($(current.closest('form').find('[name="'+ts2+'"]')).length){
-            var target = $(current.closest('form').find('[name="'+ts2+'"]'));
-          }else if($(current.closest('form').find('[name="'+ts2+'[]"]')).length){
-            var target = $(current.closest('form').find('[name="'+ts2+'[]"]'));
-          }else if($(current.closest('form').find('[name="'+ts3+'"]')).length){
-            var target = $(current.closest('form').find('[name="'+ts3+'"]'));
+          if($(form.find('[name="'+ind+'"]')).length){
+            var target = $(form.find('[name="'+ind+'"]'));
+          }else if($(form.find('[name="'+ind+'[]"]')).length){
+            var target = $(form.find('[name="'+ind+'[]"]'));
+          }else if($(form.find('[name="'+ind+'['+ind+']"]')).length){
+            var target = $(form.find('[name="'+ind+'['+ind+']"]'));
+          }else if($(form.find('[name="'+tsname+'"]')).length){
+            var target = $(form.find('[name="'+tsname+'"]'));
+          }else if($(form.find('[name="'+tsname+'[]"]')).length){
+            var target = $(form.find('[name="'+tsname+'[]"]'));
+          }else if($(form.find('[name="'+transformedName+'"]')).length){
+            var target = $(form.find('[name="'+transformedName+'"]'));
+          }else if($(form.find('[name="'+transformedName+'[]"]')).length){
+            var target = $(form.find('[name="'+transformedName+'[]"]'));
+          }else if($(form.find('[name="'+ts2+'"]')).length){
+            var target = $(form.find('[name="'+ts2+'"]'));
+          }else if($(form.find('[name="'+ts2+'[]"]')).length){
+            var target = $(form.find('[name="'+ts2+'[]"]'));
+          }else if($(form.find('[name="'+ts3+'"]')).length){
+            var target = $(form.find('[name="'+ts3+'"]'));
           }
-          console.log(ind ,'target', target);
           target.addClass('invalid');
           if((target.hasClass('globalOfSelect2') || target.hasClass('select2User') || target.hasClass('select2')) && target.next('.select2-container').length) {
               $(error).insertAfter(target.next('.select2-container'));

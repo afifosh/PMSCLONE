@@ -36,6 +36,7 @@ use Modules\MailClient\Enums\EmailAccountType;
 // use Modules\Users\Models\User;
 use App\Models\Admin as User;
 use App\Models\Admin;
+use App\Models\User as ModelsUser;
 use Modules\Core\Models\Permission;
 
 class EmailAccount extends Model implements Metable, Primaryable
@@ -455,7 +456,7 @@ class EmailAccount extends Model implements Metable, Primaryable
     /**
      * Count the unread messages for all accounts the given user can access
      */
-    public static function countUnreadMessagesForUser(User|int $user): int
+    public static function countUnreadMessagesForUser(ModelsUser|User|int $user): int
     {
         /** @var int */
         $result = static::select('id')

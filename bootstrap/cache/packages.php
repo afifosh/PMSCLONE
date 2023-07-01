@@ -230,6 +230,13 @@
       0 => 'Propaganistas\\LaravelPhone\\PhoneServiceProvider',
     ),
   ),
+  'protonemedia/laravel-verify-new-email' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'ProtoneMedia\\LaravelVerifyNewEmail\\ServiceProvider',
+    ),
+  ),
   'rappasoft/laravel-authentication-log' => 
   array (
     'providers' => 

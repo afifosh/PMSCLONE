@@ -110,11 +110,11 @@
               <input class="form-control" type="text" name="last_name" id="lastName" value="{{ old('last_name') ?? auth()->user()->last_name }}" />
               @error('last_name')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
-            <div class="mb-3 col-md-6">
+            {{-- <div class="mb-3 col-md-6">
               <label for="email" class="form-label">E-mail</label>
               <input class="form-control" type="text" id="email" name="email" value="{{old('email') ?? auth()->user()->email}}" placeholder="Email" />
               @error('email')<div class="text-danger">{{ $message }}</div>@enderror
-            </div>
+            </div> --}}
             <div class="mb-3 col-md-6">
               <label class="form-label" for="phone">Phone Number</label>
                 <input type="text" id="phone" name="phone" class="form-control" value="{{old('phone') ?? auth()->user()->phone}}"/>
@@ -190,22 +190,67 @@
       </div>
       <!-- /Account -->
     </div>
-    <div class="card">
-      <h5 class="card-header">Delete Account</h5>
-      <div class="card-body">
-        <div class="mb-3 col-12 mb-0">
-          <div class="alert alert-warning">
-            <h5 class="alert-heading mb-1">Are you sure you want to delete your account?</h5>
-            <p class="mb-0">Once you delete your account, there is no going back. Please be certain.</p>
+
+    <div class="d-flex justify-content-between">
+      <div class="col-6 me-1">
+        <div class="card">
+          <h5 class="card-header">Update Email</h5>
+          <div class="card-body">
+            <form method="POST" action="{{route('admin.account.update-email')}}">
+              @method('PUT')
+              @csrf
+              <div class="mb-3">
+                <label for="email" class="form-label">E-mail</label>
+                <input class="form-control" type="text" name="email" value="{{old('email') ?? auth()->user()->email}}" placeholder="Email" />
+                @error('email')<div class="text-danger">{{ $message }}</div>@enderror
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input class="form-control" type="password" name="password" placeholder="***********"/>
+                @error('password')<div class="text-danger">{{ $message }}</div>@enderror
+              </div>
+
+              @if (auth()->user()->getPendingEmail())
+                <div class="">
+                  <label for="email" class="form-label">Pending Verification</label>
+                  <div class="input-group mb-3">
+                    <input type="text" value="{{ auth()->user()->getPendingEmail() }}" disabled class="form-control" >
+                    <button type="button" data-form="ajax-form" data-form-id="remove-pending-email" class="btn btn-outline-primary">Remove</button>
+                    <button type="button" data-form="ajax-form" data-form-id="send-verification-email" class="btn btn-outline-primary">Resend</button>
+                  </div>
+                </div>
+              @endif
+              <button type="button" data-form="ajax-form" class="btn btn-danger">Update</button>
+            </form>
+            <form action="{{route('admin.account.resend-verification-email')}}" method="post" id="send-verification-email">
+              @csrf
+            </form>
+            <form action="{{route('admin.account.update-email.destroy')}}" method="post" id="remove-pending-email">
+              @csrf
+              @method('DELETE')
+            </form>
           </div>
         </div>
-        <form id="formAccountDeactivation" onsubmit="return false">
-          <div class="form-check mb-4">
-            <input class="form-check-input" type="checkbox" name="accountActivation" id="accountActivation" />
-            <label class="form-check-label" for="accountActivation">I confirm my account deactivation</label>
+      </div>
+      <div class="col-6">
+        <div class="card">
+          <h5 class="card-header">Delete Account</h5>
+          <div class="card-body">
+            <div class="mb-3 col-12 mb-0">
+              <div class="alert alert-warning">
+                <h5 class="alert-heading mb-1">Are you sure you want to delete your account?</h5>
+                <p class="mb-0">Once you delete your account, there is no going back. Please be certain.</p>
+              </div>
+            </div>
+            <form id="formAccountDeactivation" onsubmit="return false">
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" name="accountActivation" id="accountActivation" />
+                <label class="form-check-label" for="accountActivation">I confirm my account deactivation</label>
+              </div>
+              <button type="submit" class="btn btn-danger deactivate-account">Deactivate Account</button>
+            </form>
           </div>
-          <button type="submit" class="btn btn-danger deactivate-account">Deactivate Account</button>
-        </form>
+        </div>
       </div>
     </div>
   </div>

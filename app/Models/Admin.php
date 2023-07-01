@@ -26,12 +26,14 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasPermissions;
 use Modules\Core\Contracts\Localizeable;
 use Modules\MailClient\Models\EmailAccount;
+use ProtoneMedia\LaravelVerifyNewEmail\MustVerifyNewEmail;
 
 class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditable, Localizeable
 {
   use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs, HasPermissions;
   use \OwenIt\Auditing\Auditable;
   use HasMeta, ApprovesChanges;
+  use MustVerifyNewEmail;
   /**
    * The attributes that are mass assignable.
    *
