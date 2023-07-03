@@ -72,6 +72,20 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     'email_verified_at' => 'datetime',
   ];
 
+  protected static function boot(): void
+  {
+      parent::boot();
+
+      static::updating(function ($model) {
+          if($model->isDirty('email')) {
+            $model->email_update_logs()->create([
+              'old_email' => $model->getOriginal('email'),
+              'new_email' => $model->email,
+            ]);
+          }
+      });
+  }
+
   /**
      * Get the user time format
      */
@@ -369,6 +383,16 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
       }
     }
     return $levels;
+  }
+
+  public function projects()
+  {
+    return $this->belongsToMany(Project::class, ProjectMember::class, 'admin_id', 'project_id')->withTimestamps();
+  }
+
+  public function email_update_logs()
+  {
+    return $this->morphMany(EmailUpdateLog::class, 'user');
   }
 
     public function generateTwoFactorCode()

@@ -75,6 +75,20 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable, Locali
         'email_verified_at' => 'datetime',
     ];
 
+    protected static function boot(): void
+  {
+      parent::boot();
+
+      static::updating(function ($model) {
+          if($model->isDirty('email')) {
+            $model->email_update_logs()->create([
+              'old_email' => $model->getOriginal('email'),
+              'new_email' => $model->email,
+            ]);
+          }
+      });
+  }
+
     /**
      * Get web guard key
      *
@@ -234,5 +248,10 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable, Locali
         $this->two_factor_code = null;
         $this->two_factor_expires_at = null;
         $this->save();
+    }
+
+    public function email_update_logs()
+    {
+      return $this->morphMany(EmailUpdateLog::class, 'user');
     }
 }

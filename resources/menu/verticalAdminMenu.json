@@ -117,6 +117,12 @@
       "slug": "admin.programs.index"
     },
     {
+      "url": "/admin/projects",
+      "name": "Projects",
+      "icon": "menu-icon tf-icons ti ti-color-swatch",
+      "slug": "admin.projects.index"
+    },
+    {
       "url": "/admin/mail/accounts",
       "name": "Emails",
       "icon": "menu-icon tf-icons ti ti-mail",

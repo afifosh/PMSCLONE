@@ -8,7 +8,13 @@
         <div class="form-check {{$loop->last ? '' : 'me-3 me-lg-5'}} ">
           <input class="form-check-input" name="permissions[]" type="checkbox" value="{{$permission->id}}" id="persm-{{$permission->id}}" />
           <label class="form-check-label" for="persm-{{$permission->id}}">
+            @if($permission->name == 'Personal Mailbox')
+              Personal Account
+            @elseif ($permission->name == 'access shared inbox')
+              Shared Account
+            @else
             {{explode(" ",$permission->name)[0]}}
+            @endif
           </label>
         </div>
       @empty

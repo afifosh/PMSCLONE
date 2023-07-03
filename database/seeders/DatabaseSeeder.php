@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         // $this->call(UserSeeder::class);
         // \App\Models\User::factory(30)->create();
-        // $this->call(CountriesTableSeeder::class);
+        $this->call(CountriesTableSeeder::class);
         $this->call(ModuleSeeder::class);
         $this->call(AdminRolesPermissionsSeeder::class);
         $this->call(UserRolesPermissionsSeeder::class);
@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
         $this->call(HRSeeder::class);
         $this->call(CompanySeeder::class);
         $this->call(ProgramSeeder::class);
+        $this->call(ProjectCategorySeeder::class);
+        $this->call(ProjectSeeder::class);
         $this->call(WorkflowSeeder::class);
         $this->call(KycDocumentSeeder::class);
         $this->call(EmailPermissionsSeeder::class);

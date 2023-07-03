@@ -69,9 +69,9 @@ btnCopy.on('click', function () {
           clearInterval(countdown);
           sec = 60;
           button.innerHTML = 'Resend Code';
-          button.disabled = false;    
+          button.disabled = false;
           return;
-         } 
+         }
 
          sec--;
         }
@@ -84,18 +84,18 @@ btnCopy.on('click', function () {
 //            updateButton();
 //          }, 1000);
 // }
-        
+
         $('#resendEmailOTPCode').on('click', function () {
           event.preventDefault();
-           
+
           $.ajax({
                           type: "GET",
                           dataType: "json",
                           url: "{{ route('admin.send.email.otp') }}",
                           success: function(response) {
-                              
+
                               console.log(response);
-      
+
                               toastr['success']('', response.message, {
                                 rtl: isRtl
                               });
@@ -108,14 +108,14 @@ btnCopy.on('click', function () {
                            error: function(response) {
                             var jsonResponse = JSON.parse(response.responseText);
                               console.log(jsonResponse);
-      
+
                               toastr['error']('', jsonResponse.message, {
                                 rtl: isRtl
                               });
 
                            }
-                      });    
-                           
+                      });
+
         });
 // Send Automated OTP Code to Email on Modal Show
 $('#enableEmailOTP').on('show.bs.modal', function (event) {
@@ -125,7 +125,7 @@ $('#enableEmailOTP').on('show.bs.modal', function (event) {
 //                     dataType: "json",
 //                     url: "{{ route('admin.send.email.otp') }}",
 //                     success: function(response) {
-                        
+
 //                         console.log(response);
 
 //                         toastr['success']('', response.result, {
@@ -142,7 +142,7 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
   //alert("btn event");
   var button = $(event.relatedTarget) // Button triggered the modal
   var endpoint = button.data('endpoint')
-  var action = button.data('action') 
+  var action = button.data('action')
   //alert(endpoint + "   " + action);
   var modal = $(this)
 
@@ -163,6 +163,44 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
 <div class="row">
   <div class="col-md-12">
   @include('admin.pages.account._partials.tabs')
+    <div class="card mb-4">
+      <h5 class="card-header">Change Email</h5>
+      <div class="card-body">
+        <form method="POST" action="{{route('admin.account.update-email')}}">
+          @method('PUT')
+          @csrf
+          <div class="mb-3">
+            <label for="email" class="form-label">E-mail</label>
+            <input class="form-control" type="text" name="email" value="{{old('email') ?? auth()->user()->email}}" placeholder="Email" />
+            @error('email')<div class="text-danger">{{ $message }}</div>@enderror
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input class="form-control" type="password" name="password" placeholder="***********"/>
+            @error('password')<div class="text-danger">{{ $message }}</div>@enderror
+          </div>
+
+          @if (auth()->user()->getPendingEmail())
+            <div class="">
+              <label for="email" class="form-label">Pending Verification</label>
+              <div class="input-group mb-3">
+                <input type="text" value="{{ auth()->user()->getPendingEmail() }}" disabled class="form-control" >
+                <button type="button" data-form="ajax-form" data-form-id="remove-pending-email" class="btn btn-outline-primary">Remove</button>
+                <button type="button" data-form="ajax-form" data-form-id="send-verification-email" class="btn btn-outline-primary">Resend</button>
+              </div>
+            </div>
+          @endif
+          <button type="button" data-form="ajax-form" class="btn btn-danger">Update</button>
+        </form>
+        <form action="{{route('admin.account.resend-verification-email')}}" method="post" id="send-verification-email">
+          @csrf
+        </form>
+        <form action="{{route('admin.account.update-email.destroy')}}" method="post" id="remove-pending-email">
+          @csrf
+          @method('DELETE')
+        </form>
+      </div>
+    </div>
     <!-- Change Password -->
     <div class="card mb-4">
       <h5 class="card-header">Change Password</h5>
@@ -243,20 +281,20 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
             </span>
             <!--end::Svg Icon-->
             <!--end::Icon-->
-        
+
             <!--begin::Wrapper-->
             <div class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap">
                 <!--begin::Content-->
                 <div class="mb-3 mb-md-0 fw-semibold">
                     <h5 class="text-gray-900 fw-bold">Secure Your Account</h5>
-        
+
                     <div class="fs-6 text-gray-700 pe-7">Two-factor authentication adds an extra layer of security to your account. To log in, in addition you'll need to provide a 6 digit code</div>
                 </div>
                 <!--end::Content-->
             </div>
             <!--end::Wrapper-->
         </div>
-                  
+
 
           <!--end::Notice-->
 
@@ -303,7 +341,7 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                         <path class="st8" d="M1268,1169.3h1015.3c59.9,0,108.9,46.8,112.4,105.8c0.1-2.4,0.4-4.7,0.4-7.1c0-62.3-50.5-112.8-112.8-112.8    H1268c-62.3,0-112.8,50.5-112.8,112.8c0,2.4,0.1,4.7,0.4,7.1C1159.1,1216.1,1208,1169.3,1268,1169.3z"/>
                         <path class="st9" d="M2395.7,1275c-3.7,58.9-52.6,105.8-112.4,105.8H1268c-59.9,0-108.9-46.8-112.4-105.8c-0.3,2.4-0.4,4.7-0.4,7    c0,62.3,50.5,112.8,112.8,112.8h1015.3c62.3,0,112.8-50.5,112.8-112.8C2396.1,1279.7,2396,1277.4,2395.7,1275z"/>
                         <path class="st3" d="M1268,492.4c218,0,415.4,88.4,558.4,231.3l326-326.2c-2.4-2.4-4.7-4.8-7-7.1l-319,319.1    c-143-142.9-340.4-231.3-558.4-231.3c-436.2,0-789.7,353.5-789.7,789.7c0,2.4,0.1,4.7,0.1,7.1C482.2,842.1,834.2,492.4,1268,492.4    L1268,492.4z"/>
-                        
+
                           <radialGradient id="SVGID_1_" cx="706.7253" cy="1774.0293" r="0.9983" gradientTransform="matrix(2481.9333 0 0 -2481.9333 -1753654.125 4403410.5)" gradientUnits="userSpaceOnUse">
                           <stop offset="0" style="stop-color:#FFFFFF;stop-opacity:0.1"/>
                           <stop offset="1" style="stop-color:#FFFFFF;stop-opacity:0"/>
@@ -316,11 +354,11 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                         <div class="d-flex-disable flex-column-disable">
                           <a href="#" class="fs-5 text-dark text-hover-primary fw-bold">Setup Using Google Authenticator
 
-            
+
 
                             @if (auth()->user()->two_factor_confirmed_at && auth()->user()->two_factor_secret)
                               <span class="ms-2 badge rounded-pill bg-label-success">Active</span>
-                            @elseif (auth()->user()->two_factor_secret)  
+                            @elseif (auth()->user()->two_factor_secret)
                               <span class="ms-2 badge rounded-pill bg-label-warning">Pending</span>
                             @endif
 
@@ -333,25 +371,25 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                           Using an authenticator app like
                           <a href="https://support.google.com/accounts/answer/1066447?hl=en" target="_blank">Google Authenticator</a>,
                           <a href="https://www.microsoft.com/en-us/account/authenticator" target="_blank">Microsoft Authenticator</a>,
-                          scan the QR code. It will generate a 6 digit code for you to enter below.    
+                          scan the QR code. It will generate a 6 digit code for you to enter below.
                            </div>
-                           @if (auth()->user()->two_factor_secret)         
+                           @if (auth()->user()->two_factor_secret)
                             <div class="p-4">
                                   {!! auth()->user()->twoFactorQrCodeSvg() !!}
                           </div>
-                          @endif        
+                          @endif
                           @if (auth()->user()->two_factor_secret)
                           <div class="alert alert-primary alert-dismissible d-flex align-items-baseline" role="alert">
                             <span class="alert-icon alert-icon-lg text-primary me-2">
                               <i class="ti ti-bell ti-xs"></i>
-                            </span>  
-                            <div class="d-flex flex-column ps-1">        
+                            </span>
+                            <div class="d-flex flex-column ps-1">
                               <div class="fs-6 text-gray-700 ">If you having trouble using the QR code, select manual entry on your app, and enter your username and the code: <div class="fw-bold text-dark pt-2">{!!  decrypt(auth()->user()->two_factor_secret)  !!}</div></div>
                             </div>
                           </div>
                           @endif
                             <p>Please Scan The above code to get the Confirmation Code</p>
-                   
+
 
 
                         @if (auth()->user()->two_factor_secret)
@@ -359,7 +397,7 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                         <button type="button" class="btn btn-primary" data-action="disable" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Disable</button>
                         <button type="button" class="btn btn-danger" data-action="download_code" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Download Recovery Codes</button>
                         <button type="button" class="btn btn-danger" data-action="regenerate_code" data-endpoint="two-factor-authentication"  data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Regenerate Recovery Codes</button>
-  
+
 
 
                                     @else
@@ -404,12 +442,12 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
                           @if (Auth::user()->two_factor_email_confirmed)
                           <button type="button" class="btn btn-primary"  data-action="disable" data-endpoint="two-factor-email-authentication" data-bs-toggle="modal" data-bs-target="#ShowConfirmPassword">Disable</button>
                           @else
-                          <button type="button" class="btn btn-primary"  data-action="enable" data-endpoint="two-factor-email-authentication"  data-bs-toggle="modal" data-bs-target="#enableEmailOTP">Enable</button>           
+                          <button type="button" class="btn btn-primary"  data-action="enable" data-endpoint="two-factor-email-authentication"  data-bs-toggle="modal" data-bs-target="#enableEmailOTP">Enable</button>
                           @endif
                       </div>
                   </div>
 
-         
+
               </div>
               <!--end::Item-->
 
@@ -423,11 +461,11 @@ $('#ShowConfirmPassword').on('show.bs.modal', function (event) {
     <!-- Modal -->
     @include('admin/_partials/_modals/modal-enable-otp')
     @include('admin/_partials/_modals/modal-enable-otp-email')
-    @include('admin/_partials/_modals/modal-otp-confirm-password')    
+    @include('admin/_partials/_modals/modal-otp-confirm-password')
     <!-- /Modal -->
 
 
- 
+
     <!--/ Two-steps verification -->
 
     <!-- Create an API key -->

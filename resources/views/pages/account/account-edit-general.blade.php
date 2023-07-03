@@ -197,48 +197,8 @@
       </div>
       <!-- /Account -->
     </div>
-    <div class="d-flex justify-content-between">
-      <div class="col-6 me-1">
-        <div class="card">
-          <h5 class="card-header">Update Email</h5>
-          <div class="card-body">
-            <form method="POST" action="{{route('user.account.update-email')}}">
-              @method('PUT')
-              @csrf
-              <div class="mb-3">
-                <label for="email" class="form-label">E-mail</label>
-                <input class="form-control" type="text" name="email" value="{{old('email') ?? auth()->user()->email}}" placeholder="Email" />
-                @error('email')<div class="text-danger">{{ $message }}</div>@enderror
-              </div>
-              <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input class="form-control" type="password" name="password" placeholder="***********"/>
-                @error('password')<div class="text-danger">{{ $message }}</div>@enderror
-              </div>
-
-              @if (auth()->user()->getPendingEmail())
-                <div class="">
-                  <label for="email" class="form-label">Pending Verification</label>
-                  <div class="input-group mb-3">
-                    <input type="text" value="{{ auth()->user()->getPendingEmail() }}" disabled class="form-control" >
-                    <button type="button" data-form="ajax-form" data-form-id="remove-pending-email" class="btn btn-outline-primary">Remove</button>
-                    <button type="button" data-form="ajax-form" data-form-id="send-verification-email" class="btn btn-outline-primary">Resend</button>
-                  </div>
-                </div>
-              @endif
-              <button type="button" data-form="ajax-form" class="btn btn-danger">Update</button>
-            </form>
-            <form action="{{route('user.account.resend-verification-email')}}" method="post" id="send-verification-email">
-              @csrf
-            </form>
-            <form action="{{route('user.account.update-email.destroy')}}" method="post" id="remove-pending-email">
-              @csrf
-              @method('DELETE')
-            </form>
-          </div>
-        </div>
-      </div>
-      <div class="col-6">
+    <div class="">
+      <div class="">
         <div class="card">
           <h5 class="card-header">Delete Account</h5>
           <div class="card-body">

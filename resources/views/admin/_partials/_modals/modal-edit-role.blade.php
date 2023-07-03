@@ -15,9 +15,9 @@
             <div class="edit-role-data">
 
             </div>
-            <div class="col-12 text-center mt-4">
-              <button type="submit" class="btn btn-primary me-sm-3 me-1">Update</button>
-              <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+            <div class="d-flex justify-content-end">
+              <button type="reset" class="btn btn-label-secondary me-1" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+              <button type="submit" class="btn btn-primary">Update</button>
             </div>
           </form>
           <!--/ Edit role form -->

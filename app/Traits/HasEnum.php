@@ -11,7 +11,7 @@ trait HasEnum
     // Create an instance of the model to be able to get the table name
     $instance = new static;
 
-    $arr = DB::select(DB::raw('SHOW COLUMNS FROM ' . $instance->getTable() . ' WHERE Field = "' . $column . '"'));
+    $arr = DB::select('SHOW COLUMNS FROM ' . $instance->getTable() . ' WHERE Field = "' . $column . '"');
     if (count($arr) == 0) {
       return array();
     }
