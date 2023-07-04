@@ -34,6 +34,7 @@ use App\Models\RFPFile;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
+use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
 use App\Http\Controllers\Admin\Setting\OauthGoogleController;
 use App\Http\Controllers\Admin\Setting\OauthMicrosoftController;
@@ -134,6 +135,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::resource('programs.users', ProgramUserController::class);
 
     Route::resource('projects', ProjectController::class);
+    Route::resource('project-categories', ProjectCategoryController::class);
 
     Route::get('draft-rfps/{draft_rfp}/users', [RFPDraftController::class, 'draft_users_tab'])->name('draft-rfps.users_tab');
     Route::get('draft-rfps/{draft_rfp}/activity', [RFPDraftController::class, 'draft_activity_tab'])->name('draft-rfps.activity_tab');

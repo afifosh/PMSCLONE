@@ -117,10 +117,21 @@
       "slug": "admin.programs.index"
     },
     {
-      "url": "/admin/projects",
       "name": "Projects",
+      "slug": ["admin.projects.", "admin.project-categories"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
-      "slug": "admin.projects.index"
+      "submenu": [
+        {
+          "url": "/admin/projects",
+          "name": "Projects",
+          "slug": "admin.projects.index"
+        },
+        {
+          "url": "/admin/project-categories",
+          "name": "Project Categories",
+          "slug": "admin.project-categories.index"
+        }
+      ]
     },
     {
       "url": "/admin/mail/accounts",

@@ -26,7 +26,7 @@ class ProjectsDataTable extends DataTable
           return '<span class="badge bg-label-'.$this->resolveStatus($project->status)['color'].'">'.$this->resolveStatus($project->status)['status'].'</span>';
         })
         ->editColumn('members', function($project) {
-          return view('admin._partials.sections.user-avatar-group', ['users' => $project->members]);
+          return view('admin._partials.sections.user-avatar-group', ['users' => $project->members, 'limit' => 3]);
         })
         ->editColumn('tags', function($project){
           $tags = '';
@@ -36,6 +36,11 @@ class ProjectsDataTable extends DataTable
             }
           }
           return $tags;
+        })
+        ->filterColumn('members', function ($query, $keyword) {
+          $query->whereHas('members', function ($q) use ($keyword) {
+            return $q->where('first_name', 'like', '%' . $keyword . '%')->orWhere('last_name', 'like', '%' . $keyword . '%');
+          });
         })
         ->rawColumns(['status', 'tags']);
     }
