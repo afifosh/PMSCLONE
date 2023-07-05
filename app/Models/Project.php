@@ -31,4 +31,9 @@ class Project extends Model
   {
     return $this->belongsToMany(Admin::class, ProjectMember::class, 'project_id', 'admin_id')->withTimestamps();
   }
+
+  public function tasks()
+  {
+    return $this->hasMany(Task::class);
+  }
 }

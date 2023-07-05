@@ -18,7 +18,11 @@ class ProjectController extends Controller
    */
   public function index(ProjectsDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.projects.index');
+    $summary = Project::selectRaw('status, COUNT(*) as project_count')
+    ->whereIn('status', [0, 1, 2, 3, 4]) // 0: not started, 1: in progress, 2: on hold, 3: cancelled, 4: completed
+    ->groupBy('status')
+    ->get();
+    return $dataTable->render('admin.pages.projects.index', ['summary' => $summary]);
     // view('admin.pages.projects.index');
   }
 
@@ -30,7 +34,7 @@ class ProjectController extends Controller
     $data['programs'] = Program::pluck('name', 'id')->prepend('Select Program', '');
     $data['categories'] = ProjectCategory::pluck('name', 'id')->prepend('Select Category', '');
     $data['statuses'] = ['Active'];
-    $data['members'] = Admin::pluck('email', 'id');
+    $data['members'] = Admin::get();
     return view('admin.pages.projects.create', $data);
   }
 
@@ -49,7 +53,7 @@ class ProjectController extends Controller
    */
   public function show(Project $project)
   {
-    //
+    return view('admin.pages.projects.show', ['project' => $project]);
   }
 
   /**

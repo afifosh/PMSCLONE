@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Projects')
+@section('title', 'Tasks')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -25,32 +25,33 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
+@include('admin.pages.projects.navbar', ['tab' => 'tasks'])
 @can(true)
   <div class="mt-3  col-12">
     <div class="card">
       <div class="card-body">
         <div class="row">
-          <h4>Projects Summary</h4>
+          <h4>Tasks Summary</h4>
           <div class="row">
             <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 0)->first()->project_count ?? 0}}</h5>
+              <h5 class="mx-3">{{$summary->where('status', 'not started')->first()->task_count ?? 0}}</h5>
               <span class="">Not Started</span>
             </div>
             <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 1)->first()->project_count ?? 0}}</h5>
+              <h5 class="mx-3">{{$summary->where('status', 'in progress')->first()->task_count ?? 0}}</h5>
               <span class="text-primary">In Progress</span>
             </div>
             <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 2)->first()->project_count ?? 0}}</h5>
+              <h5 class="mx-3">{{$summary->where('status', 'on hold')->first()->task_count ?? 0}}</h5>
               <span class="text-warning">On Hold</span>
             </div>
             <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 3)->first()->project_count ?? 0}}</h5>
-              <span class="text-muted">Cancelled</span>
+              <h5 class="mx-3">{{$summary->where('status', 'awaiting feedback')->first()->task_count ?? 0}}</h5>
+              <span class="text-muted">Awaiting Feedback</span>
             </div>
             <div class="col-2 d-flex">
-              <h5 class="mx-3">{{$summary->where('status', 4)->first()->project_count ?? 0}}</h5>
-              <span class="text-success">Finished</span>
+              <h5 class="mx-3">{{$summary->where('status', 'completed')->first()->task_count ?? 0}}</h5>
+              <span class="text-success">Completed</span>
             </div>
         </div>
         <hr class="mt-2">

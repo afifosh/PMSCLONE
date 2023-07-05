@@ -54,7 +54,7 @@ $configData = Helper::appClasses();
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="tags" class="form-label">Tags</label>
-                {!! Form::select('tags[]', [], null, ['class' => 'form-select select2', 'multiple', 'data-tags' => true]) !!}
+                {!! Form::select('tags[]', [], null, ['class' => 'form-select select2', 'multiple', 'data-tags' => 'true']) !!}
               </div>
             </div>
             <div class="col-md-6">
@@ -75,10 +75,16 @@ $configData = Helper::appClasses();
                 {!! Form::select('status', $statuses, null, ['class' => 'form-select select2']) !!}
               </div>
             </div>
+
+            @php
+              $optionParameters = collect($members)->mapWithKeys(function ($item) {
+                  return [$item['id'] => ['data-full_name' => $item['full_name'], 'data-avatar' => $item['avatar']]];
+              })->all();
+            @endphp
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="members" class="form-label">Members</label>
-                {!! Form::select('members[]', $members, null, ['class' => 'form-select select2', 'multiple']) !!}
+                {!! Form::select('members[]', $members->pluck('email', 'id'), null, ['class' => 'form-select select2User', 'data-placeholder' => 'Select members', 'multiple' => 'multiple'], $optionParameters) !!}
               </div>
             </div>
             <div class="col-md-6">

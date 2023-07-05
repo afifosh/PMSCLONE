@@ -22,27 +22,26 @@ class ProjectsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+        ->editColumn('name', function($project){
+          return '<a href="'.route('admin.projects.show', $project->id).'">'.$project->name.'</a>';
+        })
         ->editColumn('status', function ($project) {
-          return '<span class="badge bg-label-'.$this->resolveStatus($project->status)['color'].'">'.$this->resolveStatus($project->status)['status'].'</span>';
+          return '<span class="badge bg-label-'.$this->resolveStatus($project->status)['color'].'" style="width:92px">'.$this->resolveStatus($project->status)['status'].'</span>';
         })
         ->editColumn('members', function($project) {
           return view('admin._partials.sections.user-avatar-group', ['users' => $project->members, 'limit' => 3]);
-        })
-        ->editColumn('tags', function($project){
-          $tags = '';
-          if($project->tags){
-            foreach($project->tags as $tag){
-              $tags .= '<span class="badge bg-label-secondary text-muted">'.htmlspecialchars($tag).'</span>';
-            }
-          }
-          return $tags;
         })
         ->filterColumn('members', function ($query, $keyword) {
           $query->whereHas('members', function ($q) use ($keyword) {
             return $q->where('first_name', 'like', '%' . $keyword . '%')->orWhere('last_name', 'like', '%' . $keyword . '%');
           });
         })
-        ->rawColumns(['status', 'tags']);
+        ->filterColumn('category', function ($query, $keyword) {
+          $query->whereHas('category', function ($q) use ($keyword) {
+            return $q->where('name', 'like', '%' . $keyword . '%');
+          });
+        })
+        ->rawColumns(['status', 'name']);
     }
 
     protected function resolveStatus($status)
@@ -74,7 +73,7 @@ class ProjectsDataTable extends DataTable
      */
     public function query(Project $model): QueryBuilder
     {
-        return $model->with('program', 'members')->newQuery();
+        return $model->with('program', 'members', 'category')->select('projects.*')->newQuery();
     }
 
     /**
@@ -102,7 +101,7 @@ class ProjectsDataTable extends DataTable
           <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
           >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
         )
-        ->orderBy(0, 'DESC')
+        ->orderBy(0, 'desc')
         ->parameters([
           'buttons' => $buttons,
           "scrollX" => true,
@@ -118,9 +117,10 @@ class ProjectsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('id')->title('ID'),
             Column::make('name')->title('Project Name'),
             Column::make('program.name')->title('Program Name'),
-            Column::make('tags'),
+            Column::make('category.name')->title('Category'),
             Column::make('start_date'),
             Column::make('deadline'),
             Column::make('members'),

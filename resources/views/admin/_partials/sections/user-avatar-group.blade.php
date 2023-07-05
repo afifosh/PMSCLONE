@@ -1,4 +1,4 @@
-<ul class="list-unstyled d-flex align-items-center avatar-group mb-0">';
+<ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
     @forelse ($users as $user)
     @php
         $limit = isset($limit) ? $limit : 0;
