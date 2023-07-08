@@ -23,6 +23,9 @@ class ProjectTasksDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
+    ->editColumn('subject', function($task){
+      return '<a href="#" data-href="'.route('admin.projects.tasks.show', [$task->project_id, $task->id]).'" data-toggle="ajax-modal" data-title ="Task Details">'.$task->subject.'</a>';
+    })
     ->editColumn('assignees', function($task) {
       return view('admin._partials.sections.user-avatar-group', ['users' => $task->assignees, 'limit' => 3]);
     })
@@ -39,7 +42,8 @@ class ProjectTasksDataTable extends DataTable
       $query->whereHas('assignees', function ($q) use ($keyword) {
         return $q->where('first_name', 'like', '%' . $keyword . '%')->orWhere('last_name', 'like', '%' . $keyword . '%');
       });
-    });
+    })
+    ->rawColumns(['subject']);
   }
 
   /**

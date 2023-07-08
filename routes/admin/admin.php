@@ -37,6 +37,8 @@ use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
 use App\Http\Controllers\Admin\Project\ProjectTaskController;
+use App\Http\Controllers\Admin\Project\TaskChecklistController;
+use App\Http\Controllers\Admin\Project\TaskFileController;
 use App\Http\Controllers\Admin\Setting\OauthGoogleController;
 use App\Http\Controllers\Admin\Setting\OauthMicrosoftController;
 use Modules\Core\Http\Controllers\ApplicationController;
@@ -137,6 +139,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
     Route::resource('projects', ProjectController::class);
     Route::resource('projects.tasks', ProjectTaskController::class);
+    Route::resource('projects.tasks.files', TaskFileController::class)->only(['store', 'destroy']);
+    Route::put('projects/{project}/tasks/{task}/checklist-items/update-order', [TaskChecklistController::class, 'updateOrder'])->name('projects.tasks.checklist-items.update-order');
+    Route::resource('projects.tasks.checklist-items', TaskChecklistController::class);
     Route::resource('project-categories', ProjectCategoryController::class);
 
     Route::get('draft-rfps/{draft_rfp}/users', [RFPDraftController::class, 'draft_users_tab'])->name('draft-rfps.users_tab');

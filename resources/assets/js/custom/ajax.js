@@ -538,6 +538,11 @@ $(document).on('click', '[data-toggle="ajax-modal"]', function () {
       if(typeof initFlatPickr != 'undefined'){
         initFlatPickr();
       }
+      if(response.data.JsMethods != undefined && response.data.JsMethods != null && response.data.JsMethods != ''){
+        for(var i = 0; i < response.data.JsMethods.length; i++){
+          eval(response.data.JsMethods[i]+'()');
+        }
+      }
       $('#globalModal').modal('show');
     },
   });

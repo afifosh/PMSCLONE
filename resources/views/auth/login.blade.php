@@ -21,6 +21,7 @@
     <script src="{{ asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js') }}"></script>
+    <script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -28,7 +29,7 @@
     <script src="{{ asset('assets/vendor/libs/fingerprint2/fingerprint2.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/ua-parser/ua-parser.min.js') }}"></script>
     <script src="{{ asset('assets/js/login-page/fingerprintJs.js') }}"></script>
-    <script async src="{{ asset('assets/vendor/libs/fingerprintJs3/fp.min.js') }}" onload="initFingerprintJS()" ></script>
+    <script async src="{{ asset('assets/vendor/libs/fingerprintJs3/fp.min.js') }}"></script>
     {{-- <script src="https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/detectIncognito.min.js"></script> --}}
 @endsection
 
@@ -97,7 +98,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3" id="login-form">
                                 <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
                             </div>
                         </form>

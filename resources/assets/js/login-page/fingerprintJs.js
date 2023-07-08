@@ -6,6 +6,26 @@ function getBarComponent() {
   return window.navigator.userAgent;
 }
 
+function blockForm(){
+  $('#login-form').block({
+    message:
+      '<div class="ms-5 mt-2 sk-fold sk-primary"><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div><div class="sk-fold-cube"></div></div><h5>LOADING...</h5>',
+
+    css: {
+      backgroundColor: 'transparent',
+      border: '0'
+    },
+    overlayCSS: {
+      backgroundColor: $('html').hasClass('dark-style') ? '#000' : '#fff',
+      opacity: 0.55
+    }
+  });
+}
+
+function unblockForm(){
+  $('#login-form').unblock();
+}
+
 async function getVisitorCountrycode() {
   const { data } = await axios.get('https://api.country.is');
   return data.country;
@@ -15,6 +35,7 @@ async function getVisitorIPaddress() {
   return data.ip;
 }
 window.initFingerprintJS = async function () {
+  blockForm();
   const fp = await FingerprintJS.load();
   const result = await fp.get();
   const {
@@ -74,7 +95,8 @@ window.initFingerprintJS = async function () {
   // Make a visitor identifier from your custom list of components
   const visitorId = FingerprintJS.hashComponents(extendedComponents);
   $('input#fingerprint').val(visitorId);
-  if(!visitorId) {
+  unblockForm();
+  if (!visitorId) {
     alert('Please disable your adblocker and refresh the page');
   }
   console.log('visitorId:', visitorId);
@@ -264,4 +286,9 @@ var incognito = detectIncognito().then(info => {
   } else {
     return false;
   }
+});
+
+$(document).ready(function () {
+  console.log('document ready')
+  initFingerprintJS();
 });
