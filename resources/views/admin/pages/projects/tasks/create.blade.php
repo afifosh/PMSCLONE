@@ -28,7 +28,7 @@
   @php
   $priority = $task::getPossibleEnumValues('priority');
   @endphp
-    {!! Form::select('priority', array_combine($priority, array_map('ucwords',$priority)), $task->priority, ['class' => 'form-select globalOfSelect2']) !!}
+    {!! Form::select('priority', array_combine($priority, $priority), $task->priority, ['class' => 'form-select globalOfSelect2']) !!}
   </div>
 
   {{-- status --}}
@@ -37,7 +37,7 @@
   @php
   $enum = $task::getPossibleEnumValues('status');
   @endphp
-    {!! Form::select('status', array_combine($enum, array_map('ucwords',$enum)), $task->status, ['class' => 'form-select globalOfSelect2']) !!}
+    {!! Form::select('status', array_combine($enum, $enum), $task->status, ['class' => 'form-select globalOfSelect2']) !!}
   </div>
 
   {{-- Assignee --}}

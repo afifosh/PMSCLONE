@@ -7,6 +7,7 @@ use App\Models\Task;
 use Illuminate\Http\Request;
 use Plank\Mediable\Exceptions\MediaUploadException;
 use Plank\Mediable\Facades\MediaUploader;
+use Plank\Mediable\Media;
 
 class TaskFileController extends Controller
 {
@@ -24,5 +25,12 @@ class TaskFileController extends Controller
 
       return $this->response(['message' => $exception->getMessage()], $exception->getStatusCode());
     }
+  }
+
+  public function destroy($project, Task $task, Media $file)
+  {
+    $file->delete();
+    // $task->detachMedia($file);
+    return $this->sendRes('File deleted successfully', []);
   }
 }

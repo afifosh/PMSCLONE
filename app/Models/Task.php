@@ -53,4 +53,9 @@ class Task extends Model
   {
     return $this->hasMany(TaskCheckListItem::class, 'task_id', 'id')->orderBy('order');
   }
+
+  public function reminders()
+  {
+    return $this->hasMany(TaskReminder::class, 'task_id', 'id');
+  }
 }

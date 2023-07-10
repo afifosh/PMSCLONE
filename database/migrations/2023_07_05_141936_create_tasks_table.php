@@ -19,9 +19,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->dateTime('start_date')->nullable();
             $table->dateTime('due_date')->nullable();
-            $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('low');
+            $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent'])->default('Low');
             $table->json('tags')->nullable();
-            $table->enum('status', ['not started', 'in progress', 'on hold', 'awaiting feedback', 'completed'])->default('not started');
+            $table->enum('status', ['Not Started', 'In Progress', 'On Hold', 'Awaiting Feedback', 'Completed'])->default('Not Started');
             $table->timestamps();
         });
     }

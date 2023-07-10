@@ -24,7 +24,7 @@ class ProjectTasksDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
     ->editColumn('subject', function($task){
-      return '<a href="#" data-href="'.route('admin.projects.tasks.show', [$task->project_id, $task->id]).'" data-toggle="ajax-modal" data-title ="Task Details">'.$task->subject.'</a>';
+      return '<a href="#" data-href="'.route('admin.projects.tasks.show', [$task->project_id, $task->id]).'" data-size="modal-lg" data-toggle="ajax-modal" data-title ="Task Details">'.$task->subject.'</a>';
     })
     ->editColumn('assignees', function($task) {
       return view('admin._partials.sections.user-avatar-group', ['users' => $task->assignees, 'limit' => 3]);

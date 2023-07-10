@@ -12,6 +12,7 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/css/tasks/style.css')}}" />
 @endsection
 
 @section('vendor-script')
@@ -27,6 +28,10 @@ $configData = Helper::appClasses();
 <script src={{asset('assets/js/custom/select2.js')}}></script>
 {{-- <script src="{{asset('assets/js/extended-ui-drag-and-drop.js')}}"></script> --}}
 <script>
+  $(document).ready(function () {
+    Dropzone.options.projectFilesUpload = false;
+    Dropzone.options.projectExpenseForm = false;
+  });
   function initSortable() {
     var sortable = Sortable.create(document.getElementById('sortable'), {
       group: 'shared',
@@ -142,17 +147,17 @@ $configData = Helper::appClasses();
     });
   }
   function add_checklist(task_id, elm){
-    var checklist = `<li class="list-group-item drag-item cursor-move d-flex mt-1" data-task-id="${task_id}" data-project-id="0">
-          <div class="form-check form-check-success mt-2">
+    var checklist = `<li class="list-group-item drag-item rounded cursor-move d-flex mt-1" data-task-id="${task_id}" data-project-id="0">
+          <div class="form-check form-check-success">
             <input class="form-check-input rounded-circle" type="checkbox" value="1">
           </div>
-          <div class="">
-              <input type="text" name="" id="" class="form-control">
+          <div class="flex-grow-1">
+              <input type="text" class="w-100 border-0">
           </div>
-          <div class="mt-2 ms-3">
-              <i class="fa-regular fa-xl fa-user cursor-pointer"></i>
-              <i class="fa-solid fa-xl fa-copy cursor-pointer"></i>
-              <i onclick="delete_checklist(this)" class="fa-regular fa-xl fa-trash-can cursor-pointer"></i>
+          <div class="ms-3">
+              <i class="fa-regular fa-md fa-user cursor-pointer"></i>
+              <i class="fa-solid fa-md fa-copy cursor-pointer"></i>
+              <i onclick="delete_checklist(this)" class="fa-regular fa-md fa-trash-can cursor-pointer"></i>
           </div>
       </li>`;
 
@@ -243,6 +248,21 @@ $configData = Helper::appClasses();
           }
         });
       }
+    }
+  }
+
+  function remove_task_attachment(id, task_id){
+    if(confirm('Are you sure you want to delete this attachment?')){
+      var url = "{{route('admin.projects.tasks.files.destroy', ['task' => ':task_id', 'project' => ':project_id', 'file' => ':file_id'])}}";
+      url = url.replace(':file_id', id);
+      url = url.replace(':task_id', task_id);
+      $.ajax({
+        url: url,
+        type: "DELETE",
+        success: function(data){
+          $('[data-task-file-id="'+id+'"]').remove();
+        }
+      });
     }
   }
 </script>

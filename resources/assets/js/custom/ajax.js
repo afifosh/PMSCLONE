@@ -319,6 +319,13 @@ for (const input of inputs) {
           }else if(data.data.close == 'modal'){
             current.closest('.modal').modal('hide');
           }
+          console.log(data.data);
+          if(data.data.JSmethods != undefined && data.data.JSmethods != null && data.data.JSmethods != ''){
+            console.log(data.data.JSmethods)
+            for(var i = 0; i < data.data.JSmethods.length; i++){
+              eval(data.data.JSmethods[i]+'()');
+            }
+          }
         }
       }
       if (data.status == false) {
