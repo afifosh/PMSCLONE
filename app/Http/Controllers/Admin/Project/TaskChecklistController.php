@@ -12,9 +12,9 @@ class TaskChecklistController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($project, Task $task)
     {
-        //
+      return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.checklist-index', compact('task'))->render()]);
     }
 
     /**
@@ -31,11 +31,10 @@ class TaskChecklistController extends Controller
     public function store($project, Task $task, Request $request)
     {
       $request->validate([
-        'title' => 'required|string|max:255',
-        'status' => 'required|in:false,true',
+        'title' => 'required|string|max:255'
       ]);
 
-      $checklist = $task->checklistItems()->create($request->only(['title'])+ ['order' => $task->checklistItems()->count() + 1, 'status' => $request->status == 'true' ? true : false]);
+      $checklist = $task->checklistItems()->create($request->only(['title'])+ ['order' => $task->checklistItems()->count() + 1]);
 
       return $this->sendRes('Checklist item created successfully', ['id' => $checklist->id]);
     }
@@ -59,14 +58,13 @@ class TaskChecklistController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update($project, Task $task, Request $request, TaskCheckListItem $checklistItem)
+    public function update($project, $task, Request $request, TaskCheckListItem $checklistItem)
     {
       $request->validate([
-        'title' => 'required|string|max:255',
         'status' => 'required|in:false,true',
       ]);
 
-      $checklistItem->update($request->only(['title']) + ['status' => $request->status == 'true' ? true : false]);
+      $checklistItem->update(['status' => $request->status == 'true' ? true : false]);
 
       return $this->sendRes('Checklist item updated successfully');
     }

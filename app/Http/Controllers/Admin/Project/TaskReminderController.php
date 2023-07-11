@@ -4,10 +4,16 @@ namespace App\Http\Controllers\Admin\Project;
 
 use App\Http\Controllers\Controller;
 use App\Models\Task;
+use App\Models\TaskReminder;
 use Illuminate\Http\Request;
 
 class TaskReminderController extends Controller
 {
+  public function index($project, Task $task)
+  {
+    return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.reminders-index', compact('task'))->render()]);
+  }
+
   public function store($project, Task $task, Request $request)
   {
     $request->validate([
@@ -22,6 +28,12 @@ class TaskReminderController extends Controller
       'can_send_email' => $request->boolean('can_send_email'),
     ]);
 
-    return $this->sendRes('Reminder added successfully.',['JSmethods' => ['update_reminder_form']]);
+    return $this->sendRes('Reminder added successfully.',['JSmethods' => ['update_reminder_form', 'reload_reminder_list']]);
+  }
+
+  public function destroy($project, $task, TaskReminder $reminder)
+  {
+    $reminder->delete();
+    return $this->sendRes('Reminder deleted successfully', []);
   }
 }

@@ -54,7 +54,7 @@ class ProjectTaskController extends Controller
   public function show(Project $project, Task $task)
   {
     $task->load('project', 'checklistItems');
-    return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.show', compact('task'))->render(), 'JsMethods' => ['initSortable', 'initDropZone']]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.show', compact('task'))->render(), 'JsMethods' => ['initSortable', 'initDropZone', 'initEditor']]);
   }
 
   /**

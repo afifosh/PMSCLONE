@@ -22,6 +22,7 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/sortablejs/sortable.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
+<script src="{{asset('vendor/tinymce/tinymce.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -31,7 +32,21 @@ $configData = Helper::appClasses();
   $(document).ready(function () {
     Dropzone.options.projectFilesUpload = false;
     Dropzone.options.projectExpenseForm = false;
+
   });
+
+  function initEditor(){
+    // destroy old editor
+    tinymce.remove();
+    tinymce.init({
+      selector: 'textarea.init-editor',
+      menubar: false,
+      toolbar: 'undo redo | formatselect | ' +
+        'bold italic backcolor | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'removeformat | help',
+    });
+  }
   function initSortable() {
     var sortable = Sortable.create(document.getElementById('sortable'), {
       group: 'shared',
@@ -100,6 +115,7 @@ $configData = Helper::appClasses();
             console.log(response);
             // remote this uploaded file from preview
             this.removeFile(file);
+            reload_files_list();
         },
         init: function(){
             /* Called once the file has been processed. It could have failed or succeded */
@@ -145,110 +161,6 @@ $configData = Helper::appClasses();
         }
       });
     });
-  }
-  function add_checklist(task_id, elm){
-    var checklist = `<li class="list-group-item drag-item rounded cursor-move d-flex mt-1" data-task-id="${task_id}" data-project-id="0">
-          <div class="form-check form-check-success">
-            <input class="form-check-input rounded-circle" type="checkbox" value="1">
-          </div>
-          <div class="flex-grow-1">
-              <input type="text" class="w-100 border-0">
-          </div>
-          <div class="ms-3">
-              <i class="fa-regular fa-md fa-user cursor-pointer"></i>
-              <i class="fa-solid fa-md fa-copy cursor-pointer"></i>
-              <i onclick="delete_checklist(this)" class="fa-regular fa-md fa-trash-can cursor-pointer"></i>
-          </div>
-      </li>`;
-
-      $(elm).parent().parent().parent().find('.list-group').append(checklist);
-      // focus on the new checklist
-      $(elm).parent().parent().parent().find('.list-group li:last-child input').focus();
-  }
-
-  // listen for focus out on the checklist input
-  $(document).on('focusout', '.list-group li input[type="text"]', function(){
-    handleChecklist($(this));
-  });
-
-  // listen for enter key on the checklist input
-  $(document).on('keyup', '.list-group li input[type="text"]', function(e){
-    if(e.keyCode == 13){
-      $(this).blur();
-    }
-  });
-
-  // listen for click on the checklist checkbox
-  $(document).on('click', '.list-group li input[type="checkbox"]', function(){
-    handleChecklist($(this).parent().parent().find('input[type="text"]'));
-  });
-
-  function handleChecklist(elm){
-    elm = $(elm).parent().parent().find('input[type="text"]');
-    if($(elm).val() == ''){
-      $(elm).parent().parent().remove();
-      return;
-    }
-    var task_id = $(elm).parent().parent().attr('data-task-id');
-    var project_id = $(elm).parent().parent().attr('data-project-id');
-    var checklist_id = $(elm).parent().parent().attr('data-checklist-id');
-    var checklist_status = $(elm).parent().parent().find('input[type="checkbox"]').is(':checked');
-    var checklist_name = $(elm).val();
-    if(checklist_id == undefined){
-      // create new checklist
-      var url = "{{route('admin.projects.tasks.checklist-items.store', ['task' => ':task_id', 'project' => ':project_id'])}}";
-      url = url.replace(':task_id', task_id);
-      url = url.replace(':project_id', project_id);
-      $.ajax({
-        url: url,
-        type: "POST",
-        data: {
-          title: checklist_name,
-          status: checklist_status,
-        },
-        success: function(res){
-          $(elm).parent().parent().attr('data-checklist-id', res.data.id);
-        }
-      });
-    }else{
-      // update checklist
-      var url = "{{route('admin.projects.tasks.checklist-items.update', ['task' => ':task_id', 'project' => ':project_id', 'checklist_item' => ':checklist_id'])}}";
-      url = url.replace(':task_id', task_id);
-      url = url.replace(':project_id', project_id);
-      url = url.replace(':checklist_id', checklist_id);
-
-      $.ajax({
-        url: url,
-        type: "PUT",
-        data: {
-          title: checklist_name,
-          status: checklist_status,
-        },
-        success: function(data){
-        }
-      });
-    }
-  }
-
-  function delete_checklist(elm) {
-    var checklist_id = $(elm).parent().parent().attr('data-checklist-id');
-    if(checklist_id == undefined || checklist_id == ''){
-      $(elm).parent().parent().remove();
-      return;
-    }else{
-      // prompt user to confirm
-      if(confirm('Are you sure you want to delete this checklist?')){
-        $(elm).parent().parent().remove();
-        var url = "{{route('admin.projects.tasks.checklist-items.destroy', ['task' => ':task_id', 'project' => ':project_id', 'checklist_item' => ':checklist_id'])}}";
-        url = url.replace(':checklist_id', checklist_id);
-        $.ajax({
-          url: url,
-          type: "DELETE",
-          success: function(data){
-          }
-        });
-      }
-    }
   }
 
   function remove_task_attachment(id, task_id){

@@ -11,6 +11,11 @@ use Plank\Mediable\Media;
 
 class TaskFileController extends Controller
 {
+  public function index($project, Task $task)
+  {
+    return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.files-index', compact('task'))->render()]);
+  }
+
   public function store($project, Task $task, Request $request)
   {
     try {

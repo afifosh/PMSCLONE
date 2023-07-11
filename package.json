@@ -110,6 +110,7 @@
     "sweetalert2": "11.7.9",
     "swiper": "8.4.2",
     "timepicker": "1.13.18",
+    "tinymce": "^6.5.1",
     "tldts": "^6.0.3",
     "toastr": "2.1.4",
     "truncate-html": "^1.0.4",
