@@ -28,7 +28,7 @@ class TaskReminderController extends Controller
       'can_send_email' => $request->boolean('can_send_email'),
     ]);
 
-    return $this->sendRes('Reminder added successfully.',['JSmethods' => ['update_reminder_form', 'reload_reminder_list']]);
+    return $this->sendRes('Reminder added successfully.',['JsMethods' => ['update_reminder_form', 'reload_reminder_list']]);
   }
 
   public function destroy($project, $task, TaskReminder $reminder)

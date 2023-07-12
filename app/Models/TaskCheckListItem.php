@@ -11,6 +11,8 @@ class TaskCheckListItem extends Model
 
   protected $fillable = [
     'task_id',
+    'created_by',
+    'completed_by',
     'title',
     'status',
     'order'
@@ -23,5 +25,15 @@ class TaskCheckListItem extends Model
   public function task()
   {
     return $this->belongsTo(Task::class, 'task_id', 'id');
+  }
+
+  public function createdBy()
+  {
+    return $this->belongsTo(Admin::class, 'created_by', 'id');
+  }
+
+  public function completedBy()
+  {
+    return $this->belongsTo(Admin::class, 'completed_by', 'id');
   }
 }

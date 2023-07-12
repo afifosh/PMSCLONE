@@ -320,10 +320,10 @@ for (const input of inputs) {
             current.closest('.modal').modal('hide');
           }
           console.log(data.data);
-          if(data.data.JSmethods != undefined && data.data.JSmethods != null && data.data.JSmethods != ''){
-            console.log(data.data.JSmethods)
-            for(var i = 0; i < data.data.JSmethods.length; i++){
-              eval(data.data.JSmethods[i]+'()');
+          if(data.data.JsMethods != undefined && data.data.JsMethods != null && data.data.JsMethods != ''){
+            console.log(data.data.JsMethods)
+            for(var i = 0; i < data.data.JsMethods.length; i++){
+              eval(data.data.JsMethods[i]+'()');
             }
           }
         }

@@ -6,11 +6,13 @@ use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Media\HasMedia;
+use Spatie\Comments\Models\Concerns\HasComments;
 
 class Task extends Model
 {
   use HasFactory, HasEnum;
   use HasMedia;
+  use HasComments;
 
   protected $fillable = [
     'subject',
@@ -21,6 +23,7 @@ class Task extends Model
     'due_date',
     'tags',
     'admin_id',
+    'is_completed_checklist_hidden',
   ];
 
   protected $casts = [
@@ -59,8 +62,26 @@ class Task extends Model
     return $this->hasMany(TaskReminder::class, 'task_id', 'id');
   }
 
-  public function comments()
+  // public function comments()
+  // {
+  //   return $this->hasMany(TaskComment::class, 'task_id', 'id');
+  // }
+
+  /*
+ * This string will be used in notifications on what a new comment
+ * was made.
+ */
+  public function commentableName(): string
   {
-    return $this->hasMany(TaskComment::class, 'task_id', 'id');
+    return $this->subject;
+  }
+
+  /*
+ * This URL will be used in notifications to let the user know
+ * where the comment itself can be read.
+ */
+  public function commentUrl(): string
+  {
+    return '#';
   }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Models\TaskCheckListItem;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TaskChecklistController extends Controller
 {
@@ -31,12 +32,21 @@ class TaskChecklistController extends Controller
     public function store($project, Task $task, Request $request)
     {
       $request->validate([
-        'title' => 'required|string|max:255'
+        'title' => [
+          'required',
+          'string',
+          'max:255',
+          Rule::unique('task_check_list_items')->where(function ($query) use ($task) {
+            return $query->where('task_id', $task->id)->where('title', request()->title);
+          })
+        ],
+      ], [
+        'title.unique' => 'Checklist item already exists',
       ]);
 
-      $checklist = $task->checklistItems()->create($request->only(['title'])+ ['order' => $task->checklistItems()->count() + 1]);
+      $checklist = $task->checklistItems()->create($request->only(['title'])+ ['order' => $task->checklistItems()->count() + 1, 'created_by' => auth()->id()]);
 
-      return $this->sendRes('Checklist item created successfully', ['id' => $checklist->id]);
+      return $this->sendRes('Checklist item created successfully', ['id' => $checklist->id, 'JsMethods' => ['reload_task_checklist', 'reset_checklist_form']]);
     }
 
     /**
@@ -61,10 +71,11 @@ class TaskChecklistController extends Controller
     public function update($project, $task, Request $request, TaskCheckListItem $checklistItem)
     {
       $request->validate([
-        'status' => 'required|in:false,true',
+        'status' => 'required',
       ]);
 
-      $checklistItem->update(['status' => $request->status == 'true' ? true : false]);
+      if($checklistItem->status != $request->boolean('status'))
+      $checklistItem->update(['status' => $request->boolean('status'), 'completed_by' => $request->boolean('status') ? auth()->id() : null]);
 
       return $this->sendRes('Checklist item updated successfully');
     }

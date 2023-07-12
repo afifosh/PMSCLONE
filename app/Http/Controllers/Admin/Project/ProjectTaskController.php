@@ -79,6 +79,12 @@ class ProjectTaskController extends Controller
     return $this->sendRes('Task Updated successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);
   }
 
+  public function hideCompleted($project, Task $task, $status = false)
+  {
+    $task->update(['is_completed_checklist_hidden' => $status ? 1 : 0]);
+    return $this->sendRes('Task Updated successfully', ['JsMethods' => ['reload_task_checklist']]);
+  }
+
   /**
    * Remove the specified resource from storage.
    */

@@ -141,7 +141,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
     Route::resource('projects', ProjectController::class);
     Route::resource('projects.tasks', ProjectTaskController::class);
-    Route::resource('projects.tasks.comments', TaskCommentController::class)->only(['index','store', 'destroy']);
+    Route::put('projects/{project}/tasks/{task}/hide-completed/{status?}', [ProjectTaskController::class, 'hideCompleted'])->name('projects.tasks.hide-completed');
     Route::resource('projects.tasks.files', TaskFileController::class)->only(['index', 'store', 'destroy']);
     Route::resource('projects.tasks.reminders', TaskReminderController::class)->only(['index', 'store', 'destroy']);
     Route::put('projects/{project}/tasks/{task}/checklist-items/update-order', [TaskChecklistController::class, 'updateOrder'])->name('projects.tasks.checklist-items.update-order');

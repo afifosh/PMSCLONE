@@ -251,6 +251,24 @@
       0 => 'Spatie\\Activitylog\\ActivitylogServiceProvider',
     ),
   ),
+  'spatie/laravel-comments' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\Comments\\CommentsServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Comments' => 'Spatie\\Comments\\Facades\\Comments',
+    ),
+  ),
+  'spatie/laravel-comments-livewire' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\LivewireComments\\LivewireCommentsServiceProvider',
+    ),
+  ),
   'spatie/laravel-ignition' => 
   array (
     'providers' => 
@@ -260,6 +278,13 @@
     'aliases' => 
     array (
       'Flare' => 'Spatie\\LaravelIgnition\\Facades\\Flare',
+    ),
+  ),
+  'spatie/laravel-markdown' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Spatie\\LaravelMarkdown\\MarkdownServiceProvider',
     ),
   ),
   'spatie/laravel-permission' => 

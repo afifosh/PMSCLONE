@@ -20,6 +20,7 @@ return new class extends Migration
             $table->dateTime('start_date')->nullable();
             $table->dateTime('due_date')->nullable();
             $table->enum('priority', ['Low', 'Medium', 'High', 'Urgent'])->default('Low');
+            $table->boolean('is_completed_checklist_hidden')->default(false);
             $table->json('tags')->nullable();
             $table->enum('status', ['Not Started', 'In Progress', 'On Hold', 'Awaiting Feedback', 'Completed'])->default('Not Started');
             $table->timestamps();

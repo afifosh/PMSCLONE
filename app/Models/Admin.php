@@ -27,13 +27,16 @@ use Spatie\Permission\Traits\HasPermissions;
 use Modules\Core\Contracts\Localizeable;
 use Modules\MailClient\Models\EmailAccount;
 use ProtoneMedia\LaravelVerifyNewEmail\MustVerifyNewEmail;
+use Spatie\Comments\Models\Concerns\InteractsWithComments;
+use Spatie\Comments\Models\Concerns\Interfaces\CanComment;
 
-class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditable, Localizeable
+class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditable, Localizeable, CanComment
 {
   use HasApiTokens, HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable, Impersonate, HasEnum, AuthenticationLoggable, AuthLogs, HasPermissions;
   use \OwenIt\Auditing\Auditable;
   use HasMeta, ApprovesChanges;
   use MustVerifyNewEmail;
+  use InteractsWithComments;
   /**
    * The attributes that are mass assignable.
    *

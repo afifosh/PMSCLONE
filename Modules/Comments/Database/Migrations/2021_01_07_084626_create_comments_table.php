@@ -21,13 +21,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('comments', function (Blueprint $table) {
-            $table->id();
-            $table->text('body');
-            $table->foreignId('created_by')->constrained('users');
-            $table->morphs('commentable');
-            $table->timestamps();
-        });
+        // Schema::create('comments', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->text('body');
+        //     $table->foreignId('created_by')->constrained('users');
+        //     $table->morphs('commentable');
+        //     $table->timestamps();
+        // });
     }
 
     /**
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('comments');
+        // Schema::dropIfExists('comments');
     }
 };

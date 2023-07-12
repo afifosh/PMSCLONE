@@ -7,10 +7,16 @@
 }
 </style>
 <div class="row d-flex">
-  <div class="d-flex my-2">
-    <textarea class="form-control me-1" placeholder="What you wanna do today?" id="checklist-input" rows="1"></textarea>
-    <button class="btn btn-success  align-self-center" onclick="add_checklist({{$task->id}}, {{$task->project_id}}, this)">Add</button>
-  </div>
+  <form action="{{route('admin.projects.tasks.checklist-items.store', ['task' => $task->id, 'project' => $task->project_id])}}">
+    <div class="d-flex my-2">
+      <div class="flex-grow-1  me-1">
+        <textarea class="form-control" name="title" placeholder="What you wanna do today?" id="checklist-input" rows="1"></textarea>
+      </div>
+      <div>
+        <button class="btn btn-primary  align-self-center" data-form="ajax-form">Add</button>
+      </div>
+    </div>
+  </form>
 </div>
 
 <ul class="p-0 list-group list-group-flush" id="sortable">
@@ -25,7 +31,7 @@
   $(document).on('click', '.checklist-status', function(){
     var checklist_id = $(this).parents('li').data('checklist-id');
     var task_id = $(this).parents('li').data('task-id');
-    var status = $(this).is(':checked');
+    var status = $(this).is(':checked') ? 1 : 0;
     var url = "{{route('admin.projects.tasks.checklist-items.update', ['task' => ':task_id', 'project' => ':project_id', 'checklist_item' => ':checklist_id'])}}";
     url = url.replace(':checklist_id', checklist_id);
     url = url.replace(':task_id', task_id);
@@ -36,33 +42,13 @@
         status: status,
       },
       success: function(res){
-        reload_task_checklist(task_id);
+        reload_task_checklist();
       }
     });
   });
 
-  function add_checklist(task_id, project_id, elm){
-    elm = $(elm).parents().find('#checklist-input');
-    if($(elm).val() == ''){
-      return;
-    }
-    var checklist_name = $(elm).val();
-    // create new checklist
-    var url = "{{route('admin.projects.tasks.checklist-items.store', ['task' => ':task_id', 'project' => ':project_id'])}}";
-    url = url.replace(':task_id', task_id);
-    url = url.replace(':project_id', project_id);
-    $.ajax({
-      url: url,
-      type: "POST",
-      data: {
-        title: checklist_name,
-        status: '',
-      },
-      success: function(res){
-        $(elm).val('');
-        reload_task_checklist(task_id);
-      }
-    });
+  function reset_checklist_form(){
+    $('#checklist-input').val('');
   }
 
   function delete_checklist(checklist_id, task_id) {
@@ -74,15 +60,14 @@
           url: url,
           type: "DELETE",
           success: function(data){
-            reload_task_checklist(task_id);
+            reload_task_checklist();
           }
         });
       }
   }
 
-  function reload_task_checklist(task_id){
-    var url = "{{route('admin.projects.tasks.checklist-items.index', ['task' => ':task_id', 'project' => ':project_id'])}}";
-    url = url.replace(':task_id', task_id);
+  function reload_task_checklist(){
+    var url = "{{route('admin.projects.tasks.checklist-items.index', ['task' => $task->id, 'project' => $task->project_id])}}";
     $.ajax({
       url: url,
       type: "GET",

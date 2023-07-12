@@ -15,6 +15,7 @@ return new class extends Migration
       $table->id();
       $table->foreignId('task_id')->constrained('tasks')->cascadeOnDelete();
       $table->foreignId('created_by')->nullable()->constrained('admins')->cascadeOnDelete();
+      $table->foreignId('completed_by')->nullable()->constrained('admins')->cascadeOnDelete();
       $table->string('title');
       $table->boolean('status')->default(0);
       $table->integer('order')->default(0);
