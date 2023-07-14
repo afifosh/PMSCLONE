@@ -132,7 +132,7 @@
                                     class="comments-reaction-picker"
                                 >
                                     @can('react', $comment)
-                                        <button class="comments-reaction-picker-trigger" type="button"
+                                        <button class="comments-reaction-picker-trigger btn btn-outline-danger btn-sm" type="button"
                                                 @click="open = !open">
                                             <x-comments::icons.smile/>
                                         </button>
@@ -147,7 +147,7 @@
                                                     @endphp
                                                     <button
                                                         type="button"
-                                                        @class(['comments-reaction-picker-reaction', 'is-reacted' => $commentatorReacted])
+                                                        @class(['comments-reaction-picker-reaction btn btn-outline-danger btn-sm', 'is-reacted' => $commentatorReacted])
                                                         wire:click="toggleReaction('{{ $reaction }}')"
                                                     >
                                                         {{ $reaction }}

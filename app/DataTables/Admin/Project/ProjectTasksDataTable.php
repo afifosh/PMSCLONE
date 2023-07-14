@@ -24,13 +24,14 @@ class ProjectTasksDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
     ->editColumn('subject', function($task){
-      return '<a href="javascript:;" data-href="'.route('admin.projects.tasks.show', [$task->project_id, $task->id]).'" data-size="modal-lg" data-toggle="ajax-modal" data-title ="Task Details">'.$task->subject.'</a>';
+      return '<a href="javascript:;" data-href="'.route('admin.projects.tasks.show', [$task->project_id, $task->id]).'" data-size="modal-xl" data-toggle="ajax-modal" data-title ="Task Details">'.$task->subject.'</a>';
     })
     ->editColumn('assignees', function($task) {
       return view('admin._partials.sections.user-avatar-group', ['users' => $task->assignees, 'limit' => 3]);
     })
-    ->editColumn('priority', function($task){
-      return ucwords($task->priority);
+    ->addColumn('progress', function($task){
+      $progress = $task->checklistItems->count() != 0 ? $task->checklistItems->whereNotNull('completed_by')->count() / $task->checklistItems->count() * 100 : 0;
+      return view('admin._partials.sections.progressBar', ['perc' => $progress, 'color' => 'primary']);
     })
     ->editColumn('status', function($task){
       return ucwords($task->status);
@@ -104,7 +105,7 @@ class ProjectTasksDataTable extends DataTable
       Column::make('start_date'),
       Column::make('due_date'),
       Column::make('assignees'),
-      Column::make('priority'),
+      Column::make('progress')->searchable(false)->orderable(false),
     ];
   }
 

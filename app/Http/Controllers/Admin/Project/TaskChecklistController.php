@@ -98,6 +98,6 @@ class TaskChecklistController extends Controller
     public function destroy($project, $task, TaskCheckListItem $checklistItem)
     {
       $checklistItem->delete();
-      return $this->sendRes('Checklist item deleted successfully');
+      return $this->sendRes('Checklist item deleted successfully', ['id' => 1]);
     }
 }

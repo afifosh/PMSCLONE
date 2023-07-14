@@ -31,6 +31,10 @@ class ProjectsDataTable extends DataTable
         ->editColumn('members', function($project) {
           return view('admin._partials.sections.user-avatar-group', ['users' => $project->members, 'limit' => 3]);
         })
+        ->addColumn('progress', function($proj){
+          $progress = $proj->tasks->count() != 0 ? $proj->tasks->where('status', 'Completed')->count() / $proj->tasks->count() * 100 : 0;
+          return view('admin._partials.sections.progressBar', ['perc' => $progress, 'color' => 'primary']);
+        })
         ->filterColumn('members', function ($query, $keyword) {
           $query->whereHas('members', function ($q) use ($keyword) {
             return $q->where('first_name', 'like', '%' . $keyword . '%')->orWhere('last_name', 'like', '%' . $keyword . '%');
@@ -120,10 +124,11 @@ class ProjectsDataTable extends DataTable
             Column::make('id')->title('ID'),
             Column::make('name')->title('Project Name'),
             Column::make('program.name')->title('Program Name'),
-            Column::make('category.name')->title('Category'),
+            // Column::make('category.name')->title('Category'),
             Column::make('start_date'),
             Column::make('deadline'),
             Column::make('members'),
+            Column::make('progress')->searchable(false)->orderable(false),
             Column::make('status'),
         ];
     }

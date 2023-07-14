@@ -8,7 +8,7 @@
             @auth
                 @if($showNotificationOptions)
                     <div x-data="{ subscriptionsOpen: false}" class="comments-subscription">
-                        <button @click.prevent="subscriptionsOpen = true" class="comments-subscription-trigger">
+                        <button @click.prevent="subscriptionsOpen = true" class="comments-subscription-trigger  btn btn-sm btn-outline-primary">
                             {{ NotificationSubscriptionType::from($selectedNotificationSubscriptionType)->longDescription() }}
                         </button>
                         <x-comments::modal
@@ -18,7 +18,7 @@
                                 @click.outside="subscriptionsOpen = false"
                             >
                             @foreach(NotificationSubscriptionType::cases() as $case)
-                                <button class="comments-subscription-item" @click="subscriptionsOpen = false" wire:click="updateSelectedNotificationSubscriptionType('{{ $case->value }}')">
+                                <button class="comments-subscription-item btn-white border-0" @click="subscriptionsOpen = false" wire:click="updateSelectedNotificationSubscriptionType('{{ $case->value }}')">
                                     {{ $case->description() }}
                                 </button>
                             @endforeach

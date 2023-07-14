@@ -14,6 +14,9 @@ use Spatie\Comments\Models\CommentNotificationSubscription;
 use Spatie\Comments\Support\CommentSanitizer;
 
 return [
+    'ui' => [
+        'editor' => 'comments::editors.textarea',
+    ],
     /*
      * These are the reactions that can be made on a comment. We highly recommend
      * only enabling positive ones for getting good vibes in your community.
@@ -105,7 +108,7 @@ return [
          * Here you can configure the number of results to show before
          * pagination links are displayed.
          */
-        'results' => 10000,
+        'results' => 5,
 
         /*
          * If you have multiple paginators on the same page, you can configure the
@@ -119,7 +122,7 @@ return [
          * a custom pagination "vendor.livewire.custom-pagination" See the livewire
          * docs for more information: https://laravel-livewire.com/docs/2.x/pagination#custom-pagination-view
          */
-        'theme' => 'tailwind',
+        'theme' => 'bootstrap',
     ],
 
     /*

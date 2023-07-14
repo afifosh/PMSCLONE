@@ -1,5 +1,5 @@
 <div class="row mt-3">
-  <livewire:comments :model="$task" />
+  <livewire:comments :model="$task" newest-first />
 </div>
 @livewireScripts
 <x-comments::scripts />
