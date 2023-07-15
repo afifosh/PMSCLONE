@@ -145,6 +145,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::resource('projects.tasks.files', TaskFileController::class)->only(['index', 'store', 'destroy']);
     Route::resource('projects.tasks.reminders', TaskReminderController::class)->only(['index', 'store', 'destroy']);
     Route::put('projects/{project}/tasks/{task}/checklist-items/update-order', [TaskChecklistController::class, 'updateOrder'])->name('projects.tasks.checklist-items.update-order');
+    Route::get('projects/{project}/tasks/{task}/checklist-items/{checklist_item}/restore', [TaskChecklistController::class, 'restore'])->name('projects.tasks.checklist-items.restore');
     Route::resource('projects.tasks.checklist-items', TaskChecklistController::class);
     Route::resource('project-categories', ProjectCategoryController::class);
 

@@ -7,7 +7,7 @@
     <div class="nav-align-top nav-tabs-shadow">
       <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item">
-          <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-controls="navs-top-summary" aria-selected="true">Summary</button>
+          <button type="button" class="nav-link {{request()->tab != 'comments' ? 'active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-controls="navs-top-summary" aria-selected="true">Summary</button>
         </li>
         <li class="nav-item">
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-checklist" aria-controls="navs-top-checklist" aria-selected="false">Checklist</button>
@@ -19,11 +19,11 @@
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-controls="navs-top-activities" aria-selected="false">Activities</button>
         </li>
         <li class="nav-item">
-          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-controls="navs-top-comments" aria-selected="false">Comments</button>
+          <button type="button" class="nav-link {{request()->tab == 'comments' ? 'active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-controls="navs-top-comments" aria-selected="false">Comments</button>
         </li>
       </ul>
       <div class="tab-content p-0">
-        <div class="tab-pane fade show active" id="navs-top-summary" role="tabpanel">
+        <div class="tab-pane fade {{request()->tab != 'comments' ? 'show active' : ''}}" id="navs-top-summary" role="tabpanel">
           @include('admin.pages.projects.tasks.show-summary')
         </div>
         <div class="tab-pane fade" id="navs-top-checklist" role="tabpanel">
@@ -35,7 +35,7 @@
         <div class="tab-pane fade" id="navs-top-activities" role="tabpanel">
           @include('admin.pages.projects.tasks.show-activities')
         </div>
-        <div class="tab-pane fade" id="navs-top-comments" role="tabpanel">
+        <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments" role="tabpanel">
           @include('admin.pages.projects.tasks.show-comments')
         </div>
       </div>

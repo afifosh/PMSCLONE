@@ -14,6 +14,8 @@ return new class extends Migration
     Schema::create('task_check_list_items', function (Blueprint $table) {
       $table->id();
       $table->foreignId('task_id')->constrained('tasks')->cascadeOnDelete();
+      $table->foreignId('assigned_to')->nullable()->constrained('admins')->cascadeOnDelete();
+      $table->dateTime('due_date')->nullable();
       $table->foreignId('created_by')->nullable()->constrained('admins')->cascadeOnDelete();
       $table->foreignId('completed_by')->nullable()->constrained('admins')->cascadeOnDelete();
       $table->string('title');

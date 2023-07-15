@@ -27,7 +27,7 @@
     <script src="{{ asset('assets/vendor/libs/fingerprint2/fingerprint2.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/ua-parser/ua-parser.min.js') }}"></script>
     <script src="{{ asset('assets/js/login-page/fingerprintJs.js') }}"></script>
-    <script async src="{{ asset('assets/vendor/libs/fingerprintJs3/fp.min.js') }}"></script>
+    <script async src="{{ asset('assets/vendor/libs/fingerprintJs3/fp.min.js') }}" onload="initFingerprintJS()"></script>
     {{-- <script src="https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/detectIncognito.min.js"></script> --}}
     <script>
 

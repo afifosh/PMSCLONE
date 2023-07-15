@@ -13,6 +13,8 @@ class TaskCheckListItem extends Model
 
   protected $fillable = [
     'task_id',
+    'assigned_to',
+    'due_date',
     'created_by',
     'completed_by',
     'title',

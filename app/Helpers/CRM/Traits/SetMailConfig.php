@@ -35,6 +35,9 @@ class SetMailConfig
             Config::set('mail.from.address', $mailSettings['from_email']);
             Config::set('mail.from.name', $mailSettings['from_name']);
 
+            Config::set('comments.notifications.mail.from.address', $mailSettings['from_email']);
+            Config::set('comments.notifications.mail.from.name', $mailSettings['from_name']);
+
             if ($mailSettings['provider'] == 'smtp') {
                 Config::set('mail.mailers.smtp.host', $mailSettings['host']);
                 Config::set('mail.mailers.smtp.port', $mailSettings['port']);

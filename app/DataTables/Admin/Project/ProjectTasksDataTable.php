@@ -89,7 +89,10 @@ class ProjectTasksDataTable extends DataTable
         "scrollX" => true,
         "drawCallback" => "function (settings) {
             $('[data-bs-toggle=\"tooltip\"]').tooltip();
-          }"
+          }",
+        'drawCallback' => 'function(){
+          view_task_from_url();
+        }'
       ]);
   }
 

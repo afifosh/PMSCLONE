@@ -73,7 +73,7 @@ class Task extends Model
  */
   public function commentableName(): string
   {
-    return $this->subject;
+    return 'Task: ' . $this->subject . ' Of ' . $this->project->name ;
   }
 
   /*
@@ -82,6 +82,6 @@ class Task extends Model
  */
   public function commentUrl(): string
   {
-    return '#';
+    return route('admin.projects.tasks.index', ['view' => $this->id, 'tab' => 'comments', 'project' => $this->project_id]);
   }
 }

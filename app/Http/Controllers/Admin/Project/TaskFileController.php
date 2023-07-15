@@ -13,11 +13,16 @@ class TaskFileController extends Controller
 {
   public function index($project, Task $task)
   {
+    abort_if(!$task->project->isMine(), 403);
+
+    $task->load('media');
+
     return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.files-index', compact('task'))->render()]);
   }
 
   public function store($project, Task $task, Request $request)
   {
+    abort_if(!$task->project->isMine(), 403);
     try {
       $media = MediaUploader::fromSource($request->file('file'))
         ->toDirectory('task-files')
@@ -34,8 +39,11 @@ class TaskFileController extends Controller
 
   public function destroy($project, Task $task, Media $file)
   {
+    abort_if(!$task->project->isMine(), 403);
+
     $file->delete();
     // $task->detachMedia($file);
+
     return $this->sendRes('File deleted successfully', []);
   }
 }

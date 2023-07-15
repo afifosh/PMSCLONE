@@ -35,7 +35,7 @@
           , <small>Completed by {{$item->completedBy->full_name}}</small>
         @endif
       </div>
-      <i onclick="delete_checklist({{$item->id}}, {{$task->id}})" class="fa-regular fa-md fa-trash-can cursor-pointer"></i>
+      <i data-toggle="ajax-delete" data-href="{{route('admin.projects.tasks.checklist-items.destroy', ['project' => $task->project_id, 'task' => $task->id, 'checklist_item' => $item->id])}}" class="fa-regular fa-md fa-trash-can cursor-pointer"></i>
     </li>
   @empty
   @endforelse

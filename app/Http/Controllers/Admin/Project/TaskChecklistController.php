@@ -15,6 +15,8 @@ class TaskChecklistController extends Controller
      */
     public function index($project, Task $task)
     {
+      abort_if(!$task->project->isMine(), 403);
+
       return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.checklist-index', compact('task'))->render()]);
     }
 
@@ -31,20 +33,24 @@ class TaskChecklistController extends Controller
      */
     public function store($project, Task $task, Request $request)
     {
+      abort_if(!$task->project->isMine(), 403);
+
       $request->validate([
         'title' => [
           'required',
           'string',
           'max:255',
           Rule::unique('task_check_list_items')->where(function ($query) use ($task) {
-            return $query->where('task_id', $task->id)->where('title', request()->title);
+            return $query->where('task_id', $task->id)->where('title', request()->title)->whereNull('deleted_at');
           })
         ],
+        'assigned_to' => 'nullable|exists:admins,id',
+        'due_date' => 'nullable|date',
       ], [
         'title.unique' => 'Checklist item already exists',
       ]);
 
-      $checklist = $task->checklistItems()->create($request->only(['title'])+ ['order' => $task->checklistItems()->count() + 1, 'created_by' => auth()->id()]);
+      $checklist = $task->checklistItems()->create($request->only(['title', 'assigned_to', 'due_date'])+ ['order' => $task->checklistItems()->count() + 1, 'created_by' => auth()->id()]);
 
       return $this->sendRes('Checklist item created successfully', ['id' => $checklist->id, 'JsMethods' => ['reload_task_checklist', 'reset_checklist_form']]);
     }
@@ -70,6 +76,8 @@ class TaskChecklistController extends Controller
      */
     public function update($project, $task, Request $request, TaskCheckListItem $checklistItem)
     {
+      abort_if(!$checklistItem->task->project->isMine(), 403);
+
       $request->validate([
         'status' => 'required',
       ]);
@@ -82,6 +90,8 @@ class TaskChecklistController extends Controller
 
     public function updateOrder($project, Task $task, Request $request)
     {
+      abort_if(!$task->project->isMine(), 403);
+
       $request->validate([
         'order' => 'required|array',
         'order.*' => 'required|integer|exists:task_check_list_items,id',
@@ -90,6 +100,8 @@ class TaskChecklistController extends Controller
       foreach ($request->order as $key => $value) {
         TaskCheckListItem::where('id', $value)->where('task_id', $task->id)->update(['order' => $key + 1]);
       }
+
+      return true;
     }
 
     /**
@@ -97,7 +109,22 @@ class TaskChecklistController extends Controller
      */
     public function destroy($project, $task, TaskCheckListItem $checklistItem)
     {
+      abort_if(!$checklistItem->task->project->isMine(), 403);
+
+      $id = $checklistItem->id;
       $checklistItem->delete();
-      return $this->sendRes('Checklist item deleted successfully', ['id' => 1]);
+
+      return $this->sendRes('Checklist item deleted successfully', ['disable_alert' => true, 'event' => 'functionCall', 'function' => 'handle_deleted_checklist', 'function_params' => route('admin.projects.tasks.checklist-items.restore', [$project, $task, $id])]);
+    }
+
+    public function restore($project, $task, $id)
+    {
+      $checklistItem = TaskCheckListItem::withTrashed()->findOrFail($id);
+
+      abort_if(!$checklistItem->task->project->isMine(), 403);
+
+      $checklistItem->restore();
+
+      return $this->sendRes('Checklist item restored successfully', ['event' => 'functionCall', 'function' => 'reload_task_checklist']);
     }
 }

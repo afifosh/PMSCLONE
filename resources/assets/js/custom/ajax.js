@@ -319,9 +319,7 @@ for (const input of inputs) {
           }else if(data.data.close == 'modal'){
             current.closest('.modal').modal('hide');
           }
-          console.log(data.data);
           if(data.data.JsMethods != undefined && data.data.JsMethods != null && data.data.JsMethods != ''){
-            console.log(data.data.JsMethods)
             for(var i = 0; i < data.data.JsMethods.length; i++){
               eval(data.data.JsMethods[i]+'()');
             }
@@ -445,7 +443,8 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
         url: url,
         success: function (response) {
           if (response.success) {
-            toast_success(response.message)
+            if(!response.data.disable_alert)
+              toast_success(response.message)
             if (response.data.event == 'table_reload') {
               if (response.data.table_id != undefined && response.data.table_id != null && response.data.table_id != '') {
                 $('#' + response.data.table_id).DataTable().ajax.reload();

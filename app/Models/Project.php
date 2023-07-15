@@ -17,6 +17,22 @@ class Project extends Model
     'deadline' => 'datetime:d M, Y',
   ];
 
+  public function scopeMine($query){
+    if(auth('admin')->check() && auth('admin')->id() == 1){
+      return $query;
+    }
+    return $query->whereHas('members', function($q){
+      return $q->where('admins.id', auth()->id());
+    });
+  }
+
+  public function isMine(){
+    if(auth('admin')->check() && auth('admin')->id() == 1){
+      return true;
+    }
+    return $this->members->contains(auth('admin')->id());
+  }
+
   public function program()
   {
     return $this->belongsTo(Program::class, 'program_id', 'id');

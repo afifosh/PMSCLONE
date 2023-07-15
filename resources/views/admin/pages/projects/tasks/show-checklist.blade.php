@@ -8,12 +8,17 @@
 </style>
 <div class="row d-flex">
   <form action="{{route('admin.projects.tasks.checklist-items.store', ['task' => $task->id, 'project' => $task->project_id])}}">
-    <div class="d-flex my-2">
+    <div class="my-2">
       <div class="flex-grow-1  me-1">
         <textarea class="form-control" name="title" placeholder="What you wanna do today?" id="checklist-input" rows="1"></textarea>
       </div>
-      <div>
-        <button class="btn btn-primary  align-self-center" data-form="ajax-form">Add</button>
+      <div class="row mt-2">
+        <div class="col-6"></div>
+        <div class="d-flex justify-conent-end col-6">
+          {!! Form::select('assigned_to', $task->assignees->pluck('email', 'id')->prepend('Assigned To', ''), null, ['class' => 'form-select globalOfSelect2', 'id' => 'assigned_to']) !!}
+          <input type="date" id="due_date" name="due_date" class="form-control">
+          <button class="btn btn-primary  align-self-center" data-form="ajax-form">Add</button>
+        </div>
       </div>
     </div>
   </form>
@@ -49,21 +54,13 @@
 
   function reset_checklist_form(){
     $('#checklist-input').val('');
+    $('#assigned_to').val('');
+    $('#due_date').val('');
   }
 
-  function delete_checklist(checklist_id, task_id) {
-      // prompt user to confirm
-      if(confirm('Are you sure you want to delete this checklist?')){
-        var url = "{{route('admin.projects.tasks.checklist-items.destroy', ['task' => ':task_id', 'project' => ':project_id', 'checklist_item' => ':checklist_id'])}}";
-        url = url.replace(':checklist_id', checklist_id);
-        $.ajax({
-          url: url,
-          type: "DELETE",
-          success: function(data){
-            reload_task_checklist();
-          }
-        });
-      }
+  function handle_deleted_checklist(url){
+    reload_task_checklist();
+    toast_undo(url);
   }
 
   function reload_task_checklist(){
@@ -72,7 +69,6 @@
       url: url,
       type: "GET",
       success: function(data){
-        console.log(data.data.view_data);
         $('#sortable').html(data.data.view_data);
       }
     });

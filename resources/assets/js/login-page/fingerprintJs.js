@@ -287,8 +287,3 @@ var incognito = detectIncognito().then(info => {
     return false;
   }
 });
-
-$(document).ready(function () {
-  console.log('document ready')
-  initFingerprintJS();
-});

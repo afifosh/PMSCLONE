@@ -53,6 +53,8 @@ class ProjectController extends Controller
    */
   public function show(Project $project)
   {
+    abort_if(!$project->isMine(), 403);
+
     return view('admin.pages.projects.show', ['project' => $project]);
   }
 

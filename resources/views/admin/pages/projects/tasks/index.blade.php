@@ -223,4 +223,48 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    <script>
+      function view_task_from_url()
+      {
+        var urlParams = new URLSearchParams(window.location.search);
+        var viewParam = urlParams.get('view');
+
+        if (viewParam !== null) {
+          var currentURL = window.location.href;
+          var link = $('<a>', { href: currentURL });
+
+          // Get the pathname from the URL using jQuery's attr() method
+          var pathname = link.prop('pathname');
+
+          // Split the pathname by '/'
+          var pathParts = pathname.split('/');
+
+          // Find the index of 'projects' in the pathParts array
+          var projectsIndex = $.inArray('projects', pathParts);
+
+          // Get the value after 'projects' (i.e., the {id})
+          var projectId = pathParts[projectsIndex + 1];
+          if($('[data-href="{{url('/')}}/admin/projects/'+projectId+'/tasks/'+ viewParam +'"][data-toggle="ajax-modal"]').length == 0){
+            var hiddenButton = $('<button>', {
+            data: {
+              toggle: 'ajax-modal',
+              href: '{{url('/')}}/admin/projects/'+projectId+'/tasks/'+ viewParam,
+            },
+            style: 'display: none;'
+          });
+
+          // Append the hidden button to the DOM
+          $('body').append(hiddenButton);
+          }
+
+          // Trigger a click event on the hidden button
+          $('[data-href="{{url('/')}}/admin/projects/'+projectId+'/tasks/'+ viewParam +'"][data-toggle="ajax-modal"]').data('href', '{{url('/')}}/admin/projects/'+projectId+'/tasks/'+ viewParam + '?tab=comments').click();
+          // revert the elements' url after the click
+          setTimeout(() => {
+            $('[data-href="{{url('/')}}/admin/projects/'+projectId+'/tasks/'+ viewParam + '?tab=comments"][data-toggle="ajax-modal"]').data('href', '{{url('/')}}/admin/projects/'+projectId+'/tasks/'+ viewParam);
+          }, 1000);
+        }
+
+      }
+    </script>
 @endpush

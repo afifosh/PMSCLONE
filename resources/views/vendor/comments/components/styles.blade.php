@@ -14,9 +14,9 @@
 
     --comments-color-border: rgb(221, 221, 221);
 
-    --comments-color-text:white;
+    --comments-color-text:black;
     --comments-color-text-dimmed: rgb(164, 164, 164);
-    --comments-color-text-inverse: white;
+    --comments-color-text-inverse: black;
 
     --comments-color-accent: rgba(205, 84, 91);
     --comments-color-accent-hover: rgba(205, 84, 91, 0.5);

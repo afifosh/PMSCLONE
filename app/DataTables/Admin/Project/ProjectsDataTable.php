@@ -77,7 +77,7 @@ class ProjectsDataTable extends DataTable
      */
     public function query(Project $model): QueryBuilder
     {
-        return $model->with('program', 'members', 'category')->select('projects.*')->newQuery();
+        return $model->with('program', 'members', 'category')->mine()->select('projects.*')->newQuery();
     }
 
     /**
