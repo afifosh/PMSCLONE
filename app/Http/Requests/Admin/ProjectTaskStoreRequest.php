@@ -24,8 +24,8 @@ class ProjectTaskStoreRequest extends FormRequest
     return [
       'subject' => 'required|string|max:255',
       'description' => 'nullable|string|max:255',
-      'start_date' => 'required|date',
-      'due_date' => 'required|date',
+      'start_date' => 'nullable|date',
+      'due_date' => 'nullable|date',
       'priority' => 'required|in:Low,Medium,High,Urgent',
       'tags' => 'nullable|array',
       'status' => 'required|in:Not Started,In Progress,On Hold,Awaiting Feedback,Completed',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Comment as ModelsComment;
 use Spatie\Comments\Notifications\ApprovedCommentNotification;
 use Spatie\Comments\Notifications\PendingCommentNotification;
 use Spatie\Comments\Actions\SendNotificationsForApprovedCommentAction;
@@ -65,7 +66,7 @@ return [
          * The model you want to use as a Comment model. It needs to be or
          * extend the `Spatie\Comments\Models\Comment::class` model.
          */
-        'comment' => Comment::class,
+        'comment' => ModelsComment::class,
 
         /*
          * The model you want to use as a React model. It needs to be or

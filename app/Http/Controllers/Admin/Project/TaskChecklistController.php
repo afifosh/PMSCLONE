@@ -66,15 +66,39 @@ class TaskChecklistController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(TaskCheckListItem $checklistItem)
+    public function edit($project, Task $task, TaskCheckListItem $checklistItem)
     {
-        //
+      abort_if(!$checklistItem->task->project->isMine(), 403);
+
+      return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.checklist-edit', compact('task', 'checklistItem'))->render()]);
+    }
+
+    public function update($project, $task, Request $request, TaskCheckListItem $checklistItem)
+    {
+      $request->validate([
+        'title' => [
+          'required',
+          'string',
+          'max:255',
+          Rule::unique('task_check_list_items')->where(function ($query) use ($checklistItem) {
+            return $query->where('task_id', $checklistItem->task_id)->where('title', request()->title)->whereNull('deleted_at')->whereNotIn('id', [$checklistItem->id]);
+          })
+        ],
+        'assigned_to' => 'nullable|exists:admins,id',
+        'due_date' => 'nullable|date',
+      ], [
+        'title.unique' => 'Checklist item already exists',
+      ]);
+
+      $checklistItem->update($request->only(['title', 'assigned_to', 'due_date']));
+
+      return $this->sendRes('Checklist item updated successfully', ['event' => 'redirect', 'url' => route('admin.projects.tasks.index', $project)]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update($project, $task, Request $request, TaskCheckListItem $checklistItem)
+    public function update_status($project, $task, Request $request, TaskCheckListItem $checklistItem)
     {
       abort_if(!$checklistItem->task->project->isMine(), 403);
 

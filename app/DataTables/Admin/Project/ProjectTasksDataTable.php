@@ -30,8 +30,7 @@ class ProjectTasksDataTable extends DataTable
       return view('admin._partials.sections.user-avatar-group', ['users' => $task->assignees, 'limit' => 3]);
     })
     ->addColumn('progress', function($task){
-      $progress = $task->checklistItems->count() != 0 ? $task->checklistItems->whereNotNull('completed_by')->count() / $task->checklistItems->count() * 100 : 0;
-      return view('admin._partials.sections.progressBar', ['perc' => $progress, 'color' => 'primary']);
+      return view('admin._partials.sections.progressBar', ['perc' => $task->progress_percentage(), 'color' => 'primary', 'show_perc' => true, 'height' => '14px']);
     })
     ->editColumn('status', function($task){
       return ucwords($task->status);
@@ -90,9 +89,10 @@ class ProjectTasksDataTable extends DataTable
         "drawCallback" => "function (settings) {
             $('[data-bs-toggle=\"tooltip\"]').tooltip();
           }",
-        'drawCallback' => 'function(){
+        'drawCallback' => "function(){
           view_task_from_url();
-        }'
+          $('[data-bs-toggle=\"tooltip\"]').tooltip();
+        }"
       ]);
   }
 
@@ -103,11 +103,11 @@ class ProjectTasksDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('subject'),
+      Column::make('subject')->title('Task Name'),
       Column::make('status'),
       Column::make('start_date'),
       Column::make('due_date'),
-      Column::make('assignees'),
+      Column::make('assignees')->orderable(false),
       Column::make('progress')->searchable(false)->orderable(false),
     ];
   }

@@ -9,6 +9,7 @@ use App\Models\Admin;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use \Spatie\Comments\Enums\NotificationSubscriptionType;
 
 class ProjectTaskController extends Controller
 {
@@ -38,7 +39,7 @@ class ProjectTaskController extends Controller
 
     $data['task'] = new Task();
     $data['project'] = $project;
-    $data['admins'] = Admin::get();
+    $data['admins'] = $project->members;
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.create', $data)->render()]);
   }
@@ -53,6 +54,19 @@ class ProjectTaskController extends Controller
     $task = $project->tasks()->create($request->validated() + ['admin_id' => auth()->id()]);
     $task->assignees()->sync($request->assignees);
     $task->followers()->sync($request->followers);
+
+    // subscribe notifications for both assignees and followers
+    if($task->assignees->count() > 0) {
+      foreach($task->assignees as $user) {
+        $user->subscribeToCommentNotifications($task, NotificationSubscriptionType::All);
+      }
+    }
+
+    if($task->followers->count() > 0) {
+      foreach($task->followers as $user) {
+        $user->subscribeToCommentNotifications($task, NotificationSubscriptionType::All);
+      }
+    }
 
     return $this->sendRes('Task created successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);
   }
@@ -72,13 +86,13 @@ class ProjectTaskController extends Controller
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit(Project $project,Task $task)
+  public function edit($project, Task $task)
   {
     abort_if(!$task->project->isMine(), 403);
 
     $data['task'] = $task;
-    $data['project'] = $project;
-    $data['admins'] = Admin::get();
+    $data['project'] = $task->project;
+    $data['admins'] = $task->project->members;
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.create', $data)->render()]);
   }

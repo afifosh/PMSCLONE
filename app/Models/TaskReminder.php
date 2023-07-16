@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasLogs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TaskReminder extends Model
 {
   use HasFactory;
+  use HasLogs;
 
   protected $fillable = [
     'task_id',

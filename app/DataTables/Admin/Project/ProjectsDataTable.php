@@ -26,14 +26,13 @@ class ProjectsDataTable extends DataTable
           return '<a href="'.route('admin.projects.show', $project->id).'">'.$project->name.'</a>';
         })
         ->editColumn('status', function ($project) {
-          return '<span class="badge bg-label-'.$this->resolveStatus($project->status)['color'].'" style="width:92px">'.$this->resolveStatus($project->status)['status'].'</span>';
+          return '<span class="badge bg-label-'.$project->resolveStatus()['color'].'" style="width:92px">'.$project->resolveStatus()['status'].'</span>';
         })
         ->editColumn('members', function($project) {
           return view('admin._partials.sections.user-avatar-group', ['users' => $project->members, 'limit' => 3]);
         })
         ->addColumn('progress', function($proj){
-          $progress = $proj->tasks->count() != 0 ? $proj->tasks->where('status', 'Completed')->count() / $proj->tasks->count() * 100 : 0;
-          return view('admin._partials.sections.progressBar', ['perc' => $progress, 'color' => 'primary']);
+          return view('admin._partials.sections.progressBar', ['perc' => $proj->progress_percentage(), 'color' => 'primary', 'show_perc' => true, 'height' => '14px']);
         })
         ->filterColumn('members', function ($query, $keyword) {
           $query->whereHas('members', function ($q) use ($keyword) {
@@ -46,30 +45,6 @@ class ProjectsDataTable extends DataTable
           });
         })
         ->rawColumns(['status', 'name']);
-    }
-
-    protected function resolveStatus($status)
-    {
-      switch ($status) {
-        case '0':
-          return ['color' => 'warning', 'status' => 'Not Started'];
-          break;
-        case '1':
-          return ['color' => 'success', 'status' => 'In Progress'];
-          break;
-        case '2':
-          return ['color' => 'danger', 'status' => 'On Hold'];
-          break;
-        case '3':
-          return ['color' => 'danger', 'status' => 'Cancelled'];
-          break;
-        case '4':
-          return ['color' => 'success', 'status' => 'Completed'];
-          break;
-        default:
-          return ['color' => 'danger', 'status' => 'Unknown'];
-          break;
-      }
     }
 
     /**

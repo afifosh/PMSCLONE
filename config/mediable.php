@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Media;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 return [
@@ -15,7 +16,7 @@ return [
      *
      * Should extend `Plank\Mediable\Media`
      */
-    'model' => \Modules\Core\Models\Media::class,
+    'model' => Media::class,
 
     /*
      * Name to be used for mediables joining table

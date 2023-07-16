@@ -32,9 +32,12 @@ $configData = Helper::appClasses();
       <div class="card">
         <div class="card-body">
           <div class="row">
-            <span class="fw-bold">Project Progress 60.3%</span>
+            @php
+                $progress = $project->progress_percentage();
+            @endphp
+            <span class="fw-bold">Project Progress {{$progress}}%</span>
             <div class="mt-2">
-              @include('admin._partials.sections.progressBar', ['perc' => 60.3, 'color' => 'success'])
+              @include('admin._partials.sections.progressBar', ['perc' => $progress, 'color' => 'success'])
             </div>
             <hr class="my-3">
             <span class="fw-bold">Overview</span>
@@ -56,11 +59,11 @@ $configData = Helper::appClasses();
             </div>
             <div class="col-md-6 p-3">
               <div>Start Date</div>
-              <span class="fw-bold">{{$project->start_date}}</span>
+              <span class="fw-bold">{{formatDateTime($project->start_date)}}</span>
             </div>
             <div class="col-md-6 p-3">
               <div>Deadline</div>
-              <span class="fw-bold">{{$project->deadline}}</span>
+              <span class="fw-bold">{{formatDateTime($project->deadline)}}</span>
             </div>
             <div class="col-md-6 p-3">
               <div>Members</div>
@@ -68,7 +71,7 @@ $configData = Helper::appClasses();
             </div>
             <div class="col-md-6 p-3">
               <div>Status</div>
-              <span class="fw-bold">{{$project->status}}</span>
+              <span class="fw-bold">{{$project->resolveStatus()['status']}}</span>
             </div>
             <div class="col-md-12 p-3">
               <div>Tags</div>
@@ -90,14 +93,14 @@ $configData = Helper::appClasses();
         <div class="card-body">
           <div class="row">
             <div class="col-md-9">
-              <span class="fw-bold">5 / 7 Open Tasks</span>
+              <span class="fw-bold">{{$project->tasks->where('status', 'Completed')->count()}} / {{$project->tasks->count()}} Open Tasks</span>
             </div>
             <div class="col-md-3 text-end">
               <i class="fa-regular fa-check-circle fa-xl" aria-hidden="true"></i>
             </div>
             <div class="mt-2">
-              <span>60.3%</span>
-              @include('admin._partials.sections.progressBar', ['perc' => 60.3, 'color' => 'success'])
+              <span>{{$progress}}%</span>
+              @include('admin._partials.sections.progressBar', ['perc' => $progress, 'color' => 'success'])
             </div>
           </div>
         </div>
@@ -108,14 +111,28 @@ $configData = Helper::appClasses();
         <div class="card-body">
           <div class="row">
             <div class="col-md-9">
-              <span class="fw-bold">5 / 7 Days Left</span>
+              @php
+                  $remainingDays = $project->deadline ? ($project->deadline->isFuture() ? now()->diffInDays($project->deadline) : 'Missed') : 'NULL';
+                  $totalDays = $project->start_date && $project->deadline ? $project->start_date->diffInDays($project->deadline) : 'NULL';
+                  if($remainingDays != 'NULL' && $totalDays != 'NULL')
+                  $percentage = $totalDays ? ($remainingDays == 'Missed' ? 100 : round((($totalDays - $remainingDays) / $totalDays) * 100, 2)) : 0;
+              @endphp
+              <span class="fw-bold">
+                @if ($remainingDays == 'Missed')
+                  {{{__('Deadline Missed')}}}
+                @else
+                  {{$remainingDays}} / {{$totalDays}} {{{__('Day(s) Remaining')}}}
+                @endif
+              </span>
             </div>
             <div class="col-md-3 text-end">
               <i class="fa-regular fa-calendar-check fa-xl" aria-hidden="true"></i>
             </div>
             <div class="mt-2">
-              <span>60.3%</span>
-              @include('admin._partials.sections.progressBar', ['perc' => 60.3, 'color' => 'success'])
+              @if ($remainingDays != 'NULL' && $totalDays != 'NULL')
+                <span>{{$percentage}}%</span>
+                @include('admin._partials.sections.progressBar', ['perc' => $percentage, 'color' => 'success'])
+              @endif
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasLogs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,6 +11,7 @@ class TaskCheckListItem extends Model
 {
   use HasFactory;
   use SoftDeletes;
+  use HasLogs;
 
   protected $fillable = [
     'task_id',
@@ -24,6 +26,7 @@ class TaskCheckListItem extends Model
 
   protected $casts = [
     'status' => 'boolean',
+    'due_date' => 'datetime:d M, Y',
   ];
 
   public function task()

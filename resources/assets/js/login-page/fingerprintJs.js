@@ -35,7 +35,7 @@ async function getVisitorIPaddress() {
   return data.ip;
 }
 window.initFingerprintJS = async function () {
-  blockForm();
+  // blockForm();
   const fp = await FingerprintJS.load();
   const result = await fp.get();
   const {
@@ -86,8 +86,8 @@ window.initFingerprintJS = async function () {
     ...components,
     incognito: { value: await getFooComponent() },
     userAgent: { value: await getBarComponent() },
-    ipAddress: { value: await getVisitorIPaddress() },
-    countryCode: { value: await getVisitorCountrycode() }
+    // ipAddress: { value: await getVisitorIPaddress() },
+    // countryCode: { value: await getVisitorCountrycode() }
   };
   //   console.log("------------------extendedComponents--------------------");
   //   console.dir(extendedComponents);
@@ -95,7 +95,7 @@ window.initFingerprintJS = async function () {
   // Make a visitor identifier from your custom list of components
   const visitorId = FingerprintJS.hashComponents(extendedComponents);
   $('input#fingerprint').val(visitorId);
-  unblockForm();
+  // unblockForm();
   if (!visitorId) {
     alert('Please disable your adblocker and refresh the page');
   }

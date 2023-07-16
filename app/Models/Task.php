@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasEnum;
+use App\Traits\HasLogs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Media\HasMedia;
@@ -13,6 +14,7 @@ class Task extends Model
   use HasFactory, HasEnum;
   use HasMedia;
   use HasComments;
+  use HasLogs;
 
   protected $fillable = [
     'subject',
@@ -35,11 +37,6 @@ class Task extends Model
   public function project()
   {
     return $this->belongsTo(Project::class);
-  }
-
-  public function files()
-  {
-    return $this->hasMany(TaskFile::class);
   }
 
   public function followers()
@@ -83,5 +80,33 @@ class Task extends Model
   public function commentUrl(): string
   {
     return route('admin.projects.tasks.index', ['view' => $this->id, 'tab' => 'comments', 'project' => $this->project_id]);
+  }
+
+  public function progress_percentage()
+  {
+    $total = $this->checklistItems()->count();
+    if ($total == 0) {
+      return 0;
+    }
+
+    $completed = $this->checklistItems()->whereNotNull('completed_by')->count();
+
+    return round(($completed / $total) * 100, 1);
+  }
+
+  public function logs()
+  {
+    return $this->morphMany(TimelineLog::class, 'logable', 'logable_type', 'logable_id');
+  }
+
+  public function createLog($log, $data = [])
+  {
+    $actioner = ['actioner_id' => null, 'actioner_type' => null];
+    if(auth()->check()){
+      $actioner['actioner_id'] = auth()->id();
+      $actioner['actioner_type'] = auth()->user()::class;
+      $data['ip'] = request()->ip();
+    }
+    return $this->logs()->create(['log' => $log, 'data' => $data,] + $actioner);
   }
 }

@@ -35,7 +35,10 @@
           , <small>Completed by {{$item->completedBy->full_name}}</small>
         @endif
       </div>
-      <i data-toggle="ajax-delete" data-href="{{route('admin.projects.tasks.checklist-items.destroy', ['project' => $task->project_id, 'task' => $task->id, 'checklist_item' => $item->id])}}" class="fa-regular fa-md fa-trash-can cursor-pointer"></i>
+      <div>
+        <i data-toggle="ajax-modal" data-title="Edit Task" data-size="modal-xl" data-href="{{route('admin.projects.tasks.checklist-items.edit', ['project' => $task->project_id, 'task' => $task->id, 'checklist_item' => $item->id])}}" class="ti ti-edit cursor-pointer"></i>
+        <i data-toggle="ajax-delete" data-href="{{route('admin.projects.tasks.checklist-items.destroy', ['project' => $task->project_id, 'task' => $task->id, 'checklist_item' => $item->id])}}" class="ti ti-trash cursor-pointer"></i>
+      </div>
     </li>
   @empty
   @endforelse

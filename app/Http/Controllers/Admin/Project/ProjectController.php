@@ -45,6 +45,9 @@ class ProjectController extends Controller
   {
     $project = Project::create($request->validated());
     $project->members()->sync($request->members);
+
+    $project->createLog('Project Created', $project->toArray());
+
     return $this->sendRes('Created Successfully', ['event' => 'redirect', 'url' => route('admin.projects.index')]);
   }
 
