@@ -266,5 +266,23 @@ $configData = Helper::appClasses();
         }
 
       }
+
+      $(document).ready(function () {
+        window.oURL = window.location.href;
+      });
+
+      $('#globalModal').on('show.bs.modal', function () {
+        $(this).find('#globalModalBody').each(function () {
+          Livewire.rescan(this);
+          Alpine.initTree(this);
+        });
+
+        setTimeout(function () {
+          history.replaceState(null, null, oURL);
+        }, 1000);
+      });
     </script>
+    @livewireScripts
+    <x-comments::scripts />
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endpush
