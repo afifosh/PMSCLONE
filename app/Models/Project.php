@@ -87,4 +87,26 @@ class Project extends Model
     }
     return round(($this->tasks()->where('status', 'Completed')->count() / $total_tasks) * 100, 1);
   }
+
+  public static function getProjectsStatusesChartData()
+  {
+    $projects = Project::mine()->get();
+    $data['labels'] = ['Not Started', 'In Progress', 'On Hold', 'Cancelled', 'Completed'];
+    $data['datasets'][0]['label'] = 'Projects';
+    $data['datasets'][0]['data'] = [];
+    $data['datasets'][0]['backgroundColor'] = [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 205, 86)',
+      'rgb(255, 159, 64)',
+      'rgb(75, 192, 192)'
+    ];
+    $data['datasets'][0]['hoverOffset'] = 4;
+    $statuses = ['Not Started', 'In Progress', 'On Hold', 'Cancelled', 'Completed'];
+    foreach ($statuses as $status) {
+      $data['datasets'][0]['data'][] = $projects->where('status', array_search($status, $statuses))->count();
+    }
+
+    return $data;
+  }
 }

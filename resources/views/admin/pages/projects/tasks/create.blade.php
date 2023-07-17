@@ -15,11 +15,11 @@
   </div>
   <div class="form-group col-6">
     {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('start_date', $task->start_date, ['class' => 'form-control']) !!}
+    {!! Form::date('start_date', $task->start_date, ['class' => 'form-control flatpickr']) !!}
   </div>
   <div class="form-group col-6">
     {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('due_date', $task->due_date, ['class' => 'form-control']) !!}
+    {!! Form::date('due_date', $task->due_date, ['class' => 'form-control flatpickr']) !!}
   </div>
 
   {{-- priority --}}

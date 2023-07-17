@@ -1,5 +1,9 @@
 <style>
     {{ $stylesheet }}
+
+    :root {
+    --comments-spacing: 0.75rem;  /*default: 2.5*/
+  }
     .comments {
     /* --comments-color-background: rgb(34, 34, 34);
     --comments-color-background: rgb(34, 34, 34); */
@@ -28,5 +32,5 @@
     --comments-color-success-hover: rgb(10, 200, 134, 0.75); */
 
     --comments-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
+  }
 </style>

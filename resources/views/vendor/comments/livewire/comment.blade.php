@@ -1,7 +1,7 @@
 <div
     id="comment-{{ $comment->id }}"
     class="comments-group {{ $showAvatar ? 'comments-group-with-avatars' : '' }}"
-    x-data="{ confirmDelete: false, urlCopied: false }"
+    x-data="{ confirmDelete: false, urlCopied: false, isReplying: false }"
     x-effect="
         if (urlCopied) {
             window.navigator.clipboard.writeText(window.location.href.split('#')[0] + '#comment-{{ $comment->id }}');
@@ -57,6 +57,11 @@
                                 </x-comments::modal>
                             </li>
                         @endcan
+                        @if($comment->isTopLevel())
+                          <li>
+                            <a href="#" @click.prevent="isReplying = !isReplying" aria-role="button">{{__('Reply')}}</a>
+                          </li>
+                        @endif
                     @endif
                     @include('comments::extraCommentHeaderActions')
                 </ul>

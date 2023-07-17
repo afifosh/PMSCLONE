@@ -3,3 +3,9 @@ window.initFlatPickr = function () {
     $(this).flatpickr($(this).data('flatpickr'));
   });
 };
+
+$(document).ready(function () {
+  if(typeof flatpickr !== 'undefined') {
+    initFlatPickr();
+  }
+});

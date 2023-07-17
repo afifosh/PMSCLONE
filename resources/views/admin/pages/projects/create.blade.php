@@ -11,6 +11,7 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 @endsection
 
 @section('vendor-script')
@@ -18,10 +19,12 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 @endsection
 
 @section('page-script')
 <script src={{asset('assets/js/custom/select2.js')}}></script>
+<script src={{asset('assets/js/custom/flatpickr.js')}}></script>
 @endsection
 
 @section('content')
@@ -60,13 +63,13 @@ $configData = Helper::appClasses();
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="start_date" class="form-label">Start Date</label>
-                <input type="date" name="start_date" id="start_date" class="form-control">
+                <input type="date" name="start_date" id="start_date" class="form-control flatpickr">
               </div>
             </div>
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="deadline" class="form-label">Deadline</label>
-                <input type="date" name="deadline" id="deadline" class="form-control">
+                <input type="date" name="deadline" id="deadline" class="form-control flatpickr">
               </div>
             </div>
             <div class="col-md-6">

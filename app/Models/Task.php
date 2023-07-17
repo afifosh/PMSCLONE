@@ -34,6 +34,17 @@ class Task extends Model
     'due_date' => 'datetime:d M, Y',
   ];
 
+  public function scopeApplyRequestFilters($query)
+  {
+    $query->when(request()->has('filter_projects') && is_array(request()->filter_projects), function ($q) {
+      $q->whereIn('project_id', request()->filter_projects);
+    });
+
+    $query->when(request()->has('filer_status') && is_array(request()->filer_status), function ($q) {
+      $q->whereIn('status', request()->filer_status);
+    });
+  }
+
   public function project()
   {
     return $this->belongsTo(Project::class);
@@ -59,18 +70,13 @@ class Task extends Model
     return $this->hasMany(TaskReminder::class, 'task_id', 'id');
   }
 
-  // public function comments()
-  // {
-  //   return $this->hasMany(TaskComment::class, 'task_id', 'id');
-  // }
-
   /*
  * This string will be used in notifications on what a new comment
  * was made.
  */
   public function commentableName(): string
   {
-    return 'Task: ' . $this->subject . ' Of ' . $this->project->name ;
+    return 'Task: ' . $this->subject . ' Of ' . $this->project->name;
   }
 
   /*
@@ -94,19 +100,21 @@ class Task extends Model
     return round(($completed / $total) * 100, 1);
   }
 
-  public function logs()
+  public function getPaginatedLogs()
   {
-    return $this->morphMany(TimelineLog::class, 'logable', 'logable_type', 'logable_id');
-  }
-
-  public function createLog($log, $data = [])
-  {
-    $actioner = ['actioner_id' => null, 'actioner_type' => null];
-    if(auth()->check()){
-      $actioner['actioner_id'] = auth()->id();
-      $actioner['actioner_type'] = auth()->user()::class;
-      $data['ip'] = request()->ip();
-    }
-    return $this->logs()->create(['log' => $log, 'data' => $data,] + $actioner);
+    return TimelineLog::where(function ($q) {
+        $q->where('logable_type', Task::class)
+          ->where('logable_id', $this->id);
+      })
+      ->orWhere(function ($q) {
+        $q->where('logable_type', TaskCheckListItem::class)
+          ->whereIn('logable_id', $this->checklistItems()->pluck('id')->toArray());
+      })
+      ->orWhere(function ($q) {
+        $q->where('logable_type', Media::class)
+          ->whereIn('logable_id', $this->media()->pluck('id')->toArray());
+      })
+      ->orderBy('created_at', 'desc')
+      ->paginate(10);
   }
 }

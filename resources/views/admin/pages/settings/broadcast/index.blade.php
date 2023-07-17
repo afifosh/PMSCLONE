@@ -42,7 +42,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input name="pusher_app_id" value="{{ $setting['pusher_app_id'] ?? '' }}" type="text" class="form-control" id="pusherAppId" placeholder="{{ __('Pusher App id') }}" aria-describedby="pusherAppId" />
+                                    <input name="pusher_app_id" value="{{ $setting['pusher_app_id'] ?? config('broadcasting.connections.pusher.app_id') }}" type="text" class="form-control" id="pusherAppId" placeholder="{{ __('Pusher App id') }}" aria-describedby="pusherAppId" />
                                 </div>
                             </div>
                             <!-- pusher app key -->
@@ -54,7 +54,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input name="pusher_app_key" value="{{ $setting['pusher_app_key'] ?? '' }}" type="text" class="form-control" id="pusherAppKey" placeholder="{{ __('Pusher App Key') }}" aria-describedby="pusherAppKey" />
+                                    <input name="pusher_app_key" value="{{ $setting['pusher_app_key'] ?? config('broadcasting.connections.pusher.key') }}" type="text" class="form-control" id="pusherAppKey" placeholder="{{ __('Pusher App Key') }}" aria-describedby="pusherAppKey" />
                                 </div>
                             </div>
                             <!-- pusher app secret -->
@@ -66,7 +66,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input name="pusher_app_secret" value="{{ $setting['pusher_app_secret'] ?? '' }}" type="text" class="form-control" id="pusherAppSecret" placeholder="{{ __('Pusher App Secret') }}" aria-describedby="pusherAppSecret" />
+                                    <input name="pusher_app_secret" value="{{ $setting['pusher_app_secret'] ?? config('broadcasting.connections.pusher.secret') }}" type="text" class="form-control" id="pusherAppSecret" placeholder="{{ __('Pusher App Secret') }}" aria-describedby="pusherAppSecret" />
                                 </div>
                             </div>
                             <!-- pusher app cluster -->
@@ -78,7 +78,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input name="pusher_app_cluster" value="{{ $setting['pusher_app_cluster'] ?? '' }}" type="text" class="form-control" id="pusherAppCluster" placeholder="{{ __('Pusher App Cluster') }}" aria-describedby="pusherAppCluster" />
+                                    <input name="pusher_app_cluster" value="{{ $setting['pusher_app_cluster'] ?? config('broadcasting.connections.pusher.options.cluster') }}" type="text" class="form-control" id="pusherAppCluster" placeholder="{{ __('Pusher App Cluster') }}" aria-describedby="pusherAppCluster" />
                                 </div>
                             </div>
                             <!-- button to submit form -->

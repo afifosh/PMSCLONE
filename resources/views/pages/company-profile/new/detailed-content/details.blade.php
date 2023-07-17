@@ -74,7 +74,7 @@
       </div>
       <div class="col-sm-6">
         <label class="form-label">Year Founded <span class="text-danger">*</span></label>
-        <input type="date" name="date_founded" value="{{ @$detail['date_founded'] }}" class="form-control"/>
+        <input type="date" name="date_founded" value="{{ @$detail['date_founded'] }}" class="form-control flatpickr"/>
         @modificationAlert(@$modifications['date_founded'])
       </div>
       <div class="col-sm-6">

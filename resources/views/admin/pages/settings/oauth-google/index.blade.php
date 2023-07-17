@@ -27,12 +27,12 @@
                               <!-- client id -->
                               <div class="col-6 mb-3">
                                 <label for="google_client_id" class="form-label fw-semibold">@lang('Client Id')</label>
-                                <input type="text" class="form-control" name="google_client_id" id="google_client_id" value="{{ $setting['google_client_id'] ?? '' }}">
+                                <input type="text" class="form-control" name="google_client_id" id="google_client_id" value="{{ $setting['google_client_id'] ?? config('core.google.client_id') }}">
                               </div>
                               <!-- client secret -->
                               <div class="col-6 mb-3">
                                 <label for="google_client_secret" class="form-label fw-semibold">@lang('Client Secret')</label>
-                                <input type="password" class="form-control" name="google_client_secret" id="google_client_secret" value="{{ $setting['google_client_secret'] ?? '' }}">
+                                <input type="password" class="form-control" name="google_client_secret" id="google_client_secret" value="{{ $setting['google_client_secret'] ?? config('core.google.client_secret') }}">
                               </div>
                             </div>
                             <!-- button to submit form -->

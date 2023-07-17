@@ -80,7 +80,9 @@ class ProjectTaskController extends Controller
 
     $task->load('project', 'checklistItems');
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.show', compact('task'))->render(), 'JsMethods' => ['initSortable', 'initDropZone', 'initEditor']]);
+    $logs = $task->getPaginatedLogs();
+
+    return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.show', compact('task', 'logs'))->render(), 'JsMethods' => ['initSortable', 'initDropZone', 'initEditor']]);
   }
 
   /**

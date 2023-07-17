@@ -24,7 +24,7 @@
   </div>
   <div class="col-sm-6">
     <label class="form-label">Year Founded <span class="text-danger">*</span></label>
-    <input type="date" name="date_founded" value="{{ $detail['date_founded'] }}" class="form-control" disabled/>
+    <input type="date" name="date_founded" value="{{ $detail['date_founded'] }}" class="form-control flatpickr" disabled/>
   </div>
   <div class="col-sm-6">
     <label class="form-label">D.U.N.S Number</label>

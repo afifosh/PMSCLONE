@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Tasks')
+@section('title', 'Dashboard')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -26,6 +26,7 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/sortablejs/sortable.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/chartjs/chartjs.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -176,46 +177,68 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@include('admin.pages.projects.navbar', ['tab' => 'tasks'])
 @can(true)
-  <div class="mt-3  col-12">
+<h4>Dashboard</h4>
+<div class="row">
+  <div class="col-9">
+    <h5>My Tasks</h5>
     <div class="card">
+      <h5 class="card-header">Search Filter</h5>
+      <form class="js-datatable-filter-form">
+        <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
+          <div class="col-md-4 user_plan">
+            <select name="filter_projects[]" class="form-select select2" multiple data-placeholder="Project">
+              @forelse ($projects as $id => $project)
+                <option value="{{$id}}">{{$project}}</option>
+              @empty
+              @endforelse
+            </select>
+          </div>
+          <div class="col-md-4 user_status">
+            <select name="filer_status[]" class="form-select select2" multiple data-placeholder="Task Status">
+              @forelse ($task_statuses as $status)
+                <option value="{{$status}}">{{$status}}</option>
+              @empty
+              @endforelse
+            </select>
+          </div>
+        </div>
+      </form>
       <div class="card-body">
         <div class="row">
-          <h4>Tasks Summary</h4>
-          <div class="row">
-            <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 'not started')->first()->task_count ?? 0}}</h5>
-              <span class="">Not Started</span>
-            </div>
-            <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 'in progress')->first()->task_count ?? 0}}</h5>
-              <span class="text-primary">In Progress</span>
-            </div>
-            <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 'on hold')->first()->task_count ?? 0}}</h5>
-              <span class="text-warning">On Hold</span>
-            </div>
-            <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 'awaiting feedback')->first()->task_count ?? 0}}</h5>
-              <span class="text-muted">Awaiting Feedback</span>
-            </div>
-            <div class="col-2 d-flex">
-              <h5 class="mx-3">{{$summary->where('status', 'completed')->first()->task_count ?? 0}}</h5>
-              <span class="text-success">Completed</span>
-            </div>
-        </div>
-        <hr class="mt-2">
         {{$dataTable->table()}}
+        </div>
       </div>
     </div>
   </div>
+  <div class="col-3">
+    <h5>Project Statistics</h5>
+    <div class="card">
+      <div class="card-body">
+        <div>
+          <canvas id="projects-statuses-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 @endcan
 
 @endsection
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    <script>
+      const ctx = document.getElementById('projects-statuses-chart');
+      const data = {!! json_encode($projectsStatusesChartData) !!};
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: data,
+        options: {
+
+        }
+      });
+    </script>
     <script>
       function view_task_from_url()
       {
@@ -278,4 +301,17 @@ $configData = Helper::appClasses();
     @livewireScripts
     <x-comments::scripts />
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+      $(document).ready(function () {
+          $('.js-datatable-filter-form :input').on('change', function (e) {
+              window.LaravelDataTables["tasks-datatable"].draw();
+          });
+
+          $('#tasks-datatable').on('preXhr.dt', function ( e, settings, data ) {
+              $('.js-datatable-filter-form :input').each(function () {
+                  data[$(this).prop('name')] = $(this).val();
+              });
+          });
+      });
+    </script>
 @endpush

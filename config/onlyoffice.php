@@ -4,7 +4,7 @@ return [
   /**
    * secret
    */
-  "secret" => env('ONLYOFFICE_SECRET', null),
+  "secret" => env('ONLYOFFICE_SECRET'),
   "doc_server_url" => env('ONLYOFFICE_HOST_URL', 'http://167.71.55.200'),
   "doc_server_api_url" => env('ONLYOFFICE_HOST_API_URL', 'http://167.71.55.200/web-apps/apps/api/documents/api.js'),
 

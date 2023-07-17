@@ -1,5 +1,12 @@
 <div class="mt-2">
-  @include('admin._partials.sections.progressBar', ['perc' => $task->checklistItems->count() > 0 ? round($task->checklistItems->whereNotNull('completed_by')->count()/$task->checklistItems->count()*100) : 0, 'color' => 'primary', 'height' => '14px', 'show_perc' => true])
+  @php
+    $checklistPerc = $task->checklistItems->count() > 0 ? round($task->checklistItems->whereNotNull('completed_by')->count()/$task->checklistItems->count()*100) : 0;
+  @endphp
+  <div class="d-flex justify-content-between ms-1 me-3">
+    <span>Progress: {{$checklistPerc}}%</span>
+    <span>{{$task->checklistItems->whereNotNull('completed_by')->count()}}/{{$task->checklistItems->count()}}</span>
+  </div>
+  @include('admin._partials.sections.progressBar', ['perc' => $checklistPerc, 'color' => 'primary', 'height' => '14px', 'show_perc' => true])
 </div>
 <div class="d-flex justify-content-end">
   @if ($task->is_completed_checklist_hidden)

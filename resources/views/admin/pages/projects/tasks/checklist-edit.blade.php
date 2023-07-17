@@ -18,7 +18,7 @@
         <div class="col-6"></div>
         <div class="d-flex justify-conent-end col-6">
           {!! Form::select('assigned_to', $task->assignees->pluck('email', 'id')->prepend('Assigned To', ''), $checklistItem->assigned_to, ['class' => 'form-select globalOfSelect2', 'id' => 'assigned_to']) !!}
-          {!! Form::date('due_date', $checklistItem->due_date, ['class' => 'form-control mx-1', 'id' => 'due_date']) !!}
+          {!! Form::date('due_date', $checklistItem->due_date, ['class' => 'form-control mx-1 flatpickr', 'id' => 'due_date']) !!}
           <button class="btn btn-primary  align-self-center" data-form="ajax-form">Update</button>
         </div>
       </div>

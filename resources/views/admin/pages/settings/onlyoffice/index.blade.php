@@ -30,7 +30,7 @@
                                 <div class="col-md-12">
                                     <p class="settings-hint">ONLYOFFICE Docs Location specifies the address of the server with the document services installed. Please change the, "{{ __('<documentserver>') }}" for the server address in the below line.</p>
                                 </div>
-                            </div>                            
+                            </div>
 
                             <div class="row mb-4">
                                 <!-- ONLYOFFICE Docs address -->
@@ -40,7 +40,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input name="doc_server_url" value="{{ $setting['doc_server_url'] ?? '' }}" type="text" class="form-control" id="docServerURL" placeholder="{{ __('https://<documentserver>/') }}" aria-describedby="docServerURL" />
+                                    <input name="doc_server_url" value="{{ $setting['doc_server_url'] ?? config('onlyoffice.doc_server_url') }}" type="text" class="form-control" id="docServerURL" placeholder="{{ __('https://<documentserver>/') }}" aria-describedby="docServerURL" />
                                 </div>
                             </div>
 
@@ -52,7 +52,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input name="doc_server_api_url" value="{{ $setting['doc_server_api_url'] ?? '' }}" type="text" class="form-control" id="docServerAPIURL" placeholder="{{ __('https://<documentserver>/web-apps/apps/api/documents/api.js') }}" aria-describedby="docServerAPIURL" />
+                                    <input name="doc_server_api_url" value="{{ $setting['doc_server_api_url'] ?? config('onlyoffice.doc_server_api_url') }}" type="text" class="form-control" id="docServerAPIURL" placeholder="{{ __('https://<documentserver>/web-apps/apps/api/documents/api.js') }}" aria-describedby="docServerAPIURL" />
                                 </div>
                             </div>
 
@@ -64,7 +64,7 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input name="secret" value="{{ $setting['secret'] ?? '' }}" type="text" class="form-control" id="docSecretKey" placeholder="{{ __('secret key') }}" aria-describedby="docSecretKey" />
+                                    <input name="secret" value="{{ $setting['secret'] ?? config('onlyoffice.secret') }}" type="text" class="form-control" id="docSecretKey" placeholder="{{ __('secret key') }}" aria-describedby="docSecretKey" />
                                 </div>
                             </div>
 
@@ -77,12 +77,12 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input name="allowed_file_size" value="{{ $setting['allowed_file_size'] ?? '' }}" type="text" class="form-control" id="docMaxFileSizeAllowed" placeholder="{{ __('32') }}" aria-describedby="docMaxFileSizeAllowed" />
+                                    <input name="allowed_file_size" value="{{ $setting['allowed_file_size'] ?? config('onlyoffice.allowed_file_size') }}" type="text" class="form-control" id="docMaxFileSizeAllowed" placeholder="{{ __('32') }}" aria-describedby="docMaxFileSizeAllowed" />
                                 </div>
                             </div>
-                            
-                            
-                            <div class="row mb-4">
+
+
+                            {{-- <div class="row mb-4">
                                 <!-- Allowed file types for upload -->
                                 <div class="col-md-3">
                                     <label for="docAllowedFileTypes" class="mt-2 form-label fs-6 fw-semibold @error('supported_files') is-invalid @enderror">
@@ -95,9 +95,9 @@
                                     placeholder="e.g. application/x-zip-compressed"
                                     class="form-control f-14">{{ $setting['supported_files'] ?? '' }}</textarea>
                                 </div>
-                            </div>
-                            
-                            
+                            </div> --}}
+
+
                             <!-- button to submit form -->
                             <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
                         </form>

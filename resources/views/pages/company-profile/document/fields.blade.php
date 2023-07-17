@@ -104,7 +104,7 @@
     @if ($document->is_expirable)
       <div class="form-group col-12 mt-2">
         <label for="" class="required">{{ $document->expiry_date_title }}</label>
-        <input type="date" name="expiry_date" value="{{@$doc['expiry_date'] ? date('Y-m-d', strtotime($doc['expiry_date'])) : ''}}" class="form-control">
+        <input type="date" name="expiry_date" value="{{@$doc['expiry_date'] ? date('Y-m-d', strtotime($doc['expiry_date'])) : ''}}" class="form-control flatpickr">
     {{-- {{dd(@$doc['expiry_date'])}} --}}
 
       </div>

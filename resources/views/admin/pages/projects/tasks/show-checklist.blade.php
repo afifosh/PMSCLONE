@@ -16,7 +16,7 @@
         <div class="col-6"></div>
         <div class="d-flex justify-conent-end col-6">
           {!! Form::select('assigned_to', $task->assignees->pluck('email', 'id')->prepend('Assigned To', ''), null, ['class' => 'form-select globalOfSelect2', 'id' => 'assigned_to']) !!}
-          <input type="date" id="due_date" name="due_date" class="form-control mx-1">
+          <input type="date" id="due_date" name="due_date" class="form-control mx-1 flatpickr">
           <button class="btn btn-primary  align-self-center" data-form="ajax-form">Add</button>
         </div>
       </div>

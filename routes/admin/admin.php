@@ -95,7 +95,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
   });
 
   Route::middleware('passwordMustNotBeExpired')->group(function () {
-    Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
 
     Route::post('/admin-account/update-profile-pic', [AdminAccountController::class, 'updateProfilePic'])->name('admin-account.update-profile');
     Route::put('/admin-account/email', [AdminAccountController::class, 'updateEmail'])->name('account.update-email');
