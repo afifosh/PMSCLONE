@@ -28,7 +28,7 @@ class SetOnlyOfficeConfig
                 Config::set('onlyoffice.doc_server_url', $default['doc_server_url']);
                 Config::set('onlyoffice.doc_server_api_url', $default['doc_server_api_url']);
                 Config::set('onlyoffice.allowed_file_size', $default['allowed_file_size']);
-                Config::set('onlyoffice.supported_files', $default['supported_files']);
+                // Config::set('onlyoffice.supported_files', $default['supported_files']);
         }
 
     }
