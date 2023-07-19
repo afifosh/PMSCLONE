@@ -24,6 +24,17 @@
       0 => 'BeyondCode\\QueryDetector\\QueryDetectorServiceProvider',
     ),
   ),
+  'beyondcode/laravel-websockets' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'BeyondCode\\LaravelWebSockets\\WebSocketsServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'WebSocketRouter' => 'BeyondCode\\LaravelWebSockets\\Facades\\WebSocketRouter',
+    ),
+  ),
   'imanghafoori/laravel-password-history' => 
   array (
     'providers' => 

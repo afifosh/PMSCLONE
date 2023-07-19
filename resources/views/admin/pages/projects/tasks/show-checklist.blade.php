@@ -25,7 +25,7 @@
 </div>
 
 <ul class="p-0 list-group list-group-flush" id="sortable">
-  @include('admin.pages.projects.tasks.checklist-index')
+  @includeWhen(request()->tab == 'checklist', 'admin.pages.projects.tasks.checklist-index')
 </ul>
 <script>
   $(document).on('input', '#checklist-input', function() {
@@ -61,16 +61,5 @@
   function handle_deleted_checklist(url){
     reload_task_checklist();
     toast_undo(url);
-  }
-
-  function reload_task_checklist(){
-    var url = "{{route('admin.projects.tasks.checklist-items.index', ['task' => $task->id, 'project' => $task->project_id])}}";
-    $.ajax({
-      url: url,
-      type: "GET",
-      success: function(data){
-        $('#sortable').html(data.data.view_data);
-      }
-    });
   }
 </script>

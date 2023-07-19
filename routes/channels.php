@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Admin;
+use App\Models\Project;
+use App\Models\ProjectMember;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -15,4 +18,9 @@ use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
+});
+
+Broadcast::channel('projects.{id}', function (Admin $user, $id) {
+  if($user->isSuperAdmin()) return true;
+  return ProjectMember::where('project_id', $id)->where('admin_id', $user->id)->exists();
 });

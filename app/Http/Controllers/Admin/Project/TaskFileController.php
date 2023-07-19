@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Project;
 
+use App\Events\Admin\ProjectTaskUpdatedEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -28,6 +29,9 @@ class TaskFileController extends Controller
         ->toDirectory('task-files')
         ->upload();
       $task->attachMedia($media, 'attachment');
+
+      broadcast(new ProjectTaskUpdatedEvent($task, 'files'))->toOthers();
+
       return $this->sendRes('File uploaded successfully', []);
     } catch (MediaUploadException $e) {
       /** @var \Symfony\Component\HttpKernel\Exception\HttpException */
@@ -43,6 +47,8 @@ class TaskFileController extends Controller
 
     $file->delete();
     // $task->detachMedia($file);
+
+    broadcast(new ProjectTaskUpdatedEvent($task, 'files'))->toOthers();
 
     return $this->sendRes('File deleted successfully', []);
   }

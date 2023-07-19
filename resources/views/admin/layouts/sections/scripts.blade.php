@@ -30,6 +30,7 @@
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
+<script src="{{ asset(mix('assets/vendor/js/Echo.js')) }}"></script>
 
 <script>
   setInterval(function() {

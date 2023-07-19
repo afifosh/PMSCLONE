@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Project;
 
+use App\Events\Admin\ProjectTaskUpdatedEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Models\TaskCheckListItem;
@@ -51,6 +52,8 @@ class TaskChecklistController extends Controller
       ]);
 
       $checklist = $task->checklistItems()->create($request->only(['title', 'assigned_to', 'due_date'])+ ['order' => $task->checklistItems()->count() + 1, 'created_by' => auth()->id()]);
+
+      broadcast(new ProjectTaskUpdatedEvent($task, 'checklist'))->toOthers();
 
       return $this->sendRes('Checklist item created successfully', ['id' => $checklist->id, 'JsMethods' => ['reload_task_checklist', 'reset_checklist_form']]);
     }
@@ -109,6 +112,8 @@ class TaskChecklistController extends Controller
       if($checklistItem->status != $request->boolean('status'))
       $checklistItem->update(['status' => $request->boolean('status'), 'completed_by' => $request->boolean('status') ? auth()->id() : null]);
 
+      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist'))->toOthers();
+
       return $this->sendRes('Checklist item updated successfully');
     }
 
@@ -125,6 +130,8 @@ class TaskChecklistController extends Controller
         TaskCheckListItem::where('id', $value)->where('task_id', $task->id)->update(['order' => $key + 1]);
       }
 
+      broadcast(new ProjectTaskUpdatedEvent($task, 'checklist'))->toOthers();
+
       return true;
     }
 
@@ -138,6 +145,8 @@ class TaskChecklistController extends Controller
       $id = $checklistItem->id;
       $checklistItem->delete();
 
+      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist'))->toOthers();
+
       return $this->sendRes('Checklist item deleted successfully', ['disable_alert' => true, 'event' => 'functionCall', 'function' => 'handle_deleted_checklist', 'function_params' => route('admin.projects.tasks.checklist-items.restore', [$project, $task, $id])]);
     }
 
@@ -148,6 +157,8 @@ class TaskChecklistController extends Controller
       abort_if(!$checklistItem->task->project->isMine(), 403);
 
       $checklistItem->restore();
+
+      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist'))->toOthers();
 
       return $this->sendRes('Checklist item restored successfully', ['event' => 'functionCall', 'function' => 'reload_task_checklist']);
     }

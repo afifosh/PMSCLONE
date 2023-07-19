@@ -110,27 +110,9 @@ $configData = Helper::appClasses();
             console.log(response);
             // remote this uploaded file from preview
             this.removeFile(file);
-            reload_files_list();
+            reload_task_files();
         },
         init: function(){
-            /* Called once the file has been processed. It could have failed or succeded */
-            this.on("complete", function(file){
-
-            });
-            /* Called after the file is uploaded and sucessful */
-            this.on("sucess", function(file){
-
-            });
-            /* Called before the file is being sent */
-            this.on("sending", function(file){
-            });
-
-            this.on("addedfile", function() {
-              // if (this.files[1]!=null){
-              //   this.removeFile(this.files[0]);
-              // }
-            });
-
             this.on("removedfile", function() {
               $($($this).data('response')).val('');
             });
@@ -173,6 +155,10 @@ $configData = Helper::appClasses();
     }
   }
 </script>
+<script>
+  window.active_project = '{{$project->id}}';
+</script>
+<script src={{asset('assets/js/echo/project-tasks.js')}}></script>
 @endsection
 
 @section('content')
@@ -185,23 +171,23 @@ $configData = Helper::appClasses();
           <h4>Tasks Summary</h4>
           <div class="row">
             <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 'not started')->first()->task_count ?? 0}}</h5>
+              <h5 class="mx-3">{{$summary->where('status', 'Not Started')->first()->task_count ?? 0}}</h5>
               <span class="">Not Started</span>
             </div>
             <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 'in progress')->first()->task_count ?? 0}}</h5>
+              <h5 class="mx-3">{{$summary->where('status', 'In Progress')->first()->task_count ?? 0}}</h5>
               <span class="text-primary">In Progress</span>
             </div>
             <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 'on hold')->first()->task_count ?? 0}}</h5>
+              <h5 class="mx-3">{{$summary->where('status', 'On Hold')->first()->task_count ?? 0}}</h5>
               <span class="text-warning">On Hold</span>
             </div>
             <div class="col-2 d-flex border-end">
-              <h5 class="mx-3">{{$summary->where('status', 'awaiting feedback')->first()->task_count ?? 0}}</h5>
+              <h5 class="mx-3">{{$summary->where('status', 'Awaiting Feedback')->first()->task_count ?? 0}}</h5>
               <span class="text-muted">Awaiting Feedback</span>
             </div>
             <div class="col-2 d-flex">
-              <h5 class="mx-3">{{$summary->where('status', 'completed')->first()->task_count ?? 0}}</h5>
+              <h5 class="mx-3">{{$summary->where('status', 'Completed')->first()->task_count ?? 0}}</h5>
               <span class="text-success">Completed</span>
             </div>
         </div>

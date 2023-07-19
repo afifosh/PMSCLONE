@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Project;
 
 use App\DataTables\Admin\Project\ProjectTasksDataTable;
+use App\Events\Admin\ProjectTaskUpdatedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProjectTaskStoreRequest;
 use App\Models\Admin;
@@ -52,21 +53,23 @@ class ProjectTaskController extends Controller
     abort_if(!$project->isMine(), 403);
 
     $task = $project->tasks()->create($request->validated() + ['admin_id' => auth()->id()]);
-    $task->assignees()->sync($request->assignees);
-    $task->followers()->sync($request->followers);
+    $task->assignees()->sync(remove_null_values($request->assignees));
+    $task->followers()->sync(remove_null_values($request->followers));
 
     // subscribe notifications for both assignees and followers
-    if($task->assignees->count() > 0) {
-      foreach($task->assignees as $user) {
+    if ($task->assignees->count() > 0) {
+      foreach ($task->assignees as $user) {
         $user->subscribeToCommentNotifications($task, NotificationSubscriptionType::All);
       }
     }
 
-    if($task->followers->count() > 0) {
-      foreach($task->followers as $user) {
+    if ($task->followers->count() > 0) {
+      foreach ($task->followers as $user) {
         $user->subscribeToCommentNotifications($task, NotificationSubscriptionType::All);
       }
     }
+
+    broadcast(new ProjectTaskUpdatedEvent($task, 'new_task_added'))->toOthers();
 
     return $this->sendRes('Task created successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);
   }
@@ -77,10 +80,25 @@ class ProjectTaskController extends Controller
   public function show(Project $project, Task $task)
   {
     abort_if(!$task->project->isMine(), 403);
+    $logs = [];
 
-    $task->load('project', 'checklistItems');
+    if ((!request()->tab && !request()->type) || request()->tab == 'summary')
+      $task->load('project');
+    else if (request()->tab == 'checklist')
+      $task->load('checklist');
+    else if (request()->tab == 'comments' || request()->type == 'comments-list')
+      $task->load('comments');
+    else if (request()->tab == 'files')
+      $task->load('media');
+    else if (request()->tab == 'logs' || request()->type == 'activities-list')
+      $logs = $task->getPaginatedLogs();
 
-    $logs = $task->getPaginatedLogs();
+    if (request()->type == 'summary-list')
+      return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.show-summary', compact('task', 'logs'))->render()]);
+    else if (request()->type == 'activities-list')
+      return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.show-activities', compact('task', 'logs'))->render()]);
+    else if (request()->type == 'comments-list')
+      return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.show-comments', compact('task'))->render()]);
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.show', compact('task', 'logs'))->render(), 'JsMethods' => ['initSortable', 'initDropZone', 'initEditor']]);
   }
@@ -107,8 +125,10 @@ class ProjectTaskController extends Controller
     abort_if(!$task->project->isMine(), 403);
 
     $task->update($request->validated());
-    $task->assignees()->sync($request->assignees);
-    $task->followers()->sync($request->followers);
+    $task->assignees()->sync(remove_null_values($request->assignees));
+    $task->followers()->sync(remove_null_values($request->followers));
+
+    broadcast(new ProjectTaskUpdatedEvent($task, 'summary'))->toOthers();
 
     return $this->sendRes('Task Updated successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);
   }
@@ -118,6 +138,8 @@ class ProjectTaskController extends Controller
     abort_if(!$task->project->isMine(), 403);
 
     $task->update(['is_completed_checklist_hidden' => $status ? 1 : 0]);
+
+    broadcast(new ProjectTaskUpdatedEvent($task, 'checklist'))->toOthers();
 
     return $this->sendRes('Task Updated successfully', ['JsMethods' => ['reload_task_checklist']]);
   }
@@ -130,6 +152,8 @@ class ProjectTaskController extends Controller
     abort_if(!$task->project->isMine(), 403);
 
     $task->delete();
+
+    broadcast(new ProjectTaskUpdatedEvent($task, 'task_deleted'))->toOthers();
 
     return $this->sendRes('Task deleted successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable']);
   }

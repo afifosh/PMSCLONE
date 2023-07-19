@@ -7,7 +7,7 @@ use Symfony\Component\Mime\MimeTypeExtensionGuesser;
 if (!function_exists('formatDateTime')) {
   function formatDateTime($dateTime)
   {
-    return date('d M, Y', strtotime($dateTime));
+    return $dateTime ? date('d M, Y', strtotime($dateTime)) : 'NULL';
   }
 }
 
@@ -123,4 +123,11 @@ function array_diff_assoc_recursive($array1, $array2)
   function getAssetUrl($path)
   {
     return Storage::url($path);
+  }
+
+  function remove_null_values($array)
+  {
+    return array_filter($array, function ($value) {
+      return !is_null($value);
+    });
   }
