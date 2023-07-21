@@ -144,6 +144,24 @@ class ProjectTaskController extends Controller
     return $this->sendRes('Task Updated successfully', ['JsMethods' => ['reload_task_checklist']]);
   }
 
+  public function updateOrder(Project $project, Request $request)
+  {
+    abort_if(!$project->isMine(), 403);
+
+      $request->validate([
+        'order' => 'required|array',
+        'order.*' => 'required|integer|exists:tasks,id',
+      ]);
+
+      foreach ($request->order as $key => $value) {
+        $project->tasks()->where('id', $value)->update(['order' => $key + 1]);
+      }
+
+      broadcast(new ProjectTaskUpdatedEvent($project->tasks()->first(), 'summary'))->toOthers();
+
+      return true;
+  }
+
   /**
    * Remove the specified resource from storage.
    */

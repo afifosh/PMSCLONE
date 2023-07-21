@@ -118,7 +118,7 @@
     },
     {
       "name": "Projects",
-      "slug": ["admin.projects.", "admin.project-categories"],
+      "slug": ["admin.projects.", "admin.project-categories", "admin.project-templates"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "submenu": [
         {
@@ -130,6 +130,11 @@
           "url": "/admin/project-categories",
           "name": "Project Categories",
           "slug": "admin.project-categories.index"
+        },
+        {
+          "url": "/admin/project-templates",
+          "name": "Project Templates",
+          "slug": "admin.project-templates.index"
         }
       ]
     },

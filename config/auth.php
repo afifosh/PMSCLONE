@@ -126,6 +126,8 @@ return [
 
     'password_expire_days' => 30,
 
+    'enable_timeout' => true,
+
     'timeout_warning_seconds' => 300,
 
     'timeout_after_seconds' => 2000,

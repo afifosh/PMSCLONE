@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_completed_checklist_hidden')->default(false);
             $table->json('tags')->nullable();
             $table->enum('status', ['Not Started', 'In Progress', 'On Hold', 'Awaiting Feedback', 'Completed'])->default('Not Started');
+            $table->bigInteger('order')->default(0);
             $table->timestamps();
         });
     }

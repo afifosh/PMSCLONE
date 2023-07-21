@@ -21,13 +21,21 @@ class SecurityRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
+
+    public function canonicalize(){
+      return [
+        'enable_timeout' => 'boolean'
+      ];
+    }
+
     public function rules()
     {
         return [
             'password_history_depth' => 'required|numeric|min:1|max:10',
             'password_expire_days' => 'required|numeric|gt:1',
-            'timeout_warning_seconds' => 'required|numeric',
-            'timeout_after_seconds' => 'required|numeric|gte:3',
+            'enable_timeout' => 'nullable|boolean',
+            'timeout_warning_seconds' => 'required_if:enable_timeout,1|numeric',
+            'timeout_after_seconds' => 'required_if:enable_timeout,1|numeric|gte:3',
         ];
     }
 
@@ -35,6 +43,8 @@ class SecurityRequest extends FormRequest
     {
       return [
         'timeout_after_seconds.gt' => 'The timeout after must be greater than or equal to timeout warning.',
+        'timeout_warning_seconds.required_if' => 'The timeout warning field is required when enabled.',
+        'timeout_after_seconds.required_if' => 'The timeout after field is required when enabled.',
       ];
     }
 }

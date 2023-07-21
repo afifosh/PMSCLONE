@@ -66,6 +66,27 @@ $configData = Helper::appClasses();
 
     });
   }
+  function initDataTableSortable()
+  {
+    var sortable = Sortable.create($('#project-tasks-datatable tbody')[0], {
+      group: 'shared',
+      animation: 150,
+      dataIdAttr: 'id',
+      onSort: function (/**Event*/evt) {
+        var url = "{{route('admin.projects.tasks.update-order', ['project' => $project])}}";
+        $.ajax({
+          url: url,
+          type: "PUT",
+          data: {
+            order: sortable.toArray(),
+          },
+          success: function(res){
+          }
+        });
+      },
+
+    });
+  }
   function initDropZone(){
     const previewTemplate = `<div class="dz-preview dz-file-preview">
         <div class="dz-details">
@@ -203,6 +224,66 @@ $configData = Helper::appClasses();
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script>
+        $(document).on('click', '.select-all-tasks', function () {
+            $('.task-row-selector').prop('checked', $(this).prop('checked'));
+        });
+        $(document).on('click', '.task-row-selector', function () {
+            if ($('.task-row-selector:checked').length > 0) {
+                $('#create_template').removeClass('d-none');
+            } else {
+                $('#create_template').addClass('d-none');
+            }
+            if ($('.task-row-selector:checked').length === $('.task-row-selector').length) {
+                $('.select-all-tasks').prop('checked', true);
+            } else {
+                $('.select-all-tasks').prop('checked', false);
+            }
+        });
+      async function toggleSortColumn()
+      {
+        var col = $('#project-tasks-datatable').DataTable().column(1);
+        await refreshTasksDatatable();
+        col.visible(!col.visible());
+        $('.select-all-tasks').prop('checked', false);
+        col.visible() ? initDataTableSortable() : null;
+      }
+
+      async function showSelectColumn(elm)
+      {
+        var col = $('#project-tasks-datatable').DataTable().column(0);
+        await refreshTasksDatatable();
+        $('.select-all-tasks').prop('checked', false);
+        col.visible(true);
+        if(col.visible()){
+          $(elm).addClass('d-none');
+          $('.saveTemplateButton').removeClass('d-none');
+         }else{
+          $('.saveTemplateButton').addClass('d-none');
+          $(elm).removeClass('d-none');
+         }
+      }
+
+      function showSaveTemplateModal()
+      {
+        if ($('.task-row-selector:checked').length == 0) {
+          alert('Please select at least one task');
+          return;
+        }
+
+        var hiddenButton = '<button data-toggle="ajax-modal" class="d-none" id="create-temp" data-href="{{route('admin.project-templates.create')}}" data-title="Create Template"></button>';
+
+          // Append the hidden button to the DOM
+          $('body').append(hiddenButton);
+          $('#create-temp').click();
+      }
+      window.includeTasks = function (){
+        console.log('includeTasks');
+        var tasks = $('.task-row-selector:checked').map(function(){
+          return $(this).val();
+        }).get();
+        console.log(tasks);
+        $('#tasks_ids').val(tasks);
+      }
       function view_task_from_url()
       {
         var urlParams = new URLSearchParams(window.location.search);

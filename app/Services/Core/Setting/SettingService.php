@@ -17,7 +17,7 @@ class SettingService extends BaseService
         $settings = request()->except('allowed_resource', '_token', '_method');
 
         return collect(array_keys($settings))->map(function ($key) use ($settings, $context) {
-            if (is_null(request()->input($key))) {
+            if (is_null(request()->input($key) && $key != 'enable_timeout')) {
                 return true;
             }
 

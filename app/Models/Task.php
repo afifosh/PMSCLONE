@@ -26,6 +26,7 @@ class Task extends Model
     'tags',
     'admin_id',
     'is_completed_checklist_hidden',
+    'order'
   ];
 
   protected $casts = [

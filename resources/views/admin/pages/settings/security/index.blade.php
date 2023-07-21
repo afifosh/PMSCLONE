@@ -56,8 +56,21 @@
                             </div>
                             <!-- Password expires after -->
 
+                            <div class="form-group col-6">
+                              <label class="switch d-flex flex-column">
+                                {{ Form::label('enable_timeout', __('Enable Timeout'), ['class' => 'col-form-label fw-semibold']) }}
+                                {{ Form::checkbox('enable_timeout', 1, config('auth.enable_timeout'),['class' => 'switch-input is-invalid', 'onclick' => 'toggleTimeoutForm()'])}}
+                                {{-- <input type="checkbox" class="switch-input is-invalid" checked /> --}}
+                                <span class="switch-toggle-slider position-relative mb-1">
+                                  <span class="switch-on"></span>
+                                  <span class="switch-off"></span>
+                                </span>
+                                <span class="switch-label"></span>
+                              </label>
+                            </div>
+
                             <!-- Password expires after -->
-                            <div class="row">
+                            <div class="row {{config('auth.enable_timeout') ? '' : 'd-none'}}" id="timeout_config">
                                 <div class="col-md-6 mb-3">
                                     <label for="timeoutWarningIn" class="form-label fs-6 mb-2 fw-semibold @error('password_expiry_days') is-invalid @enderror">
                                         @lang('Timeout warning in')
@@ -92,7 +105,9 @@
                             </div>
 
                             <!-- button to submit form -->
-                            <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                            <div class="d-flex justify-content-end">
+                              <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -103,4 +118,10 @@
         <!-- /Settings List -->
     </div>
 </div>
+<script>
+    function toggleTimeoutForm()
+    {
+      $('#timeout_config').toggleClass('d-none');
+    }
+</script>
 @endsection

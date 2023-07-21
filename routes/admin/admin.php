@@ -34,9 +34,11 @@ use App\Models\RFPFile;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
+use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
 use App\Http\Controllers\Admin\Project\ProjectTaskController;
+use App\Http\Controllers\Admin\Project\ProjectTemplateController;
 use App\Http\Controllers\Admin\Project\TaskChecklistController;
 use App\Http\Controllers\Admin\Project\TaskCommentController;
 use App\Http\Controllers\Admin\Project\TaskFileController;
@@ -138,8 +140,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
-
     Route::resource('projects', ProjectController::class);
+    Route::resource('project-templates', ProjectTemplateController::class);
+    Route::put('/projects/{project}/tasks/update-order', [ProjectTaskController::class, 'updateOrder'])->name('projects.tasks.update-order');
+    Route::resource('projects.import-templates', ImportTemplateController::class);
     Route::resource('projects.tasks', ProjectTaskController::class);
     Route::put('projects/{project}/tasks/{task}/hide-completed/{status?}', [ProjectTaskController::class, 'hideCompleted'])->name('projects.tasks.hide-completed');
     Route::resource('projects.tasks.files', TaskFileController::class)->only(['index', 'store', 'destroy']);

@@ -413,4 +413,9 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
         $this->two_factor_expires_at = null;
         $this->save();
     }
+
+    public function projectTemplates()
+    {
+      return $this->hasMany(ProjectTemplate::class);
+    }
 }

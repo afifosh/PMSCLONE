@@ -24,6 +24,7 @@ class SetAppSecurityConfig
         $default = resolve(SettingService::class)->getFormattedSettings('security');
 
         if ($default) {
+                Config::set('auth.enable_timeout', $default['enable_timeout']);
                 Config::set('auth.timeout_warning_seconds', $default['timeout_warning_seconds']);
                 Config::set('auth.timeout_after_seconds', $default['timeout_after_seconds']);
         }

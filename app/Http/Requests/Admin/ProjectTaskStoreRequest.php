@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProjectTaskStoreRequest extends FormRequest
 {
@@ -22,7 +23,12 @@ class ProjectTaskStoreRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'subject' => 'required|string|max:255',
+      'subject' => ['required', 'string', 'max:255', Rule::unique('tasks')->where('subject', $this->subject)
+      ->when(request()->method() == 'PUT', function ($query) {
+        return $query->whereNotIn('id', [request()->task->id]);
+      })->when(request()->method() == 'POST', function ($query) {
+        return $query->where('project_id', request()->project->id);
+      })],
       'description' => 'nullable|string|max:255',
       'start_date' => 'nullable|date',
       'due_date' => 'nullable|date',

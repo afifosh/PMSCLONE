@@ -13,7 +13,7 @@
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/bell-notifications.js')) }}"></script>
 @auth
-@if(Auth::getDefaultDriver() === 'admin' && Route::currentRouteName() !== 'admin.auth.lock')
+@if(Auth::getDefaultDriver() === 'admin' && Route::currentRouteName() !== 'admin.auth.lock' && config('auth.enable_timeout'))
 <script src="{{ asset(mix('assets/js/bootstrap-session-timeout.js')) }}"></script>
 <script>
   var keepAliveUrl = "{{ route('admin.alive') }}"
