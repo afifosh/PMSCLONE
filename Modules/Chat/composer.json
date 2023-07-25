@@ -1,0 +1,23 @@
+{
+  "name": "nwidart/chat",
+  "description": "",
+  "authors": [
+    {
+      "name": "Ali Raza",
+      "email": "muntazim1001@gmail.com"
+    }
+  ],
+  "extra": {
+    "laravel": {
+      "providers": [],
+      "aliases": {}
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Modules\\Chat\\": ""
+    }
+  },
+  "require": {
+  }
+}

@@ -2,6 +2,7 @@ const { EnvironmentPlugin } = require('webpack');
 const mix = require('laravel-mix');
 const glob = require('glob');
 const path = require('path');
+const chatConfig = require('./webpack.chat.mix.js');
 
 /*
  |--------------------------------------------------------------------------

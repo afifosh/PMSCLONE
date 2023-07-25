@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('key')->nullable();
             $table->longText('value')->nullable();
             $table->string('settingable_type', 160)->nullable();
             $table->unsignedBigInteger('settingable_id')->nullable();
