@@ -8,8 +8,8 @@
  */
 @font-face {
   font-family: "CoreUI-Icons-Linear-Free";
-  src: url("../fonts/CoreUI-Icons-Linear-Free.eot?64h6xh");
-  src: url("../fonts/CoreUI-Icons-Linear-Free.eot?64h6xh#iefix") format("embedded-opentype"), url("../fonts/CoreUI-Icons-Linear-Free.ttf?64h6xh") format("truetype"), url("../fonts/CoreUI-Icons-Linear-Free.woff?64h6xh") format("woff"), url("../fonts/CoreUI-Icons-Linear-Free.svg?64h6xh#CoreUI-Icons-Linear") format("svg");
+  src: url(/fonts/vendor/@coreui/icons/CoreUI-Icons-Linear-Free.eot?b5c93177864186615ed5c7090d5a934a);
+  src: url(/fonts/vendor/@coreui/icons/CoreUI-Icons-Linear-Free.eot?b5c93177864186615ed5c7090d5a934a#iefix) format("embedded-opentype"), url(/fonts/vendor/@coreui/icons/CoreUI-Icons-Linear-Free.ttf?49a8e66ae5644253b2bf811d96e0d0da) format("truetype"), url(/fonts/vendor/@coreui/icons/CoreUI-Icons-Linear-Free.woff?6779cfb19973abd1449d93e9eb09b32e) format("woff"), url(/fonts/vendor/@coreui/icons/CoreUI-Icons-Linear-Free.svg?a141262bd3f1f2e2a026c22e42dfd712#CoreUI-Icons-Linear) format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -432,8 +432,8 @@
 */
 @font-face {
   font-family: "simple-line-icons";
-  src: url("../fonts/Simple-Line-Icons.eot?v=2.4.0");
-  src: url("../fonts/Simple-Line-Icons.eot?v=2.4.0#iefix") format("embedded-opentype"), url("../fonts/Simple-Line-Icons.woff2?v=2.4.0") format("woff2"), url("../fonts/Simple-Line-Icons.ttf?v=2.4.0") format("truetype"), url("../fonts/Simple-Line-Icons.woff?v=2.4.0") format("woff"), url("../fonts/Simple-Line-Icons.svg?v=2.4.0#simple-line-icons") format("svg");
+  src: url(/fonts/vendor/simple-line-icons/Simple-Line-Icons.eot?85e8c542d5e137beecf94e0132812855);
+  src: url(/fonts/vendor/simple-line-icons/Simple-Line-Icons.eot?85e8c542d5e137beecf94e0132812855#iefix) format("embedded-opentype"), url(/fonts/vendor/simple-line-icons/Simple-Line-Icons.woff2?3826fa1cb2348dd93948a50cbd2b8fb6) format("woff2"), url(/fonts/vendor/simple-line-icons/Simple-Line-Icons.ttf?3ec13a24af3fdda1110771d3541915a2) format("truetype"), url(/fonts/vendor/simple-line-icons/Simple-Line-Icons.woff?5c9febce52054ae0b96ddd3e2d173e1a) format("woff"), url(/fonts/vendor/simple-line-icons/Simple-Line-Icons.svg?f1515a459c88508908124cfdab38ced9#simple-line-icons) format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -18255,7 +18255,7 @@ input:focus {
 }
 
 .emojionearea.focused {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 img.emojioneemoji {

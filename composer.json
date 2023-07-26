@@ -13,7 +13,7 @@
     "barryvdh/laravel-debugbar": "^3.7",
     "beyondcode/laravel-websockets": "^1.14",
     "ddeboer/imap": "^1.17",
-    "embed/embed": "^4.4",
+    "embed/embed": "^3.4",
     "firebase/php-jwt": "^6.4",
     "genealabs/laravel-pivot-events": "^10.0",
     "google/apiclient": "^2.13",

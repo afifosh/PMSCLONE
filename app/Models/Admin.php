@@ -140,6 +140,16 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     return @Storage::url($value);
   }
 
+  public function getPhotoUrlAttribute()
+  {
+    return $this->avatar;
+  }
+
+  public function getNameAttribute()
+  {
+    return $this->full_name;
+  }
+
   public function getFullNameAttribute()
   {
     return ucwords($this->first_name . ' ' . $this->last_name);

@@ -1742,7 +1742,7 @@ $(document).ready(function () {
     };
 
     window.Echo.private(`user.${loggedInUserId}`).
-        listen('UserEvent', (e) => {
+        listen('.Modules\\Chat\\Events\\UserEvent', (e) => {
             if (e.type === 1) { // block-unblock user event
                 blockUnblockUserEvent(e);
             } else if (e.type === 2) { // new user-to-user message arrived
@@ -2100,7 +2100,7 @@ $(document).ready(function () {
         templateData.isReceiver = isReceiver;
         templateData.loggedInUserId = loggedInUserId
         templateData.checkShowNameChat = checkShowNameChat
-        templateData.authImage = null;// $.parseHTML(authImgURL)[0].data
+        templateData.authImage = $.parseHTML(authImgURL)[0].data
         templateData.authUserName = authUserName;
         templateData.needToRemoveOldTimeline = needToRemoveOldTimeline;
         templateData.className = className;
@@ -3256,7 +3256,7 @@ $(document).ready(function () {
 
     /** User Profile Updated */
     Echo.private(`updates`).
-        listen('UpdatesEvent', (e) => {
+        listen('.Modules\\Chat\\Events\\UpdatesEvent', (e) => {
             if (e.type == 1) { //user profile updates
                 let user = e.user;
                 $('#userListForChat').find('.chat-user-' + user.id).find('img').attr('src', user.photo_url);
@@ -3358,7 +3358,7 @@ $(document).ready(function () {
     window.listenForGroupUpdates = function (groupId) {
         /** Group Updated Event */
         Echo.private(`group.${groupId}`).
-            listen('GroupEvent', (e) => {
+            listen('.Modules\\Chat\\Events\\GroupEvent', (e) => {
                 let group = e;
                 let currentGroupId = $('.chat__person-box--active').data('id');
 

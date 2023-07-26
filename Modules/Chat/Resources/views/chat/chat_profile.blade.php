@@ -5,7 +5,7 @@
     </div>
     <div class="chat-profile__person chat-profile__person--active mb-2">
         <div class="chat-profile__avatar">
-            <img src="{{asset('assets/images/avatar.png')}}" alt="" class="img-fluid user-about-image">
+            <img src="{{asset('chat/assets/images/avatar.png')}}" alt="" class="img-fluid user-about-image">
         </div>
     </div>
     {{--<div class="chat-profile__person-name">

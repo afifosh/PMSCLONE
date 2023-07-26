@@ -32,27 +32,29 @@
             @foreach($users as $key => $user)
                 <li class="list-group-item user-list-chat-select__list-item align-items-center chat-user-{{ $user->id }} {{ getGender($user->gender) }} {{ getOnOffClass($user->is_online) }}">
                     <input type="hidden" class="add-chat-user-id" value="{{ $user->id }}">
-                    <div class="new-conversation-img-status position-relative me-2 user-{{ $user->id }}"
-                         data-status="{{$user->is_online}}">
-                        <div
-                            class="chat__person-box-status @if ($user->is_online) chat__person-box-status--online @else chat__person-box-status--offline @endif"></div>
-                        <div class="new-conversation-img-status__inner">
-                            <img src="{{$user->photo_url}}" alt="user-avatar-img" class="user-avatar-img add-user-img">
-                        </div>
-                    </div>
-                    <div class="truncate-div">
-                    <span class="add-user-contact-name text-truncate">{{ $user->name }}
-                        <span class="my-contact-user-status"
-                              data-status="{{ checkUserStatusForGroupMember($user->userStatus) }}">
-                        @if (checkUserStatusForGroupMember($user->userStatus))
-                            <i class="nav-icon user-status-icon" data-bs-toggle="tooltip" data-bs-placement="top"
-                               title="{{$user->userStatus->status}}" data-original-title="{{$user->userStatus->status}}">
-                                {!! $user->userStatus->emoji  !!}
-                            </i>
-                        @endif
-                        </span>
-                    </span>
-                    <div class="align-self-center add-user-email text-truncate">{{ $user->email }}</div>
+                    <div class="d-flex">
+                      <div class="new-conversation-img-status position-relative me-2 user-{{ $user->id }}"
+                          data-status="{{$user->is_online}}">
+                          <div
+                              class="chat__person-box-status @if ($user->is_online) chat__person-box-status--online @else chat__person-box-status--offline @endif"></div>
+                          <div class="new-conversation-img-status__inner">
+                              <img src="{{$user->photo_url}}" alt="user-avatar-img" class="user-avatar-img add-user-img">
+                          </div>
+                      </div>
+                      <div class="truncate-div">
+                      <span class="add-user-contact-name text-truncate">{{ $user->name }}
+                          <span class="my-contact-user-status"
+                                data-status="{{ checkUserStatusForGroupMember($user->userStatus) }}">
+                          @if (checkUserStatusForGroupMember($user->userStatus))
+                              <i class="nav-icon user-status-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="{{$user->userStatus->status}}" data-original-title="{{$user->userStatus->status}}">
+                                  {!! $user->userStatus->emoji  !!}
+                              </i>
+                          @endif
+                          </span>
+                      </span>
+                      <div class="align-self-center add-user-email text-truncate">{{ $user->email }}</div>
+                  </div>
                 </div>
             </li>
         @endforeach

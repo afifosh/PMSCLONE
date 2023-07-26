@@ -255,7 +255,7 @@
                     &:hover {
                         background-color: #f0f0f0;
                     }
-                    
+
                     &:first-child {
                         background-color: white;
                     }
@@ -593,7 +593,7 @@
                 font-size: inherit;
             }
         }
-      
+
         &--read {
           color: #3db16b;
         }
@@ -1672,7 +1672,7 @@
         padding-left: 6px;
         border: 0;
         transition: all .3s;
-        
+
         &:hover {
             background-color: #ebebeb;
             border-radius: 0.4em;
@@ -1804,7 +1804,7 @@
 }
 
 .emojionearea.focused {
-    box-shadow: none;
+    box-shadow: none !important;
 }
 
 img.emojioneemoji {
@@ -2050,7 +2050,7 @@ audio {
 
 .modal-new-conversation {
     min-width: 415px;
-    
+
     .nav {
         flex-wrap: nowrap;
     }
@@ -2059,13 +2059,13 @@ audio {
 .chat-conversation__avatar {
     padding-bottom: 10px;
     overflow: inherit;
-    
+
     .img-fluid {
         width: 30px;
         height: 30px;
         border-radius: 50%;
     }
-    
+
     .highlighter {
         position: absolute;
         z-index: 1;
@@ -2077,10 +2077,10 @@ audio {
         color: $white;
         font-size: 9px;
         transform: translateY(-60%) rotate(20deg);
-        
+
         img  {
             height: 15px;
             width: 15px;
         }
-    }   
+    }
 }

@@ -3,7 +3,7 @@
         <span class="chat-profile__about"><?php echo trans('chat::messages.about') ?></span>
         <div>
         {{if !removed_from_group && my_role === 2}}
-            <a href="javascript:void(0)" class="text-decoration-none edit-group text-center me-2" data-id="{{:id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="<?php echo trans('chat::messages.edit_group') ?>"><img src="images/icons/mobile-edit.png" alt="edit"></a>
+            <a href="javascript:void(0)" class="text-decoration-none edit-group text-center me-2" data-id="{{:id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="<?php echo trans('chat::messages.edit_group') ?>"><img src="/images/icons/mobile-edit.png" alt="edit"></a>
         {{/if}}
             <i class="fa fa-times chat-profile__close-btn"></i>
         </div>

@@ -11,6 +11,10 @@
     {{ config('variables.templateSuffix') ? config('variables.templateSuffix') : 'TemplateSuffix' }}</title>
   <meta name="description" content="{{ config('variables.templateDescription') ? config('variables.templateDescription') : '' }}" />
   <meta name="keywords" content="{{ config('variables.templateKeyword') ? config('variables.templateKeyword') : '' }}">
+
+  <meta name="theme-color" content="#6777ef"/>
+  <link rel="apple-touch-icon" href="{{ asset('logo.PNG') }}">
+  <link rel="manifest" href="{{ asset('/manifest.json') }}">
   <!-- laravel CRUD token -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <!-- Canonical SEO -->
@@ -32,6 +36,9 @@
 </head>
 
 <body style="overflow-x: hidden;"  class="{{ !empty($body_class) ? $body_class : '' }}">
+  <audio id="notificationSound">
+    <source src="{{ getNotificationSound() ? getNotificationSound() : ''}}" type="audio/mp3">
+  </audio>
 
   <!-- Layout Content -->
   @yield('layoutContent')
@@ -58,6 +65,13 @@
       });
     });
   </script>
+  <script src="{{ asset('sw.js') }}"></script>
+  <script>
+    if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+            console.log('Service worker has been registered for scope: ' + reg.scope)
+        })
+    }
+  </script>
 </body>
-
 </html>

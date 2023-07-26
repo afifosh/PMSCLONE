@@ -5,7 +5,7 @@
                 <input type="hidden" id="toId" value="{{:user.id}}">
                 <input type="hidden" id="chatType" value="{{:user.id}}">
                 <div class="d-flex align-items-center w-100">
-                    <span class="back-to-chat d-flex justify-content-center align-items-center">
+                    <span class="back-to-chat d-none d-flex justify-content-center align-items-center">
                         <i class="fa fa-chevron-left" aria-hidden="true"></i>
                     </span>
                     <div class="chat__area-header-avatar">
@@ -30,7 +30,7 @@
                     <div class="cursor-pointer d-xl-none ms-auto hamburger-top"
                         id="dropdownMenuButton" aria-expanded="false">
                          {{if my_role === 2}}
-                        <a href="javascript:void(0)" class="text-decoration-none me-2 btn-add-members" data-group-id="{{:user.id}}" title="<?php __('chat::messages.add_members') ?>"><img src="images/icons/mobile-add.png" alt="add"></a>
+                        <a href="javascript:void(0)" class="text-decoration-none me-2 btn-add-members" data-group-id="{{:user.id}}" title="<?php __('chat::messages.add_members') ?>"><img src="/images/icons/mobile-add.png" alt="add"></a>
                         {{/if}}
                         <i class="fa fa-bars open-profile-menu" aria-hidden="true"></i>
                     </div>
@@ -39,7 +39,7 @@
                     <!-- setting view -->
                     {{if my_role === 2}}
                     <a href="javascript:void(0)" class="text-decoration-none me-2 btn-add-members" data-group-id="{{:user.id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="<?php echo trans('chat::messages.add_members') ?>
-    " title="<?php echo trans('chat::messages.add_members') ?>"><img src="images/icons/add.png" class="add-icon" alt="add"></a>
+    " title="<?php echo trans('chat::messages.add_members') ?>"><img src="/images/icons/add.png" class="add-icon" alt="add"></a>
                     {{/if}}
                     <div class="chat__area-icon open-profile-menu ms-2">
                         <i class="fa fa-cog" aria-hidden="true"></i>

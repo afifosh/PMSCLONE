@@ -22,19 +22,21 @@
                 <li class="list-group-item user-list-chat-select__list-item align-items-center chat-user-{{ $value->id }} {{ getGender($value->gender) }}"
                     data-status="{{ $value->is_online }}" data-gender="{{$value->gender}}">
                     <input type="hidden" class="add-chat-user-id" value="{{ $value->id }}">
-                    <div class="new-conversation-img-status position-relative me-2 user-{{ $value->id }}"
-                         data-status="{{ $value->is_online }}">
-                        <div
-                            class="chat__person-box-status @if($value->is_online) chat__person-box-status--online @else chat__person-box-status--offline @endif"></div>
-                        <div class="new-conversation-img-status__inner">
-                            <img src="{{ $value->photo_url }}" alt="user-avatar-img"
-                                 class="user-avatar-img add-user-img">
-                        </div>
-                    </div>
-                    <div class="truncate-div">
-                        <span
-                            class="add-user-contact-name align-self-center fw-bolder text-truncate">{{ $value->name }}</span>
-                        <div class="align-self-center add-user-email text-truncate">{{ $value->email }}</div>
+                    <div class="d-flex">
+                      <div class="new-conversation-img-status position-relative me-2 user-{{ $value->id }}"
+                          data-status="{{ $value->is_online }}">
+                          <div
+                              class="chat__person-box-status @if($value->is_online) chat__person-box-status--online @else chat__person-box-status--offline @endif"></div>
+                          <div class="new-conversation-img-status__inner">
+                              <img src="{{ $value->photo_url }}" alt="user-avatar-img"
+                                  class="user-avatar-img add-user-img">
+                          </div>
+                      </div>
+                      <div class="truncate-div">
+                          <span
+                              class="add-user-contact-name align-self-center fw-bolder text-truncate">{{ $value->name }}</span>
+                          <div class="align-self-center add-user-email text-truncate">{{ $value->email }}</div>
+                      </div>
                     </div>
                 </li>
             @endforeach

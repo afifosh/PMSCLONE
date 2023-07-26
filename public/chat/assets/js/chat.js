@@ -1,14 +1,4 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(self, function() {
-return /******/ (function() { // webpackBootstrap
+/******/ (function() { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./node_modules/bad-words/lib/badwords.js":
@@ -1808,7 +1798,7 @@ $(document).ready(function () {
     chatPeopleBodyEle.remove('#user-' + userId);
     chatPeopleBodyEle.prepend(userEle);
   };
-  window.Echo["private"]("user.".concat(loggedInUserId)).listen('UserEvent', function (e) {
+  window.Echo["private"]("user.".concat(loggedInUserId)).listen(".Modules\\Chat\\Events\\UserEvent", function (e) {
     if (e.type === 1) {
       // block-unblock user event
       blockUnblockUserEvent(e);
@@ -2089,7 +2079,7 @@ $(document).ready(function () {
     templateData.isReceiver = isReceiver;
     templateData.loggedInUserId = loggedInUserId;
     templateData.checkShowNameChat = checkShowNameChat;
-    templateData.authImage = null; // $.parseHTML(authImgURL)[0].data
+    templateData.authImage = $.parseHTML(authImgURL)[0].data;
     templateData.authUserName = authUserName;
     templateData.needToRemoveOldTimeline = needToRemoveOldTimeline;
     templateData.className = className;
@@ -3034,7 +3024,7 @@ $(document).ready(function () {
   };
 
   /** User Profile Updated */
-  Echo["private"]("updates").listen('UpdatesEvent', function (e) {
+  Echo["private"]("updates").listen(".Modules\\Chat\\Events\\UpdatesEvent", function (e) {
     if (e.type == 1) {
       //user profile updates
       var user = e.user;
@@ -3103,7 +3093,7 @@ $(document).ready(function () {
   }
   window.listenForGroupUpdates = function (groupId) {
     /** Group Updated Event */
-    Echo["private"]("group.".concat(groupId)).listen('GroupEvent', function (e) {
+    Echo["private"]("group.".concat(groupId)).listen('.Modules\\Chat\\Events\\GroupEvent', function (e) {
       var group = e;
       var currentGroupId = $('.chat__person-box--active').data('id');
 
@@ -4412,7 +4402,5 @@ $(document).on('click', '.load-more-archive-conversation', function () {
   });
 });
 }();
-/******/ 	return __webpack_exports__;
 /******/ })()
 ;
-});

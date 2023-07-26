@@ -26,12 +26,12 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     }
     public function updateUser(User $user, array $input): void
     {
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
-            $this->updateVerifiedUser($user, $input);
-        } else {
+        // if (//$input['email'] !== $user->email &&
+        //     $user instanceof MustVerifyEmail) {
+        //     $this->updateVerifiedUser($user, $input);
+        // } else {
             $user->forceFill($input)->save();
-        }
+        // }
     }
 
     /**
@@ -48,12 +48,12 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 
     public function updateAdmin(Admin $user, array $input): void
     {
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
-            $this->updateVerifiedAdmin($user, $input);
-        } else {
+        // if (//$input['email'] !== $user->email &&
+        //     $user instanceof MustVerifyEmail) {
+        //     $this->updateVerifiedAdmin($user, $input);
+        // } else {
             $user->forceFill($input)->save();
-        }
+        // }
     }
 
     /**

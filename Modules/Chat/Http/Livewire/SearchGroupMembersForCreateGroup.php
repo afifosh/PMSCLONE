@@ -57,8 +57,8 @@ class SearchGroupMembersForCreateGroup extends Component
                 });
             })
             ->whereNotIn('id', $this->members)
-            ->select(['id', 'first_name as name', 'avatar as photo_url', 'email'])
-            ->orderBy('name')
+            // ->select(['id', 'first_name as name', 'avatar as photo_url', 'email'])
+            ->orderBy('first_name')
             ->get()
             ->toArray();
 

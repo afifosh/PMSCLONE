@@ -7,18 +7,17 @@ $configData = Helper::appClasses();
 @section('title')
     {{ __('chat::messages.conversations') }}
 @endsection
-@section('vendor-style')
-    {{-- <link rel="stylesheet" href="{{ asset('chat/assets/css/bootstrap.min.css') }}"> --}}
+@section('page-style')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/coreui.min.css') }}">
     <link rel="stylesheet" href="{{ asset('chat/assets/icheck/skins/all.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/datetime-picker.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('chat/assets/css/datetime-picker.css') }}"/>
     <link rel="stylesheet" href="{{ mix('chat/assets/css/jquery.toast.min.css') }}">
 
     @livewireStyles
     @routes
     <link rel="stylesheet" href="{{ mix('chat/assets/css/font-awesome.css') }}">
-    <link rel="stylesheet" href="{{ asset('chat/css/emojionearea.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('chat/assets/css/emojionearea.min.css') }}">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/custom-style.css') }}">
 
@@ -64,7 +63,7 @@ $configData = Helper::appClasses();
                                  data-bs-target="#addNewChat">
                                 <i class="nav-icon remove-tooltip" data-bs-toggle="tooltip" data-bs-placement="bottom"
                                    title="{{ __('chat::messages.new_conversation') }}"><img
-                                        src="{{asset('assets/icons/bubble-chat.png')}}" width="30" height="30"></i>
+                                        src="{{asset('chat/assets/icons/bubble-chat.png')}}" width="30" height="30"></i>
                             </div>
                             <i class="nav-icon fa fa-times align-top chat__people-close-bar d-sm-none d-block align-self-center ms-2"></i>
                         </div>
@@ -144,20 +143,20 @@ $configData = Helper::appClasses();
                 <div class="modal-content modal-new-conversation">
                     <div class="modal-header border-0">
                         <h5 class="modal-title">
-                            <i class="ti-user"></i>{{__('chat::messages.group.new_conversations')}} @if($enableGroupSetting == 1) / {{__('chat::messages.group.groups')}} @endif</h5>
+                            </i>{{__('chat::messages.group.new_conversations')}} @if($enableGroupSetting == 1) / {{__('chat::messages.group.groups')}} @endif</h5>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             &times;
                         </button>
                     </div>
                     <div class="modal-body">
-                        <nav class="nav nav-pills flex-wrap" id="myTab" role="tablist">
+                        <nav class="nav nav-pills d-flex" id="myTab" role="tablist">
                             <a class="nav-item nav-link active" id="nav-my-contacts-tab" data-bs-toggle="tab"
                                href="#nav-my-contacts" role="tab" aria-controls="nav-my-contacts-tab"
-                               aria-expanded="true"> <i class="ti-user"></i>{{ __('chat::messages.my_contacts') }}
+                               aria-expanded="true"> </i>{{ __('chat::messages.my_contacts') }}
                             </a>
                             <a class="nav-item nav-link wrap-text" id="nav-users-tab" data-bs-toggle="tab"
                                     href="#nav-users" role="tab" aria-controls="nav-users" aria-expanded="true">
-                                <i class="ti-user"></i>{{ __('chat::messages.new_conversation') }}
+                                </i>{{ __('chat::messages.new_conversation') }}
                             </a>
                             @if($enableGroupSetting == 1)
                             <a class="nav-item nav-link" id="nav-groups-tab" data-bs-toggle="tab" href="#nav-groups"
@@ -215,19 +214,21 @@ $configData = Helper::appClasses();
     @include('chat::chat.templates.my_contacts_listing')
     @include('chat::chat.templates.conversation-request')
     @include('chat::chat.copyImageModal')
+    @include('chat::partials.file-upload')
+    @include('chat::partials.set_custom_status_modal')
 @endsection
 @section('page-script')
     <script src="{{ asset('chat/assets/js/dropzone.min.js') }}"></script>
     <script src="{{ asset('chat/assets/js/directive.min.js') }}"></script>
     <script src="{{ asset('chat/assets/js/yBox.min.js') }}"></script>
-    {{-- <script src="{{ mix('assets/js/video.min.js') }}"></script> --}}
+    <script src="{{ mix('chat/assets/js/video.min.js') }}"></script>
     <!--custom js-->
     <script>
         let userURL = '{{url('admin/chat/users')}}/'
         let userListURL = '{{url('admin/chat/users-list')}}' // not use in anywhere
         let chatSelected = false
         let csrfToken = '{{csrf_token()}}'
-        let authUserName = '{{ getLoggedInUser()->name }}'
+        let authUserName = '{{ getLoggedInUser()->full_name }}'
         let authImgURL = '{{ getLoggedInUser()->photo_url}}'
         let deleteConversationUrl = '{{url('admin/chat/conversations')}}/'
         let getUsers = '{{url('admin/chat/get-users')}}'  //not used in anywhere
@@ -272,7 +273,6 @@ $configData = Helper::appClasses();
 <script src="{{ mix('chat/assets/js/emojione.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('chat/assets/js/datetime-picker.js') }}"></script>
 <script src="{{ asset('chat/assets/js/bootstrap-datetimepicker.min.js') }}"></script>
-{{-- <script src="{{ asset('sw.js') }}"></script> --}}
 <script>
     $(document).ready(function () {
         let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

@@ -144,8 +144,8 @@ class MyContactsSearch extends Component
                     ->orWhereRaw('email LIKE ?', ['%'.strtolower($this->searchTerm).'%']);
                 });
             })
-            ->select(['id', 'first_name as name', 'avatar as photo_url', 'is_online', 'gender', 'email'])
-            ->orderBy('name', 'asc')
+            // ->select(['id', 'first_name as name', 'avatar as photo_url', 'is_online', 'gender', 'email'])
+            ->orderBy('first_name', 'asc')
             ->limit(20)
             ->get();
 

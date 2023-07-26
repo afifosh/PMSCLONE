@@ -1,10 +1,10 @@
 @import "color";
 
-$bg-light: #f3f3f3;
-$primary-color: #009ef7;
+$bg-light: #5c4d4d;
+$primary-color: #cd545b;
 $login-color: #024a66;
-$btn-bg-hover-color: #0095e8;
-$secondary-color: #f5f8fa;
+$btn-bg-hover-color: #cd545b;
+$secondary-color: #e9e9e9;
 $secondary-hover-color: #f1faff;
 $sidebar-bg: #1e1e2d;
 $sidebar-bg-active: #1c1c28;
@@ -284,7 +284,7 @@ body.app {
 
 .msg-badges {
     background-color: $secondary-color;
-    color: $primary-color;
+    color: $primary-color !important;
 }
 
 //user data table
@@ -704,8 +704,8 @@ table.dataTable {
         }
 
         .emojionearea.emojionearea-inline>.emojionearea-editor {
-            top: 3px;
-            background-color: $secondary-color;
+            top: 3px !important;
+            background-color: $secondary-color !important;
             white-space: unset !important;
             height: 29px;
             overflow-y: auto !important;

@@ -237,7 +237,7 @@ class User extends Admin
     ];
 
     protected $appends = [
-        'role_name',
+        'role_name', 'photo_url', 'name',
     ];
 
     /**
@@ -291,7 +291,13 @@ class User extends Admin
      * @param $value
      * @return string
      */
-    public function getPhotoUrlAttribute($value)
+
+    public function getNameAttribute()
+    {
+      return $this->full_name;
+    }
+
+    public function getPhotoUrlAttribute()
     {
       return $this->avatar;
         if (! empty($value)) {

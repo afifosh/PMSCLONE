@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header border-0">
                 <h5 class="modal-title">
-                    <i class="ti-user"></i>{{__('chat::messages.chats.add_members')}}
+                    {{__('chat::messages.chats.add_members')}}
                 </h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     &times;

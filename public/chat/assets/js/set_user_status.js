@@ -1,14 +1,4 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(self, function() {
-return /******/ (function() { // webpackBootstrap
+/******/ (function() { // webpackBootstrap
 var __webpack_exports__ = {};
 /*!*************************************************************!*\
   !*** ./Modules/Chat/Resources/assets/js/set_user_status.js ***!
@@ -72,7 +62,5 @@ if (loggedInUserStatus != '' && loggedInUserStatus.hasOwnProperty('status')) {
   $('#userStatus').val(loggedInUserStatus.status);
   $('#userStatusEmoji')[0].emojioneArea.setText(loggedInUserStatus.emoji_short_name);
 }
-/******/ 	return __webpack_exports__;
 /******/ })()
 ;
-});

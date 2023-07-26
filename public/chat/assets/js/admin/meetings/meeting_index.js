@@ -1,14 +1,4 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(self, function() {
-return /******/ (function() { // webpackBootstrap
+/******/ (function() { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
@@ -168,7 +158,5 @@ setTimeout(function () {
 /******/ 	var __webpack_exports__ = {};
 /******/ 	__webpack_modules__["./Modules/Chat/Resources/assets/js/admin/meetings/meeting_index.js"]();
 /******/ 	
-/******/ 	return __webpack_exports__;
 /******/ })()
 ;
-});

@@ -94,8 +94,8 @@ class SearchUsers extends Component
                     ->orWhereRaw('email LIKE ?', ['%'.strtolower($this->searchTerm).'%']);
                 });
             })
-            ->orderBy('name', 'asc')
-            ->select(['id', 'is_online', 'gender', 'avatar as photo_url', 'first_name as name', 'email'])
+            ->orderBy('first_name', 'asc')
+            // ->select(['id', 'is_online', 'gender', 'avatar as photo_url', 'first_name as name', 'email'])
             ->limit(20)
             ->get()
             ->except(getLoggedInUserId());
