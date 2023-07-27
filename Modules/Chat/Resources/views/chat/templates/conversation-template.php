@@ -12,7 +12,12 @@
                         <img src="{{:user.photo_url}}" alt="<?php __('chat::messages.person_image') ?>" class="img-fluid chat-header-img">
                     </div>
                     <div class="ps-3 chat__profile-avatar">
-                        <h5 class="my-0 chat__area-title contact-title text-truncate">{{>user.name}}
+                        <h5 class="my-0 chat__area-title contact-title text-truncate">
+                          {{if user.project_id}}
+                            <a href="/admin/projects/{{:user.project_id}}" class="text-decoration-none text-dark">{{>user.project.name}}</a>
+                          {{else}}
+                           {{>user.name}}
+                          {{/if}}
                         <span class="contact-title-status">
                         {{if user.is_my_contact && ~checkUserStatus(user)}}
                             <i class="nav-icon user-status-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="{{:user.user_status.status}}" data-original-title="{{:user.user_status.status}}">
@@ -37,7 +42,7 @@
                 </div>
                 <div class="chat__area-action">
                     <!-- setting view -->
-                    {{if my_role === 2}}
+                    {{if my_role === 2 && !user.project_id}}
                     <a href="javascript:void(0)" class="text-decoration-none me-2 btn-add-members" data-group-id="{{:user.id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="<?php echo trans('chat::messages.add_members') ?>
     " title="<?php echo trans('chat::messages.add_members') ?>"><img src="/images/icons/add.png" class="add-icon" alt="add"></a>
                     {{/if}}

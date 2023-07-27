@@ -10,6 +10,8 @@ use App\Models\Program;
 use App\Models\Project;
 use App\Models\ProjectCategory;
 use Illuminate\Http\Request;
+use Modules\Chat\Models\Group;
+use Modules\Chat\Repositories\GroupRepository;
 
 class ProjectController extends Controller
 {
@@ -19,9 +21,9 @@ class ProjectController extends Controller
   public function index(ProjectsDataTable $dataTable)
   {
     $summary = Project::selectRaw('status, COUNT(*) as project_count')
-    ->whereIn('status', [0, 1, 2, 3, 4]) // 0: not started, 1: in progress, 2: on hold, 3: cancelled, 4: completed
-    ->groupBy('status')
-    ->get();
+      ->whereIn('status', [0, 1, 2, 3, 4]) // 0: not started, 1: in progress, 2: on hold, 3: cancelled, 4: completed
+      ->groupBy('status')
+      ->get();
     return $dataTable->render('admin.pages.projects.index', ['summary' => $summary]);
     // view('admin.pages.projects.index');
   }
@@ -41,14 +43,31 @@ class ProjectController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(ProjectStoreRequest $request)
+  public function store(ProjectStoreRequest $request, GroupRepository $groupRepository)
   {
     $project = Project::create($request->validated());
     $project->members()->sync($request->members);
 
+    $this->createGroupForProject($project, $groupRepository);
+
     $project->createLog('Project Created', $project->toArray());
 
     return $this->sendRes('Created Successfully', ['event' => 'redirect', 'url' => route('admin.projects.index')]);
+  }
+
+  protected function createGroupForProject(Project $project, GroupRepository $groupRepository)
+  {
+    $group = $groupRepository->storeForProject([
+      'name' => $project->name,
+      'project_id' => $project->id,
+      'description' => $project->description,
+      'group_type' => Group::TYPE_OPEN,
+      'privacy' => Group::PRIVACY_PRIVATE,
+      'created_by' => getLoggedInUserId(),
+      'users' => $project->members->pluck('id')->toArray(),
+    ]);
+
+    return $group;
   }
 
   /**

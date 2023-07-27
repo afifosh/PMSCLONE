@@ -15,19 +15,14 @@ return new class extends Migration
   {
     Schema::create('groups', function (Blueprint $table) {
       $table->uuid('id')->primary();
-      $table->string('name');
+      $table->string('name')->index();
       $table->string('description')->nullable();
       $table->string('photo_url')->nullable();
       $table->integer('privacy');
       $table->integer('group_type')->comment('1 => Open (Anyone can send message), 2 => Close (Only Admin can send message) ');
-      // $table->unsignedInteger('created_by');
       $table->foreignId('created_by')->constrained('admins')->cascadeOnUpdate()->cascadeOnDelete();
+      $table->string('project_id')->nullable();
       $table->timestamps();
-
-      // $table->foreign('created_by')
-      //     ->references('id')->on('users')
-      //     ->onUpdate('cascade')
-      //     ->onDelete('cascade');
     });
   }
 

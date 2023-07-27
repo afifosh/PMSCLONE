@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('group_id');
             // $table->unsignedInteger('user_id');
             $table->foreignId('user_id')->constrained('admins')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->integer('role')->default(1);
+            $table->integer('role')->default(1)->index();
             // $table->unsignedInteger('added_by');
             $table->foreignId('added_by')->constrained('admins')->cascadeOnUpdate()->cascadeOnDelete();
             // $table->unsignedInteger('removed_by')->nullable();

@@ -15,23 +15,22 @@ return new class extends Migration
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->increments('id');
-            // $table->unsignedInteger('from_id')->nullable();
-            $table->foreignId('from_id')->constrained('admins')->cascadeOnUpdate()->cascadeOnDelete();
-            // $table->unsignedInteger('to_id')->nullable();
-            $table->foreignId('to_id')->constrained('admins')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('from_id')->nullable()->constrained('admins')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('to_id')->nullable();
+            $table->string('to_type')->default(\Modules\Chat\Models\Conversation::class)->comment('1 => Message, 2 => Group Message');
+            $table->unsignedInteger('reply_to')->nullable();
             $table->text('message');
             $table->tinyInteger('status')->default(0)->comment('0 for unread,1 for seen');
             $table->tinyInteger('message_type')->default(0)->comment('0- text message, 1- image, 2- pdf, 3- doc, 4- voice');
             $table->text('file_name')->nullable();
+            $table->text('url_details')->nullable();
             $table->timestamps();
-            // $table->foreign('from_id')
-            //     ->references('id')->on('users')
-            //     ->onUpdate('cascade')
-            //     ->onDelete('cascade');
-            // $table->foreign('to_id')
-            //     ->references('id')->on('users')
-            //     ->onUpdate('cascade')
-            //     ->onDelete('cascade');
+
+            $table->foreign('reply_to')->references('id')->on('conversations')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+
+            $table->index(['created_at']);
         });
     }
 

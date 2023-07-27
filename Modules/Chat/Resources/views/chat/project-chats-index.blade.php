@@ -59,12 +59,12 @@ $configData = Helper::appClasses();
                                     </div>
                                 @endif
                             @endif
-                            <div class="chat__people-wrapper-button d-flex align-items-center" data-bs-toggle="modal"
+                            {{-- <div class="chat__people-wrapper-button d-flex align-items-center" data-bs-toggle="modal"
                                  data-bs-target="#addNewChat">
                                 <i class="nav-icon remove-tooltip" data-bs-toggle="tooltip" data-bs-placement="bottom"
                                    title="{{ __('chat::messages.new_conversation') }}"><img
                                         src="{{asset('chat/assets/icons/bubble-chat.png')}}" width="30" height="30"></i>
-                            </div>
+                            </div> --}}
                             <i class="nav-icon fa fa-times align-top chat__people-close-bar d-sm-none d-block align-self-center ms-2"></i>
                         </div>
                     </div>
@@ -167,7 +167,7 @@ $configData = Helper::appClasses();
                                     aria-controls="nav-blocked-users">{{ __('chat::messages.blocked_users') }}</a>
                         </nav>
 
-                        <div class="tab-content search-any-member mt-3" id="nav-tabContent">
+                        {{-- <div class="tab-content search-any-member mt-3" id="nav-tabContent">
                             <div class="tab-pane fade show active" id="nav-my-contacts" role="tabpanel"
                                  aria-labelledby="nav-my-contacts-tab">
                                 @livewire('chat::my-contacts-search', ['myContactIds' => $myContactIds, 'blockUserIds' => $blockUserIds])
@@ -184,7 +184,7 @@ $configData = Helper::appClasses();
                                  aria-labelledby="nav-blocked-users-tab">
                                 @livewire('chat::blocked-user-search', ['blockedByMeUserIds' => $blockedByMeUserIds])
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
@@ -252,7 +252,7 @@ $configData = Helper::appClasses();
         let myContactIdsObj = JSON.parse('{!! json_encode($myContactIds) !!}')
         let groupMembers = []
         let checkShowNameChat = "{{ checkShowNameChat() }}"
-        let conversationType = '{{ $conversationType }}'
+        window.conversationType = '{{ $conversationType }}'
     </script>
     <script src="{{ mix('chat/assets/js/chat.js') }}"></script>
 @endsection

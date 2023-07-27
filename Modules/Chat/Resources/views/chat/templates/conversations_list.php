@@ -9,7 +9,12 @@
                 </div>
             </div>
             <div class="chat__person-box-detail">
-                <h5 class="mb-1 chat__person-box-name contact-name">{{>contactDetail.name}}
+                <h5 class="mb-1 chat__person-box-name contact-name">
+                  {{if contactDetail.project_id}}
+                    {{>contactDetail.project.name}}
+                  {{else}}
+                    {{>contactDetail.name}}
+                  {{/if}}
                     <span class="contact-status">
                     {{if showUserStatus && ~checkUserStatus(contactDetail)}}
                         <i class="nav-icon user-status-icon" data-bs-toggle="tooltip" data-bs-placement="top" title="{{:contactDetail.user_status.status}}" data-original-title="{{:contactDetail.user_status.status}}">

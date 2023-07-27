@@ -30,7 +30,8 @@ class TaskFileController extends Controller
         ->upload();
       $task->attachMedia($media, 'attachment');
 
-      broadcast(new ProjectTaskUpdatedEvent($task, 'files'))->toOthers();
+      $message = auth()->user()->name . ' uploaded a file in task : "' . $task->subject . '"';
+      broadcast(new ProjectTaskUpdatedEvent($task, 'files', $message))->toOthers();
 
       return $this->sendRes('File uploaded successfully', []);
     } catch (MediaUploadException $e) {
@@ -44,11 +45,12 @@ class TaskFileController extends Controller
   public function destroy($project, Task $task, Media $file)
   {
     abort_if(!$task->project->isMine(), 403);
+    $message = auth()->user()->name . ' removed a file from task : "' . $task->subject . '"';
 
     $file->delete();
     // $task->detachMedia($file);
 
-    broadcast(new ProjectTaskUpdatedEvent($task, 'files'))->toOthers();
+    broadcast(new ProjectTaskUpdatedEvent($task, 'files', $message))->toOthers();
 
     return $this->sendRes('File deleted successfully', []);
   }

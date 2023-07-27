@@ -73,7 +73,8 @@ class ChatRepository extends BaseRepository
         $offset = isset($input['offset']) ? $input['offset'] : 0;
         $isArchived = isset($input['isArchived']) ? 1 : 0;
         $authId = getLoggedInUserId();
-        $isGroupChatEnabled = isGroupChatEnabled();
+        $isGroupChatEnabled = true;// isGroupChatEnabled();
+        $projectsOnly = isset($input['type']) && $input['type'] == 'projects' ? true : false; // To get only projects conversations
 
         $subQuery = Conversation::leftJoin('admins as u', 'u.id', '=', DB::raw("if(from_id = $authId, to_id, from_id)"))
             ->leftJoin('message_action as ma', function (JoinClause $join) use ($authId) {
@@ -123,11 +124,24 @@ class ChatRepository extends BaseRepository
                 )->whereHas('group.usersWithTrashed', function (Builder $q) use ($authId) {
                     $q->where('user_id', $authId); // To get conversations in which user is
                 })
+                ->when($projectsOnly, function (Builder $q) {
+                    $q->whereHas('group', function (Builder $q) {
+                        $q->whereNotNull('project_id');
+                    });
+                })
+                ->when(!$projectsOnly, function (Builder $q) {
+                    $q->whereHas('group', function (Builder $q) {
+                        $q->whereNull('project_id');
+                    });
+                })
                 ->groupBy('conversations.to_id');
 
-            $bindings = array_merge($subQuery->getBindings(), $groupSubQuery->getBindings());
+            if(!$projectsOnly)
+              $bindings = array_merge($subQuery->getBindings(), $groupSubQuery->getBindings());
+            else
+              $bindings = $groupSubQuery->getBindings();
             $groupSubQueryStr = $groupSubQuery->toSql();
-            $relations = ['group.lastConversations.conversation', 'user.userStatus', 'group.usersWithTrashed'];
+            $relations = ['group.lastConversations.conversation', 'user.userStatus', 'group.usersWithTrashed', 'group.project', 'group.project'];
         } else {
             $bindings = $subQuery->getBindings();
             $relations = ['user.userStatus'];
@@ -142,10 +156,10 @@ class ChatRepository extends BaseRepository
 
         $chatList = Conversation::with($relations)->newQuery();
         $chatList = $chatList->select('temp.*', 'cc.*');
-        if ($isGroupChatEnabled) {
+        if (!$projectsOnly) {
             $chatList->from(DB::raw("($subQueryStr union $groupSubQueryStr) as temp"));
         } else {
-            $chatList->from(DB::raw("($subQueryStr) as temp"));
+            $chatList->from(DB::raw("($groupSubQueryStr) as temp"));
         }
         $chatList->setBindings($bindings)
             ->leftJoin('conversations as cc', 'cc.id', '=', 'temp.latest_id');
@@ -306,8 +320,6 @@ class ChatRepository extends BaseRepository
      */
     public function sendGroupMessage($input)
     {
-        if(!@$input['from_id'])
-          $input['from_id'] = getLoggedInUserId();
         $input['to_type'] = Group::class;
 
         /** @var Group $group */

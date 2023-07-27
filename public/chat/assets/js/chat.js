@@ -457,7 +457,9 @@ $(document).ready(function () {
   });
   $.ajax({
     type: 'GET',
-    url: route('conversations-list'),
+    url: route('conversations-list', {
+      type: conversationType
+    }),
     success: function success(data) {
       if (data.success) {
         $('#infyLoader').hide();
@@ -485,7 +487,9 @@ $(document).ready(function () {
   //GET Archive conversations list
   $.ajax({
     type: 'GET',
-    url: route('archive-conversations'),
+    url: route('archive-conversations', {
+      type: conversationType
+    }),
     success: function success(data) {
       if (data.success) {
         var archiveConversations = data.data.conversations;
@@ -4328,7 +4332,9 @@ $(document).on('click', '.load-more-conversation', function () {
   isLoaded = true;
   $.ajax({
     type: 'GET',
-    url: route('conversations-list'),
+    url: route('conversations-list', {
+      type: conversationType
+    }),
     data: {
       'offset': offset
     },
@@ -4373,7 +4379,9 @@ $(document).on('click', '.load-more-archive-conversation', function () {
   //GET Archive conversations list
   $.ajax({
     type: 'GET',
-    url: route('archive-conversations'),
+    url: route('archive-conversations', {
+      type: conversationType
+    }),
     data: {
       'offset': archiveOffset
     },

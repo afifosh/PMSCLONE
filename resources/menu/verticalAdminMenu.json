@@ -118,13 +118,18 @@
     },
     {
       "name": "Projects",
-      "slug": ["admin.projects.", "admin.project-categories", "admin.project-templates"],
+      "slug": ["admin.projects.", "admin.project-categories", "admin.project-templates", "admin.chat.project.conversations"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "submenu": [
         {
           "url": "/admin/projects",
           "name": "Projects",
           "slug": "admin.projects.index"
+        },
+        {
+          "url": "/admin/chat/project-conversations",
+          "name": "Project Conversations",
+          "slug": "admin.chat.project.conversations"
         },
         {
           "url": "/admin/project-categories",
@@ -143,6 +148,12 @@
       "name": "Emails",
       "icon": "menu-icon tf-icons ti ti-mail",
       "slug": "admin.mail.index"
+    },
+    {
+      "url": "/admin/chat/conversations",
+      "name": "Chat",
+      "icon": "menu-icon tf-icons ti ti-mail",
+      "slug": "admin.chat.conversations"
     },
     {
       "url": "/admin/draft-rfps",

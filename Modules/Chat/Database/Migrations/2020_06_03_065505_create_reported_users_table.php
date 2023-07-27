@@ -22,6 +22,8 @@ return new class extends Migration
       $table->longText('notes');
       $table->timestamps();
 
+      $table->index(['created_at']);
+
       // $table->foreign('reported_by')
       //     ->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
       // $table->foreign('reported_to')

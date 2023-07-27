@@ -17,6 +17,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->integer('conversation_id');
             $table->integer('deleted_by');
+            $table->tinyInteger('is_hard_delete')->default(0);
             $table->timestamps();
         });
     }

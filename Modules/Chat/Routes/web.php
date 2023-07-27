@@ -18,7 +18,8 @@ use Modules\Chat\Http\Controllers\API\ChatAPIController;
 
 Route::prefix('admin/chat')->middleware(['auth:admin'])->group(function() {
   // view routes
-  Route::get('/conversations',[ChatController::class, 'index'])->name('conversations');//->middleware('permission:manage_conversations');
+  Route::get('/project-conversations',[ChatController::class, 'ProjectChatIndex'])->name('admin.chat.project.conversations');
+  Route::get('/conversations',[ChatController::class, 'index'])->name('admin.chat.conversations');//->middleware('permission:manage_conversations');
   // Route::get('profile', [UserController::class, 'getProfile']);
   // Route::get('logout', [LoginController::class, 'logout']);
 

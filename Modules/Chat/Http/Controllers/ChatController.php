@@ -23,6 +23,7 @@ class ChatController extends AppBaseController
      */
     public function index(Request $request)
     {
+        $data['conversationType'] = 'general';
         $conversationId = $request->get('conversationId');
         $data['conversationId'] = ! empty($conversationId) ? $conversationId : 0;
 
@@ -54,5 +55,26 @@ class ChatController extends AppBaseController
         }
 
         return view('chat::chat.index')->with($data);
+    }
+
+    public function ProjectChatIndex(Request $request)
+    {
+        $data['conversationType'] = 'projects';
+        $conversationId = $request->get('conversationId');
+        $data['conversationId'] = ! empty($conversationId) ? $conversationId : 0;
+
+        $data['enableGroupSetting'] = false;// isGroupChatEnabled();
+        $data['membersCanAddGroup'] = false;// canMemberAddGroup();
+        $data['myContactIds'] = [];
+        $data['blockUserIds'] = [];
+        $data['blockedByMeUserIds'] = [];
+
+        /** @var Setting $setting */
+        $setting = Setting::where('key', 'notification_sound')->pluck('value', 'key')->toArray();
+        if (isset($setting['notification_sound'])) {
+            $data['notification_sound'] = app(Setting::class)->getNotificationSound($setting['notification_sound']);
+        }
+
+        return view('chat::chat.project-chats-index')->with($data);
     }
 }

@@ -100,6 +100,44 @@ class GroupRepository extends BaseRepository
 
     /**
      * @param  array  $input
+     * @return Group
+     */
+    public function storeForProject($input)
+    {
+        try {
+            if (! empty($input['photo'])) {
+                $input['photo_url'] = ImageTrait::makeImage($input['photo'], Group::$PATH);
+            }
+
+            /** @var Group $group */
+            $group = Group::create($input);
+
+            $users[] = getLoggedInUserId();
+            $this->addMembersToGroup($group, $users, false);
+
+            $userIds = $group->fresh()->users->pluck('id')->toArray();
+            $broadcastData = $this->prepareDataForMemberAddedToGroup($group);
+            broadcast(new UserEvent($broadcastData, $userIds))->toOthers();
+
+            $msgInput = [
+                'to_id' => $group->id,
+                'message' => Auth::user()->name.' created project "'.$group->name.'"',
+                'is_group' => true,
+                'message_type' => Conversation::MESSAGE_TYPE_BADGES,
+            ];
+            $this->sendMessage($msgInput);
+
+            $users = $input['users'];
+            $this->addMembersToGroup($group, $users, true);
+
+            return $group;
+        } catch (Exception $e) {
+            throw new UnprocessableEntityHttpException($e->getMessage());
+        }
+    }
+
+    /**
+     * @param  array  $input
      * @param  int  $id
      * @return array
      */

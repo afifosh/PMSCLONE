@@ -5,6 +5,9 @@ namespace App\Models;
 use App\Traits\HasLogs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Chat\Models\Conversation;
+use Modules\Chat\Models\Group;
+use Modules\Chat\Repositories\GroupRepository;
 
 class Project extends Model
 {
@@ -19,17 +22,19 @@ class Project extends Model
     'deadline' => 'datetime:d M, Y',
   ];
 
-  public function scopeMine($query){
-    if(auth('admin')->check() && auth('admin')->id() == 1){
+  public function scopeMine($query)
+  {
+    if (auth('admin')->check() && auth('admin')->id() == 1) {
       return $query;
     }
-    return $query->whereHas('members', function($q){
+    return $query->whereHas('members', function ($q) {
       return $q->where('admins.id', auth()->id());
     });
   }
 
-  public function isMine(){
-    if(auth('admin')->check() && auth('admin')->id() == 1){
+  public function isMine()
+  {
+    if (auth('admin')->check() && auth('admin')->id() == 1) {
       return true;
     }
     return $this->members->contains(auth('admin')->id());
@@ -108,5 +113,25 @@ class Project extends Model
     }
 
     return $data;
+  }
+
+  public function group()
+  {
+    return $this->hasOne(Group::class, 'project_id', 'id');
+  }
+
+  public function sendMessageInChat($message, $type = Conversation::MESSAGE_TYPE_BADGES)
+  {
+    $msgInput = [
+      'to_id' => $this->group->id,
+      'message' => $message,
+      'is_group' => true,
+      'message_type' => $type,
+    ];
+
+    $repo = app(GroupRepository::class);
+    $repo->sendMessage($msgInput);
+
+    return true;
   }
 }

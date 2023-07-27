@@ -2,6 +2,7 @@
 
 namespace Modules\Chat\Models;
 
+use App\Models\Project;
 use Barryvdh\LaravelIdeHelper\Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -95,7 +96,7 @@ class Group extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'photo_url', 'group_type', 'privacy', 'created_by',
+        'name', 'description', 'photo_url', 'group_type', 'privacy', 'created_by', 'project_id',
     ];
 
     public static $PATH = 'groups';
@@ -199,7 +200,7 @@ class Group extends Model
             return $this->imageUrl(self::$PATH.DIRECTORY_SEPARATOR.$this->getRawOriginal('photo_url'));
         }
 
-        return asset('assets/images/group-img.png');
+        return asset('chat/assets/images/group-img.png');
     }
 
     /**
@@ -237,5 +238,14 @@ class Group extends Model
     public function lastConversations(): HasMany
     {
         return $this->hasMany(LastConversation::class, 'group_id', 'id');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'project_id');
     }
 }

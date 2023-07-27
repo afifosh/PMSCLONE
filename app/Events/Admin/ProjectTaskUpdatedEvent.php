@@ -19,10 +19,19 @@ class ProjectTaskUpdatedEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct($projectTask, $modifiedTab)
+    public function __construct($projectTask, $modifiedTab, $message = false)
     {
         $this->projectTask = $projectTask;
         $this->modifiedTab = $modifiedTab;
+
+        if ($message) {
+            $this->sendMessage($message);
+        }
+    }
+
+    public function sendMessage($message)
+    {
+        $this->projectTask->project->sendMessageInChat($message);
     }
 
     /**

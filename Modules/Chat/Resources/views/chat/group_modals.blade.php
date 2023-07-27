@@ -28,7 +28,7 @@
                         <div class="mt-2 profile__inner mw-unset w-auto m-auto">
                             <div class=" preview-image-video-container text-center chat-profile__img-wrapper mt-0">
                                 <img id='groupPhotoPreview' class=""
-                                     src="{{asset('assets/images/group-img.png')}}"/>
+                                     src="{{asset('chat/assets/images/group-img.png')}}"/>
                             </div>
                         </div>
                     </div>

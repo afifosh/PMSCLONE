@@ -69,7 +69,8 @@ class ProjectTaskController extends Controller
       }
     }
 
-    broadcast(new ProjectTaskUpdatedEvent($task, 'new_task_added'))->toOthers();
+    $chatMessage = auth()->user()->name. ' created a new task: '.$task->subject;
+    broadcast(new ProjectTaskUpdatedEvent($task, 'new_task_added', $chatMessage))->toOthers();
 
     return $this->sendRes('Task created successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);
   }
@@ -128,7 +129,8 @@ class ProjectTaskController extends Controller
     $task->assignees()->sync(remove_null_values($request->assignees));
     $task->followers()->sync(remove_null_values($request->followers));
 
-    broadcast(new ProjectTaskUpdatedEvent($task, 'summary'))->toOthers();
+    $chatMessage = auth()->user()->name. ' updated task: '.$task->subject;
+    broadcast(new ProjectTaskUpdatedEvent($task, 'summary', $chatMessage))->toOthers();
 
     return $this->sendRes('Task Updated successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);
   }
@@ -157,7 +159,8 @@ class ProjectTaskController extends Controller
         $project->tasks()->where('id', $value)->update(['order' => $key + 1]);
       }
 
-      broadcast(new ProjectTaskUpdatedEvent($project->tasks()->first(), 'summary'))->toOthers();
+      $message = auth()->user()->name. ' updated task order';
+      broadcast(new ProjectTaskUpdatedEvent($project->tasks()->first(), 'summary', $message))->toOthers();
 
       return true;
   }
@@ -169,9 +172,11 @@ class ProjectTaskController extends Controller
   {
     abort_if(!$task->project->isMine(), 403);
 
+    $message = auth()->user()->name. ' deleted task: '.$task->subject;
+
     $task->delete();
 
-    broadcast(new ProjectTaskUpdatedEvent($task, 'task_deleted'))->toOthers();
+    broadcast(new ProjectTaskUpdatedEvent($task, 'task_deleted', $message))->toOthers();
 
     return $this->sendRes('Task deleted successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable']);
   }

@@ -53,7 +53,8 @@ class TaskChecklistController extends Controller
 
       $checklist = $task->checklistItems()->create($request->only(['title', 'assigned_to', 'due_date'])+ ['order' => $task->checklistItems()->count() + 1, 'created_by' => auth()->id()]);
 
-      broadcast(new ProjectTaskUpdatedEvent($task, 'checklist'))->toOthers();
+      $message = auth()->user()->name . ' added a checklist item : "' . $checklist->title . '" in task : "' . $task->subject . '"';
+      broadcast(new ProjectTaskUpdatedEvent($task, 'checklist', $message))->toOthers();
 
       return $this->sendRes('Checklist item created successfully', ['id' => $checklist->id, 'JsMethods' => ['reload_task_checklist', 'reset_checklist_form']]);
     }
@@ -112,7 +113,9 @@ class TaskChecklistController extends Controller
       if($checklistItem->status != $request->boolean('status'))
       $checklistItem->update(['status' => $request->boolean('status'), 'completed_by' => $request->boolean('status') ? auth()->id() : null]);
 
-      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist'))->toOthers();
+      $message = auth()->user()->name . ' marked checklist item : "' . $checklistItem->title . '" as ' . ($request->boolean('status') ? 'completed' : 'incomplete') . ' in task : "' . $checklistItem->task->subject . '"';
+
+      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist', $message))->toOthers();
 
       return $this->sendRes('Checklist item updated successfully');
     }
@@ -130,7 +133,8 @@ class TaskChecklistController extends Controller
         TaskCheckListItem::where('id', $value)->where('task_id', $task->id)->update(['order' => $key + 1]);
       }
 
-      broadcast(new ProjectTaskUpdatedEvent($task, 'checklist'))->toOthers();
+      $message = auth()->user()->name . ' updated checklist item order in task : "' . $task->subject . '"';
+      broadcast(new ProjectTaskUpdatedEvent($task, 'checklist', $message))->toOthers();
 
       return true;
     }
@@ -143,9 +147,10 @@ class TaskChecklistController extends Controller
       abort_if(!$checklistItem->task->project->isMine(), 403);
 
       $id = $checklistItem->id;
+      $message = auth()->user()->name . ' deleted checklist item : "' . $checklistItem->title . '" from task : "' . $checklistItem->task->subject . '"';
       $checklistItem->delete();
 
-      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist'))->toOthers();
+      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist', $message))->toOthers();
 
       return $this->sendRes('Checklist item deleted successfully', ['disable_alert' => true, 'event' => 'functionCall', 'function' => 'handle_deleted_checklist', 'function_params' => route('admin.projects.tasks.checklist-items.restore', [$project, $task, $id])]);
     }
@@ -158,7 +163,8 @@ class TaskChecklistController extends Controller
 
       $checklistItem->restore();
 
-      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist'))->toOthers();
+      $message = auth()->user()->name . ' restored checklist item : "' . $checklistItem->title . '" in task : "' . $checklistItem->task->subject . '"';
+      broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist', $message))->toOthers();
 
       return $this->sendRes('Checklist item restored successfully', ['event' => 'functionCall', 'function' => 'reload_task_checklist']);
     }

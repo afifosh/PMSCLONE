@@ -15,17 +15,12 @@ return new class extends Migration
     {
         Schema::create('social_accounts', function (Blueprint $table) {
             $table->increments('id');
-            // $table->unsignedInteger('user_id');
             $table->foreignId('user_id')->constrained('admins')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('provider');
             $table->string('provider_id');
             $table->timestamps();
 
             $table->unique(['user_id', 'provider', 'provider_id']);
-
-            // $table->foreign('user_id')->references('id')->on('users')
-            //     ->onDelete('cascade')
-            //     ->onUpdate('cascade');
         });
     }
 

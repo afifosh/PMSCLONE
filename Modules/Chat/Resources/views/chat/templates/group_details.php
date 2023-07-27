@@ -2,7 +2,7 @@
     <div class="chat-profile__header">
         <span class="chat-profile__about"><?php echo trans('chat::messages.about') ?></span>
         <div>
-        {{if !removed_from_group && my_role === 2}}
+        {{if !removed_from_group && my_role === 2 && !project_id}}
             <a href="javascript:void(0)" class="text-decoration-none edit-group text-center me-2" data-id="{{:id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="<?php echo trans('chat::messages.edit_group') ?>"><img src="/images/icons/mobile-edit.png" alt="edit"></a>
         {{/if}}
             <i class="fa fa-times chat-profile__close-btn"></i>
@@ -24,7 +24,13 @@
     <div class="chat-profile__person-last-seen chat-profile__column mb-0">
      <div class="divGroupDetails d-flex justify-content-around row">
             <div class="col-12">
-            <h4 id="groupDetailsName-{{:id}}" class="align-items-center mb-0">{{:name}}</h4>
+            <h4 id="groupDetailsName-{{:id}}" class="align-items-center mb-0">
+              {{if project_id && project}}
+                <a href="/admin/projects/{{:project_id}}" class="text-decoration-none text-dark">{{:project.name}}</a>
+              {{else}}
+                {{:name}}
+              {{/if}}
+              </h4>
             </div>
             <span class="mt-2">Created By {{:group_created_by}}, {{:~getLocalDate(created_at, 'DD/MM/YYYY')}} </span>
     </div>
@@ -32,11 +38,47 @@
 
     <div class="group-profile-data group-about-sidebar">
         <div class="chat-profile__divider"></div>
+        {{if project_id && project}}
+          <div class="chat-profile__column">
+              <h6 class="chat-profile__column-title"><?php echo trans('Category') ?></h6>
+              <p class="chat-profile__column-title-detail text-muted mb-0 group-desc" id="groupDetailsCategory-{{:id}}">
+                {{:project.category.name}}
+              </p>
+          </div>
+          <div class="chat-profile__column">
+              <h6 class="chat-profile__column-title"><?php echo trans('Program') ?></h6>
+              <p class="chat-profile__column-title-detail text-muted mb-0 group-desc" id="groupDetailsProgram-{{:id}}">
+                {{:project.program.name}}
+              </p>
+          </div>
+          <div class="chat-profile__column">
+              <h6 class="chat-profile__column-title"><?php echo trans('Start Date') ?></h6>
+              <p class="chat-profile__column-title-detail text-muted mb-0 group-desc" id="groupDetailsStartDate-{{:id}}">
+                {{:project.start_date}}
+              </p>
+          </div>
+          <div class="chat-profile__column">
+              <h6 class="chat-profile__column-title"><?php echo trans('Deadline') ?></h6>
+              <p class="chat-profile__column-title-detail text-muted mb-0 group-desc" id="groupDetailsDeadline-{{:id}}">
+                {{:project.deadline}}
+              </p>
+          </div>
+          <div class="chat-profile__column">
+              <h6 class="chat-profile__column-title"><?php echo trans('Tags') ?></h6>
+              <p class="chat-profile__column-title-detail text-muted mb-0 group-desc" id="groupDetailsTags-{{:id}}">
+                {{:project.tags.join(', ')}}
+              </p>
+          </div>
+        {{/if}}
         <div class="chat-profile__column">
             <h6 class="chat-profile__column-title"><?php echo trans('chat::messages.group.description') ?></h6>
             <p class="chat-profile__column-title-detail text-muted mb-0 group-desc" id="groupDetailsDescription-{{:id}}">
-                {{if description}}
-                    {{:description}}
+                {{if (project_id && project) || description}}
+                    {{if project_id && project}}
+                      {{:project.description}}
+                    {{else}}
+                      {{:description}}
+                    {{/if}}
                 {{else}}
                     No description added yet...
                 {{/if}}
@@ -45,8 +87,7 @@
         <div class="chat-profile__divider"></div>
             <nav class="nav nav-pills m-3" id="myTab" role="tablist">
                 <a class="nav-item nav-link active group-members-tab" id="nav-group-members-tab" data-bs-toggle="tab" href="#nav-group-members"
-                   role="tab" aria-controls="nav-group-members " aria-expanded="true"> <i
-                            class="ti-user"></i><?php echo trans('chat::messages.participants') ?><span class="badge badge-pill badge-secondary ms-2 members-count" data-bs-toggle="tooltip" data-bs-placement="top"
+                   role="tab" aria-controls="nav-group-members " aria-expanded="true"><?php echo trans('chat::messages.participants') ?><span class="badge badge-pill badge-secondary ms-2 members-count" data-bs-toggle="tooltip" data-bs-placement="top"
                                title="Total group members">{{:members_count}}</span></a>
                 <a class="nav-item nav-link" id="nav-group-medias-tab" data-bs-toggle="tab" href="#nav-group-medias"
                    role="tab" aria-controls="nav-group-medias"><?php echo trans('chat::messages.media') ?></a>
@@ -56,7 +97,7 @@
                                  aria-labelledby="nav-group-members-tab">
                     <p class="chat-profile__column-title-detail text-muted mb-0 group-participants"></p>
                     {{for users}}
-                    <div class="chat__person-box group-member-{{:id}} {{if ~root.logged_in_user_id === id}} non-clickable {{/if}}" data-id="{{:id}}" data-is_group="0" id="user-{{:id}}">
+                    <div class="chat__person-box group-member-{{:id}} {{if ~root.logged_in_user_id === id }} non-clickable {{/if}}" data-id="{{:id}}" data-is_group="0" id="user-{{:id}}">
                         <div class="position-relative chat__person-box-status-wrapper">
                             <div class="chat__person-box-avtar chat__person-box-avtar--active">
                                 <img src="{{:photo_url}}" alt="person image" class="user-avatar-img">
@@ -79,6 +120,7 @@
                          {{if ~root.created_by !== id && ~root.my_role === 2 && ~root.logged_in_user_id != id && !~root.removed_from_group}}
                             <div class="chat__person-box-msg-time">
                                 <div class="chat__person-box-group" data-member-id="{{:id}}" data-group-id="{{:~root.id}}">
+                                  {{if !~root.project_id}}
                                    <div class="btn-group">
                                       <i class="fa fa-ellipsis-v group-details-bar" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                       </i>
@@ -91,6 +133,7 @@
                                         {{/if}}
                                       </div>
                                     </div>
+                                  {{/if}}
                                 </div>
                             </div>
                         {{/if}}
@@ -117,23 +160,25 @@
                 </div>
             </div>
 
-    <div class="chat-profile__divider"></div>
-    {{if privacy === 2 && my_role === 2 && !removed_from_group}}
-    <div class="chat-profile__column pb-0">
-        <a href="#" class='btn btn-primary btn-add-members' data-group-id="{{:id}}"><?php echo trans('chat::messages.chats.add_members') ?></a>
+    {{if !project_id }}
+      <div class="chat-profile__divider"></div>
+      {{if privacy === 2 && my_role === 2 && !removed_from_group}}
+      <div class="chat-profile__column pb-0">
+          <a href="#" class='btn btn-primary btn-add-members' data-group-id="{{:id}}"><?php echo trans('chat::messages.chats.add_members') ?></a>
+      </div>
+      {{else privacy === 1 && !removed_from_group}}
+      <div class="chat-profile__column pb-0">
+          <a href="#" class='btn btn-primary btn-add-members' data-group-id="{{:id}}"><?php echo trans('chat::messages.chats.add_members') ?></a>
     </div>
-    {{else privacy === 1 && !removed_from_group}}
-    <div class="chat-profile__column pb-0">
-        <a href="#" class='btn btn-primary btn-add-members' data-group-id="{{:id}}"><?php echo trans('chat::messages.chats.add_members') ?></a>
-   </div>
-    {{/if}}
-    {{if !group_deleted_by_owner && removed_from_group || (created_by === logged_in_user_id)}}
-    <div class="chat-profile__column pt-1">
-       <a href="#" class='btn btn-danger btn-delete-group' data-group-id="{{:id}}"><?php echo trans('chat::messages.group.delete_group') ?></a>
-    </div>
-    {{else !removed_from_group}}
-    <div class="chat-profile__column pt-1">
-       <a href="#" class='btn btn-danger btn-leave-from-group' data-group-id="{{:id}}"><?php echo trans('chat::messages.group.leave_group') ?></a>
-    </div>
+      {{/if}}
+      {{if !group_deleted_by_owner && removed_from_group || (created_by === logged_in_user_id)}}
+      <div class="chat-profile__column pt-1">
+        <a href="#" class='btn btn-danger btn-delete-group' data-group-id="{{:id}}"><?php echo trans('chat::messages.group.delete_group') ?></a>
+      </div>
+      {{else !removed_from_group}}
+      <div class="chat-profile__column pt-1">
+        <a href="#" class='btn btn-danger btn-leave-from-group' data-group-id="{{:id}}"><?php echo trans('chat::messages.group.leave_group') ?></a>
+      </div>
+      {{/if}}
     {{/if}}
 </script>

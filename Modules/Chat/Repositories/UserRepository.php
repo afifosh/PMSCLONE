@@ -151,7 +151,7 @@ class UserRepository extends BaseRepository
 
             /** @var Group $group */
             $group = Group::with([
-                'users.userStatus', 'users.roles', 'usersWithTrashed', 'lastConversations', 'createdByUser',
+                'users.userStatus', 'users.roles', 'usersWithTrashed', 'lastConversations', 'createdByUser', 'project.category', 'project.program'
             ])->find($id);
             $group->append('group_created_by');
             $group->users;
