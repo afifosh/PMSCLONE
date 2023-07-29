@@ -274,6 +274,8 @@ return [
         'add_to_group' => 'Add To Group',
         'active_chat' => 'Active Chat',
         'archive_chat' => 'Archive chat',
+        'pin' => 'Pin',
+        'unpin' => 'Unpin',
         'delete' => 'Delete',
         'load_more' => 'Load More',
         'test_message' => 'Test Message',

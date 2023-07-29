@@ -6,10 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class UsersDataTable extends DataTable
@@ -88,21 +85,6 @@ class UsersDataTable extends DataTable
         'buttons' => $buttons,
         "scrollX" => true
       ]);
-      // ->language(['sLengthMenu' => '_MENU_',
-      // 'search' => '',
-      // 'searchPlaceholder' => 'Search..']);
-    //   ->parameters([
-    //     'buttons'      => ['export', 'print', 'reset', 'reload'],
-    // ]);
-    // ->selectStyleSingle();
-    // ->buttons([
-    //     Button::make('excel'),
-    //     Button::make('csv'),
-    //     Button::make('pdf'),
-    //     Button::make('print'),
-    //     Button::make('reset'),
-    //     Button::make('reload')
-    // ]);
   }
   /**
    * Get the dataTable columns definition.
@@ -112,11 +94,6 @@ class UsersDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      // Column::computed('action')
-      //       ->exportable(true)
-      //       ->printable(true)
-      //       ->width(60)
-      //       ->addClass('text-center'),
       Column::make('id'),
       Column::make('first_name'),
       Column::make('last_name'),

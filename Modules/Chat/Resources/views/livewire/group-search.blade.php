@@ -21,7 +21,7 @@
         </ul>
         <div class="text-center no-group new-conversation__no-group @if(count($groups) > 0) d-none @endif">
             <div class="chat__not-selected">
-                <div class="text-center"><i class="fa fa-2x fa-users" aria-hidden="true"></i>
+                <div class="text-center"><i class="fa-solid fa-2x fa-users" aria-hidden="true"></i>
                 </div>
                 {{ ($groupsCount > 0) ? __('chat::messages.no_group_found') : __('chat::messages.no_group_yet') }}
             </div>

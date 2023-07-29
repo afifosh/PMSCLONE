@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 use Modules\Chat\Traits\ImageTrait;
 use Illuminate\Support\Str;
@@ -247,5 +248,10 @@ class Group extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    public function pins(): MorphMany
+    {
+        return $this->morphMany(PinnedConversation::class, 'conversation');
     }
 }

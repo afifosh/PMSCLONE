@@ -13,7 +13,7 @@
     </div>
     <div class="chat-conversation__menu d-flex align-items-center">
            <div class="dropdown btn-group hide-ele msg-options">
-                <i class="fa fa-ellipsis-v " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa-solid fa-ellipsis-vertical " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>
                 <div class="dropdown-menu">
                     <a class="dropdown-item msg-delete-icon" href="#">Delete Message</a>
@@ -34,7 +34,7 @@
             </div>
                <div class="chat-container__time text-nowrap chat-time">{{:time}}</div>
             <div class="chat-container__read-status position-absolute">
-                <i class="fa fa-check" aria-hidden="true"></i>
+                <i class="fa-solid fa-check" aria-hidden="true"></i>
             </div>
         {{else}}
             <div class="chat-conversation__bubble-text message">
@@ -42,7 +42,7 @@
             </div>
             <div class="chat-container__time text-nowrap chat-time">{{:time}}</div>
             <div class="chat-container__read-status position-absolute">
-                <i class="fa fa-check" aria-hidden="true"></i>
+                <i class="fa-solid fa-check" aria-hidden="true"></i>
             </div>
         {{/if}}
     </div>

@@ -8,10 +8,10 @@
                 data-bs-target="#fileUpload"
                 id="chat-media-paperclip"
                 data-bs-toggle="modal">
-            <i class="fa fa-paperclip" aria-hidden="true"></i>
+            <i class="fa-solid fa-paperclip" aria-hidden="true"></i>
         </button>
         <button type="button" id="btnSend" class="btn chat__area-send-btn chat__area-send-btn--disable">
-            <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
         </button>
     </div>
 </div>
@@ -49,12 +49,12 @@
 </script>
 
 <script id="tmplCloseGroupIcon" type="text/x-jsrender">
-<i class="fa fa-lock closed-group-badge" data-bs-toggle="tooltip" data-bs-placement="top" title="The admin only can send messages into the group."></i>
+<i class="fa-solid fa-lock closed-group-badge" data-bs-toggle="tooltip" data-bs-placement="top" title="The admin only can send messages into the group."></i>
 
 </script>
 
 <script id="tmplPrivateGroupIcon" type="text/x-jsrender">
-<i class="fa fa-shield private-group-badge" data-bs-toggle="tooltip" data-bs-placement="top" title="The admin only can add or remove members from the group."> </i>
+<i class="fa-solid fa-shield private-group-badge" data-bs-toggle="tooltip" data-bs-placement="top" title="The admin only can add or remove members from the group."> </i>
 
 </script>
 
@@ -77,7 +77,7 @@
                 <h6 class="replay-message">{{:message}}</h6>
             {{/if}}
         </div>
-        <div class="ps-0 mx-3 chat__reply-close cursor-pointer"><i class="fa fa-close text-dark replay-close-btn"></i></div>
+        <div class="ps-0 mx-3 chat__reply-close cursor-pointer"><i class="fa-solid fa-xmark text-dark replay-close-btn"></i></div>
     </div>
 </div>
 

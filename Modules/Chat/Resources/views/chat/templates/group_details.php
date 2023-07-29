@@ -5,17 +5,17 @@
         {{if !removed_from_group && my_role === 2 && !project_id}}
             <a href="javascript:void(0)" class="text-decoration-none edit-group text-center me-2" data-id="{{:id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="<?php echo trans('chat::messages.edit_group') ?>"><img src="/images/icons/mobile-edit.png" alt="edit"></a>
         {{/if}}
-            <i class="fa fa-times chat-profile__close-btn"></i>
+            <i class="fa-solid fa-xmark chat-profile__close-btn"></i>
         </div>
     </div>
     <div class="chat-profile__person--active mb-2 profile__inner m-auto">
         <div class="chat-profile__avatar text-center chat-profile__img-wrapper group-profile-image">
          {{if group_type === 2}}
-          <i class="fa fa-lock closed-group-badge" data-bs-toggle="tooltip" data-bs-placement="top"
+          <i class="fa-solid fa-lock closed-group-badge" data-bs-toggle="tooltip" data-bs-placement="top"
                                title="The admin only can send messages into the group."> </i>
           {{/if}}
           {{if privacy === 2}}
-          <i class="fa fa-shield private-group-badge" data-bs-toggle="tooltip" data-bs-placement="top"
+          <i class="fa-solid fa-shield private-group-badge" data-bs-toggle="tooltip" data-bs-placement="top"
                                title="The admin only can add or remove members from the group."> </i>
         {{/if}}
             <img src="{{:photo_url}}" alt="" class="img-fluid user-about-image img-circle" id="groupDetailsImage-{{:id}}">
@@ -122,7 +122,7 @@
                                 <div class="chat__person-box-group" data-member-id="{{:id}}" data-group-id="{{:~root.id}}">
                                   {{if !~root.project_id}}
                                    <div class="btn-group">
-                                      <i class="fa fa-ellipsis-v group-details-bar" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                      <i class="fa-solid fa-ellipsis-vertical group-details-bar" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                       </i>
                                       <div class="dropdown-menu member-options-{{:id}}">
                                         <a class="dropdown-item remove-member-from-group" href="#" data-member-id="{{:id}}" data-group-id="{{:~root.id}}" id="removeMember-{{:id}}">Remove Member</a>
@@ -160,7 +160,7 @@
                 </div>
             </div>
 
-    {{if !project_id }}
+    {{if project_id }}
       <div class="chat-profile__divider"></div>
       {{if privacy === 2 && my_role === 2 && !removed_from_group}}
       <div class="chat-profile__column pb-0">

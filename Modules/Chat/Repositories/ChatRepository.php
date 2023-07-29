@@ -81,6 +81,10 @@ class ChatRepository extends BaseRepository
                 $join->on('ma.deleted_by', '=', DB::raw("$authId"));
                 $join->on('ma.conversation_id', '=', 'conversations.id');
             })
+            ->leftJoin('pinned_conversations', function (JoinClause $join) use ($authId) {
+                $join->on('pinned_conversations.conversation_id', '=', DB::raw("if(from_id = $authId, to_id, from_id)"));
+                $join->on('pinned_conversations.pinned_by', '=', DB::raw("$authId"));
+            })
             ->whereNull('u.deleted_at')
             ->where(function (Builder $q) use ($authId) {
                 $q->where('from_id', '=', $authId)->orWhere('to_id', '=', $authId);
@@ -92,15 +96,19 @@ class ChatRepository extends BaseRepository
             ->where('conversations.to_type', '=', Conversation::class)
             ->selectRaw(
                 "max(conversations.id) as latest_id , u.id as user_id, 0 as group_id,
-                 sum(if(conversations.status = 0 and from_id != $authId, 1, 0)) as unread_count"
+                 sum(if(conversations.status = 0 and from_id != $authId, 1, 0)) as unread_count,
+                 count(pinned_conversations.id) as is_pinned"
             )
-            // ->groupBy(DB::raw("if(from_id = $authId, to_id, from_id)"));
             ->groupBy('u.id', 'group_id'); // query fix
 
         if ($isGroupChatEnabled) {
             $groupSubQuery = Conversation::leftJoin('message_action as ma', function (JoinClause $join) use ($authId) {
                 $join->on('ma.deleted_by', '=', DB::raw("$authId"));
                 $join->on('ma.conversation_id', '=', 'conversations.id');
+            })
+            ->leftJoin('pinned_conversations', function (JoinClause $join) use ($authId) {
+              $join->on('pinned_conversations.conversation_id', '=', 'to_id');
+              $join->on('pinned_conversations.pinned_by', '=', DB::raw("$authId"));
             });
             if (! $isArchived) {
                 $groupSubQuery->has('archiveConversation', '=', 0);
@@ -119,7 +127,8 @@ class ChatRepository extends BaseRepository
                 })
                 ->selectRaw(
                     "max(conversations.id) as latest_id , 0 as user_id, to_id as group_id,
-             SUM(CASE WHEN gmr.read_at IS NULL and user_id = $authId THEN 1 END) as unread_count"
+             SUM(CASE WHEN gmr.read_at IS NULL and user_id = $authId THEN 1 END) as unread_count,
+             count(pinned_conversations.id) as is_pinned"
 
                 )->whereHas('group.usersWithTrashed', function (Builder $q) use ($authId) {
                     $q->where('user_id', $authId); // To get conversations in which user is
@@ -154,7 +163,22 @@ class ChatRepository extends BaseRepository
             ->whereOwnerType(User::class)
             ->pluck('owner_id')->toArray();
 
+            // ['user' => function($q) {
+            //   $q->withCount(['pins' => function ($q) {
+            //     $q->where('pinned_by', getLoggedInUserId());
+            //   }]);
+            // }, 'group' => function($q) {
+            //   $q->withCount(['pins' => function ($q) {
+            //     $q->where('pinned_by', getLoggedInUserId());
+            //   }]);
+            // }]
         $chatList = Conversation::with($relations)->newQuery();
+        // $chatList = $chatList->leftJoin('pinned_conversations', function ($q){
+        //   $q->on('pinned_conversations.conversation_id', '=', 'conversations.id');
+        //   $q->where('pinned_conversations.pinned_by', getLoggedInUserId());
+        // });
+        // select pinned_conversations count
+        // $chatList = $chatList->selectRaw('temp.*, cc.*, count(pinned_conversations.id) as pinned_count');
         $chatList = $chatList->select('temp.*', 'cc.*');
         if (!$projectsOnly) {
             $chatList->from(DB::raw("($subQueryStr union $groupSubQueryStr) as temp"));
@@ -177,9 +201,18 @@ class ChatRepository extends BaseRepository
                 }
             });
         }
-        $chatList = $chatList->orderBy('cc.created_at', 'desc')->offset($offset)->limit(10)
-            ->get()->keyBy('id');
 
+        // // select above all and pinned conversations count
+        // $chatList = $chatList->selectRaw('temp.*, cc.*, count(pinned_conversations.id) as pinned_count')
+        //     ->groupBy('temp.latest_id')
+        //     ->orderBy('cc.created_at', 'desc')
+        //     ->offset($offset)
+        //     ->limit(10)
+        //     ->get()->keyBy('id');
+
+
+        $chatList = $chatList->orderBy('is_pinned', 'desc')->orderBy('cc.created_at', 'desc')->offset($offset)->limit(10)
+            ->get()->keyBy('id');
         // TODO : refactor this later
         // To replace user's last conversation when he/she leave the group
         $groupsConversation = [];
@@ -318,7 +351,7 @@ class ChatRepository extends BaseRepository
      * @param  array  $input
      * @return Conversation
      */
-    public function sendGroupMessage($input)
+    public function sendGroupMessage($input, $toOthers = true)
     {
         $input['to_type'] = Group::class;
 
@@ -337,8 +370,31 @@ class ChatRepository extends BaseRepository
             $broadcastData['reply_message']['sender']['id'] = $conversation->replyMessage->sender->id;
             $broadcastData['reply_message']['sender']['name'] = $conversation->replyMessage->sender->name;
         }
-        broadcast(new GroupEvent($broadcastData))->toOthers();
+        if($toOthers){
+          broadcast(new GroupEvent($broadcastData))->toOthers();
+        }else{
+          broadcast(new GroupEvent($broadcastData));
+        }
         $this->groupRepo->addRecordsToGroupMessageRecipients($groupUsers, $conversation->id, $group->id);
+
+        // if message is /status then send report of related project in group
+        if($input['message'] == '/status' && $group->project_id != null){
+          $group->load('project.tasks.checklistItems');
+          $message = '<div class="text-start project-status-message">
+                        <div>Overall Progress: '. $group->project->progress_percentage() .' % <div>';
+          $message .= '<div>Total Tasks: '. $group->project->tasks->count() .'<div>';
+          $message .= '<div>Completed Tasks: '. $group->project->tasks->where('status', 'Completed')->count() .'<div>';
+          if($group->project->tasks->count()){
+            foreach($group->project->tasks as $task){
+              $message .= '<hr><div>Task: '. $task->subject .'<div>';
+              $message .= '<div>Progress: '. $task->progress_percentage() .' % <div>';
+              $message .= '<div>Total Checklist Items: '. $task->checklistItems->count() .'<div>';
+              $message .= '<div>Completed Checklist Items: '. $task->checklistItems->whereNotNull('completedBy')->count() .'<div>';
+            }
+          }
+          $message .= '</div>';
+          $group->project->sendMessageInChat($message, false);
+        }
 
         // Send PushNotifications to group users who's push are enabled
         $headings = $group->name.' | '.getAppName();

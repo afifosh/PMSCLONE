@@ -32,7 +32,8 @@ return new class extends Migration
             $table->string('currency')->nullable();
             $table->rememberToken();
             $table->enum('status', ['active', 'suspended'])->default('active');
-            $table->boolean('is_online')->default(false);
+            $table->timestamp('last_seen')->nullable();
+            $table->tinyInteger('is_online')->default(0)->nullable();
             $table->timestamps();
         });
     }

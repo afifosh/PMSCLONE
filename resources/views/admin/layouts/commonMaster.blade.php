@@ -28,6 +28,7 @@
   <!-- Include Scripts for customizer, helper, analytics, config -->
   @include('admin/layouts/sections/scriptsIncludes')
   @yield('head')
+  @routes
   <style>
     div.dataTables_scrollBody.dropdown-visible {
     overflow: visible !important;
@@ -73,5 +74,6 @@
         })
     }
   </script>
+  <script src="{{ mix('chat/assets/js/set-user-on-off.js') }}"></script>
 </body>
 </html>

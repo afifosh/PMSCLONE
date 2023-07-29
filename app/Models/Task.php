@@ -91,12 +91,12 @@ class Task extends Model
 
   public function progress_percentage()
   {
-    $total = $this->checklistItems()->count();
+    $total = $this->checklistItems->count();
     if ($total == 0) {
       return 0;
     }
 
-    $completed = $this->checklistItems()->whereNotNull('completed_by')->count();
+    $completed = $this->checklistItems->whereNotNull('completed_by')->count();
 
     return round(($completed / $total) * 100, 1);
   }

@@ -16,7 +16,7 @@ $configData = Helper::appClasses();
 
     @livewireStyles
     @routes
-    <link rel="stylesheet" href="{{ mix('chat/assets/css/font-awesome.css') }}">
+    {{-- <link rel="stylesheet" href="{{ mix('chat/assets/css/font-awesome.css') }}"> --}}
     <link rel="stylesheet" href="{{ asset('chat/assets/css/emojionearea.min.css') }}">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/custom-style.css') }}">
@@ -35,7 +35,7 @@ $configData = Helper::appClasses();
                     <div class="chat__people-wrapper-header">
                         <span class="h3 mb-0">{{ __('chat::messages.conversations') }}</span>
                         <div class="d-flex chat__people-wrapper-btn-group ms-1">
-                            <i class="nav-icon fa fa-bars align-top chat__people-wrapper-bar"></i>
+                            <i class="nav-icon fa-solid fa-bars align-top chat__people-wrapper-bar"></i>
                             @if($enableGroupSetting == 1)
                                 @if(Auth::user()->hasRole('Admin'))
                                     <div
@@ -65,15 +65,15 @@ $configData = Helper::appClasses();
                                    title="{{ __('chat::messages.new_conversation') }}"><img
                                         src="{{asset('chat/assets/icons/bubble-chat.png')}}" width="30" height="30"></i>
                             </div> --}}
-                            <i class="nav-icon fa fa-times align-top chat__people-close-bar d-sm-none d-block align-self-center ms-2"></i>
+                            <i class="nav-icon fa-solid fa-xmark align-top chat__people-close-bar d-sm-none d-block align-self-center ms-2"></i>
                         </div>
                     </div>
                     <div class="chat__search-wrapper">
                         <div class="chat__search clearfix chat__search--responsive">
-                            <i class="fa fa-search"></i>
+                            <i class="fa-solid fa-magnifying-glass"></i>
                             <input type="search" placeholder="{{ __('chat::messages.search') }}" class="chat__search-input"
                                    id="searchUserInput">
-                            <i class="fa fa-search d-lg-none chat__search-responsive-icon"></i>
+                            <i class="fa-solid fa-magnifying-glass d-lg-none chat__search-responsive-icon"></i>
                         </div>
                     </div>
                     <ul class="nav nav-tabs chat__tab-nav mb-1 border-bottom-0" id="chatTabs">
@@ -91,13 +91,13 @@ $configData = Helper::appClasses();
                             </div>
                             <div class="text-center no-conversation" style="display: none">
                                 <div class="chat__no-conversation">
-                                    <div class="text-center"><i class="fa fa-2x fa-commenting-o" aria-hidden="true"></i></div>
+                                    <div class="text-center"><i class="fa-solid fa-2x fa-comment" aria-hidden="true"></i></div>
                                     {{ __('chat::messages.no_conversation_found') }}
                                 </div>
                             </div>
                             <div class="text-center no-conversation-yet" style="display: none">
                                 <div class="chat__no-conversation">
-                                    <div class="text-center"><i class="fa fa-2x fa-commenting-o" aria-hidden="true"></i></div>
+                                    <div class="text-center"><i class="fa-solid fa-2x fa-comment" aria-hidden="true"></i></div>
                                     {{ __('chat::messages.no_conversation_added_yet') }}
                                 </div>
                             </div>
@@ -108,13 +108,13 @@ $configData = Helper::appClasses();
                         <div class="chat__people-body tab-pane fade in active" id="archivePeopleBody">
                             <div class="text-center no-archive-conversation">
                                 <div class="chat__no-archive-conversation">
-                                    <div class="text-center"><i class="fa fa-2x fa-commenting-o" aria-hidden="true"></i></div>
+                                    <div class="text-center"><i class="fa-solid fa-2x fa-comment" aria-hidden="true"></i></div>
                                     {{ __('chat::messages.no_conversation_found') }}
                                 </div>
                             </div>
                             <div class="text-center no-archive-conversation-yet">
                                 <div class="chat__no-archive-conversation">
-                                    <div class="text-center"><i class="fa fa-2x fa-commenting-o" aria-hidden="true"></i></div>
+                                    <div class="text-center"><i class="fa-solid fa-2x fa-comment" aria-hidden="true"></i></div>
                                     {{ __('chat::messages.no_conversation_added_yet') }}
                                 </div>
                             </div>
@@ -259,7 +259,7 @@ $configData = Helper::appClasses();
 
 
 @section('vendor-script')
-{{-- <script src="{{ asset('messages.js') }}"></script> --}}
+<script src="{{ asset('messages.js') }}"></script>
 {{-- <script src="{{ asset('chat/assets/js/bootstrap.bundle.min.js') }}"></script> --}}
 <script src="{{ mix('chat/assets/js/coreui.min.js') }}"></script>
 <script src="{{ mix('chat/assets/js/jquery.toast.min.js') }}"></script>
@@ -292,7 +292,7 @@ $configData = Helper::appClasses();
     if (currentLocale == '') {
         currentLocale = 'en'
     }
-    // Lang.setLocale(currentLocale)
+    Lang.setLocale(currentLocale)
     let pusherKey = '{{ config('broadcasting.connections.pusher.key') }}'
     let pusherCluster = '{{ config('broadcasting.connections.pusher.options.cluster') }}'
     let messageDeleteTime = '{{ config('configurable.delete_message_time') }}'
@@ -327,7 +327,6 @@ $configData = Helper::appClasses();
 <script src="{{ mix('chat/assets/js/custom.js') }}"></script>
 <script src="{{ mix('chat/assets/js/notification.js') }}"></script>
 <script src="{{ mix('chat/assets/js/set_user_status.js') }}"></script>
-<script src="{{ mix('chat/assets/js/set-user-on-off.js') }}"></script>
 <script src="{{mix('chat/assets/js/profile.js')}}"></script>
 @livewireScripts
 @endsection

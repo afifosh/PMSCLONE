@@ -33,6 +33,9 @@ Route::prefix('admin/chat')->middleware(['auth:admin'])->group(function() {
   Route::get('conversations/{ownerId}/archive-chat', [API\UserAPIController::class, 'archiveChat'])->name('conversations.archive-chat');
   Route::get('conversations/{ownerId}/un-archive-chat', [API\UserAPIController::class, 'unArchiveChat'])->name('conversations.un-archive-chat');
 
+  Route::get('conversations/{ownerId}/pin-chat', [API\UserAPIController::class, 'pinChat'])->name('conversations.pin-chat');
+  Route::get('conversations/{ownerId}/unpin-chat', [API\UserAPIController::class, 'unPinChat'])->name('conversations.unpin-chat');
+
   Route::get('get-profile', [API\UserAPIController::class, 'getProfile']);
   Route::post('profile', [API\UserAPIController::class, 'updateProfile'])->name('update.profile');
   Route::post('update-last-seen', [API\UserAPIController::class, 'updateLastSeen'])->name('update-last-seen');

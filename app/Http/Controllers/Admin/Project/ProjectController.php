@@ -48,6 +48,7 @@ class ProjectController extends Controller
     $project = Project::create($request->validated());
     $project->members()->sync($request->members);
 
+    if($request->boolean('create_chat_group'))
     $this->createGroupForProject($project, $groupRepository);
 
     $project->createLog('Project Created', $project->toArray());

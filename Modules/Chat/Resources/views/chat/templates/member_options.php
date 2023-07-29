@@ -2,7 +2,7 @@
 <div class="chat__person-box-msg-time">
     <div class="chat__person-box-group" data-member-id="{{:member_id}}" data-group-id="{{:group_id}}">
         <div class="btn-group">
-            <i class="fa fa-ellipsis-v group-details-bar" data-bs-toggle="dropdown" aria-haspopup="true"
+            <i class="fa-solid fa-ellipsis-vertical group-details-bar" data-bs-toggle="dropdown" aria-haspopup="true"
                aria-expanded="false">
             </i>
             <div class="dropdown-menu member-options-{{:member_id}}">

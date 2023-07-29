@@ -30,11 +30,18 @@
                 <div class="chat__person-box-count {{if contact.unread_count <= 0}} d-none {{/if}}">{{:contact.unread_count}}</div>
                 <div class="dropdown msgDropdown">
                     <div class="chat-item-menu action-dropdown text-end pe-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-ellipsis-v hide-ele text-logo-color"></i>
+                    <i class="fa-solid fa-ellipsis-vertical hide-ele text-logo-color"></i>
                     </div>
                    <div class="dropdown-menu dropdown-menu-right more-btn-conversation-item action-dropdown-menu">
                        <a class="dropdown-item text-center chat__person-box-delete more-delete-option">
                             <?php echo __('chat::messages.chats.delete') ?>
+                        </a>
+                        <a class="dropdown-item text-center chat__person-box-pin" data-is-pinned={{>contact.is_pinned != 0}}>
+                          {{if contact.is_pinned}}
+                            <?php echo __('chat::messages.chats.unpin') ?>
+                          {{else}}
+                            <?php echo __('chat::messages.chats.pin') ?>
+                          {{/if}}
                         </a>
                         <a class="dropdown-item text-center chat__person-box-archive">
                             <?php echo __('chat::messages.chats.archive_chat') ?>

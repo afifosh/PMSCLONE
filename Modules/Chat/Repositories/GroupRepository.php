@@ -484,11 +484,11 @@ class GroupRepository extends BaseRepository
      * @param  array  $input
      * @return Conversation
      */
-    public function sendMessage($input)
+    public function sendMessage($input, $toOthers = true)
     {
         /** @var ChatRepository $chatRepo */
         $chatRepo = app(ChatRepository::class);
-        $conversation = $chatRepo->sendGroupMessage($input);
+        $conversation = $chatRepo->sendGroupMessage($input, $toOthers);
 
         return $conversation;
     }

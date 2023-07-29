@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-start align-items-center">
   <div class="avatar-wrapper">
-    <div class="avatar avatar-sm me-3"><img src="{{ $user->avatar }}" alt="Avatar" class="rounded-circle">
+    <div class="avatar avatar-{{$user->is_online ? 'online' : 'offline'}} u-avatar-{{$user->id}} avatar-sm me-3 "><img src="{{ $user->avatar }}" alt="Avatar" class="rounded-circle">
     </div>
   </div>
   <div class="d-flex flex-column">

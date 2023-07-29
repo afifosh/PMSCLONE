@@ -74,6 +74,18 @@ $configData = Helper::appClasses();
             </div>
             <div class="col-md-6">
               <div class="mb-3">
+                <label for="budget" class="form-label">Budget</label>
+                <input type="number" name="budget" id="budget" placeholder="Budget" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="refrence_id" class="form-label">Refrence ID</label>
+                <input type="text" name="refrence_id" id="refrence_id" placeholder="Refrence ID" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
                 <label for="status" class="form-label">Status</label>
                 {!! Form::select('status', $statuses, null, ['class' => 'form-select select2']) !!}
               </div>
@@ -90,16 +102,20 @@ $configData = Helper::appClasses();
                 {!! Form::select('members[]', $members->pluck('email', 'id'), null, ['class' => 'form-select select2User', 'data-placeholder' => 'Select members', 'multiple' => 'multiple'], $optionParameters) !!}
               </div>
             </div>
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" name="description" id="description" rows="5"></textarea>
+              </div>
+            </div>
             <div class="col-md-6">
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="1" id="progress" name="is_progress_calculatable" checked>
                 <label class="form-check-label" for="progress">Calculate progress through tasks</label>
               </div>
-            </div>
-            <div class="col-md-12">
-              <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" name="description" id="description" rows="5"></textarea>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="1" id="create_chat_group" name="create_chat_group" checked>
+                <label class="form-check-label" for="create_chat_group">Auto create a group chat for the project</label>
               </div>
             </div>
           </div>

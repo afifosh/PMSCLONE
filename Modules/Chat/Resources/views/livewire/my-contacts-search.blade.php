@@ -61,7 +61,7 @@
     </ul>
     <div class="text-center no-my-contact new-conversation__no-my-contact @if(count($users) > 0) d-none @endif">
         <div class="chat__not-selected">
-            <div class="text-center"><i class="fa fa-2x fa-user" aria-hidden="true"></i>
+            <div class="text-center"><i class="fa-solid fa-2x fa-user" aria-hidden="true"></i>
             </div>
             {{ ($myContactsCount > 0) ? __('chat::messages.no_user_found') : __('chat::messages.no_conversation_added_yet') }}
         </div>

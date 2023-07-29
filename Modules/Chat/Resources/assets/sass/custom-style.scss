@@ -19,6 +19,10 @@ body.app {
     box-shadow: none !important;
 }
 
+.chat__person-box-detail .project-status-message{
+  max-height: 20px;
+  overflow: hidden;
+}
 .btn-primary {
     background-color: $primary-color !important;
     padding: 0.5rem 1.5rem;
@@ -669,7 +673,7 @@ table.dataTable {
     }
 
     &__not-selected, &__no-archive-conversation, &__no-conversation {
-        .fa {
+        .fa-solid {
             color: $primary-color;
         }
     }
@@ -725,14 +729,14 @@ table.dataTable {
     &__area-media-btn {
         background-color: $secondary-color;
 
-        .fa {
+        .fa-solid {
             transition: all 0.2s ease;
         }
 
         &:hover {
             background-color: $secondary-hover-color;
 
-            .fa {
+            .fa-solid {
                 color: $primary-color;
             }
         }
@@ -775,7 +779,7 @@ table.dataTable {
 
 .chat-profile {
     &__column {
-        .fa {
+        .fa-solid {
             color: #aeb0b1;
             font-size: 16px;
         }
@@ -1122,7 +1126,7 @@ table.dataTable {
         cursor: pointer;
         transition: all 0.1s ease;
 
-        .fa {
+        .fa-solid {
             transition: all 0.1s ease;
         }
 
@@ -1130,7 +1134,7 @@ table.dataTable {
             color: $primary-color !important;
             background-color: $secondary-hover-color;
 
-            .fa {
+            .fa-solid {
                 color: $primary-color;
             }
         }

@@ -55,7 +55,7 @@ class TasksDataTable extends DataTable
   {
     $q = $model->whereHas('assignees', function($q){
       $q->where('admin_id', auth()->id());
-    })->with('assignees', 'project')->newQuery();
+    })->with('assignees', 'project', 'checklistItems')->newQuery();
 
     return $q->applyRequestFilters();
   }

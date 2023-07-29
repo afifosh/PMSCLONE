@@ -29,18 +29,7 @@ class DepartmentsDataTable extends DataTable
         if (!$department->head) {
           return '-';
         }
-        return '<div class="d-flex justify-content-start align-items-center">
-                <div class="avatar-wrapper">
-                  <div class="avatar avatar-sm me-3"><img src="' . $department->head->avatar . '" alt="Avatar" class="rounded-circle">
-                  </div>
-                </div>
-                <div class="d-flex flex-column">
-                  <span class="text-body text-truncate">
-                    <span class="fw-semibold"><a href="'.route('admin.users.show', $department->head->id).'" class="fw-semibold">' . htmlspecialchars($department->head->full_name, ENT_QUOTES, 'UTF-8') . '</a></span>
-                  </span>
-                  <small class="text-muted">' . htmlspecialchars($department->head->email, ENT_QUOTES, 'UTF-8') . '</small>
-                </div>
-              </div>';
+        return view('admin._partials.sections.user-info', ['user' => $department->head]);
       })
       ->addColumn('action', function (CompanyDepartment $department) {
         return view('admin.pages.partner.departments.action', compact('department'));

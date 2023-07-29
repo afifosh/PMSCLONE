@@ -18,7 +18,7 @@
                 <div class="chat__person-box-count {{if messageInfo === ''}} d-none {{/if}}">{{:count}}</div>
                 <div class="dropdown msgDropdown">
                     <div class="chat-item-menu action-dropdown text-end pe-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-ellipsis-v hide-ele text-logo-color"></i>
+                    <i class="fa-solid fa-ellipsis-vertical hide-ele text-logo-color"></i>
                     </div>
                    <div class="dropdown-menu dropdown-menu-right more-btn-conversation-item action-dropdown-menu">
                        <a class="dropdown-item text-center chat__person-box-delete more-delete-option">

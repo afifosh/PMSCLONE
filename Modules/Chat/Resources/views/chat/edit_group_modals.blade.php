@@ -40,13 +40,13 @@
                             <div class="d-flex justify-content-around radio-group-type">
                                 <div class="me-3">
                                     {!! Form::radio('group_type', 1, true, ['class' => 'group-type', 'id' => 'editGroupTypeOpen']) !!} {{ __('chat::messages.group.open') }}
-                                    <i class="fa fa-question-circle ms-2 question-type-open cursor-pointer"
+                                    <i class="fa-solid fa-circle-question ms-2 question-type-open cursor-pointer"
                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                        title="All group members can send messages into the group."></i>
                                 </div>
                                 <div>
                                     {!! Form::radio('group_type', 2, false, ['class' => 'group-type', 'id' => 'editGroupTypeClose']) !!} {{ __('chat::messages.group.close') }}
-                                    <i class="fa fa-question-circle ms-2 question-type-close cursor-pointer"
+                                    <i class="fa-solid fa-circle-question ms-2 question-type-close cursor-pointer"
                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                        title="The admin only can send messages into the group."></i></div>
                             </div>
@@ -59,13 +59,13 @@
                             <div class="d-flex justify-content-around ms-1 radio-group-type">
                                 <div class="me-3">
                                     {!! Form::radio('privacy', 1, true, ['class' => 'group-privacy', 'id' => 'editGroupPublic']) !!} {{ __('chat::messages.group.public') }}
-                                    <i class="fa fa-question-circle ms-2 question-type-public cursor-pointer"
+                                    <i class="fa-solid fa-circle-question ms-2 question-type-public cursor-pointer"
                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                        title="All group members can add or remove members from the group."></i>
                                 </div>
                                 <div>
                                     {!! Form::radio('privacy', 2, false, ['class' => 'group-privacy', 'id' => 'editGroupPrivate']) !!} {{ __('chat::messages.group.private') }}
-                                    <i class="fa fa-question-circle ms-2  question-type-private cursor-pointer"
+                                    <i class="fa-solid fa-circle-question ms-2  question-type-private cursor-pointer"
                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                        title="The admin only can add or remove members from the group."></i>
                                 </div>

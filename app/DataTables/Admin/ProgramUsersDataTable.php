@@ -25,32 +25,10 @@ class ProgramUsersDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->addColumn('user', function ($row) {
-        return '<div class="d-flex justify-content-start align-items-center">
-                <div class="avatar-wrapper">
-                  <div class="avatar avatar-sm me-3"><img src="' . $row->user->avatar . '" alt="Avatar" class="rounded-circle">
-                  </div>
-                </div>
-                <div class="d-flex flex-column">
-                  <span class="text-body text-truncate">
-                    <a href="'.route('admin.users.show', $row->user).'" class="fw-semibold">' . htmlspecialchars($row->user->full_name, ENT_QUOTES, 'UTF-8') . '</a>
-                  </span>
-                  <small class="text-muted">' . htmlspecialchars($row->user->email, ENT_QUOTES, 'UTF-8') . '</small>
-                </div>
-              </div>';
+        return view('admin._partials.sections.user-info', ['user' => $row->user]);
       })
       ->editColumn('added_by', function ($row) {
-        return '<div class="d-flex justify-content-start align-items-center">
-                <div class="avatar-wrapper">
-                  <div class="avatar avatar-sm me-3"><img src="' . $row->addedBy->avatar . '" alt="Avatar" class="rounded-circle">
-                  </div>
-                </div>
-                <div class="d-flex flex-column">
-                  <span class="text-body text-truncate">
-                    <a href="'.route('admin.users.show', $row->addedBy).'" class="fw-semibold">' . htmlspecialchars($row->addedBy->full_name, ENT_QUOTES, 'UTF-8') . '</a>
-                  </span>
-                  <small class="text-muted">' . htmlspecialchars($row->addedBy->email, ENT_QUOTES, 'UTF-8') . '</small>
-                </div>
-              </div>';
+        return view('admin._partials.sections.user-info', ['user' => $row->addedBy]);
       })
       ->addColumn('user_organization', function ($row) {
         return @$row->user->designation->department->company->name ? view('admin._partials.sections.company-avatar', ['company' => @$row->user->designation->department->company]) : '-';

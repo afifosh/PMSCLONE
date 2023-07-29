@@ -33,7 +33,7 @@
                 @endforeach
                 <div class="text-center no-member-found h-110 {{ count($contacts) > 0 ? 'd-none' : '' }}">
                     <div class="chat__not-selected">
-                        <div class="text-center"><i class="fa fa-2x fa-user" aria-hidden="true"></i>
+                        <div class="text-center"><i class="fa-solid fa-2x fa-user" aria-hidden="true"></i>
                         </div>
                         <span>{{__('chat::messages.no_member_found')}}</span>
                     </div>
@@ -44,7 +44,7 @@
             <ul class="absolute z-10 list-group bg-white w-full added-group-members-list new-group-members__added-member-list">
                 <div class="text-center no-member-added h-130">
                     <div class="chat__not-selected not-selected">
-                        <div class="text-center"><i class="fa fa-2x fa-user" aria-hidden="true"></i>
+                        <div class="text-center"><i class="fa-solid fa-2x fa-user" aria-hidden="true"></i>
                         </div>
                         <span>{{__('chat::messages.no_member_added_yet')}}</span>
                     </div>

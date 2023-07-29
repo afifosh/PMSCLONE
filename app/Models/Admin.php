@@ -48,6 +48,8 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     'avatar',
     'phone',
     'email',
+    'last_seen',
+    'is_online',
     'password',
     'status',
     'designation_id',

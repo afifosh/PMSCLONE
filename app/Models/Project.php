@@ -14,7 +14,7 @@ class Project extends Model
   use HasFactory;
   use HasLogs;
 
-  protected $fillable = ['program_id', 'category_id', 'name', 'description', 'tags', 'start_date', 'deadline', 'status'];
+  protected $fillable = ['program_id', 'category_id', 'name', 'description', 'tags', 'start_date', 'deadline', 'status', 'budget', 'refrence_id'];
 
   protected $casts = [
     'tags' => 'array',
@@ -86,7 +86,7 @@ class Project extends Model
 
   public function progress_percentage()
   {
-    $total_tasks = $this->tasks()->count();
+    $total_tasks = $this->tasks->count();
     if ($total_tasks == 0) {
       return 0;
     }
@@ -120,7 +120,7 @@ class Project extends Model
     return $this->hasOne(Group::class, 'project_id', 'id');
   }
 
-  public function sendMessageInChat($message, $type = Conversation::MESSAGE_TYPE_BADGES)
+  public function sendMessageInChat($message, $toOthers = true, $type = Conversation::MESSAGE_TYPE_BADGES)
   {
     $msgInput = [
       'to_id' => $this->group->id,
@@ -130,7 +130,7 @@ class Project extends Model
     ];
 
     $repo = app(GroupRepository::class);
-    $repo->sendMessage($msgInput);
+    $repo->sendMessage($msgInput, $toOthers);
 
     return true;
   }

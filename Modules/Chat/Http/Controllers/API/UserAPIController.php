@@ -18,6 +18,8 @@ use Modules\Chat\Http\Requests\UpdateUserNotificationRequest;
 use Modules\Chat\Http\Requests\UpdateUserProfileRequest;
 use Modules\Chat\Models\ArchivedUser;
 use Modules\Chat\Models\BlockedUser;
+use Modules\Chat\Models\Group;
+use Modules\Chat\Models\PinnedConversation;
 use Modules\Chat\Models\User;
 use Modules\Chat\Models\UserDevice;
 use Modules\Chat\Repositories\UserRepository;
@@ -210,6 +212,44 @@ class UserAPIController extends AppBaseController
         $archivedUser->delete();
 
         return $this->sendSuccess('Chat unarchived successfully.');
+    }
+
+    /**
+     * @param $ownerId
+     * @return JsonResponse
+     *
+     * @throws Exception
+     */
+    public function pinChat($ownerId): JsonResponse
+    {
+        $pinnedConversatoin = PinnedConversation::where('conversation_id', $ownerId)->where('pinned_by', getLoggedInUserId())->first();
+        if (is_string($ownerId) && ! is_numeric($ownerId)) {
+            $ownerType = Group::class;
+        } else {
+            $ownerType = User::class;
+        }
+
+        if (empty($pinnedConversatoin)) {
+          PinnedConversation::create([
+                'conversation_id' => $ownerId,
+                'conversation_type' => $ownerType,
+                'pinned_by' => getLoggedInUserId(),
+            ]);
+        }
+
+        return $this->sendSuccess('Chat pinned successfully.');
+    }
+
+    /**
+     * @param $ownerId
+     * @return JsonResponse
+     */
+    public function unPinChat($ownerId): JsonResponse
+    {
+        $pinnedConversatoin = PinnedConversation::where('conversation_id', $ownerId)->where('pinned_by', getLoggedInUserId())->first();
+        $pinnedConversatoin->delete();
+
+        return $this->sendSuccess('Chat unpinned successfully.');
     }
 
     /**

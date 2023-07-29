@@ -19,6 +19,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->dateTime('start_date')->nullable();
             $table->dateTime('deadline')->nullable();
+            $table->string('refrence_id')->nullable();
+            $table->unsignedBigInteger('budget')->nullable();
             $table->json('tags')->nullable();
             $table->boolean('is_progress_calculatable')->default(false); // calculate progress based on tasks
             $table->integer('progress')->default(0); // 0-100

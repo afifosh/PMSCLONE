@@ -27,18 +27,7 @@ class AdminsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->addColumn('user', function ($row) {
-        return '<div class="d-flex justify-content-start align-items-center">
-                <div class="avatar-wrapper">
-                  <div class="avatar avatar-sm me-3"><img src="' . $row->avatar . '" alt="Avatar" class="rounded-circle">
-                  </div>
-                </div>
-                <div class="d-flex flex-column">
-                  <span class="text-body text-truncate">
-                    <span class="fw-semibold"><a href="' . route('admin.users.show', $row->id) . '" class="fw-semibold">' . htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8') . '</a></span>
-                  </span>
-                  <small class="text-muted">' . htmlspecialchars($row->email, ENT_QUOTES, 'UTF-8') . '</small>
-                </div>
-              </div>';
+        return view('admin._partials.sections.user-info', ['user' => $row]);
       })
       ->addColumn('roles', function ($row) {
         return $row->roles->pluck('name')->implode(', ');
@@ -110,7 +99,7 @@ class AdminsDataTable extends DataTable
         return $dep->whereIn('company_id', request('filter_companies'));
       });
     });
-    return $query->select(['admins.*', DB::raw("CONCAT(admins.first_name,' ',admins.last_name) as full_name")])->with('roles');
+    return $query->select(['admins.*', DB::raw("CONCAT(admins.first_name,' ',admins.last_name) as full_name")])->with('roles', 'designation.department.company');
   }
 
   protected function makeStatus($status)
@@ -167,21 +156,6 @@ class AdminsDataTable extends DataTable
         'buttons' => $buttons,
         "scrollX" => true
       ]);
-    // ->language(['sLengthMenu' => '_MENU_',
-    // 'search' => '',
-    // 'searchPlaceholder' => 'Search..']);
-    //   ->parameters([
-    //     'buttons'      => ['export', 'print', 'reset', 'reload'],
-    // ]);
-    // ->selectStyleSingle();
-    // ->buttons([
-    //     Button::make('excel'),
-    //     Button::make('csv'),
-    //     Button::make('pdf'),
-    //     Button::make('print'),
-    //     Button::make('reset'),
-    //     Button::make('reload')
-    // ]);
   }
   /**
    * Get the dataTable columns definition.

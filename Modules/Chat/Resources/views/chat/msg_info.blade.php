@@ -1,7 +1,7 @@
 <div class="msg-info ms-lg-3">
     <div class="msg-info__header">
         <span class="chat-profile__about">Message info</span>
-        <i class="fa fa-times msg-info__close-btn"></i>
+        <i class="fa-solid fa-xmark msg-info__close-btn"></i>
     </div>
     <div class="group-profile-data">
         <div class="chat-profile__divider"></div>
@@ -13,7 +13,7 @@
                     </div>
                     <div class="chat-container__time text-nowrap chat-time">6:37pm</div>
                     <div class="chat-container__read-status position-absolute">
-                        <i class="fa fa-check" aria-hidden="true"></i>
+                        <i class="fa-solid fa-check" aria-hidden="true"></i>
                     </div>
                 </div>
             </div>

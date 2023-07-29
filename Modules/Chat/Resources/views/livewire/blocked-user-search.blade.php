@@ -26,7 +26,7 @@
         </ul>
         <div class="text-center no-blocked-user new-conversation__no-user @if(count($users) > 0) d-none @endif">
             <div class="chat__not-selected">
-                <div class="text-center"><i class="fa fa-2x fa-user" aria-hidden="true"></i>
+                <div class="text-center"><i class="fa-solid fa-2x fa-user" aria-hidden="true"></i>
                 </div>
                 <span id="noBlockedUsers">
                     {{ ($blockedUsersCount > 0) ? __('chat::messages.no_blocked_user_found') : __('chat::messages.no_users_blocked') }}

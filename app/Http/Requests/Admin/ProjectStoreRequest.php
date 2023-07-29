@@ -33,6 +33,8 @@ class ProjectStoreRequest extends FormRequest
             'deadline' => 'nullable|date',
             'is_progress_calculatable' => 'required',
             'tags' => 'nullable|array',
+            'refrence_id' => 'nullable|string|max:255',
+            'budget' => 'nullable|numeric|min:0',
             // 'progress' => 'required_if:is_progress_calculateable,0|numeric|min:0|max:100',
         ];
     }
@@ -41,6 +43,7 @@ class ProjectStoreRequest extends FormRequest
     {
         return [
             'members.required' => 'Please select at least one member',
+            'members.*.required' => 'Please select at least one member',
             'members.*.exists' => 'Please select valid member',
             'program_id.required' => 'Please select program',
             'program_id.exists' => 'Please select valid program',

@@ -15,7 +15,7 @@
             {{if !isReceiver}}
                 <div class="chat-conversation__menu d-flex align-items-center">
                     <div class="dropdown btn-group hide-ele msg-options">
-                        <i class="fa fa-ellipsis-v " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                        <i class="fa-solid fa-ellipsis-vertical " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
                         <div class="dropdown-menu chat-replay-dropdown">
                             {{if allowToDelete}}
                                 <a class="dropdown-item msg-delete-icon" href="#">Delete Message</a>
@@ -50,13 +50,13 @@
                     {{/if}}
                 {{/if}}{{:~getChatMagTimeInConversation(data.created_at)}}</div>
                 <div class="chat-container__read-status position-absolute {{if isReceiver}} d-none {{else}} {{:readUnread}} {{/if}}">
-                    <i class="fa fa-check" aria-hidden="true"></i>
+                    <i class="fa-solid fa-check" aria-hidden="true"></i>
                 </div>
             </div>
          {{if isReceiver}}
          <div class="chat-conversation__menu d-flex align-items-center">
             <div class="dropdown btn-group hide-ele msg-options">
-                <i class="fa fa-ellipsis-v " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa-solid fa-ellipsis-vertical " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </i>
                 <div class="dropdown-menu">
                     <a class="dropdown-item msg-replay" href="#" data-self-reply="0" data-message-id="{{:data.id}}" data-message='{{:data.message}}' data-sender="{{:data.sender.name}}" data-user-id="{{:data.sender.id}}" data-message-type='{{:data.message_type}}'>Reply</a>
@@ -78,7 +78,7 @@
             <h5 class="mb-1 chat__person-box-name contact-name">{{:user.name}}</h5>
             <p class="mb-0 chat-message">
                 {{if ~checkReadAtDate(read_at) }}
-                    <span><i class="fa fa-check mx-0 chat__person-box--read" aria-hidden="true"></i>&nbsp;<span class="read_at">{{:~getCalenderFormatForLastSeen(read_at)}}</span></span>
+                    <span><i class="fa-solid fa-check mx-0 chat__person-box--read" aria-hidden="true"></i>&nbsp;<span class="read_at">{{:~getCalenderFormatForLastSeen(read_at)}}</span></span>
                 {{/if}}
             </p>
         </div>
@@ -102,7 +102,7 @@
         {{/if}}
         <div class="chat-container__time text-nowrap chat-time">{{:~getChatMagTimeInConversation(data.created_at)}}</div>
         <div class="chat-container__read-status position-absolute>
-            <i class="fa fa-check" aria-hidden="true"></i>
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
         </div>
     </div>
 </div>

@@ -1,13 +1,13 @@
 <script id="tmplUserDetails" type="text/x-jsrender">
     <div class="chat-profile__header">
         <span class="chat-profile__about"><?php echo trans('chat::messages.about') ?></span>
-        <i class="fa fa-times chat-profile__close-btn"></i>
+        <i class="fa-solid fa-xmark chat-profile__close-btn"></i>
     </div>
     <div class="chat-profile__person chat-profile__person--active mb-2">
         <div class="chat-profile__avatar">
             <img src="{{:photo_url}}" alt="" class="img-fluid user-about-image">
             {{if !is_my_contact && is_private_account }}
-                <i class="fa fa-lock private-user-badge"> </i>
+                <i class="fa-solid fa-lock private-user-badge"> </i>
             {{/if}}
         </div>
     </div>
@@ -32,7 +32,7 @@
     <div class="user-profile-data">
         <div class="chat-profile__divider"></div>
         <div class="chat-profile__column d-flex">
-            <i class="fa fa-user" aria-hidden="true"></i>
+            <i class="fa-solid fa-user" aria-hidden="true"></i>
             <div class="ms-3">
                 <h6 class="chat-profile__column-title mb-0"><?php echo trans('chat::messages.bio') ?></h6>
                 <p class="chat-profile__column-title-detail text-muted mb-0 user-about">
@@ -46,7 +46,7 @@
         </div>
         {{if is_my_contact || !is_private_account }}
             <div class="chat-profile__column d-flex">
-                <i class="fa fa-phone" aria-hidden="true"></i>
+                <i class="fa-solid fa-phone" aria-hidden="true"></i>
                 <div class="ms-3">
                     <h6 class="chat-profile__column-title mb-0"><?php echo trans('chat::messages.phone') ?></h6>
                     <p class="chat-profile__column-title-detail text-muted mb-0 user-phone">
@@ -59,7 +59,7 @@
                 </div>
             </div>
             <div class="chat-profile__column d-flex">
-                <i class="fa fa-envelope" aria-hidden="true"></i>
+                <i class="fa-solid fa-envelope" aria-hidden="true"></i>
                 <div class="ms-3 truncate-div">
                     <h6 class="chat-profile__column-title mb-0 text-truncate"><?php echo trans('chat::messages.email') ?></h6>
                     <p class="chat-profile__column-title-detail text-muted mb-0 text-truncate user-email">{{:email}}</p>

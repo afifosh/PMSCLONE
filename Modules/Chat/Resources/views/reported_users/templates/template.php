@@ -8,7 +8,7 @@
 <script id="viewDelIcons" type="text/x-jsrender">
 <div class="d-flex justify-content-center align-items-center">
     <button title="View" class="index__btn btn btn-ghost-success btn-sm view-btn mr-1" data-id="{{:id}}">
-        <i class="fa fa-eye action-icon"></i>
+        <i class="fa-solid fa-eye action-icon"></i>
     </button>
     <button title="Delete" class="index__btn btn btn-ghost-danger btn-sm delete-btn" data-id="{{:id}}">
         <i class="cui-trash action-icon"></i>

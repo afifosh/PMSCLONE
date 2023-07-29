@@ -27,7 +27,7 @@ jobs:
               git pull origin master
               rm .env -f
               cp .env.server .env
-              composer update
+              composer install --no-ansi --no-interaction --no-plugins --no-progress --no-scripts --optimize-autoloader
               php -d  memory_limit=128M artisan storage:link --force
               php -d  memory_limit=128M artisan migrate:fresh --force
               php -d  memory_limit=512M artisan db:seed --force
@@ -42,4 +42,4 @@ jobs:
               # php -d  memory_limit=128M artisan db:seed --class=WorkflowSeeder --force
               # php -d  memory_limit=128M artisan db:seed --class=KycDocumentSeeder --force
               nvm use 16 && yarn
-              yarn dev
+              yarn prod

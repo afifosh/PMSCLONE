@@ -173,7 +173,7 @@ $(document).ready(function () {
                     each(function () {
                         $(this).text('Unarchive Chat');
                     });
-
+                archivePeopleBodyEle.find('.chat__person-box-pin').remove();
                 searchUsers();
 
                 if (data.data.conversations.length > 9) {
@@ -741,28 +741,28 @@ $(document).ready(function () {
             return imageRendererInSideMedia(data.message, data.id);
         } else if (data.message_type === mediaTypePdf) {
             return sideMediaRenderer(data.message, data.file_name,
-                'fa-file-pdf-o', data.id);
+                'fa-solid fa-file-pdf', data.id);
         } else if (data.message_type === mediaTypeDocx) {
             return sideMediaRenderer(data.message, data.file_name,
-                'fa-file-word-o', data.id);
+                'fa-solid fa-file-word', data.id);
         } else if (data.message_type === mediaTypeVideo) {
             return sideMediaRenderer(data.message, data.file_name,
-                'fa-file-video-o', data.id);
+                'fa-solid fa-file-video', data.id);
         } else if (data.message_type === youtubeUrl) {
             return sideMediaRenderer(data.message, data.message,
-                'fa fa-youtube-play', data.id);
+                'fa-solid fa-play', data.id);
         } else if (data.message_type === mediaTypeTxt) {
             return sideMediaRenderer(data.message, data.file_name,
-                'fa-file-text-o', data.id);
+                'fa-solid fa-file-lines', data.id);
         } else if (data.message_type === mediaTypeXls) {
             return sideMediaRenderer(data.message, data.file_name,
-                'fa-file-excel-o', data.id);
+                'fa-solid fa-file-excel', data.id);
         } else if (data.message_type === mediaTypeVoice) {
             return sideMediaRenderer(data.message, data.file_name,
-                'fa-file-audio-o', data.id);
+                'fa-solid fa-file-audio', data.id);
         } else if (data.message_type === mediaTypeZip) {
             return sideMediaRenderer(data.message, data.file_name,
-                'fa fa-file-archive-o', data.id);
+                'fa-solid fa-file-zipper', data.id);
         } else {
             return '';
         }
@@ -1648,27 +1648,27 @@ $(document).ready(function () {
     window.getMessageByItsTypeForChatList = function (
         message, message_type, file_name = '') {
         if (message_type === mediaTypeImage) {
-            return '<i class="fa fa-camera" aria-hidden="true"></i>' + ' Photo';
+            return '<i class="fa-solid fa-camera" aria-hidden="true"></i>' + ' Photo';
         } else if (message_type === mediaTypePdf) {
-            return '<i class="fa fa-file-pdf-o" aria-hidden="true"></i>' + ' ' +
+            return '<i class="fa-solid fa-file-pdf" aria-hidden="true"></i>' + ' ' +
                 file_name;
         } else if (message_type === mediaTypeDocx) {
-            return '<i class="fa fa-file-word-o" aria-hidden="true"></i>' +
+            return '<i class="fa-solid fa-file-word" aria-hidden="true"></i>' +
                 ' ' + file_name;
         } else if (message_type === mediaTypeVoice) {
-            return '<i class="fa fa-file-audio-o" aria-hidden="true"></i>' +
+            return '<i class="fa-solid fa-file-audio" aria-hidden="true"></i>' +
                 ' ' + file_name;
         } else if (message_type === mediaTypeVideo) {
-            return '<i class="fa fa-file-video-o" aria-hidden="true"></i>' +
+            return '<i class="fa-solid fa-file-video" aria-hidden="true"></i>' +
                 ' ' + file_name;
         } else if (message_type === mediaTypeTxt) {
-            return '<i class="fa fa-file-text-o" aria-hidden="true"></i>' +
+            return '<i class="fa-solid fa-file-lines" aria-hidden="true"></i>' +
                 ' ' + file_name;
         } else if (message_type === mediaTypeXls) {
-            return '<i class="fa fa-file-excel-o" aria-hidden="true"></i>' +
+            return '<i class="fa-solid fa-file-excel" aria-hidden="true"></i>' +
                 ' ' + file_name;
         } else if (message_type === mediaTypeZip) {
-            return '<i class="fa fa-file-archive-o" aria-hidden="true"></i>' +
+            return '<i class="fa-solid fa-file-zipper" aria-hidden="true"></i>' +
                 ' ' + file_name;
         } else {
             return emojione.shortnameToImage(message);
@@ -1687,7 +1687,7 @@ $(document).ready(function () {
     window.getDraftMessage = function (contactId) {
         let lastDraftMsg = getLocalStorageItem('user_' + contactId);
 
-        return (lastDraftMsg != null) ? '<i class="fa fa-pencil" aria-hidden="true"></i> ' + getMessageByItsTypeForChatList(lastDraftMsg, 0) : false;
+        return (lastDraftMsg != null) ? '<i class="fa-solid fa-pencil" aria-hidden="true"></i> ' + getMessageByItsTypeForChatList(lastDraftMsg, 0) : false;
     };
 
     window.prepareContacts = function (contact) {
@@ -2778,7 +2778,7 @@ $(document).ready(function () {
     };
 
     window.pdfRenderer = function (message, fileName) {
-        return `<div class="media-wrapper d-flex align-items-center"><i class="fa fa-file-pdf-o" aria-hidden="true"></i><a href= "${message}"  target="blank" class="item"> ${fileName}</a></div>`;
+        return `<div class="media-wrapper d-flex align-items-center"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i><a href= "${message}"  target="blank" class="item"> ${fileName}</a></div>`;
     };
 
     window.voiceRenderer = function (message, fileName) {
@@ -2788,12 +2788,12 @@ $(document).ready(function () {
     };
 
     window.docRenderer = function (message, fileName) {
-        return `<div class="media-wrapper d-flex align-items-center"><i class="fa fa-file-word-o" aria-hidden="true"></i><a href="${message}"
+        return `<div class="media-wrapper d-flex align-items-center"><i class="fa-solid fa-file-word" aria-hidden="true"></i><a href="${message}"
     target="_blank">${fileName}</a></div>`;
     };
 
     window.txtRenderer = function (message, fileName) {
-        return `<div class="media-wrapper d-flex align-items-center"><i class="fa fa-file-text-o" aria-hidden="true"></i><a href="${message}"
+        return `<div class="media-wrapper d-flex align-items-center"><i class="fa-solid fa-file-lines" aria-hidden="true"></i><a href="${message}"
     target="_blank">${fileName}</a></div>`;
     };
 
@@ -3087,6 +3087,7 @@ $(document).ready(function () {
                     } else {
                         archivePeopleBodyEle.append(archiveConversation);
                     }
+                    archivePeopleBodyEle.find('.chat__person-box-pin').remove();
 
                     makeArchiveChatTabActive();
 
@@ -3096,6 +3097,106 @@ $(document).ready(function () {
         });
     };
 
+    $(document).on('click', '.chat__person-box-pin', function (e) {
+      let chatArchiveEle = $(this);
+      let userId = chatArchiveEle.parents('.chat__person-box').data('id');
+      let isArchiveChat = $(this).data('is-pinned');
+      console.log(isArchiveChat);
+      let contactName = $('#user-' + userId).find('.contact-name').text();
+      let ArchiveUnarchive = (isArchiveChat) ? 'Unpin' : 'Pin';
+
+      swalDelete.fire({
+          title: 'Are you sure?',
+          html: ArchiveUnarchive + ' chat with <b>' + contactName + '</b>?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes',
+      }).then((result) => {
+          if (result.value) {
+              if(ArchiveUnarchive == 'Unpin') {
+                  unpinConversation(userId)
+              }else {
+                  pinConversation(userId);
+              }
+          }
+      });
+
+      //here we write stopPropagation to stop ajax call of select chat after this delete call, if we not write this than select conversation call will happen
+      e.stopPropagation();
+  });
+
+    window.pinConversation = function (userId) {
+      $.ajax({
+          type: 'get',
+          url: route('conversations.pin-chat',userId),
+          success: function (data) {
+              if (data.success == true) {
+                  fireSwal('success', 'Pinned!',
+                      'Conversation has been pinned!');
+                  reloadConversations();
+              }
+          },
+      });
+    };
+    window.unpinConversation = function (userId) {
+      $.ajax({
+          type: 'get',
+          url: route('conversations.unpin-chat',userId),
+          success: function (data) {
+              if (data.success == true) {
+                  fireSwal('success', 'Unpinned!',
+                      'Conversation has been unpinned!');
+                  reloadConversations();
+              }
+          },
+      });
+  };
+function reloadConversations (){
+  $('.contact-area').remove();
+    let $loader = $(conversationsContainer).
+        find('.chat__people-body-loader').
+        clone();
+    $loader.addClass('ajax-loading');
+    $(chatPeopleBodyEle).append($loader);
+    $loader.show();
+    isLoaded = true;
+    offset = 0;
+    $.ajax({
+        type: 'GET',
+        url: route('conversations-list', { type : conversationType}),
+        data: { 'offset': offset },
+        dataType: 'json',
+        success: function (data) {
+            $loader.remove();
+            if (data.data.conversations.length > 0) {
+                isLoaded = false;
+                offset += 10;
+                if (data.success) {
+                  $('#infyLoader').hide();
+                  let latestConversations = data.data.conversations;
+                  if (latestConversations.length === 0) {
+                      noConversationYetEle.show();
+                      noConversationYet = true;
+                  }
+                  chatPeopleBodyEle.
+                      append(latestConversations.map(prepareContacts).join(''));
+
+                  searchUsers();
+                  loadTooltip();
+                  if (data.data.conversations.length > 9) {
+                      let $loadMoreBtn = $('#loadMoreConversationBtn').clone();
+                      $('#chatPeopleBody').append($loadMoreBtn);
+                      $loadMoreBtn.addClass('active');
+                      $loadMoreBtn.show();
+                  }
+              }
+            }
+        },
+        error: function (error) {
+            console.log(error);
+        },
+    });
+}
     window.unaArchiveConversation = function (userId) {
         $.ajax({
             type: 'get',
@@ -3115,6 +3216,7 @@ $(document).ready(function () {
                     } else {
                         chatPeopleBodyEle.append(archiveConversation);
                     }
+                    reloadConversations();
 
                     makeActiveChatTabActive();
 
@@ -3499,7 +3601,7 @@ $(document).ready(function () {
     }
 
     function prepareEditGroupIconHTML (groupId) {
-        return '<div class="col-2"><i class="fa fa-edit edit-group pointer text-center" data-id="' +
+        return '<div class="col-2"><i class="fa-solid fa-pen-to-square edit-group pointer text-center" data-id="' +
             groupId + '"></i></div>';
     }
 
@@ -4660,7 +4762,7 @@ window.Dropzone.options.dropzone = {
     autoProcessQueue: false,
     parallelUploads: 10, // Number of files process at a time (default 2)
     addRemoveLinks: true,
-    dictRemoveFile: '<i class="fa fa-trash-o" title="Remove" style="color: indianred;"></i>',
+    dictRemoveFile: '<i class="fa-solid fa-trash" title="Remove" style="color: indianred;"></i>',
     uploadMultiple: true,
     init: function () {
         let submitButton = document.querySelector('#submit-all');
@@ -4836,6 +4938,7 @@ $(document).on('click', '.load-more-archive-conversation', function () {
                     each(function () {
                         $(this).text('Unarchive Chat');
                     });
+                archivePeopleBodyEle.find('.chat__person-box-pin').remove();
 
                 searchUsers();
 
