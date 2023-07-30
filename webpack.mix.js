@@ -2,6 +2,15 @@ const { EnvironmentPlugin } = require('webpack');
 const mix = require('laravel-mix');
 const glob = require('glob');
 const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin')
+mix.webpackConfig({
+  optimization: {
+    minimize: true,
+    minimizer: [ new TerserPlugin({
+      extractComments: false,
+    })]
+  }
+})
 const chatConfig = require('./webpack.chat.mix.js');
 
 /*
@@ -13,7 +22,10 @@ const chatConfig = require('./webpack.chat.mix.js');
 mix.options({
   resourceRoot: process.env.ASSET_URL || undefined,
   processCssUrls: false,
-  postCss: [require('autoprefixer')]
+  postCss: [require('autoprefixer')],
+  terser: {
+    extractComments: false,
+  }
 });
 
 /*

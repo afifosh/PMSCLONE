@@ -1,9 +1,22 @@
 const mix = require('laravel-mix');
 
 require('laravel-mix-merge-manifest');
-
+const TerserPlugin = require('terser-webpack-plugin')
+mix.webpackConfig({
+  optimization: {
+    minimize: true,
+    minimizer: [ new TerserPlugin({
+      extractComments: false,
+    })]
+  }
+})
 mix.mergeManifest();
 
+mix.options({
+  terser: {
+    extractComments: false,
+  }
+})
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
