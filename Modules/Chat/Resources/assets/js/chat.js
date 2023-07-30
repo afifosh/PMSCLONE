@@ -379,6 +379,54 @@ $(document).ready(function () {
                             focus: function (editor) {
                                 placeCaretAtEnd(editor[0]);
                             },
+                            ready: function() {
+                              if(isGroup){
+                                this.editor.textcomplete([{
+                                    id: 'emojionearea',
+                                    match: /\B#([\-\d\w]*)$/,
+                                    search: function (term, callback) {
+                                        callback(groupOrUserObj.users.filter(user => {
+                                          var chatText = textMessageEle[0].emojioneArea.getText().trim();
+                                          var selectedUsers = chatText.split('#');
+                                          if(user.id == loggedInUserId || selectedUsers.includes(user.email)){
+                                            return false;
+                                          }
+                                          // Convert the keyword and user properties to lowercase for case-insensitive search
+                                          const keywordLowerCase = term.toLowerCase();
+                                          const nameLowerCase = user.name.toLowerCase();
+                                          const emailLowerCase = user.email.toLowerCase();
+
+                                          // Check if the keyword is present in either name, or email
+                                          if (nameLowerCase.includes(keywordLowerCase) || emailLowerCase.includes(keywordLowerCase))
+                                          {
+                                            return true; // Include the user in the result
+                                          }
+
+                                          return false; // Exclude the user from the result
+                                        }));
+                                    },
+                                    template: function (user) {
+                                      return `<div class="d-flex justify-content-start align-items-center">
+                                      <div class="avatar-wrapper">
+                                        <div class="avatar u-avatar-1 avatar-sm me-1"><img src="${user.photo_url}" alt="Avatar" class="rounded-circle">
+                                        </div>
+                                      </div>
+                                      <div class="d-flex flex-column">
+                                        <span class="text-body text-truncate">
+                                          <span class="fw-semibold">${user.name}</span>
+                                        </span>
+                                        <small class="text-muted">${user.email}</small>
+                                      </div>
+                                    </div>`
+                                    },
+                                    replace: function (user) {
+                                        return '<b class="bg-primary">#' + user.email + '</b>&nbsp;';
+                                    },
+                                    cache: true,
+                                    index: 1
+                                }]);
+                             }
+                            }
                         },
                     });
                     if (lastDraftMsg !== '' && lastDraftMsg !== null) {
@@ -1743,6 +1791,9 @@ $(document).ready(function () {
 
     window.Echo.private(`user.${loggedInUserId}`).
         listen('.Modules\\Chat\\Events\\UserEvent', (e) => {
+            if(conversationType == 'projects'){
+              return false;
+            }
             if (e.type === 1) { // block-unblock user event
                 blockUnblockUserEvent(e);
             } else if (e.type === 2) { // new user-to-user message arrived
@@ -3461,6 +3512,9 @@ function reloadConversations (){
         /** Group Updated Event */
         Echo.private(`group.${groupId}`).
             listen('.Modules\\Chat\\Events\\GroupEvent', (e) => {
+                if((e.project_id == null && conversationType == 'projects') || (e.project_id != null && conversationType != 'projects')){
+                    return false;
+                }
                 let group = e;
                 let currentGroupId = $('.chat__person-box--active').data('id');
 

@@ -8,6 +8,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Modules\Chat\Models\Group;
 
 /**
  * Class GroupEvent
@@ -26,6 +27,16 @@ class GroupEvent implements ShouldBroadcast
     public function __construct($data)
     {
         $this->data = $data;
+
+        $this->setProjectId();
+    }
+
+    /**
+     * Set project id
+     */
+    private function setProjectId()
+    {
+        $this->data['project_id'] = $this->data['group']['project_id'] ?? Group::find($this->data['group']['id'])->project_id;
     }
 
     /**

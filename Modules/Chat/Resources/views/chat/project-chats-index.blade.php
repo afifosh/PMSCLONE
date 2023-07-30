@@ -274,6 +274,7 @@ $configData = Helper::appClasses();
 <script src="{{ mix('chat/assets/js/emojione.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('chat/assets/js/datetime-picker.js') }}"></script>
 <script src="{{ asset('chat/assets/js/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{ asset('chat/assets/js/jquery.textcomplete.js') }}"></script>
 <script>
     $(document).ready(function () {
         let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

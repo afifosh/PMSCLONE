@@ -23,6 +23,7 @@ use Modules\Chat\Models\Group;
 use Modules\Chat\Models\GroupMessageRecipient;
 use Modules\Chat\Models\MessageAction;
 use Modules\Chat\Models\User;
+use Modules\Chat\Notifications\MentionedInChatNotification;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
@@ -396,6 +397,26 @@ class ChatRepository extends BaseRepository
           $group->project->sendMessageInChat($message, false);
         }
 
+        // check if message contains # and next word is email then send message to that user
+        if(preg_match_all('/#([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/', $input['message'], $matches)){
+          $matches = array_unique($matches[1]);
+          foreach($matches as $email){
+            // check if email is member of group
+            if($group->project_id != null){
+              $project = $group->project;
+              if($project->members()->where('email', $email)->count()){
+                $user = $project->members()->where('email', $email)->first();
+
+                $user->notify(new MentionedInChatNotification($group, auth()->user()));
+              }
+            }else if($group->users->where('email', $email)->count()){
+              $user = $group->users->where('email', $email)->first();
+
+              $user->notify(new MentionedInChatNotification($group, auth()->user()));
+            }
+          }
+        }
+
         // Send PushNotifications to group users who's push are enabled
         $headings = $group->name.' | '.getAppName();
         $playerIds = [];
@@ -474,6 +495,7 @@ class ChatRepository extends BaseRepository
         $conversation['sender']['name'] = $senderInfo['name'];
         $conversation['sender']['role_name'] = $senderInfo['role_name'];
         $conversation['type'] = Group::NEW_GROUP_MESSAGE_ARRIVED;
+        $conversation['project_id'] = $groupInfo['project_id'];
 
         return $conversation;
     }

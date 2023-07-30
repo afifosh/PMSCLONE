@@ -24,6 +24,7 @@ $configData = Helper::appClasses();
     <link rel="stylesheet" href="{{ asset('chat/assets/css/yBox.min.css') }}">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/video-js.css') }}">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/new-conversation.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/mentiony/jquery.mentiony.css') }}">
 @endsection
 @section('content')
     <div class="page-container">
@@ -273,6 +274,7 @@ $configData = Helper::appClasses();
 <script src="{{ mix('chat/assets/js/emojione.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('chat/assets/js/datetime-picker.js') }}"></script>
 <script src="{{ asset('chat/assets/js/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{ asset('chat/assets/js/jquery.textcomplete.js') }}"></script>
 <script>
     $(document).ready(function () {
         let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

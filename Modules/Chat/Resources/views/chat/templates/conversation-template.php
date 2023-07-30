@@ -52,6 +52,14 @@
                 </div>
             </div>
         </div>
+        <div class="chat__search-wrapper d-none">
+            <div class="chat__search clearfix chat__search--responsive">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" placeholder="<?php echo trans('chat::messages.search') ?>" class="chat__search-input"
+                        id="searchMessageInput">
+                <i class="fa-solid fa-magnifying-glass d-lg-none chat__search-responsive-icon"></i>
+            </div>
+        </div>
         <div class="loading-message chat__area-header-loader d-none">
             <svg width="150px" height="75px" viewBox="0 0 187.3 93.7"
             preserveAspectRatio="xMidYMid meet">
