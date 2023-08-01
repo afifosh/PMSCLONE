@@ -47,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
    */
   public function boot(UrlGenerator $url)
   {
+    // Model::preventLazyLoading(true);
     // Vite::useScriptTagAttributes(fn (string $src, string $url, array|null $chunk, array|null $manifest) => [
     //   'onload' => $src === 'resources/js/app.js' ? 'bootApplication()' : false,
     // ]);

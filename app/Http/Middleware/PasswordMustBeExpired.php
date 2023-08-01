@@ -22,9 +22,7 @@ class PasswordMustBeExpired
     {
         $user = $request->user();
         $passwordChangedAt = new Carbon(($user->password_changed_at) ? $user->password_changed_at : null );
-
-        $security = app(SettingService::class)->getFormattedSettings('security');
-        $passwordExpiresInDays = $security['password_expire_days'] ?? config('auth.password_expire_days');
+        $passwordExpiresInDays = config('auth.password_expire_days');
 
         if (!$user->password_changed_at || Carbon::now()->diffInDays($passwordChangedAt) >= $passwordExpiresInDays) {
            return $next($request);

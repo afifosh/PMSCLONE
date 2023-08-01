@@ -59,7 +59,7 @@
   </div>
   <div class="form-group col-6">
     {{ Form::label('roles', __('Role'), ['class' => 'col-form-label']) }}
-    {!! Form::select('roles[]', $roles, $user->roles, ['class' => 'form-select globalOfSelect2', 'multiple' => 'multiple']) !!}
+    {!! Form::select('roles', $roles, $user->roles, ['class' => 'form-select globalOfSelect2']) !!}
   </div>
 <div class="form-group col-6">
   {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}

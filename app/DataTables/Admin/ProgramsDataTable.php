@@ -42,7 +42,7 @@ class ProgramsDataTable extends DataTable
    */
   public function query(Program $programs): QueryBuilder
   {
-    return $programs->mine();
+    return $programs->mine()->with('parent');
   }
 
   /**

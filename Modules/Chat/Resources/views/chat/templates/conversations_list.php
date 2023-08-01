@@ -1,9 +1,12 @@
 <script id="tmplConversationsList" type="text/x-jsrender">
-    <div class="contact-area">
+    <div class="contact-area" data-chat-pinned={{>contact.is_pinned != 0}}>
         <div class="chat__person-box" data-id="{{:contactId}}" data-is_group="{{:contact.is_group}}" id="user-{{:contactId}}" data-is_my_contact="{{:~checkForMyContact(contactId)}}">
             <div class="position-relative chat__person-box-status-wrapper">
                 {{if !contact.is_group && showStatus}}<div class="chat__person-box-status {{if is_online}} chat__person-box-status--online {{else}} chat__person-box-status--offline{{/if}}"></div>{{/if}}
                 <div class="chat__person-box-avtar chat__person-box-avtar--active">
+                    {{if contact.is_pinned != 0 }}
+                      <i class="fa-solid fa-thumbtack position-absolute"></i>
+                    {{/if}}
                     <img src="{{:contactDetail.photo_url}}" alt="<?php __('chat::messages.person_image') ?>"
                          class="user-avatar-img">
                 </div>

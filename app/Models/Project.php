@@ -90,7 +90,7 @@ class Project extends Model
     if ($total_tasks == 0) {
       return 0;
     }
-    return round(($this->tasks()->where('status', 'Completed')->count() / $total_tasks) * 100, 1);
+    return round(($this->tasks->where('status', 'Completed')->count() / $total_tasks) * 100, 1);
   }
 
   public static function getProjectsStatusesChartData()

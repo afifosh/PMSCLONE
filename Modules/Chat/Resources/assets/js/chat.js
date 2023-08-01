@@ -282,7 +282,8 @@ $(document).ready(function () {
                                 groupOrUserObj.is_online,
                                 0,
                             );
-                            chatPeopleBodyEle.prepend(newUserEle);
+                            // chatPeopleBodyEle.prepend(newUserEle);
+                            addUserToTopOfConversation(null, newUserEle);
                             $('#user-' + groupOrUserObj.id).
                                 addClass('chat__person-box--active');
                         }
@@ -381,32 +382,32 @@ $(document).ready(function () {
                             },
                             ready: function() {
                               if(isGroup){
-                                this.editor.textcomplete([{
-                                    id: 'emojionearea',
-                                    match: /\B#([\-\d\w]*)$/,
-                                    search: function (term, callback) {
-                                        callback(groupOrUserObj.users.filter(user => {
-                                          var chatText = textMessageEle[0].emojioneArea.getText().trim();
-                                          var selectedUsers = chatText.split('#');
-                                          if(user.id == loggedInUserId || selectedUsers.includes(user.email)){
-                                            return false;
-                                          }
-                                          // Convert the keyword and user properties to lowercase for case-insensitive search
-                                          const keywordLowerCase = term.toLowerCase();
-                                          const nameLowerCase = user.name.toLowerCase();
-                                          const emailLowerCase = user.email.toLowerCase();
+                              this.editor.textcomplete([{
+                                id: 'emojionearea',
+                                  match: /\B@([\-\d\w]*)$/,
+                                  search: function (term, callback) {
+                                      callback(groupOrUserObj.users.filter(user => {
+                                        var chatText = textMessageEle[0].emojioneArea.getText().trim();
+                                        var selectedUsers = chatText.split('#');
+                                        if(user.id == loggedInUserId || selectedUsers.includes(user.email)){
+                                          return false;
+                                        }
+                                        // Convert the keyword and user properties to lowercase for case-insensitive search
+                                        const keywordLowerCase = term.toLowerCase();
+                                        const nameLowerCase = user.name.toLowerCase();
+                                        const emailLowerCase = user.email.toLowerCase();
 
-                                          // Check if the keyword is present in either name, or email
-                                          if (nameLowerCase.includes(keywordLowerCase) || emailLowerCase.includes(keywordLowerCase))
-                                          {
-                                            return true; // Include the user in the result
-                                          }
+                                        // Check if the keyword is present in either name, or email
+                                        if (nameLowerCase.includes(keywordLowerCase) || emailLowerCase.includes(keywordLowerCase))
+                                        {
+                                          return true; // Include the user in the result
+                                        }
 
-                                          return false; // Exclude the user from the result
-                                        }));
-                                    },
-                                    template: function (user) {
-                                      return `<div class="d-flex justify-content-start align-items-center">
+                                        return false; // Exclude the user from the result
+                                      }));
+                                  },
+                                  template: function ( user ) {
+                                    return `<div class="d-flex justify-content-start align-items-center">
                                       <div class="avatar-wrapper">
                                         <div class="avatar u-avatar-1 avatar-sm me-1"><img src="${user.photo_url}" alt="Avatar" class="rounded-circle">
                                         </div>
@@ -418,15 +419,17 @@ $(document).ready(function () {
                                         <small class="text-muted">${user.email}</small>
                                       </div>
                                     </div>`
-                                    },
-                                    replace: function (user) {
-                                        return '<b class="bg-primary">#' + user.email + '</b>&nbsp;';
-                                    },
-                                    cache: true,
-                                    index: 1
-                                }]);
-                             }
+                                      return '<span>@' + mention.id + '</span><small>' +mention.name+ '</small>';
+                                  },
+                                  replace: function ( mention ) {
+                                  //  return '@' + mention.ID + '&nbsp;';
+                                      return '<span userid="' + mention.id + '" class="username" contenteditable="false">' + mention.name + "</span> ";
+                                  },
+                                  cache: true,
+                                  index: 1
+                              }]);
                             }
+                          }
                         },
                     });
                     if (lastDraftMsg !== '' && lastDraftMsg !== null) {
@@ -1205,7 +1208,8 @@ $(document).ready(function () {
         let chatEle = $('.chat__person-box--active')
         chatEle.find('.chat__person-box-archive').
             text('Archive Chat');
-        $('#chatPeopleBody').prepend(chatEle);
+        // $('#chatPeopleBody').prepend(chatEle);
+        addUserToTopOfConversation(null, chatEle);
         $('#archivePeopleBody').
             find('.chat__person-box--active').
             remove();
@@ -1494,7 +1498,10 @@ $(document).ready(function () {
 
     function htmlEntities(str)
     {
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      return String(str).replace(/<span\b[^>]*>[\s\S]*?<\/span>|<.*?>/gi, function(match) {
+        return match.startsWith('<span') ? match : match.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      });
+        // return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     window.getSelectedUserUnreadMsgCount = function (userId) {
@@ -1785,8 +1792,18 @@ $(document).ready(function () {
 
     //add latest messaged user to top of conversation
     window.addUserToTopOfConversation = function (userId, userEle) {
-        chatPeopleBodyEle.remove('#user-' + userId);
-        chatPeopleBodyEle.prepend(userEle);
+        if(userId != null){
+          chatPeopleBodyEle.remove('#user-' + userId);
+        }
+
+        const pinnedChats = chatPeopleBodyEle.find("[data-chat-pinned='true']");
+        if (pinnedChats.length > 0) {
+          // If a pinned div exists, append the new div after it
+          pinnedChats.last().after(userEle);
+        } else {
+          // If no pinned div exists, prepend the new div at the beginning
+          chatPeopleBodyEle.prepend(userEle);
+        }
     };
 
     window.Echo.private(`user.${loggedInUserId}`).
@@ -1995,7 +2012,8 @@ $(document).ready(function () {
             let newUserEle = prepareNewConversation(e.from_id,
                 htmlSpecialCharsDecode(e.sender.name), e,
                 e.sender.photo_url);
-            chatPeopleBodyEle.prepend(newUserEle);
+            // chatPeopleBodyEle.prepend(newUserEle);
+            addUserToTopOfConversation(null, newUserEle);
             let userEle = chatPeopleBodyEle.find('#user-' + e.from_id);
             userEle.find('.chat__person-box-status').
                 removeClass('chat__person-box-status--offline').
@@ -2386,7 +2404,8 @@ $(document).ready(function () {
                 selectedUserStatus,
                 (isGroup) ? 1 : 0,
             );
-            chatPeopleBodyEle.prepend(newUserEle);
+            // chatPeopleBodyEle.prepend(newUserEle);
+            addUserToTopOfConversation(null, newUserEle);
             if (!isGroup) {
                 newConversationStartedUserIds.push(selectedUserId)
             }
@@ -3224,6 +3243,7 @@ function reloadConversations (){
                 offset += 10;
                 if (data.success) {
                   $('#infyLoader').hide();
+                  chatPeopleBodyEle.find('.chat__person-box').remove();
                   let latestConversations = data.data.conversations;
                   if (latestConversations.length === 0) {
                       noConversationYetEle.show();
@@ -3496,7 +3516,8 @@ function reloadConversations (){
             '',
             1,
         );
-        chatPeopleBodyEle.prepend(newUserEle);
+        // chatPeopleBodyEle.prepend(newUserEle);
+        addUserToTopOfConversation(null, newUserEle);
         $('#user-' + groupObj.id).find('.chat-message').
             text(msgText);
         $('#user-' + groupObj.id).find('.chat__person-box-count').
@@ -3637,7 +3658,8 @@ function reloadConversations (){
             let newUserEle = prepareNewConversation(e.to_id,
                 htmlSpecialCharsDecode(e.group.name), e,
                 e.group.photo_url, '', 1);
-            chatPeopleBodyEle.prepend(newUserEle);
+            // chatPeopleBodyEle.prepend(newUserEle);
+            addUserToTopOfConversation(null, newUserEle);
             noConversationEle.hide();
         }
     }

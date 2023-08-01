@@ -51,6 +51,7 @@ class MentionedInChatNotification extends Notification implements ShouldQueue
   public function toMail(object $notifiable): MailMessage
   {
     return (new MailMessage)
+      ->subject('You have been mentioned in a chat')
       ->line('You have been mentioned in a chat by ' . $this->mentionedBy->name)
       ->action('Open Chat', $this->actionUrl)
       ->line('Thank you for using our application!');

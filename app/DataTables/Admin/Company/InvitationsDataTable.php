@@ -94,7 +94,7 @@ class InvitationsDataTable extends DataTable
       });
     });
 
-    return $query->with('contactPerson')->orderBy('id', 'DESC');
+    return $query->with(['contactPerson.company.detail', 'role'])->orderBy('id', 'DESC');
   }
 
   protected function makeStatus($status)

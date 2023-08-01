@@ -23,6 +23,22 @@ body.app {
   max-height: 20px;
   overflow: hidden;
 }
+span.username {
+  display: inline;
+  padding: 5px 5px;
+  font-size: 10px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  vertical-align: middle; /* Ensure both elements are vertically aligned in the same line */
+}
+
+/* Specific styles for <span> to make it look like <label> */
+span.username {
+  background-color: #f2f2f2;
+  color: #333;
+}
 .btn-primary {
     background-color: $primary-color !important;
     padding: 0.5rem 1.5rem;

@@ -110,7 +110,7 @@ class ApprovalRequestsDataTable extends DataTable
       return $q->whereNotNull('approved_at');
     });
 
-    return $query->applyRequestFilters()->orderBy('verified_at', 'DESC');
+    return $query->applyRequestFilters()->with(['detail', 'addresses', 'kycDocs', 'bankAccounts'])->orderBy('verified_at', 'DESC');
   }
 
   /**

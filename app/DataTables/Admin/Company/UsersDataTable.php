@@ -113,7 +113,7 @@ class UsersDataTable extends DataTable
     $query->when($this->company_id, function($q){
       $q->where('company_id', $this->company_id);
     });
-    return $query;
+    return $query->with(['company.detail', 'roles']);
     // return $model->with('roles');
   }
 
