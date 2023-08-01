@@ -75,8 +75,7 @@ class AdminUsersController extends Controller
       'email' => ['required', 'string', 'max:255', 'unique:admins,email'],
       'password' => 'sometimes|confirmed',
       'status' => 'required',
-      'roles' => 'required|array',
-      'roles.*' => 'exists:roles,id',
+      'roles' => 'required|exists:roles,id',
       'company_id' => 'required|exists:partner_companies,id',
       'department_id' => 'required|exists:company_departments,id',
       'designation_id' => 'required|exists:company_designations,id',
@@ -97,7 +96,7 @@ class AdminUsersController extends Controller
     $att['email_verified_at'] = $request->boolean('email_verified_at') ? now() : null;
     $user = Admin::create($att);
     $user->notify(new WelcomeNotification($password));
-    $user->syncRoles(array_unique($request->roles));
+    $user->syncRoles([$request->roles]);
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
   }
 
@@ -140,8 +139,7 @@ class AdminUsersController extends Controller
       'email' => ['required', 'string', 'max:255', Rule::unique('admins')->ignore($user->id),],
       'password' => 'sometimes|confirmed',
       'status' => 'required',
-      'roles' => 'required|array',
-      'roles.*' => 'exists:roles,id',
+      'roles' => 'required|exists:roles,id',
       'company_id' => 'required|exists:partner_companies,id',
       'department_id' => 'required|exists:company_departments,id',
       'designation_id' => 'required|exists:company_designations,id',
@@ -155,7 +153,7 @@ class AdminUsersController extends Controller
     }else if(!$request->boolean('email_verified_at')){
       $att['email_verified_at'] = null;
     }
-    $user->syncRoles(array_unique($request->roles));
+    $user->syncRoles([$request->roles]);
     if ($user->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => 'admins-table', 'close' => 'globalModal']);
     }

@@ -63,7 +63,7 @@ class DesignationsDataTable extends DataTable
       });
     });
 
-    return $query;
+    return $query->with(['department.company']);
   }
 
   /**

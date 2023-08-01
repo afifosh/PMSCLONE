@@ -36,7 +36,7 @@ $configData = Helper::appClasses();
       <div class="card">
         <div class="card-body">
           <div class="d-flex justify-content-between">
-            <h6 class="fw-normal mb-2">Total {{ $role->users_count}} users</h6>
+            <h6 class="fw-normal mb-2">Total {{ $role->users->count()}} users</h6>
             <ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
               @forelse ($role->users as $user)
                 @if ($loop->iteration <= 5)

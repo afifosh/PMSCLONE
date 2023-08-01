@@ -24,7 +24,6 @@ $configData = Helper::appClasses();
     <link rel="stylesheet" href="{{ asset('chat/assets/css/yBox.min.css') }}">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/video-js.css') }}">
     <link rel="stylesheet" href="{{ mix('chat/assets/css/new-conversation.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/mentiony/jquery.mentiony.css') }}">
 @endsection
 @section('content')
     <div class="page-container">
@@ -45,7 +44,7 @@ $configData = Helper::appClasses();
                                         <i class="nav-icon group-icon color-green remove-tooltip" data-bs-toggle="tooltip"
                                            data-bs-placement="bottom"
                                            title="{{ __('chat::messages.create_new_group') }}"><img
-                                                    src="{{asset('assets/icons/group.png')}}" width="33" height="33"></i>
+                                                    src="{{asset('chat/assets/icons/group.png')}}" width="33" height="33"></i>
                                     </div>
                                 @elseif($membersCanAddGroup == 1)
                                     <div
@@ -270,7 +269,7 @@ $configData = Helper::appClasses();
 <script src="{{ asset('chat/assets/js/moment-timezone.min.js') }}"></script>
 <script src="{{ asset('chat/assets/icheck/icheck.min.js') }}"></script>
 <script src="https://www.jsviews.com/download/jsviews.min.js"></script>
-<script src="{{ asset('chat/assets/js/emojionearea.js') }}"></script>
+<script src="{{ asset('chat/assets/js/emojioneareav3.js') }}"></script>
 <script src="{{ mix('chat/assets/js/emojione.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('chat/assets/js/datetime-picker.js') }}"></script>
 <script src="{{ asset('chat/assets/js/bootstrap-datetimepicker.min.js') }}"></script>

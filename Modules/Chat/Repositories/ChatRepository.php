@@ -2,6 +2,7 @@
 
 namespace Modules\Chat\Repositories;
 
+use App\Support\InputSanitizer;
 use Modules\Chat\Traits\ImageTrait;
 use Carbon\Carbon;
 use Embed\Embed;
@@ -354,6 +355,7 @@ class ChatRepository extends BaseRepository
      */
     public function sendGroupMessage($input, $toOthers = true)
     {
+      $input['message'] = resolve(InputSanitizer::class)->sanitize($input['message']);
         $input['to_type'] = Group::class;
 
         /** @var Group $group */
@@ -397,22 +399,21 @@ class ChatRepository extends BaseRepository
           $group->project->sendMessageInChat($message, false);
         }
 
-        // check if message contains # and next word is email then send message to that user
-        if(preg_match_all('/#([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/', $input['message'], $matches)){
-          $matches = array_unique($matches[1]);
-          foreach($matches as $email){
-            // check if email is member of group
-            if($group->project_id != null){
-              $project = $group->project;
-              if($project->members()->where('email', $email)->count()){
-                $user = $project->members()->where('email', $email)->first();
-
+        // Extract the mentioned users from the HTML and send them a notification if they are a member of the group
+        if(preg_match_all('/<span\s+userid="([^"]+)"\s+class="username"[^>]*>([^<]+)<\/span>/', $input['message'], $matches, PREG_SET_ORDER)){
+          $mentionedUsers = array_unique(array_column($matches, 1));
+          if(!empty($mentionedUsers)){
+            foreach($mentionedUsers as $mentionedUser){
+              if($group->project_id != null){
+                $project = $group->project;
+                if($project->members()->where('id', $mentionedUser)->count()){
+                  $user = $project->members()->find($mentionedUser);
+                  $user->notify(new MentionedInChatNotification($group, auth()->user()));
+                }
+              }else if($group->users->where('id', $mentionedUser)->count()){
+                $user = $group->users->find($mentionedUser);
                 $user->notify(new MentionedInChatNotification($group, auth()->user()));
               }
-            }else if($group->users->where('email', $email)->count()){
-              $user = $group->users->where('email', $email)->first();
-
-              $user->notify(new MentionedInChatNotification($group, auth()->user()));
             }
           }
         }

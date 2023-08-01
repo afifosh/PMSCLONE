@@ -48,10 +48,9 @@ class AdminsDataTable extends DataTable
         return $row->roles->pluck('name')->implode(', ');
       })
       ->addColumn('pwd_expires', function ($row) {
-        $security = app(SettingService::class)->getFormattedSettings('security');
         $passwordChangedAt = new Carbon(($row->password_changed_at) ? $row->password_changed_at : $row->created_at);
 
-        $passwordExpiresInDays = $security['password_expire_days'] ?? config('auth.password_expire_days');
+        $passwordExpiresInDays = config('auth.password_expire_days');
 
         $days = $passwordExpiresInDays - Carbon::now()->diffInDays($passwordChangedAt);
 

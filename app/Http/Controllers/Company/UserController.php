@@ -20,7 +20,7 @@ class UserController extends Controller
    */
   public function index(UsersDataTable $dataTable)
   {
-    $data['roles'] = Role::where('guard_name', 'web')->withCount('users')->get();
+    $data['roles'] = Role::where('guard_name', 'web')->with('users')->get();
     return $dataTable->render('pages.users.index', $data);
     // view('pages.users.index');
   }
@@ -52,8 +52,7 @@ class UserController extends Controller
       'email' => ['required', 'string', 'max:255', 'unique:users,email'],
       'password' => 'required|confirmed',
       'status' => 'required',
-      'roles' => 'required|array',
-      'roles.*' => 'exists:roles,id',
+      'roles' => 'required|exists:roles,id'
     ]);
     unset($att['roles']);
     if($request->password){
@@ -62,7 +61,7 @@ class UserController extends Controller
       unset($att['password']);
     }
     $user = User::create($att);
-    $user->syncRoles(array_unique($request->roles));
+    $user->syncRoles([$request->roles]);
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalModal']);
   }
 
@@ -106,8 +105,7 @@ class UserController extends Controller
       'email' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id),],
       'status' => 'required',
       'password' => 'sometimes|confirmed',
-      'roles' => 'required|array',
-      'roles.*' => 'exists:roles,id',
+      'roles' => 'required|exists:roles,id'
     ]);
     unset($att['roles']);
     if($request->password){
@@ -115,7 +113,7 @@ class UserController extends Controller
     }else{
       unset($att['password']);
     }
-    $user->syncRoles(array_unique($request->roles));
+    $user->syncRoles([$request->roles]);
     if ($user->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => User::DT_ID, 'close' => 'globalModal']);
     }

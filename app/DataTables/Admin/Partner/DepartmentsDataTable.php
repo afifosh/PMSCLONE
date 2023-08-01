@@ -70,7 +70,7 @@ class DepartmentsDataTable extends DataTable
       return $q->whereIn('company_id', request('filter_organizations'));
     });
 
-    return $query->with('head');
+    return $query->with(['head', 'company']);
   }
 
   /**

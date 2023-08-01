@@ -9,11 +9,17 @@ trait CompanyApprovalBaseLogic
 {
   use RequiresApproval;
 
+  protected static $approversCount;
+
   public function __construct()
   {
     parent::__construct();
 
-    $this->approversRequired = ApprovalLevel::count(); //one approver per approval level
+    if (!isset(static::$approversCount)) {
+      static::$approversCount = ApprovalLevel::count();
+    }
+
+    $this->approversRequired = static::$approversCount; //one approver per approval level
   }
 
   protected function requiresApprovalWhen(array $modifications): bool

@@ -45,7 +45,7 @@ $configData = Helper::appClasses();
                                         <i class="nav-icon group-icon color-green remove-tooltip" data-bs-toggle="tooltip"
                                            data-bs-placement="bottom"
                                            title="{{ __('chat::messages.create_new_group') }}"><img
-                                                    src="{{asset('assets/icons/group.png')}}" width="33" height="33"></i>
+                                                    src="{{asset('chat/assets/icons/group.png')}}" width="33" height="33"></i>
                                     </div>
                                 @elseif($membersCanAddGroup == 1)
                                     <div

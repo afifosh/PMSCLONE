@@ -62,7 +62,7 @@ class ProgramUsersDataTable extends DataTable
     $query->when(request()->program, function ($query) {
       return $query->ofProgram(request()->program);
     });
-    return $query;
+    return $query->with(['addedBy', 'user.designation.department.company']);
   }
 
   /**

@@ -80,9 +80,9 @@ class CompaniesDataTable extends DataTable
   {
     $query = $model->newQuery();
     $query->when($this->approval_requests, function ($query){
-      return $query->where('approval_status', 2);
+       $query->where('approval_status', 2);
     });
-    return $query->with('addedBy');
+    return $query->with(['addedBy', 'addresses', 'bankAccounts', 'kycDocs', 'detail', 'contacts']);
   }
 
   /**

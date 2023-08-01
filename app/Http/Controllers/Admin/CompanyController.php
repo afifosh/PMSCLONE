@@ -51,11 +51,13 @@ class CompanyController extends Controller
 
   public function show(Company $company, InvitationsDataTable $dataTable)
   {
+    $company->load(['detail', 'addresses', 'bankAccounts', 'contacts', 'kycDocs']);
       return $dataTable->render('admin.pages.company.show-profile', compact('company'));
   }
 
   public function showUsers(Company $company, UsersDataTable $dataTable)
   {
+    $company->load(['detail', 'addresses', 'bankAccounts', 'contacts', 'kycDocs']);
     $dataTable->company_id = $company->id;
     $data['statuses'] = User::distinct()->pluck('status', 'status');
     $data['roles'] = Role::where('guard_name', 'web')->distinct()->pluck('name');
@@ -66,6 +68,7 @@ class CompanyController extends Controller
 
   public function showInvitations(Company $company, InvitationsDataTable $dataTable)
   {
+    $company->load(['detail', 'addresses', 'bankAccounts', 'contacts', 'kycDocs']);
     return $dataTable->render('admin.pages.company.show-invitations', compact('company'));
   }
 
@@ -83,7 +86,7 @@ class CompanyController extends Controller
       'status' => 'required',
     ]);
     $company->update($att);
-    auth()->user()->approve($company->modifications()->first());
+    // auth()->user()->approve($company->modifications()->first());
     // $company->approve('name');
     // if ($company->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);

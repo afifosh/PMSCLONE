@@ -82,12 +82,12 @@ class Migration
      */
     public function needed(): bool
     {
-        $ran = $this->migrator->getRepository()->getRan();
-        $all = $this->getAllMigrationFiles();
+        // $ran = $this->migrator->getRepository()->getRan();
+        // $all = $this->getAllMigrationFiles();
 
-        if (count($all) > 0) {
-            return count($all) > count($ran);
-        }
+        // if (count($all) > 0) {
+        //     return count($all) > count($ran);
+        // }
 
         return false;
     }

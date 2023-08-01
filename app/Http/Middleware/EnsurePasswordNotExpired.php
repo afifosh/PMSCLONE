@@ -28,8 +28,7 @@ class EnsurePasswordNotExpired
             'web' => redirect()->route('password.expired.'),
         ];
 
-        $security = app(SettingService::class)->getFormattedSettings('security');
-        $passwordExpiresInDays = $security['password_expire_days'] ?? config('auth.password_expire_days');
+        $passwordExpiresInDays = config('auth.password_expire_days');
 
         if (!$user->password_changed_at || Carbon::now()->diffInDays($passwordChangedAt) >= $passwordExpiresInDays) {
             return $redirects[$guard];
