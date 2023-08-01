@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -32,9 +32,9 @@ use Modules\MailClient\Client\ConnectionType;
 use Modules\MailClient\Client\FolderType;
 use Modules\MailClient\Console\Commands\EmailAccountsSyncCommand;
 use Modules\MailClient\Criteria\EmailAccountsForUserCriteria;
-use Modules\MailClient\Events\EmailAccountMessageCreated;
-use Modules\MailClient\Listeners\AttachEmailAccountMessageToContact;
-use Modules\MailClient\Listeners\CreateContactFromEmailAccountMessage;
+// use Modules\MailClient\Events\EmailAccountMessageCreated;
+// use Modules\MailClient\Listeners\AttachEmailAccountMessageToContact;
+// use Modules\MailClient\Listeners\CreateContactFromEmailAccountMessage;
 use Modules\MailClient\Listeners\CreateEmailAccountViaOAuth;
 use Modules\MailClient\Listeners\StopRelatedOAuthEmailAccounts;
 use Modules\MailClient\Listeners\TransferMailClientUserData;
@@ -60,12 +60,11 @@ class MailClientServiceProvider extends ServiceProvider
         $this->registerPermissions();
 
         $this->app['events']->listen(OAuthAccountConnected::class, CreateEmailAccountViaOAuth::class);
-        $this->app['events']->listen(EmailAccountMessageCreated::class, CreateContactFromEmailAccountMessage::class);
-        $this->app['events']->listen(EmailAccountMessageCreated::class, AttachEmailAccountMessageToContact::class);
         $this->app['events']->listen(OAuthAccountDeleting::class, StopRelatedOAuthEmailAccounts::class);
         $this->app['events']->listen(TransferringUserData::class, TransferMailClientUserData::class);
 
         $this->app->booted(function () {
+            $this->registerResources();
             Innoclapps::whenReadyForServing($this->bootModule(...));
         });
 
@@ -138,21 +137,28 @@ class MailClientServiceProvider extends ServiceProvider
      */
     public function scheduleTasks(): void
     {
+        /** @var \Illuminate\Console\Scheduling\Schedule */
         $schedule = $this->app->make(Schedule::class);
 
-        if (function_exists('proc_open') && function_exists('proc_close')) {
+        $syncOutputPath = storage_path('logs/email-accounts-sync.log');
+        $syncCommandCronExpression = config('mailclient.sync.interval');
+        $syncCommandName = 'sync-email-accounts';
+
+        // if (Innoclapps::canRunProcess()) {
+        if (function_exists('proc_open') && function_exists('proc_close')){
             $schedule->command(EmailAccountsSyncCommand::class, ['--broadcast', '--isolated' => 5])
-                ->cron(config('mailclient.sync.interval'))
+                ->cron($syncCommandCronExpression)
+                ->name($syncCommandName)
                 ->withoutOverlapping(30)
-                ->sendOutputTo(storage_path('logs/email-accounts-sync.log'));
+                ->sendOutputTo($syncOutputPath);
         } else {
             $schedule->call(function () {
-                Artisan::call(EmailAccountsSyncCommand::class, ['--broadcast', '--isolated' => 5]);
+                Artisan::call(EmailAccountsSyncCommand::class, ['--broadcast' => true, '--isolated' => 5]);
             })
-                ->cron(config('mailclient.sync.interval'))
-                ->name('sync-email-accounts')
+                ->cron($syncCommandCronExpression)
+                ->name($syncCommandName)
                 ->withoutOverlapping(30)
-                ->sendOutputTo(storage_path('logs/email-accounts-sync.log'));
+                ->sendOutputTo($syncOutputPath);
         }
     }
 

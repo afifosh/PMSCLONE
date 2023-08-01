@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -25,7 +25,15 @@ use Modules\Core\Table\Table;
 class IncomingMessageTable extends Table
 {
     /**
-     * Provides table available default columns
+     * Additional database columns to select for the table query.
+     */
+    protected array $select = [
+        'is_read',
+        'email_account_id', // uri key for json resource
+    ];
+
+    /**
+     * Provide the table available default columns.
      */
     public function columns(): array
     {
@@ -47,7 +55,7 @@ class IncomingMessageTable extends Table
         return [
             TextFilter::make('subject', __('mailclient::inbox.subject')),
 
-            TextFilter::make('to', __('mailclient::inbox.to'))->withoutEmptyOperators()
+            TextFilter::make('to', __('mailclient::inbox.to'))->withoutNullOperators()
                 ->query(function ($builder, $value, $condition, $sqlOperator) {
                     return $builder->whereHas(
                         'from',
@@ -65,7 +73,7 @@ class IncomingMessageTable extends Table
                     );
                 }),
 
-            TextFilter::make('from', __('mailclient::inbox.from'))->withoutEmptyOperators()
+            TextFilter::make('from', __('mailclient::inbox.from'))->withoutNullOperators()
                 ->query(function ($builder, $value, $condition, $sqlOperator) {
                     return $builder->whereHas(
                         'to',
@@ -89,17 +97,6 @@ class IncomingMessageTable extends Table
                 true => __('core::app.yes'),
                 false => __('core::app.no'),
             ]),
-        ];
-    }
-
-    /**
-     * Additional fields to be selected with the query
-     */
-    public function addSelect(): array
-    {
-        return [
-            'is_read',
-            'email_account_id', // uri key for json resource
         ];
     }
 

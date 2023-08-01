@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -43,7 +43,7 @@ class EmailAccountSync extends ApiController
 
         return $this->response(
             new EmailAccountResource(
-                EmailAccount::withResponseRelations()->find($accountId)
+                EmailAccount::withCommon()->find($accountId)
             )
         );
     }

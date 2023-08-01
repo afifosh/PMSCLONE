@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -67,14 +67,12 @@ class EmailAccountMessage extends Model implements Presentable
     ];
 
     /**
-     * The fields for the model that are searchable.
+     * The columns for the model that are searchable.
      */
-    protected static array $searchableFields = [
+    protected static array $searchableColumns = [
         'subject' => 'like',
-        'text_body' => 'like',
-        'html_body' => 'like',
-        'from.address' => 'like',
-        'from.name' => 'like',
+        'from.address',
+        'from.name',
     ];
 
     /**
@@ -247,6 +245,14 @@ class EmailAccountMessage extends Model implements Presentable
     }
 
     /**
+     * Get the timeline sort column.
+     */
+    public function getTimelineSortColumn(): string
+    {
+        return 'date';
+    }
+
+    /**
      * Get the message attachments excluding the inline
      */
     public function attachments(): MorphToMany
@@ -319,10 +325,8 @@ class EmailAccountMessage extends Model implements Presentable
 
     /**
      * Mark a message as read
-     *
-     * @param  int|null  $folderId
      */
-    public function markAsRead($folderId = null): static
+    public function markAsRead(?int $folderId = null): static
     {
         if ($this->is_read) {
             return $this;
@@ -345,10 +349,8 @@ class EmailAccountMessage extends Model implements Presentable
 
     /**
      * Mark a message as unread
-     *
-     * @param  int|null  $folderId
      */
-    public function markAsUnread($folderId): static
+    public function markAsUnread(?int $folderId = null): static
     {
         if (! $this->is_read) {
             return $this;
@@ -387,6 +389,24 @@ class EmailAccountMessage extends Model implements Presentable
     }
 
     /**
+     * Scope a query to include only unread messages.
+     */
+    public function scopeUnread(Builder $query)
+    {
+        // is_read = 0 causes slow performance, use is_read < 1 for better performance
+        $query->where('is_read', '<', 1);
+    }
+
+    /**
+     * Scope a query to include only read messages.
+     */
+    public function scopeRead(Builder $query)
+    {
+        // is_read = 1 causes slow performance, use is_read > 0 for better performance
+        $query->where('is_read', '>', 0);
+    }
+
+    /**
      * Scope a query to include only messages of the given folder.
      */
     public function scopeOfFolder(Builder $query, int|string $folderId): void
@@ -409,7 +429,7 @@ class EmailAccountMessage extends Model implements Presentable
     /**
      * Eager load the relations that are required for the front end response.
      */
-    public function scopeWithResponseRelations(Builder $query): void
+    public function scopeWithCommon(Builder $query): void
     {
         $query->with([
             'headers',
@@ -423,7 +443,7 @@ class EmailAccountMessage extends Model implements Presentable
             'folders',
             'account',
             'account.folders' => fn ($query) => $query->withCount([
-                'messages as unread_count' => fn ($query) => $query->where('is_read', false),
+              'messages as unread_count' => fn ($query) => $query->unread(),
             ]),
             // 'contacts.nextActivity',
             // 'companies.nextActivity',

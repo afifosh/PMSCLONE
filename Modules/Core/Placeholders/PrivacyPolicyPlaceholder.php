@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -15,9 +15,14 @@ namespace Modules\Core\Placeholders;
 class PrivacyPolicyPlaceholder extends UrlPlaceholder
 {
     /**
-     * The placeholder tag
+     * Initialize new PrivacyPolicyPlaceholder instance.
      */
-    public string $tag = 'privacy_policy';
+    public function __construct(string $tag = 'privacy_policy')
+    {
+        parent::__construct(null, $tag);
+
+        $this->description(__('core::app.privacy_policy'));
+    }
 
     /**
      * Format the placeholder
@@ -27,15 +32,5 @@ class PrivacyPolicyPlaceholder extends UrlPlaceholder
     public function format(?string $contentType = null)
     {
         return privacy_url();
-    }
-
-    /**
-     * Boot the placeholder and set default values
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->description(__('core::app.privacy_policy'));
     }
 }

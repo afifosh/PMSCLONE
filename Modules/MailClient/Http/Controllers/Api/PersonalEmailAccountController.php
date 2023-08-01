@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -25,7 +25,7 @@ class PersonalEmailAccountController extends ApiController
      */
     public function __invoke(Request $request): JsonResponse
     {
-        $accounts = EmailAccount::withResponseRelations()
+        $accounts = EmailAccount::withCommon()
             ->personal((int) $request->user()->id)
             ->orderBy('email')
             ->get();

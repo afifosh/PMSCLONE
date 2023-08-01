@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -45,7 +45,7 @@ class GlobalSearch implements JsonSerializable
                         ->take($resource->globalSearchResultsLimit)
                         ->get()
                         ->whereInstanceOf(Presentable::class)
-                        ->map(function ($model) use ($resource) {
+                        ->map(function (Model&Presentable $model) use ($resource) {
                             return $this->data($model, $resource);
                         }),
                 ]);

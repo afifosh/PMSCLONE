@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -12,6 +12,8 @@
 
 namespace Modules\MailClient\Services;
 
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Arr;
 use Modules\MailClient\Client\ConnectionType;
 use Modules\MailClient\Client\FolderCollection;
 use Modules\MailClient\Models\EmailAccount;
@@ -52,8 +54,22 @@ class EmailAccountService
 
     public function update(EmailAccount $model, array $attributes): EmailAccount
     {
-        $model->fill($attributes);
-        $model->save();
+        // This may happen if for some reason Laravel failed to decrypt an IMAP account password
+        // The user may provide new password via account update, however, as Laravel is accessing
+        // the attributes to store their original value, will throw an exception on the original invalid password,
+        // in this case if this happens, we will remove the password from the attributes array and re-fill the model
+        // again with the newly provided password from the user.
+        if ($oldPassword = $model->getRawOriginal('password')) {
+            try {
+                $model->fromEncryptedString($oldPassword);
+            } catch (DecryptException) {
+                $modelAttributes = $model->getAttributes();
+                Arr::forget($modelAttributes, 'password');
+                $model->setRawAttributes($modelAttributes, true);
+            }
+        }
+
+        $model->fill($attributes)->save();
 
         if (isset($attributes['from_name_header'])) {
             $model->setMeta('from_name_header', $attributes['from_name_header']);

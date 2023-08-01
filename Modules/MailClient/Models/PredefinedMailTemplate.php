@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -57,6 +57,14 @@ class PredefinedMailTemplate extends Model
         $query->where(function ($query) use ($userId) {
             $query->where('user_id', $userId ?: Auth::id())->orWhere('is_shared', true);
         });
+    }
+
+    /**
+     * Scope a query to only include shared templates.
+     */
+    public function scopeShared(Builder $query): void
+    {
+        $query->where('is_shared', true);
     }
 
     /**

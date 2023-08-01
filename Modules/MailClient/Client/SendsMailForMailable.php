@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -42,7 +42,7 @@ trait SendsMailForMailable
          * First, we will check if unit tests are running or tne environment is set to local
          * if yes, we will fallback to the Laravel default mail driver that is currently set
          */
-        if (app()->runningUnitTests() || app()->environment('local')) {
+        if (app()->runningUnitTests() || app()->isLocal()) {
             return parent::send($mailer);
         }
 

@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -13,6 +13,7 @@
 namespace Modules\MailClient\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Modules\Core\Facades\OAuthState;
 use Modules\Core\OAuth\OAuthManager;
@@ -27,7 +28,7 @@ class OAuthEmailAccountController extends Controller
      * @param  string  $providerName
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function connect($type, $providerName, Request $request, OAuthManager $manager)
+    public function connect(string $type, string $providerName, Request $request, OAuthManager $manager): RedirectResponse
     {
         abort_if(
             ! $request->user()->isSuperAdmin() && EmailAccountType::from($type) === EmailAccountType::SHARED,
@@ -41,13 +42,8 @@ class OAuthEmailAccountController extends Controller
 
     /**
      * Create state
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $type
-     * @param  \Modules\Core\OAuth\OAuthManager  $manager
-     * @return string
      */
-    protected function createState($request, $type, $manager)
+    protected function createState(Request $request, string $type, OAuthManager $manager): string
     {
         return OAuthState::putWithParameters([
             'return_url' => '/mail/accounts?viaOAuth=true',

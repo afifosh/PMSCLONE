@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -16,6 +16,7 @@ use Ddeboer\Imap\Exception\UnexpectedEncodingException;
 use Ddeboer\Imap\Exception\UnsupportedCharsetException;
 use Illuminate\Support\Str;
 use Modules\Core\Synchronization\SyncState;
+use Modules\MailClient\Models\EmailAccountMessage;
 use Modules\MailClient\Synchronization\Exceptions\SyncFolderTimeoutException;
 
 class ImapEmailAccountSynchronization extends EmailAccountSynchronization
@@ -33,11 +34,9 @@ class ImapEmailAccountSynchronization extends EmailAccountSynchronization
     /**
      * Start account messages synchronization
      *
-     * @return void
-     *
      * @throws \Modules\MailClient\Synchronization\Exceptions\SyncFolderTimeoutException
      */
-    public function syncMessages()
+    public function syncMessages(): void
     {
         $this->checkForRemovedMessages();
 
@@ -184,13 +183,10 @@ class ImapEmailAccountSynchronization extends EmailAccountSynchronization
                 continue;
             }
 
-            // All local database stored UID's and their ID's
-            $databaseUids = $this->getDatabaseMessages($folder);
-
             // Remote folder all UID's
             $allFolderUids = $remoteFolder->getAllUids();
 
-            foreach ($databaseUids as $message) {
+            foreach (EmailAccountMessage::ofFolder($folder->id)->lazy() as $message) {
                 if (! $allFolderUids->contains($message->remote_id)) {
                     $this->addMessageToDeleteQueue($message->remote_id, $folder);
                 }

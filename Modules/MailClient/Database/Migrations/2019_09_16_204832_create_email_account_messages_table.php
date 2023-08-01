@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -35,7 +35,7 @@ return new class extends Migration
             }
 
             $table->char('hash', 32)->index()->nullable();
-            $table->string('subject', 256)->nullable();
+            $table->string('subject', 256)->index()->nullable();
             $table->mediumText('html_body')->nullable();
             $table->mediumText('text_body')->nullable();
             $table->boolean('is_draft')->default(false);

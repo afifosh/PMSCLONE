@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -57,7 +57,9 @@ class EmailMessage extends Resource implements Tableable
      */
     public function globalSearchQuery(Builder $query = null): Builder
     {
-        return parent::globalSearchQuery($query)->with(['folders', 'account']);
+        return parent::globalSearchQuery($query)
+            ->select(['id', 'subject', 'email_account_id', 'created_at'])
+            ->with(['folders', 'account']);
     }
 
     /**
@@ -91,7 +93,7 @@ class EmailMessage extends Resource implements Tableable
     {
         $query = parent::associatedIndexQuery($primary, $applyOrder);
 
-        return $query->withResponseRelations()
+        return $query->withCommon()
             ->whereHas('folders.account', function ($query) {
                 return $query->whereColumn('folder_id', '!=', 'trash_folder_id');
             });

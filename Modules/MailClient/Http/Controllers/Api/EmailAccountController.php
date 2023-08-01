@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -28,7 +28,7 @@ class EmailAccountController extends ApiController
      */
     public function index(): JsonResponse
     {
-        $accounts = EmailAccount::withResponseRelations()
+        $accounts = EmailAccount::withCommon()
             ->criteria(EmailAccountsForUserCriteria::class)
             ->get();
         return $this->response(
@@ -41,7 +41,7 @@ class EmailAccountController extends ApiController
      */
     public function show(string $id): JsonResponse
     {
-        $account = EmailAccount::withResponseRelations()->findOrFail($id);
+        $account = EmailAccount::withCommon()->findOrFail($id);
 
         $this->authorize('view', $account);
 
@@ -55,7 +55,7 @@ class EmailAccountController extends ApiController
     {
         $model = $service->create($request->all());
 
-        $account = EmailAccount::withResponseRelations()->find($model->id);
+        $account = EmailAccount::withCommon()->find($model->id);
 
         $account->wasRecentlyCreated = true;
 
@@ -78,7 +78,7 @@ class EmailAccountController extends ApiController
         $service->update($account, $request->except($except));
 
         return $this->response(
-            new EmailAccountResource(EmailAccount::withResponseRelations()->find($account->id))
+            new EmailAccountResource(EmailAccount::withCommon()->find($account->id))
         );
     }
 

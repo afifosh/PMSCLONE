@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -18,6 +18,7 @@ use Modules\Core\Contracts\Resources\ResourcefulRequestHandler;
 use Modules\Core\Contracts\Services\CreateService;
 use Modules\Core\Contracts\Services\DeleteService;
 use Modules\Core\Contracts\Services\UpdateService;
+use Modules\Core\Criteria\FilterRulesCriteria;
 use Modules\Core\Models\Model;
 use Modules\Core\Resource\Events\ResourceRecordCreated;
 use Modules\Core\Resource\Events\ResourceRecordUpdated;
@@ -44,6 +45,9 @@ class ResourcefulHandler implements ResourcefulRequestHandler
         if ($criteria = $this->resource()->viewAuthorizedRecordsCriteria()) {
             $query->criteria($criteria);
         }
+
+        // Allow passing filters to the index query or passing the filter ID
+        $query->criteria($this->createFiltersCriteria());
 
         return $this->resource()->indexQuery(
             $this->resource()->order($query)
@@ -134,6 +138,18 @@ class ResourcefulHandler implements ResourcefulRequestHandler
     public function restore(Model $model): void
     {
         $model->restore();
+    }
+
+    /**
+     * Create filters criteria.
+     */
+    protected function createFiltersCriteria(): FilterRulesCriteria
+    {
+        return new FilterRulesCriteria(
+            $this->request->get('filters', []),
+            $this->resource()->filtersForResource($this->request),
+            $this->request
+        );
     }
 
     /**

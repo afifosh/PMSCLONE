@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -29,6 +29,8 @@ class EmailAccountResource extends JsonResource
     {
         return $this->withCommonData([
             'email' => $this->email,
+            'alias_email' => $this->alias_email,
+            'display_email' => $this->display_email,
             'connection_type' => $this->connection_type,
             'requires_auth' => $this->requires_auth,
             'sync_state_comment' => $this->sync_state_comment,
@@ -37,6 +39,7 @@ class EmailAccountResource extends JsonResource
             'is_initial_sync_performed' => $this->isInitialSyncPerformed(),
             'is_sync_disabled' => $this->isSyncDisabled(),
             'is_sync_stopped' => $this->isSyncStoppedBySystem(),
+            'is_primary' => $this->isPrimary(), // for current user
             'type' => $this->type,
             'is_shared' => $this->isShared(),
             'is_personal' => $this->isPersonal(),

@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -24,6 +24,7 @@ use Modules\MailClient\Client\Compose\AbstractComposer;
 use Modules\MailClient\Client\Compose\Message;
 use Modules\MailClient\Client\Compose\MessageForward;
 use Modules\MailClient\Client\Compose\MessageReply;
+use Modules\MailClient\Client\Exceptions\ConnectionErrorException;
 use Modules\MailClient\Client\Exceptions\FolderNotFoundException;
 use Modules\MailClient\Client\Exceptions\MessageNotFoundException;
 use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
@@ -33,7 +34,6 @@ use Modules\MailClient\Http\Resources\EmailAccountMessageResource;
 use Modules\MailClient\Models\EmailAccount;
 use Modules\MailClient\Models\EmailAccountMessage;
 use Modules\MailClient\Services\EmailAccountMessageSyncService;
-use Modules\MailClient\Support\MailTracker;
 
 class EmailAccountMessagesController extends ApiController
 {
@@ -52,7 +52,7 @@ class EmailAccountMessagesController extends ApiController
     {
         $this->authorize('view', EmailAccount::findOrFail($accountId));
 
-        $messages = EmailAccountMessage::withResponseRelations()
+        $messages = EmailAccountMessage::withCommon()
             ->criteria(new EmailAccountMessageCriteria($accountId, $folderId))
             ->paginate($request->integer('per_page', null));
 
@@ -141,7 +141,7 @@ class EmailAccountMessagesController extends ApiController
      */
     public function show($folderId, $id)
     {
-        $message = EmailAccountMessage::withResponseRelations()->findOrFail($id);
+        $message = EmailAccountMessage::withCommon()->findOrFail($id);
 
         $this->authorize('view', $message->account);
 
@@ -158,7 +158,7 @@ class EmailAccountMessagesController extends ApiController
         // Reload the account and all it's relationship so the unread_count of the folders
         // is updated  in case the message was marked as read above.
         $message->load(['account' => function ($query) {
-            $query->withResponseRelations();
+            $query->withCommon();
         }]);
         return view('admin.pages.emails.view-email',compact('message'))->render();
 
@@ -194,7 +194,7 @@ class EmailAccountMessagesController extends ApiController
      */
     public function read($messageId)
     {
-        $message = EmailAccountMessage::withResponseRelations()->find($messageId);
+        $message = EmailAccountMessage::withCommon()->find($messageId);
 
         $message->markAsRead();
 
@@ -211,7 +211,7 @@ class EmailAccountMessagesController extends ApiController
      */
     public function unread($messageId)
     {
-        $message = EmailAccountMessage::withResponseRelations()->find($messageId);
+        $message = EmailAccountMessage::withCommon()->find($messageId);
 
         $message->markAsUnread();
 
@@ -238,11 +238,12 @@ class EmailAccountMessagesController extends ApiController
                 ->to($request->to)
                 ->bcc($request->bcc)
                 ->cc($request->cc)
-                ->htmlBody($request->message);
-
-            (new MailTracker)->createTrackers($composer);
+                ->htmlBody($request->message)
+                ->withTrackers();
 
             $message = $composer->send();
+        } catch (ConnectionErrorException $e) {
+          return $this->response(['message' => "A connection error occured, re-authenticate or try again later.{$e->getMessage()}"], 409);
         } catch (MessageNotFoundException) {
             return $this->response(['message' => 'The message does not exist on remote server.'], 409);
         } catch (FolderNotFoundException) {
@@ -259,7 +260,7 @@ class EmailAccountMessagesController extends ApiController
             );
 
             $jsonResource = new EmailAccountMessageResource(
-                EmailAccountMessage::withResponseRelations()->find($dbMessage->id)
+                EmailAccountMessage::withCommon()->find($dbMessage->id)
             );
 
             return $this->response([

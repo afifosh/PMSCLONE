@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -100,7 +100,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      * @var array
      */
     protected $fillable = [
-        'email', 'password', 'connection_type',
+        'email', 'alias_email', 'password', 'connection_type',
         'last_sync_at', 'requires_auth', 'initial_sync_from',
         'sent_folder_id', 'trash_folder_id', 'create_contact',
         // imap
@@ -250,11 +250,13 @@ class EmailAccount extends Model implements Metable, Primaryable
     }
 
     /**
-     * Check whether the account is primary account for the current logged in user
+     * Check whether the account is primary account for the given or current user
      */
-    public function isPrimary(): bool
+    public function isPrimary(Metable $user = null): bool
     {
-        return (int) auth()->user()->getMeta(self::PRIMARY_META_KEY) === $this->id;
+        $user = $user ?? auth()->user();
+
+        return (int) $user->getMeta(self::PRIMARY_META_KEY) === (int) $this->id;
     }
 
     /**
@@ -285,6 +287,14 @@ class EmailAccount extends Model implements Metable, Primaryable
 
             return empty($meta) ? static::DEFAULT_FROM_NAME_HEADER : $meta;
         });
+    }
+
+    /**
+     * Get the email address that should be used to the account owner.
+     */
+    public function displayEmail(): Attribute
+    {
+        return Attribute::get(fn () => $this->alias_email ?? $this->email);
     }
 
     /**
@@ -351,7 +361,7 @@ class EmailAccount extends Model implements Metable, Primaryable
             );
         }
 
-        $client->setFromAddress($this->email)->setFromName($this->formatted_from_name_header);
+        $client->setFromAddress($this->display_email)->setFromName($this->formatted_from_name_header);
 
         return $client;
     }
@@ -398,17 +408,17 @@ class EmailAccount extends Model implements Metable, Primaryable
     public function scopeWithFolders(Builder $query): void
     {
         $query->with(['folders' => fn ($query) => $query->withCount([
-            'messages as unread_count' => fn ($query) => $query->where('is_read', false),
+            'messages as unread_count' => fn ($query) => $query->unread(),
         ])]);
     }
 
     /**
      * Eager load the relations that are required for the front end response.
      */
-    public function scopeWithResponseRelations(Builder $query): void
+    public function scopeWithCommon(Builder $query): void
     {
         $query->withCount([
-            'messages as unread_count' => fn ($query) => $query->where('is_read', false),
+            'messages as unread_count' => fn ($query) => $query->unread(),
         ])->withFolders()->with([
             'user',
             'sentFolder',
@@ -458,18 +468,18 @@ class EmailAccount extends Model implements Metable, Primaryable
      */
     public static function countUnreadMessagesForUser(ModelsUser|User|int $user): int
     {
-        /** @var int */
-        $result = static::select('id')
+        $userAccounts = static::select('id')
             ->criteria(new EmailAccountsForUserCriteria($user))
-            ->withCount(['messages' => function ($query) {
-                return $query->where('is_read', 0)
-                    ->whereHas('folders', fn ($folderQuery) => $folderQuery->where('syncable', true));
-            }])
-            ->groupBy('id')
-            ->get()
-            ->reduce(fn ($carry, $item) => $carry + $item['messages_count'], 0);
+            ->get();
 
-        return $result;
+        if ($userAccounts->isEmpty()) {
+            return 0;
+        }
+
+        return EmailAccountMessage::unread()
+            ->whereHas('folders', fn ($query) => $query->where('syncable', 1))
+            ->whereIn('email_account_id', $userAccounts->pluck('id')->all())
+            ->count();
     }
 
     /**
@@ -477,7 +487,7 @@ class EmailAccount extends Model implements Metable, Primaryable
      */
     public static function countUnreadMessages(int $id): int
     {
-        return static::countReadOrUnreadMessages($id, false);
+        return static::countReadOrUnreadMessages($id, 'unread');
     }
 
     /**
@@ -485,16 +495,16 @@ class EmailAccount extends Model implements Metable, Primaryable
      */
     public static function countReadMessages(int $id): int
     {
-        return static::countReadOrUnreadMessages($id, true);
+      return static::countReadOrUnreadMessages($id, 'read');
     }
 
     /**
      * Count read or unread messages for the given account.
      */
-    protected static function countReadOrUnreadMessages(int $id, int|bool $isRead): int
+    protected static function countReadOrUnreadMessages(int $id, string $scope): int
     {
         return EmailAccountMessage::where('email_account_id', $id)
-            ->where('is_read', $isRead)
+            ->{$scope}()
             ->count();
     }
 

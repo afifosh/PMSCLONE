@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -26,13 +26,14 @@ use Modules\Core\Facades\Fields;
 use Modules\Core\Facades\Innoclapps;
 use Modules\Core\Facades\Menu;
 use Modules\Core\Fields\CustomFieldFactory;
-use Modules\Core\Models\Model;
+use Modules\Core\Fields\Field;
 use Modules\Core\ResolvesActions;
 use Modules\Core\ResolvesFilters;
 use Modules\Core\Resource\Http\ResourceRequest;
 use Modules\Core\Resource\Import\Import;
 use Modules\Core\Resource\Import\ImportSample;
 use Modules\Core\Settings\SettingsMenu;
+use Modules\Core\Table\ID;
 
 abstract class Resource implements JsonSerializable
 {
@@ -73,6 +74,8 @@ abstract class Resource implements JsonSerializable
 
     /**
      * The model the resource is related to.
+     *
+     * @var \Modules\Core\Models\Model|null
      */
     public static string $model;
 
@@ -82,6 +85,8 @@ abstract class Resource implements JsonSerializable
      * @var \Modules\Core\Models\Model|null
      */
     public $resource;
+
+    protected static array $registered = [];
 
     /**
      * Record finder instance.
@@ -93,7 +98,7 @@ abstract class Resource implements JsonSerializable
      */
     public function __construct()
     {
-        $this->register();
+        $this->registerIfNotRegistered();
     }
 
     /**
@@ -219,7 +224,7 @@ abstract class Resource implements JsonSerializable
     {
         return $this->resolveFields()->reject(function ($field) use ($request) {
             return $field->excludeFromZapierResponse && $request->isZapier();
-        })->filter(function ($field) use ($canSeeResource) {
+        })->filter(function (Field $field) use ($canSeeResource) {
             if (! $canSeeResource) {
                 return $field->alwaysInJsonResource === true;
             }
@@ -367,7 +372,7 @@ abstract class Resource implements JsonSerializable
     {
         return Innoclapps::registeredResources()
             ->reject(fn ($resource) => is_null($resource->associateableName()))
-            ->filter(fn ($resource) => app(static::$model)->isRelation($resource->associateableName()))
+            ->filter(fn ($resource) => static::newModel()->isRelation($resource->associateableName()))
             ->values();
     }
 
@@ -396,7 +401,7 @@ abstract class Resource implements JsonSerializable
      */
     public static function searchable(): bool
     {
-        return ! empty(static::newModel()->getSearchableFields());
+        return ! empty(static::newModel()->getSearchableColumns());
     }
 
     /**
@@ -456,6 +461,14 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
+     * Create ID field instance for the resource.
+     */
+    public function idField()
+    {
+        return ID::make(__('core::app.id'), $this->newModel()->getKeyName());
+    }
+
+    /**
      * Register the resource available menu items
      */
     protected function registerMenuItems(): void
@@ -510,13 +523,27 @@ abstract class Resource implements JsonSerializable
      */
     public function finder(): RecordFinder
     {
-        if ($this->finder) {
-            return $this->finder;
-        }
+        return $this->finder ??= new RecordFinder($this->newModel());
+    }
 
-        return $this->finder = new RecordFinder(
-            $this->newModel()
-        );
+    /**
+     * Clear the registered resource.
+     */
+    public static function clearRegisteredResources(): void
+    {
+        static::$registered = [];
+    }
+
+    /**
+     * Register the resource if not registered.
+     */
+    protected function registerIfNotRegistered(): void
+    {
+        if (! isset(static::$registered[static::class])) {
+            $this->register();
+
+            static::$registered[static::class] = true;
+        }
     }
 
     /**
@@ -525,12 +552,11 @@ abstract class Resource implements JsonSerializable
     protected function register(): void
     {
         $this->registerPermissions();
+        $this->registerCards();
 
         if ($this instanceof Resourceful) {
             $this->registerFields();
         }
-
-        $this->registerCards();
 
         Innoclapps::booting(function () {
             $this->registerMenuItems();
