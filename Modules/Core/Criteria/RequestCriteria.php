@@ -502,6 +502,6 @@ class RequestCriteria implements QueryCriteria
             return false;
         }
 
-        return $this->request->isZapier();
+        return false;
     }
 }

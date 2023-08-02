@@ -18,6 +18,5 @@ class DatabaseSeeder extends Seeder
         $this->call(CreatePermissionSeeder::class);
         $this->call(AddPWAIconFieldSettingSeeder::class);
         $this->call(SetIsDefaultSuperAdminSeeder::class);
-        $this->call(AddDefaultSettingSeeder::class);
     }
 }

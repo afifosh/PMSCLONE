@@ -35,7 +35,7 @@ trait Resourceable
      */
     protected static function bootResourceable(): void
     {
-        if (! Innoclapps::isAppInstalled() || ! $resource = static::resource()) {
+        if (! $resource = static::resource()) {
             return;
         }
 

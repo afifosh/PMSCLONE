@@ -66,7 +66,7 @@ class JsonResource extends BaseJsonResource
             ];
         });
 
-        if (! $request->isZapier()) {
+        if (true) {
             if (Timelineables::isTimelineable($this->resource)) {
                 $data[] = $this->merge([
                     'timeline_component' => $this->getTimelineComponent(),

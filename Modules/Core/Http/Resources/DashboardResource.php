@@ -26,7 +26,6 @@ class DashboardResource extends JsonResource
         return $this->withCommonData([
             'name' => $this->name,
             'is_default' => $this->is_default,
-            'cards' => $this->cards,
             'user_id' => $this->user_id,
         ], $request);
     }

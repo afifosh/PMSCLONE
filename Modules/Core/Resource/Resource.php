@@ -21,7 +21,6 @@ use Modules\Core\Contracts\Resources\Resourceful;
 use Modules\Core\Contracts\Resources\ResourcefulRequestHandler;
 use Modules\Core\Contracts\Services\Service;
 use Modules\Core\Criteria\RequestCriteria;
-use Modules\Core\Facades\Cards;
 use Modules\Core\Facades\Fields;
 use Modules\Core\Facades\Innoclapps;
 use Modules\Core\Facades\Menu;
@@ -144,14 +143,6 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
-     * Provide the resource available cards
-     */
-    public function cards(): array
-    {
-        return [];
-    }
-
-    /**
      *  Get the filters intended for the resource
      *
      * @return \Illuminate\Support\Collection
@@ -223,7 +214,7 @@ abstract class Resource implements JsonSerializable
     public function getFieldsForJsonResource($request, $model, $canSeeResource = true)
     {
         return $this->resolveFields()->reject(function ($field) use ($request) {
-            return $field->excludeFromZapierResponse && $request->isZapier();
+            return false;
         })->filter(function (Field $field) use ($canSeeResource) {
             if (! $canSeeResource) {
                 return $field->alwaysInJsonResource === true;
@@ -493,14 +484,6 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
-     * Register the resource available cards
-     */
-    protected function registerCards(): void
-    {
-        Cards::register($this->name(), $this->cards(...));
-    }
-
-    /**
      * Register the resource available CRUD fields
      */
     protected function registerFields(): void
@@ -552,7 +535,6 @@ abstract class Resource implements JsonSerializable
     protected function register(): void
     {
         $this->registerPermissions();
-        $this->registerCards();
 
         if ($this instanceof Resourceful) {
             $this->registerFields();

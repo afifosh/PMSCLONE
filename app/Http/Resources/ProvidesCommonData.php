@@ -13,20 +13,9 @@
 namespace App\Http\Resources;
 
 use Illuminate\Support\Collection;
-use Modules\Activities\Contracts\Attendeeable;
-use Modules\Activities\Http\Resources\ActivityResource;
-use Modules\Activities\Models\Activity;
-use Modules\Billable\Contracts\BillableResource as BillableResourceContract;
-use Modules\Billable\Http\Resources\BillableResource;
-use Modules\Core\Facades\Innoclapps;
 
 trait ProvidesCommonData
 {
-    /**
-     * The created follow up task for the resource.
-     */
-    protected static ?Activity $createdActivity = null;
-
     /**
      * Add common data to the resource.
      *
@@ -36,44 +25,13 @@ trait ProvidesCommonData
     {
         $data = parent::withCommonData($data, $request);
 
-        $data[] = $this->mergeWhen(! is_null(static::$createdActivity), [
-            'createdActivity' => new ActivityResource(static::$createdActivity),
-        ]);
-
-        static::withActivity(null);
-
-        if (! $request->isZapier()) {
-            $resourceInstance = Innoclapps::resourceByModel($this->resource);
-
-            if ($resourceInstance instanceof BillableResourceContract && $this->relationLoaded('billable')) {
-                $data[] = $this->merge([
-                    'billable' => new BillableResource($this->billable),
-                ]);
-            }
-
-            if ($this->resource instanceof Attendeeable) {
-                $data[] = $this->merge([
-                    'guest_email' => $this->getGuestEmail(),
-                    'guest_display_name' => $this->getGuestDisplayName(),
-                ]);
-            }
-
-            if ($this->shouldMergeAssociations()) {
-                $data[] = $this->merge([
-                    'associations' => $this->prepareAssociationsForResponse(),
-                ]);
-            }
+        if ($this->shouldMergeAssociations()) {
+            $data[] = $this->merge([
+                'associations' => $this->prepareAssociationsForResponse(),
+            ]);
         }
 
         return $data;
-    }
-
-    /**
-     * Set the follow up activity which was created to merge in the resource
-     */
-    public static function withActivity(?Activity $task): void
-    {
-        static::$createdActivity = $task;
     }
 
     /**

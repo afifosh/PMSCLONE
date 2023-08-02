@@ -13,8 +13,6 @@
 namespace Modules\MailClient\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use Modules\Activities\Concerns\CreatesFollowUpTask;
-use Modules\Activities\Http\Resources\ActivityResource;
 use Modules\Core\Http\Controllers\ApiController;
 use Modules\Core\Models\PendingMedia;
 use Modules\Core\OAuth\EmptyRefreshTokenException;
@@ -38,7 +36,6 @@ use Modules\MailClient\Services\EmailAccountMessageSyncService;
 class EmailAccountMessagesController extends ApiController
 {
     use InteractsWithEmailMessageAssociations,
-        CreatesFollowUpTask,
         AssociatesResources;
 
     /**
@@ -231,7 +228,6 @@ class EmailAccountMessagesController extends ApiController
     {
         $this->addComposerAssociationsHeaders($composer, $request->input('associations', []));
         $this->addPendingAttachments($composer, $request);
-        $task = $this->handleFollowUpTaskCreation($request);
 
         try {
             $composer->subject($request->subject)
@@ -269,35 +265,13 @@ class EmailAccountMessagesController extends ApiController
                         app(ResourceRequest::class)->setResource($dbMessage::resource()->name())
                     )
                 ),
-                'createdActivity' => $task ? new ActivityResource($task) : null,
+                'createdActivity' => null,
             ], 201);
         }
 
         return $this->response([
-            'createdActivity' => $task ? new ActivityResource($task) : null,
+            'createdActivity' => null,
         ], 202);
-    }
-
-    /**
-     * Handle the follow up task creation, it's created here
-     * because if the message is not sent immediately we won't be able
-     * to return the activity
-     *
-     * @return null|\Modules\Activities\Models\Activity
-     */
-    protected function handleFollowUpTaskCreation(Request $request)
-    {
-        $task = null;
-        if ($request->via_resource
-                && $this->shouldCreateFollowUpTask($request->all())) {
-            $task = $this->createFollowUpTask(
-                $request->task_date,
-                $request->via_resource,
-                $request->via_resource_id
-            );
-        }
-
-        return $task;
     }
 
     /**

@@ -115,18 +115,6 @@ if (! function_exists('clone_prefix')) {
     }
 }
 
-if (! function_exists('privacy_url')) {
-    /**
-     * Application privacy policy url
-     *
-     * @return string
-     */
-    function privacy_url()
-    {
-        return url('/privacy-policy');
-    }
-}
-
 if (! function_exists('settings')) {
     /**
      * Get the settings manager instance.

@@ -12,7 +12,6 @@
 
 namespace Modules\MailClient\Http\Controllers\Api;
 
-use App\Installer\RequirementsChecker;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,12 +32,8 @@ class EmailAccountConnectionTestController extends ApiController
     /**
      * Test the account connection.
      */
-    public function handle(Request $request, RequirementsChecker $requirementsChecker): JsonResponse
+    public function handle(Request $request): JsonResponse
     {
-        // if ($requirementsChecker->fails('imap')) {
-        //     abort(409, 'In order to use IMAP account type, you will need to enable the PHP extension "imap".');
-        // }
-
         if (! function_exists('imap_open')) {
             abort(409, 'The PHP "imap" extension is enabled, but the "imap_open" PHP function is disabled, remove all the imap_* related PHP functions from the php.ini "disable_functions" configuration directive.');
         }

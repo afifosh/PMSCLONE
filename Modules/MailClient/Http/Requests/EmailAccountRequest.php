@@ -12,7 +12,6 @@
 
 namespace Modules\MailClient\Http\Requests;
 
-use App\Installer\RequirementsChecker;
 use Closure;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -59,10 +58,6 @@ class EmailAccountRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator) {
-            if ($this->isImapConnectionType() && ! (new RequirementsChecker)->passes('imap')) {
-                abort(409, 'In order to use IMAP account type, you will need to enable the PHP extension "imap".');
-            }
-
             if ($this->isMethod('POST') && $this->isSharedAccountRequest() && ! $this->user()->isSuperAdmin()) {
                 abort(403, 'Only super administrators can create shared email accounts.');
             }

@@ -40,11 +40,9 @@ class JsonResource extends BaseJsonResource
             $this->mergeFieldsFromResource($resource, $data, $request);
         }
 
-        if (! $request->isZapier()) {
-            $data[] = $this->mergeWhen(! is_null($this->actions), [
-                'actions' => $this->actions,
-            ]);
-        }
+        $data[] = $this->mergeWhen(! is_null($this->actions), [
+            'actions' => $this->actions,
+        ]);
 
         return $data;
     }

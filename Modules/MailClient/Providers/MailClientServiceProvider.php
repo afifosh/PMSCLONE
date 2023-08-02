@@ -124,12 +124,10 @@ class MailClientServiceProvider extends ServiceProvider
      */
     protected function bootModule(): void
     {
-        Innoclapps::booting($this->registerMenuItems(...));
         Innoclapps::booting($this->shareDataToScript(...));
 
         $this->scheduleTasks();
         $this->registerResources();
-        $this->registerRelatedRecordsDetailTab();
     }
 
     /**
@@ -196,27 +194,6 @@ class MailClientServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the menu items.
-     */
-    private function registerMenuItems(): void
-    {
-        $accounts = auth()->check() ? EmailAccount::with('oAuthAccount')
-            ->criteria(EmailAccountsForUserCriteria::class)
-            ->get()->filter->canSendMails() : null;
-
-        Menu::register(
-            MenuItem::make(__('mailclient::inbox.inbox'), '/inbox', 'Mail')
-                ->position(15)
-                ->badge(fn () => EmailAccount::countUnreadMessagesForUser(Auth::user()))
-                ->inQuickCreate(! is_null($accounts?->filter->isPrimary()->first() ?? $accounts?->first()))
-                ->quickCreateName(__('mailclient::mail.send'))
-                ->quickCreateRoute('/inbox?compose=true')
-                ->keyboardShortcutChar('E')
-                ->badgeVariant('info')
-        );
-    }
-
-    /**
      * Register the mail client module permissions.
      */
     protected function registerPermissions(): void
@@ -231,18 +208,6 @@ class MailClientServiceProvider extends ServiceProvider
                 ]);
             });
         });
-    }
-
-    /**
-     * Register the documents module related tabs.
-     */
-    public function registerRelatedRecordsDetailTab(): void
-    {
-        $tab = Tab::make('emails', 'emails-tab')->panel('emails-tab-panel')->order(20);
-
-        // ContactViewComponent::registerTab($tab);
-        // CompanyViewComponent::registerTab($tab);
-        // DealViewComponent::registerTab($tab);
     }
 
     /**

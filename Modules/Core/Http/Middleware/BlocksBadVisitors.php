@@ -57,8 +57,7 @@ class BlocksBadVisitors
     {
         return Auth::check() ||
             settings('block_bad_visitors') === false ||
-            app()->runningUnitTests() ||
-            ! Innoclapps::isAppInstalled();
+            app()->runningUnitTests();
     }
 
     /**

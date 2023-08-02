@@ -164,11 +164,11 @@ trait QueriesResources
         $with = $fields->pluck('belongsToRelation');
 
         $hasMany = $fields->whereInstanceOf(HasMany::class)->reject(function ($field) {
-            return $field->excludeFromZapierResponse && request()->isZapier();
+            return $field->excludeFromZapierResponse && false;
         });
 
         $morphMany = $fields->whereInstanceOf(MorphMany::class)->reject(function ($field) {
-            return $field->excludeFromZapierResponse && request()->isZapier();
+            return $field->excludeFromZapierResponse && false;
         });
 
         $customFieldAble = $fields->whereInstanceOf(Customfieldable::class);

@@ -4,7 +4,7 @@
     </div>
     <div class="offcanvas-body mx-0 flex-grow-0 pt-0 h-100" style="padding:20px; width:100%; display:block;">
       <form class="add-new-user pt-0" id="update-mail-account">
-      @if($account->sync_state && $account->sync_state->name != App\Enums\SyncState::ENABLED->name)
+      @if($account->sync_state && $account->sync_state->name != Modules\Core\Synchronization\SyncState::ENABLED->name)
       <div class="mb-3 alert alert-warning">
       {{$account->sync_state_comment}}
     </div>
