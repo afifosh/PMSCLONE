@@ -12,34 +12,20 @@
 
 namespace Modules\MailClient\Providers;
 
-use App\Http\View\FrontendComposers\Tab;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
-use Modules\Contacts\Resource\Company\Frontend\ViewComponent as CompanyViewComponent;
-use Modules\Contacts\Resource\Contact\Frontend\ViewComponent as ContactViewComponent;
 use Modules\Core\Facades\Innoclapps;
-use Modules\Core\Facades\Menu;
 use Modules\Core\Facades\Permissions;
-use Modules\Core\Menu\MenuItem;
 use Modules\Core\OAuth\Events\OAuthAccountConnected;
 use Modules\Core\OAuth\Events\OAuthAccountDeleting;
-use Modules\Core\SystemInfo;
-use Modules\Deals\Resource\Frontend\ViewComponent as DealViewComponent;
 use Modules\MailClient\Client\ClientManager;
 use Modules\MailClient\Client\ConnectionType;
 use Modules\MailClient\Client\FolderType;
 use Modules\MailClient\Console\Commands\EmailAccountsSyncCommand;
-use Modules\MailClient\Criteria\EmailAccountsForUserCriteria;
-// use Modules\MailClient\Events\EmailAccountMessageCreated;
-// use Modules\MailClient\Listeners\AttachEmailAccountMessageToContact;
-// use Modules\MailClient\Listeners\CreateContactFromEmailAccountMessage;
 use Modules\MailClient\Listeners\CreateEmailAccountViaOAuth;
 use Modules\MailClient\Listeners\StopRelatedOAuthEmailAccounts;
-use Modules\MailClient\Listeners\TransferMailClientUserData;
 use Modules\MailClient\Models\EmailAccount;
-use Modules\Users\Events\TransferringUserData;
 
 class MailClientServiceProvider extends ServiceProvider
 {
@@ -61,14 +47,11 @@ class MailClientServiceProvider extends ServiceProvider
 
         $this->app['events']->listen(OAuthAccountConnected::class, CreateEmailAccountViaOAuth::class);
         $this->app['events']->listen(OAuthAccountDeleting::class, StopRelatedOAuthEmailAccounts::class);
-        $this->app['events']->listen(TransferringUserData::class, TransferMailClientUserData::class);
 
         $this->app->booted(function () {
             $this->registerResources();
             Innoclapps::whenReadyForServing($this->bootModule(...));
         });
-
-        SystemInfo::register('MAIL_CLIENT_SYNC_INTERVAL', $this->app['config']->get('mailclient.sync.interval'));
     }
 
     /**
@@ -137,7 +120,6 @@ class MailClientServiceProvider extends ServiceProvider
     {
         /** @var \Illuminate\Console\Scheduling\Schedule */
         $schedule = $this->app->make(Schedule::class);
-
         $syncOutputPath = storage_path('logs/email-accounts-sync.log');
         $syncCommandCronExpression = config('mailclient.sync.interval');
         $syncCommandName = 'sync-email-accounts';

@@ -244,6 +244,17 @@
       'Module' => 'Nwidart\\Modules\\Facades\\Module',
     ),
   ),
+  'opcodesio/log-viewer' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Opcodes\\LogViewer\\LogViewerServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'LogViewer' => 'Opcodes\\LogViewer\\Facades\\LogViewer',
+    ),
+  ),
   'owen-it/laravel-auditing' => 
   array (
     'providers' => 

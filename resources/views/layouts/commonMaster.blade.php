@@ -44,7 +44,6 @@
   <!-- Global Model -->
   <!-- Include Scripts -->
   @include('layouts/sections/scripts')
-  @stack('scripts')
   <script>
     $(document).ready(function () {
       $('.table.dataTable').on('show.bs.dropdown', function () {

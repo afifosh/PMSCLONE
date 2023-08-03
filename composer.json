@@ -43,6 +43,7 @@
     "mhmiton/laravel-modules-livewire": "^1.6",
     "microsoft/microsoft-graph": "^1.97",
     "nwidart/laravel-modules": "^10.0",
+    "opcodesio/log-viewer": "^2.5",
     "owen-it/laravel-auditing": "^13.5",
     "pelago/emogrifier": "^7.0",
     "pion/laravel-chunk-upload": "^1.5",

@@ -23,22 +23,10 @@ use Modules\Core\Contracts\Services\Service;
 use Modules\Core\Criteria\RequestCriteria;
 use Modules\Core\Facades\Fields;
 use Modules\Core\Facades\Innoclapps;
-use Modules\Core\Facades\Menu;
-use Modules\Core\Fields\CustomFieldFactory;
-use Modules\Core\Fields\Field;
-use Modules\Core\ResolvesActions;
-use Modules\Core\ResolvesFilters;
 use Modules\Core\Resource\Http\ResourceRequest;
-use Modules\Core\Resource\Import\Import;
-use Modules\Core\Resource\Import\ImportSample;
-use Modules\Core\Settings\SettingsMenu;
-use Modules\Core\Table\ID;
 
 abstract class Resource implements JsonSerializable
 {
-    use ResolvesActions;
-    use ResolvesFilters;
-    use ResolvesTables;
     use QueriesResources;
 
     /**
@@ -143,28 +131,6 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
-     *  Get the filters intended for the resource
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function filtersForResource(ResourceRequest $request)
-    {
-        return $this->resolveFilters($request)->merge(
-            (new CustomFieldFactory($this->name()))->createFieldsForFilters()
-        );
-    }
-
-    /**
-     * Get the actions intended for the resource
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function actionsForResource(ResourceRequest $request)
-    {
-        return $this->resolveActions($request);
-    }
-
-    /**
      * Get the json resource that should be used for json response
      */
     public function jsonResource(): ?string
@@ -213,17 +179,7 @@ abstract class Resource implements JsonSerializable
      */
     public function getFieldsForJsonResource($request, $model, $canSeeResource = true)
     {
-        return $this->resolveFields()->reject(function ($field) use ($request) {
-            return false;
-        })->filter(function (Field $field) use ($canSeeResource) {
-            if (! $canSeeResource) {
-                return $field->alwaysInJsonResource === true;
-            }
-
-            return $canSeeResource;
-        })->reject(function ($field) use ($model) {
-            return is_null($field->resolveForJsonResource($model));
-        })->values();
+        return collect([]);
     }
 
     /**
@@ -428,59 +384,11 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
-     * Get the resource importable class
-     */
-    public function importable(): Import
-    {
-        return new Import($this);
-    }
-
-    /**
-     * Get the resource import sample class
-     */
-    public function importSample(): ImportSample
-    {
-        return new ImportSample($this);
-    }
-
-    /**
      * Get the resource export class.
      */
     public function exportable(Builder $query): Export
     {
         return new Export($this, $query);
-    }
-
-    /**
-     * Create ID field instance for the resource.
-     */
-    public function idField()
-    {
-        return ID::make(__('core::app.id'), $this->newModel()->getKeyName());
-    }
-
-    /**
-     * Register the resource available menu items
-     */
-    protected function registerMenuItems(): void
-    {
-        foreach ($this->menu() as $item) {
-            if (! $item->singularName) {
-                $item->singularName($this->singularLabel());
-            }
-
-            Menu::register($item);
-        }
-    }
-
-    /**
-     * Register the resource settings menu items
-     */
-    protected function registerSettingsMenuItems(): void
-    {
-        foreach ($this->settingsMenu() as $key => $item) {
-            SettingsMenu::register($item, is_int($key) ? $this->name() : $key);
-        }
     }
 
     /**
@@ -539,11 +447,6 @@ abstract class Resource implements JsonSerializable
         if ($this instanceof Resourceful) {
             $this->registerFields();
         }
-
-        Innoclapps::booting(function () {
-            $this->registerMenuItems();
-            $this->registerSettingsMenuItems();
-        });
     }
 
     /**

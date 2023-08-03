@@ -11,7 +11,6 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Modules\Core\Http\Controllers\ApplicationController;
 use Modules\Core\Http\Controllers\MediaViewController;
 use Modules\Core\Http\Controllers\MigrateController;
 use Modules\Core\Http\Controllers\OAuthController;
@@ -33,9 +32,4 @@ Route::withoutMiddleware([
 Route::middleware('auth')->group(function () {
     Route::get('/{providerName}/connect', [OAuthController::class, 'connect'])->where('providerName', 'microsoft|google');
     Route::get('/{providerName}/callback', [OAuthController::class, 'callback'])->where('providerName', 'microsoft|google');
-});
-
-
-Route::middleware(['auth'])->group(function () {
-    Route::fallback(ApplicationController::class);
 });

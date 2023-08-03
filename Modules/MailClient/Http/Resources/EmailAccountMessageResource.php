@@ -15,11 +15,11 @@ namespace Modules\MailClient\Http\Resources;
 use App\Http\Resources\ProvidesCommonData;
 use App\Support\AutoParagraph;
 use Illuminate\Http\Request;
-use Modules\Contacts\Http\Resources\CompanyResource;
-use Modules\Contacts\Http\Resources\ContactResource;
+// use Modules\Contacts\Http\Resources\CompanyResource;
+// use Modules\Contacts\Http\Resources\ContactResource;
 use Modules\Core\Http\Resources\MediaResource;
 use Modules\Core\Resource\Http\JsonResource;
-use Modules\Deals\Http\Resources\DealResource;
+// use Modules\Deals\Http\Resources\DealResource;
 
 /** @mixin \Modules\MailClient\Models\EmailAccountMessage */
 class EmailAccountMessageResource extends JsonResource

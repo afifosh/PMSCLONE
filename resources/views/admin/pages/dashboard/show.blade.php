@@ -177,7 +177,6 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@can(true)
 <h4>Dashboard</h4>
 <div class="row">
   <div class="col-9">
@@ -222,7 +221,6 @@ $configData = Helper::appClasses();
     </div>
   </div>
 </div>
-@endcan
 
 @endsection
 @push('scripts')

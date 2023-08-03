@@ -25,7 +25,6 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@can(true)
   <div class="mt-3  col-12">
     <div class="card">
       <div class="card-body">
@@ -58,7 +57,6 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </div>
-@endcan
 
 @endsection
 @push('scripts')

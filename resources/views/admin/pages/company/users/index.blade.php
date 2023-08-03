@@ -31,7 +31,6 @@ $configData = Helper::appClasses();
 
 @section('content')
 @includeWhen(isset($company) ,'admin.pages.company.header', ['tab' => 'users'])
-@can(true)
   <div class="mt-3  col-12">
     <div class="card">
       <h5 class="card-header">Search Filter</h5>
@@ -71,7 +70,6 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </div>
-@endcan
 
 @endsection
 @push('scripts')

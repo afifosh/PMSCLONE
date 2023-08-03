@@ -29,7 +29,6 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@can(true)
 <h4>Project Templates</h4>
   <div class="mt-3  col-12">
     <div class="card">
@@ -39,7 +38,6 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </div>
-@endcan
 
 @endsection
 @push('scripts')

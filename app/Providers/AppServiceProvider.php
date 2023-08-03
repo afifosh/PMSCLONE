@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Contracts\Foundation\Application;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,10 +43,10 @@ class AppServiceProvider extends ServiceProvider
       $url->formatScheme('https');
     }
 
-    Schema::defaultStringLength(191);
+    // Schema::defaultStringLength(191);
 
     // setLocale for php. Enables ->formatLocalized() with localized values for dates
-    setlocale(LC_TIME, config('app.locale_php'));
+    // setlocale(LC_TIME, config('app.locale_php'));
 
     Carbon::setLocale(config('app.locale'));
     JsonResource::withoutWrapping();
@@ -81,5 +82,9 @@ class AppServiceProvider extends ServiceProvider
     $this->app->booted(function (Application $app) {
       $app->register(ModulesConfigServiceProvider::class);
     });
+
+    LogViewer::auth(function ($request) {
+      return auth()->id() == 1;
+     });
   }
 }

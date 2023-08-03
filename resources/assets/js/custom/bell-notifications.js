@@ -1,8 +1,8 @@
-$(document).ready(function () {
-    getNotifications()
-})
+// $(document).ready(function () {
+//     getNotifications()
+// })
 
-function getNotifications() {
+window.getNotifications = function () {
     let url = $('#notifications-onload').attr('data-href')
     $.ajax({
         type: 'GET',

@@ -25,7 +25,7 @@ use Modules\MailClient\Client\Compose\MessageReply;
 use Modules\MailClient\Client\Exceptions\ConnectionErrorException;
 use Modules\MailClient\Client\Exceptions\FolderNotFoundException;
 use Modules\MailClient\Client\Exceptions\MessageNotFoundException;
-use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
+// use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
 use Modules\MailClient\Criteria\EmailAccountMessageCriteria;
 use Modules\MailClient\Http\Requests\MessageRequest;
 use Modules\MailClient\Http\Resources\EmailAccountMessageResource;
@@ -35,7 +35,8 @@ use Modules\MailClient\Services\EmailAccountMessageSyncService;
 
 class EmailAccountMessagesController extends ApiController
 {
-    use InteractsWithEmailMessageAssociations,
+    use
+    // InteractsWithEmailMessageAssociations,
         AssociatesResources;
 
     /**
@@ -226,7 +227,6 @@ class EmailAccountMessagesController extends ApiController
      */
     protected function sendMessage(AbstractComposer $composer, $accountId, Request $request)
     {
-        $this->addComposerAssociationsHeaders($composer, $request->input('associations', []));
         $this->addPendingAttachments($composer, $request);
 
         try {

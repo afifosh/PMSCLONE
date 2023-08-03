@@ -167,7 +167,7 @@ class EmailAccountFolder extends Model implements Metable
         // for the messages where media is available
         $messages = $this->messages()->has('folders', '=', 1)->cursor()
             ->each(function ($message) {
-                foreach (['deals', 'contacts', 'companies'] as $relation) {
+                foreach ([] as $relation) {
                     tap($message->{$relation}(), function ($query) {
                         if ($query->getModel()->usesSoftDeletes()) {
                             $query->withTrashed();

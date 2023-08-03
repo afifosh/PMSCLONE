@@ -184,7 +184,6 @@ $configData = Helper::appClasses();
 
 @section('content')
 @include('admin.pages.projects.navbar', ['tab' => 'tasks'])
-@can(true)
   <div class="mt-3  col-12">
     <div class="card">
       <div class="card-body">
@@ -217,7 +216,6 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </div>
-@endcan
 
 @endsection
 @push('scripts')

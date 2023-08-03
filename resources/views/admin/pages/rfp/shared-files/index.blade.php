@@ -29,7 +29,6 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@can(true)
   <div class="mt-3  col-12">
     <div class="card">
       <h5 class="card-header">Search Filter</h5>
@@ -62,7 +61,6 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </div>
-@endcan
 
 @endsection
 @push('scripts')

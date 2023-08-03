@@ -13,15 +13,7 @@
 namespace Modules\Core\Resource;
 
 use Closure;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Modules\Core\Contracts\Resources\AcceptsCustomFields;
 use Modules\Core\Facades\Innoclapps;
-use Modules\Core\Facades\Zapier;
-use Modules\Core\Fields\CustomFieldResourceCollection;
-use Modules\Core\Fields\CustomFieldService;
-use Modules\Core\Models\CustomField;
-use Modules\Core\Models\CustomFieldOption;
 
 /** @mixin \Modules\Core\Models\Model */
 trait Resourceable
@@ -35,52 +27,7 @@ trait Resourceable
      */
     protected static function bootResourceable(): void
     {
-        if (! $resource = static::resource()) {
-            return;
-        }
-
         static::bootFieldsEvents();
-
-        if ($resource instanceof AcceptsCustomFields) {
-            static::bootCustomFields();
-        }
-
-        if ($resource::$hasZapierHooks === true) {
-            static::bootZapierHooks();
-        }
-    }
-
-    /**
-     * Boot the resource Zapier hooks
-     */
-    protected static function bootZapierHooks(): void
-    {
-        foreach (Zapier::supportedActions() as $event) {
-            static::{$event}(function ($model) use ($event) {
-                Zapier::queue($event, $model->getKey(), static::resource());
-            });
-        }
-    }
-
-    /**
-     * Boot the fields model events
-     */
-    protected static function bootFieldsEvents(): void
-    {
-        // Available events from the Field trait
-        $events = ['creating', 'created', 'updating', 'updated', 'deleting', 'deleted'];
-
-        foreach ($events as $event) {
-            static::{$event}(function ($model) use ($event) {
-                $fields = static::resource()->resolveFields();
-
-                $fields->each(function ($field) use ($model, $event) {
-                    $method = 'record'.ucfirst($event);
-
-                    $field->{$method}($model);
-                });
-            });
-        }
     }
 
     /**
@@ -147,21 +94,6 @@ trait Resourceable
      */
     public function fill(array $attributes)
     {
-        // Because model may be initialized without attributes in this case
-        // first, we will check if there are attributes, then will merge the non-relation
-        // custom field field_id's as fillable attributes
-        if (static::resource() instanceof AcceptsCustomFields &&
-                count($attributes) > 0 &&
-                ! static::isUnguarded() &&
-                count($this->getFillable()) > 0) {
-            $this->fillable(array_unique(
-                array_merge(
-                    $this->getFillable(),
-                    static::getCustomFields()->fillable()
-                )
-            ));
-        }
-
         return parent::fill($attributes);
     }
 
@@ -179,21 +111,6 @@ trait Resourceable
     protected static function bootCustomFields(): void
     {
         static::bootCustomFieldsWithOptions();
-    }
-
-    /**
-     * Get the model searchable columns.
-     */
-    public static function getSearchableColumns(): array
-    {
-        // Because of performance reasons, allow only unique custom fields to be searchable,
-        // the user can search via the top search bar or via select async fields
-        $columns = static::getCustomFields()->filter->isUnique()
-            ->mapWithKeys(
-                fn (CustomField $field) => [$field->field_id => 'like']
-            );
-
-        return array_merge(static::$searchableColumns, $columns->all());
     }
 
     /**
@@ -231,53 +148,6 @@ trait Resourceable
 
         return static::getCustomFieldService()->forResource(
             static::resource()->name()
-        );
-    }
-
-    /**
-     * Determine if a relation exists in dynamic relations list
-     */
-    public static function getCustomFieldByRelationship(string $name): ?CustomField
-    {
-        return static::getCustomFields()
-            ->optionable()
-            ->firstWhere('relationName', $name);
-    }
-
-    /**
-     * Create new custom field multi value options relation.
-     */
-    protected function newMultiValueOptionCustomFieldRelation(CustomField $field): MorphToMany
-    {
-        $instance = $this->newRelatedInstance(CustomFieldOption::class);
-
-        return $this->newMorphToMany(
-            $instance->newQuery(),
-            $this,
-            'model',
-            'model_has_custom_field_options',
-            'model_id',
-            'option_id',
-            $this->getKeyName(),
-            $instance->getKeyName(),
-            $field->relationName,
-            false
-        )->wherePivot('custom_field_id', $field->id);
-    }
-
-    /**
-     * Create new custom field single value options relation.
-     */
-    protected function newSingleValueOptionCustomFieldRelation(CustomField $field): BelongsTo
-    {
-        $instance = $this->newRelatedInstance(CustomFieldOption::class);
-
-        return $this->newBelongsTo(
-            $instance->newQuery(),
-            $this,
-            $field->field_id,
-            $instance->getKeyName(),
-            $field->relationName
         );
     }
 

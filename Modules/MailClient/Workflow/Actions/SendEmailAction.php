@@ -25,10 +25,9 @@ use Modules\Core\MailableTemplate\Renderer;
 use Modules\Core\Placeholders\Placeholders as BasePlaceholders;
 use Modules\Core\Resource\PlaceholdersGroup;
 use Modules\Core\Resource\ResourcePlaceholders;
-use Modules\Core\Workflow\Action;
 use Modules\MailClient\Client\Compose\Message;
 use Modules\MailClient\Client\Exceptions\ConnectionErrorException;
-use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
+// use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
 use Modules\MailClient\Criteria\EmailAccountsForUserCriteria;
 use Modules\MailClient\Models\EmailAccount;
 use Modules\MailClient\Services\EmailAccountMessageSyncService;
@@ -36,9 +35,9 @@ use Modules\MailClient\Services\EmailAccountMessageSyncService;
 use App\Models\Admin as User;
 use ReflectionClass;
 
-class SendEmailAction extends Action implements ShouldQueue
+class SendEmailAction implements ShouldQueue
 {
-    use InteractsWithEmailMessageAssociations;
+    // use InteractsWithEmailMessageAssociations;
 
     /**
      * Available mail template merge fields

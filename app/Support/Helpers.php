@@ -14,7 +14,6 @@ use Akaunting\Money\Currency;
 use Akaunting\Money\Money;
 use Illuminate\Support\Str;
 use Modules\Core\Facades\Innoclapps;
-use Modules\Core\Settings\Contracts\Manager as SettingsManager;
 
 if (! function_exists('format_bytes')) {
     /**
@@ -112,34 +111,6 @@ if (! function_exists('clone_prefix')) {
         $title = preg_replace('/\s-\sCopy\([a-zA-Z0-9]{6}+\)/', '', $to);
 
         return $title.' - Copy('.Str::random(6).')';
-    }
-}
-
-if (! function_exists('settings')) {
-    /**
-     * Get the settings manager instance.
-     *
-     * @param  string|array|null  $driver
-     * @param  bool  $save
-     * @return mixed
-     */
-    function settings($driver = null, $save = true)
-    {
-        $manager = app(SettingsManager::class);
-
-        if ($driver) {
-            if (is_array($driver)) {
-                return tap($manager->set($driver), fn ($instance) => $save && $instance->save());
-            }
-
-            if (in_array($driver, array_keys(config('settings.drivers')))) {
-                return $manager->driver($driver);
-            }
-
-            return $manager->get($driver);
-        }
-
-        return $manager;
     }
 }
 

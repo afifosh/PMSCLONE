@@ -22,7 +22,7 @@ use Modules\Core\Mail\ContentDecoder;
 use Modules\Core\Resource\AssociatesResources;
 use Modules\MailClient\Client\AbstractMessage;
 use Modules\MailClient\Client\Contracts\AttachmentInterface;
-use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
+// use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
 use Modules\MailClient\Events\EmailAccountMessageCreated;
 use Modules\MailClient\Models\EmailAccount;
 use Modules\MailClient\Models\EmailAccountMessage;
@@ -31,8 +31,8 @@ use Plank\Mediable\Exceptions\MediaUploadException;
 
 class EmailAccountMessageSyncService
 {
-    use AssociatesResources,
-        InteractsWithEmailMessageAssociations;
+    use AssociatesResources;
+        // InteractsWithEmailMessageAssociations;
 
     /**
      * Message addresses headers and relations.
@@ -108,7 +108,7 @@ class EmailAccountMessageSyncService
             } else {
                 // If the message is queued, we need to fetch the associations from
                 // the headers and sync with the actual associations
-                $this->syncAssociationsViaMessageHeaders($dbMessage, $message);
+                // $this->syncAssociationsViaMessageHeaders($dbMessage, $message);
             }
         }
 
@@ -431,7 +431,7 @@ class EmailAccountMessageSyncService
         // sync and was not inserted in database when the user click send, hence
         // the associations were not saved in database
         if ($remoteMessage->isSentFromApplication()) {
-            $this->syncAssociationsViaMessageHeaders($dbMessage, $remoteMessage);
+            // $this->syncAssociationsViaMessageHeaders($dbMessage, $remoteMessage);
 
             return true;
         }
@@ -462,11 +462,11 @@ class EmailAccountMessageSyncService
             ->first();
 
         if ($inReplyToDbMessage) {
-            foreach ($inReplyToDbMessage->associatedResources() as $resource => $records) {
-                $relationship = Innoclapps::resourceByName($resource)->associateableName();
+            // foreach ($inReplyToDbMessage->associatedResources() as $resource => $records) {
+            //     $relationship = Innoclapps::resourceByName($resource)->associateableName();
 
-                $dbMessage->{$relationship}()->sync($records->pluck('id')->all());
-            }
+            //     $dbMessage->{$relationship}()->sync($records->pluck('id')->all());
+            // }
 
             return true;
         }

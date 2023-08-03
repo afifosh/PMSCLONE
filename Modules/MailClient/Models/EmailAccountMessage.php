@@ -24,16 +24,16 @@ use Modules\Core\Concerns\HasAvatar;
 use Modules\Core\Contracts\Presentable;
 use Modules\Core\Media\HasMedia;
 use Modules\Core\Models\Model;
-use Modules\Core\Resource\Resourceable;
-use Modules\Core\Timeline\Timelineable;
+// use Modules\Core\Resource\Resourceable;
+// use Modules\Core\Timeline\Timelineable;
 use Modules\MailClient\Support\EmailAccountMessageBody;
 
 class EmailAccountMessage extends Model implements Presentable
 {
     use HasAvatar,
-        HasMedia,
-        Resourceable,
-        Timelineable;
+        HasMedia;
+        // Resourceable,
+        // Timelineable;
 
     /**
      * The attributes that are mass assignable.
@@ -115,45 +115,6 @@ class EmailAccountMessage extends Model implements Presentable
     public function addresses(): HasMany
     {
         return $this->hasMany(\Modules\MailClient\Models\EmailAccountMessageAddress::class, 'message_id');
-    }
-
-    /**
-     * A message can have many contacts.
-     */
-    public function contacts(): MorphToMany
-    {
-        return $this->morphedByMany(
-            \Modules\Contacts\Models\Contact::class,
-            'messageable',
-            'email_account_messageables',
-            'message_id'
-        );
-    }
-
-    /**
-     * A message can have many companies.
-     */
-    public function companies(): MorphToMany
-    {
-        return $this->morphedByMany(
-            \Modules\Contacts\Models\Company::class,
-            'messageable',
-            'email_account_messageables',
-            'message_id'
-        );
-    }
-
-    /**
-     * A message can have many deals.
-     */
-    public function deals(): MorphToMany
-    {
-        return $this->morphedByMany(
-            \Modules\Deals\Models\Deal::class,
-            'messageable',
-            'email_account_messageables',
-            'message_id'
-        );
     }
 
     /**
@@ -376,8 +337,7 @@ class EmailAccountMessage extends Model implements Presentable
      */
     public function purge(): void
     {
-        // foreach (['deals', 'contacts', 'companies', 'folders'] as $relation) {
-        foreach (['contacts', 'folders'] as $relation) {
+        foreach (['folders'] as $relation) {
             tap($this->{$relation}(), function ($query) {
                 if ($query->getModel()->usesSoftDeletes()) {
                     $query->withTrashed();
@@ -445,18 +405,7 @@ class EmailAccountMessage extends Model implements Presentable
             'account.folders' => fn ($query) => $query->withCount([
               'messages as unread_count' => fn ($query) => $query->unread(),
             ]),
-            // 'contacts.nextActivity',
-            // 'companies.nextActivity',
-            // 'deals.nextActivity',
         ]);
-    }
-
-    /**
-     * Get the activity front-end component
-     */
-    public function getTimelineComponent(): string
-    {
-        return 'record-tab-timeline-email';
     }
 
     public function getParent()

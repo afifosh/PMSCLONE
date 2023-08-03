@@ -54,8 +54,6 @@
   <!-- Include Scripts -->
   @include('admin/layouts/sections/scripts')
 
-  @stack('scripts')
-
   <script>
     $(document).ready(function () {
       $('.table.dataTable').on('show.bs.dropdown', function () {
@@ -74,6 +72,8 @@
         })
     }
   </script>
-  <script src="{{ mix('chat/assets/js/set-user-on-off.js') }}"></script>
+  @auth
+    <script src="{{ mix('chat/assets/js/set-user-on-off.js') }}"></script>
+  @endauth
 </body>
 </html>

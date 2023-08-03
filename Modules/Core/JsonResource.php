@@ -15,7 +15,6 @@ namespace Modules\Core;
 use Illuminate\Http\Resources\Json\JsonResource as BaseJsonResource;
 use Modules\Core\Contracts\Presentable;
 use Modules\Core\Contracts\Primaryable;
-use Modules\Core\Timeline\Timelineables;
 
 class JsonResource extends BaseJsonResource
 {
@@ -67,29 +66,6 @@ class JsonResource extends BaseJsonResource
         });
 
         if (true) {
-            if (Timelineables::isTimelineable($this->resource)) {
-                $data[] = $this->merge([
-                    'timeline_component' => $this->getTimelineComponent(),
-                    'timeline_relation' => $this->getTimelineRelation(),
-                    'timeline_key' => $this->timelineKey(),
-                ]);
-
-                if (static::$topLevelResource &&
-                        $this->relationLoaded('pinnedTimelineSubjects')) {
-                    $pinnedSubject = $this->getPinnedSubject(static::$topLevelResource::class, static::$topLevelResource->getKey());
-
-                    $data[] = $this->merge([
-                        'is_pinned' => ! is_null($pinnedSubject),
-                        'pinned_date' => $pinnedSubject?->created_at,
-                    ]);
-                }
-            }
-
-            $data[] = $this->mergeWhen(Timelineables::hasTimeline($this->resource), function () {
-                return [
-                    'timeline_subject_key' => $this->getTimelineSubjectKey(),
-                ];
-            });
 
             $data[] = $this->mergeWhen($authorizations = $this->getAuthorizations($this->resource), [
                 'authorizations' => $authorizations,

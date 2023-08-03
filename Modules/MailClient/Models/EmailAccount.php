@@ -515,7 +515,7 @@ class EmailAccount extends Model implements Metable, Primaryable
     {
         // Detach from only messages with associations
         // This helps to not loop over all messages and delete them
-        foreach (['contacts', 'companies'] as $relation) {
+        foreach ([] as $relation) {
             $this->messages()->whereHas($relation, function ($query) {
                 $query->withTrashed();
             })->cursor()->each(function ($message) use ($relation) {
@@ -532,12 +532,6 @@ class EmailAccount extends Model implements Metable, Primaryable
         $this->messages()->delete();
 
         $this->folders->each->delete();
-
-        $systemEmailAccountId = settings('system_email_account_id');
-
-        if ((int) $systemEmailAccountId === (int) $this->id) {
-            settings()->forget('system_email_account_id')->save();
-        }
     }
 
     /**

@@ -16,12 +16,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            settings()->set('last_cron_run', now());
-        })->after(function () {
-            settings()->save();
-        })->everyMinute();
-
         $schedule->command('queue:flush')->weekly();
     }
 

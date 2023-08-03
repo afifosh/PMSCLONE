@@ -22,9 +22,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Modules\Core\DatabaseState;
 use Modules\Core\Facades\Innoclapps;
-use Modules\Core\Facades\MailableTemplates;
 use Modules\Core\Media\PruneStaleMediaAttachments;
-use Modules\Core\Timeline\Timelineables;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -39,7 +37,6 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
-        Innoclapps::whenReadyForServing(Timelineables::discover(...));
 
         $this->registerMacros();
         $this->registerCommands();
@@ -116,8 +113,6 @@ class CoreServiceProvider extends ServiceProvider
 
         Arr::macro('toObject', new \Modules\Core\Macros\Arr\ToObject);
         Arr::macro('valuesAsString', new \Modules\Core\Macros\Arr\CastValuesAsString);
-
-        Request::macro('isSearching', new \Modules\Core\Macros\Request\IsSearching);
 
         Filesystem::macro('deepCleanDirectory', new \Modules\Core\Macros\Filesystem\DeepCleanDirectory);
 

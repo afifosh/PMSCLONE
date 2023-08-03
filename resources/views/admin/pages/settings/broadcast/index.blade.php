@@ -26,10 +26,13 @@
                                     </label>
                                 </div>
                                 <div class="col-md-8">
-                                    <select name="broadcast_driver" id="broadcast_driver" data-attr="{{ $settings['broadcast_driver'] ?? '' }}" class="form-select"{{--selectpicker--}} data-style="btn-default" data-live-search="true">
-                                        <option value="pusher" data-tokens="pusher" {{ isset($settings['broadcast_driver']) && $settings['broadcast_driver'] === 'pusher' ? 'selected' : '' }}>
+                                    <select onchange="updateSocketInputs();" name="broadcast_driver" id="broadcast_driver" data-attr="{{ $setting['broadcast_driver'] ?? '' }}" class="form-select"{{--selectpicker--}} data-style="btn-default" data-live-search="true">
+                                        <option value="pusher" data-tokens="pusher" {{ isset($setting['broadcast_driver']) && $setting['broadcast_driver'] === 'pusher' ? 'selected' : '' }}>
                                             {{ __('Pusher') }}
                                         </option>
+                                        <option value="websockets" data-tokens="websockets" {{ isset($setting['broadcast_driver']) && $setting['broadcast_driver'] === 'websockets' ? 'selected' : '' }}>
+                                          {{ __('Laravel WebSockets') }}
+                                      </option>
                                     </select>
                                 </div>
                             </div>
@@ -81,6 +84,43 @@
                                     <input name="pusher_app_cluster" value="{{ $setting['pusher_app_cluster'] ?? config('broadcasting.connections.pusher.options.cluster') }}" type="text" class="form-control" id="pusherAppCluster" placeholder="{{ __('Pusher App Cluster') }}" aria-describedby="pusherAppCluster" />
                                 </div>
                             </div>
+                            <div class="websocket-inputs">
+                              <div class="row mb-4">
+                                <!-- Pusher App Cluster -->
+                                <div class="col-md-3">
+                                    <label class="mt-2 form-label fs-6 fw-semibold @error('app_host') is-invalid @enderror">
+                                        @lang('App Host')
+                                    </label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input name="app_host" value="{{ $setting['app_host'] ?? config('broadcasting.connections.pusher.options.host') }}" type="text" class="form-control" placeholder="{{ __('App Host') }}"/>
+                                </div>
+                              </div>
+                              <div class="row mb-4">
+                                <!-- Pusher App Cluster -->
+                                <div class="col-md-3">
+                                    <label class="mt-2 form-label fs-6 fw-semibold @error('app_port') is-invalid @enderror">
+                                        @lang('App Port')
+                                    </label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input name="app_port" value="{{ $setting['app_port'] ?? config('broadcasting.connections.pusher.options.port') }}" type="text" class="form-control" placeholder="{{ __('App Port') }}"/>
+                                </div>
+                              </div>
+                              <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <label for="broadcast_driver" class="form-label fs-6 mt-2 fw-semibold">
+                                        {{ __('Broadcast Driver') }}
+                                    </label>
+                                </div>
+                                <div class="col-md-8">
+                                  <select name="app_scheme" class="form-select">
+                                    <option value="https" @selected(@$setting['app_scheme'] == 'https')>https</option>
+                                    <option value="http" @selected(@$setting['app_scheme'] == 'http')>http</option>
+                                </select>
+                                </div>
+                              </div>
+                            </div>
                             <!-- button to submit form -->
                             <button data-form="ajax-form" type="submit" class="btn btn-primary me-sm-3">@lang('Update')</button>
                         </form>
@@ -90,4 +130,13 @@
         </div>
     </div>
 </div>
+<script>
+    function updateSocketInputs() {
+      if ($('#broadcast_driver').val() == 'websockets') {
+        $('.websocket-inputs').show();
+      } else {
+        $('.websocket-inputs').hide();
+      }
+    }
+</script>
 @endsection

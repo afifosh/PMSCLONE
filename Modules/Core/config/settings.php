@@ -11,61 +11,6 @@
  */
 
 return [
-    /* -----------------------------------------------------------------
-     |  Default drivers
-     | -----------------------------------------------------------------
-     | Supported: 'array', 'json', 'database', 'redis'
-     |
-     | When using the "override" feature, the database driver should not be used
-     | as it's interacting with the database in the service provider, it works good, but it's not recommended
-     */
-
-    'default' => ENV('SETTINGS_DRIVER', 'json'),
-
-    /* -----------------------------------------------------------------
-     |  Drivers
-     | -----------------------------------------------------------------
-     */
-
-    'drivers' => [
-
-        'array' => [
-            'driver' => Modules\Core\Settings\Stores\ArrayStore::class,
-        ],
-
-        'json' => [
-            'driver' => Modules\Core\Settings\Stores\JsonStore::class,
-
-            'options' => [
-                'path' => storage_path('settings.json'),
-            ],
-        ],
-
-        'database' => [
-            'driver' => \Modules\Core\Settings\Stores\DatabaseStore::class,
-
-            'options' => [
-                'table' => 'settings',
-                'model' => \Modules\Core\Models\Setting::class,
-            ],
-        ],
-
-        'redis' => [
-            'driver' => Modules\Core\Settings\Stores\RedisStore::class,
-
-            'options' => [
-                'client' => 'predis',
-
-                'default' => [
-                    'host' => env('REDIS_HOST', '127.0.0.1'),
-                    'port' => env('REDIS_PORT', 6379),
-                    'database' => env('REDIS_DB', 0),
-                ],
-            ],
-        ],
-
-    ],
-
     /*
     |--------------------------------------------------------------------------
     | Override application config values
