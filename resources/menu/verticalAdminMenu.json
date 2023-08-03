@@ -189,7 +189,7 @@
       "url": "admin/logs",
       "name": "Logs",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": "admin.pms.logs"
+      "slug": "log-viewer.index"
     }
   ]
 }

@@ -12,7 +12,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Core\Http\Controllers\MediaViewController;
-use Modules\Core\Http\Controllers\MigrateController;
+// use Modules\Core\Http\Controllers\MigrateController;
 use Modules\Core\Http\Controllers\OAuthController;
 use Modules\Core\Http\Middleware\PreventRequestsWhenMigrationNeeded;
 use Modules\Core\Http\Middleware\PreventRequestsWhenUpdateNotFinished;
@@ -21,8 +21,8 @@ Route::withoutMiddleware([
     PreventRequestsWhenMigrationNeeded::class,
     PreventRequestsWhenUpdateNotFinished::class,
 ])->group(function () {
-    Route::get('/errors/migration', [MigrateController::class, 'show']);
-    Route::post('/errors/migration', [MigrateController::class, 'migrate']);
+    // Route::get('/errors/migration', [MigrateController::class, 'show']);
+    // Route::post('/errors/migration', [MigrateController::class, 'migrate']);
 
     Route::get('/media/{token}', [MediaViewController::class, 'show']);
     Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
