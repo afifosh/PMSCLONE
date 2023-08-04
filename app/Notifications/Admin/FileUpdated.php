@@ -4,6 +4,7 @@ namespace App\Notifications\Admin;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class FileUpdated extends Notification implements ShouldQueue
@@ -27,7 +28,7 @@ class FileUpdated extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -47,5 +48,12 @@ class FileUpdated extends Notification implements ShouldQueue
                 'view' => 'admin.notifications.file-updated',
             ]
         ];
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([
+          'type' => 'file-updated'
+        ]);
     }
 }

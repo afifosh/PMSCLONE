@@ -20,7 +20,7 @@
       <button type="button" data-form="ajax-form" class="btn btn-primary btn-sm mt-2">Hide Completed</button>
     </form>
   @endif
-
+  <button class="btn btn-primary btn-sm mt-2 ms-2" onclick="initSortable();"> Sort </button>
 </div>
 @php
     $items = $task->is_completed_checklist_hidden ? $task->checklistItems->whereNull('completed_by') : $task->checklistItems;
@@ -29,7 +29,7 @@
     <li class="list-group-item lh-1 d-flex justify-content-between align-items-center" data-task-id="{{$task->id}}" data-project-id="{{$task->project_id}}" data-checklist-id={{$item->id}}>
       <div>
         <span class="d-flex align-items-center">
-          <i class="drag-handle cursor-move ti ti-menu-2 align-text-bottom me-2"></i>
+          <i class="drag-handle cursor-move ti ti-menu-2 align-text-bottom me-2 checklist-drag" style="display: none"></i>
           <div class="form-check form-check-success">
             <input class="form-check-input mt-1 checklist-status" type="checkbox" value="1" @checked($item->status)>
           </div>

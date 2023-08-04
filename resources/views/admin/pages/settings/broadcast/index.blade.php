@@ -15,6 +15,7 @@
                 <hr>
                 <div class="setting pt-0 px-4">
                     <div class="setting-item" data-general="true" data-bs-toggle="sidebar">
+                        <h5>{{__('Please restart queue worker and socket server after updating these settings.')}}</h5>
                         <!-- form -->
                         <form method="POST" action="{{ route('admin.setting.broadcast.update') }}" class="mt-3">
                             @csrf
@@ -84,7 +85,7 @@
                                     <input name="pusher_app_cluster" value="{{ $setting['pusher_app_cluster'] ?? config('broadcasting.connections.pusher.options.cluster') }}" type="text" class="form-control" id="pusherAppCluster" placeholder="{{ __('Pusher App Cluster') }}" aria-describedby="pusherAppCluster" />
                                 </div>
                             </div>
-                            <div class="websocket-inputs">
+                            <div class="websocket-inputs" style="display:{{ @$setting['broadcast_driver'] == 'websockets' ? '' : 'none' }}">
                               <div class="row mb-4">
                                 <!-- Pusher App Cluster -->
                                 <div class="col-md-3">

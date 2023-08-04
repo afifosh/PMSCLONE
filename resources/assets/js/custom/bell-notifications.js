@@ -1,17 +1,18 @@
-// $(document).ready(function () {
-//     getNotifications()
-// })
-
 window.getNotifications = function () {
     let url = $('#notifications-onload').attr('data-href')
     $.ajax({
         type: 'GET',
         url,
     }).done(function (response) {
-        $('.dropdown-notifications-ul-list').append(response.data)
+        $('.dropdown-notifications-ul-list').empty().append(response.data)
     })
 }
 
+window.notificationSound = function() {
+  let sound = document.getElementById("notificationSound");
+  sound.currentTime = 0;
+  sound.play();
+}
 
 $('.dropdown-notifications a.dropdown-toggle').on('click', function () {
     let url = $(this).attr('data-href')

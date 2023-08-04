@@ -43,6 +43,7 @@ $configData = Helper::appClasses();
     // destroy old editor
   }
   function initSortable() {
+    $('.checklist-drag').show();
     var sortable = Sortable.create(document.getElementById('sortable'), {
       group: 'shared',
       animation: 150,

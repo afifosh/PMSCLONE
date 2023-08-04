@@ -38,7 +38,7 @@
 
 <body style="overflow-x: hidden;"  class="{{ !empty($body_class) ? $body_class : '' }}">
   <audio id="notificationSound">
-    <source src="{{ getNotificationSound() ? getNotificationSound() : ''}}" type="audio/mp3">
+    <source src="{{ getNotificationSound() ? getNotificationSound() : asset('notification.wav')}}" type="audio/mp3">
   </audio>
 
   <!-- Layout Content -->

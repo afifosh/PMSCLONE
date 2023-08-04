@@ -5,11 +5,11 @@ window.Pusher = Pusher;
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: process.env.MIX_PUSHER_APP_KEY,
-    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-    // wsHost: window.location.hostname,
-    // wsPort: 6001,
-    // forceTLS: false,
+    key: broadcastKey,
+    cluster: broadcastCluster,
+    wsHost: broadcastHost,
+    wsPort: broadcastPort,
+    forceTLS:broadcastForceTLS == 1,
     disableStats: true,
 
 });

@@ -89,9 +89,8 @@
     85 => 'Spatie\\Permission\\PermissionServiceProvider',
     86 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     87 => 'Laravolt\\Avatar\\ServiceProvider',
-    88 => 'App\\Providers\\SettingServiceProvider',
-    89 => 'App\\Providers\\CustomBladeDirectiveServiceProvider',
-    90 => 'Mavinoo\\Batch\\BatchServiceProvider',
+    88 => 'App\\Providers\\CustomBladeDirectiveServiceProvider',
+    89 => 'Mavinoo\\Batch\\BatchServiceProvider',
   ),
   'eager' => 
   array (
@@ -166,9 +165,8 @@
     68 => 'Spatie\\Permission\\PermissionServiceProvider',
     69 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     70 => 'Laravolt\\Avatar\\ServiceProvider',
-    71 => 'App\\Providers\\SettingServiceProvider',
-    72 => 'App\\Providers\\CustomBladeDirectiveServiceProvider',
-    73 => 'Mavinoo\\Batch\\BatchServiceProvider',
+    71 => 'App\\Providers\\CustomBladeDirectiveServiceProvider',
+    72 => 'Mavinoo\\Batch\\BatchServiceProvider',
   ),
   'deferred' => 
   array (

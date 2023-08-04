@@ -122,6 +122,9 @@ class Project extends Model
 
   public function sendMessageInChat($message, $toOthers = true, $type = Conversation::MESSAGE_TYPE_BADGES)
   {
+    if (!$this->group) {
+      return false;
+    }
     $msgInput = [
       'to_id' => $this->group->id,
       'message' => $message,

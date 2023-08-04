@@ -58,12 +58,12 @@ class AppServiceProvider extends ServiceProvider
     } catch (\Exception $exception) {
     }
 
-    try {
+    // try {
       SetBroadcastingConfig::new(true)
         ->cashClear()
         ->configSet();
-    } catch (\Exception $exception) {
-    }
+    // } catch (\Exception $exception) {
+    // }
 
     try {
       SetOnlyOfficeConfig::new(true)

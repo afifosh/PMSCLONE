@@ -4,6 +4,7 @@ namespace App\Notifications\Auth;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
@@ -32,7 +33,7 @@ class NewLocation extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return ['database', 'broadcast', 'mail'];
     }
 
     /**
@@ -69,5 +70,12 @@ class NewLocation extends Notification implements ShouldQueue
             'browser' => $this->authenticationLog->user_agent,
             'location' => $this->authenticationLog->location,
         ];
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([
+          'type' => 'new-device'
+        ]);
     }
 }

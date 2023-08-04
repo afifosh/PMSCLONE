@@ -5,6 +5,7 @@ namespace App\Notifications\Admin;
 use App\Models\FileShare;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class FileShared extends Notification implements ShouldQueue
@@ -28,7 +29,7 @@ class FileShared extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -50,5 +51,12 @@ class FileShared extends Notification implements ShouldQueue
                 'view' => 'admin.notifications.file-shared',
             ]
         ];
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([
+          'type' => 'file-shared'
+        ]);
     }
 }
