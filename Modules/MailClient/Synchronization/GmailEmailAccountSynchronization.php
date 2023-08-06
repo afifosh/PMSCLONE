@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -108,6 +108,12 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
             * @link https://developers.google.com/gmail/api/v1/reference/users/history/list#startHistoryId
             */
             if ($e->getCode() == 404) {
+                $this->error(sprintf(
+                    'Folder %s history id (%s) not found, re-syncing all.',
+                    $folder->name,
+                    $currentHistoryId
+                ));
+
                 return $this->syncAll($folder);
             } elseif ($this->isRateLimitExceededException($e)) {
                 $retryAfter = $this->setAccountSyncAfterFlag($e);
@@ -137,15 +143,17 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
         // But we need to get the first history id from the first message so
         // we can store the history id in database as it was synced
         if ($remoteFolder->isTrashOrSpam()) {
-            return $this->setFolderHistoryIdFromMessage(
+            return $this->setFolderHistoryId(
                 $folder,
-                $this->getInitialMessages($remoteFolder, 1)->first()
+                $this->getInitialMessages($remoteFolder, 1)->first()?->getHistoryId()
             );
         }
 
         $this->info(sprintf('Performing initial sync for folder %s.', $folder->name));
 
         $nextPageResult = null;
+        $newHistoryId = null;
+
         // If _continue_sync_token flag is empty, will perform initial sync
         $continueFromPageToken = $folder->getMeta('_continue_sync_token');
 
@@ -155,12 +163,6 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
                 if (! $nextPageResult) {
                     /** @var \Modules\Core\Google\Services\MessageCollection */
                     $result = $this->getInitialMessages($remoteFolder);
-
-                    // Remember the first message as we will set the history id
-                    // after the messages are processed and the system mailables excluded
-                    // the message token will be saved after all data is saved, it should not
-                    // be saved when rate limit exceeded exception is thrown because the sync must continue from where stopped
-                    $firstMessage = $result->first();
 
                     if (! is_null($continueFromPageToken)) {
                         $result->setNextPageToken($continueFromPageToken);
@@ -172,10 +174,20 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
                     $result = $nextPageResult;
                 }
 
+                // Remember the first message as we will set the history id
+                // after the messages are processed and the system mailables excluded
+                // the message token will be saved after all data is saved
+
+                if ($result->isNotEmpty()) {
+                    // The supplied startHistoryId should be obtained from the historyId of a message, thread, or previous list response.
+                    $newHistoryId = $result->first()->getHistoryId();
+                }
+
                 $this->processMessages($this->excludeSystemMailables($result));
             } catch (GoogleServiceException $e) {
                 if ($this->isRateLimitExceededException($e)) {
                     $retryAfter = $this->setAccountSyncAfterFlag($e);
+
                     $folder->setMeta('_continue_sync_token', $result->getPrevPageToken());
 
                     $this->error(sprintf(
@@ -189,7 +201,8 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
             }
         } while ($nextPageResult = $result->getNextPageResults());
 
-        $this->setFolderHistoryIdFromMessage($folder, $firstMessage ?? null);
+        $this->setFolderHistoryId($folder, $newHistoryId);
+
         $folder->removeMeta('_continue_sync_token');
     }
 
@@ -263,15 +276,15 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
      * In all cases, the provided message should be the first message
      *
      * @param  \Modules\MailClient\Models\EmailAccountFolder  $folder
-     * @param  \Modules\MailClient\Client\Gmail\Message|null  $message
+     * @param  string|null  $historyId
      */
-    protected function setFolderHistoryIdFromMessage($folder, $message): void
+    protected function setFolderHistoryId($folder, $historyId): void
     {
-        if (is_null($message)) {
+        if (is_null($historyId)) {
             return;
         }
 
-        $folder->setMeta(static::HISTORY_META_KEY, $message->getHistoryId());
+        $folder->setMeta(static::HISTORY_META_KEY, $historyId);
     }
 
     /**
@@ -336,11 +349,8 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
 
     /**
      * Set the account sync flag from the given exception
-     *
-     * @param  \Google\Service\Exception  $exception
-     * @return string
      */
-    protected function setAccountSyncAfterFlag($exception)
+    protected function setAccountSyncAfterFlag(GoogleServiceException $exception): string
     {
         $retryAfter = Str::after($exception->getErrors()['message'], 'Retry after ');
         $this->account->setMeta('_continue_sync_after', $retryAfter);
@@ -357,11 +367,9 @@ class GmailEmailAccountSynchronization extends EmailAccountIdBasedSynchronizatio
     }
 
     /**
-     * Check whether the given exception is rate limit exceeded
-     *
-     * @param  \Google\Service\Exception  $exception
+     * Check whether the given exception is rate limit exceeded.
      */
-    protected function isRateLimitExceededException($exception): bool
+    protected function isRateLimitExceededException(GoogleServiceException $exception): bool
     {
         return $exception->getCode() == 403 && $exception->getErrors()['reason'] == 'rateLimitExceeded';
     }

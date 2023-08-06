@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -25,15 +25,21 @@ class ActionButtonPlaceholder extends UrlPlaceholder
     public string $interpolationEnd = '}}}';
 
     /**
-     * The placeholder tag
+     * Initialize new ActionButtonPlaceholder instance.
+     *
+     * @param  \Closure|mixed  $value
      */
-    public string $tag = 'action_button';
+    public function __construct($value = null, string $tag = 'action_button')
+    {
+        parent::__construct($value, $tag);
+
+        $this->description('Formatted action button.');
+    }
 
     /**
      * Format the placeholder
      *
-     *
-     * @return string
+     * @return \Closure
      */
     public function format(?string $contentType = null)
     {
@@ -49,15 +55,5 @@ class ActionButtonPlaceholder extends UrlPlaceholder
                 'text' => $text ?: __('core::mail_template.placeholders.view_record'),
             ])->render();
         };
-    }
-
-    /**
-     * Boot the placeholder and set default values
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->description('Formatted action button.');
     }
 }

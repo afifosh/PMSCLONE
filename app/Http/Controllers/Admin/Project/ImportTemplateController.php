@@ -30,10 +30,15 @@ class ImportTemplateController extends Controller
       if($project->tasks()->where('subject', $taskTemplate->subject)->count() > 0){
         continue;
       }
-      $task = $project->tasks()->create($taskTemplate->toArray() + ['admin_id' => auth()->id()]);
+      $task = $project->tasks()->create(['admin_id' => auth()->id(), 'status' => 'Not Started'] + $taskTemplate->toArray());
       if($taskTemplate->checkItemTemplates->count() > 0){
         foreach($taskTemplate->checkItemTemplates as $checkItemTemplate){
-          $task->checklistItems()->create($checkItemTemplate->toArray());
+          $task->checklistItems()->create([
+            'completed_by' => null,
+            'assigned_to' => null,
+            'due_date' => null,
+            'created_by' => auth()->id()
+            ] + $checkItemTemplate->toArray());
         }
       }
     }

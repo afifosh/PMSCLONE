@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -37,7 +37,7 @@ trait HasEmails
      */
     public function unreadEmails(): MorphToMany
     {
-        return $this->emails()->where('is_read', false)->whereHas('folders', function ($folderQuery) {
+        return $this->emails()->unread()->whereHas('folders', function ($folderQuery) {
             return $folderQuery->where('syncable', true);
         });
     }

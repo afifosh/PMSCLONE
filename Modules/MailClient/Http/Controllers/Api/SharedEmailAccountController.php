@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -24,7 +24,7 @@ class SharedEmailAccountController extends ApiController
      */
     public function __invoke(): JsonResponse
     {
-        $accounts = EmailAccount::withResponseRelations()
+        $accounts = EmailAccount::withCommon()
             ->shared()
             ->orderBy('email')
             ->get();

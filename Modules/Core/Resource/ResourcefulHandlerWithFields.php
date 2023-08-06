@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -19,6 +19,7 @@ use Modules\Core\Contracts\Fields\TracksMorphManyModelAttributes;
 use Modules\Core\Contracts\Resources\ResourcefulRequestHandler;
 use Modules\Core\Contracts\Services\CreateService;
 use Modules\Core\Contracts\Services\UpdateService;
+use Modules\Core\Fields\Field;
 use Modules\Core\Fields\MorphMany;
 use Modules\Core\Models\Model;
 use Modules\Core\Resource\Events\ResourceRecordCreated;
@@ -38,7 +39,7 @@ class ResourcefulHandlerWithFields extends ResourcefulHandler implements Resourc
         if ($service instanceof CreateService) {
             $model = $service->create($attributes);
         } else {
-            $model = $this->resource()::$model::create($attributes);
+            $model = tap($this->resource()->newModel()->fill($attributes))->save();
         }
 
         $model = $this->handleAssociatedResources($model);
@@ -96,7 +97,7 @@ class ResourcefulHandlerWithFields extends ResourcefulHandler implements Resourc
             ->reject(function ($field) {
                 return $this->request->missing($field->requestAttribute());
             })
-            ->mapWithKeys(function ($field) {
+            ->mapWithKeys(function (Field $field) {
                 return $field->storageAttributes($this->request, $field->requestAttribute());
             });
     }

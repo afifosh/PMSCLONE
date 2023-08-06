@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -434,7 +434,7 @@ class SmtpClient extends AbstractSmtpClient implements SupportSaveToSentFolderPa
             return false;
         }
 
-        $values = collect($this->headers)->mapWithKeys(function ($header) {
+        $values = collect($this->headers)->mapWithKeys(function (array $header) {
             return [$header['name'] => $header['value']];
         })->all();
 

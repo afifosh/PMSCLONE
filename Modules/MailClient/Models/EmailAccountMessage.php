@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -24,16 +24,16 @@ use Modules\Core\Concerns\HasAvatar;
 use Modules\Core\Contracts\Presentable;
 use Modules\Core\Media\HasMedia;
 use Modules\Core\Models\Model;
-use Modules\Core\Resource\Resourceable;
-use Modules\Core\Timeline\Timelineable;
+// use Modules\Core\Resource\Resourceable;
+// use Modules\Core\Timeline\Timelineable;
 use Modules\MailClient\Support\EmailAccountMessageBody;
 
 class EmailAccountMessage extends Model implements Presentable
 {
     use HasAvatar,
-        HasMedia,
-        Resourceable,
-        Timelineable;
+        HasMedia;
+        // Resourceable,
+        // Timelineable;
 
     /**
      * The attributes that are mass assignable.
@@ -67,14 +67,12 @@ class EmailAccountMessage extends Model implements Presentable
     ];
 
     /**
-     * The fields for the model that are searchable.
+     * The columns for the model that are searchable.
      */
-    protected static array $searchableFields = [
+    protected static array $searchableColumns = [
         'subject' => 'like',
-        'text_body' => 'like',
-        'html_body' => 'like',
-        'from.address' => 'like',
-        'from.name' => 'like',
+        'from.address',
+        'from.name',
     ];
 
     /**
@@ -117,45 +115,6 @@ class EmailAccountMessage extends Model implements Presentable
     public function addresses(): HasMany
     {
         return $this->hasMany(\Modules\MailClient\Models\EmailAccountMessageAddress::class, 'message_id');
-    }
-
-    /**
-     * A message can have many contacts.
-     */
-    public function contacts(): MorphToMany
-    {
-        return $this->morphedByMany(
-            \Modules\Contacts\Models\Contact::class,
-            'messageable',
-            'email_account_messageables',
-            'message_id'
-        );
-    }
-
-    /**
-     * A message can have many companies.
-     */
-    public function companies(): MorphToMany
-    {
-        return $this->morphedByMany(
-            \Modules\Contacts\Models\Company::class,
-            'messageable',
-            'email_account_messageables',
-            'message_id'
-        );
-    }
-
-    /**
-     * A message can have many deals.
-     */
-    public function deals(): MorphToMany
-    {
-        return $this->morphedByMany(
-            \Modules\Deals\Models\Deal::class,
-            'messageable',
-            'email_account_messageables',
-            'message_id'
-        );
     }
 
     /**
@@ -247,6 +206,14 @@ class EmailAccountMessage extends Model implements Presentable
     }
 
     /**
+     * Get the timeline sort column.
+     */
+    public function getTimelineSortColumn(): string
+    {
+        return 'date';
+    }
+
+    /**
      * Get the message attachments excluding the inline
      */
     public function attachments(): MorphToMany
@@ -319,10 +286,8 @@ class EmailAccountMessage extends Model implements Presentable
 
     /**
      * Mark a message as read
-     *
-     * @param  int|null  $folderId
      */
-    public function markAsRead($folderId = null): static
+    public function markAsRead(?int $folderId = null): static
     {
         if ($this->is_read) {
             return $this;
@@ -345,10 +310,8 @@ class EmailAccountMessage extends Model implements Presentable
 
     /**
      * Mark a message as unread
-     *
-     * @param  int|null  $folderId
      */
-    public function markAsUnread($folderId): static
+    public function markAsUnread(?int $folderId = null): static
     {
         if (! $this->is_read) {
             return $this;
@@ -374,8 +337,7 @@ class EmailAccountMessage extends Model implements Presentable
      */
     public function purge(): void
     {
-        // foreach (['deals', 'contacts', 'companies', 'folders'] as $relation) {
-        foreach (['contacts', 'folders'] as $relation) {
+        foreach (['folders'] as $relation) {
             tap($this->{$relation}(), function ($query) {
                 if ($query->getModel()->usesSoftDeletes()) {
                     $query->withTrashed();
@@ -384,6 +346,24 @@ class EmailAccountMessage extends Model implements Presentable
                 $query->detach();
             });
         }
+    }
+
+    /**
+     * Scope a query to include only unread messages.
+     */
+    public function scopeUnread(Builder $query)
+    {
+        // is_read = 0 causes slow performance, use is_read < 1 for better performance
+        $query->where('is_read', '<', 1);
+    }
+
+    /**
+     * Scope a query to include only read messages.
+     */
+    public function scopeRead(Builder $query)
+    {
+        // is_read = 1 causes slow performance, use is_read > 0 for better performance
+        $query->where('is_read', '>', 0);
     }
 
     /**
@@ -409,7 +389,7 @@ class EmailAccountMessage extends Model implements Presentable
     /**
      * Eager load the relations that are required for the front end response.
      */
-    public function scopeWithResponseRelations(Builder $query): void
+    public function scopeWithCommon(Builder $query): void
     {
         $query->with([
             'headers',
@@ -423,20 +403,9 @@ class EmailAccountMessage extends Model implements Presentable
             'folders',
             'account',
             'account.folders' => fn ($query) => $query->withCount([
-                'messages as unread_count' => fn ($query) => $query->where('is_read', false),
+              'messages as unread_count' => fn ($query) => $query->unread(),
             ]),
-            // 'contacts.nextActivity',
-            // 'companies.nextActivity',
-            // 'deals.nextActivity',
         ]);
-    }
-
-    /**
-     * Get the activity front-end component
-     */
-    public function getTimelineComponent(): string
-    {
-        return 'record-tab-timeline-email';
     }
 
     public function getParent()

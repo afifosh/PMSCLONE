@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -30,10 +30,8 @@ class OutlookEmailAccountSynchronization extends EmailAccountIdBasedSynchronizat
 
     /**
      * Start account messages synchronization
-     *
-     * @return void
      */
-    public function syncMessages()
+    public function syncMessages(): void
     {
         $folders = $this->account->folders->active();
         $messages = $this->getInitialDataAndQueueMessagesForDelete($folders->all());

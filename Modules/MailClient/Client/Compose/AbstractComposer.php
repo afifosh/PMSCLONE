@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -16,9 +16,10 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use KubAT\PhpSimple\HtmlDomParser;
 use Modules\Core\Models\Media;
-use Modules\Core\Resource\MailPlaceholders;
+use Modules\Core\Placeholders\Placeholders;
 use Modules\MailClient\Client\Client;
 use Modules\MailClient\Client\FolderIdentifier;
+use Modules\MailClient\Support\MailTracker;
 
 abstract class AbstractComposer
 {
@@ -52,6 +53,16 @@ abstract class AbstractComposer
         $this->client->setSentFolder(
             $this->client->getFolders()->find($identifier)
         );
+
+        return $this;
+    }
+
+    /**
+     * Add trackers to the message body.
+     */
+    public function withTrackers(): static
+    {
+        (new MailTracker)->createTrackers($this);
 
         return $this;
     }
@@ -111,7 +122,7 @@ abstract class AbstractComposer
             $parameters[0] = trim(str_replace(
                 ['<p><br /></p>', '<p><br/></p>', '<p><br></p>', '<p>&nbsp;</p>'],
                 "\n",
-                MailPlaceholders::cleanUpWhenViaInputFields($parameters[0])
+                Placeholders::cleanup($parameters[0])
             ));
 
             // Next, we will convert the media images that are inline from the current server

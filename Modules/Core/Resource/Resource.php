@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -21,24 +21,12 @@ use Modules\Core\Contracts\Resources\Resourceful;
 use Modules\Core\Contracts\Resources\ResourcefulRequestHandler;
 use Modules\Core\Contracts\Services\Service;
 use Modules\Core\Criteria\RequestCriteria;
-use Modules\Core\Facades\Cards;
 use Modules\Core\Facades\Fields;
 use Modules\Core\Facades\Innoclapps;
-use Modules\Core\Facades\Menu;
-use Modules\Core\Fields\CustomFieldFactory;
-use Modules\Core\Models\Model;
-use Modules\Core\ResolvesActions;
-use Modules\Core\ResolvesFilters;
 use Modules\Core\Resource\Http\ResourceRequest;
-use Modules\Core\Resource\Import\Import;
-use Modules\Core\Resource\Import\ImportSample;
-use Modules\Core\Settings\SettingsMenu;
 
 abstract class Resource implements JsonSerializable
 {
-    use ResolvesActions;
-    use ResolvesFilters;
-    use ResolvesTables;
     use QueriesResources;
 
     /**
@@ -73,6 +61,8 @@ abstract class Resource implements JsonSerializable
 
     /**
      * The model the resource is related to.
+     *
+     * @var \Modules\Core\Models\Model|null
      */
     public static string $model;
 
@@ -82,6 +72,8 @@ abstract class Resource implements JsonSerializable
      * @var \Modules\Core\Models\Model|null
      */
     public $resource;
+
+    protected static array $registered = [];
 
     /**
      * Record finder instance.
@@ -93,7 +85,7 @@ abstract class Resource implements JsonSerializable
      */
     public function __construct()
     {
-        $this->register();
+        $this->registerIfNotRegistered();
     }
 
     /**
@@ -136,36 +128,6 @@ abstract class Resource implements JsonSerializable
         $model = static::$model;
 
         return new $model;
-    }
-
-    /**
-     * Provide the resource available cards
-     */
-    public function cards(): array
-    {
-        return [];
-    }
-
-    /**
-     *  Get the filters intended for the resource
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function filtersForResource(ResourceRequest $request)
-    {
-        return $this->resolveFilters($request)->merge(
-            (new CustomFieldFactory($this->name()))->createFieldsForFilters()
-        );
-    }
-
-    /**
-     * Get the actions intended for the resource
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function actionsForResource(ResourceRequest $request)
-    {
-        return $this->resolveActions($request);
     }
 
     /**
@@ -217,17 +179,7 @@ abstract class Resource implements JsonSerializable
      */
     public function getFieldsForJsonResource($request, $model, $canSeeResource = true)
     {
-        return $this->resolveFields()->reject(function ($field) use ($request) {
-            return $field->excludeFromZapierResponse && $request->isZapier();
-        })->filter(function ($field) use ($canSeeResource) {
-            if (! $canSeeResource) {
-                return $field->alwaysInJsonResource === true;
-            }
-
-            return $canSeeResource;
-        })->reject(function ($field) use ($model) {
-            return is_null($field->resolveForJsonResource($model));
-        })->values();
+        return collect([]);
     }
 
     /**
@@ -367,7 +319,7 @@ abstract class Resource implements JsonSerializable
     {
         return Innoclapps::registeredResources()
             ->reject(fn ($resource) => is_null($resource->associateableName()))
-            ->filter(fn ($resource) => app(static::$model)->isRelation($resource->associateableName()))
+            ->filter(fn ($resource) => static::newModel()->isRelation($resource->associateableName()))
             ->values();
     }
 
@@ -396,7 +348,7 @@ abstract class Resource implements JsonSerializable
      */
     public static function searchable(): bool
     {
-        return ! empty(static::newModel()->getSearchableFields());
+        return ! empty(static::newModel()->getSearchableColumns());
     }
 
     /**
@@ -432,59 +384,11 @@ abstract class Resource implements JsonSerializable
     }
 
     /**
-     * Get the resource importable class
-     */
-    public function importable(): Import
-    {
-        return new Import($this);
-    }
-
-    /**
-     * Get the resource import sample class
-     */
-    public function importSample(): ImportSample
-    {
-        return new ImportSample($this);
-    }
-
-    /**
      * Get the resource export class.
      */
     public function exportable(Builder $query): Export
     {
         return new Export($this, $query);
-    }
-
-    /**
-     * Register the resource available menu items
-     */
-    protected function registerMenuItems(): void
-    {
-        foreach ($this->menu() as $item) {
-            if (! $item->singularName) {
-                $item->singularName($this->singularLabel());
-            }
-
-            Menu::register($item);
-        }
-    }
-
-    /**
-     * Register the resource settings menu items
-     */
-    protected function registerSettingsMenuItems(): void
-    {
-        foreach ($this->settingsMenu() as $key => $item) {
-            SettingsMenu::register($item, is_int($key) ? $this->name() : $key);
-        }
-    }
-
-    /**
-     * Register the resource available cards
-     */
-    protected function registerCards(): void
-    {
-        Cards::register($this->name(), $this->cards(...));
     }
 
     /**
@@ -510,13 +414,27 @@ abstract class Resource implements JsonSerializable
      */
     public function finder(): RecordFinder
     {
-        if ($this->finder) {
-            return $this->finder;
-        }
+        return $this->finder ??= new RecordFinder($this->newModel());
+    }
 
-        return $this->finder = new RecordFinder(
-            $this->newModel()
-        );
+    /**
+     * Clear the registered resource.
+     */
+    public static function clearRegisteredResources(): void
+    {
+        static::$registered = [];
+    }
+
+    /**
+     * Register the resource if not registered.
+     */
+    protected function registerIfNotRegistered(): void
+    {
+        if (! isset(static::$registered[static::class])) {
+            $this->register();
+
+            static::$registered[static::class] = true;
+        }
     }
 
     /**
@@ -529,13 +447,6 @@ abstract class Resource implements JsonSerializable
         if ($this instanceof Resourceful) {
             $this->registerFields();
         }
-
-        $this->registerCards();
-
-        Innoclapps::booting(function () {
-            $this->registerMenuItems();
-            $this->registerSettingsMenuItems();
-        });
     }
 
     /**

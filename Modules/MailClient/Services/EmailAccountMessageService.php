@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -147,7 +147,7 @@ class EmailAccountMessageService
      */
     public function batchDelete($messages)
     {
-        $allAccounts = EmailAccount::get();
+        $allAccounts = EmailAccount::with(['user', 'oAuthAccount', 'trashFolder.account'])->get();
         $messagesByAccount = $messages->groupBy('email_account_id');
 
         $messagesByAccount->each(function ($messages, $accountId) use ($allAccounts) {

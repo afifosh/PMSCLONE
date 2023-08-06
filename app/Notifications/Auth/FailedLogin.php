@@ -3,6 +3,7 @@
 namespace App\Notifications\Auth;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Rappasoft\LaravelAuthenticationLog\Notifications\FailedLogin as NotificationsFailedLogin;
 
 class FailedLogin extends NotificationsFailedLogin
@@ -12,7 +13,7 @@ class FailedLogin extends NotificationsFailedLogin
     public function via($notifiable)
     {
         return [
-            'database', 'mail'
+            'database', 'broadcast', 'mail'
         ];
     }
 
@@ -31,5 +32,12 @@ class FailedLogin extends NotificationsFailedLogin
             'browser' => $this->authenticationLog->user_agent,
             'location' => $this->authenticationLog->location,
         ];
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([
+          'type' => 'failed-login'
+        ]);
     }
 }

@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -16,69 +16,58 @@ use Closure;
 use JsonSerializable;
 use Modules\Core\Makeable;
 
+/**
+ * @property-read mixed $value
+ */
 abstract class Placeholder implements JsonSerializable
 {
     use Makeable;
 
     /**
-     * Indicates the starting interpolation
+     * Indicates the starting interpolation.
      */
     public string $interpolationStart = '{{';
 
     /**
-     * Indicates the ending interpolation
+     * Indicates the ending interpolation.
      */
     public string $interpolationEnd = '}}';
 
     /**
-     * The placeholder description
+     * The placeholder description.
      */
     public ?string $description = null;
 
     /**
-     * The placeholder tag
-     */
-    public string $tag;
-
-    /**
-     * Custom value callback
-     * e.q. can be used value(function(){})
+     * Custom value callback.
      *
      * @var null|callable
      */
     public $valueCallback;
 
     /**
-     * Initialize the placeholder
-     *
-     * @param  \Closure|string  $value Pass value via the constructor
+     * Indicates whether the placeholder may contain new lines.
      */
-    public function __construct($value = null)
+    public bool $newlineable = false;
+
+    /**
+     * Initialize new Placeholder instance.
+     *
+     * @param  \Closure|mixed  $value
+     */
+    public function __construct(public string $tag, $value = null)
     {
         if ($value) {
             $this->value($value);
         }
-
-        $this->boot();
     }
 
     /**
-     * Format the placeholder
-     *
+     * Format the placeholder.
      *
      * @return string
      */
     abstract public function format(?string $contentType = null);
-
-    /**
-     * Boot the mail placeholder
-     * e.q. can be used to set custom description or tag
-     *
-     * @return void
-     */
-    public function boot()
-    {
-    }
 
     /**
      * Change the placeholder starting interpolation
@@ -127,6 +116,14 @@ abstract class Placeholder implements JsonSerializable
     }
 
     /**
+     * Prefix the placeholder tag with the given prefix
+     */
+    public function prefixTag(string $prefix): static
+    {
+        return $this->tag($prefix.$this->tag);
+    }
+
+    /**
      * Set placeholder description
      */
     public function description(?string $description): static
@@ -146,6 +143,7 @@ abstract class Placeholder implements JsonSerializable
             'description' => $this->description,
             'interpolation_start' => $this->interpolationStart,
             'interpolation_end' => $this->interpolationEnd,
+            'newlineable' => $this->newlineable,
         ];
     }
 

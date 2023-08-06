@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -12,7 +12,7 @@
 
 namespace Modules\MailClient\Http\Requests;
 
-use App\Installer\RequirementsChecker;
+use Closure;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
@@ -58,10 +58,6 @@ class EmailAccountRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator) {
-            if ($this->isImapConnectionType() && ! (new RequirementsChecker)->passes('imap')) {
-                abort(409, 'In order to use IMAP account type, you will need to enable the PHP extension "imap".');
-            }
-
             if ($this->isMethod('POST') && $this->isSharedAccountRequest() && ! $this->user()->isSuperAdmin()) {
                 abort(403, 'Only super administrators can create shared email accounts.');
             }
@@ -120,7 +116,7 @@ class EmailAccountRequest extends FormRequest
     {
         return [
             'date',
-            function ($attribute, $value, $fail) {
+            function (string $attribute, mixed $value, Closure $fail) {
                 if ($this->isMethod('PUT')) {
                     return;
                 }

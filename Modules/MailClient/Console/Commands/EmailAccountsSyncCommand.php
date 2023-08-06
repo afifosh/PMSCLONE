@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -100,7 +100,7 @@ class EmailAccountsSyncCommand extends Command implements Isolatable
             ->get();
 
         if ($this->option('account')) {
-            $accounts = $accounts->filter(function ($account) {
+            $accounts = $accounts->filter(function (EmailAccount $account) {
                 return (int) $account->id === (int) $this->option('account');
             })->values();
         }

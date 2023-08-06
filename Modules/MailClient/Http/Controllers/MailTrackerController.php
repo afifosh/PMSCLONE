@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -22,7 +22,6 @@ class MailTrackerController extends Controller
 {
     public function opens($hash)
     {
-
         $response = response($this->createPixel(), 200)
             ->header('Content-type', 'image/gif')
             ->header('Content-Length', 42)

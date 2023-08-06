@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -25,7 +25,7 @@ class EmailAccountSyncStateController extends ApiController
      */
     public function enable(string $id): JsonResponse
     {
-        $account = EmailAccount::withResponseRelations()->findOrFail($id);
+        $account = EmailAccount::withCommon()->findOrFail($id);
 
         $this->authorize('update', $account);
 
@@ -45,7 +45,7 @@ class EmailAccountSyncStateController extends ApiController
      */
     public function disable(string $id): JsonResponse
     {
-        $account = EmailAccount::withResponseRelations()->findOrFail($id);
+        $account = EmailAccount::withCommon()->findOrFail($id);
 
         $this->authorize('update', $account);
 

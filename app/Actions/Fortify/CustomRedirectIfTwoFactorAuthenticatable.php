@@ -68,7 +68,7 @@ class CustomRedirectIfTwoFactorAuthenticatable extends RedirectIfTwoFactorAuthen
         }
 
         return $next($request);
-    }    
+    }
     public function handless($request, $next)
     {
         $user = $this->validateCredentials($request);
@@ -83,10 +83,10 @@ class CustomRedirectIfTwoFactorAuthenticatable extends RedirectIfTwoFactorAuthen
         if (Fortify::confirmsTwoFactorAuthentication()) {
             if (optional($user)->two_factor_secret &&
                 ! is_null(optional($user)->two_factor_confirmed_at) &&
-                //  ! $known && 
+                //  ! $known &&
                 //  ! $newUser &&
                 //   config('authentication-log.notifications.new-device.enabled') &&
-                in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {        
+                in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
                 return $this->twoFactorChallengeResponse($request, $user);
             } else {
                 return $next($request);

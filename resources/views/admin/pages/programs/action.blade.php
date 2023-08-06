@@ -3,8 +3,6 @@
         class="ti ti-eye"></i></a>    
     @can(true)
         <button class="btn btn-sm btn-icon" data-toggle="ajax-modal" data-title="Edit Program" data-href="{{route('admin.programs.edit', $program)}}"><i class="ti ti-edit"></i></button>
-    @endcan
-    @can(true)
         <button class="btn btn-sm btn-icon delete-record" data-toggle="ajax-delete"
             data-href="{{ route('admin.programs.destroy', $program) }}"><i class="ti ti-trash"></i></button>
     @endcan

@@ -12,20 +12,6 @@
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/bell-notifications.js')) }}"></script>
-@auth
-@if(Auth::getDefaultDriver() === 'web' && Route::currentRouteName() !== 'auth.lock' && config('auth.enable_timeout'))
-<script src="{{ asset(mix('assets/js/bootstrap-session-timeout.js')) }}"></script>
-<script>
-  var keepAliveUrl = "{{ route('alive') }}"
-  var logoutUrl = "{{ route('logout') }}"
-  var redirUrl = "{{ route('logout') }}"
-  var warnAfter = +"{{ config('auth.timeout_warning_seconds') }}"
-  var redirAfter = +"{{ config('auth.timeout_after_seconds') }}" + warnAfter
-</script>
-<script src="{{ asset(mix('assets/js/custom/session-timeout.js')) }}"></script>
-@endif
-@endauth
-
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
@@ -42,8 +28,8 @@
     toast_success("{{ucwords(str_replace('-', ' ', session('status')))}}");
     @endif
   });
-
 </script>
+@stack('scripts')
 
 <script>
   setInterval(function() {
@@ -66,3 +52,16 @@
 <!-- BEGIN: Page JS-->
 @yield('page-script')
 <!-- END: Page JS-->
+@auth
+@if(Route::currentRouteName() !== 'auth.lock' && config('auth.enable_timeout'))
+<script src="{{ asset(mix('assets/js/bootstrap-session-timeout.js')) }}"></script>
+<script>
+  var keepAliveUrl = "{{ route('alive') }}"
+  var logoutUrl = "{{ route('logout') }}"
+  var redirUrl = "{{ route('logout') }}"
+  var warnAfter = +"{{ config('auth.timeout_warning_seconds') }}"
+  var redirAfter = +"{{ config('auth.timeout_after_seconds') }}" + warnAfter
+</script>
+<script src="{{ asset(mix('assets/js/custom/session-timeout.js')) }}"></script>
+@endif
+@endauth

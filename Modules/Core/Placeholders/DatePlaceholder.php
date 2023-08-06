@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -16,11 +16,6 @@ use Modules\Core\Facades\Format;
 
 class DatePlaceholder extends Placeholder
 {
-    /**
-     * The placeholder tag
-     */
-    public string $tag = 'date';
-
     /**
      * The user the date is intended for
      *
@@ -38,7 +33,6 @@ class DatePlaceholder extends Placeholder
     /**
      * Format the placeholder
      *
-     *
      * @return string
      */
     public function format(?string $contentType = null)
@@ -52,11 +46,8 @@ class DatePlaceholder extends Placeholder
 
     /**
      * Add custom format callback
-     *
-     *
-     * @return static
      */
-    public function formatUsing(callable $callback)
+    public function formatUsing(callable $callback): static
     {
         $this->formatCallback = $callback;
 
@@ -67,9 +58,8 @@ class DatePlaceholder extends Placeholder
      * The user the date is intended for
      *
      * @param  \Modules\Users\Models\User  $user
-     * @return static
      */
-    public function forUser($user)
+    public function forUser($user): static
     {
         $this->user = $user;
 

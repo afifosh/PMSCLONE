@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('remote_id')->nullable()
                 ->comment('API ID, uidvalidity etc...');
             $table->boolean('support_move')->default(true);
-            $table->boolean('syncable')->default(false);
+            $table->boolean('syncable')->index()->default(false);
             $table->boolean('selectable')->default(false);
             $table->string('type')->nullable();
             $table->string('name');

@@ -71,7 +71,7 @@ Route::prefix('admin')->middleware('guest:web')->group(function () {
             $limiter ? 'throttle:'.$limiter : null,
         ]));
 
-    Route::any('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
     // Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
     // Password Reset...

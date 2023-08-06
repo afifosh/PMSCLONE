@@ -11,26 +11,25 @@
 <script src="{{ asset(mix('assets/vendor/libs/toastr/toastr.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
-<script src="{{ asset(mix('assets/js/custom/bell-notifications.js')) }}"></script>
-@auth
-@if(Auth::getDefaultDriver() === 'admin' && Route::currentRouteName() !== 'admin.auth.lock' && config('auth.enable_timeout'))
-<script src="{{ asset(mix('assets/js/bootstrap-session-timeout.js')) }}"></script>
-<script>
-  var keepAliveUrl = "{{ route('admin.alive') }}"
-  var logoutUrl = "{{ route('admin.logout') }}"
-  var redirUrl = "{{ route('admin.logout') }}"
-  var warnAfter = +"{{ config('auth.timeout_warning_seconds') }}"
-  var redirAfter = +"{{ config('auth.timeout_after_seconds') }}" + warnAfter
-</script>
-<script src="{{ asset(mix('assets/js/custom/session-timeout.js')) }}"></script>
-@endif
-@endauth
-
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
+<script>
+  const broadcastKey = "{{ config('broadcasting.connections.pusher.key') }}"
+  const broadcastCluster = "{{ config('broadcasting.connections.pusher.options.cluster') }}"
+  const broadcastHost = "{{ config('broadcasting.connections.pusher.options.host') }}"
+  const broadcastPort = "{{ config('broadcasting.connections.pusher.options.port') }}"
+  const broadcastForceTLS = '{{ config('broadcasting.connections.pusher.options.host') ? 0 : 1 }}'
+</script>
 <script src="{{ asset(mix('assets/vendor/js/Echo.js')) }}"></script>
+<script>
+  Echo.private('App.Models.Admin.{{ auth()->id() }}')
+    .notification((notification) => {
+      $('#unread-notifications-count').show();
+      notificationSound();
+    });
+</script>
 
 <script>
   setInterval(function() {
@@ -66,3 +65,18 @@
     @endif
   });
  </script>
+ @stack('scripts')
+ @auth
+ @if(Route::currentRouteName() !== 'admin.auth.lock' && config('auth.enable_timeout'))
+ <script src="{{ asset(mix('assets/js/bootstrap-session-timeout.js')) }}"></script>
+ <script>
+   const keepAliveUrl = "{{ route('admin.alive') }}"
+   const logoutUrl = "{{ route('admin.logout') }}"
+   const warnAfter = +"{{ config('auth.timeout_warning_seconds') }}"
+   const redirAfter = +"{{ config('auth.timeout_after_seconds') }}" + warnAfter
+ </script>
+ <script src="{{ asset(mix('assets/js/custom/session-timeout.js')) }}"></script>
+ @endif
+ @endauth
+<script src="{{ asset(mix('assets/js/custom/bell-notifications.js')) }}"></script>
+

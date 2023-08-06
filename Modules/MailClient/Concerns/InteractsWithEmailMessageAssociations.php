@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -30,10 +30,8 @@ trait InteractsWithEmailMessageAssociations
     protected function addComposerAssociationsHeaders(AbstractComposer $composer, array $associations): void
     {
         foreach (EmailAccountMessage::resource()->availableAssociations() as $resource) {
-            if (isset($associations[$resource->name()])
-                    && is_array($associations[$resource->name()])) {
-                $associations = $associations[$resource->name()];
-                if ($relatedModels = $this->getRelatedResourceModels($resource, $associations)) {
+            if (is_array($associations[$resource->name()] ?? null)) {
+                if ($relatedModels = $this->getRelatedResourceModels($resource, $associations[$resource->name()])) {
                     $composer->addHeader(
                         $this->createAssociationHeaderName($resource->name()),
                         implode($this->associationsSeparator, $relatedModels->pluck('uuid')->all())
@@ -65,13 +63,13 @@ trait InteractsWithEmailMessageAssociations
      * Get the associate models via the uuids
      *
      * @param  string  $uuids The header value uuids
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     protected function getAssociatedModelsViaHeaderUuids(Resource $resource, string $uuids)
     {
         $uuids = explode($this->associationsSeparator, $uuids);
 
-        return $resource->newModel()->whereIn('uuid', $uuids);
+        return $resource->newModel()->whereIn('uuid', $uuids)->get();
     }
 
     /**

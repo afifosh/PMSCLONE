@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -12,34 +12,20 @@
 
 namespace Modules\MailClient\Providers;
 
-use App\Http\View\FrontendComposers\Tab;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
-use Modules\Contacts\Resource\Company\Frontend\ViewComponent as CompanyViewComponent;
-use Modules\Contacts\Resource\Contact\Frontend\ViewComponent as ContactViewComponent;
 use Modules\Core\Facades\Innoclapps;
-use Modules\Core\Facades\Menu;
 use Modules\Core\Facades\Permissions;
-use Modules\Core\Menu\MenuItem;
 use Modules\Core\OAuth\Events\OAuthAccountConnected;
 use Modules\Core\OAuth\Events\OAuthAccountDeleting;
-use Modules\Core\SystemInfo;
-use Modules\Deals\Resource\Frontend\ViewComponent as DealViewComponent;
 use Modules\MailClient\Client\ClientManager;
 use Modules\MailClient\Client\ConnectionType;
 use Modules\MailClient\Client\FolderType;
 use Modules\MailClient\Console\Commands\EmailAccountsSyncCommand;
-use Modules\MailClient\Criteria\EmailAccountsForUserCriteria;
-use Modules\MailClient\Events\EmailAccountMessageCreated;
-use Modules\MailClient\Listeners\AttachEmailAccountMessageToContact;
-use Modules\MailClient\Listeners\CreateContactFromEmailAccountMessage;
 use Modules\MailClient\Listeners\CreateEmailAccountViaOAuth;
 use Modules\MailClient\Listeners\StopRelatedOAuthEmailAccounts;
-use Modules\MailClient\Listeners\TransferMailClientUserData;
 use Modules\MailClient\Models\EmailAccount;
-use Modules\Users\Events\TransferringUserData;
 
 class MailClientServiceProvider extends ServiceProvider
 {
@@ -60,16 +46,12 @@ class MailClientServiceProvider extends ServiceProvider
         $this->registerPermissions();
 
         $this->app['events']->listen(OAuthAccountConnected::class, CreateEmailAccountViaOAuth::class);
-        $this->app['events']->listen(EmailAccountMessageCreated::class, CreateContactFromEmailAccountMessage::class);
-        $this->app['events']->listen(EmailAccountMessageCreated::class, AttachEmailAccountMessageToContact::class);
         $this->app['events']->listen(OAuthAccountDeleting::class, StopRelatedOAuthEmailAccounts::class);
-        $this->app['events']->listen(TransferringUserData::class, TransferMailClientUserData::class);
 
         $this->app->booted(function () {
+            $this->registerResources();
             Innoclapps::whenReadyForServing($this->bootModule(...));
         });
-
-        SystemInfo::register('MAIL_CLIENT_SYNC_INTERVAL', $this->app['config']->get('mailclient.sync.interval'));
     }
 
     /**
@@ -125,12 +107,10 @@ class MailClientServiceProvider extends ServiceProvider
      */
     protected function bootModule(): void
     {
-        Innoclapps::booting($this->registerMenuItems(...));
         Innoclapps::booting($this->shareDataToScript(...));
 
         $this->scheduleTasks();
         $this->registerResources();
-        $this->registerRelatedRecordsDetailTab();
     }
 
     /**
@@ -138,21 +118,27 @@ class MailClientServiceProvider extends ServiceProvider
      */
     public function scheduleTasks(): void
     {
+        /** @var \Illuminate\Console\Scheduling\Schedule */
         $schedule = $this->app->make(Schedule::class);
+        $syncOutputPath = storage_path('logs/email-accounts-sync.log');
+        $syncCommandCronExpression = config('mailclient.sync.interval');
+        $syncCommandName = 'sync-email-accounts';
 
-        if (function_exists('proc_open') && function_exists('proc_close')) {
+        // if (Innoclapps::canRunProcess()) {
+        if (function_exists('proc_open') && function_exists('proc_close')){
             $schedule->command(EmailAccountsSyncCommand::class, ['--broadcast', '--isolated' => 5])
-                ->cron(config('mailclient.sync.interval'))
+                ->cron($syncCommandCronExpression)
+                ->name($syncCommandName)
                 ->withoutOverlapping(30)
-                ->sendOutputTo(storage_path('logs/email-accounts-sync.log'));
+                ->sendOutputTo($syncOutputPath);
         } else {
             $schedule->call(function () {
-                Artisan::call(EmailAccountsSyncCommand::class, ['--broadcast', '--isolated' => 5]);
+                Artisan::call(EmailAccountsSyncCommand::class, ['--broadcast' => true, '--isolated' => 5]);
             })
-                ->cron(config('mailclient.sync.interval'))
-                ->name('sync-email-accounts')
+                ->cron($syncCommandCronExpression)
+                ->name($syncCommandName)
                 ->withoutOverlapping(30)
-                ->sendOutputTo(storage_path('logs/email-accounts-sync.log'));
+                ->sendOutputTo($syncOutputPath);
         }
     }
 
@@ -190,27 +176,6 @@ class MailClientServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the menu items.
-     */
-    private function registerMenuItems(): void
-    {
-        $accounts = auth()->check() ? EmailAccount::with('oAuthAccount')
-            ->criteria(EmailAccountsForUserCriteria::class)
-            ->get()->filter->canSendMails() : null;
-
-        Menu::register(
-            MenuItem::make(__('mailclient::inbox.inbox'), '/inbox', 'Mail')
-                ->position(15)
-                ->badge(fn () => EmailAccount::countUnreadMessagesForUser(Auth::user()))
-                ->inQuickCreate(! is_null($accounts?->filter->isPrimary()->first() ?? $accounts?->first()))
-                ->quickCreateName(__('mailclient::mail.send'))
-                ->quickCreateRoute('/inbox?compose=true')
-                ->keyboardShortcutChar('E')
-                ->badgeVariant('info')
-        );
-    }
-
-    /**
      * Register the mail client module permissions.
      */
     protected function registerPermissions(): void
@@ -225,18 +190,6 @@ class MailClientServiceProvider extends ServiceProvider
                 ]);
             });
         });
-    }
-
-    /**
-     * Register the documents module related tabs.
-     */
-    public function registerRelatedRecordsDetailTab(): void
-    {
-        $tab = Tab::make('emails', 'emails-tab')->panel('emails-tab-panel')->order(20);
-
-        // ContactViewComponent::registerTab($tab);
-        // CompanyViewComponent::registerTab($tab);
-        // DealViewComponent::registerTab($tab);
     }
 
     /**

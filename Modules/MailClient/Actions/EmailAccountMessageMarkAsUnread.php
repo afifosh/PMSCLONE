@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -33,9 +33,9 @@ class EmailAccountMessageMarkAsUnread extends Action
         $accountId = request()->integer('account_id');
 
         $service = new EmailAccountMessageService();
-        $service->batchMarkAsUnread($models, $accountId, request()->integer('folder_id'));
+        $service->batchMarkAsUnread($models, $accountId, request()->integer('folder_id') ?: null);
 
-        $account = EmailAccount::withResponseRelations()->find($accountId);
+        $account = EmailAccount::withCommon()->find($accountId);
 
         return [
             'unread_count' => EmailAccount::countUnreadMessagesForUser(auth()->user()),

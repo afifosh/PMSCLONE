@@ -31,7 +31,6 @@ $configData = Helper::appClasses();
 
 @section('content')
 @includeWhen(isset($program), 'admin.pages.programs.program-nav', ['tab' => 'rfps']);
-@can(true)
   <div class="mt-3  col-12">
     <div class="card">
       <div class="card-body">
@@ -39,7 +38,6 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </div>
-@endcan
 
 @endsection
 @push('scripts')

@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -12,31 +12,32 @@
 
 namespace Modules\MailClient\Services;
 
+use Exception;
 use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use MediaUploader;
 use Modules\Core\Facades\Innoclapps;
 use Modules\Core\Mail\ContentDecoder;
 use Modules\Core\Resource\AssociatesResources;
 use Modules\MailClient\Client\AbstractMessage;
 use Modules\MailClient\Client\Contracts\AttachmentInterface;
-use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
+// use Modules\MailClient\Concerns\InteractsWithEmailMessageAssociations;
 use Modules\MailClient\Events\EmailAccountMessageCreated;
 use Modules\MailClient\Models\EmailAccount;
 use Modules\MailClient\Models\EmailAccountMessage;
+use PDOException;
 use Plank\Mediable\Exceptions\MediaUploadException;
 
 class EmailAccountMessageSyncService
 {
-    use AssociatesResources,
-        InteractsWithEmailMessageAssociations;
+    use AssociatesResources;
+        // InteractsWithEmailMessageAssociations;
 
     /**
-     * Message addresses headers and relations
-     *
-     * @var array
+     * Message addresses headers and relations.
      */
-    protected $addresses = ['from', 'to', 'cc', 'bcc', 'replyTo', 'sender'];
+    protected array $addresses = ['from', 'to', 'cc', 'bcc', 'replyTo', 'sender'];
 
     /**
      * Cache account folders
@@ -47,7 +48,7 @@ class EmailAccountMessageSyncService
      *
      * @var array
      */
-    protected $cachedAccountFolders = [];
+    protected array $cachedAccountFolders = [];
 
     /**
      * Get messages for account
@@ -55,15 +56,35 @@ class EmailAccountMessageSyncService
      * @param  int  $accountId
      * @return \Modules\MailClient\Models\EmailAccountMessage
      */
-    public function create($accountId, AbstractMessage $message, ?array $associations = null)
+    public function create(int $accountId, AbstractMessage $message, ?array $associations = null)
     {
         $data = $message->toArray();
 
-        $dbMessage = EmailAccountMessage::create(array_merge($data, [
+        $attributes = array_merge($data, [
             'email_account_id' => $accountId,
             'is_sent_via_app' => $message->isSentFromApplication(),
             'hash' => $message->getHeader('x-concord-hash')?->getValue(),
-        ]));
+        ]);
+
+        try {
+          $dbMessage = EmailAccountMessage::create($attributes);
+        } catch (PDOException $e) {
+            // In most cases this may happen when the message has invalid subject or body
+            // Confirmed with subject that contains binary string
+            // https://stackoverflow.com/questions/1734005/in-php-what-is-a-binary-string-bxxxx
+            if ($this->isPDOExceptionInvalidSubjectString($e)) {
+                $dbMessage = EmailAccountMessage::create(array_merge($attributes, [
+                    'subject' => '[Invalid Subject]',
+                ]));
+            } elseif ($this->isPDOExceptionInvalidMessageString($e)) {
+                $dbMessage = EmailAccountMessage::create(array_merge($attributes, [
+                    'html_body' => '[Invalid Message]',
+                    'text_body' => '[Invalid Message]',
+                ]));
+            } else {
+                throw $e;
+            }
+        }
 
         $this->persistAddresses($data, $dbMessage);
         $this->persistHeaders($message, $dbMessage);
@@ -87,7 +108,7 @@ class EmailAccountMessageSyncService
             } else {
                 // If the message is queued, we need to fetch the associations from
                 // the headers and sync with the actual associations
-                $this->syncAssociationsViaMessageHeaders($dbMessage, $message);
+                // $this->syncAssociationsViaMessageHeaders($dbMessage, $message);
             }
         }
 
@@ -99,19 +120,35 @@ class EmailAccountMessageSyncService
     /**
      * Update a message for a given account
      *
-     * NOTE: This functions does not syncs attachments
+     * NOTE: This functions does not sync attachments
      *
      * @param  \Modules\MailClient\Client\AbstractMessage  $message
      * @param  int  $id The account ID
      * @return \Modules\MailClient\Models\EmailAccountMessage
      */
-    public function update($message, $id)
+    public function update(AbstractMessage $message, EmailAccountMessage|int $dbMessage): EmailAccountMessage
     {
         $data = $message->toArray();
 
-        $dbMessage = EmailAccountMessage::find($id);
+        $dbMessage = is_int($dbMessage) ? EmailAccountMessage::find($dbMessage) : $dbMessage;
 
-        $dbMessage->fill($data)->save();
+        try {
+            $dbMessage->fill($data)->save();
+        } catch (PDOException $e) {
+            // In most cases this may happen when the message has invalid subject or body
+            // Confirmed with subject that contains binary string
+            // https://stackoverflow.com/questions/1734005/in-php-what-is-a-binary-string-bxxxx
+            if ($this->isPDOExceptionInvalidSubjectString($e)) {
+                $dbMessage->fill(['subject' => '[Invalid Subject]'])->save();
+            } elseif ($this->isPDOExceptionInvalidMessageString($e)) {
+                $dbMessage->fill([
+                    'html_body' => '[Invalid Message]',
+                    'text_body' => '[Invalid Message]',
+                ])->save();
+            } else {
+                throw $e;
+            }
+        }
 
         $this->persistAddresses($data, $dbMessage);
         $this->persistHeaders($message, $dbMessage);
@@ -126,12 +163,8 @@ class EmailAccountMessageSyncService
 
     /**
      * Create the message addresses
-     *
-     * @param  array  $data
-     * @param  \Modules\MailClient\Models\EmailAccountMessage  $message
-     * @return void
      */
-    protected function persistAddresses($data, $message)
+    protected function persistAddresses(array $data, EmailAccountMessage $message): void
     {
         // Delete the existing addresses
         // Below we will re-create them
@@ -151,9 +184,8 @@ class EmailAccountMessageSyncService
      *
      * @param  int|\Illuminate\Database\Eloquent\Collection  $message
      * @param  null|int  $fromFolderId
-     * @return void
      */
-    public function delete($message, $fromFolderId = null)
+    public function delete($message, $fromFolderId = null): void
     {
         $service = new EmailAccountMessageService();
 
@@ -193,13 +225,8 @@ class EmailAccountMessageSyncService
 
     /**
      * Create message addresses
-     *
-     * @param  \Modules\MailClient\Models\EmailAccountMessage  $message
-     * @param  \Modules\Core\Mail\Headers\AddressHeader  $addresses
-     * @param  string  $type
-     * @return void
      */
-    protected function createAddresses($message, $addresses, $type)
+    protected function createAddresses(EmailAccountMessage $message, $addresses, string $type): void
     {
         foreach ($addresses->getAll() as $address) {
             $message->addresses()->create(array_merge($address, [
@@ -244,9 +271,8 @@ class EmailAccountMessageSyncService
      *
      * @param  \Modules\MailClient\Client\Contracts\MessageInterface  $imapMessage
      * @param  \Modules\MailClient\Models\EmailAccountMessage  $dbMessage
-     * @return array
      */
-    protected function determineMessageDatabaseFolders($imapMessage, $dbMessage)
+    protected function determineMessageDatabaseFolders($imapMessage, $dbMessage): array
     {
         if (isset($this->cachedAccountFolders[$dbMessage->email_account_id])) {
             $folders = $this->cachedAccountFolders[$dbMessage->email_account_id];
@@ -264,9 +290,8 @@ class EmailAccountMessageSyncService
      *
      * @param  \Modules\MailClient\Models\EmailAccountMessage  $message
      * @param  \Modules\MailClient\Client\Contracts\MessageInterface  $imapMessage
-     * @return array
      */
-    protected function handleAttachments($dbMessage, $imapMessage)
+    protected function handleAttachments($dbMessage, $imapMessage): array
     {
         // Store embedded attachments with embedded-attachments tag
         // We will cast as embedded/inline attachments only the attachments which
@@ -288,9 +313,8 @@ class EmailAccountMessageSyncService
      *
      * @param \Modules\MailClient\Models\EmailAccountMessage
      * @param  \Modules\MailClient\Client\Contracts\MessageInterface  $imapMessage
-     * @return array
      */
-    protected function replaceBodyInlineAttachments($dbMessage, $imapMessage)
+    protected function replaceBodyInlineAttachments($dbMessage, $imapMessage): array
     {
         $embeddedAttachmentsKeys = [];
 
@@ -336,9 +360,8 @@ class EmailAccountMessageSyncService
      * @param  \Iluminate\Support\Collection|\Modules\MailClient\Client\Contracts\AttachmentInterface  $attachments
      * @param  \Modules\MailClient\Models\EmailAccountMessage  $message
      * @param  string  $tag
-     * @return array
      */
-    protected function storeAttachments($attachments, $message, $tag)
+    protected function storeAttachments($attachments, $message, $tag): array
     {
         if ($attachments instanceof AttachmentInterface) {
             $attachments = [$attachments];
@@ -356,7 +379,7 @@ class EmailAccountMessageSyncService
             );
 
             try {
-                $storedMedia[] = $media = MediaUploader::fromSource($tmpFile)
+              $media = MediaUploader::fromSource($tmpFile)
                     ->toDirectory($message->getMediaDirectory())
                     ->onDuplicateUpdate()
                     ->useFilename($filename = pathinfo($attachment->getFileName(), PATHINFO_FILENAME))
@@ -368,6 +391,7 @@ class EmailAccountMessageSyncService
 
                 $message->attachMedia($media, [$tag]);
 
+                $storedMedia[] = $media;
             } catch (MediaUploadException $e) {
                 Log::debug(
                     sprintf(
@@ -397,9 +421,8 @@ class EmailAccountMessageSyncService
      *
      * @param \Modules\MailClient\Models\EmailAccountMessage
      * @param \Modules\MailClient\Client\Contracts\MessageInterface
-     * @return bool
      */
-    protected function syncAssociationsWhenReply($dbMessage, $remoteMessage)
+    protected function syncAssociationsWhenReply($dbMessage, $remoteMessage): bool
     {
         // If the message is sent from the application,
         // we will use the headers to associate the selected
@@ -408,7 +431,7 @@ class EmailAccountMessageSyncService
         // sync and was not inserted in database when the user click send, hence
         // the associations were not saved in database
         if ($remoteMessage->isSentFromApplication()) {
-            $this->syncAssociationsViaMessageHeaders($dbMessage, $remoteMessage);
+            // $this->syncAssociationsViaMessageHeaders($dbMessage, $remoteMessage);
 
             return true;
         }
@@ -439,13 +462,38 @@ class EmailAccountMessageSyncService
             ->first();
 
         if ($inReplyToDbMessage) {
-            foreach ($inReplyToDbMessage->associatedResources() as $resource => $records) {
-                $dbMessage->{Innoclapps::resourceByName($resource)->associateableName()}()->sync($records->pluck('id')->all());
-            }
+            // foreach ($inReplyToDbMessage->associatedResources() as $resource => $records) {
+            //     $relationship = Innoclapps::resourceByName($resource)->associateableName();
+
+            //     $dbMessage->{$relationship}()->sync($records->pluck('id')->all());
+            // }
 
             return true;
         }
 
         return false;
+    }
+
+    protected function isPDOExceptionIncorrectStringValue(PDOException|Exception $e): bool
+    {
+        return str_contains($e->getMessage(), 'Incorrect string value');
+    }
+
+    protected function isPDOExceptionInvalidSubjectString(PDOException|Exception $e): bool
+    {
+        if (! str_contains($e->getMessage(), '`subject` at row 1')) {
+            return false;
+        }
+
+        return $this->isPDOExceptionIncorrectStringValue($e);
+    }
+
+    protected function isPDOExceptionInvalidMessageString(PDOException|Exception $e): bool
+    {
+        if (! Str::contains($e->getMessage(), ['`html_body` at row 1', '`text_body` at row 1'])) {
+            return false;
+        }
+
+        return $this->isPDOExceptionIncorrectStringValue($e);
     }
 }

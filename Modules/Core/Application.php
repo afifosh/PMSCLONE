@@ -18,8 +18,6 @@ use Illuminate\Support\Facades\File;
 use Modules\Core\Contracts\Metable;
 use Modules\Core\Models\Model;
 use Modules\Core\Resource\Resource;
-use Modules\Core\Updater\Migration;
-use Modules\Core\Updater\UpdateFinalizer;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class Application
@@ -29,7 +27,7 @@ class Application
      *
      * @var string
      */
-    const VERSION = '1.1.9';
+    const VERSION = '1.2.2';
 
     /**
      * System name that will be used over the system.
@@ -347,22 +345,10 @@ class Application
     }
 
     /**
-     * Check whether the application is installed
-     */
-    public static function isAppInstalled(): bool
-    {
-        return file_exists(static::installedFileLocation());
-    }
-
-    /**
      * Run callback when the application is already installed
      */
     public static function whenInstalled(callable $callback): void
     {
-        if (! static::isAppInstalled()) {
-            return;
-        }
-
         call_user_func($callback);
     }
 
@@ -537,7 +523,7 @@ class Application
      */
     public static function readyForServing(): bool
     {
-        return static::isAppInstalled() && ! static::requiresUpdateFinalization();
+        return true;
     }
 
     /**
@@ -545,10 +531,6 @@ class Application
      */
     public static function whenReadyForServing(callable $callback): void
     {
-        if (! static::readyForServing()) {
-            return;
-        }
-
         call_user_func($callback);
     }
 
@@ -557,7 +539,7 @@ class Application
      */
     public static function requiresMigration(): bool
     {
-        return app(Migration::class)->needed();
+        return false;
     }
 
     /**
@@ -565,7 +547,7 @@ class Application
      */
     public static function requiresUpdateFinalization(): bool
     {
-        return app(UpdateFinalizer::class)->needed();
+       return false;
     }
 
     /**

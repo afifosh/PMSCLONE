@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -13,6 +13,7 @@
 namespace Modules\MailClient\Client\Imap;
 
 use Illuminate\Mail\Mailer;
+use Illuminate\Support\Str;
 use Modules\MailClient\Client\AbstractSmtpClient;
 use Modules\MailClient\Client\Compose\PreparesSymfonyMessage;
 use Modules\MailClient\Client\Contracts\Connectable;
@@ -184,7 +185,11 @@ class SmtpClient extends AbstractSmtpClient implements Connectable, SupportSaveT
             $username,
             $this->getConfig()->password(),
             $this->getConfig()->port(),
-            ['verify_peer' => $this->getConfig()->validateCertificate()]
+            [
+              'verify_peer' => $this->getConfig()->validateCertificate(),
+              // https://github.com/symfony/symfony/discussions/48693
+              'local_domain' => str_contains($this->getConfig()->host(), 'hostinger') ? Str::after($this->getConfig()->email(), '@') : null,
+            ]
         ));
 
         return $this->mailer = new Mailer('smtp', app()->get('view'), $transport, app()->get('events'));

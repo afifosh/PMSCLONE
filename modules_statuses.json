@@ -2,9 +2,5 @@
     "Posts": true,
     "MailClient": true,
     "Core": true,
-    "Activities": true,
-    "Comments": true,
-    "Contacts": true,
-    "Translator": true,
     "Chat": true
 }

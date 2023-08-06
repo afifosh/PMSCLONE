@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -23,9 +23,15 @@ class EmailAccountPrimaryStateController extends ApiController
      */
     public function update(string $id): JsonResponse
     {
-        $this->authorize('view', $account = EmailAccount::findOrFail($id));
+        /** @var \Modules\MailClient\Models\EmailAccount */
+        $account = EmailAccount::findOrFail($id);
 
-        $account->markAsPrimary(auth()->user());
+        $this->authorize('view', $account);
+
+        /** @var \Modules\Users\Model\User&\Modules\Core\Contracts\Metable */
+        $user = auth()->user();
+
+        $account->markAsPrimary($user);
 
         return $this->response('', 204);
     }
@@ -35,7 +41,10 @@ class EmailAccountPrimaryStateController extends ApiController
      */
     public function destroy(): JsonResponse
     {
-        EmailAccount::unmarkAsPrimary(auth()->user());
+        /** @var \Modules\Users\Model\User&\Modules\Core\Contracts\Metable */
+        $user = auth()->user();
+
+        EmailAccount::unmarkAsPrimary($user);
 
         return $this->response('', 204);
     }

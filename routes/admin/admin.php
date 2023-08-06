@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -31,7 +32,6 @@ use App\Http\Controllers\Admin\SharedFileController;
 use App\Http\Controllers\Admin\Workflow\WorkflowController;
 use App\Http\Controllers\OnlyOfficeController;
 use App\Models\RFPFile;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
@@ -40,55 +40,31 @@ use App\Http\Controllers\Admin\Project\ProjectController;
 use App\Http\Controllers\Admin\Project\ProjectTaskController;
 use App\Http\Controllers\Admin\Project\ProjectTemplateController;
 use App\Http\Controllers\Admin\Project\TaskChecklistController;
-use App\Http\Controllers\Admin\Project\TaskCommentController;
 use App\Http\Controllers\Admin\Project\TaskFileController;
 use App\Http\Controllers\Admin\Project\TaskReminderController;
 use App\Http\Controllers\Admin\Setting\OauthGoogleController;
 use App\Http\Controllers\Admin\Setting\OauthMicrosoftController;
-use Modules\Core\Http\Controllers\ApplicationController;
 use Modules\Core\Http\Controllers\OAuthController;
 use Modules\MailClient\Http\Controllers\OAuthEmailAccountController;
 
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
-Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','adminVerified' , 'mustBeActive', CheckForLockMode::class)->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'adminVerified', 'mustBeActive', CheckForLockMode::class)->group(function () {
   Route::get('/mail/accounts/{type}/{provider}/connect', [OAuthEmailAccountController::class, 'connect']);
   // Email accounts routes
   Route::prefix('mail/accounts')->group(function () {
-   // Email accounts management
-  //  Route::get('{account}/sync', EmailAccountSync::class);
-  //  Route::put('{account}/update', [EmailAccountController::class, 'update']);
-  //  Route::delete('{account}/delete', [EmailAccountController::class, 'destroy']);
-  //  Route::get('unread', [EmailAccountController::class, 'unread']);
-   Route::get('{account}/share', [EmailAccountController::class, 'share']);
-   Route::post('{account}/setPermission', [EmailAccountController::class, 'setPermission']);
+    Route::get('{account}/share', [EmailAccountController::class, 'share']);
+    Route::post('{account}/setPermission', [EmailAccountController::class, 'setPermission']);
+  });
+  Route::get('/{providerName}/connect', [OAuthController::class, 'connect'])->where('providerName', 'microsoft|google');
+  Route::get('/{providerName}/callback', [OAuthController::class, 'callback'])->where('providerName', 'microsoft|google');
 
-   // The GET route for all shared accounts
-  //  Route::get('shared', SharedEmailAccountController::class)->middleware('permission:access shared inbox');
-
-   // The GET route for all logged in user personal mail accounts
-  //  Route::get('personal', PersonalEmailAccountController::class);
-
-   // Test connection route
-  //  Route::post('connection', [EmailAccountConnectionTestController::class, 'handle']);
-
-  //  Route::put('{account}/primary', [EmailAccountPrimaryStateController::class, 'update']);
-  //  Route::delete('primary', [EmailAccountPrimaryStateController::class, 'destroy']);
-  //  Route::post('{account}/sync/enable', [EmailAccountSyncStateController::class, 'enable']);
-  //  Route::post('{account}/sync/disable', [EmailAccountSyncStateController::class, 'disable']);
- });
-
-
-    //  Route::resource('emails', EmailAccountController::class);
-     Route::get('/{providerName}/connect', [OAuthController::class, 'connect'])->where('providerName', 'microsoft|google');
-     Route::get('/{providerName}/callback', [OAuthController::class, 'callback'])->where('providerName', 'microsoft|google');
-
-    Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class,'index'])->name('mail.accounts.manage');
-    Route::resource('/mail/accounts', EmailAccountController::class);
+  Route::get('/mail/accounts/manage-accounts', [EmailAccountController::class, 'index'])->name('mail.accounts.manage');
+  Route::resource('/mail/accounts', EmailAccountController::class);
 
   Route::post('/keep-alive', fn () => response()->json(['status' => __('success')]))->name('alive');
-  Route::prefix('auth')->name('auth.')->group(function() {
+  Route::prefix('auth')->name('auth.')->group(function () {
     Route::get('lock', [LockModeController::class, 'lock'])->name('lock');
-    Route::post('unlock', [LockModeController::class ,'unlock'])->name('unlock');
+    Route::post('unlock', [LockModeController::class, 'unlock'])->name('unlock');
   });
 
   Route::prefix('password')->middleware(['passwordMustBeExpired'])->name('password.expired.')->group(function () {
@@ -194,28 +170,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
 
     // Route::resource('companies.invitations', InvitationController::class);
     Route::prefix('settings')->name('setting.')->group(function () {
-      Route::prefix('security')->name('security.')->controller(SecuritySettingController::class)->group(function() {
-        Route::get('', 'index')->name('index');
-        Route::put('', 'update')->name('update');
-    });
-
-      // Route::prefix('general')->name('general.')->controller(GeneralSettingController::class)->group(function() {
-      //   Route::get('', 'index')->name('index');
-      //   Route::put('', 'update')->name('update');
-      // });
-
-      // Route::prefix('delivery')->name('delivery.')->controller(DeliverySettingController::class)->group(function() {
-      //   Route::get('', 'index')->name('index');
-      //   Route::get('show', 'show')->name('show');
-      //   Route::put('', 'update')->name('update');
-      // });
-
-      Route::prefix('broadcast')->name('broadcast.')->controller(BroadcastSettingController::class)->group(function() {
+      Route::prefix('security')->name('security.')->controller(SecuritySettingController::class)->group(function () {
         Route::get('', 'index')->name('index');
         Route::put('', 'update')->name('update');
       });
 
-      Route::prefix('onlyoffice')->name('onlyoffice.')->controller(OnlyOfficeSettingController::class)->group(function() {
+      Route::prefix('broadcast')->name('broadcast.')->controller(BroadcastSettingController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+      });
+
+      Route::prefix('onlyoffice')->name('onlyoffice.')->controller(OnlyOfficeSettingController::class)->group(function () {
         Route::get('', 'index')->name('index');
         Route::put('', 'update')->name('update');
       });
@@ -228,10 +193,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web','ad
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
   });
-
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
 
 Route::any('update-file/{file}', [OnlyOfficeController::class, 'updateFile'])->name('update-file');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -135,7 +135,7 @@ class EmailAccountFolder extends Model implements Metable
      */
     public function countUnreadMessages(): int
     {
-        return $this->countReadOrUnreadMessages($this->id, false);
+        return $this->countReadOrUnreadMessages($this->id, 'unread');
     }
 
     /**
@@ -143,17 +143,17 @@ class EmailAccountFolder extends Model implements Metable
      */
     public function countReadMessages(): int
     {
-        return $this->countReadOrUnreadMessages($this->id, true);
+        return $this->countReadOrUnreadMessages($this->id, 'read');
     }
 
     /**
      * Count read or unread messages for a given folder
      */
-    protected function countReadOrUnreadMessages(int $folderId, bool|int $isRead): int
+    protected function countReadOrUnreadMessages(int $folderId, string $scope): int
     {
-        return (int) static::select(['id'])
-            ->withCount(['messages' => function ($query) use ($isRead) {
-                return $query->where('is_read', $isRead);
+        return (int) static::select('id')
+            ->withCount(['messages' => function ($query) use ($scope) {
+                return $query->{$scope}();
             }])->where('id', $folderId)->first()->messages_count ?? 0;
     }
 
@@ -167,7 +167,7 @@ class EmailAccountFolder extends Model implements Metable
         // for the messages where media is available
         $messages = $this->messages()->has('folders', '=', 1)->cursor()
             ->each(function ($message) {
-                foreach (['deals', 'contacts', 'companies'] as $relation) {
+                foreach ([] as $relation) {
                     tap($message->{$relation}(), function ($query) {
                         if ($query->getModel()->usesSoftDeletes()) {
                             $query->withTrashed();

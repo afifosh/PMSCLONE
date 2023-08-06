@@ -87,9 +87,3 @@ window.deleteItemAjax = function (url, tableId, header, callFunction = null) {
         },
     });
 };
-
-window.notificationSound = function() {
-    let sound = document.getElementById("notificationSound");
-    sound.currentTime = 0;
-    sound.play();
-}

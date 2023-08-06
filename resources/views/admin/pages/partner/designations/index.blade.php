@@ -26,7 +26,6 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@can(true)
 <style>
   .dt-bootstrap5 .dropdown-menu {
     position: relative;
@@ -63,7 +62,6 @@ $configData = Helper::appClasses();
       </div>
     </div>
   </div>
-@endcan
 
 @endsection
 @push('scripts')

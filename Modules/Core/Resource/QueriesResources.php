@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -44,7 +44,7 @@ trait QueriesResources
 
         [$with, $withCount] = static::getEagerLoadable($this->resolveFields());
 
-        return $query->withResponseRelations()
+        return $query->withCommon()
             ->withCount($withCount->all())
             ->with($with->all());
     }
@@ -164,11 +164,11 @@ trait QueriesResources
         $with = $fields->pluck('belongsToRelation');
 
         $hasMany = $fields->whereInstanceOf(HasMany::class)->reject(function ($field) {
-            return $field->excludeFromZapierResponse && request()->isZapier();
+            return $field->excludeFromZapierResponse && false;
         });
 
         $morphMany = $fields->whereInstanceOf(MorphMany::class)->reject(function ($field) {
-            return $field->excludeFromZapierResponse && request()->isZapier();
+            return $field->excludeFromZapierResponse && false;
         });
 
         $customFieldAble = $fields->whereInstanceOf(Customfieldable::class);
@@ -181,8 +181,8 @@ trait QueriesResources
             return $field->count === false;
         })
             ->pluck('hasManyRelationship'))->merge($morphMany->filter(function ($field) {
-            return $field->count === false;
-        })->pluck('morphManyRelationship'))
+                return $field->count === false;
+            })->pluck('morphManyRelationship'))
             ->merge($customFieldAble->filter(function ($field) {
                 return $field->isCustomField() && $field->isOptionable();
             })->pluck('customField.relationName'));

@@ -184,6 +184,12 @@
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",
       "slug": "admin.core.settings.index"
+    },
+    {
+      "url": "admin/logs",
+      "name": "Logs",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "log-viewer.index"
     }
   ]
 }

@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -66,7 +66,7 @@ return [
         'no_accounts_configured' => 'Nenhuma conta de e-mail configurada',
         'no_accounts_configured_info' => 'Conecte uma conta para começar a enviar e organizar e-mails para fechar negócios mais rapidamente',
         'create_shared_info' => 'Conecte uma conta de e-mail da empresa, como contato@empresa.com.br ou vendas@empresa.com.br',
-        'create_shared_confirmation_message' => 'Ao conectar uma conta de e-mail compartilhada, esteja ciente de que as contas de e-mail compartilhadas podem ser acessadas por todos os membros da equipe que receberam "acesso à caixa de entrada compartilhada". 
+        'create_shared_confirmation_message' => 'Ao conectar uma conta de e-mail compartilhada, esteja ciente de que as contas de e-mail compartilhadas podem ser acessadas por todos os membros da equipe que receberam "acesso à caixa de entrada compartilhada".
 Isso significa que cada membro da equipe poderá visualizar e interagir com os e-mails.',
         'type' => 'Tipo de Conta',
         'email_address' => 'Endereço de e-mail',

@@ -134,7 +134,7 @@
                                         <span class="switch-label">Sync Account</span>
                                         <label class="switch">
                                             <input type="checkbox" @if (auth()->user()->hasPermission(['Owner', 'Editor', 'Contributor'], $account)) @else disabled @endif
-                                                class="switch-input" @if ($account->sync_state->value == App\Enums\SyncState::ENABLED->value) checked @endif
+                                                class="switch-input" @if ($account->sync_state->value == Modules\Core\Synchronization\SyncState::ENABLED->value) checked @endif
                                                 onchange="disableSync(this,{{ $account->id }});" name="disable_sync" />
                                             <span class="switch-toggle-slider">
                                                 <span class="switch-on"></span>

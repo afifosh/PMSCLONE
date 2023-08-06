@@ -2,7 +2,7 @@
 /**
  * Concord CRM - https://www.concordcrm.com
  *
- * @version   1.1.9
+ * @version   1.2.2
  *
  * @link      Releases - https://www.concordcrm.com/releases
  * @link      Terms Of Service - https://www.concordcrm.com/terms
@@ -23,9 +23,9 @@ return new class extends Migration
     {
         Schema::create('email_account_message_addresses', function (Blueprint $table) {
             $table->foreignId('message_id')->constrained('email_account_messages')->cascadeOnDelete();
-            $table->string('address')->nullable(); // For drafts without address
-            $table->string('name')->nullable();
-            $table->string('address_type');
+            $table->string('address')->index()->nullable(); // For drafts without address
+            $table->string('name')->index()->nullable();
+            $table->string('address_type')->index();
         });
     }
 
