@@ -112,7 +112,7 @@ class ChatRepository extends BaseRepository
               $join->on('pinned_conversations.conversation_id', '=', 'to_id');
               $join->on('pinned_conversations.pinned_by', '=', DB::raw("$authId"));
             });
-            if (! $isArchived) {
+            if (! $isArchived && !$projectsOnly) {
                 $groupSubQuery->has('archiveConversation', '=', 0);
             }
             $groupSubQuery->leftJoin('group_message_recipients as gmr', function (JoinClause $join) use ($authId) {
@@ -135,9 +135,19 @@ class ChatRepository extends BaseRepository
                 )->whereHas('group.usersWithTrashed', function (Builder $q) use ($authId) {
                     $q->where('user_id', $authId); // To get conversations in which user is
                 })
-                ->when($projectsOnly, function (Builder $q) {
-                    $q->whereHas('group', function (Builder $q) {
-                        $q->whereNotNull('project_id');
+                ->when($projectsOnly, function (Builder $q) use ($isArchived) {
+                    $q->whereHas('group', function (Builder $q) use ($isArchived) {
+                        $q->whereNotNull('project_id')
+                        ->when(!$isArchived, function (Builder $q){
+                            $q->whereHas('project', function($q){
+                              $q->where('status', '!=', 4);
+                            });
+                        })
+                        ->when($isArchived, function (Builder $q){
+                          $q->whereHas('project', function($q){
+                            $q->where('status', 4);
+                          });
+                      });
                     });
                 })
                 ->when(!$projectsOnly, function (Builder $q) {
@@ -189,7 +199,8 @@ class ChatRepository extends BaseRepository
         }
         $chatList->setBindings($bindings)
             ->leftJoin('conversations as cc', 'cc.id', '=', 'temp.latest_id');
-        if (! $isArchived) {
+        if (! $isArchived || $projectsOnly) {
+            if(!$projectsOnly)
             $chatList = $chatList->whereNotIn('temp.user_id', $archiveUsers);
         } else {
             $archiveGroups = [];

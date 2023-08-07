@@ -120,7 +120,6 @@ class MailClientServiceProvider extends ServiceProvider
     {
         /** @var \Illuminate\Console\Scheduling\Schedule */
         $schedule = $this->app->make(Schedule::class);
-        $syncOutputPath = storage_path('logs/email-accounts-sync.log');
         $syncCommandCronExpression = config('mailclient.sync.interval');
         $syncCommandName = 'sync-email-accounts';
 
@@ -130,7 +129,7 @@ class MailClientServiceProvider extends ServiceProvider
                 ->cron($syncCommandCronExpression)
                 ->name($syncCommandName)
                 ->withoutOverlapping(30)
-                ->sendOutputTo($syncOutputPath);
+                ->runInBackground();
         } else {
             $schedule->call(function () {
                 Artisan::call(EmailAccountsSyncCommand::class, ['--broadcast' => true, '--isolated' => 5]);
@@ -138,7 +137,7 @@ class MailClientServiceProvider extends ServiceProvider
                 ->cron($syncCommandCronExpression)
                 ->name($syncCommandName)
                 ->withoutOverlapping(30)
-                ->sendOutputTo($syncOutputPath);
+                ->runInBackground();
         }
     }
 

@@ -15,6 +15,7 @@ namespace Modules\MailClient\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Modules\Core\Date\Carbon;
 use Modules\MailClient\Events\EmailAccountsSyncFinished;
 use Modules\MailClient\Models\EmailAccount;
@@ -43,15 +44,15 @@ class EmailAccountsSyncCommand extends Command implements Isolatable
      */
     public function handle(): void
     {
-        $this->info('Gathering email accounts to sync.');
+        $this->logInfo('Gathering email accounts to sync.');
 
         $accounts = $this->getAccounts();
 
         if ($accounts->isEmpty()) {
-            $this->info('No accounts found for synchronization.');
+            $this->logInfo('No accounts found for synchronization.');
         }
 
-        $this->info(sprintf('Performing sync for %d email accounts.', $accounts->count()));
+        $this->logInfo(sprintf('Performing sync for %d email accounts.', $accounts->count()));
 
         $this->sync($accounts);
     }
@@ -73,7 +74,7 @@ class EmailAccountsSyncCommand extends Command implements Isolatable
                 $hasInitialSync = true;
             }
 
-            $this->info(sprintf('Starting synchronization for account %s.', $account->email));
+            $this->logInfo(sprintf('Starting synchronization for account %s.', $account->email));
 
             $synchronizer = EmailAccountSynchronizationManager::getSynchronizer($account)->setCommand($this);
 
@@ -106,5 +107,14 @@ class EmailAccountsSyncCommand extends Command implements Isolatable
         }
 
         return $accounts;
+    }
+
+    protected function logInfo(string $message): void
+    {
+        $this->info($message);
+        // Log::build(
+
+        // )
+        Log::channel('email-accounts-sync')->info($message);
     }
 }

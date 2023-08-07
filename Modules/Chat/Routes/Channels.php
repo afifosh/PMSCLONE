@@ -23,6 +23,5 @@ Broadcast::channel('group.{group}', function ($user, Group $group) {
 });
 
 Broadcast::channel('user.{id}', function ($user, $id) {
-  return true;
     return (int) $user->id === (int) $id;
 });

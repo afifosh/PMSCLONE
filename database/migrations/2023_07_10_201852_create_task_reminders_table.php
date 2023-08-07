@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignId('sender_id')->constrained('admins')->cascadeOnDelete();
             $table->string('description');
             $table->dateTime('remind_at');
-            $table->boolean('can_send_email')->default(false);
+            $table->dateTime('reminded_at')->nullable();
+            $table->boolean('notify_by_email')->default(false);
 
             $table->timestamps();
         });

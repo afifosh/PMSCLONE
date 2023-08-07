@@ -81,7 +81,7 @@ window.renderNotifications = function () {
 
 renderNotifications();
 
-window.Echo.private(`user.${loggedInUserId}`).
+Echo.private(`user.${loggedInUserId}`).
     listen('UserEvent', (notification) => {
         if (notification.type !== 6) { // message deleted for everyone
             return false;

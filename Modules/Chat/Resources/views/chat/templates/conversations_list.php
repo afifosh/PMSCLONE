@@ -46,9 +46,11 @@
                             <?php echo __('chat::messages.chats.pin') ?>
                           {{/if}}
                         </a>
-                        <a class="dropdown-item text-center chat__person-box-archive">
-                            <?php echo __('chat::messages.chats.archive_chat') ?>
-                        </a>
+                        {{if !(contact.is_group && contact.group.project_id)}}
+                          <a class="dropdown-item text-center chat__person-box-archive">
+                              <?php echo __('chat::messages.chats.archive_chat') ?>
+                          </a>
+                        {{/if}}
                    </div>
                 </div>
             </div>

@@ -6,6 +6,7 @@ use App\DataTables\Admin\Project\ProjectTasksDataTable;
 use App\Events\Admin\ProjectTaskUpdatedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProjectTaskStoreRequest;
+use App\Http\Requests\Admin\ProjectTaskUpdateRequest;
 use App\Models\Admin;
 use App\Models\Project;
 use App\Models\Task;
@@ -121,7 +122,7 @@ class ProjectTaskController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update($project, ProjectTaskStoreRequest $request, Task $task)
+  public function update(Project $project, ProjectTaskUpdateRequest $request, Task $task)
   {
     abort_if(!$task->project->isMine(), 403);
 
@@ -130,6 +131,10 @@ class ProjectTaskController extends Controller
     $task->followers()->sync(remove_null_values($request->followers));
 
     $chatMessage = auth()->user()->name. ' updated task: '.$task->subject;
+
+    $project->load('tasks');
+    if($project->tasks->count() >= 0 && $project->tasks->count() == $project->tasks->where('status', 'Completed')->count())
+      $project->update(['status' => 4]);
     broadcast(new ProjectTaskUpdatedEvent($task, 'summary', $chatMessage))->toOthers();
 
     return $this->sendRes('Task Updated successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);

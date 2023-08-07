@@ -1806,9 +1806,9 @@ $(document).ready(function () {
         }
     };
 
-    window.Echo.private(`user.${loggedInUserId}`).
+    Echo.private(`user.${loggedInUserId}`).
         listen('.Modules\\Chat\\Events\\UserEvent', (e) => {
-            if(conversationType == 'projects'){
+            if((e.project_id == null && conversationType == 'projects') || (e.project_id != null && conversationType != 'projects')){
               return false;
             }
             if (e.type === 1) { // block-unblock user event
@@ -2039,7 +2039,7 @@ $(document).ready(function () {
         });
     };
 
-    window.Echo.private(`chat`).
+    Echo.private(`chat`).
         listenForWhisper(`start-typing.${loggedInUserId}`, (e) => {
             if (latestSelectedUser == e.user.id) {
                 let userTyping = e.user.name + ' Typing...';
@@ -2052,7 +2052,7 @@ $(document).ready(function () {
     });
 
     function listenForGroupMessageTyping (groupId) {
-        window.Echo.private(`group.${groupId}`).
+        Echo.private(`group.${groupId}`).
             listenForWhisper(`group-message-typing`, (e) => {
                 var userTyping = e.data.name + ' Typing...';
                 let currentGroupId = $('.chat__person-box--active').data('id');

@@ -60,6 +60,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
+        'email-accounts-sync' => [
+          'driver' => 'single',
+          'path' => storage_path('logs/mail-sync-logs/' . date("Y") . '/' . date("m") . '/' . 'sync-'. date("d-m-Y") .'.log'),
+          'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),

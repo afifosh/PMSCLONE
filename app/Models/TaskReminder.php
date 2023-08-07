@@ -17,7 +17,7 @@ class TaskReminder extends Model
     'sender_id',
     'description',
     'remind_at',
-    'can_send_email',
+    'notify_by_email',
   ];
 
   protected $casts = [

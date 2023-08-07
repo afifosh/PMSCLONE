@@ -24,12 +24,12 @@ class TaskReminderController extends Controller
       'recipient_id' => 'required|exists:admins,id',
       'description' => 'required',
       'remind_at' => 'required|date',
-      'can_send_email' => 'sometimes',
+      'notify_by_email' => 'sometimes',
     ]);
 
     $task->reminders()->create($request->only(['recipient_id', 'description', 'remind_at']) + [
       'sender_id' => auth()->id(),
-      'can_send_email' => $request->boolean('can_send_email'),
+      'notify_by_email' => $request->boolean('notify_by_email'),
     ]);
 
     return $this->sendRes('Reminder added successfully.',['JsMethods' => ['update_reminder_form', 'reload_reminder_list']]);

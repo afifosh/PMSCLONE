@@ -11,9 +11,6 @@
 <script src="{{ asset(mix('assets/vendor/libs/toastr/toastr.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/ajax.js')) }}"></script>
 <script src="{{ asset(mix('assets/js/custom/toastr-helpers.js')) }}"></script>
-@yield('vendor-script')
-<!-- END: Page Vendor JS-->
-<!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
 <script>
   const broadcastKey = "{{ config('broadcasting.connections.pusher.key') }}"
@@ -30,6 +27,10 @@
       notificationSound();
     });
 </script>
+@yield('vendor-script')
+<!-- END: Page Vendor JS-->
+<!-- BEGIN: Theme JS-->
+
 
 <script>
   setInterval(function() {
