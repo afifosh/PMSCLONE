@@ -21,7 +21,14 @@ class TemplatesDataTable extends DataTable
         return (new EloquentDataTable($query))
         ->addColumn('tasks_count', function($template){
           return $template->taskTemplates()->count();
-        });
+        })
+        ->editColumn('name', function($template){
+          return view('admin.pages.projects.templates.template-name', compact('template'))->render();
+        })
+        ->addColumn('action', function($template){
+          return view('admin.pages.projects.templates.action', compact('template'))->render();
+        })
+        ->rawColumns(['name', 'action']);
     }
 
     /**
@@ -38,6 +45,16 @@ class TemplatesDataTable extends DataTable
     public function html(): HtmlBuilder
     {
       $buttons = [];
+
+      $buttons[] = [
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Template</span>',
+        'className' =>  'btn btn-primary mx-3',
+        'attr' => [
+          'data-toggle' => "ajax-modal",
+          'data-title' => 'Create New Template',
+          'data-href' => route('admin.project-templates.create')
+        ]
+      ];
 
       return $this->builder()
         ->setTableId('project-templates-datatable')
@@ -56,7 +73,6 @@ class TemplatesDataTable extends DataTable
           'buttons' => $buttons,
           "scrollX" => true,
           'drawCallback' => "function(){
-            view_task_from_url();
             $('[data-bs-toggle=\"tooltip\"]').tooltip();
           }"
         ]);

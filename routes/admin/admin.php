@@ -42,6 +42,8 @@ use App\Http\Controllers\Admin\Project\ProjectTemplateController;
 use App\Http\Controllers\Admin\Project\TaskChecklistController;
 use App\Http\Controllers\Admin\Project\TaskFileController;
 use App\Http\Controllers\Admin\Project\TaskReminderController;
+use App\Http\Controllers\Admin\Project\TemplateTaskCheckItemController;
+use App\Http\Controllers\Admin\Project\TemplateTaskController;
 use App\Http\Controllers\Admin\Setting\OauthGoogleController;
 use App\Http\Controllers\Admin\Setting\OauthMicrosoftController;
 use Modules\Core\Http\Controllers\OAuthController;
@@ -118,6 +120,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs.users', ProgramUserController::class);
     Route::resource('projects', ProjectController::class);
     Route::resource('project-templates', ProjectTemplateController::class);
+    Route::resource('project-templates.tasks', TemplateTaskController::class);
+    Route::resource('project-templates.tasks.check-items', TemplateTaskCheckItemController::class);
     Route::put('/projects/{project}/tasks/update-order', [ProjectTaskController::class, 'updateOrder'])->name('projects.tasks.update-order');
     Route::resource('projects.import-templates', ImportTemplateController::class);
     Route::resource('projects.tasks', ProjectTaskController::class);

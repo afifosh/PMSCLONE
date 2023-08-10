@@ -23,6 +23,8 @@ use Modules\MailClient\Client\ClientManager;
 use Modules\MailClient\Client\ConnectionType;
 use Modules\MailClient\Client\FolderType;
 use Modules\MailClient\Console\Commands\EmailAccountsSyncCommand;
+// use Modules\MailClient\Events\EmailAccountMessageCreated;
+// use Modules\MailClient\Listeners\CreateContactFromEmailAccountMessage;
 use Modules\MailClient\Listeners\CreateEmailAccountViaOAuth;
 use Modules\MailClient\Listeners\StopRelatedOAuthEmailAccounts;
 use Modules\MailClient\Models\EmailAccount;
@@ -47,6 +49,7 @@ class MailClientServiceProvider extends ServiceProvider
 
         $this->app['events']->listen(OAuthAccountConnected::class, CreateEmailAccountViaOAuth::class);
         $this->app['events']->listen(OAuthAccountDeleting::class, StopRelatedOAuthEmailAccounts::class);
+        // $this->app['events']->listen(EmailAccountMessageCreated::class, CreateContactFromEmailAccountMessage::class);
 
         $this->app->booted(function () {
             $this->registerResources();
