@@ -13,8 +13,9 @@ class TemplateTaskController extends Controller
   public function index(ProjectTemplate $project_template)
   {
     $project_template->load('taskTemplates.checkItemTemplates');
+    $priorities = TaskTemplate::getPossibleEnumValues('priority');
 
-    return view('admin.pages.projects.templates.tasks.index', compact('project_template'));
+    return view('admin.pages.projects.templates.tasks.index', compact('project_template', 'priorities'));
   }
 
   public function create(ProjectTemplate $project_template)
@@ -36,7 +37,7 @@ class TemplateTaskController extends Controller
 
     $project_template->taskTemplates()->create($request->only('subject', 'priority', 'description', 'tags'));
 
-    return $this->sendRes('Task created successfully', ['event' => 'redirect', 'url' => route('admin.project-templates.tasks.index', $project_template)]);
+    return $this->sendRes('Task created successfully', ['event' => 'redirect', 'url' => route('admin.project-templates.tasks.index', $project_template), 'close' => 'globalModal']);
   }
 
   public function edit(ProjectTemplate $project_template, TaskTemplate $task)
@@ -56,7 +57,7 @@ class TemplateTaskController extends Controller
 
     $task->update($request->only('subject', 'priority', 'description', 'tags'));
 
-    return $this->sendRes('Task updated successfully', ['event' => 'redirect', 'url' => route('admin.project-templates.tasks.index', $project_template)]);
+    return $this->sendRes('Task updated successfully', ['event' => 'redirect', 'url' => route('admin.project-templates.tasks.index', $project_template), 'close' => 'globalModal']);
   }
 
   public function destroy(ProjectTemplate $project_template, TaskTemplate $task)

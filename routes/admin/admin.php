@@ -39,6 +39,7 @@ use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
 use App\Http\Controllers\Admin\Project\ProjectTaskController;
 use App\Http\Controllers\Admin\Project\ProjectTemplateController;
+use App\Http\Controllers\Admin\Project\TaskBoardController;
 use App\Http\Controllers\Admin\Project\TaskChecklistController;
 use App\Http\Controllers\Admin\Project\TaskFileController;
 use App\Http\Controllers\Admin\Project\TaskReminderController;
@@ -119,6 +120,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
     Route::resource('projects', ProjectController::class);
+    Route::put('project-templates/move-check-item', [ProjectTemplateController::class, 'moveCheckItem'])->name('project-templates.move-check-item');
+    Route::put('project-templates/order-check-item', [ProjectTemplateController::class, 'orderCheckItem'])->name('project-templates.order-check-item');
     Route::resource('project-templates', ProjectTemplateController::class);
     Route::resource('project-templates.tasks', TemplateTaskController::class);
     Route::resource('project-templates.tasks.check-items', TemplateTaskCheckItemController::class);
@@ -133,6 +136,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::put('projects/{project}/tasks/{task}/checklist-items/{checklist_item}/update-status', [TaskChecklistController::class, 'update_status'])->name('projects.tasks.checklist-items.update-status');
     Route::resource('projects.tasks.checklist-items', TaskChecklistController::class);
     Route::resource('project-categories', ProjectCategoryController::class);
+    Route::resource('projects.board-tasks', TaskBoardController::class);
 
     Route::get('draft-rfps/{draft_rfp}/users', [RFPDraftController::class, 'draft_users_tab'])->name('draft-rfps.users_tab');
     Route::get('draft-rfps/{draft_rfp}/activity', [RFPDraftController::class, 'draft_activity_tab'])->name('draft-rfps.activity_tab');

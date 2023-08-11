@@ -26,6 +26,6 @@ class ProjectTemplate extends Model
 
   public function taskTemplates()
   {
-    return $this->hasMany(TaskTemplate::class);
+    return $this->hasMany(TaskTemplate::class)->orderBy('order');
   }
 }

@@ -34,7 +34,7 @@ class TemplateTaskCheckItemController extends Controller
     $task = TaskTemplate::find($task);
     $task->checkItemTemplates()->create($request->only('title'));
 
-    return $this->sendRes('Check item created successfully', ['event' => 'functionCall', 'function' => 'reloadCheckItems', 'function_params' => $task->id, 'close' => 'globalModal']);
+    return $this->sendRes('Check item created successfully', ['event' => 'page_reload', 'close' => 'globalModal']);
   }
 
   public function edit($project_template, $task, CheckItemTemplate $checkItem)
@@ -52,13 +52,13 @@ class TemplateTaskCheckItemController extends Controller
 
     $checkItem->update($request->only('title'));
 
-    return $this->sendRes('Check item updated successfully', ['event' => 'functionCall', 'function' => 'reloadCheckItems', 'function_params' => $task->id, 'close' => 'globalModal']);
+    return $this->sendRes('Check item updated successfully', ['event' => 'page_reload', 'close' => 'globalModal']);
   }
 
   public function destroy($project_template, TaskTemplate $task, CheckItemTemplate $checkItem)
   {
     $checkItem->delete();
 
-    return $this->sendRes('Check item deleted successfully', ['event' => 'functionCall', 'function' => 'reloadCheckItems', 'function_params' => $task->id, 'close' => 'globalModal']);
+    return $this->sendRes('Check item deleted successfully', ['event' => 'page_reload', 'close' => 'globalModal']);
   }
 }

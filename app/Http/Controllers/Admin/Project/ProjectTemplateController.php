@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Project;
 
 use App\DataTables\Admin\Project\TemplatesDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\CheckItemTemplate;
 use App\Models\ProjectTemplate;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class ProjectTemplateController extends Controller
       }
     }
 
-    return $this->sendRes('Project template created successfully', ['event' => 'redirect', 'url' => route('admin.project-templates.index')]);
+    return $this->sendRes('Project template created successfully', ['event' => 'redirect', 'url' => route('admin.project-templates.index'), 'close' => 'globalModal']);
   }
 
   public function edit(ProjectTemplate $project_template)
@@ -71,5 +72,39 @@ class ProjectTemplateController extends Controller
     $project_template->delete();
 
     return $this->sendRes('Project template deleted successfully', ['event' => 'table_reload', 'table_id' => 'project-templates-datatable']);
+  }
+
+  public function moveCheckItem(Request $request)
+  {
+    $request->validate([
+      'from_id' => ['required', 'exists:task_templates,id'],
+      'to_id' => ['required', 'exists:task_templates,id'],
+      'check_item_id' => ['required', 'exists:check_item_templates,id'],
+      'order' => ['required', 'array'],
+      'order.*' => ['required', 'exists:check_item_templates,id'],
+    ]);
+
+    $checkItem = CheckItemTemplate::find($request->check_item_id);
+    $checkItem->forceFill([
+      'task_template_id' => $request->to_id,
+    ])->save();
+
+    $this->orderCheckItem($request);
+
+    return $this->sendRes('success', []);
+  }
+
+  public function orderCheckItem(Request $request)
+  {
+    $request->validate([
+      'order' => ['required', 'array'],
+      'order.*' => ['required', 'exists:check_item_templates,id'],
+    ]);
+
+    foreach ($request->order as $key => $check_item_id) {
+      CheckItemTemplate::where('id', $check_item_id)->update(['order' => $key]);
+    }
+
+    return $this->sendRes('success', []);
   }
 }

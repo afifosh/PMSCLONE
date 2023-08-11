@@ -24,9 +24,11 @@ class TaskChecklistController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($project, Task $task)
     {
-        //
+      abort_if(!$task->project->isMine(), 403);
+
+      return $this->sendRes('success', ['view_data' => view('admin.pages.projects.tasks.checklist-form', compact('task'))->render()]);
     }
 
     /**

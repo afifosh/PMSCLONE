@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Mime\MimeTypeExtensionGuesser;
 
@@ -15,6 +16,13 @@ if (!function_exists('formatUNIXTimeStamp')) {
   function formatUNIXTimeStamp($dateTime)
   {
     return Carbon::parse($dateTime)->diffForHumans();
+  }
+}
+
+if (!function_exists('slug')) {
+  function slug($string)
+  {
+    return Str::slug($string);
   }
 }
 

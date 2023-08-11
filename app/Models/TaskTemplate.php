@@ -32,6 +32,6 @@ class TaskTemplate extends Model
 
   public function checkItemTemplates()
   {
-    return $this->hasMany(CheckItemTemplate::class);
+    return $this->hasMany(CheckItemTemplate::class)->orderBy('order');
   }
 }

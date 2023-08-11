@@ -43,4 +43,9 @@ class TaskCheckListItem extends Model
   {
     return $this->belongsTo(Admin::class, 'completed_by', 'id');
   }
+
+  public function assignedTo()
+  {
+    return $this->belongsTo(Admin::class, 'assigned_to', 'id');
+  }
 }
