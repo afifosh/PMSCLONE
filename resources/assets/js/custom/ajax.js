@@ -466,7 +466,8 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
               // call the function whose name is in the response.data.function
               if(typeof response.data.function_params != "undefined" && response.data.function_params != null && response.data.function_params != '')
               typeof window[response.data.function] == "function" ? window[response.data.function](response.data.function_params) : null;
-              console.log(typeof window[response.data.function]);
+              else
+              typeof window[response.data.function] == "function" ? window[response.data.function]() : null;
             }
           } else {
             toast_danger(response.message)

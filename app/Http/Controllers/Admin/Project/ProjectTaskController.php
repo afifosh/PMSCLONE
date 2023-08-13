@@ -73,6 +73,10 @@ class ProjectTaskController extends Controller
     $chatMessage = auth()->user()->name. ' created a new task: '.$task->subject;
     broadcast(new ProjectTaskUpdatedEvent($task, 'new_task_added', $chatMessage))->toOthers();
 
+    if(request()->from == 'task-board'){
+      return $this->sendRes('Task created successfully', ['event' => 'functionCall', 'function' => 'refreshTaskList', 'close' => 'globalModal']);
+    }
+
     return $this->sendRes('Task created successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);
   }
 
@@ -137,6 +141,9 @@ class ProjectTaskController extends Controller
       $project->update(['status' => 4]);
     broadcast(new ProjectTaskUpdatedEvent($task, 'summary', $chatMessage))->toOthers();
 
+    if(request()->from == 'task-board')
+      return $this->sendRes('Task Updated successfully', ['event' => 'functionCall', 'function' => 'refreshTaskList', 'close' => 'globalModal']);
+
     return $this->sendRes('Task Updated successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable', 'close' => 'globalModal']);
   }
 
@@ -182,6 +189,9 @@ class ProjectTaskController extends Controller
     $task->delete();
 
     broadcast(new ProjectTaskUpdatedEvent($task, 'task_deleted', $message))->toOthers();
+
+    if(request()->from == 'task-board')
+      return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'refreshTaskList']);
 
     return $this->sendRes('Task deleted successfully', ['event' => 'table_reload', 'table_id' => 'project-tasks-datatable']);
   }

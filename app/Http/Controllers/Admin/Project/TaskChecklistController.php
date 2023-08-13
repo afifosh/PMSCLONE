@@ -58,6 +58,10 @@ class TaskChecklistController extends Controller
       $message = auth()->user()->name . ' added a checklist item : "' . $checklist->title . '" in task : "' . $task->subject . '"';
       broadcast(new ProjectTaskUpdatedEvent($task, 'checklist', $message))->toOthers();
 
+      if(request()->from == 'task-board'){
+        return $this->sendRes('Checklist item created successfully', ['event' => 'functionCall', 'function' => 'refreshTaskList', 'close' => 'globalModal']);
+      }
+
       return $this->sendRes('Checklist item created successfully', ['id' => $checklist->id, 'JsMethods' => ['reload_task_checklist', 'reset_checklist_form']]);
     }
 
@@ -97,6 +101,10 @@ class TaskChecklistController extends Controller
       ]);
 
       $checklistItem->update($request->only(['title', 'assigned_to', 'due_date']));
+
+      if(request()->from == 'task-board'){
+        return $this->sendRes('Checklist item updated successfully', ['event' => 'functionCall', 'function' => 'refreshTaskList', 'close' => 'globalModal']);
+      }
 
       return $this->sendRes('Checklist item updated successfully', ['event' => 'redirect', 'url' => route('admin.projects.tasks.index', $project)]);
     }
@@ -153,6 +161,10 @@ class TaskChecklistController extends Controller
       $checklistItem->delete();
 
       broadcast(new ProjectTaskUpdatedEvent($checklistItem->task, 'checklist', $message))->toOthers();
+
+      if(request()->from == 'task-board'){
+        return $this->sendRes('Checklist item deleted successfully', ['event' => 'functionCall', 'function' => 'refreshTaskList', 'close' => 'globalModal']);
+      }
 
       return $this->sendRes('Checklist item deleted successfully', ['disable_alert' => true, 'event' => 'functionCall', 'function' => 'handle_deleted_checklist', 'function_params' => route('admin.projects.tasks.checklist-items.restore', [$project, $task, $id])]);
     }

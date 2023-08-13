@@ -7,7 +7,7 @@
   }
   </style>
 <div class="row d-flex">
-  <form action="{{route('admin.projects.tasks.checklist-items.update', ['task' => $task->id, 'project' => $task->project_id, 'checklist_item' => $checklistItem])}}">
+  <form action="{{route('admin.projects.tasks.checklist-items.update', ['task' => $task->id, 'project' => $task->project_id, 'checklist_item' => $checklistItem, 'from' => request()->from == 'task-board'? 'task-board' : ''])}}">
     @csrf
     @method('PUT')
     <div class="my-2">

@@ -48,7 +48,7 @@ $container = ($container ?? 'container-xxl');
 
 
       <!-- Content wrapper -->
-      <div class="content-wrapper">
+      <div class="content-wrapper body-animate" style="display: none;">
 
         <!-- Content -->
         @if ($isFlex)

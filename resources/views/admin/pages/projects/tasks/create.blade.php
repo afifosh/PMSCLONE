@@ -1,7 +1,7 @@
 @if ($task->id)
-    {!! Form::model($task, ['route' => ['admin.projects.tasks.update', ['project' => $project, 'task' => $task->id]], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
+    {!! Form::model($task, ['route' => ['admin.projects.tasks.update', ['project' => $project, 'task' => $task->id, 'from' => request()->from == 'task-board'? 'task-board' : '']], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
 @else
-    {!! Form::model($task, ['route' => ['admin.projects.tasks.store',  ['project' => $project]], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
+    {!! Form::model($task, ['route' => ['admin.projects.tasks.store',  ['project' => $project, 'from' => request()->from == 'task-board'? 'task-board' : '']], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
 @endif
 
 <div class="row">

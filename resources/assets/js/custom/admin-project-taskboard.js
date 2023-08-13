@@ -105,43 +105,43 @@
     });
 
     // init sortable
-    $('.task-check-items').each(function (index, element) {
-      let sortable = Sortable.create(this, {
-        animation: 150,
-        // group: 'handleList',
-        handle: '.drag-handle',
-        dataIdAttr: 'data-item-id',
-        onAdd: function (evt) {
-          let fromTask = evt.from.dataset.taskList;
-          let toTask = evt.to.dataset.taskList;
-          let checkItemId = evt.item.dataset.itemId;
-          console.log(fromTask, toTask, checkItemId);
-          $.ajax({
-            type: "put",
-            url: route('admin.project-templates.move-check-item'),
-            data: {
-              from_id: fromTask,
-              to_id: toTask,
-              check_item_id: checkItemId,
-              order: sortable.toArray(),
-            },
-            success: function (response) {
-            }
-          });
-        },
-        onUpdate: function (evt) {
-          $.ajax({
-            type: "put",
-            url: route('admin.projects.tasks.checklist-items.update-order', { project: ':null', task: evt.to.dataset.taskList}),
-            data: {
-              order: sortable.toArray(),
-            },
-            success: function (response) {
-            }
-          });
-        },
-      });
-    });
+    // $('.task-check-items').each(function (index, element) {
+    //   let sortable = Sortable.create(this, {
+    //     animation: 150,
+    //     // group: 'handleList',
+    //     handle: '.drag-handle',
+    //     dataIdAttr: 'data-item-id',
+    //     onAdd: function (evt) {
+    //       let fromTask = evt.from.dataset.taskList;
+    //       let toTask = evt.to.dataset.taskList;
+    //       let checkItemId = evt.item.dataset.itemId;
+    //       console.log(fromTask, toTask, checkItemId);
+    //       $.ajax({
+    //         type: "put",
+    //         url: route('admin.project-templates.move-check-item'),
+    //         data: {
+    //           from_id: fromTask,
+    //           to_id: toTask,
+    //           check_item_id: checkItemId,
+    //           order: sortable.toArray(),
+    //         },
+    //         success: function (response) {
+    //         }
+    //       });
+    //     },
+    //     onUpdate: function (evt) {
+    //       $.ajax({
+    //         type: "put",
+    //         url: route('admin.projects.tasks.checklist-items.update-order', { project: ':null', task: evt.to.dataset.taskList}),
+    //         data: {
+    //           order: sortable.toArray(),
+    //         },
+    //         success: function (response) {
+    //         }
+    //       });
+    //     },
+    //   });
+    // });
     // Refresh Mails
 
     // if (refreshEmails && emailList) {
@@ -218,6 +218,13 @@
         });
       });
     }
+
+    Echo.private(`projects.${active_project}`).listen('.project-updated', e => {
+      const update_on = ['summary', 'new_task_added', 'checklist'];
+      if(update_on.includes(e.modifiedTab)){
+        refreshTaskList();
+      }
+    });
   });
   $(document).on('click', '.checklist-status', function(){
     var checklist_id = $(this).parents('li').data('item-id');
@@ -230,6 +237,7 @@
         status: status,
       },
       success: function(res){
+        refreshTaskList();
       }
     });
   });
