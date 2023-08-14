@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CheckItemTemplate;
 use App\Models\ProjectTemplate;
 use App\Models\Task;
+use App\Models\TaskTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -56,6 +57,13 @@ class ProjectTemplateController extends Controller
 
   public function update(Request $request, ProjectTemplate $project_template)
   {
+    if(request()->type == 'copy'){
+      $request->validate([
+        'name' => ['required', 'string', 'max:255', Rule::unique('project_templates')->where('admin_id', auth()->id())]
+      ]);
+
+      return $this->copyTemplate($request, $project_template);
+    }
     $request->validate([
       'name' => ['required', 'string', 'max:255', Rule::unique('project_templates')->where('admin_id', auth()->id())->ignore($project_template->id)]
     ]);
@@ -67,6 +75,23 @@ class ProjectTemplateController extends Controller
     return $this->sendRes('Project template updated successfully', ['event' => 'table_reload', 'table_id' => 'project-templates-datatable', 'close' => 'globalModal']);
   }
 
+  public function copyTemplate(Request $request, ProjectTemplate $project_template)
+  {
+    $newTemplate = ProjectTemplate::create([
+      'name' => $request->name,
+      'admin_id' => auth()->id(),
+    ]);
+
+    $project_template->load('taskTemplates.checkItemTemplates');
+    if($project_template->taskTemplates->count() != 0)
+    foreach ($project_template->taskTemplates as $task) {
+      $taskTemp = $newTemplate->taskTemplates()->create($task->toArray());
+      $taskTemp->checkItemTemplates()->createMany($task->checkItemTemplates->toArray());
+    }
+
+    return $this->sendRes('Project template copied successfully', ['event' => 'table_reload', 'table_id' => 'project-templates-datatable', 'close' => 'globalModal']);
+  }
+
   public function destroy(ProjectTemplate $project_template)
   {
     $project_template->delete();
@@ -74,37 +99,24 @@ class ProjectTemplateController extends Controller
     return $this->sendRes('Project template deleted successfully', ['event' => 'table_reload', 'table_id' => 'project-templates-datatable']);
   }
 
-  public function moveCheckItem(Request $request)
+  public function orderCheckItem(Request $request, ProjectTemplate $project_template)
   {
-    $request->validate([
-      'from_id' => ['required', 'exists:task_templates,id'],
-      'to_id' => ['required', 'exists:task_templates,id'],
-      'check_item_id' => ['required', 'exists:check_item_templates,id'],
-      'order' => ['required', 'array'],
-      'order.*' => ['required', 'exists:check_item_templates,id'],
+    request()->validate([
+      'tasks' => 'required|array',
+      'tasks.*.id' => ['required', 'exists:task_templates,id'],
+      'tasks.*.subtasks' => 'sometimes|array',
+      'tasks.*.subtasks.*.id' => ['required', 'exists:check_item_templates,id']
     ]);
 
-    $checkItem = CheckItemTemplate::find($request->check_item_id);
-    $checkItem->forceFill([
-      'task_template_id' => $request->to_id,
-    ])->save();
-
-    $this->orderCheckItem($request);
-
-    return $this->sendRes('success', []);
-  }
-
-  public function orderCheckItem(Request $request)
-  {
-    $request->validate([
-      'order' => ['required', 'array'],
-      'order.*' => ['required', 'exists:check_item_templates,id'],
-    ]);
-
-    foreach ($request->order as $key => $check_item_id) {
-      CheckItemTemplate::where('id', $check_item_id)->update(['order' => $key]);
+    foreach($request->tasks as $i => $task){
+      TaskTemplate::where('project_template_id', $project_template->id)->where('id', $task['id'])->update(['order' => $i+1]);
+      if(isset($task['subtasks'])){
+        foreach($task['subtasks'] as $i => $checkItem){
+          CheckItemTemplate::where('id', $checkItem['id'])->update(['task_template_id' => $task['id'], 'order' => $i+1]);
+        }
+      }
     }
 
-    return $this->sendRes('success', []);
+    return $this->sendRes('success', ['message' => 'Tasks sorted successfully.']);
   }
 }

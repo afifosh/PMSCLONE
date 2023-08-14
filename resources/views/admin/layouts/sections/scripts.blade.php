@@ -24,6 +24,7 @@
   Echo.private('App.Models.Admin.{{ auth()->id() }}')
     .notification((notification) => {
       $('#unread-notifications-count').show();
+      $('#unread-notifications-count').text(parseInt($('#unread-notifications-count').text()) + 1);
       notificationSound();
     });
 </script>

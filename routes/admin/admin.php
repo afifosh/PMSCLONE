@@ -120,8 +120,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
     Route::resource('projects', ProjectController::class);
-    Route::put('project-templates/move-check-item', [ProjectTemplateController::class, 'moveCheckItem'])->name('project-templates.move-check-item');
-    Route::put('project-templates/order-check-item', [ProjectTemplateController::class, 'orderCheckItem'])->name('project-templates.order-check-item');
+    Route::put('project-templates/{project_template}/order-check-item', [ProjectTemplateController::class, 'orderCheckItem'])->name('project-templates.order-check-item');
     Route::resource('project-templates', ProjectTemplateController::class);
     Route::resource('project-templates.tasks', TemplateTaskController::class);
     Route::resource('project-templates.tasks.check-items', TemplateTaskCheckItemController::class);
@@ -136,6 +135,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::put('projects/{project}/tasks/{task}/checklist-items/{checklist_item}/update-status', [TaskChecklistController::class, 'update_status'])->name('projects.tasks.checklist-items.update-status');
     Route::resource('projects.tasks.checklist-items', TaskChecklistController::class);
     Route::resource('project-categories', ProjectCategoryController::class);
+    Route::put('projects/{project}/sort-board-tasks', [TaskBoardController::class, 'sortBoardTasks'])->name('projects.sort-board-tasks');
     Route::resource('projects.board-tasks', TaskBoardController::class);
 
     Route::get('draft-rfps/{draft_rfp}/users', [RFPDraftController::class, 'draft_users_tab'])->name('draft-rfps.users_tab');

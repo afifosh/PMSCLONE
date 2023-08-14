@@ -161,30 +161,6 @@
     }
     initSelect2();
 
-    Echo.private(`projects.${active_project}`).listen('.project-updated', e => {
-      const update_on = ['summary', 'new_task_added', 'checklist'];
-      if(update_on.includes(e.modifiedTab)){
-        refreshTaskList();
-      }
-    });
-  });
-  $(document).on('click', '.checklist-status', function(){
-    var checklist_id = $(this).parents('li').data('item-id');
-    var task_id = $(this).parents('.task-check-items').data('task-list');
-    var status = $(this).is(':checked') ? 1 : 0;
-    $.ajax({
-      url: route('admin.projects.tasks.checklist-items.update-status', { project: ':null', task: task_id, checklist_item: checklist_id }),
-      type: "PUT",
-      data: {
-        status: status,
-      },
-      success: function(res){
-        if(status == 1){
-          toastr.success('Completed Successfully', 'Congratulations!! 🎉');
-        }
-        refreshTaskList();
-      }
-    });
   });
   function refreshTaskList(project_id){
     project_id = project_id || window.active_project;
@@ -274,12 +250,12 @@
 
       $.ajax({
         type: "put",
-        url: route('admin.projects.sort-board-tasks', {project : active_project}),
+        url: route('admin.project-templates.order-check-item', {project_template : active_project}),
         data: {
           tasks: uniqueTasks
         },
         complete: function(data) {
-          refreshTaskList();
+          // refreshTaskList();
         }
       });
     })

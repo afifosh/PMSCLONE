@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin\Project;
 
+use App\Events\Admin\ProjectTaskUpdatedEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\TaskCheckListItem;
 use Illuminate\Http\Request;
 
 class TaskBoardController extends Controller
@@ -34,5 +36,31 @@ class TaskBoardController extends Controller
     }
 
     return view('admin.pages.projects.task-board.index', compact('project', 'priorities', 'task_statuses', 'colors', 'myTasksCount'));
+  }
+
+  public function sortBoardTasks(Request $request, Project $project)
+  {
+    abort_if(!$project->isMine(), 403);
+    request()->validate([
+      'tasks' => 'required|array',
+      'tasks.*.id' => ['required', 'exists:tasks,id'],
+      'tasks.*.subtasks' => 'sometimes|array',
+      'tasks.*.subtasks.*.id' => ['required', 'exists:task_check_list_items,id']
+    ]);
+
+    foreach($request->tasks as $i => $task){
+      Task::where('project_id', $project->id)->where('id', $task['id'])->update(['order' => $i+1]);
+      if(isset($task['subtasks'])){
+        foreach($task['subtasks'] as $i => $checkItem){
+          TaskCheckListItem::where('id', $checkItem['id'])->update(['task_id' => $task['id'], 'order' => $i+1]);
+        }
+      }
+    }
+
+    $chatMessage = auth()->user()->name . ' sorted tasks in project : "' . $project->name . '"';
+    $task = Task::where('project_id', $project->id)->first();
+    broadcast(new ProjectTaskUpdatedEvent($task, 'summary', $chatMessage))->toOthers();
+
+    return $this->sendRes('success', ['message' => 'Tasks sorted successfully.']);
   }
 }

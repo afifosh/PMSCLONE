@@ -11,6 +11,7 @@ use App\Models\Admin;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use \Spatie\Comments\Enums\NotificationSubscriptionType;
 
 class ProjectTaskController extends Controller
@@ -130,6 +131,8 @@ class ProjectTaskController extends Controller
   {
     abort_if(!$task->project->isMine(), 403);
 
+    if($request->status == 'Completed' && $task->checklistItems()->where('completed_by', null)->count())
+      throw ValidationException::withMessages(['status' => 'Please complete all checklist items first']);
     $task->update($request->validated());
     $task->assignees()->sync(remove_null_values($request->assignees));
     $task->followers()->sync(remove_null_values($request->followers));
@@ -154,6 +157,9 @@ class ProjectTaskController extends Controller
     $task->update(['is_completed_checklist_hidden' => $status ? 1 : 0]);
 
     broadcast(new ProjectTaskUpdatedEvent($task, 'checklist'))->toOthers();
+
+    if(request()->from == 'task-board')
+      return $this->sendRes('Task Updated successfully', ['event' => 'functionCall', 'function' => 'refreshTaskList']);
 
     return $this->sendRes('Task Updated successfully', ['JsMethods' => ['reload_task_checklist']]);
   }

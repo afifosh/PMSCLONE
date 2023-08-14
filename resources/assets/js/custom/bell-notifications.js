@@ -21,5 +21,6 @@ $('.dropdown-notifications a.dropdown-toggle').on('click', function () {
         url,
     }).done(function () {
         $('.notification-bell').hide();
+        $('.notification-bell').text(0);
     })
 })

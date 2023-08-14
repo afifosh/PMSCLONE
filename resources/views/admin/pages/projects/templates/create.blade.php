@@ -1,5 +1,5 @@
 @if ($template->id)
-    {!! Form::model($template, ['route' => ['admin.project-templates.update', ['project_template' => $template->id]], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
+    {!! Form::model($template, ['route' => ['admin.project-templates.update', ['project_template' => $template->id, 'type' => request()->type]], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
 @else
     {!! Form::model($template, ['route' => ['admin.project-templates.store'], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
 @endif
