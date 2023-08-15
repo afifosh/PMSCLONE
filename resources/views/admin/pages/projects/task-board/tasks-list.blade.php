@@ -9,7 +9,7 @@
         <div class="el-hoh me-2" style="width: 80px">
           @include('admin._partials.sections.progressBar', ['perc' => $task->progress_percentage(), 'color' => 'primary', 'show_perc' => true, 'height' => '14px'])
         </div>
-        <span class="el-hoh badge bg-label-{{$colors[$task->priority]}} me-2">{{$task->priority}}</span>
+        <span class="el-hoh badge bg-label-{{$colors[$task->priority]}} me-2" style="width: 68px;">{{$task->priority}}</span>
         @isset($task->assignees[0])
         <img src="{{ $task->assignees[0]->avatar }}" alt="user-avatar" class="el-hoh d-block flex-shrink-0 rounded-circle me-sm-3 me-2" height="32" width="32" />
         @endisset
@@ -17,9 +17,9 @@
           <form action="{{route('admin.projects.tasks.hide-completed', ['project' => $task->project_id, 'task' => $task->id, 'status' => !$task->is_completed_checklist_hidden, 'from' => 'task-board'])}}" method="POST">
             @method('PUT')
           @if ($task->is_completed_checklist_hidden)
-            <li class="m-0 me-2 p-0"> <button class="btn btn-sm btn-primary" data-form="ajax-form">Show Completed ({{$task->checklistItems->whereNotNull('completed_by')->count()}})</button> </li>
+            <li class="m-0 me-2 p-0 pt-1" data-form="ajax-form"> <i class="fa-solid fa-eye"></i></button> </li>
           @else
-            <li class="m-0 me-2 p-0"> <button class="btn btn-sm btn-primary" data-form="ajax-form">Hide Completed</button> </li>
+            <li class="m-0 me-2 p-0 pt-1" data-form="ajax-form"> <i class="fa-solid fa-eye-slash"></i></li>
           @endif
         </form>
           <li class="m-0 me-2 p-0" data-href="{{route('admin.projects.tasks.checklist-items.create', [$project, $task, 'from' => 'task-board'])}}" data-toggle="ajax-modal" data-title="Add Check Item"> <i class="tf-icons ti ti-plus scaleX-n1-rtl ti-sm"></i> </li>

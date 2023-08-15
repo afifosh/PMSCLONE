@@ -6,7 +6,7 @@
         <span class="email-list-item-subject d-xl-inline-block d-block">{{$task->subject}}</span>
       </div>
       <div class="email-list-item-meta ms-auto d-flex align-items-center">
-        <span class="el-hoh badge bg-label-{{$colors[$task->priority]}} me-2">{{$task->priority}}</span>
+        <span class="el-hoh badge bg-label-{{$colors[$task->priority]}} me-2" style="width: 68px;">{{$task->priority}}</span>
         @isset($task->assignees[0])
         <img src="{{ $task->assignees[0]->avatar }}" alt="user-avatar" class="el-hoh d-block flex-shrink-0 rounded-circle me-sm-3 me-2" height="32" width="32" />
         @endisset
