@@ -34,9 +34,11 @@ use App\Http\Controllers\OnlyOfficeController;
 use App\Models\RFPFile;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
+use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
+use App\Http\Controllers\Admin\Project\ProjectPhaseController;
 use App\Http\Controllers\Admin\Project\ProjectTaskController;
 use App\Http\Controllers\Admin\Project\ProjectTemplateController;
 use App\Http\Controllers\Admin\Project\TaskBoardController;
@@ -78,6 +80,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
   Route::middleware('passwordMustNotBeExpired')->group(function () {
     Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
 
+    Route::resource('private-notes', PersonalNoteController::class);
+
     Route::post('/admin-account/update-profile-pic', [AdminAccountController::class, 'updateProfilePic'])->name('admin-account.update-profile');
     Route::put('/admin-account/email', [AdminAccountController::class, 'updateEmail'])->name('account.update-email');
     Route::delete('/admin-account/email', [AdminAccountController::class, 'removePendingMail'])->name('account.update-email.destroy');
@@ -117,9 +121,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
 
     Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
+    Route::put('projects/{project}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.sort-phases');
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
     Route::resource('projects', ProjectController::class);
+    Route::resource('projects.phases', ProjectPhaseController::class);
     Route::put('project-templates/{project_template}/order-check-item', [ProjectTemplateController::class, 'orderCheckItem'])->name('project-templates.order-check-item');
     Route::resource('project-templates', ProjectTemplateController::class);
     Route::resource('project-templates.tasks', TemplateTaskController::class);

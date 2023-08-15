@@ -135,7 +135,7 @@ class CompaniesDataTable extends DataTable
       // Column::make('website'),
       Column::make('source'),
       Column::make('added_by'),
-      Column::make('step_completed_count')->title(__('Setup'))->orderable(false)->searchable(false),
+      // Column::make('step_completed_count')->title(__('Setup'))->orderable(false)->searchable(false),
       Column::make('status'),
       // Column::make('created_at'),
       Column::make('updated_at'),

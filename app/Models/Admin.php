@@ -360,6 +360,16 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     return $this->morphMany(TimelineLog::class, 'actioner', 'actioner_type', 'actioner_id');
   }
 
+  public function personalNotes()
+  {
+    return $this->morphMany(PersonalNote::class, 'user');
+  }
+
+  public function noteTags()
+  {
+    return $this->morphMany(NoteTag::class, 'user');
+  }
+
   /**
    * Admin has many shared files
    */

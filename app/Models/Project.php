@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasLogs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Chat\Models\Conversation;
 use Modules\Chat\Models\Group;
 use Modules\Chat\Repositories\GroupRepository;
@@ -118,6 +119,11 @@ class Project extends Model
   public function group()
   {
     return $this->hasOne(Group::class, 'project_id', 'id');
+  }
+
+  public function phases(): HasMany
+  {
+    return $this->hasMany(ProjectPhase::class)->orderBy('order');
   }
 
   public function sendMessageInChat($message, $toOthers = true, $type = Conversation::MESSAGE_TYPE_BADGES)
