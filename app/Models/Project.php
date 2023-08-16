@@ -15,7 +15,7 @@ class Project extends Model
   use HasFactory;
   use HasLogs;
 
-  protected $fillable = ['program_id', 'category_id', 'name', 'description', 'tags', 'start_date', 'deadline', 'status', 'budget', 'refrence_id'];
+  protected $fillable = ['program_id', 'category_id', 'company_id', 'name', 'description', 'tags', 'start_date', 'deadline', 'status', 'budget', 'refrence_id'];
 
   protected $casts = [
     'tags' => 'array',
@@ -85,6 +85,11 @@ class Project extends Model
     return $this->hasMany(Task::class)->orderBy('order');
   }
 
+  public function contracts(): HasMany
+  {
+    return $this->hasMany(Contract::class);
+  }
+
   public function progress_percentage()
   {
     $total_tasks = $this->tasks->count();
@@ -119,11 +124,6 @@ class Project extends Model
   public function group()
   {
     return $this->hasOne(Group::class, 'project_id', 'id');
-  }
-
-  public function phases(): HasMany
-  {
-    return $this->hasMany(ProjectPhase::class)->orderBy('order');
   }
 
   public function sendMessageInChat($message, $toOthers = true, $type = Conversation::MESSAGE_TYPE_BADGES)

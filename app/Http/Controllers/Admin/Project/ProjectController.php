@@ -6,6 +6,7 @@ use App\DataTables\Admin\Project\ProjectsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProjectStoreRequest;
 use App\Models\Admin;
+use App\Models\Company;
 use App\Models\Program;
 use App\Models\Project;
 use App\Models\ProjectCategory;
@@ -37,6 +38,7 @@ class ProjectController extends Controller
     $data['categories'] = ProjectCategory::pluck('name', 'id')->prepend('Select Category', '');
     $data['statuses'] = ['Active'];
     $data['members'] = Admin::get();
+    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
     return view('admin.pages.projects.create', $data);
   }
 
@@ -81,6 +83,53 @@ class ProjectController extends Controller
     return view('admin.pages.projects.show', ['project' => $project]);
   }
 
+  public function ganttChart(Project $project)
+  {
+    abort_if(!$project->isMine(), 403);
+
+    $project->load('contracts.phases');
+
+    $tasks = [[
+      'id' => 'project-'.$project->id,
+      'name' => $project->name,
+      'start' => $project->start_date->format('Y-m-d'),
+      'end' => $project->deadline->format('Y-m-d'),
+      'dependencies' => '',
+      'collapsed' => false,
+      'custom_class' => 'pro-bar'
+    ]];
+
+    if($project->contracts->count())
+    foreach($project->contracts as $contract)
+    {
+      $tasks[] = [
+        'id' => 'contract-'.$contract->id,
+        'name' => $contract->subject,
+        'start' => $contract->start_date->format('Y-m-d'),
+        'end' => $contract->end_date->format('Y-m-d'),
+        'dependencies' => 'project-'.$project->id,
+        'collapsed' => false,
+        'custom_class' => 'con-bar'
+      ];
+
+      if($contract->phases->count())
+      foreach($contract->phases as $phase)
+      {
+        $tasks[] = [
+          'id' => 'Phase'.$phase->id,
+          'name' => $phase->name,
+          'start' => $phase->start_date->format('Y-m-d'),
+          'end' => $phase->due_date->format('Y-m-d'),
+          'dependencies' => 'contract-'.$contract->id,
+          'collapsed' => false,
+          'custom_class' => 'pha-bar'
+        ];
+      }
+    }
+
+    return view('admin.pages.projects.gantt-chart', ['project' => $project, 'tasks' => $tasks]);
+  }
+
   /**
    * Show the form for editing the specified resource.
    */
@@ -103,5 +152,11 @@ class ProjectController extends Controller
   public function destroy(Project $project)
   {
     //
+  }
+
+  public function getByCompany(Request $request)
+  {
+    $data = Project::where('company_id', $request->id)->pluck('name', 'id')->prepend('Select Project', '');
+    return $this->sendRes('Departments list', ['data' => $data]);
   }
 }

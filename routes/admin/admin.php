@@ -12,6 +12,9 @@ use App\Http\Controllers\Admin\Company\KycDocumentController;
 use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
+use App\Http\Controllers\Admin\Contract\ContractController;
+use App\Http\Controllers\Admin\Contract\ContractPhaseController;
+use App\Http\Controllers\Admin\Contract\ContractTypeController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
@@ -35,6 +38,7 @@ use App\Models\RFPFile;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
+use App\Http\Controllers\Admin\Project\GanttChartController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
@@ -120,12 +124,21 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     });
 
 
+    Route::get('projects/gantt-chart', [GanttChartController::class, 'index'])->name('projects.gantt-chart');
     Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
-    Route::put('projects/{project}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.sort-phases');
+    Route::put('projects/{project}/contracts/{contract}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.contracts.sort-phases');
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
+
+    Route::resource('contracts', ContractController::class);
+    Route::resource('contracts.phases', ContractPhaseController::class);
+    Route::resource('contract-types', ContractTypeController::class);
+
+    Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
+    Route::resource('projects.contracts.phases', ProjectPhaseController::class);
+    Route::get('projects/getByCompany', [ProjectController::class, 'getByCompany'])->name('projects.getByCompany');
+    Route::get('projects/{project}/gantt-chart', [ProjectController::class, 'ganttChart'])->name('projects.gantt-chart');
     Route::resource('projects', ProjectController::class);
-    Route::resource('projects.phases', ProjectPhaseController::class);
     Route::put('project-templates/{project_template}/order-check-item', [ProjectTemplateController::class, 'orderCheckItem'])->name('project-templates.order-check-item');
     Route::resource('project-templates', ProjectTemplateController::class);
     Route::resource('project-templates.tasks', TemplateTaskController::class);

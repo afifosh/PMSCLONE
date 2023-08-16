@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProjectPhase>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ContractType>
  */
-class ProjectPhaseFactory extends Factory
+class ContractTypeFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,7 +17,7 @@ class ProjectPhaseFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->unique()->word(),
         ];
     }
 }

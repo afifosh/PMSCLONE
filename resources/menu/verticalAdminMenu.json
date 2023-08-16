@@ -58,18 +58,6 @@
           "name": "Companies",
           "slug": "admin.companies.index",
           "permission" : "read company"
-        },
-        {
-          "url": "/admin/company-roles",
-          "name": "Company Roles",
-          "slug": "admin.company-roles.index",
-          "permission": "read company role"
-        },
-        {
-          "url": "/admin/company-users",
-          "name": "Company Users",
-          "slug": "admin.company-users.index",
-          "permission": "read company role"
         }
       ]
     },
@@ -90,6 +78,11 @@
           "slug": "admin.projects.index"
         },
         {
+          "url": "/admin/projects/gantt-chart",
+          "name": "Gantt Chart",
+          "slug": "admin.projects.gantt-chart"
+        },
+        {
           "url": "/admin/chat/project-conversations",
           "name": "Project Conversations",
           "slug": "admin.chat.project.conversations"
@@ -103,6 +96,23 @@
           "url": "/admin/project-templates",
           "name": "Project Templates",
           "slug": "admin.project-templates.index"
+        }
+      ]
+    },
+    {
+      "name": "Contracts",
+      "slug": ["admin.contracts.", "admin.contract-types"],
+      "icon": "menu-icon tf-icons ti ti-color-swatch",
+      "submenu": [
+        {
+          "url": "/admin/contracts",
+          "name": "Contracts",
+          "slug": "admin.contracts.index"
+        },
+        {
+          "url": "/admin/contract-types",
+          "name": "Contract Types",
+          "slug": "admin.contract-types.index"
         }
       ]
     },

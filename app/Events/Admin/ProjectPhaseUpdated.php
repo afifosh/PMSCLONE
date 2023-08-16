@@ -12,15 +12,15 @@ class ProjectPhaseUpdated implements ShouldBroadcast
 {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
-  public $projectPhase;
+  public $project;
   public $modifiedTab;
 
   /**
    * Create a new event instance.
    */
-  public function __construct($projectPhase, $modifiedTab, $message = false)
+  public function __construct($project, $modifiedTab, $message = false)
   {
-    $this->projectPhase = $projectPhase;
+    $this->project = $project;
     $this->modifiedTab = $modifiedTab;
 
     if ($message) {
@@ -30,7 +30,7 @@ class ProjectPhaseUpdated implements ShouldBroadcast
 
   public function sendMessage($message)
     {
-        $this->projectPhase->project->sendMessageInChat($message);
+        $this->project->sendMessageInChat($message);
     }
 
   /**
@@ -41,7 +41,7 @@ class ProjectPhaseUpdated implements ShouldBroadcast
   public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('projects.' . $this->projectPhase->project_id),
+            new PrivateChannel('projects.' . $this->project->id),
         ];
     }
 

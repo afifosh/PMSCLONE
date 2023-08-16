@@ -5,29 +5,32 @@ namespace App\Models;
 use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ProjectPhase extends Model
+class ContractPhase extends Model
 {
   use HasFactory, HasEnum;
 
   protected $fillable = [
-    'project_id',
+    'contract_id',
     'name',
-    'description',
     'estimated_cost',
-    'status',
-    'order',
     'start_date',
     'due_date',
+    'description',
+    'status',
+    'order'
   ];
 
   protected $casts = [
     'start_date' => 'datetime:d M, Y',
     'due_date' => 'datetime:d M, Y',
+    'created_at' => 'datetime:d M, Y',
+    'updated_at' => 'datetime:d M, Y',
   ];
 
-  public function project()
+  public function contract(): BelongsTo
   {
-    return $this->belongsTo(Project::class);
+    return $this->belongsTo(Contract::class);
   }
 }

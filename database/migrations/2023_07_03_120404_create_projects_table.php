@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('program_id')->nullable()->constrained('programs')->onDelete('cascade');
             $table->foreignId('category_id')->nullable()->constrained('project_categories')->onDelete('cascade');
+            $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade');
             $table->string('name')->nullable();
             $table->text('description')->nullable();
             $table->dateTime('start_date')->nullable();

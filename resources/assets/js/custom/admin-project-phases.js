@@ -171,7 +171,7 @@
     project_id = project_id || window.active_project;
     $.ajax({
       type: "get",
-      url: route('admin.projects.phases.index', {project: project_id}),
+      url: route('admin.projects.contracts.phases.index', {project: project_id, contract: active_contract}),
       success: function (response) {
         $('.tasks-list').html(response.data.view_data)
         $('.myTasksCount').text(response.data.myTasksCount)
@@ -238,7 +238,7 @@
 
       $.ajax({
         type: "put",
-        url: route('admin.projects.sort-phases', {project : active_project}),
+        url: route('admin.projects.contracts.sort-phases', {project : active_project, contract: active_contract}),
         data: {
           phases: uniquePhases
         },

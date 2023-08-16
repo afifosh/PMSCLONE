@@ -1,7 +1,7 @@
 @if ($phase->id)
-    {!! Form::model($phase, ['route' => ['admin.projects.phases.update', ['project' => $project, 'phase' => $phase->id]], 'method' => 'PUT']) !!}
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.phases.update', ['project' => $project, 'contract' => $contract, 'phase' => $phase->id]], 'method' => 'PUT']) !!}
 @else
-    {!! Form::model($phase, ['route' => ['admin.projects.phases.store',  ['project' => $project]], 'method' => 'POST']) !!}
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.phases.store',  ['project' => $project, 'contract' => $contract]], 'method' => 'POST']) !!}
 @endif
 
 <div class="row">
@@ -10,17 +10,22 @@
       {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
   </div>
   <div class="form-group col-6">
-    {{ Form::label('duration', __('Duration'), ['class' => 'col-form-label']) }}
-    {!! Form::date('duration', null, ['class' => 'form-control flatpickr', 'data-flatpickr' => $phase->id ? '{"mode": "range", "dateFormat": "Y-m-d", "defaultDate": ["'.$phase->start_date->toDateString().'", "'.$phase->due_date->toDateString().'"]}' : '{"mode": "range", "dateFormat": "Y-m-d"}', 'placeholder' => __('Duration')]) !!}
-  </div>
-
-  <div class="form-group col-6">
     {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
-    {!! Form::text('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
+    {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
+  </div>
+  {{-- start date --}}
+  <div class="form-group col-6">
+    {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
+    {!! Form::date('start_date', $phase->start_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Start Date')]) !!}
+  </div>
+  {{-- due date --}}
+  <div class="form-group col-6">
+    {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
+    {!! Form::date('due_date', $phase->due_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Due Date')]) !!}
   </div>
 
   {{-- status --}}
-  <div class="form-group col-6">
+  <div class="form-group col-12">
     {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}
     {!! Form::select('status', array_combine($phase_statuses, $phase_statuses), $phase->status, ['class' => 'form-select globalOfSelect2']) !!}
   </div>
