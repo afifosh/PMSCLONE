@@ -35,7 +35,7 @@ class ContractsDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    $q = $model->with(['project', 'type'])->newQuery();
+    $q = $model->with(['project', 'type', 'company'])->withCount('phases')->newQuery();
 
     if ($this->projectId) {
       $q->where('project_id', $this->projectId);
@@ -88,17 +88,21 @@ class ContractsDataTable extends DataTable
     return [
       Column::make('subject'),
       Column::make('type.name')->title('Type'),
+      Column::make('value')->title('Value('.config('app.currency').')'),
       Column::make('start_date'),
       Column::make('end_date'),
+      Column::make('phases_count')->title('Phases'),
       Column::make('status'),
     ];
 
     return [
       Column::make('subject'),
-      Column::make('project.name')->title('Project'),
+      Column::make('company.name')->title('Company'),
       Column::make('type.name')->title('Type'),
+      Column::make('value')->title('Value('.config('app.currency').')'),
       Column::make('start_date'),
       Column::make('end_date'),
+      Column::make('phases_count')->title('Phases'),
       Column::make('status'),
     ];
   }

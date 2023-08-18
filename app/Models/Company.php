@@ -166,6 +166,11 @@ class Company extends BaseModel
     return $this->hasOne(CompanyDetail::class);
   }
 
+  public function projects()
+  {
+    return $this->hasMany(Project::class);
+  }
+
   public function POCDetail()
   {
     $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);

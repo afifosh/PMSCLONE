@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin\Project;
 use App\DataTables\Admin\Project\ProjectsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProjectStoreRequest;
+use App\Http\Requests\Admin\ProjectUpdateRequest;
 use App\Models\Admin;
 use App\Models\Company;
+use App\Models\Contract;
 use App\Models\Program;
 use App\Models\Project;
 use App\Models\ProjectCategory;
@@ -36,9 +38,11 @@ class ProjectController extends Controller
   {
     $data['programs'] = Program::pluck('name', 'id')->prepend('Select Program', '');
     $data['categories'] = ProjectCategory::pluck('name', 'id')->prepend('Select Category', '');
-    $data['statuses'] = ['Active'];
+    $data['statuses'] = Project::STATUSES;
     $data['members'] = Admin::get();
     $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
+    $data['project'] = new Project;
+
     return view('admin.pages.projects.create', $data);
   }
 
@@ -47,11 +51,11 @@ class ProjectController extends Controller
    */
   public function store(ProjectStoreRequest $request, GroupRepository $groupRepository)
   {
-    $project = Project::create($request->validated());
+    $project = Project::create(['is_progress_calculatable' => $request->boolean('is_progress_calculatable')] + $request->validated());
     $project->members()->sync($request->members);
 
-    if($request->boolean('create_chat_group'))
-    $this->createGroupForProject($project, $groupRepository);
+    if ($request->boolean('create_chat_group'))
+      $this->createGroupForProject($project, $groupRepository);
 
     $project->createLog('Project Created', $project->toArray());
 
@@ -86,48 +90,10 @@ class ProjectController extends Controller
   public function ganttChart(Project $project)
   {
     abort_if(!$project->isMine(), 403);
+    $data['project'] = $project;
+    $data['contracts'] = Contract::where('project_id', $project->id)->with('phases')->get();
 
-    $project->load('contracts.phases');
-
-    $tasks = [[
-      'id' => 'project-'.$project->id,
-      'name' => $project->name,
-      'start' => $project->start_date->format('Y-m-d'),
-      'end' => $project->deadline->format('Y-m-d'),
-      'dependencies' => '',
-      'collapsed' => false,
-      'custom_class' => 'pro-bar'
-    ]];
-
-    if($project->contracts->count())
-    foreach($project->contracts as $contract)
-    {
-      $tasks[] = [
-        'id' => 'contract-'.$contract->id,
-        'name' => $contract->subject,
-        'start' => $contract->start_date->format('Y-m-d'),
-        'end' => $contract->end_date->format('Y-m-d'),
-        'dependencies' => 'project-'.$project->id,
-        'collapsed' => false,
-        'custom_class' => 'con-bar'
-      ];
-
-      if($contract->phases->count())
-      foreach($contract->phases as $phase)
-      {
-        $tasks[] = [
-          'id' => 'Phase'.$phase->id,
-          'name' => $phase->name,
-          'start' => $phase->start_date->format('Y-m-d'),
-          'end' => $phase->due_date->format('Y-m-d'),
-          'dependencies' => 'contract-'.$contract->id,
-          'collapsed' => false,
-          'custom_class' => 'pha-bar'
-        ];
-      }
-    }
-
-    return view('admin.pages.projects.gantt-chart', ['project' => $project, 'tasks' => $tasks]);
+    return view('admin.pages.projects.gantt-chart', $data);
   }
 
   /**
@@ -135,15 +101,28 @@ class ProjectController extends Controller
    */
   public function edit(Project $project)
   {
-    //
+    $data['programs'] = Program::pluck('name', 'id')->prepend('Select Program', '');
+    $data['categories'] = ProjectCategory::pluck('name', 'id')->prepend('Select Category', '');
+    $data['statuses'] = Project::STATUSES;
+    $data['members'] = Admin::get();
+    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
+    $data['project'] = $project;
+    return view('admin.pages.projects.create', $data);
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, Project $project)
+  public function update(ProjectUpdateRequest $request, Project $project)
   {
-    //
+    abort_if(!$project->isMine(), 403);
+
+    $project->update(['is_progress_calculatable' => $request->boolean('is_progress_calculatable')] + $request->validated());
+    $project->members()->sync($request->members);
+
+    $project->createLog('Project Updated', $project->toArray());
+
+    return $this->sendRes('Updated Successfully', ['event' => 'redirect', 'url' => route('admin.projects.index')]);
   }
 
   /**
@@ -151,7 +130,16 @@ class ProjectController extends Controller
    */
   public function destroy(Project $project)
   {
-    //
+    abort_if(!$project->isMine(), 403);
+
+    if ($project->group)
+      $project->group->delete();
+
+    $project->delete();
+
+    $project->createLog('Project Deleted', $project->toArray());
+
+    return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => 'projects-table']);
   }
 
   public function getByCompany(Request $request)

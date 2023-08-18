@@ -31,6 +31,9 @@ class ProjectsDataTable extends DataTable
         ->addColumn('progress', function($proj){
           return view('admin._partials.sections.progressBar', ['perc' => $proj->progress_percentage(), 'color' => 'primary', 'show_perc' => true, 'height' => '14px']);
         })
+        ->addColumn('action', function($project){
+          return view('admin.pages.projects.action', compact('project'));
+        })
         ->filterColumn('members', function ($query, $keyword) {
           $query->whereHas('members', function ($q) use ($keyword) {
             return $q->where('first_name', 'like', '%' . $keyword . '%')->orWhere('last_name', 'like', '%' . $keyword . '%');
@@ -49,7 +52,7 @@ class ProjectsDataTable extends DataTable
      */
     public function query(Project $model): QueryBuilder
     {
-        return $model->with('program', 'members', 'category', 'tasks')->mine()->select('projects.*')->newQuery();
+        return $model->with('program', 'members', 'category', 'tasks')->withCount('contracts')->mine()->newQuery();
     }
 
     /**
@@ -78,6 +81,7 @@ class ProjectsDataTable extends DataTable
           >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
         )
         ->orderBy(0, 'desc')
+        ->addAction(['width' => '80px', 'className' => 'text-center'])
         ->parameters([
           'buttons' => $buttons,
           "scrollX" => true,
@@ -100,6 +104,7 @@ class ProjectsDataTable extends DataTable
             Column::make('start_date'),
             Column::make('deadline'),
             Column::make('members'),
+            Column::make('contracts_count')->title('Contracts'),
             Column::make('progress')->searchable(false)->orderable(false),
             Column::make('status'),
         ];

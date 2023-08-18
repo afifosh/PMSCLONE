@@ -15,7 +15,15 @@ class Project extends Model
   use HasFactory;
   use HasLogs;
 
-  protected $fillable = ['program_id', 'category_id', 'company_id', 'name', 'description', 'tags', 'start_date', 'deadline', 'status', 'budget', 'refrence_id'];
+  protected $fillable = ['program_id', 'category_id', 'company_id', 'name', 'description', 'is_progress_calculatable', 'tags', 'start_date', 'deadline', 'status', 'budget', 'refrence_id'];
+
+  public const STATUSES = [
+    '0' => 'Not Started',
+    '1' => 'In Progress',
+    '2' => 'On Hold',
+    '3' => 'Cancelled',
+    '4' => 'Completed',
+  ];
 
   protected $casts = [
     'tags' => 'array',

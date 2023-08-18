@@ -22,6 +22,7 @@ return new class extends Migration
       $table->dateTime('end_date')->nullable();
       $table->text('description')->nullable();
       $table->enum('status', ['Not Started', 'In Progress', 'On Hold', 'Awaiting Feedback', 'Completed'])->default('Not Started');
+      $table->softDeletes();
       $table->timestamps();
     });
   }

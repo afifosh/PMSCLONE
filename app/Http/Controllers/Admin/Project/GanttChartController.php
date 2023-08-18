@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin\Project;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\Contract;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -10,50 +12,29 @@ class GanttChartController extends Controller
 {
   public function index()
   {
-    $projects = Project::mine()->with('contracts.phases')->get();
+    $contracts = Contract::whereHas('project', function ($query) {
+      $query->mine();
+    })->when(request()->projects, function($q){
+      $q->whereIn('project_id', request()->projects);
+    })
+    ->when(request()->status, function($q){
+      $q->where('status', request()->status);
+    })
+    ->when(request()->companies, function($q){
+      $q->whereIn('company_id', request()->companies);
+    })->with('phases')->get();
 
-    $tasks = [];
-
-    if($projects->count() > 0) {
-      foreach ($projects as $project) {
-        $tasks[] = [
-          'id' => 'project-'.$project->id,
-          'name' => $project->name,
-          'start' => $project->start_date->format('Y-m-d'),
-          'end' => $project->deadline->format('Y-m-d'),
-          'dependencies' => '',
-          'collapsed' => false,
-          'custom_class' => 'pro-bar'
-        ];
-        if($project->contracts->count() > 0)
-        foreach ($project->contracts as $contract) {
-          $tasks[] = [
-            'id' => 'contract-'.$contract->id,
-            'name' => $contract->subject,
-            'start' => $contract->start_date->format('Y-m-d'),
-            'end' => $contract->end_date->format('Y-m-d'),
-            'dependencies' => 'project-'.$project->id,
-            'collapsed' => false,
-            'custom_class' => 'con-bar'
-          ];
-
-          if($contract->phases->count())
-          foreach($contract->phases as $phase)
-          {
-            $tasks[] = [
-              'id' => 'Phase'.$phase->id,
-              'name' => $phase->name,
-              'start' => $phase->start_date->format('Y-m-d'),
-              'end' => $phase->due_date->format('Y-m-d'),
-              'dependencies' => 'contract-'.$contract->id,
-              'collapsed' => false,
-              'custom_class' => 'pha-bar'
-            ];
-          }
-        }
-      }
+    if(request()->ajax()){
+      return response()->json($contracts);
     }
+    $statuses = Contract::getPossibleEnumValues('status');
 
-    return view('admin.pages.projects.gantt-chart', compact('tasks'));
+    $projects = Project::mine()->whereHas('contracts')->pluck('name', 'id');
+
+    $companies = Company::whereHas('projects' , function($q){
+      $q->mine();
+    })->pluck('name', 'id');
+
+    return view('admin.pages.projects.gantt-chart', compact('contracts', 'statuses', 'projects', 'companies'));
   }
 }

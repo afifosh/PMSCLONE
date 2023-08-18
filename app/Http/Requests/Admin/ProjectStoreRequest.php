@@ -23,7 +23,7 @@ class ProjectStoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:projects,name',
-            'company_id' => 'required|exists:companies,id',
+            'company_id' => 'nullable|exists:companies,id',
             'program_id' => 'required|exists:programs,id',
             'category_id' => 'required|exists:project_categories,id',
             'status' => 'required',
@@ -32,7 +32,7 @@ class ProjectStoreRequest extends FormRequest
             'description' => 'required|string|max:255',
             'start_date' => 'nullable|date',
             'deadline' => 'nullable|date',
-            'is_progress_calculatable' => 'required',
+            // 'is_progress_calculatable' => 'required',
             'tags' => 'nullable|array',
             'refrence_id' => 'nullable|string|max:255',
             'budget' => 'nullable|numeric|min:0',
