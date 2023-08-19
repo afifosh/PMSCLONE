@@ -9,174 +9,99 @@
 
 @section('page-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-projects-task-board.css')}}" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.0/dist/frappe-gantt.css" />
-<link rel="stylesheet" href="https://zehntech.github.io/zt-gantt/style.css"/>
-<link rel="stylesheet" href="https://zehntech.github.io/zt-gantt/gantt.css"/>
+{{-- <link rel="stylesheet" href="https://zehntech.github.io/zt-gantt/style.css"/> --}}
+{{-- <link rel="stylesheet" href="https://zehntech.github.io/zt-gantt/gantt.css"/> --}}
+<link rel="stylesheet" href="{{asset('assets/libs/zt-gantt/gantt.css')}}" />
+<style>
+  #ZT-Gantt {
+  /* width: 100vw; */
+  height: calc(100vh - 100px);
+}
+</style>
 @endsection
 
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
-<script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.5.0/dist/frappe-gantt.min.js"></script>
-<script src="https://code.jscharting.com/latest/jscharting.js"></script>
-<script type="text/javascript" src="https://code.jscharting.com/latest/modules/toolbar.js"></script>
-<script type="text/javascript" src="https://zehntech.github.io/zt-gantt/gantt.js"></script>
+{{-- <script type="text/javascript" src="https://zehntech.github.io/zt-gantt/gantt.js"></script> --}}
+<script src="{{asset('assets/libs/zt-gantt/gantt.js')}}"></script>
+<script src="{{asset('assets/libs/zt-gantt/gantt.js')}}"></script>
 @endsection
 
 @section('page-script')
 <script src={{asset('assets/js/custom/select2.js')}}></script>
-<script src={{asset('assets/js/custom/flatpickr.js')}}></script>
+<script src={{asset('assets/js/cards-actions.js')}}></script>
 <script>
-  let data = [
-    { id: 1, text: "Project 1", parent: 0, progress: 30 },
-    {
-      id: 2,
-      text: "Task #2",
-      start_date: "06-05-2023",
-      end_date: "06-05-2023",
-      parent: 1,
-      progress: 50,
-    },
-    {
-      id: 23,
-      text: "Final Milestone",
-      start_date: "06-17-2023",
-      end_date: "06-17-2023",
-      parent: 1,
-      type: "milestone",
-    },
-    {
-      id: 3,
-      text: "Task #3",
-      start_date: "06-06-2023",
-      end_date: "06-07-2023",
-      parent: 1,
-      progress: 60,
-    },
-    {
-      id: 5,
-      text: "SubTask #5",
-      start_date: "06-04-2023",
-      end_date: "06-06-2023",
-      parent: 3,
-      progress: 20,
-    },
-    {
-      id: 6,
-      text: "SubTask #6",
-      start_date: "06-06-2023",
-      end_date: "06-09-2023",
-      parent: 3,
-      progress: 10,
-    },
-    {
-      id: 7,
-      text: "SubTask #7",
-      start_date: "06-08-2023",
-      end_date: "06-11-2023",
-      parent: 3,
-      progress: 50,
-    },
-    {
-      id: 4,
-      text: "Task #4",
-      start_date: "06-13-2023",
-      end_date: "06-16-2023",
-      parent: 1,
-      progress: 90,
-    },
-    { id: 8, text: "Project 2", parent: 0, progress: 80 },
-    {
-      id: 12,
-      text: "Task #12",
-      start_date: "06-03-2023",
-      end_date: "06-05-2023",
-      parent: 8,
-      progress: 50,
-    },
-    {
-      id: 25,
-      text: "Next Milestone",
-      start_date: "06-20-2023",
-      end_date: "06-20-2023",
-      parent: 8,
-      type: "milestone",
-    },
-    {
-      id: 13,
-      text: "Task #13",
-      start_date: "06-04-2023",
-      end_date: "06-07-2023",
-      parent: 8,
-    },
-    {
-      id: 14,
-      text: "Task #14",
-      start_date: "06-05-2023",
-      end_date: "06-09-2023",
-      parent: 8,
-    },
-    {
-      id: 15,
-      text: "Task #15",
-      start_date: "06-07-2023",
-      end_date: "06-08-2023",
-      parent: 8,
-    },
-    { id: 9, text: "Project 3", parent: 0, progress: 10 },
-    {
-      id: 16,
-      text: "Task #16",
-      start_date: "06-05-2023",
-      end_date: "06-09-2023",
-      parent: 9,
-    },
-    {
-      id: 17,
-      text: "Task #17",
-      start_date: "06-06-2023",
-      end_date: "06-08-2023",
-      parent: 9,
-    },
-    { id: 10, text: "Project 4", parent: 0, progress: 40 },
-    {
-      id: 18,
-      text: "Task #18",
-      start_date: "06-08-2023",
-      end_date: "06-16-2023",
-      parent: 10,
-    },
-    {
-      id: 19,
-      text: "Task #19",
-      start_date: "06-02-2023",
-      end_date: "06-09-2023",
-      parent: 10,
-    },
-    {
-      id: 20,
-      text: "Task #20",
-      start_date: "06-11-2023",
-      end_date: "06-13-2023",
-      parent: 10,
-    },
-    { id: 11, text: "Project 5", parent: 0, progress: 100 },
-    {
-      id: 21,
-      text: "Task #21",
-      start_date: "06-04-2023",
-      end_date: "06-10-2023",
-      parent: 11,
-    },
-    {
-      id: 22,
-      text: "Task #22",
-      start_date: "06-06-2023",
-      end_date: "06-12-2023",
-      parent: 11,
-    },
-  ];
+  function formateDate(dateString){
+    const dateObj = new Date(dateString);
+    return `${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')}-${dateObj.getFullYear()}`;
+  }
+
+  function formateData(rawData){
+    let data = [];
+    rawData.forEach((project) => {
+      // data.push({
+      //   id: 'Project:' + project.id,
+      //   type: "Project",
+      //   text: project.name,
+      //   parent: 0,
+      //   progress: 0
+      // });
+      project.contracts.forEach((contract) => {
+        // update min and max dates
+        if(minDate == null || new Date(contract.start_date) < new Date(minDate)){
+          minDate = contract.start_date;
+        }
+        if(maxDate == null || new Date(contract.end_date) > new Date(maxDate)){
+          maxDate = contract.end_date;
+        }
+        // end update min and max dates
+        let contractData = {
+          id: 'Contract:' + contract.id,
+          text: contract.subject,
+          projectName: project.name,
+          // parent: 'Project:' + project.id,
+          parent: 0,
+          type: "Contract",
+          status: contract.status,
+          progress: 0,
+          start_date: formateDate(contract.start_date),
+          end_date: formateDate(contract.end_date),
+        };
+        data.push(contractData);
+        contract.phases.forEach((phase) => {
+          // update min and max dates
+          if(new Date(phase.start_date) < new Date(minDate)){
+            minDate = phase.start_date;
+          }
+          if(new Date(phase.due_date) > new Date(maxDate)){
+            maxDate = phase.due_date;
+          }
+          // end update min and max dates
+          let taskData = {
+            id: 'Phase:' + phase.id,
+            text: phase.name,
+            parent: 'Contract:' + contract.id,
+            contractName: contract.subject,
+            projectName: project.name,
+            status: phase.status,
+            progress: 0,
+            type: "Phase",
+            start_date: formateDate(phase.start_date),
+            end_date: formateDate(phase.due_date),
+          };
+          data.push(taskData);
+        });
+      });
+    });
+
+    return data;
+  }
+  var minDate = null;
+  var maxDate = null;
+  let projects = {!!json_encode($ganttProjects)!!};
+  let data = formateData(projects);
 
   let element = document.getElementById("ZT-Gantt");
   let ZT_Gantt = new ztGantt(element);
@@ -184,29 +109,16 @@
   ZT_Gantt.options.columns = [
     {
       name: "text",
-      width: 245,
-      min_width: 80,
-      max_width: 300,
+      width: 400,
+      min_width: 300,
+      max_width: 500,
       tree: true,
-      label: "Task Name",
+      label: "Contract",
       resize: true,
       template: (task) => {
         return `<span>${task.text}</span>`;
       },
-    },
-    {
-      name: "progress",
-      width: 245,
-      min_width: 80,
-      max_width: 300,
-      tree: false,
-      label: "Progress",
-      resize: true,
-      align: "center",
-      template: (task) => {
-        return `<span>${task.progress || 0}</span>`;
-      },
-    },
+    }
   ];
 
   ZT_Gantt.options.date_format = "%m-%d-%Y";
@@ -226,12 +138,12 @@
   ZT_Gantt.options.exportApi = "https://zt-gantt.zehntech.net/";
   ZT_Gantt.options.taskColor = true;
   ZT_Gantt.options.taskOpacity = 0.7;
-  ZT_Gantt.options.links = [
-    { id: 1, source: 2, target: 23, type: 1 },
-    { id: 2, source: 3, target: 6, type: 2 },
-    { id: 3, source: 4, target: 23, type: 3 },
-    { id: 4, source: 12, target: 15 },
-  ];
+  // ZT_Gantt.options.links = [
+  //   { id: 1, source: 2, target: 23, type: 1 },
+  //   { id: 2, source: 3, target: 6, type: 2 },
+  //   { id: 3, source: 4, target: 23, type: 3 },
+  //   { id: 4, source: 12, target: 15 },
+  // ];
   ZT_Gantt.options.weekStart = 1; // set the start of the week
   ZT_Gantt.options.sidebarWidth = 300;
   ZT_Gantt.options.scales = [
@@ -252,7 +164,7 @@
     { unit: "day", step: 1, format: "%d %D" },
   ];
 
-  ZT_Gantt.options.zoomLevel = "day";
+  ZT_Gantt.options.zoomLevel = "week";
 
   // zoom config
   ZT_Gantt.options.zoomConfig = {
@@ -325,8 +237,9 @@
         scale_height: 30,
         min_col_width: 30,
         scales: [
-          { unit: "year", step: 3, format: "2022 - 2024" },
+          { unit: "year", step: 3, format: new Date().getFullYear() - 1 + ' - ' + ( new Date().getFullYear() + 1)},
           { unit: "year", step: 1, format: "%Y" },
+          { unit: "month", format: "%M" },
         ],
       },
     ],
@@ -335,37 +248,8 @@
   ZT_Gantt.options.scale_height = 30;
   ZT_Gantt.options.row_height = 24;
   ZT_Gantt.options.minColWidth = 80;
-  ZT_Gantt.options.addTaskOnDrag = true;
-  ZT_Gantt.options.taskProgress = true;
-
-  // Gantt layout to implement columns in right side
-  // ZT_Gantt.options.rightGrid = [
-  // {
-  //     name: "text",
-  //     width: 245,
-  //     min_width: 80,
-  //     max_width: 120,
-  //     tree: true,
-  //     label: "Task Name",
-  //     resize: true,
-  //     template: (task) => {
-  //       return `<span>${task.text}</span>`;
-  //     },
-  //   },
-  //   {
-  //     name: "text",
-  //     width: 245,
-  //     min_width: 80,
-  //     max_width: 120,
-  //     tree: false,
-  //     align: "center",
-  //     label: "Task Name",
-  //     resize: true,
-  //     template: (task) => {
-  //       return `<span>${task.text}</span>`;
-  //     },
-  //   },
-  // ];
+  ZT_Gantt.options.addTaskOnDrag = false;
+  ZT_Gantt.options.taskProgress = false;
 
   function weekStartAndEnd(t) {
     const e = t.getDay();
@@ -381,29 +265,26 @@
     };
   }
 
-  ZT_Gantt.options.startDate = "2023-06-01T11:46:17.775Z";
-  ZT_Gantt.options.endDate = "2023-06-30T11:46:17.775Z";
+  ZT_Gantt.options.startDate = new Date(minDate).toISOString();;
+  ZT_Gantt.options.endDate = new Date(maxDate).toISOString();;
 
   ZT_Gantt.templates.tooltip_text = function (start, end, task) {
-    return `<b>${task.parent === 0 ? "Project" : "Task"}:</b>
-        ${task.text}
-        <br/><b>Start date:</b>
-        ${ZT_Gantt.formatDateToString("%d-%m-%y %H:%i", start)}
-        <br/><b>End date:</b>
-        ${ZT_Gantt.formatDateToString("%d-%m-%y %H:%i", end)}<br/>
-        <b>Duration:</b> ${task.duration} ${
-      task.duration > 1 ? "Days" : "Day"
-    }`;
+    return `
+        <b>Project:</b>${task.projectName}<br/>
+        ${task.type == 'Phase' ? `<b>Contract:</b>${task.contractName}<br/>` : ''}
+        <b>${task.type}:</b>${task.text}<br/>
+        <b>Start date:</b>
+        ${ZT_Gantt.formatDateToString("%d-%m-%y", task.start_date)}<br/>
+        <b>End date:</b>
+        ${ZT_Gantt.formatDateToString("%d-%m-%y", task.end_date)}<br/>
+        <b>Status:</b>${task.status}<br/>
+        <b>Duration:</b> ${task.duration} ${task.duration > 1 ? "Days" : "Day"}<br/>
+        ${Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) > 0 ? '<b>Remaining Days:</b>' + Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) : ''}
+    `;
   };
 
   ZT_Gantt.templates.taskbar_text = function (start, end, task) {
-    if (task.parent == 0) {
-      return `Project : ${task.text}`;
-    } else if (task.type === "milestone") {
-      return task.text;
-    } else {
-      return `Task : ${task.text}`;
-    }
+    return task.type + " : " + task.text;
   };
 
   ZT_Gantt.templates.grid_folder = (task) => {
@@ -418,11 +299,12 @@
 
   ZT_Gantt.templates.grid_file = (task) => {
     if (task.parent != 0) {
+      // return '';
       var tracker_name = task.hasOwnProperty("tracker")
         ? task.tracker.name
         : " ";
       let issue_id = task.id;
-      return `<div class='gantt_file ${tracker_name}'><a  class="link-issue ${tracker_name}" href='http://127.0.0.1:5500//issues/${issue_id}'>#${issue_id}</a></div>`;
+      return `<div class='gantt_file ${tracker_name}'><b  class="link-issue ${tracker_name}">${task.type} :  </b></div>`;
     }
   };
 
@@ -617,6 +499,16 @@
     }
   }
 
+  function changeSidebar(e) {
+    if (e.target.checked === true) {
+      $('#zt-gantt-grid-left-data').show()
+      $('#zt-gantt-left-layout-resizer-wrap').show()
+    } else {
+      $('#zt-gantt-grid-left-data').hide()
+      $('#zt-gantt-left-layout-resizer-wrap').hide()
+    }
+  }
+
   function changeToday(e) {
     if (event.target.checked === true) {
       ZT_Gantt.addTodayFlag();
@@ -717,8 +609,12 @@
 
   function searchTask(e) {
     let isFilter = e.target.value.trim() !== "";
+    let parentIds = [];
     ZT_Gantt.filterTask((task) => {
-      return task.text.toLowerCase().includes(e.target.value.toLowerCase());
+      return task.text.toLowerCase().includes(e.target.value.toLowerCase()) && parentIds.push(task.parent);
+    }, isFilter);
+    ZT_Gantt.filterTask((task) => {
+      return parentIds.includes(task.id) || task.text.toLowerCase().includes(e.target.value.toLowerCase());
     }, isFilter);
   }
   function addCol() {
@@ -743,190 +639,98 @@
     ZT_Gantt.render();
   }
 
-</script>
-<script type="text/javascript">
-  function renderChart(data, config){
-      var columnWidths = [200];
-      var span = function(val, width) {
-        return '<span style="width:' + width + 'px;">' + val + '</span>';
-      };
-      var mapLabels = function(labels) {
-        return labels
-          .map(function(v, i) {
-            return span(v, columnWidths[i]);
-          })
-          .join('');
-      };
-
-      var headerText = '' + mapLabels(['Contract']) + '';
-      var tickTemplate = mapLabels(['%name']);
-      boldTickTemplate = '<b>' + tickTemplate + '</b>';
-
-      window.chart = JSC.chart('chartDiv', {
-        debug: true,
-        /*Typical Gantt setup. Horizontal columns by default.*/
-        type: 'horizontal column solid',
-        /*Make columns overlap.*/
-        zAxis_scale_type: 'stacked',
-
-        defaultBox_boxVisible: false,
-        axisToZoom: 'y',
-        defaultAnnotation: { label_style_fontSize: '15px' },
-        annotations: [
-          { position: '0,2', label_text: headerText },
-          { position: 'top right', label_text: 'Contracts from %min to %max' }
-        ],
-        legend: {
-          visible: false,
-          position: 'inside left bottom',
-          fill: 'white',
-          outline_width: 0,
-          corners: 'round',
-          template: '%icon %name'
-        },
-        xAxis: {
-          defaultTick: { label_style: { fontSize: 12 } }
-        },
-        palette: 'fiveColor46',
-        yAxis: {
-          id: 'yAx',
-          alternateGridFill: 'none',
-          scale: {
-            type: 'time',
-            range: [config.minDate, config.maxDate]
-          },
-          scale_range_padding: 0.15,
-          markers: [
-            // today marker
-            { value: 'today', line_color: 'red', line_style: 'dashed', label_text: 'Now'},
-            // marker for current month
-            { value: [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)], color: ['gold', 0.6], label_text: 'This Month'},
-
-            //
-            // { value: ['1/1/'+new Date(config.minDate).getFullYear(), 'today'], color: ['gold', 0.6], label_text: 'YTD'}
-          ]
-        },
-        defaultTooltip_combined: false,
-        defaultPoint: {
-          xAxisTick_label_text: tickTemplate,
-          tooltip: '<b>%name</b> %low - %high<br/>{days(%high-%low)} days'
-        },
-        defaultSeries: {
-          firstPoint: {
-            outline: { color: 'darkenMore', width: 2 },
-            hatch_style: 'light-downward-diagonal',
-            xAxisTick_label_text: boldTickTemplate
-          }
-        },
-        yAxis_scale_type: 'time',
-        series: data
-      });
-      setTimeout(() => {
-        chart.redraw();
-      }, 600);
-    }
-      function setSeriesData(data, config){
-        renderChart(data, config);
-        console.log(data)
-        console.log(config)
+  $(document).on('change', '.gantt_filter', function (e) {
+    e.preventDefault();
+    applyFilters();
+  });
+  function applyFilters(){
+    $.ajax({
+      type: "get",
+      url: route('admin.projects.gantt-chart.index'),
+      data: {
+        projects: $('[name="projects[]"]').val(),
+        status: $('[name="status"]').val(),
+        companies: $('[name="companies[]"]').val()
+      },
+      success: function (ids) {
+        console.log(ids);
+        ZT_Gantt.filterTask((task) => {
+          console.log(task.id, ids.includes(task.id));
+          return ids.includes(task.id);
+        }, true);
       }
-      function setRawSeriesData(data){
-        var series = [];
-        var minDate = null;
-        var maxDate = null;
-        data.forEach(function (contract) {
-          // update min and max dates
-          if(minDate == null || new Date(contract.start_date) < new Date(minDate)){
-            minDate = contract.start_date;
-          }
-          if(maxDate == null || new Date(contract.end_date) > new Date(maxDate)){
-            maxDate = contract.end_date;
-          }
-          // end update min and max dates
-          var points = [];
-          points.push({
-            name: contract.subject + '(' + contract.id + 'ProjectName)',
-            y: [contract.start_date, contract.end_date]
-          })
-          contract.phases.forEach(function (phase) {
-            // update min and max dates
-            if(new Date(phase.start_date) < new Date(minDate)){
-              minDate = phase.start_date;
-            }
-            if(new Date(phase.due_date) > new Date(maxDate)){
-              maxDate = phase.due_date;
-            }
-            // end update min and max dates
-
-            points.push({
-              name: phase.name,
-              y: [phase.start_date, phase.due_date]
-            });
-          });
-          series.push({
-            name: contract.subject + '(' + contract.id + 'ProjectName)',
-            points: points
-          });
-        });
-        const config = {
-          minDate : minDate,
-          maxDate : maxDate
-        }
-        setSeriesData(series, config);
-      }
-      $(document).ready(function () {
-        // window.contracts = {!! json_encode($contracts) !!};
-        // setRawSeriesData(contracts);
-      });
-      $(document).on('change', '.gantt_filter', function (e) {
-        e.preventDefault();
-        applyFilters();
-      });
-      function applyFilters(){
-        $.ajax({
-          type: "get",
-          url: route('admin.projects.gantt-chart.index'),
-          data: {
-            projects: $('[name="projects[]"]').val(),
-            status: $('[name="status"]').val(),
-            companies: $('[name="companies[]"]').val()
-          },
-          success: function (contracts) {
-            setRawSeriesData(contracts);
-          }
-        });
-      }
+    });
+  }
 </script>
 @endsection
 
 @section('content')
 @includeWhen(isset($project),'admin.pages.projects.navbar', ['tab' => 'gantt-chart'])
-@if (!isset($project))
-  <div class="card">
-    <h5 class="card-header">Filters</h5>
-    <form class="js-datatable-filter-form">
-      <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
-        <div class="col-md-4">
-          {!! Form::label('projects', 'Projects') !!}
-          {!! Form::select('projects[]', $projects, null, ['class' => 'form-select gantt_filter select2', 'multiple' => 'true', 'data-placeholder' => 'Projects']) !!}
-        </div>
-        <div class="col-md-4">
-          {!! Form::label('project Status', 'Project Status') !!}
-          {!! Form::select('status', [0 => 'All'] + array_combine($statuses, $statuses), null, ['class' => 'form-select gantt_filter select2', 'data-placeholder' => 'Status']) !!}
-        </div>
-        <div class="col-md-4">
-          {!! Form::label('companies[]', 'Company') !!}
-          {!! Form::select('companies[]', $companies, null, ['class' => 'form-select gantt_filter select2', 'multiple' => 'true', 'data-placeholder' => 'Company']) !!}
-        </div>
+<div class="col-12 mt-3">
+  <div class="card card-action mb-4">
+    <div class="card-header">
+      <h5 class="card-action-title">Contracts</h5>
+      <div class="card-action-element">
+        <ul class="list-inline mb-0">
+          <li class="list-inline-item">
+            <a href="javascript:void(0);" onclick="setTimeout(function(){ZT_Gantt.render()}, 300)" class="card-expand"><i class="tf-icons ti ti-arrows-maximize ti-sm"></i></a>
+          </li>
+        </ul>
       </div>
-    </form>
-  </div>
-@endif
-{{-- <div class="mt-3 card">
-  <div id="chartDiv" style="height:70vh;"></div>
-</div> --}}
-<div class="card col-12">
-  <div id="ZT-Gantt"></div>
-</div>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+          @if (!isset($project))
+            <div class="col-md-3">
+              {!! Form::label('projects', 'Projects') !!}
+              {!! Form::select('projects[]', $projects, null, ['class' => 'form-select gantt_filter', 'data-placeholder' => 'Projects']) !!}
+            </div>
+            <div class="col-md-3">
+              {!! Form::label('project Status', 'Project Status') !!}
+              {!! Form::select('status', [null => 'All'] + $statuses, null, ['class' => 'form-select gantt_filter', 'data-placeholder' => 'Status']) !!}
+            </div>
+            <div class="col-md-3">
+              {!! Form::label('companies[]', 'Company') !!}
+              {!! Form::select('companies[]', $companies, null, ['class' => 'form-select gantt_filter', 'data-placeholder' => 'Company']) !!}
+            </div>
+          @endif
+          <div class="col-md-3">
+            {!! Form::label('search', 'Search') !!}
+            {!! Form::text('search', null, ['class' => 'form-control', 'placeholder' => 'Search', 'onkeyup' => 'searchTask(event)']) !!}
+          </div>
 
+          <div class="{{!isset($project) ? 'mt-3' : ''}} col-3">
+            <label>Zoom To</label>
+            <select class="form-select" onchange="changeZoom(event)">
+              <option value="year">Years</option>
+              <option value="quarter">Quarters</option>
+              <option value="month">Months</option>
+              <option value="week">Weeks</option>
+              <option value="day" selected="day">Days</option>
+              <option value="hour">Hour</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex justify-content-between pt-4 me-5">
+            <label class="switch">
+              <label for="collapse-zt" class="me-2">Collapse</label>
+              <input id="collapse-zt" type="checkbox" class="switch-input" onchange="changeCollapse(event)">
+              <span class="switch-toggle-slider">
+                <span class="switch-on"></span>
+                <span class="switch-off"></span>
+              </span>
+            </label>
+            <label class="switch">
+              <label for="sidebar-zt" class="me-2">SideBar</label>
+              <input id="sidebar-zt" type="checkbox" class="switch-input" onchange="changeSidebar(event)" checked>
+              <span class="switch-toggle-slider">
+                <span class="switch-on"></span>
+                <span class="switch-off"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+      <div class="mt-4" id="ZT-Gantt"></div>
+    </div>
+  </div>
+</div>
 @endsection

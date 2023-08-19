@@ -82,7 +82,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
   });
 
   Route::middleware('passwordMustNotBeExpired')->group(function () {
-    Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
+    Route::get('/', [GanttChartController::class, 'index'])->name('dashboard');
 
     Route::resource('private-notes', PersonalNoteController::class);
 

@@ -90,8 +90,7 @@ class ProjectController extends Controller
   public function ganttChart(Project $project)
   {
     abort_if(!$project->isMine(), 403);
-    $data['project'] = $project;
-    $data['contracts'] = Contract::where('project_id', $project->id)->with('phases')->get();
+    $data['project'] = $data['ganttProjects'] = [$project->load('contracts.phases')];
 
     return view('admin.pages.projects.gantt-chart', $data);
   }

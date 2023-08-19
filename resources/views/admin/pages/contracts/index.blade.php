@@ -132,7 +132,7 @@ $configData = Helper::appClasses();
     </div>
     {{-- Types Graph End --}}
 @endif
-    <div class="card mt-2">
+    <div class="card mt-3">
       <div class="card-body">
         {{$dataTable->table()}}
       </div>

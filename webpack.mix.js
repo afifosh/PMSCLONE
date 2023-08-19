@@ -142,6 +142,9 @@ mixAssetsDir('vendor/fonts/!(_)*.scss', (src, dest) =>
 mixAssetsDir('js/**/*.js', (src, dest) => mix.scripts(src, dest));
 mixAssetsDir('css/**/*.css', (src, dest) => mix.copy(src, dest));
 mixAssetsDir('img/**/*.*', (src, dest) => mix.copy(src, dest));
+
+// full libs
+mixAssetsDir('libs/**/*.*', (src, dest) => mix.copy(src, dest));
 // laravel working crud app related js
 mix.js('resources/js/laravel-user-management.js', 'public/js/');
 

@@ -103,7 +103,7 @@ class ProjectsDataTable extends DataTable
             // Column::make('category.name')->title('Category'),
             Column::make('start_date'),
             Column::make('deadline'),
-            Column::make('members'),
+            Column::make('members')->orderable(false),
             Column::make('contracts_count')->title('Contracts'),
             Column::make('progress')->searchable(false)->orderable(false),
             Column::make('status'),

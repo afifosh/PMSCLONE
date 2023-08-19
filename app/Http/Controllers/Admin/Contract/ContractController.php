@@ -40,7 +40,7 @@ class ContractController extends Controller
     $data['contractTypesValue'] = ContractType::selectRaw('contract_types.name, sum(contracts.value) as total, round(sum(contracts.value) / (select sum(value) from contracts where contracts.deleted_at Is NULL) * 100, 2) as percentage')
       ->leftJoin('contracts', 'contracts.type_id', '=', 'contract_types.id')
       ->whereNull('contracts.deleted_at')
-      ->groupBy('contract_types.id')
+      ->groupBy('contract_types.id', 'contract_types.name')
       ->orderBy('total', 'desc')
       ->limit(5)
       ->get();
