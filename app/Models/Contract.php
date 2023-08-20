@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Contract extends Model
 {
-  use HasFactory, HasEnum, SoftDeletes;
+  use HasFactory, SoftDeletes;
 
   protected $fillable = [
     'type_id',
@@ -21,8 +21,14 @@ class Contract extends Model
     'value',
     'start_date',
     'end_date',
-    'description',
-    'status',
+    'description'
+  ];
+
+  public const STATUSES = [
+    'Not started',
+    'Active',
+    'About To Expire',
+    'Expired',
   ];
 
   protected $casts = [
@@ -31,6 +37,14 @@ class Contract extends Model
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
+
+  public function getStatusAttribute()
+  {
+    if($this->end_date->isPast()) return 'Expired';
+    elseif($this->start_date->isFuture()) return 'Not started';
+    elseif(now() > $this->end_date->subWeeks(2)) return 'About To Expire';
+    elseif(now() >= $this->start_date) return 'Active';
+  }
 
   public function type(): BelongsTo
   {

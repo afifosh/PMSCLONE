@@ -25,14 +25,14 @@ class DatabaseSeeder extends Seeder
         $this->call(UserRolesPermissionsSeeder::class);
         $this->call(AdminSeeder::class);
         $this->call(HRSeeder::class);
-        $this->call(CompanySeeder::class);
+        // $this->call(CompanySeeder::class);
         $this->call(ProgramSeeder::class);
         $this->call(ProjectCategorySeeder::class);
-        $this->call(ProjectSeeder::class);
-        $this->call(WorkflowSeeder::class);
-        $this->call(KycDocumentSeeder::class);
+        // $this->call(ProjectSeeder::class);
+        // $this->call(WorkflowSeeder::class);
+        // $this->call(KycDocumentSeeder::class);
         $this->call(EmailPermissionsSeeder::class);
         $this->call(NoteTagSeeder::class);
-        $this->call(ContractTypeSeeder::class);
+        // $this->call(ContractTypeSeeder::class);
     }
 }

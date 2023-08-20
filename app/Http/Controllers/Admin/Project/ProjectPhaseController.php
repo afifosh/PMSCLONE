@@ -20,8 +20,8 @@ class ProjectPhaseController extends Controller
 
     abort_if(!$project->isMine(), 403);
 
-    $phase_statuses = ContractPhase::getPossibleEnumValues('status');
-    $colors = ['Not Started' => 'danger', 'In Progress' => 'warning', 'On Hold' => 'warning', 'Awaiting Feedback' => 'warning', 'Completed' => 'success'];
+    $phase_statuses = ContractPhase::STATUSES;
+    $colors = ContractPhase::STATUSCOLORS;
 
     if(request()->ajax()){
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.phase-list', compact('contract', 'project', 'phase_statuses', 'colors'))->render()]);
@@ -36,11 +36,9 @@ class ProjectPhaseController extends Controller
     $project = $contract->project;
     abort_if(!$project->isMine(), 403);
 
-    $phase_statuses = ContractPhase::getPossibleEnumValues('status');
-
     $phase = new ContractPhase();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'phase_statuses'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase'))->render()]);
   }
 
   public function store($project, Contract $contract,Request $request)
@@ -52,9 +50,8 @@ class ProjectPhaseController extends Controller
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,contract_id,' . $contract->id,
       'estimated_cost' => 'required|max:255',
-      'description' => 'required|string|max:65000',
-      'status' => 'required|in:' . implode(',', ContractPhase::getPossibleEnumValues('status')),
-      'start_date' => 'required|date',
+      'description' => 'nullable|string|max:65000',
+      'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
       'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
     ],[
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
@@ -75,9 +72,7 @@ class ProjectPhaseController extends Controller
     $project = $contract->project;
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
 
-    $phase_statuses = ContractPhase::getPossibleEnumValues('status');
-
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'phase_statuses'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase'))->render()]);
   }
 
   public function update($project, Request $request, Contract $contract, ContractPhase $phase)
@@ -89,9 +84,8 @@ class ProjectPhaseController extends Controller
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,' . $phase->id . ',id,contract_id,' . $contract->id,
       'estimated_cost' => 'required|max:255',
-      'description' => 'required|string|max:65000',
-      'status' => 'required|in:' . implode(',', ContractPhase::getPossibleEnumValues('status')),
-      'start_date' => 'required|date',
+      'description' => 'nullable|string|max:65000',
+      'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
       'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
     ],[
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'

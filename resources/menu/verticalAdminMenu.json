@@ -69,23 +69,13 @@
     },
     {
       "name": "Projects",
-      "slug": ["admin.projects.", "admin.project-categories", "admin.project-templates", "admin.chat.project.conversations"],
+      "slug": ["admin.projects.index", "admin.project-categories", "admin.project-templates"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "submenu": [
         {
           "url": "/admin/projects",
           "name": "Projects",
           "slug": "admin.projects.index"
-        },
-        {
-          "url": "/admin/projects/gantt-chart",
-          "name": "Gantt Chart",
-          "slug": "admin.projects.gantt-chart.index"
-        },
-        {
-          "url": "/admin/chat/project-conversations",
-          "name": "Project Conversations",
-          "slug": "admin.chat.project.conversations"
         },
         {
           "url": "/admin/project-categories",
@@ -101,7 +91,7 @@
     },
     {
       "name": "Contracts",
-      "slug": ["admin.contracts.", "admin.contract-types"],
+      "slug": ["admin.contracts.", "admin.contract-types", "admin.projects.gantt-chart.index"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "submenu": [
         {
@@ -113,6 +103,11 @@
           "url": "/admin/contract-types",
           "name": "Contract Types",
           "slug": "admin.contract-types.index"
+        },
+        {
+          "url": "/admin/projects/gantt-chart",
+          "name": "Gantt Chart",
+          "slug": "admin.projects.gantt-chart.index"
         }
       ]
     },

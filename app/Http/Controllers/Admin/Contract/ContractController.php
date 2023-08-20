@@ -63,16 +63,19 @@ class ContractController extends Controller
   public function create()
   {
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
-    $data['statuses'] = Contract::getPossibleEnumValues('status');
     $data['contract'] = new Contract();
 
     if(request()->has('project')){
       $data['projects'] = Project::where('id', request()->project)->first();
-      $data['companies'] = Company::where('id', $data['projects']->company_id)->pluck('name', 'id');
-      $data['projects'] = [$data['projects']->id => $data['projects']->name];
+      // $data['companies'] = Company::where('id', $data['projects']->company_id)->pluck('name', 'id');
+      // $data['projects'] = [$data['projects']->id => $data['projects']->name];
+      $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
+      $data['companies'] = ['' => 'Select Company'];
     }else{
-      $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Company'), '');
-      $data['projects'] = [];
+      // $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Company'), '');
+      // $data['projects'] = [];
+      $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
+      $data['companies'] = ['' => 'Select Company'];
     }
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
@@ -88,11 +91,10 @@ class ContractController extends Controller
       'type_id' => 'required|exists:contract_types,id',
       'company_id' => 'required|exists:companies,id',
       'project_id' => 'required|exists:projects,id',
-      'status' => 'required|in:' . implode(',', Contract::getPossibleEnumValues('status')),
       'start_date' => 'required|date',
       'end_date' => 'required|date|after_or_equal:start_date',
       'value' => 'required',
-      'description' => 'required|string|max:1000',
+      'description' => 'nullable|string|max:1000',
     ]);
 
     Contract::create($request->all());
@@ -115,14 +117,11 @@ class ContractController extends Controller
   {
     $contract->load('project');
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
-    if($contract->project_id)
-      $data['companies'] = Company::where('id', $contract->project->company_id)->pluck('name', 'id');
-    else
-      $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Company'), '');
-    $data['statuses'] = Contract::getPossibleEnumValues('status');
+    $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
+    $data['companies'] = Company::when($contract->company_id, function($q) use ($contract){
+      $q->where('id', $contract->company_id);
+    })->pluck('name', 'id')->prepend(__('Select Company'), '');
     $data['contract'] = $contract;
-
-    $data['projects'] = [$contract->project->id => $contract->project->name];
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
   }
@@ -137,11 +136,10 @@ class ContractController extends Controller
       'type_id' => 'required|exists:contract_types,id',
       'company_id' => 'required|exists:companies,id',
       'project_id' => 'required|exists:projects,id',
-      'status' => 'required|in:' . implode(',', Contract::getPossibleEnumValues('status')),
       'start_date' => 'required|date',
       'end_date' => 'required|date|after_or_equal:start_date',
       'value' => 'required',
-      'description' => 'required|string|max:1000',
+      'description' => 'nullable|string|max:1000',
     ]);
 
     $contract->update($request->all());

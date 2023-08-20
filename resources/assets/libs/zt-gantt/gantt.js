@@ -2070,6 +2070,9 @@
             this.options.links[i]
           );
         }
+        $('.config-input').each(function () {
+          $(this).trigger('change');
+        });
     },
 
     // create left sidebar
@@ -2865,15 +2868,16 @@
         let start_date = new Date(this.options.data[j].start_date);
         let end_date = new Date(this.options.data[j].end_date);
 
-        if (
-          this.options.data[j].children &&
-          this.options.data[j].children.length > 0
-        ) {
-          let taskData = [...this.options.data[j].children];
-          let startAndEndDate = this.getStartAndEndDate(taskData);
-          start_date = startAndEndDate.startDate;
-          end_date = startAndEndDate.endDate;
-        }
+        // commented out to render the milstone based on the start date and end date
+        // if (
+        //   this.options.data[j].children &&
+        //   this.options.data[j].children.length > 0
+        // ) {
+        //   let taskData = [...this.options.data[j].children];
+        //   let startAndEndDate = this.getStartAndEndDate(taskData);
+        //   start_date = startAndEndDate.startDate;
+        //   end_date = startAndEndDate.endDate;
+        // }
 
         let cellStartDate = this.options.startDate;
         let isCellGreater = true;

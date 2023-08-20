@@ -141,9 +141,11 @@ class ProjectController extends Controller
     return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => 'projects-table']);
   }
 
-  public function getByCompany(Request $request)
+  public function getCompanyByProject()
   {
-    $data = Project::where('company_id', $request->id)->pluck('name', 'id')->prepend('Select Project', '');
-    return $this->sendRes('Departments list', ['data' => $data]);
+    $data = Company::whereHas('projects', function($q){
+      $q->where('id', request()->id);
+    })->pluck('name', 'id');
+    return $this->sendRes('Company', ['data' => $data]);
   }
 }

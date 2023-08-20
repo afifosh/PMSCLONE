@@ -16,18 +16,12 @@
   {{-- start date --}}
   <div class="form-group col-6">
     {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('start_date', $phase->start_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Start Date')]) !!}
+    {!! Form::date('start_date', $phase->start_date, ['class' => 'form-control flatpickr', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Start Date')]) !!}
   </div>
   {{-- due date --}}
   <div class="form-group col-6">
     {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('due_date', $phase->due_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Due Date')]) !!}
-  </div>
-
-  {{-- status --}}
-  <div class="form-group col-12">
-    {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}
-    {!! Form::select('status', array_combine($phase_statuses, $phase_statuses), $phase->status, ['class' => 'form-select globalOfSelect2']) !!}
+    {!! Form::date('due_date', $phase->due_date, ['class' => 'form-control flatpickr', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Due Date')]) !!}
   </div>
 
 </div>

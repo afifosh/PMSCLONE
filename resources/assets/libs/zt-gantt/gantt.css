@@ -27,8 +27,8 @@
   --taskbar-background: #7fbbfff2;
   --taskbar-child-background: #56a4fdf2;
   --task-area-background: #0094ff4d;
-  --task-progress-background: #0094ff4d;
-  --child-task-progress-background: #298dfff2;
+  --task-progress-background: #070102f5;
+  --child-task-progress-background: #cd545b;
 
   /* milestone content */
   --milestone-content-background: #e84855;
@@ -1110,13 +1110,13 @@
 }
 
 .zt-gantt-bar-task.child-task {
-  background-color: #cd545b;
-  border: 1px solid #cd545b;
+  background-color: #bdb9b9;
+  border: none;
 }
 
 .zt-gantt-bar-task.zt-gantt-bar-parent-task.parent-task {
-  background-color: #000000;
-  border: 1px solid #000000;
+  background-color: #bdb9b9;
+  border: none;
 }
 
 .zt-gantt-marker-today, .zt-gantt-marker-area .zt-gantt-marker {
@@ -1124,5 +1124,5 @@
 }
 
 .zt-gantt-current-month-cell {
-background-color: var(--weekend-cell-background);
+background-color: beige;
 }

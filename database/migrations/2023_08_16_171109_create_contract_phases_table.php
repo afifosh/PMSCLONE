@@ -17,7 +17,6 @@ return new class extends Migration
           $table->string('name');
           $table->text('description');
           $table->string('estimated_cost');
-          $table->enum('status', ['Not Started', 'In Progress', 'On Hold', 'Awaiting Feedback', 'Completed'])->default('Not Started');
           $table->bigInteger('order')->default(0);
           $table->dateTime('start_date');
           $table->dateTime('due_date');

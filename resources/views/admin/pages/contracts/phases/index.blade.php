@@ -51,7 +51,7 @@
               <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
                 <span class="align-middle ms-2">{{$status}}</span>
               </a>
-              <div class="badge bg-label-warning rounded-pill badge-center">{{$contract->phases->where('status', $status)->count()}}</div>
+              <div class="badge bg-label-{{$colors[$status]}} rounded-pill badge-center">{{$contract->phases->where('status', $status)->count()}}</div>
             </li>
           @empty
           @endforelse

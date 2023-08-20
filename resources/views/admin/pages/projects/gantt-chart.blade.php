@@ -59,13 +59,13 @@
         // end update min and max dates
         let contractData = {
           id: 'Contract:' + contract.id,
-          text: contract.subject,
+          text: `<b>Project : ${project.name} : </b> ${contract.subject}`,
           projectName: project.name,
           // parent: 'Project:' + project.id,
           parent: 0,
           type: "Contract",
           status: contract.status,
-          progress: 0,
+          progress: calculateProgressPercentage(contract.start_date, contract.end_date),
           start_date: formateDate(contract.start_date),
           end_date: formateDate(contract.end_date),
         };
@@ -86,7 +86,8 @@
             contractName: contract.subject,
             projectName: project.name,
             status: phase.status,
-            progress: 0,
+            // calculate from start date and end date and current date
+            progress: calculateProgressPercentage(phase.start_date, phase.due_date),
             type: "Phase",
             start_date: formateDate(phase.start_date),
             end_date: formateDate(phase.due_date),
@@ -97,6 +98,26 @@
     });
 
     return data;
+  }
+
+  function calculateProgressPercentage(start_date, end_date) {
+    start_date = new Date(start_date);
+    end_date = new Date(end_date);
+    const current_date = new Date();
+
+    // Convert dates to milliseconds
+    const start_time = start_date.getTime();
+    const end_time = end_date.getTime();
+    const current_time = current_date.getTime();
+
+    // Calculate total duration and elapsed duration in milliseconds
+    const total_duration = end_time - start_time;
+    const elapsed_duration = current_time - start_time;
+
+    // Calculate progress percentage
+    const progress_percentage = (elapsed_duration / total_duration) * 100;
+
+    return Math.min(100, Math.max(0, progress_percentage)); // Ensure the percentage is within 0 to 100 range
   }
   var minDate = null;
   var maxDate = null;
@@ -237,7 +258,7 @@
         scale_height: 30,
         min_col_width: 30,
         scales: [
-          { unit: "year", step: 3, format: new Date(minDate).getFullYear()+ ' - ' + ( new Date(maxDate).getFullYear())},
+          { unit: "year", step: 3, format: new Date(minDate).getFullYear() - 1 + ' - ' + (new Date(maxDate).getFullYear() + 1)},
           { unit: "year", step: 1, format: "%Y" },
           { unit: "month", format: "%M" },
         ],
@@ -249,7 +270,7 @@
   ZT_Gantt.options.row_height = 24;
   ZT_Gantt.options.minColWidth = 80;
   ZT_Gantt.options.addTaskOnDrag = false;
-  ZT_Gantt.options.taskProgress = false;
+  ZT_Gantt.options.taskProgress = true;
 
   function weekStartAndEnd(t) {
     const e = t.getDay();
@@ -265,8 +286,10 @@
     };
   }
 
-  ZT_Gantt.options.startDate = new Date(minDate).toISOString();;
-  ZT_Gantt.options.endDate = new Date(maxDate).toISOString();;
+  var mnDate = new Date(minDate).setFullYear(new Date(minDate).getFullYear() - 1);
+  ZT_Gantt.options.startDate = new Date(mnDate).toISOString();
+  var mxDate = new Date(maxDate).setFullYear(new Date(maxDate).getFullYear() + 1);
+  ZT_Gantt.options.endDate = new Date(mxDate).toISOString();;
 
   ZT_Gantt.templates.tooltip_text = function (start, end, task) {
     return `
@@ -485,22 +508,23 @@
     //   ZT_Gantt.options.endDate = "2023-06-30T11:46:17.775Z";
     // }
     ZT_Gantt.zoomInit();
+    ZT_Gantt.render();
   }
 
   function changeLang(e) {
     ZT_Gantt.setLocalLang(e.target.value);
   }
 
-  function changeCollapse(e) {
-    if (e.target.checked === true) {
+  function changeCollapse(elm) {
+    if($(elm).is(':checked')) {
       ZT_Gantt.collapseAll();
     } else {
       ZT_Gantt.expandAll();
     }
   }
 
-  function changeSidebar(e) {
-    if (e.target.checked === true) {
+  function changeSidebar(elm) {
+    if($(elm).is(':checked')) {
       $('#zt-gantt-grid-left-data').show()
       $('#zt-gantt-left-layout-resizer-wrap').show()
     } else {
@@ -509,8 +533,8 @@
     }
   }
 
-  function changeToday(e) {
-    if (event.target.checked === true) {
+  function changeToday(elm) {
+    if($(elm).is(':checked')) {
       ZT_Gantt.addTodayFlag();
     } else {
       ZT_Gantt.removeTodayFlag();
@@ -682,11 +706,10 @@
         companies: $('[name="companies[]"]').val()
       },
       success: function (ids) {
-        console.log(ids);
         ZT_Gantt.filterTask((task) => {
-          console.log(task.id, ids.includes(task.id));
           return ids.includes(task.id);
         }, true);
+        ZT_Gantt.render();
       }
     });
   }
@@ -715,7 +738,7 @@
               {!! Form::select('projects[]', $projects, null, ['class' => 'form-select gantt_filter', 'data-placeholder' => 'Projects']) !!}
             </div>
             <div class="col-md-3">
-              {!! Form::label('project Status', 'Project Status') !!}
+              {!! Form::label('project Status', 'Contract Status') !!}
               {!! Form::select('status', [null => 'All'] + $statuses, null, ['class' => 'form-select gantt_filter', 'data-placeholder' => 'Status']) !!}
             </div>
             <div class="col-md-3">
@@ -741,7 +764,7 @@
           </div>
           <div class="col-md-3 d-flex justify-content-between pt-4 me-5">
             <label class="switch switch-lg">
-              <input type="checkbox" class="switch-input" onchange="changeCollapse(event)">
+              <input type="checkbox" class="switch-input config-input" onchange="changeCollapse(this)">
               <span class="switch-toggle-slider">
                 <span class="switch-on">
                   <i class="ti ti-check"></i>
@@ -753,7 +776,7 @@
               <span class="switch-label">Collapse</span>
             </label>
             <label class="switch switch-lg">
-              <input type="checkbox" class="switch-input" onchange="changeToday(event)" checked>
+              <input type="checkbox" class="switch-input config-input" onchange="changeToday(this)" checked>
               <span class="switch-toggle-slider">
                 <span class="switch-on">
                   <i class="ti ti-check"></i>
@@ -765,7 +788,7 @@
               <span class="switch-label">Today</span>
             </label>
             <label class="switch switch-lg">
-              <input type="checkbox" class="switch-input" onchange="changeSidebar(event)" checked>
+              <input type="checkbox" class="switch-input config-input" onclick="setTimeout(function(){ZT_Gantt.render();}, 500)" onchange="changeSidebar(this)" checked>
               <span class="switch-toggle-slider">
                 <span class="switch-on">
                   <i class="ti ti-check"></i>

@@ -5,10 +5,7 @@ namespace App\Http\Controllers\Admin\Project;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Contract;
-use App\Models\ContractPhase;
 use App\Models\Project;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class GanttChartController extends Controller
 {
@@ -17,9 +14,6 @@ class GanttChartController extends Controller
     $ganttProjects = Project::mine()->has('contracts')
       ->when(request()->projects, function ($q) {
         $q->where('id', request()->projects);
-      })
-      ->when(request()->has('status'), function ($q) {
-        $q->where('status', request()->status);
       })
       ->when(request()->companies, function ($q) {
         $q->where('company_id', request()->companies);
@@ -33,6 +27,7 @@ class GanttChartController extends Controller
 
         if($project->contracts->isEmpty()) continue;
         foreach ($project->contracts as $contract) {
+          if(request()->status && $contract->status != request()->status) continue;
           $ids[] = 'Contract:' . $contract->id;
 
           if($contract->phases->isEmpty()) continue;
@@ -43,7 +38,8 @@ class GanttChartController extends Controller
       }
       return response()->json($ids);
     }
-    $statuses = Project::STATUSES;
+    $statuses = Contract::STATUSES;
+    $statuses = array_combine($statuses, $statuses);
 
     $projects = Project::mine()->whereHas('contracts')->pluck('name', 'id')->prepend('All', '');
 
