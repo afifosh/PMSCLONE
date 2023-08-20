@@ -711,21 +711,29 @@
             </select>
           </div>
           <div class="col-md-2 d-flex justify-content-between pt-4 me-5">
-            <label class="switch">
-              <label for="collapse-zt" class="me-2">Collapse</label>
-              <input id="collapse-zt" type="checkbox" class="switch-input" onchange="changeCollapse(event)">
+            <label class="switch switch-lg">
+              <input type="checkbox" class="switch-input"onchange="changeCollapse(event)">
               <span class="switch-toggle-slider">
-                <span class="switch-on"></span>
-                <span class="switch-off"></span>
+                <span class="switch-on">
+                  <i class="ti ti-check"></i>
+                </span>
+                <span class="switch-off">
+                  <i class="ti ti-x"></i>
+                </span>
               </span>
+              <span class="switch-label">Collapse</span>
             </label>
-            <label class="switch">
-              <label for="sidebar-zt" class="me-2">SideBar</label>
-              <input id="sidebar-zt" type="checkbox" class="switch-input" onchange="changeSidebar(event)" checked>
+            <label class="switch switch-lg">
+              <input type="checkbox" class="switch-input" onchange="changeSidebar(event)" checked>
               <span class="switch-toggle-slider">
-                <span class="switch-on"></span>
-                <span class="switch-off"></span>
+                <span class="switch-on">
+                  <i class="ti ti-check"></i>
+                </span>
+                <span class="switch-off">
+                  <i class="ti ti-x"></i>
+                </span>
               </span>
+              <span class="switch-label">SideBar</span>
             </label>
           </div>
         </div>

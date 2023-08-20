@@ -396,7 +396,7 @@
   z-index: 10000;
   white-space: nowrap;
   background-color: var(--tooltip-background);
-  font-size: 8pt;
+  font-size: 11pt;
   color: var(--tooltip-color);
   border-color: #b3b3b3;
   line-height: 120%;
@@ -762,13 +762,8 @@
   right: -20px;
 }
 
-.zt-gantt-bar-task:hover .zt-gantt-link-control div,
+.zt-gantt-bar-task:not(.read-only):hover .zt-gantt-link-control div,
 .zt-gantt-bar-milestone:hover .zt-gantt-link-control div {
-  display: block;
-}
-
-.zt-gantt-bar-task.hovered .zt-gantt-link-control div,
-.zt-gantt-bar-milestone.hovered .zt-gantt-link-control div {
   display: block;
 }
 
@@ -922,7 +917,7 @@
   background-color: var(--child-task-progress-background);
 }
 
-.zt-gantt-bar-task:hover .zt-gantt-task-progress-drag {
+.zt-gantt-bar-task:not(.read-only):hover .zt-gantt-task-progress-drag {
   display: block;
 }
 
@@ -964,13 +959,6 @@
 }
 
 /* toastr css start  */
-.zt-gantt-toastr-area{
-  position: fixed;
-  z-index: 999999;
-  right: 5px;
-  top: 5px;
-}
-
 .zt-gantt-toastr {
   visibility: hidden;
   min-width: 250px;
@@ -979,15 +967,12 @@
   color: #fff;
   border-radius: 3px;
   padding: 16px;
-  margin: 5px;
+  position: fixed;
+  z-index: 9999999;
+  right: 5px;
+  top: 5px;
   font-size: 17px;
   cursor: pointer;
-  opacity: 0.85;
-  transition: opacity .3s ease-in;
-}
-
-.zt-gantt-toastr:hover{
-  opacity: 1;
 }
 
 .zt-gantt-toastr p {
@@ -1017,56 +1002,50 @@
 
 .zt-gantt-toastr.show {
   visibility: visible;
-  -webkit-animation: fadein 0.5s;
-  animation: fadein 0.5s;
-}
-
-.zt-gantt-toastr.hide {
-  visibility: visible;
-  -webkit-animation: fadeout 0.5s;
-  animation: fadeout 0.5s;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
 }
 
 @-webkit-keyframes fadein {
   from {
-    margin-top: 0;
+    top: 0;
     opacity: 0;
   }
   to {
-    margin-top: 5px;
-    opacity: 0.85;
+    top: 5px;
+    opacity: 1;
   }
 }
 
 @keyframes fadein {
   from {
-    margin-top: 0;
+    top: 0;
     opacity: 0;
   }
   to {
-    margin-top: 5px;
-    opacity: 0.85;
+    top: 5px;
+    opacity: 1;
   }
 }
 
 @-webkit-keyframes fadeout {
   from {
-    margin-top: 5px;
-    opacity: 0.85;
+    top: 5px;
+    opacity: 1;
   }
   to {
-    margin-top: 0;
+    top: 0;
     opacity: 0;
   }
 }
 
 @keyframes fadeout {
   from {
-    margin-top: 5px;
-    opacity: 0.85;
+    top: 5px;
+    opacity: 1;
   }
   to {
-    margin-top: 0;
+    top: 0;
     opacity: 0;
   }
 }
@@ -1082,9 +1061,10 @@
   margin-right: -50px;
 }
 
-.zt-gantt-bar-task:hover .zt-gantt-task-color-picker,
-.zt-gantt-bar-task:hover .zt-gantt-task-color-picker input {
-  visibility: visible;
+/* This targets .zt-gantt-bar-task elements being hovered, which do not have the .read-only class */
+.zt-gantt-bar-task:not(.read-only):hover .zt-gantt-task-color-picker,
+.zt-gantt-bar-task:not(.read-only):hover .zt-gantt-task-color-picker input {
+    visibility: visible;
 }
 
 .zt-gantt-task-color-picker input {
