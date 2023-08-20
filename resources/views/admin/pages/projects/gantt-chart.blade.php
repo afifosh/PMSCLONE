@@ -125,7 +125,7 @@
   ZT_Gantt.options.localLang = "en";
   ZT_Gantt.options.data = data;
   ZT_Gantt.options.collapse = false;
-  ZT_Gantt.options.weekends = ["Sat", "Sun"];
+  ZT_Gantt.options.weekends = ["Fri", "Sat"];
   ZT_Gantt.options.fullWeek = true;
   ZT_Gantt.options.todayMarker = true;
   ZT_Gantt.options.addLinks = (task)=>{
@@ -164,7 +164,7 @@
     { unit: "day", step: 1, format: "%d %D" },
   ];
 
-  ZT_Gantt.options.zoomLevel = "week";
+  ZT_Gantt.options.zoomLevel = "month";
 
   // zoom config
   ZT_Gantt.options.zoomConfig = {
@@ -237,7 +237,7 @@
         scale_height: 30,
         min_col_width: 30,
         scales: [
-          { unit: "year", step: 3, format: new Date().getFullYear() - 1 + ' - ' + ( new Date().getFullYear() + 1)},
+          { unit: "year", step: 3, format: new Date(minDate).getFullYear()+ ' - ' + ( new Date(maxDate).getFullYear())},
           { unit: "year", step: 1, format: "%Y" },
           { unit: "month", format: "%M" },
         ],
@@ -284,7 +284,7 @@
   };
 
   ZT_Gantt.templates.taskbar_text = function (start, end, task) {
-    return task.type + " : " + task.text;
+    return '';//task.type + " : " + task.text;
   };
 
   ZT_Gantt.templates.grid_folder = (task) => {
@@ -349,15 +349,15 @@
   // }
 
   // add custom marker
-  ZT_Gantt.addMarker({
-    start_date: ZT_Gantt.add(new Date(), 1, "day"), //a Date object that sets the marker's date
-    css: "tomorrow", //a CSS class applied to the marker
-    text: "Tomorrow", //the marker title
-    title: ZT_Gantt.formatDateToString(
-      "%d %F %y",
-      ZT_Gantt.add(new Date(), 1, "day")
-    ), // the marker's tooltip
-  });
+  // ZT_Gantt.addMarker({
+  //   start_date: ZT_Gantt.add(new Date(), 1, "day"), //a Date object that sets the marker's date
+  //   css: "tomorrow", //a CSS class applied to the marker
+  //   text: "Tomorrow", //the marker title
+  //   title: ZT_Gantt.formatDateToString(
+  //     "%d %F %y",
+  //     ZT_Gantt.add(new Date(), 1, "day")
+  //   ), // the marker's tooltip
+  // });
 
   // ZT_Gantt.addMarker({
   //   start_date: ZT_Gantt.add(new Date(),-1, "day"), //a Date object that sets the marker's date
@@ -474,16 +474,16 @@
 
   function changeZoom(e) {
     ZT_Gantt.options.zoomLevel = e.target.value;
-    if (e.target.value === "month" || e.target.value === "quarter") {
-      ZT_Gantt.options.startDate = "2023-01-01T11:46:17.775Z";
-      ZT_Gantt.options.endDate = "2023-12-31T11:46:17.775Z";
-    } else if (e.target.value === "year") {
-      ZT_Gantt.options.startDate = "2022-01-01T11:46:17.775Z";
-      ZT_Gantt.options.endDate = "2024-12-31T11:46:17.775Z";
-    } else {
-      ZT_Gantt.options.startDate = "2023-06-01T11:46:17.775Z";
-      ZT_Gantt.options.endDate = "2023-06-30T11:46:17.775Z";
-    }
+    // if (e.target.value === "month" || e.target.value === "quarter") {
+    //   ZT_Gantt.options.startDate = "2023-01-01T11:46:17.775Z";
+    //   ZT_Gantt.options.endDate = "2023-12-31T11:46:17.775Z";
+    // } else if (e.target.value === "year") {
+    //   ZT_Gantt.options.startDate = "2022-01-01T11:46:17.775Z";
+    //   ZT_Gantt.options.endDate = "2024-12-31T11:46:17.775Z";
+    // } else {
+    //   ZT_Gantt.options.startDate = "2023-06-01T11:46:17.775Z";
+    //   ZT_Gantt.options.endDate = "2023-06-30T11:46:17.775Z";
+    // }
     ZT_Gantt.zoomInit();
   }
 
@@ -638,6 +638,38 @@
     ZT_Gantt.options.columns.splice(ZT_Gantt.options.columns.length - 1, 1);
     ZT_Gantt.render();
   }
+  /* For flexibility to scroll on y axis when clicked on the container */
+  const container = document.querySelector('.zt-gantt-right-cell');
+  let isDown = false;
+  let startX, startY, scrollLeft, scrollTop;
+
+  container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      container.style.cursor = 'grabbing';
+      startX = e.pageX;
+      startY = e.pageY;
+      scrollLeft = container.scrollLeft;
+      scrollTop = container.scrollTop;
+  });
+
+  container.addEventListener('mouseup', () => {
+      isDown = false;
+      container.style.cursor = 'grab';
+  });
+
+  container.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX;
+      const y = e.pageY;
+      const walkX = x - startX;
+      const walkY = y - startY;
+      container.scrollLeft = scrollLeft - walkX;
+      container.scrollTop = scrollTop - walkY;
+  });
+  // To ensure the cursor indicates "grab" even when the mouse is not pressed
+  container.style.cursor = 'grab';
+  /* For flexibility to scroll on y axis when clicked on the container */
 
   $(document).on('change', '.gantt_filter', function (e) {
     e.preventDefault();
@@ -704,15 +736,15 @@
             <select class="form-select" onchange="changeZoom(event)">
               <option value="year">Years</option>
               <option value="quarter">Quarters</option>
-              <option value="month">Months</option>
+              <option value="month" selected="month">Months</option>
               <option value="week">Weeks</option>
-              <option value="day" selected="day">Days</option>
+              <option value="day">Days</option>
               <option value="hour">Hour</option>
             </select>
           </div>
-          <div class="col-md-2 d-flex justify-content-between pt-4 me-5">
+          <div class="col-md-3 d-flex justify-content-between pt-4 me-5">
             <label class="switch switch-lg">
-              <input type="checkbox" class="switch-input"onchange="changeCollapse(event)">
+              <input type="checkbox" class="switch-input" onchange="changeCollapse(event)">
               <span class="switch-toggle-slider">
                 <span class="switch-on">
                   <i class="ti ti-check"></i>
@@ -722,6 +754,18 @@
                 </span>
               </span>
               <span class="switch-label">Collapse</span>
+            </label>
+            <label class="switch switch-lg">
+              <input type="checkbox" class="switch-input" onchange="changeToday(event)" checked>
+              <span class="switch-toggle-slider">
+                <span class="switch-on">
+                  <i class="ti ti-check"></i>
+                </span>
+                <span class="switch-off">
+                  <i class="ti ti-x"></i>
+                </span>
+              </span>
+              <span class="switch-label">Today</span>
             </label>
             <label class="switch switch-lg">
               <input type="checkbox" class="switch-input" onchange="changeSidebar(event)" checked>

@@ -1098,3 +1098,31 @@
 .zt-gantt-bar-milestone .zt-gantt-task-color-picker input {
   margin-left: -25px;
 }
+
+.zt-gantt-right-cell {
+  height: 100%;
+  overflow: auto;
+}
+
+.zt-gantt-right-cell {
+  overflow: auto;
+  cursor: grab;  /* This will give a visual indication that the container is draggable */
+}
+
+.zt-gantt-bar-task.child-task {
+  background-color: #cd545b;
+  border: 1px solid #cd545b;
+}
+
+.zt-gantt-bar-task.zt-gantt-bar-parent-task.parent-task {
+  background-color: #000000;
+  border: 1px solid #000000;
+}
+
+.zt-gantt-marker-today, .zt-gantt-marker-area .zt-gantt-marker {
+  background-color: #523f8e;
+}
+
+.zt-gantt-current-month-cell {
+background-color: var(--weekend-cell-background);
+}

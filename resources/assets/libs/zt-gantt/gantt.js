@@ -1971,7 +1971,7 @@
       if (options.view_mode) {
         // Add ready only class
         mainContainer.classList.add("read-only");
-      }     
+      }
 
       this.createSidebar(options, mainContainer);
 
@@ -2061,8 +2061,8 @@
       linksArea.classList.add("zt-gantt-links-area");
       linksArea.id = "zt-gantt-links-area";
       rightDataContainer.append(linksArea);
-      
-      // create links 
+
+      // create links
         for (let i = 0; i < this.options.links.length; i++) {
           this.createLinks(
             this.options.links[i].source,
@@ -2666,6 +2666,11 @@
         scaleRow.style.height = options.row_height + "px";
         let cellEndDate = new Date(0);
         let rangeCount = 0;
+
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+
         for (let k = 0; k < dates.length; k++) {
           let date = new Date(dates[k]);
           if (new Date(cellEndDate).getTime() >= date.setHours(0, 0, 0, 0)) {
@@ -2674,10 +2679,16 @@
           let colDates;
           let scaleCell = document.createElement("div");
           scaleCell.classList.add("zt-gantt-task-cell");
+          if (this.options.zoomLevel == "month") {
+            // Check if the date belongs to the current month
+            if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+              scaleCell.classList.add("zt-gantt-current-month-cell");
+            }
+          }
           if (this.options.zoomLevel !== "day") {
             colDates = this.initColSizes(this.options.zoomLevel, 1, date);
           } else {
-            
+
             scaleCell.classList.add(
               options.weekends.includes(weekday[date.getDay()])
                 ? "zt-gantt-weekend-cell"
@@ -3546,7 +3557,7 @@
             rightResizer.offsetLeft - 80 <= resizer.offsetLeft
             ? rightResizer.offsetLeft - resizer.offsetLeft
             : 80;
-            
+
             left = e.x - (80 - x);
           }
 
@@ -4027,7 +4038,7 @@
           // Stop the event from propagating through the DOM hierarchy.
           event.stopPropagation();
           return;
-        }     
+        }
 
         rightPanelScroll = document.getElementById("zt-gantt-right-cell");
         rightPanelScrollWidth = rightPanelScroll.scrollWidth;
@@ -4939,7 +4950,7 @@
     <button role="save">${this.options.currentLanguage.buttons.save}</button>
     <button role="cancel">${this.options.currentLanguage.buttons.cancel}</button>
     <button role="delete">${this.options.currentLanguage.buttons.delete}</button>
-    </div>   
+    </div>
     `;
       document.body.append(backdrop);
       document.body.append(lightBoxContainer);
@@ -5618,6 +5629,10 @@
         scaleRow.style.height = `${options.row_height}px`;
         let cellEndDate = new Date(0);
         let rangeCount = 0;
+
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
         // loop through all the dates
         for (let k = 0; k < dates.length; k++) {
           let date = new Date(dates[k]);
@@ -5627,6 +5642,13 @@
           let colDates;
           let scaleCell = document.createElement("div");
           scaleCell.classList.add("zt-gantt-task-cell");
+
+          if (this.options.zoomLevel == "month") {
+            // Check if the date belongs to the current month
+            if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+              scaleCell.classList.add("zt-gantt-current-month-cell");
+            }
+          }
 
           if (this.options.zoomLevel !== "day") {
             colDates = this.initColSizes(this.options.zoomLevel, 1, date);
@@ -5811,7 +5833,7 @@
         }
 
         let ztGanttBarTask = document.createElement("div");
-                
+
         if (this.options.view_mode) {
           // Add 'read-only' class to ztGanttBarTask
           ztGanttBarTask.classList.add("read-only");
