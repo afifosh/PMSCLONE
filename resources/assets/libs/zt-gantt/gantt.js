@@ -5724,7 +5724,6 @@
           // handle cell click event
           let that = this;
           scaleCell.addEventListener("click", function (e) {
-       alert("test");
             const onCellClick = new CustomEvent("onCellClick", {
               detail: {
                 task: taskData[l],

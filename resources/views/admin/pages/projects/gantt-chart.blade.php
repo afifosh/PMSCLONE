@@ -639,36 +639,33 @@
     ZT_Gantt.render();
   }
   /* For flexibility to scroll on y axis when clicked on the container */
-  const container = document.querySelector('.zt-gantt-right-cell');
   let isDown = false;
   let startX, startY, scrollLeft, scrollTop;
 
-  container.addEventListener('mousedown', (e) => {
-      isDown = true;
-      container.style.cursor = 'grabbing';
-      startX = e.pageX;
-      startY = e.pageY;
-      scrollLeft = container.scrollLeft;
-      scrollTop = container.scrollTop;
+  $(document).on('mousedown', '.zt-gantt-right-cell', function (e) {
+    isDown = true;
+    this.style.cursor = 'grabbing';
+    startX = e.pageX;
+    startY = e.pageY;
+    scrollLeft = this.scrollLeft;
+    scrollTop = this.scrollTop;
   });
 
-  container.addEventListener('mouseup', () => {
+  $(document).on('mouseup', '.zt-gantt-right-cell', function (e) {
       isDown = false;
-      container.style.cursor = 'grab';
+      this.style.cursor = 'grab';
   });
 
-  container.addEventListener('mousemove', (e) => {
+  $(document).on('mousemove', '.zt-gantt-right-cell', function (e) {
       if (!isDown) return;
       e.preventDefault();
       const x = e.pageX;
       const y = e.pageY;
       const walkX = x - startX;
       const walkY = y - startY;
-      container.scrollLeft = scrollLeft - walkX;
-      container.scrollTop = scrollTop - walkY;
+      this.scrollLeft = scrollLeft - walkX;
+      this.scrollTop = scrollTop - walkY;
   });
-  // To ensure the cursor indicates "grab" even when the mouse is not pressed
-  container.style.cursor = 'grab';
   /* For flexibility to scroll on y axis when clicked on the container */
 
   $(document).on('change', '.gantt_filter', function (e) {
