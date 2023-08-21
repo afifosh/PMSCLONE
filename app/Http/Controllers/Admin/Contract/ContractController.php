@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin\Contract;
 
 use App\DataTables\Admin\Contract\ContractsDataTable;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ContractStoreRequest;
+use App\Http\Requests\Admin\ContractUpdateRequest;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ContractType;
@@ -24,6 +26,7 @@ class ContractController extends Controller
       ->selectRaw('count(case when deleted_at is null and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 MONTH) then 1 end) as expiring_soon')
       ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at >= DATE_SUB(now(), INTERVAL 2 MONTH) then 1 end) as recently_added')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
+      // ->selectRaw('count(case when deleted_at is null and status = Terminated then 1 end) as terminated')
       ->withTrashed()
       ->first();
 
@@ -84,20 +87,9 @@ class ContractController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(Request $request)
+  public function store(ContractStoreRequest $request)
   {
-    $request->validate([
-      'subject' => 'required|string|max:100',
-      'type_id' => 'required|exists:contract_types,id',
-      'company_id' => 'required|exists:companies,id',
-      'project_id' => 'required|exists:projects,id',
-      'start_date' => 'required|date',
-      'end_date' => 'required|date|after_or_equal:start_date',
-      'value' => 'required',
-      'description' => 'nullable|string|max:1000',
-    ]);
-
-    Contract::create($request->all());
+    Contract::create($request->validated());
 
     return $this->sendRes(__('Contract created successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
   }
@@ -122,6 +114,9 @@ class ContractController extends Controller
       $q->where('id', $contract->company_id);
     })->pluck('name', 'id')->prepend(__('Select Company'), '');
     $data['contract'] = $contract;
+    $data['statuses'] = $contract->getPossibleStatuses();
+    if($contract->status == 'Terminated')
+      $data['termination_reason'] = $contract->getLatestTerminationReason();
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
   }
@@ -129,20 +124,14 @@ class ContractController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, Contract $contract)
+  public function update(ContractUpdateRequest $request, Contract $contract)
   {
-    $request->validate([
-      'subject' => 'required|string|max:100',
-      'type_id' => 'required|exists:contract_types,id',
-      'company_id' => 'required|exists:companies,id',
-      'project_id' => 'required|exists:projects,id',
-      'start_date' => 'required|date',
-      'end_date' => 'required|date|after_or_equal:start_date',
-      'value' => 'required',
-      'description' => 'nullable|string|max:1000',
-    ]);
+    if($request->status != $contract->getRawOriginal('status') || $request->start_date != $contract->start_date || $request->end_date != $contract->end_date || $request->value != $contract->value){
+      $contract->saveEventLog($request, $contract);
+    }
 
-    $contract->update($request->all());
+    $status = $request->status == 'Resumed' ? 'Active' : $request->status;
+    $contract->update(['status' => $status] + $request->validated());
 
     return $this->sendRes(__('Contract updated successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
   }

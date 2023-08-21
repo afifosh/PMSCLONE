@@ -98,6 +98,7 @@ class ContractsDataTable extends DataTable
     return [
       Column::make('subject'),
       Column::make('company.name')->title('Company'),
+      Column::make('project.name')->title('Project'),
       Column::make('type.name')->title('Type'),
       Column::make('value')->title('Value('.config('app.currency').')'),
       Column::make('start_date'),

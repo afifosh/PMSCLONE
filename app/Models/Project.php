@@ -151,4 +151,9 @@ class Project extends Model
 
     return true;
   }
+
+  public function companies()
+  {
+    return $this->belongsToMany(Company::class, 'project_companies', 'project_id', 'company_id')->withTimestamps();
+  }
 }

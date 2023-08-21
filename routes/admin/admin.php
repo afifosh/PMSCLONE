@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\ContractController;
 use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Contract\ContractTypeController;
+use App\Http\Controllers\Admin\Contract\PaymentScheduleController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
@@ -131,7 +132,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs.users', ProgramUserController::class);
 
     Route::resource('contracts', ContractController::class);
-    Route::resource('contracts.phases', ContractPhaseController::class);
+    Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
+    // Route::resource('contracts.phases', ContractPhaseController::class);
     Route::resource('contract-types', ContractTypeController::class);
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');

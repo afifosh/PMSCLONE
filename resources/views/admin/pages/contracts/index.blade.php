@@ -94,7 +94,25 @@ $configData = Helper::appClasses();
               <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
               <div class="card-info">
                 <h5 class="mb-0">{{$contracts['trashed']}}</h5>
-                <small>{{__('Trash')}}</small>
+                <small>{{__('Paused')}}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="d-flex align-items-center">
+              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+              <div class="card-info">
+                <h5 class="mb-0">{{$contracts['trashed']}}</h5>
+                <small>{{__('Terminated')}}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="d-flex align-items-center">
+              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+              <div class="card-info">
+                <h5 class="mb-0">{{$contracts['trashed']}}</h5>
+                <small>{{__('Rescheduled')}}</small>
               </div>
             </div>
           </div>

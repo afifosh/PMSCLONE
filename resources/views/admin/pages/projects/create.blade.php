@@ -47,8 +47,8 @@ $configData = Helper::appClasses();
             </div>
             <div class="col-md-6">
               <div class="mb-3">
-                <label for="company_id" class="form-label">Company</label>
-                {!! Form::select('company_id', $companies, $project->company_id, ['class' => 'form-select select2']) !!}
+                <label for="companies" class="form-label">Company</label>
+                {!! Form::select('companies[]', $companies, $project->companies, ['class' => 'form-select select2', 'multiple' => 'multiple']) !!}
               </div>
             </div>
             <div class="col-md-6">

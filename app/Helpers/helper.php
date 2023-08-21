@@ -139,3 +139,8 @@ function array_diff_assoc_recursive($array1, $array2)
       return !is_null($value);
     });
   }
+
+  function filterInputIds(array $ids): array
+  {
+    return array_unique(remove_null_values($ids));
+  }

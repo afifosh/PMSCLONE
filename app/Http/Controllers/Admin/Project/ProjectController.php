@@ -40,7 +40,7 @@ class ProjectController extends Controller
     $data['categories'] = ProjectCategory::pluck('name', 'id')->prepend('Select Category', '');
     $data['statuses'] = Project::STATUSES;
     $data['members'] = Admin::get();
-    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
+    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id');
     $data['project'] = new Project;
 
     return view('admin.pages.projects.create', $data);
@@ -52,7 +52,9 @@ class ProjectController extends Controller
   public function store(ProjectStoreRequest $request, GroupRepository $groupRepository)
   {
     $project = Project::create(['is_progress_calculatable' => $request->boolean('is_progress_calculatable')] + $request->validated());
-    $project->members()->sync($request->members);
+
+    $project->members()->sync(filterInputIds($request->members));
+    $project->companies()->sync(filterInputIds($request->companies));
 
     if ($request->boolean('create_chat_group'))
       $this->createGroupForProject($project, $groupRepository);
@@ -104,7 +106,7 @@ class ProjectController extends Controller
     $data['categories'] = ProjectCategory::pluck('name', 'id')->prepend('Select Category', '');
     $data['statuses'] = Project::STATUSES;
     $data['members'] = Admin::get();
-    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
+    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id');
     $data['project'] = $project;
     return view('admin.pages.projects.create', $data);
   }
@@ -117,7 +119,9 @@ class ProjectController extends Controller
     abort_if(!$project->isMine(), 403);
 
     $project->update(['is_progress_calculatable' => $request->boolean('is_progress_calculatable')] + $request->validated());
-    $project->members()->sync($request->members);
+
+    $project->members()->sync(filterInputIds($request->members));
+    $project->companies()->sync(filterInputIds($request->companies));
 
     $project->createLog('Project Updated', $project->toArray());
 
@@ -144,8 +148,9 @@ class ProjectController extends Controller
   public function getCompanyByProject()
   {
     $data = Company::whereHas('projects', function($q){
-      $q->where('id', request()->id);
-    })->pluck('name', 'id');
+      $q->where('projects.id', request()->id);
+    })->pluck('name', 'companies.id');
+
     return $this->sendRes('Company', ['data' => $data]);
   }
 }

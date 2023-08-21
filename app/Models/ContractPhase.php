@@ -20,6 +20,8 @@ class ContractPhase extends Model
     'order'
   ];
 
+  protected $appends = ['status'];
+
   protected $casts = [
     'start_date' => 'datetime:d M, Y',
     'due_date' => 'datetime:d M, Y',

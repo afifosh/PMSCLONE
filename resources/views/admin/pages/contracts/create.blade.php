@@ -44,6 +44,17 @@
       {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
       {!! Form::select('type_id', $types, $contract->type_id, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
+    @if ($contract->id)
+      {{-- status --}}
+      <div class="form-group col-6">
+        {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}
+        {!! Form::select('status', array_combine($statuses, $statuses), $contract->status, ['id' => 'contract-status', 'class' => 'form-select globalOfSelect2']) !!}
+      </div>
+    @endif
+    <div class="form-group col-12 {{$contract->status != 'Terminated' ? 'd-none' : ''}}">
+      {{ Form::label('termination_reason', __('Termination Reason'), ['class' => 'col-form-label']) }}
+      {!! Form::text('termination_reason', $termination_reason ?? null, ['id' => 'termination_reason', 'class' => 'form-control', 'placeholder' => __('Termination Reason')]) !!}
+    </div>
     {{-- description --}}
     <div class="form-group col-12">
       {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}
@@ -58,3 +69,12 @@
 </div>
 {!! Form::close() !!}
 </div>
+<script>
+  $(document).on('change', '#contract-status', function() {
+    if ($(this).val() == 'Terminated') {
+      $('#termination_reason').parent().removeClass('d-none');
+    } else {
+      $('#termination_reason').parent().addClass('d-none');
+    }
+  });
+</script>

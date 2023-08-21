@@ -23,7 +23,8 @@ class ProjectStoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:projects,name',
-            'company_id' => 'nullable|exists:companies,id',
+            'companies' => 'nullable|array',
+            'companies.*' => 'nullable|exists:companies,id',
             'program_id' => 'required|exists:programs,id',
             'category_id' => 'required|exists:project_categories,id',
             'status' => 'required',
@@ -43,8 +44,8 @@ class ProjectStoreRequest extends FormRequest
     public function messages()
     {
         return [
-            'company_id.required' => 'Please select company',
-            'company_id.exists' => 'Please select valid company',
+            'companies.required' => 'Please select company',
+            'companyies.exists' => 'Please select valid company',
             'members.required' => 'Please select at least one member',
             'members.*.required' => 'Please select at least one member',
             'members.*.exists' => 'Please select valid member',

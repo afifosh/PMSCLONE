@@ -37,5 +37,7 @@ class MenuServiceProvider extends ServiceProvider
 
         // Share all menuData to all the views
         \View::share('menuData', [$verticalMenuData]);
+        \View::share('container', 'container-fluid');
+        \View::share('containerNav', 'container-fluid');
     }
 }
