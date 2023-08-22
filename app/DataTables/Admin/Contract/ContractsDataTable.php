@@ -27,6 +27,9 @@ class ContractsDataTable extends DataTable
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
+      ->editColumn('company.name', function($comp){
+        return $comp->name ?? '-';
+      })
       ->rawColumns(['subject']);
   }
 
@@ -91,7 +94,7 @@ class ContractsDataTable extends DataTable
       Column::make('value')->title('Value('.config('app.currency').')'),
       Column::make('start_date'),
       Column::make('end_date'),
-      Column::make('phases_count')->title('Phases'),
+      Column::make('phases_count')->title('Phases')->searchable(false),
       Column::make('status'),
     ];
 
@@ -103,7 +106,7 @@ class ContractsDataTable extends DataTable
       Column::make('value')->title('Value('.config('app.currency').')'),
       Column::make('start_date'),
       Column::make('end_date'),
-      Column::make('phases_count')->title('Phases'),
+      Column::make('phases_count')->title('Phases')->searchable(false),
       Column::make('status'),
     ];
   }

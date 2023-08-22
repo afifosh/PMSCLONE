@@ -48,6 +48,12 @@
       ]
     },
     {
+      "url": "admin/clients",
+      "name": "Clients",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "admin.clients.index"
+    },
+    {
       "name": "Companies",
       "icon": "menu-icon fas fa-building",
       "slug": ["admin.companies.", "admin.company-roles", "admin.company-invitations.", "admin.company-users.", "admin.approval-requests.", "admin.change-requests", "admin.pending-companies", "admin.verified-companies"],

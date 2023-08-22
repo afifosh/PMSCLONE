@@ -34,5 +34,6 @@ class DatabaseSeeder extends Seeder
         $this->call(EmailPermissionsSeeder::class);
         $this->call(NoteTagSeeder::class);
         $this->call(ContractTypeSeeder::class);
+        $this->call(ClientSeeder::class);
     }
 }

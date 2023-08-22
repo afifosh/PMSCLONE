@@ -1,1 +1,1 @@
-<a href="{{route('admin.projects.contracts.phases.index', ['project' => 'project', 'contract' => $contract->id])}}">{{$contract->subject}}</a>
+<a href="{{route('admin.contracts.show', ['contract' => $contract->id])}}">{{$contract->subject}}</a>

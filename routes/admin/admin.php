@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminUsersController;
+use App\Http\Controllers\Admin\Client\ClientController;
 use App\Http\Controllers\Admin\Company\ApprovalRequestController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\ContractController;
 use App\Http\Controllers\Admin\Contract\ContractPhaseController;
+use App\Http\Controllers\Admin\Contract\ContractSettingController;
 use App\Http\Controllers\Admin\Contract\ContractTypeController;
 use App\Http\Controllers\Admin\Contract\PaymentScheduleController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
@@ -106,6 +108,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('/users/{user}/editPassword', [AdminUsersController::class, 'editPassword'])->name('users.editPassword');
     Route::put('/users/{user}/updatePassword', [AdminUsersController::class, 'updatePassword'])->name('users.updatePassword');
     Route::resource('users', AdminUsersController::class);
+    Route::resource('clients', ClientController::class);
 
     Route::get('companies/{company}/users', [CompanyController::class, 'showUsers'])->name('companies.showUsers');
     Route::get('companies/{company}/invitations', [CompanyController::class, 'showInvitations'])->name('companies.showInvitations');
@@ -132,6 +135,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs.users', ProgramUserController::class);
 
     Route::resource('contracts', ContractController::class);
+    Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
+    Route::put('contracts/{contract}/terminate', [ContractSettingController::class, 'terminate'])->name('contracts.terminate');
+    Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');
     Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
     // Route::resource('contracts.phases', ContractPhaseController::class);
     Route::resource('contract-types', ContractTypeController::class);

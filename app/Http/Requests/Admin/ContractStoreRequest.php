@@ -24,8 +24,10 @@ class ContractStoreRequest extends FormRequest
     return [
       'subject' => 'required|string|max:100',
       'type_id' => 'required|exists:contract_types,id',
-      'company_id' => 'required|exists:companies,id',
-      'project_id' => 'required|exists:projects,id',
+      'assign_to' => 'required|in:Client,Company',
+      'client_id' => 'nullable|required_if:assign_to,Client|exists:clients,id',
+      'company_id' => 'nullable|required_if:assign_to,Company|exists:companies,id',
+      'project_id' => 'nullable|required_if:assign_to,Company|exists:projects,id',
       'start_date' => 'required|date',
       'end_date' => 'required|date|after_or_equal:start_date',
       'value' => 'required',

@@ -6,6 +6,7 @@ use App\DataTables\Admin\Contract\ContractsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ContractStoreRequest;
 use App\Http\Requests\Admin\ContractUpdateRequest;
+use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ContractType;
@@ -67,6 +68,7 @@ class ContractController extends Controller
   {
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
     $data['contract'] = new Contract();
+    $data['clients'] = Client::orderBy('id', 'desc')->pluck('email', 'id')->prepend(__('Select Client'), '');
 
     if(request()->has('project')){
       $data['projects'] = Project::where('id', request()->project)->first();
@@ -89,7 +91,12 @@ class ContractController extends Controller
    */
   public function store(ContractStoreRequest $request)
   {
-    Contract::create($request->validated());
+    if($request->assign_to == 'Client')
+      $data['company_id'] = null;
+    else
+      $data['client_id'] = null;
+
+    Contract::create($data + $request->validated());
 
     return $this->sendRes(__('Contract created successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
   }
@@ -114,6 +121,7 @@ class ContractController extends Controller
       $q->where('id', $contract->company_id);
     })->pluck('name', 'id')->prepend(__('Select Company'), '');
     $data['contract'] = $contract;
+    $data['clients'] = Client::orderBy('id', 'desc')->pluck('email', 'id')->prepend(__('Select Client'), '');
     $data['statuses'] = $contract->getPossibleStatuses();
     if($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
@@ -130,8 +138,13 @@ class ContractController extends Controller
       $contract->saveEventLog($request, $contract);
     }
 
-    $status = $request->status == 'Resumed' ? 'Active' : $request->status;
-    $contract->update(['status' => $status] + $request->validated());
+    if($request->assign_to == 'Client')
+      $data['company_id'] = null;
+    else
+      $data['client_id'] = null;
+
+    $data['status'] = $request->status == 'Resumed' ? 'Active' : $request->status;
+    $contract->update($data + $request->validated());
 
     return $this->sendRes(__('Contract updated successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
   }

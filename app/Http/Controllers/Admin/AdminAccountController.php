@@ -157,13 +157,13 @@ class AdminAccountController extends Controller
     //
   }
 
-  protected function timezones()
+  public function timezones()
   {
     $timezone = new Timezonelist;
 
     return $timezone->toArray(false);
   }
-  protected function languages()
+  public function languages()
   {
     return [
       'en' => 'English',
@@ -210,7 +210,7 @@ class AdminAccountController extends Controller
     ];
   }
 
-  protected function currencies()
+  public function currencies()
   {
     return [
       'USD' => 'US Dollar',

@@ -149,7 +149,7 @@ class ProjectController extends Controller
   {
     $data = Company::whereHas('projects', function($q){
       $q->where('projects.id', request()->id);
-    })->pluck('name', 'companies.id');
+    })->pluck('name', 'companies.id')->prepend('Select Company', '');
 
     return $this->sendRes('Company', ['data' => $data]);
   }

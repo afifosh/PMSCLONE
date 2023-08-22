@@ -24,10 +24,18 @@
         'data-href' => route('admin.projects.getCompanyByProject'),
         'data-target' => '#project-company-select']) !!}
     </div>
-    {{-- customer --}}
     <div class="form-group col-6">
+      {{ Form::label('assign_to', __('Assign To'), ['class' => 'col-form-label']) }}
+      {!! Form::select('assign_to', ['Company' => 'Company', 'Client' => 'Client'], @$contract->client_id ? 'Client' : 'Company', ['id' => 'project-assign-to', 'class' => 'form-select globalOfSelect2']) !!}
+    </div>
+    {{-- customer --}}
+    <div class="form-group col-6 {{$contract->client_id ? 'd-none' : ''}}">
       {{ Form::label('company_id', __('Company'), ['class' => 'col-form-label']) }}
       {!! Form::select('company_id', $companies, @$contract->company_id ?? null, ['id' => 'project-company-select', 'class' => 'form-select globalOfSelect2']) !!}
+    </div>
+    <div class="form-group col-6 {{!$contract->client_id ? 'd-none' : ''}}">
+      {{ Form::label('client_id', __('Client'), ['class' => 'col-form-label']) }}
+      {!! Form::select('client_id', $clients, @$contract->Client_id ?? null, ['id' => 'contract-client-select', 'class' => 'form-select globalOfSelect2']) !!}
     </div>
     {{-- start date --}}
     <div class="form-group col-6">
@@ -75,6 +83,15 @@
       $('#termination_reason').parent().removeClass('d-none');
     } else {
       $('#termination_reason').parent().addClass('d-none');
+    }
+  });
+  $(document).on('change', '#project-assign-to', function() {
+    if ($(this).val() == 'Client') {
+      $('#project-company-select').parent().addClass('d-none');
+      $('#contract-client-select').parent().removeClass('d-none');
+    } else {
+      $('#project-company-select').parent().removeClass('d-none');
+      $('#contract-client-select').parent().addClass('d-none');
     }
   });
 </script>

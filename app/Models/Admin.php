@@ -127,7 +127,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
 
   public function isSuperAdmin(): bool
   {
-    return true;// $this->id == 1;
+    return $this->id == 1;
   }
 
   /**
