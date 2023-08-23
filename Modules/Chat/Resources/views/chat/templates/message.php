@@ -1,4 +1,213 @@
+<script id="tmplMessageOLD" type="text/x-jsrender">
+        <div id="send-receive-direction" class="{{:className}} message-{{:data.id}}" data-message_id="{{:data.id}}">
+            <div class="chat-conversation__avatar">
+            {{if data.sender.role_name == 'Admin'}}
+            <span class="highlighter" data-bs-toggle="tooltip" title="Admin"><img src="./assets/images/crown.svg"></span>
+            {{/if}}
+             {{if isReceiver}}
+                <img src="{{:data.sender.photo_url}}" alt="" class="img-fluid conversation-user-img user-chat-image-{{:data.sender.id}}"
+                     {{if data.is_group}} data-bs-toggle="tooltip" data-bs-placement="top" title="{{:data.sender.name}}" {{/if}}>
+             {{else}}
+              <img src="{{:authImage}}" alt="" class="img-fluid conversation-user-img"
+                     {{if data.is_group}} data-bs-toggle="tooltip" data-bs-placement="top" title="{{:authUserName}}" {{/if}}>
+             {{/if}}
+            </div>
+            {{if !isReceiver}}
+                <div class="chat-conversation__menu d-flex align-items-center">
+                    <div class="dropdown btn-group hide-ele msg-options">
+                        <i class="fa-solid fa-ellipsis-vertical " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                        <div class="dropdown-menu chat-replay-dropdown">
+                            {{if allowToDelete}}
+                                <a class="dropdown-item msg-delete-icon" href="#">Delete Message</a>
+                            {{/if}}
+                            {{if deleteMsgForEveryone}}
+                                <a class="dropdown-item msg-delete-for-everyone" href="#">Delete For Everyone</a>
+                            {{/if}}
+                             <a class="dropdown-item msg-replay" href="#" data-self-reply="1" data-message-id="{{:data.id}}" data-message='{{:data.message}}' data-message-type='{{:data.message_type}}'>Reply</a>
+                             <a class="dropdown-item open-msg-info" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-sidebar-right"  data-message-id="{{:data.id}}" data-is_group="{{:data.is_group}}">
+                                Info
+                             </a>
+                             
+                        </div>
+                    </div>
+                </div>
+            {{/if}}
+            <div class="chat-conversation__bubble clearfix {{if data.message_type !== 0 && isReceiver}} bubble-border-green {{/if}}" >
+                {{if data.reply_to }}
+                    <span class="person-name-texture {{if isReceiver}} text-white {{/if}}">{{if loggedInUserId == data.reply_message.sender.id}} You {{else}} {{:data.reply_message.sender.name}} {{/if}}</span>
+                    <p class="m-1 px-2">{{:~displayMessage(data.reply_message)}}</p>
+
+                    <div class="{{if isReceiver}} conversation__receiver-reply-text {{else}} conversation-reply-text {{/if}}">
+                        <span class="reply-confirm-text fw-normal">{{:~displayMessage(data)}}</span>
+                    </div>
+                {{else}}
+                    <div class="chat-conversation__bubble-text message">
+                        {{:~displayMessage(data)}}
+                    </div>
+                {{/if}}
+                <div class="chat-container__time text-nowrap chat-time" style="{{if checkShowNameChat == 1}} left:-40px; {{/if}}"> {{if isReceiver}}
+                    {{if checkShowNameChat == 1}}
+                        <span class="me-1">{{:data.sender.name}}</span>
+                    {{/if}}
+                {{/if}}{{:~getChatMagTimeInConversation(data.created_at)}}</div>
+                <div class="chat-container__read-status position-absolute {{if isReceiver}} d-none {{else}} {{:readUnread}} {{/if}}">
+                    <i class="fa-solid fa-check" aria-hidden="true"></i>
+                </div>
+            </div>
+         {{if isReceiver}}
+         <div class="chat-conversation__menu d-flex align-items-center">
+            <div class="dropdown btn-group hide-ele msg-options">
+                <i class="fa-solid fa-ellipsis-vertical " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                </i>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item msg-replay" href="#" data-self-reply="0" data-message-id="{{:data.id}}" data-message='{{:data.message}}' data-sender="{{:data.sender.name}}" data-user-id="{{:data.sender.id}}" data-message-type='{{:data.message_type}}'>Reply</a>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        </div>
+</script>
+
 <script id="tmplMessage" type="text/x-jsrender">
+    {{if isReceiver}}
+    <li class="chat-message">
+    {{else}}
+    <li class="chat-message chat-message-right">
+    {{/if}}
+        <div class="d-flex overflow-hidden-disable">
+            {{if isReceiver}}
+            <div class="user-avatar flex-shrink-0 me-3">
+                <div class="avatar avatar-sm">
+                    <img src="{{:data.sender.photo_url}}" alt="Avatar" class="rounded-circle user-chat-image-{{:data.sender.id}}" 
+                    {{if data.is_group}} data-bs-toggle="tooltip" data-bs-placement="top" title="{{:data.sender.name}}" {{/if}}>
+                </div>
+            </div>
+            {{/if}}         
+            {{if !isReceiver}}            
+              <div class="dropdown d-flex align-self-center">
+                <button class="btn p-0" type="button" id="chat-header-actions1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="chat-header-actions">
+                {{if allowToDelete}}
+                     <a class="dropdown-item msg-delete-icon" href="#">Delete Message</a>
+                   {{/if}}                   
+                   {{if deleteMsgForEveryone}}                   
+                   <a class="dropdown-item msg-delete-for-everyone" href="#">Delete For Everyone</a>
+                   {{/if}}
+                   <a class="dropdown-item msg-replay" href="#" data-self-reply="1" data-message-id="{{:data.id}}" data-message='{{:data.message}}' data-message-type='{{:data.message_type}}'>Reply</a>
+                   <a class="dropdown-item open-msg-info" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-sidebar-right" data-message-id="{{:data.id}}" data-is_group="{{:data.is_group}}"> Info</a>
+                   <a class="dropdown-item view-msg-info"  data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-sidebar-right" data-message-id="{{:data.id}}" data-is_group="{{:data.is_group}}"> Info</a>
+                </div>
+              </div>
+            {{/if}}              
+            <div class="chat-message-wrapper flex-grow-1">
+                {{if data.reply_to}}
+                    <div class="chat-message-text">
+                        <p class="mb-0">{{:~displayMessage(data.reply_message)}}</p>
+                        <p class="mb-0">{{:~displayMessage(data)}}</p>
+                    </div>
+                {{else}}
+                    <div class="chat-message-text">
+                        <p class="mb-0">{{:~displayMessage(data)}}</p>
+                    </div>
+                {{/if}}
+
+                <div class="{{if isReceiver}} text-muted {{else}} text-end text-muted {{/if}} mt-1">
+                    {{if isReceiver && checkShowNameChat == 1}}
+                        <span class="me-1">{{:data.sender.name}}</span>
+                    {{/if}}
+                    <small>{{:~getChatMagTimeInConversation(data.created_at)}}</small>
+                    {{if !isReceiver}}
+                        <i class="ti ti-checks ti-xs me-1 text-success"></i>
+                    {{/if}}
+                </div>
+            </div>
+            {{if isReceiver}}            
+              <div class="dropdown d-flex align-self-center">
+                <button class="btn p-0" type="button" id="chat-header-actions1" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="chat-header-actions">
+                {{if allowToDelete}}
+                     <a class="dropdown-item msg-delete-icon" href="#">Delete Message</a>
+                   {{/if}}                   
+                   {{if deleteMsgForEveryone}}                   
+                   <a class="dropdown-item msg-delete-for-everyone" href="#">Delete For Everyone</a>
+                   {{/if}}
+                   <a class="dropdown-item msg-replay" href="#" data-self-reply="1" data-message-id="{{:data.id}}" data-message='{{:data.message}}' data-message-type='{{:data.message_type}}'>Reply</a>
+                   <a class="dropdown-item open-msg-info" data-message-id="{{:data.id}}" data-is_group="{{:data.is_group}}"> Info</a>
+                   <a class="dropdown-item view-msg-info"  data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-sidebar-right" data-message-id="{{:data.id}}" data-is_group="{{:data.is_group}}"> Info</a>
+                </div>
+              </div>
+            {{/if}}    
+            {{if !isReceiver}}
+            <div class="user-avatar flex-shrink-0 ms-3">
+                <div class="avatar avatar-sm">
+                    <img src="{{:authImage}}" alt="Avatar" class="rounded-circle" 
+                    {{if data.is_group}} data-bs-toggle="tooltip" data-bs-placement="top" title="{{:authUserName}}" {{/if}}>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </li>
+</script>
+
+<script id="tmplMessagedd" type="text/x-jsrender">tttttttttttttttttttttttttttttttttttt
+            {{if isReceiver}}
+            <li class="chat-message chat-message-right">
+              <div class="d-flex overflow-hidden" id="send-receive-direction" class="{{:className}} message-{{:data.id}}" data-message_id="{{:data.id}}">
+              <div class="align-self-start message-box-drop dropdown mt-2">
+                <div class="dropdown d-flex align-self-center" style="">
+                    <button class="btn p-0 show" type="button" id="chat-header-actions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <i class="ti ti-dots-vertical"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="chat-header-actions"" data-popper-placement="bottom-end">
+                    <a class="dropdown-item" href="javascript:void(0);">View Contact</a>
+                    <a class="dropdown-item" href="javascript:void(0);">Mute Notifications</a>
+                    <a class="dropdown-item" href="javascript:void(0);">Block Contact</a>
+                    <a class="dropdown-item" href="javascript:void(0);">Clear Chat</a>
+                    <a class="dropdown-item" href="javascript:void(0);">Report</a>
+                    </div>
+                 </div>
+                </div>
+                <div class="chat-message-wrapper flex-grow-1">
+                  <div class="chat-message-text">
+                    <p class="mb-0">{{:~displayMessage(data)}}</p>
+                  </div>
+                  <div class="text-end text-muted mt-1">
+                    <i class="ti ti-checks ti-xs me-1 text-success"></i>
+                    <small>{{:~getChatMagTimeInConversation(data.created_at)}}</small>
+                  </div>
+                </div>
+                <div class="user-avatar flex-shrink-0 ms-3">
+                  <div class="avatar avatar-sm">
+                    <img src="{{:data.sender.photo_url}}" alt="" class="rounded-circle mg-fluid conversation-user-img user-chat-image-{{:data.sender.id}}"
+                     {{if data.is_group}} data-bs-toggle="tooltip" data-bs-placement="top" title="{{:data.sender.name}}" {{/if}}>
+                  </div>
+                </div>
+              </div>
+            </li>  
+            {{else}}
+            <li class="chat-message">
+            <div class="d-flex overflow-hidden" id="send-receive-direction" class="{{:className}} message-{{:data.id}}" data-message_id="{{:data.id}}">
+                <div class="user-avatar flex-shrink-0 me-3">
+                  <div class="avatar avatar-sm">
+                  <img src="{{:authImage}}" alt="" class="rounded-circle  img-fluid conversation-user-img"
+                     {{if data.is_group}} data-bs-toggle="tooltip" data-bs-placement="top" title="{{:authUserName}}" {{/if}}>
+                  </div>
+                </div>
+                <div class="chat-message-wrapper flex-grow-1">
+                  <div class="chat-message-text">
+                  <p class="mb-0">{{:~displayMessage(data)}}</p>
+                  </div>
+                  <div class="text-muted mt-1">
+                    <small>{{:~getChatMagTimeInConversation(data.created_at)}}</small>
+                  </div>
+                </div>
+              </div>
+            </li>                        
+            {{/if}}
         <div id="send-receive-direction" class="{{:className}} message-{{:data.id}}" data-message_id="{{:data.id}}">
             <div class="chat-conversation__avatar">
             {{if data.sender.role_name == 'Admin'}}

@@ -25,16 +25,73 @@ document.addEventListener('DOMContentLoaded', function () {
         away: 'avatar-away',
         busy: 'avatar-busy'
       };
+      let psInstances = {};
 
+    //   $(document).on('click', '.dropdown-trigger', function(event) {
+    //     event.stopPropagation();
+
+        
+    //     var dropdownElement = $('#chat-header-action2')[0];
+    //     console.dir(dropdownElement);
+    //     var dropdown = new bootstrap.Dropdown(dropdownElement);
+    //     console.dir(dropdown);
+    //     dropdown.toggle();
+    //     event.preventDefault();
+    // });
+
+    
+// let psInstance = null;
+
+$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+    const targetId = e.target.getAttribute('href').replace('#', '');
+    console.log(" targetId ----> " +  targetId);
+        // Hide all tab contents
+        $('.tab-pane').hide();
+
+        // Show only the targeted tab content
+        $(`#${targetId}`).show();
+    
+// ... some time later, after dynamic content has been added/changed
+psInstances.update();
+
+});
+
+
+      
     // Initialize PerfectScrollbar
     // ------------------------------
+// Step 1: Set up the mutation observer
+const observer = new MutationObserver(mutations => {
+  for (let mutation of mutations) {
+      // Check if addedNodes contains a node that you're interested in
+      for (let addedNode of mutation.addedNodes) {
+          if (addedNode.nodeType === Node.ELEMENT_NODE && addedNode.matches('.chat-history-body')) {
+              // Step 2: Initialize PerfectScrollbar on the added div
+              new PerfectScrollbar(addedNode, {
+                  wheelPropagation: false,
+                  suppressScrollX: true
+              });
+
+              document.querySelector('.chat-history-body').scrollTo(0, document.querySelector('.chat-history-body').scrollHeight);
+          }
+      }
+  }
+});
+
+// Start observing the parent container with the configured parameters
+observer.observe(document.body, {
+  childList: true,  // Indicates that added/removed nodes should be reported
+  subtree: true     // Indicates that mutations of descendants of the target should be reported
+});
 
     // Chat contacts scrollbar
     if (chatContactsBody) {
-      new PerfectScrollbar(chatContactsBody, {
-        wheelPropagation: false,
-        suppressScrollX: true
-      });
+// Assuming chatContactsBody is the element you want to have the custom scrollbar
+ psInstances = new PerfectScrollbar(chatContactsBody, {
+  wheelPropagation: false,
+  suppressScrollX: true
+});
+
     }
 
     // Chat history scrollbar
@@ -63,7 +120,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Scroll to bottom function
     function scrollToBottom() {
+      if (chatHistoryBody) {
       chatHistoryBody.scrollTo(0, chatHistoryBody.scrollHeight);
+      }
     }
     scrollToBottom();
 
@@ -122,6 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('#contact-list li:not(.chat-contact-list-item-title)')
           );
 
+          // console.dir("searchChatListItems" + searchChatListItems);
         // Search in chats
         searchChatContacts(searchChatListItems, searchChatListItemsCount, searchValue, chatListItem0);
         // Search in contacts
@@ -133,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function searchChatContacts(searchListItems, searchListItemsCount, searchValue, listItem0) {
       searchListItems.forEach(searchListItem => {
         let searchListItemText = searchListItem.textContent.toLowerCase();
+        // console.log("searchListItemText" + searchListItemText);
         if (searchValue) {
           if (-1 < searchListItemText.indexOf(searchValue)) {
             searchListItem.classList.add('d-flex');
@@ -150,7 +211,9 @@ document.addEventListener('DOMContentLoaded', function () {
       // Display no search fount if searchListItemsCount == 0
       if (searchListItemsCount == 0) {
         listItem0.classList.remove('d-none');
+        console.log("searchListItemsCount " + searchListItemsCount);
       } else {
+        console.log("searchListItemsCount " + searchListItemsCount);        
         listItem0.classList.add('d-none');
       }
     }

@@ -74,8 +74,8 @@ $(document).ready(function () {
     let currentConversationGroupId = ''
     let isAccepted = false
 
-    let chatPeopleBodyEle = $('#chatPeopleBody');
-    let archivePeopleBodyEle = $('#archivePeopleBody');
+    let chatPeopleBodyEle = $('#chatPeopleBody #chat-list');
+    let archivePeopleBodyEle = $('#archivePeopleBody #chat-list');
     let noMsgesYet = $('.chat__not-selected');
     let membersCountArr = [];
 
@@ -139,6 +139,13 @@ $(document).ready(function () {
                 }
                 chatPeopleBodyEle.
                     append(latestConversations.map(prepareContacts).join(''));
+
+                console.log("conversations-list conversations-list conversations-list 143");
+                var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+                var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                    console.log("dropdownToggleEl " + dropdownToggleEl);
+                    return new bootstrap.Dropdown(dropdownToggleEl)
+                })
 
                 searchUsers();
                 loadTooltip();
@@ -211,6 +218,13 @@ $(document).ready(function () {
             removeClass('chat__person-box--active')
           selectedContactId = $(e.currentTarget).data('id')
         $('.chat__people-body').find('#user-'+selectedContactId).addClass('chat__person-box--active');
+
+        // Remove class 'active' from all '.chat__person-box' parents
+        $(document).
+            find('.chat__person-box').parent().removeClass('active');
+  
+        $('.chat__people-body').find('#user-'+selectedContactId).parent().addClass('active');
+  
         let isGroup = $(e.currentTarget).data('is_group');
         let lastDraftMsg = getLocalStorageItem('user_' + selectedContactId);
         let urlDetail = userURL + selectedContactId + '/conversation';
@@ -838,8 +852,11 @@ $(document).ready(function () {
 
         $('.chat-profile').empty();
         $('.chat-profile').html(htmlOutput);
+        // update app-chat-sidebar-right
+        $('.app-chat-sidebar-right').empty();
+        $('.app-chat-sidebar-right').html(htmlOutput);
     }
-
+    
     function pluck (objs, name) {
         var sol = [];
         for (var i in objs) {
@@ -874,7 +891,8 @@ $(document).ready(function () {
                     $(this).parents('.dropdown-menu').removeClass('show');
                 }
                 //added this bcz after this, it will not consider document click event and will not close profile
-                e.stopPropagation();
+                // disable stopPropagaiton afifosh
+                // e.stopPropagation();
             });
     }
 
@@ -927,6 +945,20 @@ $(document).ready(function () {
             closeMsgInfo();
             e.stopPropagation();
         });
+
+        $('.view-msg-info').on('click', function (e) {
+            let messageId = $(this).attr('data-message-id');
+            let isGroup = $(this).attr('data-is_group');
+            if (isGroup === '1' && typeof messageId != 'undefined') {
+                console.log("view-msg-info" + messageId +  isGroup);
+                setReadByContactsInfo(messageId);
+            } else {
+                console.log("view-msg-info" + messageId +  isGroup);
+                setReadByMessageInfo(messageId);
+            }
+            openMsgInfo();
+            e.stopPropagation();
+        });       
     }
 
     window.openMsgInfo = function () {
@@ -1039,6 +1071,12 @@ $(document).ready(function () {
             let template = $.templates('#singleMessageReadInfoTmpl');
             let msgHtml = template.render(messageInfo, helpers);
             $("#single-msg-section").html(msgHtml);
+
+                    // update app-chat-sidebar-right
+                    console.log('.app-chat-sidebar-right 69' + msgHtml);
+        $('.app-chat-sidebar-right').empty();
+        $('.app-chat-sidebar-right').html(msgHtml);
+
         }
         resetSingleMessageReadByInfo();
     };
@@ -1085,6 +1123,10 @@ $(document).ready(function () {
         templateData.loggedInUserId = loggedInUserId;
         let msgHtml = template.render(templateData, helpers);
         $("#msg-info-container-msg").html(msgHtml);
+
+        // update app-chat-sidebar-right afifosh
+        // $('.app-chat-sidebar-right').empty();
+        // $('.app-chat-sidebar-right').html(msgHtml);        
     };
 
     $(document).on('click', function () {
@@ -2350,8 +2392,9 @@ $(document).ready(function () {
     };
 
     window.setNoConversationYet = function () {
-        let conversationListLength = $('#chatPeopleBody').find('.chat__person-box').length;
-        let archiveConversationListLength = $('#archivePeopleBody').find('.chat__person-box').length;
+        let conversationListLength = $('#chatPeopleBody').find('.chat-contact-list-item').length;
+        let archiveConversationListLength = $('#archivePeopleBody').find('.chat-contact-list-item').length;
+
         noConversationYet = (conversationListLength > 0) ? false : true;
         noArchiveConversationYet = (archiveConversationListLength > 0) ? false : true;
         if (!noConversationYet) {
@@ -3092,7 +3135,8 @@ $(document).ready(function () {
 
     $(document).on('click', '.chat__person-box-delete', function (e) {
         let chatDelEle = $(this);
-        let userId = chatDelEle.parents('.chat__person-box').data('id');
+        //let userId = chatDelEle.parents('.chat__person-box').data('id');
+        let userId = chatDelEle.closest('li').find('.chat__person-box').data('id');
         let contactName = $('#user-' + userId).find('.contact-name').text().toString().trim();
 
         swalDelete.fire({
@@ -3113,11 +3157,14 @@ $(document).ready(function () {
 
     $(document).on('click', '.chat__person-box-archive', function (e) {
         let chatArchiveEle = $(this);
-        let userId = chatArchiveEle.parents('.chat__person-box').data('id');
-        let isArchiveChat = $(this).parents('#archivePeopleBody').length;
+        let userId = chatArchiveEle.closest('li').find('.chat__person-box').data('id');
+        //let isArchiveChat = chatArchiveEle.closest('li').prev('#archivePeopleBody').length;
+        let isArchiveChat = $(this).closest('#archivePeopleBody').length;
+
+
         let contactName = $('#user-' + userId).find('.contact-name').text();
         let ArchiveUnarchive = (isArchiveChat) ? 'Unarchive' : 'Archive';
-
+        console.log('chat__person-box-archive' + userId  + '  contactName' + contactName );
         swalDelete.fire({
             title: 'Are you sure?',
             html: ArchiveUnarchive + ' chat with <b>' + contactName + '</b>?',
@@ -3146,9 +3193,27 @@ $(document).ready(function () {
                 if (data.success == true) {
                     fireSwal('success', 'Archived!',
                         'Conversation has been archived!');
+                    
+                    // let archiveConversation = $('#user-' + userId).closest('li');
+                    // console.log($('#user-' + userId));
 
+                    // console.log("----------------");
+                    // console.log($('#user-' + userId).closest('li'));
+                    // $('#user-' + userId).remove();
+
+                    // Get the specific <a> tag with the defined ID
                     let archiveConversation = $('#user-' + userId);
-                    $('#user-' + userId).remove();
+
+                    // Find the parent <li> element containing the <a> tag
+                    archiveConversation = archiveConversation.closest('li');
+
+
+
+                    // Detach the <li> from its current <ul> and append it to the other <ul>
+                    // if (liToMove && ul1.contains(liToMove)) {
+                    // ul1.removeChild(liToMove);
+                    // ul2.appendChild(liToMove);
+                    // }
 
                     archiveConversation.find('.chat__person-box-archive').
                         text('Unarchive Chat');
@@ -3162,6 +3227,23 @@ $(document).ready(function () {
                     makeArchiveChatTabActive();
 
                     setNoConversationYet();
+
+// 1. Check if the main container is accessible
+console.log("Chat People Body exists:", $('#chatPeopleBody').length);  // Should log 1 if element exists
+
+// 2. Check individual chat items
+console.log("Chat items in Chat People Body:", $('#chatPeopleBody').find('.chat-contact-list-item').length);
+
+// 3. Check individual chat user boxes
+console.log("Chat user boxes in Chat People Body:", $('#chatPeopleBody').find('.chat__person-box').length);
+
+// 4. Also, check the archived chat container
+console.log("Archive People Body exists:", $('#archivePeopleBody').length);  // Should log 1 if element exists
+
+// 5. Then, count archived chat items
+console.log("Chat items in Archive People Body:", $('#archivePeopleBody').find('.chat-contact-list-item').length);
+
+
                 }
             },
         });
@@ -3169,9 +3251,11 @@ $(document).ready(function () {
 
     $(document).on('click', '.chat__person-box-pin', function (e) {
       let chatArchiveEle = $(this);
-      let userId = chatArchiveEle.parents('.chat__person-box').data('id');
+      //let userId = chatArchiveEle.parents('.chat__person-box').data('id');
+      let userId = chatArchiveEle.closest('li').find('.chat__person-box').data('id');
       let isArchiveChat = $(this).data('is-pinned');
-      console.log(isArchiveChat);
+      console.log("isArchiveChat" + isArchiveChat);
+      console.log("userId" + userId);
       let contactName = $('#user-' + userId).find('.contact-name').text();
       let ArchiveUnarchive = (isArchiveChat) ? 'Unpin' : 'Pin';
 
@@ -3222,7 +3306,9 @@ $(document).ready(function () {
       });
   };
 function reloadConversations (){
-  $('.contact-area').remove();
+  //$('.contact-area').remove();
+  $('#chatPeopleBody ul#chat-list').empty();
+
     let $loader = $(conversationsContainer).
         find('.chat__people-body-loader').
         clone();
@@ -3243,7 +3329,9 @@ function reloadConversations (){
                 offset += 10;
                 if (data.success) {
                   $('#infyLoader').hide();
-                  chatPeopleBodyEle.find('.chat__person-box').remove();
+                  //chatPeopleBodyEle.find('.chat__person-box').remove();
+                  chatPeopleBodyEle.empty();
+
                   let latestConversations = data.data.conversations;
                   if (latestConversations.length === 0) {
                       noConversationYetEle.show();
@@ -3277,11 +3365,30 @@ function reloadConversations (){
                     fireSwal('success', 'Unarchived!',
                         'Conversation has been unarchived!');
 
+                    // let archiveConversation = $('#user-' + userId);
+                    // $('#user-' + userId).remove();
+
+                    // archiveConversation.find('.chat__person-box-archive').
+                    //     text('Archive Chat');
+
+
+                    // Get the specific <a> tag with the defined ID
                     let archiveConversation = $('#user-' + userId);
-                    $('#user-' + userId).remove();
+
+                    // Find the parent <li> element containing the <a> tag
+                    archiveConversation = archiveConversation.closest('li');
+
+
+
+                    // Detach the <li> from its current <ul> and append it to the other <ul>
+                    // if (liToMove && ul1.contains(liToMove)) {
+                    // ul1.removeChild(liToMove);
+                    // ul2.appendChild(liToMove);
+                    // }
 
                     archiveConversation.find('.chat__person-box-archive').
                         text('Archive Chat');
+
                     if($('#loadMoreConversationBtn.active').length > 0) {
                         $('#loadMoreConversationBtn.active').before(archiveConversation);
                     } else {
@@ -3290,8 +3397,23 @@ function reloadConversations (){
                     reloadConversations();
 
                     makeActiveChatTabActive();
+                    console.log("UnaArchhive");
+// 1. Check if the main container is accessible
+console.log("Chat People Body exists:", $('#chatPeopleBody').length);  // Should log 1 if element exists
 
-                    setNoConversationYet();
+// 2. Check individual chat items
+console.log("Chat items in Chat People Body:", $('#chatPeopleBody').find('.chat-contact-list-item').length);
+
+// 3. Check individual chat user boxes
+console.log("Chat user boxes in Chat People Body:", $('#chatPeopleBody').find('.chat__person-box').length);
+
+// 4. Also, check the archived chat container
+console.log("Archive People Body exists:", $('#archivePeopleBody').length);  // Should log 1 if element exists
+
+// 5. Then, count archived chat items
+console.log("Chat items in Archive People Body:", $('#archivePeopleBody').find('.chat-contact-list-item').length);
+
+                   setNoConversationYet();
                 }
             },
         });
@@ -4934,7 +5056,7 @@ let conversationsContainer = document.getElementById('chatPeopleBody')
 let containerHeight = $(conversationsContainer).outerHeight()
 let isLoaded = false
 let offset = 10
-let chatPeopleBodyEle = $('#chatPeopleBody')
+let chatPeopleBodyEle = $('#chatPeopleBody #chat-list');
 let loadMoreBtn = $('#loadMoreConversationBtn').clone()
 $(document).on('click', '.load-more-conversation', function () {
     $(this).parent().remove();

@@ -992,38 +992,47 @@ const Helpers = {
 
   // ---
   // SidebarToggle (Used in Apps)
-  initSidebarToggle() {
-    const sidebarToggler = document.querySelectorAll('[data-bs-toggle="sidebar"]')
 
-    sidebarToggler.forEach(el => {
-      el.addEventListener('click', () => {
-        const target = el.getAttribute('data-target')
-        const overlay = el.getAttribute('data-overlay')
-        const appOverlay = document.querySelectorAll('.app-overlay')
-        const targetEl = document.querySelectorAll(target)
+    
+    initSidebarToggle() {
+      const sidebarToggler = document.querySelectorAll('[data-bs-toggle="sidebar"]')
+      const body = document.body;  // or some other parent element that exists on load
+      sidebarToggler.forEach(el => {
+        body.addEventListener('click', (e) => {
 
-        targetEl.forEach(tel => {
-          tel.classList.toggle('show')
-          if (
-            typeof overlay !== 'undefined' &&
-            overlay !== null &&
-            overlay !== false &&
-            typeof appOverlay !== 'undefined'
-          ) {
-            if (tel.classList.contains('show')) {
-              appOverlay[0].classList.add('show')
-            } else {
-              appOverlay[0].classList.remove('show')
+          const el = e.target.closest('[data-bs-toggle="sidebar"]');
+    
+          // Exit if clicked element doesn't match our criteria
+          if (!el) return;
+
+          const target = el.getAttribute('data-target')
+          const overlay = el.getAttribute('data-overlay')
+          const appOverlay = document.querySelectorAll('.app-overlay')
+          const targetEl = document.querySelectorAll(target)
+  
+          targetEl.forEach(tel => {
+            tel.classList.toggle('show')
+            if (
+              typeof overlay !== 'undefined' &&
+              overlay !== null &&
+              overlay !== false &&
+              typeof appOverlay !== 'undefined'
+            ) {
+              if (tel.classList.contains('show')) {
+                appOverlay[0].classList.add('show')
+              } else {
+                appOverlay[0].classList.remove('show')
+              }
+              appOverlay[0].addEventListener('click', e => {
+                e.currentTarget.classList.remove('show')
+                tel.classList.remove('show')
+              })
             }
-            appOverlay[0].addEventListener('click', e => {
-              e.currentTarget.classList.remove('show')
-              tel.classList.remove('show')
-            })
-          }
+          })
         })
       })
-    })
-  }
+    }
+  
 }
 
 // *******************************************************************************
