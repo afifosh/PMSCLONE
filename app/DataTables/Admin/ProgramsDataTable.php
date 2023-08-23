@@ -27,9 +27,9 @@ class ProgramsDataTable extends DataTable
       ->addColumn('parent', function (Program $program) {
         return @$program->parent->name ?? '-';
       })
-      ->editColumn('description', function ($program) {
-        return substr($program->description, 0, 15);
-      })
+      // ->editColumn('description', function ($program) {
+      //   return substr($program->description, 0, 15);
+      // })
       ->addColumn('action', function (Program $program) {
         return view('admin.pages.programs.action', compact('program'));
       })
@@ -97,7 +97,7 @@ class ProgramsDataTable extends DataTable
       Column::make('name')->title('Program Name'),
       Column::make('parent'),
       Column::make('program_code'),
-      Column::make('description'),
+      // Column::make('description'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

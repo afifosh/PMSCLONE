@@ -26,8 +26,15 @@ class ProjectPhaseController extends Controller
     if(request()->ajax()){
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.phase-list', compact('contract', 'project', 'phase_statuses', 'colors'))->render()]);
     }
+    $page = 'Project';
+    if(request()->route()->getName() == 'admin.contracts.phases.index')
+      $page = 'Contract';
 
-    return view('admin.pages.contracts.phases.index', compact('contract', 'project', 'phase_statuses', 'colors'));
+    return view('admin.pages.contracts.phases.index', compact('contract', 'project', 'phase_statuses', 'colors', 'page'));
+  }
+
+  public function contractPhases(Contract $contract){
+    return $this->index('project', $contract);
   }
 
   public function create($project, Contract $contract)

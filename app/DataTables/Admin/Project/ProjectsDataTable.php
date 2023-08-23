@@ -104,9 +104,9 @@ class ProjectsDataTable extends DataTable
             Column::make('start_date'),
             Column::make('deadline'),
             Column::make('members')->orderable(false),
-            Column::make('contracts_count')->title('Contracts'),
+            Column::make('contracts_count')->title('Contracts')->searchable(false),
             Column::make('progress')->searchable(false)->orderable(false),
-            Column::make('status'),
+            Column::make('status')->searchable('false'),
         ];
     }
 

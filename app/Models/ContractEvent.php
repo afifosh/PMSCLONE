@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ContractEvent extends Model
 {
-  use HasFactory;
+  use HasFactory, HasEnum;
 
   protected $fillable = [
     'modifications',
@@ -25,5 +26,10 @@ class ContractEvent extends Model
   public function contract()
   {
     return $this->belongsTo(Contract::class);
+  }
+
+  public function actioner()
+  {
+    return $this->belongsTo(Admin::class, 'admin_id');
   }
 }

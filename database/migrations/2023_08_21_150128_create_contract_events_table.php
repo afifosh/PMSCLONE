@@ -16,7 +16,19 @@ return new class extends Migration
 
       $table->foreignId('contract_id')->constrained()->onDelete('cascade');
       $table->foreignId('admin_id')->nullable()->constrained()->onDelete('cascade');
-      $table->enum('event_type', ['Paused', 'Resumed', 'Terminated', 'Rescheduled', 'Amount Updated']);
+      $table->enum('event_type', [
+        'Created',
+        'Paused',
+        'Resumed',
+        'Extended',
+        'Shortened',
+        'Rescheduled',
+        'Terminated',
+        'Amount Increased',
+        'Amount Decreased',
+        'Rescheduled And Amount Increased',
+        'Rescheduled And Amount Decreased'
+      ]);
       $table->json('modifications')->nullable();
       $table->text('description')->nullable();
       $table->timestamps();

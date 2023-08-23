@@ -226,7 +226,9 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
 
 const inputs = form[0].querySelectorAll('input, select, textarea');
 for (const input of inputs) {
-  if (input.type === 'checkbox' || input.type === 'radio') {
+  if(input.type === 'radio')
+    continue;
+  if (input.type === 'checkbox') {
     if (!input.checked) {
       fd.append(input.name, '');
     }

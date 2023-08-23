@@ -18,6 +18,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Lab404\Impersonate\Models\Impersonate;
 use Avatar;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
@@ -439,5 +440,10 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     public function projectTemplates()
     {
       return $this->hasMany(ProjectTemplate::class);
+    }
+
+    public function contractEvents(): HasMany
+    {
+      return $this->hasMany(ContractEvent::class);
     }
 }

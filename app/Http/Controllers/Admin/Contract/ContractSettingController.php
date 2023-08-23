@@ -28,7 +28,7 @@ class ContractSettingController extends Controller
         'termination_reason' => $request->reason,
         'termination_date' => $request->terminate_date == 'now' ? now() : $request->custom_date,
       ],
-      'description' => $request->terminate_date == 'now' ? 'Contract Terminated Immediately' : 'Contract Scheduled For Termination',
+      'description' => $request->terminate_date == 'now' ? 'Contract Terminated' : 'Contract Scheduled For Termination',
       'admin_id' => auth()->id(),
     ]);
     if($request->terminate_date == 'now')
@@ -39,24 +39,36 @@ class ContractSettingController extends Controller
 
   public function pause(Contract $contract, Request $request)
   {
+    if($contract->status == 'Paused' || $contract->status == 'Terminated')
+      return $this->sendError('Contract Already '. $contract->status);
     $request->validate([
-      'pause_until' => 'required|in:manual,custom_date,days,weeks,months',
-      'custom_date_value' => 'required_if:pause_until,custom_date|date|after:today',
-      'pause_days_value' => 'required_if:pause_until,days|integer|min:1',
-      'pause_weeks_value' => 'required_if:pause_until,weeks|integer|min:1',
-      'pause_months_value' => 'required_if:pause_until,months|integer|min:1',
+      'pause_until' => 'required|in:manual,custom_date,custom_unit',
+      'custom_date_value' => 'nullable|required_if:pause_until,custom_date|date|after:today',
+      'custom_unit' => 'required_if:pause_until,custom_unit|in:Days,Weeks,Months',
+      'pause_for' => 'nullable|required_if:pause_until,custom_unit|numeric|min:1',
+    ],[
+      'pause_for.required_if' => 'This field is required',
     ]);
-    dd('t');
+
+    if($request->pause_until == 'manual'){
+      $description = 'Contract Paused Until Manual Resume';
+      $modifications = ['pause_until' => 'manual'];
+    }else if($request->pause_until == 'custom_date'){
+      $description = 'Contract Paused Until '.$request->custom_date_value;
+      $modifications = ['pause_until' => $request->custom_date_value, 'pause_date' => now()];
+    }else if($request->pause_until == 'custom_unit'){
+      $description = 'Contract Paused For '.$request->pause_for.' '.$request->custom_unit;
+      $modifications = ['pause_until' => now()->{'add'.$request->custom_unit}($request->pause_for), 'pause_date' => now()];
+    }
 
     $contract->events()->create([
       'event_type' => 'Paused',
-      'modifications' => [
-        'pause_reason' => $request->reason,
-        'pause_date' => $request->pause_date == 'now' ? now() : $request->custom_date,
-      ],
-      'description' => $request->pause_date == 'now' ? 'Contract Paused Immediately' : 'Contract Scheduled For Pause',
+      'modifications' => $modifications,
+      'description' => $description,
       'admin_id' => auth()->id(),
     ]);
+
+    $contract->update(['status' => 'Paused']);
 
     return $this->sendRes('Contract Paused Successfully', ['event' => 'page_reload']);
   }

@@ -23,71 +23,87 @@
 @include('admin.pages.contracts.header', ['tab' => 'settings'])
 <!-- User Profile Content -->
 <div class="row">
-  <div class="d-flex">
-    <div class="card col-md-6 me-2">
-      <h5 class="card-header">Pause Contract</h5>
-        <div class="card-body">
-          <form method="post" action="{{route('admin.contracts.pause', [$contract])}}">
-            @method('PUT')
-            <div class="row ms-3">
-              <div class="row">
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="radio" name="pause_until" value="manual" id="pause-manual" checked>
-                  <label class="form-check-label" for="pause-manual">
-                    Pause Until I Resume
-                  </label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="radio" name="pause_until" value="custom_date" id="pause-custom">
-                  <label class="form-check-label" for="pause-custom">
-                    Pause Until a specific date
-                  </label>
-                </div>
-                <div class="col-3 d-none pause-durantion">
-                  <div class="mb-3">
-                    <input type="date" id="custom-date-value" name="custom_date_value" class="form-control flatpickr" data-flatpickr='{"minDate": "today"}' placeholder="Select Date">
+  <div class="col-12">
+    @if ($contract->status != 'Paused')
+      <div class="card">
+        <h5 class="card-header">Pause Contract</h5>
+          <div class="card-body">
+            <form method="post" action="{{route('admin.contracts.pause', [$contract])}}">
+              @method('PUT')
+              <div class="row ms-3">
+                <div class="row">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="pause_until" value="manual" id="pause-manual" checked>
+                    <label class="form-check-label" for="pause-manual">
+                      Pause Until I Resume
+                    </label>
                   </div>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="radio" name="pause_until" value="days" id="pause-days">
-                  <label class="form-check-label" for="pause-days">
-                    Pause For Days
-                  </label>
-                </div>
-                <div class="col-3 d-none pause-durantion">
-                  <div class="mb-3">
-                    <input type="number" id="days-value" name="pause_days_value"class="form-control" placeholder="No. Of Days">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="pause_until" value="custom_date" id="pause-custom">
+                    <label class="form-check-label" for="pause-custom">
+                      Pause Until a specific date
+                    </label>
                   </div>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="radio" name="pause_until" value="weeks" id="pause-weeks">
-                  <label class="form-check-label" for="pause-weeks">
-                    Pause For Weeks
-                  </label>
-                </div>
-                <div class="col-3 d-none pause-durantion">
-                  <div class="mb-3">
-                    <input type="number" id="weeks-value" name="pause_weeks_value" class="form-control" placeholder="No. Of Weeks">
+                  <div class="col-3 d-none pause-durantion">
+                    <div class="mb-3">
+                      <input type="date" id="custom-date-value" name="custom_date_value" class="form-control flatpickr" data-flatpickr='{"minDate": "today"}' placeholder="Select Date">
+                    </div>
                   </div>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="radio" name="pause_until" value="monts" id="pause-months">
-                  <label class="form-check-label" for="pause-months">
-                    Pause For Months
-                  </label>
-                </div>
-                <div class="col-3 d-none pause-durantion">
-                  <div class="mb-3">
-                    <input type="number" id="months-value" name="pause_months_value" class="form-control" placeholder="No. Of Months">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="pause_until" value="custom_unit" id="pause-days">
+                    <label class="form-check-label" for="pause-days">
+                      Pause For
+                    </label>
+                  </div>
+                  <div class="col-3 d-none pause-durantion">
+                    <div class="mb-3 d-flex">
+                      <span>
+                        <input type="number" id="unit-value" name="pause_for"class="form-control">
+                      </span>
+                      <span>
+                        {!! Form::select('custom_unit', ['Days' => 'Days', 'Weeks' => 'Weeks', 'Months'=> 'Months'], null, ['class' => 'form-select select2']) !!}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <button type="button" data-form="ajax-form" class="mt-3 btn btn-danger">Pause Contract</button>
-          </form>
-        </div>
-    </div>
-    <div class="card col-md-6">
+              <button type="button" data-form="ajax-form" class="mt-3 btn btn-primary">Pause Contract</button>
+            </form>
+          </div>
+      </div>
+    @endif
+    @if ($contract->status == 'Paused')
+      <div class="card">
+        <h5 class="card-header">Resume Contract</h5>
+          <div class="card-body">
+            <form method="post" action="{{route('admin.contracts.pause', [$contract])}}">
+              @method('PUT')
+              @if ($contract->events->where('event_type', 'Paused')->count())
+              @php
+                  $lastPaused = $contract->events->where('event_type', 'Paused')->last();
+              @endphp
+                @if ($lastPaused->modifications['pause_until'] == 'manual')
+                  <p>Contract Is paused until you resume it</p>
+                  <div class="row ms-3">
+                    <div class="row">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="resume_now" id="resume_now">
+                        <label class="form-check-label" for="resume_now">
+                          Resume Contract Immediately
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                @else
+                <p>Contract is scheduled to be resumed at</p>
+                @endif
+              @endif
+              <button type="button" data-form="ajax-form" class="mt-3 btn btn-primary">Resume Contract</button>
+            </form>
+          </div>
+      </div>
+    @endif
+    <div class="card mt-3">
       <h5 class="card-header">Terminate Contract</h5>
       @if ($contract->events->where('event_type', 'Terminated')->count())
         <div class="card-body">
@@ -141,7 +157,7 @@
                 </div>
               </div>
             </div>
-            <button type="button" id="terminate-submit" data-form="ajax-form" class="mt-3 btn btn-danger disabled">Terminate Contract</button>
+            <button type="button" id="terminate-submit" data-form="ajax-form" class="mt-3 btn btn-primary disabled">Terminate Contract</button>
           </form>
         </div>
         @endif
@@ -189,20 +205,11 @@
       } else {
         $('#custom-date-value').parents('.pause-durantion').addClass('d-none');
       }
-      if ($(this).val() == 'days') {
-        $('#days-value').parents('.pause-durantion').removeClass('d-none');
+
+      if ($(this).val() == 'custom_unit') {
+        $('#unit-value').parents('.pause-durantion').removeClass('d-none');
       } else {
-        $('#days-value').parents('.pause-durantion').addClass('d-none');
-      }
-      if ($(this).val() == 'weeks') {
-        $('#weeks-value').parents('.pause-durantion').removeClass('d-none');
-      } else {
-        $('#weeks-value').parents('.pause-durantion').addClass('d-none');
-      }
-      if ($(this).val() == 'monts') {
-        $('#months-value').parents('.pause-durantion').removeClass('d-none');
-      } else {
-        $('#months-value').parents('.pause-durantion').addClass('d-none');
+        $('#unit-value').parents('.pause-durantion').addClass('d-none');
       }
     });
 

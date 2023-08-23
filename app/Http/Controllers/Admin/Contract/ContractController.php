@@ -96,7 +96,14 @@ class ContractController extends Controller
     else
       $data['client_id'] = null;
 
-    Contract::create($data + $request->validated());
+    $contract = Contract::create($data + $request->validated());
+
+    $contract->events()->create([
+      'event_type' => 'Created',
+      'modifications' => $request->validated(),
+      'description' => 'Contract Created',
+      'admin_id' => auth()->id(),
+    ]);
 
     return $this->sendRes(__('Contract created successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
   }

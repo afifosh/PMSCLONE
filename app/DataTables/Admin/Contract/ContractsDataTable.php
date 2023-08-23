@@ -27,8 +27,8 @@ class ContractsDataTable extends DataTable
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
-      ->editColumn('company.name', function($comp){
-        return $comp->name ?? '-';
+      ->editColumn('company.name', function($project){
+        return $project->company ? $project->company->name : '-';
       })
       ->rawColumns(['subject']);
   }

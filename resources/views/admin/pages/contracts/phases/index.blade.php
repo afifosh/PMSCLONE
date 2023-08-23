@@ -1,6 +1,6 @@
 @extends('admin/layouts/layoutMaster')
 
-@section('title', 'Project Phases')
+@section('title', $page.' Phases')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -9,6 +9,7 @@
 
 @section('page-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-projects-phases.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/css/pages/page-profile.css')}}" />
 @endsection
 
 @section('vendor-script')
@@ -29,7 +30,8 @@
 @endsection
 
 @section('content')
-@include('admin.pages.projects.navbar', ['tab' => 'phases'])
+@includeWhen($page == 'Project', 'admin.pages.projects.navbar', ['tab' => 'phases'])
+@includeWhen($page == 'Contract', 'admin.pages.contracts.header', ['tab' => 'phases'])
 <div class="app-email mt-3 card">
   <div class="row g-0">
     <!-- Task Sidebar -->
