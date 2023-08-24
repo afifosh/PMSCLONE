@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('image')->nullable();
             $table->string('program_code')->unique();
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

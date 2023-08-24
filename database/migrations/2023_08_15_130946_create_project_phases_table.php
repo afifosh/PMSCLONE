@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->string('estimated_cost');
             $table->enum('status', ['Not Started', 'In Progress', 'On Hold', 'Awaiting Feedback', 'Completed'])->default('Not Started');
             $table->bigInteger('order')->default(0);

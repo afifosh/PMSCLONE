@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\ContractExpiryNotificationCron;
 use App\Console\Commands\TaskReminderCron;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -19,6 +20,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:flush')->weekly();
 
         $schedule->command(TaskReminderCron::class)->everyMinute()->runInBackground();
+
+        $schedule->command(ContractExpiryNotificationCron::class)->daily()->runInBackground();
 
         // run queue worker every minute
         $schedule->command('queue:work --tries=3 --max-time=300 --stop-when-empty')

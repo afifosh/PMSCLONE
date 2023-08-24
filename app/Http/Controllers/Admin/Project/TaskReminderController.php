@@ -22,7 +22,7 @@ class TaskReminderController extends Controller
 
     $request->validate([
       'recipient_id' => 'required|exists:admins,id',
-      'description' => 'required',
+      'description' => 'nullable|string|max:2000',
       'remind_at' => 'required|date',
       'notify_by_email' => 'sometimes',
     ]);

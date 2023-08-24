@@ -19,7 +19,7 @@ class TaskReminderCron extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Task reminder cron';
 
     /**
      * Execute the console command.

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Contract extends Model
@@ -98,6 +99,16 @@ class Contract extends Model
   public function getLatestTerminationReason()
   {
     return $this->events()->where('event_type', 'Terminated')->latest()->first()->modifications['termination_reason'] ?? '';
+  }
+
+  public function expiryNotificaions(): HasMany
+  {
+    return $this->hasMany(ContractNotification::class);
+  }
+
+  public function lastExpiryNotification(): HasOne
+  {
+    return $this->hasOne(ContractNotification::class)->latest();
   }
 
   public function saveEventLog(ContractUpdateRequest $request, Contract $contract)

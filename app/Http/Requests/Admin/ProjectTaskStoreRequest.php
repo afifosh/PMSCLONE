@@ -24,7 +24,7 @@ class ProjectTaskStoreRequest extends FormRequest
   {
     return [
       'subject' => ['required', 'string', 'max:255', Rule::unique('tasks')->where('subject', $this->subject)->where('project_id', request()->project->id)],
-      'description' => 'nullable|string|max:255',
+      'description' => 'nullable|string|max:2000',
       'start_date' => 'nullable|date',
       'due_date' => 'nullable|date',
       'priority' => 'required|in:Low,Medium,High,Urgent',

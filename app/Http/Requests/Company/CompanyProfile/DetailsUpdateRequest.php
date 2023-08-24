@@ -37,7 +37,7 @@ class DetailsUpdateRequest extends FormRequest
       'duns_number' => 'nullable|string|max:255',
       'no_of_employees' => 'required_if:submit_type,submit|nullable|string|max:255',
       'legal_form' => 'required_if:submit_type,submit|nullable|string|max:255',
-      'description' => 'nullable|string|max:255',
+      'description' => 'nullable|string|max:2000',
       'facebook_url' => 'nullable|url|max:255',
       'twitter_url' => 'nullable|url|max:255',
       'linkedin_url' => 'nullable|url|max:255',

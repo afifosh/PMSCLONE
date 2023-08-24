@@ -34,7 +34,7 @@ class ContractUpdateRequest extends FormRequest
       'end_date' => 'required|date|after_or_equal:start_date',
       'value' => 'required',
       'status' => 'required|in:'.implode(',', $this->contract->getPossibleStatuses()),
-      'description' => 'nullable|string|max:1000',
+      'description' => 'nullable|string|max:2000',
       'termination_reason' => 'required_if:status,Terminated|max:100',
     ];
   }

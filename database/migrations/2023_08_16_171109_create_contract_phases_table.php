@@ -15,7 +15,7 @@ return new class extends Migration
           $table->id();
           $table->foreignId('contract_id')->constrained('contracts')->cascadeOnDelete()->cascadeOnUpdate();
           $table->string('name');
-          $table->text('description');
+          $table->text('description')->nullable();
           $table->string('estimated_cost');
           $table->bigInteger('order')->default(0);
           $table->dateTime('start_date');

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('task_id')->constrained()->cascadeOnDelete();
             $table->foreignId('recipient_id')->constrained('admins')->cascadeOnDelete();
             $table->foreignId('sender_id')->constrained('admins')->cascadeOnDelete();
-            $table->string('description');
+            $table->text('description')->nullable();
             $table->dateTime('remind_at');
             $table->dateTime('reminded_at')->nullable();
             $table->boolean('notify_by_email')->default(false);

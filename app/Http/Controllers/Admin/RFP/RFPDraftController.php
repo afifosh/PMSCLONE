@@ -32,7 +32,7 @@ class RFPDraftController extends Controller
     $att = $request->validate([
       'name' => 'required|string|max:255|unique:rfp_drafts,name',
       'program_id' => 'required|exists:programs,id',
-      'description' => 'required|string',
+      'description' => 'nullable|string|max:2000',
     ]);
     RFPDraft::create($att + ['uuid' => Str::uuid()]);
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => RFPDraft::DT_ID, 'close' => 'globalModal']);
@@ -82,7 +82,7 @@ class RFPDraftController extends Controller
     $att = $request->validate([
       'name' => 'required|string|max:255|unique:rfp_drafts,name,'.$draft_rfp->id,
       'program_id' => 'required|exists:programs,id',
-      'description' => 'required|string',
+      'description' => 'nullable|string|max:2000',
     ]);
     if ($draft_rfp->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => RFPDraft::DT_ID, 'close' => 'globalModal']);

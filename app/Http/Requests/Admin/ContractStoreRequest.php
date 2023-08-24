@@ -31,7 +31,7 @@ class ContractStoreRequest extends FormRequest
       'start_date' => 'required|date',
       'end_date' => 'required|date|after_or_equal:start_date',
       'value' => 'required',
-      'description' => 'nullable|string|max:1000',
+      'description' => 'nullable|string|max:2000',
     ];
   }
 }

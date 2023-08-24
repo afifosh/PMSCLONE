@@ -30,7 +30,7 @@ class KycDocumentUpdateRequest extends FormRequest
           'required_from' => ['required'],
           'status' => ['required', 'boolean'],
           'is_mendatory' => ['required', 'boolean'],
-          'description' => ['required', 'string', 'max:255'],
+          'description' => ['nullable', 'string', 'max:2000'],
           'is_expirable' => ['nullable', 'boolean'],
           'expiry_date_title' => ['required_if:is_expirable,1', 'nullable', 'max:255'],
           'is_expiry_date_required' => ['required_if:is_expirable,1', 'boolean'],

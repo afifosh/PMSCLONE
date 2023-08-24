@@ -32,7 +32,7 @@ class TemplateTaskController extends Controller
       'priority' => 'required',
       'tags' => 'nullable|array',
       'tags.*' => 'nullable|string|max:255',
-      'description' => 'nullable|string|max:255',
+      'description' => 'nullable|string|max:2000',
     ]);
 
     $project_template->taskTemplates()->create($request->only('subject', 'priority', 'description', 'tags'));

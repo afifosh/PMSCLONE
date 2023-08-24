@@ -31,7 +31,7 @@ class PersonalNoteController extends Controller
   {
     $request->validate([
       'title' => 'required|string|max:255',
-      'description' => 'required|string|max:65000',
+      'description' => 'nullable|string|max:2000',
       'tag' => 'required|exists:note_tags,id',
     ]);
 
@@ -65,7 +65,7 @@ class PersonalNoteController extends Controller
 
     $request->validate([
       'title' => 'required|string|max:255',
-      'description' => 'required|string|max:65000',
+      'description' => 'nullable|string|max:2000',
       'tag' => 'required|exists:note_tags,id',
     ]);
 

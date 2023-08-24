@@ -267,4 +267,122 @@
     const contractsByValueChart = new ApexCharts(contractsByValueEl, contractsByValueConfig);
     contractsByValueChart.render();
   }
+
+  // companies by projects
+  const companiesByProjectsEl = document.querySelector('#comapaniesByProjectsChart');
+  const companiesByProjectsConfig = {
+    chart: {
+      height: 270,
+      type: 'bar',
+      toolbar: {
+        show: false
+      }
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        barHeight: '70%',
+        distributed: true,
+        startingShape: 'rounded',
+        borderRadius: 7
+      }
+    },
+    grid: {
+      strokeDashArray: 10,
+      borderColor: borderColor,
+      xaxis: {
+        lines: {
+          show: true
+        }
+      },
+      yaxis: {
+        lines: {
+          show: false
+        }
+      },
+      padding: {
+        top: -35,
+        bottom: -12
+      }
+    },
+
+    colors: [
+      config.colors.primary,
+      config.colors.info,
+      config.colors.success,
+      config.colors.secondary,
+      config.colors.danger,
+      config.colors.warning
+    ],
+    dataLabels: {
+      enabled: true,
+      style: {
+        colors: ['#fff'],
+        fontWeight: 200,
+        fontSize: '13px',
+        fontFamily: 'Public Sans'
+      },
+      formatter: function (val, opts) {
+        return companiesByProjectsConfig.labels[opts.dataPointIndex] + ': ('+ companiesByProjects[opts.dataPointIndex].total +')';
+      },
+      offsetX: 0,
+      dropShadow: {
+        enabled: false
+      }
+    },
+    labels: companiesByProjects.map((item) => item.name),
+    series: [
+      {
+        data: companiesByProjects.map((item) => item.percentage)
+      }
+    ],
+
+    xaxis: {
+      categories: companiesByProjects.map((item) => item.name),
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      },
+      labels: {
+        style: {
+          colors: labelColor,
+          fontSize: '13px'
+        },
+        formatter: function (val) {
+          return `${val}%`;
+        }
+      }
+    },
+    yaxis: {
+      max: 100,
+      labels: {
+        style: {
+          colors: [labelColor],
+          fontFamily: 'Public Sans',
+          fontSize: '13px'
+        }
+      }
+    },
+    tooltip: {
+      enabled: true,
+      style: {
+        fontSize: '12px'
+      },
+      onDatasetHover: {
+        highlightDataSeries: false
+      },
+      custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+        return '<div class="px-3 py-2">' + '<span>' + series[seriesIndex][dataPointIndex] + '%</span>' + '</div>';
+      }
+    },
+    legend: {
+      show: true
+    }
+  };
+  if (typeof companiesByProjectsEl !== undefined && companiesByProjectsEl !== null) {
+    const companiesByProjectsChart = new ApexCharts(companiesByProjectsEl, companiesByProjectsConfig);
+    companiesByProjectsChart.render();
+  }
 })();

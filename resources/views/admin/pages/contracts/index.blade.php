@@ -35,6 +35,7 @@ $configData = Helper::appClasses();
   <script>
     window.contractsByType = {!! json_encode($contractTypes); !!};
     window.contractsByValue = {!! json_encode($contractTypesValue) !!};
+    window.companiesByProjects = {!! json_encode($companiesByProjects) !!};
   </script>
   <script src="{{asset('assets/js/custom/admin-contracts-index.js')}}"></script>
 @endif
@@ -120,6 +121,33 @@ $configData = Helper::appClasses();
       </div>
     </div>
     {{-- Stats End --}}
+
+    {{-- Companies By Projects --}}
+    <div class="col-12 col-xl-12 mt-2">
+      <div class="card h-100">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h5 class="card-title m-0 me-2">Companies By No. Of Contracts</h5>
+        </div>
+        <div class="card-body row g-3">
+          <div class="col-md-6">
+            <div id="comapaniesByProjectsChart"></div>
+          </div>
+          <div class="col-md-6 d-flex justify-content-around align-items-center">
+            @forelse ($companiesByProjects as $compByProject)
+              <div class="d-flex align-items-baseline">
+                <span class="text-primary me-2"><i class='ti ti-circle-filled fs-6'></i></span>
+                <div>
+                  <p class="mb-2">{{$compByProject->name}}</p>
+                  <h5>{{$compByProject->percentage}}%</h5>
+                </div>
+              </div>
+            @empty
+            @endforelse
+          </div>
+        </div>
+      </div>
+    </div>
+    {{-- Companies By Projects End--}}
 
     {{-- Types graph start --}}
     <div class="row">

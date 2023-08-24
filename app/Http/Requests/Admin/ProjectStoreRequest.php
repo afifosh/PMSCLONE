@@ -30,7 +30,7 @@ class ProjectStoreRequest extends FormRequest
             'status' => 'required',
             'members' => 'required|array',
             'members.*' => 'required|exists:admins,id',
-            'description' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
             'start_date' => 'nullable|date',
             'deadline' => 'nullable|date',
             // 'is_progress_calculatable' => 'required',

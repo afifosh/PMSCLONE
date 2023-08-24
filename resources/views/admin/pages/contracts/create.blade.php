@@ -43,6 +43,39 @@
       {!! Form::date('start_date', $contract->start_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Start Date')]) !!}
     </div>
     {{-- dute date --}}
+    <div class="col-12 mt-2">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="cal-cont-end-date">
+        <label class="form-check-label" for="cal-cont-end-date">
+          Calculate End Date
+        </label>
+      </div>
+    </div>
+    <div class="d-none" id="end-date-cal-form">
+      <hr>
+      <div class="mb-3">
+        <label for="" class="form-label">After From Start Date</label>
+        <div class="d-flex">
+          <div class="input-group">
+            <input id="cont-add-days" type="number"  class="form-control cal-cont-end-date" placeholder="Days">
+            <span class="input-group-text me-2">Days</span>
+          </div>
+          <div class="input-group">
+            <input id="cont-add-weeks" type="number" class="form-control cal-cont-end-date" placeholder="Weeks">
+            <span class="input-group-text me-2">Weeks</span>
+          </div>
+          <div class="input-group">
+            <input id="cont-add-months" type="number" class="form-control cal-cont-end-date" placeholder="Months">
+            <span class="input-group-text me-2">Months</span>
+          </div>
+          <div class="input-group">
+            <input id="cont-add-years" type="number" class="form-control cal-cont-end-date" placeholder="Years">
+            <span class="input-group-text me-2">Years</span>
+          </div>
+        </div>
+      </div>
+      <hr>
+    </div>
     <div class="form-group col-6">
       {{ Form::label('end_date', __('End Date'), ['class' => 'col-form-label']) }}
       {!! Form::date('end_date', $contract->end_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('End Date')]) !!}
@@ -94,4 +127,50 @@
       $('#contract-client-select').parent().addClass('d-none');
     }
   });
+
+  $(document).on('change', '#cal-cont-end-date', function() {
+    if ($(this).is(':checked')) {
+      $('#end-date-cal-form').removeClass('d-none');
+      calContEndDate();
+    } else {
+      $('#end_date').val('');
+      $('#end-date-cal-form').addClass('d-none');
+      initFlatPickr();
+    }
+  });
+
+  $(document).on('change', '[name="start_date"]', function(){
+    calContEndDate();
+  })
+
+  $(document).on('change', '.cal-cont-end-date', function() {
+    calContEndDate();
+  });
+
+  function calContEndDate()
+  {
+    const days = $('#cont-add-days').val();
+      const months = $('#cont-add-months').val();
+      const years = $('#cont-add-years').val();
+      const weeks = $('#cont-add-weeks').val();
+      const startDate = $('#start_date').val();
+      if(!startDate) return;
+      if (days || months || years) {
+        let endDate = new Date(startDate);
+        if (days) {
+          endDate.setDate(endDate.getDate() + parseInt(days));
+        }
+        if (months) {
+          endDate.setMonth(endDate.getMonth() + parseInt(months));
+        }
+        if (years) {
+          endDate.setFullYear(endDate.getFullYear() + parseInt(years));
+        }
+        if (weeks) {
+          endDate.setDate(endDate.getDate() + (parseInt(weeks) * 7));
+        }
+        $('#end_date').val(endDate.toISOString().slice(0, 10));
+      }
+      initFlatPickr();
+  }
 </script>

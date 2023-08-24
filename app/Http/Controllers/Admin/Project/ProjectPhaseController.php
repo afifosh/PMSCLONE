@@ -57,7 +57,7 @@ class ProjectPhaseController extends Controller
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,contract_id,' . $contract->id,
       'estimated_cost' => 'required|max:255',
-      'description' => 'nullable|string|max:65000',
+      'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
       'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
     ],[
@@ -91,7 +91,7 @@ class ProjectPhaseController extends Controller
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,' . $phase->id . ',id,contract_id,' . $contract->id,
       'estimated_cost' => 'required|max:255',
-      'description' => 'nullable|string|max:65000',
+      'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
       'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
     ],[

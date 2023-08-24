@@ -534,4 +534,9 @@ class Company extends BaseModel
   {
     return $this->hasMany(CompanyApprovalRequest::class, 'company_id');
   }
+
+  public function contracts()
+  {
+    return $this->hasMany(Contract::class);
+  }
 }

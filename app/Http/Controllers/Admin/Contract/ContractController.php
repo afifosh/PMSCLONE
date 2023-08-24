@@ -49,6 +49,16 @@ class ContractController extends Controller
       ->limit(5)
       ->get();
 
+    // top 5 companies by number of projects
+    $data['companiesByProjects'] = Company:://has('contracts')->
+    selectRaw('companies.name, count(contracts.id) as total, round(count(contracts.id) / (select count(*) from contracts where contracts.deleted_at Is NULL) * 100, 2) as percentage')
+    ->leftJoin('contracts', 'contracts.company_id', '=', 'companies.id')
+    ->whereNull('contracts.deleted_at')
+    ->groupBy('companies.id', 'companies.name')
+    ->orderBy('total', 'desc')
+    ->limit(5)
+    ->get();
+
 
     return $dataTable->render('admin.pages.contracts.index', $data);
     // view('admin.pages.contracts.index');

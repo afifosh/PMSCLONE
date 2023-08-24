@@ -8,6 +8,7 @@ $urls = [
     'onlyoffice' => 'admin.setting.onlyoffice.index',
     'oauth-google' => 'admin.setting.oauth-google.create',
     'oauth-microsoft' => 'admin.setting.oauth-microsoft.create',
+    'contract-notifications' => 'admin.setting.contract-notifications.create',
 ];
 $active = Request::route()->getName();
 @endphp
@@ -53,6 +54,11 @@ $active = Request::route()->getName();
             <li class="{{ $active === $urls['oauth-microsoft'] ? 'active' : '' }} d-flex py-3" data-target="oauth-microsoft">
               <a href="{{ route($urls['oauth-microsoft']) }}" class="d-flex flex-wrap align-items-center">
                   <span class="align-middle ms-2">@lang('Microsoft Oauth Setup')</span>
+              </a>
+            </li>
+            <li class="{{ $active === $urls['contract-notifications'] ? 'active' : '' }} d-flex py-3" data-target="contract-notifications">
+              <a href="{{ route($urls['contract-notifications']) }}" class="d-flex flex-wrap align-items-center">
+                  <span class="align-middle ms-2">@lang('Contract Notifications')</span>
               </a>
             </li>
         </ul>

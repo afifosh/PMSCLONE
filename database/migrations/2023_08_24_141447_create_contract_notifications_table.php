@@ -11,14 +11,11 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('personal_notes', function (Blueprint $table) {
+    // contract expiry notifications, record expiry notifications, contract expiry reminders
+    Schema::create('contract_notifications', function (Blueprint $table) {
       $table->id();
-      $table->foreignId('note_tag_id')->constrained()->cascadeOnDelete();
-      $table->string('user_type');
-      $table->string('user_id');
-      $table->string('title');
-      $table->text('description')->nullable();
-      $table->boolean('is_favorite')->default(false);
+      $table->foreignId('contract_id')->constrained()->onDelete('cascade');
+      $table->foreignId('sent_to')->constrained('admins')->onDelete('cascade');
       $table->timestamps();
     });
   }
@@ -28,6 +25,6 @@ return new class extends Migration
    */
   public function down(): void
   {
-    Schema::dropIfExists('personal_notes');
+    Schema::dropIfExists('contract_notifications');
   }
 };

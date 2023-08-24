@@ -29,6 +29,10 @@ class SettingService extends BaseService
                 $settings[$key] = $this->uploadImage(request()->file($key), config('file.' . $key . '.folder'), config('file.' . $key . '.height'));
             }
 
+            if(is_array(request()->{$key})){
+              $settings[$key] = implode(',', filterInputIds(request()->{$key}));
+            }
+
             $this->setModel($setting);
 
             if ($locale = request()->get('language')) {

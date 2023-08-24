@@ -55,6 +55,7 @@ use App\Http\Controllers\Admin\Project\TaskFileController;
 use App\Http\Controllers\Admin\Project\TaskReminderController;
 use App\Http\Controllers\Admin\Project\TemplateTaskCheckItemController;
 use App\Http\Controllers\Admin\Project\TemplateTaskController;
+use App\Http\Controllers\Admin\Setting\ContractSettingController as SettingContractSettingController;
 use App\Http\Controllers\Admin\Setting\OauthGoogleController;
 use App\Http\Controllers\Admin\Setting\OauthMicrosoftController;
 use Modules\Core\Http\Controllers\OAuthController;
@@ -220,6 +221,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
       Route::prefix('onlyoffice')->name('onlyoffice.')->controller(OnlyOfficeSettingController::class)->group(function () {
         Route::get('', 'index')->name('index');
+        Route::put('', 'update')->name('update');
+      });
+
+      Route::prefix('contract-notifications')->name('contract-notifications.')->controller(SettingContractSettingController::class)->group(function () {
+        Route::get('', 'create')->name('create');
         Route::put('', 'update')->name('update');
       });
 

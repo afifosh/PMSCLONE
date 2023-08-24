@@ -28,7 +28,7 @@ class ProgramController extends Controller
       'name' => 'required|string|max:255|unique:programs,name',
       'program_code' => 'required|unique:programs,program_code|string|max:255',
       'parent_id' => 'nullable|exists:programs,id',
-      'description' => 'required',
+      'description' => 'nullable|string|max:2000',
     ]);
     Program::create($att);
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Program::DT_ID, 'close' => 'globalModal']);
@@ -54,7 +54,7 @@ class ProgramController extends Controller
       'name' => 'required|string|max:255|unique:programs,name,'.$program->id.',id',
       'program_code' => 'required|string|max:255|unique:programs,program_code,'.$program->id.',id',
       'parent_id' => 'nullable|exists:programs,id',
-      'description' => 'required',
+      'description' => 'nullable|string',
     ]);
     if ($program->update($att)) {
       return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Program::DT_ID, 'close' => 'globalModal']);
