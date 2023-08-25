@@ -3,6 +3,7 @@
 @section('title', 'User Profile - Profile')
 
 @section('vendor-style')
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/apex-charts/apex-charts.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css')}}">
@@ -11,15 +12,165 @@
 <!-- Page -->
 @section('page-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/page-profile.css')}}" />
+<style>
+  .bullet {
+    width: 15px;
+    height: 10px;
+    border-radius: 20%;
+    display: inline-block;
+  }
+</style>
 @endsection
 
 
 @section('vendor-script')
+<script src="{{asset('assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
 @endsection
 
 @section('page-script')
 <script src="{{asset('assets/js/pages-profile.js')}}"></script>
+<script>
+  const contractEventsSummary = {!! json_encode($summary) !!}
+  $(document).ready(function () {
+    if (isDarkStyle) {
+    labelColor = config.colors_dark.textMuted;
+    headingColor = config.colors_dark.headingColor;
+    borderColor = config.colors_dark.borderColor;
+  } else {
+    labelColor = config.colors.textMuted;
+    headingColor = config.colors.headingColor;
+    borderColor = config.colors.borderColor;
+  }
+    const chartColors = {
+    donut: {
+      series1: config.colors.warning,
+      series2: config.colors.danger,
+      series3: config.colors.success,
+      series4: config.colors.secondary
+    }
+  };
+    // Generated Leads Chart
+  // --------------------------------------------------------------------
+  const eventsSummaryChartEl = document.querySelector('#eventsSummaryChart'),
+    eventsSummaryChartConfig = {
+      chart: {
+        height: 147,
+        width: 130,
+        parentHeightOffset: 0,
+        type: 'donut'
+      },
+      labels: ['Paused', 'Rescheduled', 'Value Updated', 'Terminated'],
+      series: [
+                parseInt($('.paused-event-count').text()),
+                parseInt($('.rescheduled-event-count').text()),
+                parseInt($('.value-event-count').text()),
+                parseInt($('.terminated-event-count').text())
+              ],
+      colors: [
+        chartColors.donut.series1,
+        chartColors.donut.series2,
+        chartColors.donut.series3,
+        chartColors.donut.series4
+      ],
+      stroke: {
+        width: 0
+      },
+      dataLabels: {
+        enabled: false,
+        formatter: function (val, opt) {
+          return parseInt(val) + '%';
+        }
+      },
+      legend: {
+        show: false
+      },
+      tooltip: {
+        theme: false
+      },
+      grid: {
+        padding: {
+          top: 15,
+          right: -20,
+          left: -20
+        }
+      },
+      states: {
+        hover: {
+          filter: {
+            type: 'none'
+          }
+        }
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '70%',
+            labels: {
+              show: true,
+              value: {
+                fontSize: '1.375rem',
+                fontFamily: 'Public Sans',
+                color: headingColor,
+                fontWeight: 500,
+                offsetY: -15,
+                formatter: function (val) {
+                  return parseInt(val) + '%';
+                }
+              },
+              name: {
+                offsetY: 20,
+                fontFamily: 'Public Sans'
+              },
+              total: {
+                show: true,
+                showAlways: true,
+                color: config.colors.success,
+                fontSize: '.8125rem',
+                label: 'Total',
+                fontFamily: 'Public Sans',
+                formatter: function (w) {
+                  return parseInt($('.total-summary-event-count').text()) ;
+                }
+              }
+            }
+          }
+        }
+      },
+      responsive: [
+        {
+          breakpoint: 1025,
+          options: {
+            chart: {
+              height: 172,
+              width: 160
+            }
+          }
+        },
+        {
+          breakpoint: 769,
+          options: {
+            chart: {
+              height: 178
+            }
+          }
+        },
+        {
+          breakpoint: 426,
+          options: {
+            chart: {
+              height: 147
+            }
+          }
+        }
+      ]
+    };
+  if (typeof eventsSummaryChartEl !== undefined && eventsSummaryChartEl !== null) {
+    const eventsSummaryChart = new ApexCharts(eventsSummaryChartEl, eventsSummaryChartConfig);
+    eventsSummaryChart.render();
+  }
+  });
+</script>
 @endsection
 
 @section('content')
@@ -71,85 +222,43 @@
   </div>
   <div class="col-xl-8 col-lg-7 col-md-7">
     <!-- Activity Timeline -->
-    <div class="card card-action mb-4">
-      <div class="card-header align-items-center">
-        <h5 class="card-action-title mb-0">Activity Timeline</h5>
-        <div class="card-action-element">
-          <div class="dropdown">
-            <button type="button" class="btn dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical text-muted"></i></button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="javascript:void(0);">Share timeline</a></li>
-              <li><a class="dropdown-item" href="javascript:void(0);">Suggest edits</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="javascript:void(0);">Report bug</a></li>
-            </ul>
+    <div class="row">
+      <div class="col-xl-6 mb-4 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="card-title mb-auto">
+              <h5 class="mb-1 text-nowrap">Events summary</h5>
+            </div>
+            <div class="d-flex justify-content-start">
+              <div class="d-flex me-5">
+                <div id="eventsSummaryChart"></div>
+              </div>
+              <div class="mt-2 me-5">
+                <div class="d-flex fs-6 justify-content-between fw-semibold mb-3">
+                  <div class="bullet bg-warning mt-1 me-1"></div>
+                  <div class="text-muted me-5">Paused</div>
+                  <div class="ms-auto fw-bold paused-event-count">{{$summary->where('event_type', 'Paused')->sum('total')}}</div>
+                </div>
+                <div class="d-flex fs-6 justify-content-between fw-semibold mb-3">
+                  <div class="bullet bg-primary mt-1 me-1"></div>
+                  <div class="text-muted me-5">Rescheduled</div>
+                  <div class="ms-auto fw-bold rescheduled-event-count">{{$summary->whereIn('event_type', ['Extended', 'Shortened', 'Rescheduled', 'Rescheduled And Amount Increased', 'Rescheduled And Amount Decreased'])->sum('total')}}</div>
+                </div>
+                <div class="d-flex fs-6 justify-content-between fw-semibold mb-3">
+                  <div class="bullet bg-success mt-1 me-1"></div>
+                  <div class="text-muted me-5">Value Updated</div>
+                  <div class="ms-auto fw-bold value-event-count">{{$summary->whereIn('event_type', ['Amount Increased','Amount Decreased','Rescheduled And Amount Increased','Rescheduled And Amount Decreased'])->sum('total')}}</div>
+                </div>
+                <div class="d-flex fs-6 justify-content-between fw-semibold mb-3">
+                  <div class="bullet bg-secondary mt-1 me-1"></div>
+                  <div class="text-muted me-5">Terminated</div>
+                  <div class="ms-auto fw-bold terminated-event-count">{{$summary->where('event_type', 'Terminated')->sum('total')}}</div>
+                  <div class="d-none total-summary-event-count">{{$summary->whereIn('event_type', ['Paused', 'Terminated', 'Extended', 'Shortened', 'Rescheduled', 'Rescheduled And Amount Increased', 'Rescheduled And Amount Decreased'])->sum('total')}}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card-body pb-0">
-        <ul class="timeline ms-1 mb-0">
-          <li class="timeline-item timeline-item-transparent">
-            <span class="timeline-point timeline-point-primary"></span>
-            <div class="timeline-event">
-              <div class="timeline-header">
-                <h6 class="mb-0">Client Meeting</h6>
-                <small class="text-muted">Today</small>
-              </div>
-              <p class="mb-2">Project meeting with john @10:15am</p>
-              <div class="d-flex flex-wrap">
-                <div class="avatar me-2">
-                  <img src="{{ asset('assets/img/avatars/3.png') }}" alt="Avatar" class="rounded-circle" />
-                </div>
-                <div class="ms-1">
-                  <h6 class="mb-0">Lester McCarthy (Client)</h6>
-                  <span>CEO of Infibeam</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="timeline-item timeline-item-transparent">
-            <span class="timeline-point timeline-point-success"></span>
-            <div class="timeline-event">
-              <div class="timeline-header">
-                <h6 class="mb-0">Create a new project for client</h6>
-                <small class="text-muted">2 Day Ago</small>
-              </div>
-              <p class="mb-0">Add files to new design folder</p>
-            </div>
-          </li>
-          <li class="timeline-item timeline-item-transparent">
-            <span class="timeline-point timeline-point-danger"></span>
-            <div class="timeline-event">
-              <div class="timeline-header">
-                <h6 class="mb-0">Shared 2 New Project Files</h6>
-                <small class="text-muted">6 Day Ago</small>
-              </div>
-              <p class="mb-2">Sent by Mollie Dixon <img src="{{ asset('assets/img/avatars/4.png') }}" class="rounded-circle me-3" alt="avatar" height="24" width="24"></p>
-              <div class="d-flex flex-wrap gap-2 pt-1">
-                <a href="javascript:void(0)" class="me-3">
-                  <img src="{{asset('assets/img/icons/misc/doc.png') }}" alt="Document image" width="15" class="me-2">
-                  <span class="fw-semibold text-heading">App Guidelines</span>
-                </a>
-                <a href="javascript:void(0)">
-                  <img src="{{asset('assets/img/icons/misc/xls.png') }}" alt="Excel image" width="15" class="me-2">
-                  <span class="fw-semibold text-heading">Testing Results</span>
-                </a>
-              </div>
-            </div>
-          </li>
-          <li class="timeline-item timeline-item-transparent border-0">
-            <span class="timeline-point timeline-point-info"></span>
-            <div class="timeline-event">
-              <div class="timeline-header">
-                <h6 class="mb-0">Project status updated</h6>
-                <small class="text-muted">10 Day Ago</small>
-              </div>
-              <p class="mb-0">Woocommerce iOS App Completed</p>
-            </div>
-          </li>
-        </ul>
       </div>
     </div>
     <!--/ Activity Timeline -->

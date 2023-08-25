@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}">
 @endsection
 
 <!-- Page -->
@@ -18,14 +19,24 @@
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 @endsection
 @section('content')
 @include('admin.pages.contracts.header', ['tab' => 'settings'])
 <!-- User Profile Content -->
 <div class="row">
   <div class="col-12">
-    @if ($contract->status != 'Paused')
-      <div class="card">
+    {{-- notifiable users --}}
+    @if ($contract->status != 'Terminated')
+      <div class="card mt-3">
+        <div class="card-body">
+          {{$dataTable->table()}}
+        </div>
+      </div>
+    @endif
+    {{-- End notifiable users --}}
+    @if ($contract->status != 'Paused' && $contract->status != 'Terminated')
+      <div class="card mt-2">
         <h5 class="card-header">Pause Contract</h5>
           <div class="card-body">
             <form method="post" action="{{route('admin.contracts.pause', [$contract])}}">
@@ -73,7 +84,7 @@
       </div>
     @endif
     @if ($contract->status == 'Paused')
-      <div class="card">
+      <div class="card mt-2">
         <h5 class="card-header">Resume Contract</h5>
           <div class="card-body">
             <form method="post" action="{{route('admin.contracts.pause', [$contract])}}">
@@ -214,7 +225,9 @@
     });
 
   });
-
-
 </script>
 @endsection
+@push('scripts')
+    {{$dataTable->scripts()}}
+    <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+@endpush

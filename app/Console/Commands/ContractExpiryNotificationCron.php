@@ -38,21 +38,26 @@ class ContractExpiryNotificationCron extends Command
       $adminsToNotify = Admin::whereIn('id', explode(',', $config['emails']))->get();
 
       Contract::where('status', 'Active')
-        // ->where('end_date', '<=', now()->add($config['expiry_unit_value'], $config['expiry_unit_name']))
-        // ->whereDoesntHave('lastExpiryNotification', function ($query) use ($config) {
-        //   $query->where('created_at', '>=', now()->sub($config['sending_unit_value'], $config['sending_unit_name']));
-        // })
         ->where('end_date', '<=', now()->add($config['cycle_unit_value'] * $config['cycle_count'], $config['cycle_unit_name']))
         ->whereDoesntHave('lastExpiryNotification', function ($query) use ($config) {
           $query->where('created_at', '>=', now()->sub($config['cycle_unit_value'], $config['cycle_unit_name']));
-        })
+        })->with('notifiableUsers')
         ->chunkById(1, function ($contracts) use ($adminsToNotify) {
           foreach ($contracts as $contract) {
-            $this->saveLog('Sending notification for contract ' . $contract->subject . ' to ' . $adminsToNotify->count() . ' admins');
+            $this->saveLog('Sending notification for contract ' . $contract->subject . ' to ' . ($adminsToNotify->count() + $contract->notifiableUsers->whereNotIn('id', $adminsToNotify->pluck('id'))->count()) . ' admins');
             foreach ($adminsToNotify as $admin) {
               $admin->notify(new ContractExpiryNotification($contract));
               $contract->lastExpiryNotification()->create([
                 'sent_to' => $admin->id
+              ]);
+            }
+
+            foreach ($contract->notifiableUsers as $user) {
+              if($adminsToNotify->contains($user))
+                continue;
+              $user->notify(new ContractExpiryNotification($contract));
+              $contract->lastExpiryNotification()->create([
+                'sent_to' => $user->id
               ]);
             }
           }

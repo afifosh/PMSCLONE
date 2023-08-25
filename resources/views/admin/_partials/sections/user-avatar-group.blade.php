@@ -5,7 +5,7 @@
     @endphp
       @if ((!$limit || $loop->iteration <= $limit))
         <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" title="{{ $user->full_name }}"
-            class="avatar avatar-sm pull-up">
+            class="avatar avatar-{{isset($size) ? $size : 'sm'}} pull-up">
             <img class="rounded-circle" src="{{ $user->avatar }}" alt="Avatar">
         </li>
       @else

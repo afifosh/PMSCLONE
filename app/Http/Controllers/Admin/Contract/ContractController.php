@@ -22,12 +22,15 @@ class ContractController extends Controller
   {
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
     $data['contracts'] = Contract::selectRaw('count(*) as total')
-      ->selectRaw('count(case when deleted_at is null and end_date > now() then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and end_date <= now() then 1 end) as expired')
-      ->selectRaw('count(case when deleted_at is null and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 MONTH) then 1 end) as expiring_soon')
-      ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at >= DATE_SUB(now(), INTERVAL 2 MONTH) then 1 end) as recently_added')
+      ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date > now() then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date <= now() then 1 end) as expired')
+      ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 MONTH) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and status != "Draft" and created_at <= now() and created_at >= DATE_SUB(now(), INTERVAL 2 MONTH) then 1 end) as recently_added')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
-      // ->selectRaw('count(case when deleted_at is null and status = Terminated then 1 end) as terminated')
+      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
+      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
+      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
+      ->selectRaw('(SELECT COUNT(DISTINCT contract_id) FROM contract_events WHERE event_type IN ("Extended", "Shortened", "Rescheduled", "Rescheduled And Amount Increased", "Rescheduled And Amount Decreased")) as rescheduled')
       ->withTrashed()
       ->first();
 
@@ -106,8 +109,12 @@ class ContractController extends Controller
     else
       $data['client_id'] = null;
 
+    if($request->isSavingDraft)
+      $data['status'] = 'Draft';
+
     $contract = Contract::create($data + $request->validated());
 
+    if(!$request->isSavingDraft)
     $contract->events()->create([
       'event_type' => 'Created',
       'modifications' => $request->validated(),
@@ -123,7 +130,10 @@ class ContractController extends Controller
    */
   public function show(Contract $contract)
   {
-    return view('admin.pages.contracts.show', ['contract' => $contract]);
+    $data['contract'] = $contract->load('notifiableUsers');
+    $data['summary'] = $contract->events()->selectRaw('event_type, count(*) as total')->groupBy('event_type')->get();
+
+    return view('admin.pages.contracts.show', $data);
   }
 
   /**
@@ -151,8 +161,18 @@ class ContractController extends Controller
    */
   public function update(ContractUpdateRequest $request, Contract $contract)
   {
-    if($request->status != $contract->getRawOriginal('status') || $request->start_date != $contract->start_date || $request->end_date != $contract->end_date || $request->value != $contract->value){
-      $contract->saveEventLog($request, $contract);
+    if($contract->status == 'Draft' && !$request->isSavingDraft)
+      $contract->events()->create([
+        'event_type' => 'Created',
+        'modifications' => $request->validated(),
+        'description' => 'Contract Created',
+        'admin_id' => auth()->id(),
+      ]);
+    else{
+      if(!$request->isSavingDraft)
+      if($request->start_date != $contract->start_date || $request->end_date != $contract->end_date || $request->value != $contract->value){
+        $contract->saveEventLog($request, $contract);
+      }
     }
 
     if($request->assign_to == 'Client')
@@ -160,7 +180,13 @@ class ContractController extends Controller
     else
       $data['client_id'] = null;
 
-    $data['status'] = $request->status == 'Resumed' ? 'Active' : $request->status;
+    if($request->isSavingDraft)
+      $data['status'] = 'Draft';
+    else{
+      if($contract->status == 'Draft')
+        $data['status'] = 'Active';
+    }
+
     $contract->update($data + $request->validated());
 
     return $this->sendRes(__('Contract updated successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);

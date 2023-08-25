@@ -2,16 +2,24 @@
 
 namespace App\Http\Controllers\Admin\Contract;
 
+use App\DataTables\Admin\Contract\NotifiableUsersDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Contract;
+use App\Notifications\Admin\Contract\ContractTerminationNotification;
+use App\Services\Core\Setting\SettingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class ContractSettingController extends Controller
 {
-  public function index(Contract $contract)
+  public function index(Contract $contract, NotifiableUsersDataTable $dataTable)
   {
     $contract->load('events');
-    return view('admin.pages.contracts.settings.index', compact('contract'));
+    $dataTable->contract = $contract;
+
+    return $dataTable->render('admin.pages.contracts.settings.index', compact('contract'));
+    // return view('admin.pages.contracts.settings.index', compact('contract'));
   }
 
   public function terminate(Contract $contract, Request $request)
@@ -31,8 +39,11 @@ class ContractSettingController extends Controller
       'description' => $request->terminate_date == 'now' ? 'Contract Terminated' : 'Contract Scheduled For Termination',
       'admin_id' => auth()->id(),
     ]);
-    if($request->terminate_date == 'now')
+    if($request->terminate_date == 'now'){
       $contract->update(['status' => 'Terminated']);
+      $this->sendTerminateNotification($contract);
+    }
+
 
     return $this->sendRes('Contract Terminated Successfully', ['event' => 'page_reload']);
   }
@@ -71,5 +82,18 @@ class ContractSettingController extends Controller
     $contract->update(['status' => 'Paused']);
 
     return $this->sendRes('Contract Paused Successfully', ['event' => 'page_reload']);
+  }
+
+  public function sendTerminateNotification($contract, $isImmediate = true)
+  {
+    $admins = $contract->notifiableUsers;
+    $config = (new SettingService())->getFormattedSettings('contract-notifications');
+
+    if (isset($config['enable_notifications']) && $config['enable_notifications'] == 1) {
+      $adminsGlobal = Admin::whereIn('id', explode(',', $config['emails']))->get();
+      $admins = $admins->merge($adminsGlobal);
+
+      Notification::send($admins, new ContractTerminationNotification($contract, $isImmediate));
+    }
   }
 }

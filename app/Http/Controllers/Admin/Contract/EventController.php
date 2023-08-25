@@ -14,6 +14,7 @@ class EventController extends Controller
   public function index(Contract $contract, EventsDataTable $dataTable)
   {
     $dataTable->contract = $contract;
+    $contract->load('notifiableUsers');
     $data['contract'] = $contract;
     $data['summary'] = $contract->events()->selectRaw('event_type, count(*) as total')->groupBy('event_type')->get();
 

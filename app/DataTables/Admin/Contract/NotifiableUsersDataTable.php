@@ -2,15 +2,16 @@
 
 namespace App\DataTables\Admin\Contract;
 
-use App\Models\ContractType;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class ContractTypesDataTable extends DataTable
+class NotifiableUsersDataTable extends DataTable
 {
+  public $contract;
   /**
    * Build the DataTable class.
    *
@@ -19,17 +20,22 @@ class ContractTypesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->addColumn('action', function ($contract_type) {
-        return view('admin.pages.contract-types.action', compact('contract_type'));
-      });
+    ->addColumn('user', function ($user) {
+      return view('admin._partials.sections.user-info', ['user' => $user]);
+    })
+    ->addColumn('action', function ($admin) {
+      return view('admin.pages.contracts.settings.notifiable-users.action', ['admin' => $admin, 'contract' => $this->contract]);
+    });
   }
 
   /**
    * Get the query source of dataTable.
    */
-  public function query(ContractType $model): QueryBuilder
+  public function query(Admin $model): QueryBuilder
   {
-    return $model->withCount('contracts')->newQuery();
+    return $model->whereHas('contractNotifiableUser', function ($q) {
+      $q->where('contract_id', $this->contract->id);
+    })->newQuery();
   }
 
   /**
@@ -39,17 +45,17 @@ class ContractTypesDataTable extends DataTable
   {
     $buttons = [];
     $buttons[] = [
-      'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Type</span>',
+      'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add User</span>',
       'className' =>  'btn btn-primary mx-3',
       'attr' => [
         'data-toggle' => "ajax-modal",
-        'data-title' => 'Add Type',
-        'data-href' => route('admin.contract-types.create')
+        'data-title' => 'Add User',
+        'data-href' => route('admin.contracts.notifiable-users.create', $this->contract->id)
       ]
     ];
 
     return $this->builder()
-      ->setTableId('contract-types-table')
+      ->setTableId('contract-notifiable-users-table')
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
@@ -73,10 +79,7 @@ class ContractTypesDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      Column::make('name'),
-      Column::make('contracts_count')->title('Contracts'),
-      Column::make('created_at'),
-      Column::make('updated_at'),
+      Column::make('user')
     ];
   }
 
@@ -85,6 +88,6 @@ class ContractTypesDataTable extends DataTable
    */
   protected function filename(): string
   {
-    return 'ContractTypes_' . date('YmdHis');
+    return 'NotifiableUsers_' . date('YmdHis');
   }
 }

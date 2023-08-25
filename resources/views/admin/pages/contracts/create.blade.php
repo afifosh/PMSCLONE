@@ -56,21 +56,9 @@
       <div class="mb-3">
         <label for="" class="form-label">After From Start Date</label>
         <div class="d-flex">
-          <div class="input-group">
-            <input id="cont-add-days" type="number"  class="form-control cal-cont-end-date" placeholder="Days">
-            <span class="input-group-text me-2">Days</span>
-          </div>
-          <div class="input-group">
-            <input id="cont-add-weeks" type="number" class="form-control cal-cont-end-date" placeholder="Weeks">
-            <span class="input-group-text me-2">Weeks</span>
-          </div>
-          <div class="input-group">
-            <input id="cont-add-months" type="number" class="form-control cal-cont-end-date" placeholder="Months">
-            <span class="input-group-text me-2">Months</span>
-          </div>
-          <div class="input-group">
-            <input id="cont-add-years" type="number" class="form-control cal-cont-end-date" placeholder="Years">
-            <span class="input-group-text me-2">Years</span>
+          <div class="d-flex w-100">
+            <input id="cont-add-count" type="number"  class="form-control cal-cont-end-date">
+            {!! Form::select('null', ['Days' => 'Day(s)', 'Weeks' => 'Week(s)', 'Months' => 'Month(s)', 'Years' => 'Year(s)'], null, ['class' => 'cont-add-unit cal-cont-end-date input-group-text form-select globalOfSelect2']) !!}
           </div>
         </div>
       </div>
@@ -85,32 +73,28 @@
       {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
       {!! Form::select('type_id', $types, $contract->type_id, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
-    @if ($contract->id)
-      {{-- status --}}
-      <div class="form-group col-6">
-        {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}
-        {!! Form::select('status', array_combine($statuses, $statuses), $contract->status, ['id' => 'contract-status', 'class' => 'form-select globalOfSelect2']) !!}
-      </div>
-    @endif
-    <div class="form-group col-12 {{$contract->status != 'Terminated' ? 'd-none' : ''}}">
-      {{ Form::label('termination_reason', __('Termination Reason'), ['class' => 'col-form-label']) }}
-      {!! Form::text('termination_reason', $termination_reason ?? null, ['id' => 'termination_reason', 'class' => 'form-control', 'placeholder' => __('Termination Reason')]) !!}
-    </div>
     {{-- description --}}
     <div class="form-group col-12">
       {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}
       {!! Form::textarea('description', null, ['class' => 'form-control', 'rows' => 3, 'placeholder' => __('Description')]) !!}
     </div>
+    {!! Form::hidden('isSavingDraft', null, ['id' => 'isSavingDraft']) !!}
 </div>
 <div class="mt-3">
     <div class="btn-flt float-end">
+      @if (!$contract->status || $contract->status == 'Draft')
+        <button type="button" class="btn btn-secondary" data-form="ajax-form" data-preAjaxAction="isSavingDraft" data-preAjaxParams="1">{{ __('Save Draft') }}</button>
+      @endif
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-        <button type="submit" data-form="ajax-form" class="btn btn-primary">{{ __('Save') }}</button>
+        <button type="submit" data-form="ajax-form" data-preAjaxAction="isSavingDraft" data-preAjaxParams="0" class="btn btn-primary">{{ __('Save') }}</button>
     </div>
 </div>
 {!! Form::close() !!}
 </div>
 <script>
+  function isSavingDraft(isDraft){
+    $('#isSavingDraft').val(isDraft);
+  }
   $(document).on('change', '#contract-status', function() {
     if ($(this).val() == 'Terminated') {
       $('#termination_reason').parent().removeClass('d-none');
@@ -143,34 +127,31 @@
     calContEndDate();
   })
 
-  $(document).on('change', '.cal-cont-end-date', function() {
+  $(document).on('change keyup', '.cal-cont-end-date', function() {
     calContEndDate();
   });
 
   function calContEndDate()
   {
-    const days = $('#cont-add-days').val();
-      const months = $('#cont-add-months').val();
-      const years = $('#cont-add-years').val();
-      const weeks = $('#cont-add-weeks').val();
-      const startDate = $('#start_date').val();
-      if(!startDate) return;
-      if (days || months || years) {
-        let endDate = new Date(startDate);
-        if (days) {
-          endDate.setDate(endDate.getDate() + parseInt(days));
-        }
-        if (months) {
-          endDate.setMonth(endDate.getMonth() + parseInt(months));
-        }
-        if (years) {
-          endDate.setFullYear(endDate.getFullYear() + parseInt(years));
-        }
-        if (weeks) {
-          endDate.setDate(endDate.getDate() + (parseInt(weeks) * 7));
-        }
-        $('#end_date').val(endDate.toISOString().slice(0, 10));
+    const count = $('#cont-add-count').val();
+    const unit = $('.cont-add-unit').val();
+    const startDate = $('#start_date').val();
+    if(!startDate) return;
+    if (count && unit) {
+      let endDate = new Date(startDate);
+      if(unit == 'Days') {
+        endDate.setDate(endDate.getDate() + parseInt(count));
+      } else if(unit == 'Weeks') {
+        endDate.setDate(endDate.getDate() + (parseInt(count) * 7));
+      } else if(unit == 'Months') {
+        endDate.setMonth(endDate.getMonth() + parseInt(count));
+      } else if(unit == 'Years') {
+        endDate.setFullYear(endDate.getFullYear() + parseInt(count));
       }
-      initFlatPickr();
+      $('#end_date').val(endDate.toISOString().slice(0, 10));
+    }else{
+      $('#end_date').val('');
+    }
+    initFlatPickr();
   }
 </script>

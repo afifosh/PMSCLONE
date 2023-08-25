@@ -2,16 +2,16 @@
 
 namespace App\Notifications\Admin;
 
-// use Illuminate\Bus\Queueable;
-// use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 use App\Mail\Admin\ContractExpiryMail;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class ContractExpiryNotification extends Notification
+class ContractExpiryNotification extends Notification implements ShouldQueue
 {
-  // use Queueable;
+  use Queueable;
 
   public $contract;
 
@@ -30,7 +30,7 @@ class ContractExpiryNotification extends Notification
    */
   public function via(object $notifiable): array
   {
-    return ['mail'];
+    return ['database', 'broadcast', 'mail'];
   }
 
   /**
@@ -40,4 +40,28 @@ class ContractExpiryNotification extends Notification
   {
     return (new ContractExpiryMail($notifiable, $this->contract))->to($notifiable->email);
   }
+
+  /**
+     * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'data' => [
+              'title' => 'Contract Expiring Soon',
+              'description' => 'Contract : ' . $this->contract->subject . ' is expiring on ' . formatDateTime($this->contract->end_date),
+              'action_url' => route('admin.contracts.show', $this->contract->id),
+              'view' => 'admin.notifications.task-reminder',
+            ]
+        ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'type' => 'contract-expiry',
+        ]);
+    }
 }

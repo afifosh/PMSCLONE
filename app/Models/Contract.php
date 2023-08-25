@@ -7,6 +7,7 @@ use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -49,7 +50,7 @@ class Contract extends Model
   public function getStatusAttribute()
   {
     $value = $this->getRawOriginal('status');
-    if($value == 'Terminated' || $value == 'Paused') return $value;
+    if($value == 'Terminated' || $value == 'Paused' || $value == 'Draft') return $value;
     elseif(!$this->end_date || !$this->start_date) return '';
     elseif($this->end_date->isPast()) return 'Expired';
     elseif($this->start_date->isFuture()) return 'Not started';
@@ -111,6 +112,22 @@ class Contract extends Model
     return $this->hasOne(ContractNotification::class)->latest();
   }
 
+  public function notifiableUsers(): BelongsToMany
+  {
+    return $this->belongsToMany(Admin::class, 'contract_notifiable_users');
+  }
+
+  public function getStatusColor()
+  {
+    $status = $this->status;
+    if($status == 'Active') return 'success';
+    elseif($status == 'Not started') return 'warning';
+    elseif($status == 'About To Expire') return 'warning';
+    elseif($status == 'Expired') return 'danger';
+    elseif($status == 'Terminated') return 'danger';
+    elseif($status == 'Paused') return 'warning';
+  }
+
   public function saveEventLog(ContractUpdateRequest $request, Contract $contract)
   {
     if($contract->start_date->ne($request->start_date) || $contract->end_date->ne($request->end_date)){
@@ -135,34 +152,34 @@ class Contract extends Model
       ]);
     }
 
-    if($request->status != $contract->getRawOriginal('status')){
-      $contract->events()->create([
-        'event_type' => $request->status,
-        'modifications' => [
-          'old' => ['status' => $contract->getRawOriginal('status')],
-          'new' => ['status' => $request->status],
-        ],
-        'description' => 'Contract ' . $request->status,
-        'admin_id' => auth()->id(),
-      ]);
-    }
+    // if($request->status != $contract->getRawOriginal('status')){
+    //   $contract->events()->create([
+    //     'event_type' => $request->status,
+    //     'modifications' => [
+    //       'old' => ['status' => $contract->getRawOriginal('status')],
+    //       'new' => ['status' => $request->status],
+    //     ],
+    //     'description' => 'Contract ' . $request->status,
+    //     'admin_id' => auth()->id(),
+    //   ]);
+    // }
 
-    if($request->status == 'Terminated' && $request->termination_reason){
-      $event = $contract->events()->where('event_type', 'Terminated')->latest()->first();
-      $event->modifications = array_merge($event->modifications, ['termination_reason' => $request->termination_reason]);
-      $event->save();
-    }
+    // if($request->status == 'Terminated' && $request->termination_reason){
+    //   $event = $contract->events()->where('event_type', 'Terminated')->latest()->first();
+    //   $event->modifications = array_merge($event->modifications, ['termination_reason' => $request->termination_reason]);
+    //   $event->save();
+    // }
 
-    if($request->value != $contract->value){
-      $contract->events()->create([
-        'event_type' => 'Amount Updated',
-        'modifications' => [
-          'old' => ['value' => $contract->value],
-          'new' => ['value' => $request->value],
-        ],
-        'description' => 'Contract Amount Updated From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
+    // if($request->value != $contract->value){
+    //   $contract->events()->create([
+    //     'event_type' => 'Amount Updated',
+    //     'modifications' => [
+    //       'old' => ['value' => $contract->value],
+    //       'new' => ['value' => $request->value],
+    //     ],
+    //     'description' => 'Contract Amount Updated From ' . $contract->value . ' to ' . $request->value,
+    //     'admin_id' => auth()->id(),
+    //   ]);
+    // }
   }
 }

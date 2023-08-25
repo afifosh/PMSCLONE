@@ -30,6 +30,21 @@ class ContractsDataTable extends DataTable
       ->editColumn('company.name', function($project){
         return $project->company ? $project->company->name : '-';
       })
+      ->editColumn('project.name', function($project){
+        return $project->project ? $project->project->name : '-';
+      })
+      ->editColumn('type.name', function($project){
+        return $project->type ? $project->type->name : '-';
+      })
+      ->editColumn('value', function($project){
+        return $project->value ? $project->value : '-';
+      })
+      ->editColumn('start_date', function($project){
+        return $project->start_date ? $project->start_date->format('d M, Y') : '-';
+      })
+      ->editColumn('end_date', function($project){
+        return $project->end_date ? $project->end_date->format('d M, Y') : '-';
+      })
       ->rawColumns(['subject']);
   }
 

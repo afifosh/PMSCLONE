@@ -24,18 +24,39 @@ class ContractUpdateRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'subject' => 'required|string|max:100',
-      'type_id' => 'required|exists:contract_types,id',
-      'assign_to' => 'required|in:Client,Company',
-      'client_id' => 'nullable|required_if:assign_to,Client|exists:clients,id',
-      'company_id' => 'nullable|required_if:assign_to,Company|exists:companies,id',
-      'project_id' => 'nullable|required_if:assign_to,Company|exists:projects,id',
-      'start_date' => 'required|date',
-      'end_date' => 'required|date|after_or_equal:start_date',
-      'value' => 'required',
-      'status' => 'required|in:'.implode(',', $this->contract->getPossibleStatuses()),
-      'description' => 'nullable|string|max:2000',
-      'termination_reason' => 'required_if:status,Terminated|max:100',
+      'isSavingDraft' => 'nullable',
+      'subject' => 'required|string|max:100|unique:contracts,subject,' . $this->contract->id . ',id,deleted_at,NULL,project_id,' . $this->contract->project_id . ',company_id,' . $this->contract->company_id . ',client_id,' . $this->contract->client_id,
+      'type_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'exists:contract_types,id'],
+      'assign_to' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'in:Client,Company'],
+      'client_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Client' && !$this->isSavingDraft), 'exists:clients,id'],
+      'company_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && !$this->isSavingDraft), 'exists:companies,id'],
+      'project_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && !$this->isSavingDraft), 'exists:projects,id'],
+      'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],
+      'end_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date', 'after_or_equal:start_date'],
+      'value' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft')],
+      'description' => 'nullable|string|max:2000'
+    ];
+  }
+
+  public function messages()
+  {
+    return [
+      'type_id.required_if' => 'Please select contract type',
+      'type_id.required' => 'Please select contract type',
+      'assign_to.required_if' => 'Please select assign to',
+      'assign_to.required' => 'Please select assign to',
+      'client_id.required_if' => 'Please select client',
+      'client_id.required' => 'Please select client',
+      'company_id.required_if' => 'Please select company',
+      'company_id.required' => 'Please select company',
+      'project_id.required_if' => 'Please select project',
+      'project_id.required' => 'Please select project',
+      'start_date.required_if' => 'Please select start date',
+      'start_date.required' => 'Please select start date',
+      'end_date.required_if' => 'Please select end date',
+      'end_date.required' => 'Please select end date',
+      'value.required_if' => 'Please enter value',
+      'value.required' => 'Please enter value',
     ];
   }
 }

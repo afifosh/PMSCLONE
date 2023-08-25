@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
 use App\Http\Controllers\Admin\Contract\ContractTypeController;
 use App\Http\Controllers\Admin\Contract\EventController;
+use App\Http\Controllers\Admin\Contract\NotifiableUserController;
 use App\Http\Controllers\Admin\Contract\PaymentScheduleController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
@@ -139,6 +140,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
     Route::resource('contracts', ContractController::class);
     Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
+    Route::resource('contracts.notifiable-users', NotifiableUserController::class)->only(['create', 'store', 'destroy']);
     Route::resource('contracts.events', EventController::class)->only(['index']);
     Route::put('contracts/{contract}/terminate', [ContractSettingController::class, 'terminate'])->name('contracts.terminate');
     Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');

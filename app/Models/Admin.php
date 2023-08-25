@@ -18,6 +18,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Lab404\Impersonate\Models\Impersonate;
 use Avatar;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -445,5 +446,10 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     public function contractEvents(): HasMany
     {
       return $this->hasMany(ContractEvent::class);
+    }
+
+    public function contractNotifiableUser(): BelongsToMany
+    {
+      return $this->belongsToMany(Contract::class, 'contract_notifiable_users', 'admin_id', 'contract_id');
     }
 }
