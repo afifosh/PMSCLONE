@@ -31,15 +31,5 @@ jobs:
               php -d  memory_limit=128M artisan storage:link --force
               php -d  memory_limit=128M artisan migrate:fresh --force
               php -d  memory_limit=512M artisan db:seed --force
-              # php -d  memory_limit=128M artisan db:seed --class=CountriesTableSeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=ModuleSeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=AdminRolesPermissionsSeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=UserRolesPermissionsSeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=AdminSeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=HRSeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=CompanySeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=ProgramSeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=WorkflowSeeder --force
-              # php -d  memory_limit=128M artisan db:seed --class=KycDocumentSeeder --force
               nvm use 16 && yarn
               yarn prod
