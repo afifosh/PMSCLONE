@@ -24,8 +24,8 @@ class ContractController extends Controller
     $data['contracts'] = Contract::selectRaw('count(*) as total')
       ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date > now() then 1 end) as active')
       ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date <= now() then 1 end) as expired')
-      ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 MONTH) then 1 end) as expiring_soon')
-      ->selectRaw('count(case when deleted_at is null and status != "Draft" and created_at <= now() and created_at >= DATE_SUB(now(), INTERVAL 2 MONTH) then 1 end) as recently_added')
+      ->selectRaw('count(case when deleted_at is null and status != "Draft" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 MONTH) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and status != "Draft" and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
       ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
       ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
@@ -55,7 +55,10 @@ class ContractController extends Controller
     // top 5 companies by number of projects
     $data['companiesByProjects'] = Company:://has('contracts')->
     selectRaw('companies.name, count(contracts.id) as total, round(count(contracts.id) / (select count(*) from contracts where contracts.deleted_at Is NULL) * 100, 2) as percentage')
-    ->leftJoin('contracts', 'contracts.company_id', '=', 'companies.id')
+    ->leftJoin('contracts', function($join){
+      $join->on('contracts.assignable_id', '=', 'companies.id')
+      ->where('contracts.assignable_type', '=', Company::class);
+    })
     ->whereNull('contracts.deleted_at')
     ->groupBy('companies.id', 'companies.name')
     ->orderBy('total', 'desc')
@@ -85,13 +88,9 @@ class ContractController extends Controller
 
     if(request()->has('project')){
       $data['projects'] = Project::where('id', request()->project)->first();
-      // $data['companies'] = Company::where('id', $data['projects']->company_id)->pluck('name', 'id');
-      // $data['projects'] = [$data['projects']->id => $data['projects']->name];
       $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
       $data['companies'] = ['' => 'Select Company'];
     }else{
-      // $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Company'), '');
-      // $data['projects'] = [];
       $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
       $data['companies'] = ['' => 'Select Company'];
     }
@@ -104,10 +103,8 @@ class ContractController extends Controller
    */
   public function store(ContractStoreRequest $request)
   {
-    if($request->assign_to == 'Client')
-      $data['company_id'] = null;
-    else
-      $data['client_id'] = null;
+    $data['assignable_id'] = $request->assign_to == 'Client' ? $request->client_id : $request->company_id;
+    $data['assignable_type'] = $request->assign_to == 'Client' ? Client::class : Company::class;
 
     if($request->isSavingDraft)
       $data['status'] = 'Draft';
@@ -144,8 +141,8 @@ class ContractController extends Controller
     $contract->load('project');
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
     $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
-    $data['companies'] = Company::when($contract->company_id, function($q) use ($contract){
-      $q->where('id', $contract->company_id);
+    $data['companies'] = Company::when($contract->assignable_type == Company::class, function($q) use ($contract){
+      $q->where('id', $contract->assignable_id);
     })->pluck('name', 'id')->prepend(__('Select Company'), '');
     $data['contract'] = $contract;
     $data['clients'] = Client::orderBy('id', 'desc')->pluck('email', 'id')->prepend(__('Select Client'), '');
@@ -175,10 +172,8 @@ class ContractController extends Controller
       }
     }
 
-    if($request->assign_to == 'Client')
-      $data['company_id'] = null;
-    else
-      $data['client_id'] = null;
+    $data['assignable_id'] = $request->assign_to == 'Client' ? $request->client_id : $request->company_id;
+    $data['assignable_type'] = $request->assign_to == 'Client' ? Client::class : Company::class;
 
     if($request->isSavingDraft)
       $data['status'] = 'Draft';

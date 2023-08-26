@@ -11,32 +11,46 @@ class GanttChartController extends Controller
 {
   public function index()
   {
-    $ganttProjects = Project::mine()->has('contracts')
+    $ganttProjects = Project::mine()
       ->when(request()->projects, function ($q) {
         $q->where('id', request()->projects);
       })
       ->when(request()->companies, function ($q) {
         $q->where('company_id', request()->companies);
       })
-      ->with('contracts.phases')->get();
+      ->when(request()->search_q, function ($q) {
+        $q->where('name', 'like', '%' . request()->search_q . '%')->orWhereHas('contracts', function ($q) {
+          $q->where('subject', 'like', '%' . request()->search_q . '%');
+        })->orWhereHas('contracts.phases', function ($q) {
+          $q->where('name', 'like', '%' . request()->search_q . '%');
+        });
+      })
+      ->when(request()->status, function ($q) {
+        $q->whereHas('contracts', function ($q) {
+          if (request()->status == 'Not started') {
+            $q->where('start_date', '>', now());
+          } elseif (request()->status == 'Active') {
+            $q->where('start_date', '<=', now())->where('end_date', '>=', now())->where('end_date', '<', now()->subWeeks(2));
+          } elseif (request()->status == 'About To Expire') {
+            $q->where('end_date', '>=', now()->subWeeks(2))->where('end_date', '>', now());
+          } elseif (request()->status == 'Expired') {
+            $q->where('end_date', '<', now());
+          } elseif (request()->status == 'Terminated') {
+            $q->where('status', 'Terminated');
+          } elseif (request()->status == 'Paused') {
+            $q->where('status', 'Paused');
+          }
+        });
+      })
+      ->with(['contracts' => function ($q) {
+        $q->select('contracts.id', 'contracts.subject', 'contracts.project_id', 'contracts.status', 'contracts.start_date', 'contracts.end_date');
+      }, 'contracts.phases' => function ($q) {
+        $q->select('id', 'name', 'start_date', 'due_date', 'contract_id');
+      }])
+      ->select('projects.id', 'projects.name')->get();
 
     if (request()->ajax()) {
-      $ids = [];
-      foreach ($ganttProjects as $project) {
-        $ids[] = 'Project:' . $project->id;
-
-        if($project->contracts->isEmpty()) continue;
-        foreach ($project->contracts as $contract) {
-          if(request()->status && $contract->status != request()->status) continue;
-          $ids[] = 'Contract:' . $contract->id;
-
-          if($contract->phases->isEmpty()) continue;
-          foreach ($contract->phases as $phase) {
-            $ids[] = 'Phase:'.$phase->id;
-          }
-        }
-      }
-      return response()->json($ids);
+      return response()->json($ganttProjects);
     }
     $statuses = Contract::STATUSES;
     $statuses = array_combine($statuses, $statuses);

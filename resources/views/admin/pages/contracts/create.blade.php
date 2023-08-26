@@ -26,16 +26,16 @@
     </div>
     <div class="form-group col-6">
       {{ Form::label('assign_to', __('Assign To'), ['class' => 'col-form-label']) }}
-      {!! Form::select('assign_to', ['Company' => 'Company', 'Client' => 'Client'], @$contract->client_id ? 'Client' : 'Company', ['id' => 'project-assign-to', 'class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('assign_to', ['Company' => 'Company', 'Client' => 'Client'], @$contract->assignable_type == 'App\Models\Client' ? 'Client' : 'Company', ['id' => 'project-assign-to', 'class' => 'form-select globalOfSelect2']) !!}
     </div>
     {{-- customer --}}
-    <div class="form-group col-6 {{$contract->client_id ? 'd-none' : ''}}">
+    <div class="form-group col-6 {{$contract->assignable_type == 'App\Models\Client' ? 'd-none' : ''}}">
       {{ Form::label('company_id', __('Company'), ['class' => 'col-form-label']) }}
-      {!! Form::select('company_id', $companies, @$contract->company_id ?? null, ['id' => 'project-company-select', 'class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('company_id', $companies, @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'project-company-select', 'class' => 'form-select globalOfSelect2']) !!}
     </div>
-    <div class="form-group col-6 {{!$contract->client_id ? 'd-none' : ''}}">
+    <div class="form-group col-6 {{$contract->assignable_type != 'App\Models\Client' ? 'd-none' : ''}}">
       {{ Form::label('client_id', __('Client'), ['class' => 'col-form-label']) }}
-      {!! Form::select('client_id', $clients, @$contract->Client_id ?? null, ['id' => 'contract-client-select', 'class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('client_id', $clients, @$contract->assignable_type == 'App\Models\Client' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select', 'class' => 'form-select globalOfSelect2']) !!}
     </div>
     {{-- start date --}}
     <div class="form-group col-6">
@@ -73,6 +73,10 @@
       {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
       {!! Form::select('type_id', $types, $contract->type_id, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
+    <div class="form-group col-6">
+      {{ Form::label('refrence_id', __('Refrence Id'), ['class' => 'col-form-label']) }}
+      {!! Form::text('refrence_id', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Refrence Id')]) !!}
+    </div>
     {{-- description --}}
     <div class="form-group col-12">
       {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}
@@ -82,10 +86,10 @@
 </div>
 <div class="mt-3">
     <div class="btn-flt float-end">
-      @if (!$contract->status || $contract->status == 'Draft')
-        <button type="button" class="btn btn-secondary" data-form="ajax-form" data-preAjaxAction="isSavingDraft" data-preAjaxParams="1">{{ __('Save Draft') }}</button>
-      @endif
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
+        @if (!$contract->status || $contract->status == 'Draft')
+          <button type="button" class="btn btn-dark" data-form="ajax-form" data-preAjaxAction="isSavingDraft" data-preAjaxParams="1">{{ __('Save Draft') }}</button>
+        @endif
         <button type="submit" data-form="ajax-form" data-preAjaxAction="isSavingDraft" data-preAjaxParams="0" class="btn btn-primary">{{ __('Save') }}</button>
     </div>
 </div>

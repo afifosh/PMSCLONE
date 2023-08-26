@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin\Contract;
 
+use App\Models\Company;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -27,8 +28,8 @@ class ContractsDataTable extends DataTable
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
-      ->editColumn('company.name', function($project){
-        return $project->company ? $project->company->name : '-';
+      ->addColumn('company_name', function($project){
+        return $project->assignable_type == Company::class ? $project->assignable->name : '-';
       })
       ->editColumn('project.name', function($project){
         return $project->project ? $project->project->name : '-';
@@ -45,6 +46,11 @@ class ContractsDataTable extends DataTable
       ->editColumn('end_date', function($project){
         return $project->end_date ? $project->end_date->format('d M, Y') : '-';
       })
+      ->filterColumn('company_name', function($query, $keyword){
+        $query->whereHasMorph('assignable', Company::class, function($q) use($keyword){
+          $q->where('name', 'like', '%'.$keyword.'%');
+        });
+      })
       ->rawColumns(['subject']);
   }
 
@@ -53,7 +59,7 @@ class ContractsDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    $q = $model->with(['project', 'type', 'company'])->withCount('phases')->newQuery();
+    $q = $model->with(['project', 'type', 'assignable'])->withCount('phases')->newQuery();
 
     if ($this->projectId) {
       $q->where('project_id', $this->projectId);
@@ -115,7 +121,7 @@ class ContractsDataTable extends DataTable
 
     return [
       Column::make('subject'),
-      Column::make('company.name')->title('Company'),
+      Column::make('company_name')->title('Company'),
       Column::make('project.name')->title('Project'),
       Column::make('type.name')->title('Type'),
       Column::make('value')->title('Value('.config('app.currency').')'),

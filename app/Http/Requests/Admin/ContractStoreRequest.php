@@ -30,6 +30,7 @@ class ContractStoreRequest extends FormRequest
       'client_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Client' && $this->isSavingDraft == 0), 'exists:clients,id'],
       'company_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && $this->isSavingDraft == 0), 'exists:companies,id'],
       'project_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && $this->isSavingDraft == 0), 'exists:projects,id'],
+      'refrence_id' => 'nullable|unique:contracts,refrence_id',
       'start_date' => 'nullable|required_if:isSavingDraft,0|date',
       'end_date' => 'nullable|required_if:isSavingDraft,0|date|after_or_equal:start_date',
       'value' => 'nullable|required_if:isSavingDraft,0',

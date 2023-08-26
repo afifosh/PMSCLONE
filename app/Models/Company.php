@@ -537,6 +537,6 @@ class Company extends BaseModel
 
   public function contracts()
   {
-    return $this->hasMany(Contract::class);
+    return $this->morphMany(Contract::class, 'assignable');
   }
 }

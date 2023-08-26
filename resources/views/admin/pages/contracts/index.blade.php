@@ -90,6 +90,15 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </div>
+          <div class="col-md-2 col-6">
+            <div class="d-flex align-items-center">
+              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+              <div class="card-info">
+                <h5 class="mb-0">{{$contracts['trashed']}}</h5>
+                <small>{{__('Trashed')}}</small>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

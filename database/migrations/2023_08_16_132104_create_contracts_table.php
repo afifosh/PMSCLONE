@@ -14,9 +14,10 @@ return new class extends Migration
     Schema::create('contracts', function (Blueprint $table) {
       $table->id();
       $table->foreignId('type_id')->nullable()->constrained('contract_types')->onDelete('cascade')->cascadeOnUpdate();
-      $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade')->cascadeOnUpdate();
-      $table->foreignId('client_id')->nullable()->constrained('clients')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('cascade')->cascadeOnUpdate();
+      $table->string('assignable_type');
+      $table->unsignedBigInteger('assignable_id');
+      $table->string('refrence_id', 100)->unique()->nullable();
       $table->string('subject', 100);
       $table->string('value', 100)->nullable();
       $table->dateTime('start_date')->nullable();

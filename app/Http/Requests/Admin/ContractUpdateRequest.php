@@ -25,11 +25,12 @@ class ContractUpdateRequest extends FormRequest
   {
     return [
       'isSavingDraft' => 'nullable',
-      'subject' => 'required|string|max:100|unique:contracts,subject,' . $this->contract->id . ',id,deleted_at,NULL,project_id,' . $this->contract->project_id . ',company_id,' . $this->contract->company_id . ',client_id,' . $this->contract->client_id,
+      'subject' => 'required|string|max:100|unique:contracts,subject,' . $this->contract->id . ',id,deleted_at,NULL,project_id,' . $this->contract->project_id,
       'type_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'exists:contract_types,id'],
       'assign_to' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'in:Client,Company'],
       'client_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Client' && !$this->isSavingDraft), 'exists:clients,id'],
       'company_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && !$this->isSavingDraft), 'exists:companies,id'],
+      'refrence_id' => 'nullable|unique:contracts,refrence_id',
       'project_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && !$this->isSavingDraft), 'exists:projects,id'],
       'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],
       'end_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date', 'after_or_equal:start_date'],

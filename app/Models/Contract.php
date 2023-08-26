@@ -18,9 +18,10 @@ class Contract extends Model
 
   protected $fillable = [
     'type_id',
-    'company_id',
-    'client_id',
     'project_id',
+    'assignable_type',
+    'assignable_id',
+    'refrence_id',
     'subject',
     'value',
     'start_date',
@@ -77,9 +78,9 @@ class Contract extends Model
     return $this->belongsTo(ContractType::class);
   }
 
-  public function company(): BelongsTo
+  public function assignable()
   {
-    return $this->belongsTo(Company::class);
+    return $this->morphTo();
   }
 
   public function project(): BelongsTo
