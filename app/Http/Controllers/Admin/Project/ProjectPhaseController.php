@@ -16,9 +16,9 @@ class ProjectPhaseController extends Controller
   public function index($project, Contract $contract)
   {
     $contract->load('phases', 'project');
-    $project = $contract->project;
+    $project = $contract->project ?? 'project';
 
-    abort_if(!$project->isMine(), 403);
+    // abort_if(!$project->isMine(), 403);
 
     $phase_statuses = ContractPhase::STATUSES;
     $colors = ContractPhase::STATUSCOLORS;
@@ -42,8 +42,8 @@ class ProjectPhaseController extends Controller
   public function create($project, Contract $contract)
   {
     $contract->load('project');
-    $project = $contract->project;
-    abort_if(!$project->isMine(), 403);
+    $project = $contract->project ?? 'project';
+    // abort_if(!$project->isMine(), 403);
 
     $phase = new ContractPhase();
 
@@ -53,8 +53,8 @@ class ProjectPhaseController extends Controller
   public function store($project, Contract $contract,Request $request)
   {
     $contract->load('project');
-    $project = $contract->project;
-    abort_if(!$project->isMine(), 403);
+    $project = $contract->project ?? 'project';
+    // abort_if(!$project->isMine(), 403);
 
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,contract_id,' . $contract->id,
@@ -70,6 +70,7 @@ class ProjectPhaseController extends Controller
 
     $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
 
+    if($contract->project)
     broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
     return $this->sendRes(__('Phase Created Successfully'), ['event' => 'functionCall', 'function' => 'refreshPhaseList', 'close' => 'globalModal']);
@@ -78,7 +79,7 @@ class ProjectPhaseController extends Controller
   public function edit($project,Contract $contract, ContractPhase $phase)
   {
     $contract->load('project');
-    $project = $contract->project;
+    $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase'))->render()]);
@@ -87,7 +88,7 @@ class ProjectPhaseController extends Controller
   public function update($project, Request $request, Contract $contract, ContractPhase $phase)
   {
     $contract->load('project');
-    $project = $contract->project;
+    $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
 
     $request->validate([
@@ -104,6 +105,7 @@ class ProjectPhaseController extends Controller
 
     $message = auth()->user()->name . ' updated phase: ' . $phase->name;
 
+    if($contract->project)
     broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
     return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'functionCall', 'function' => 'refreshPhaseList', 'close' => 'globalModal']);
@@ -112,13 +114,14 @@ class ProjectPhaseController extends Controller
   public function destroy($project, Contract $contract, ContractPhase $phase)
   {
     $contract->load('project');
-    $project = $contract->project;
+    $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
 
     $phase->delete();
 
     $message = auth()->user()->name . ' deleted phase: ' . $phase->name;
 
+    if($contract->project)
     broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
     return $this->sendRes(__('Phase Deleted Successfully'), ['event' => 'functionCall', 'function' => 'refreshPhaseList']);
@@ -127,7 +130,7 @@ class ProjectPhaseController extends Controller
 public function sortPhases($project, Contract $contract, Request $request)
   {
     $contract->load('project');
-    $project = $contract->project;
+    $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine(), 403);
 
     $request->validate([
@@ -141,6 +144,7 @@ public function sortPhases($project, Contract $contract, Request $request)
 
     $message = auth()->user()->name . ' sorted phase list';
 
+    if($contract->project)
     broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
     return $this->sendRes(__('Phases Sorted Successfully'), ['event' => 'functionCall', 'function' => 'refreshPhaseList']);

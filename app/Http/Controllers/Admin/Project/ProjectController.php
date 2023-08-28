@@ -92,7 +92,15 @@ class ProjectController extends Controller
   public function ganttChart(Project $project)
   {
     abort_if(!$project->isMine(), 403);
-    $data['project'] = $data['ganttProjects'] = [$project->load('contracts.phases')];
+    $data['project'] = $project;
+    $project->load(['contracts' => function($q){
+      $q->select('contracts.id', 'contracts.subject', 'contracts.project_id', 'contracts.status', 'contracts.start_date', 'contracts.end_date', 'assignable_type', 'assignable_id');
+    }, 'contracts.phases' => function ($q) {
+      $q->select('id', 'name', 'start_date', 'due_date', 'contract_id');
+    }, 'contracts.assignable', 'contracts.project' => function ($q) {
+      $q->select('id', 'name');
+    }]);
+    $data['ganttProjects'] = $project->contracts;
 
     return view('admin.pages.projects.gantt-chart', $data);
   }

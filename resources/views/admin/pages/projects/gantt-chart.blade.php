@@ -12,13 +12,16 @@
 {{-- <link rel="stylesheet" href="https://zehntech.github.io/zt-gantt/style.css"/> --}}
 {{-- <link rel="stylesheet" href="https://zehntech.github.io/zt-gantt/gantt.css"/> --}}
 {{-- <link rel="stylesheet" href="{{asset('assets/libs/zt-gantt/gantt.css')}}" /> --}}
-<link rel="stylesheet" href="http://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css" type="text/css">
+<link rel="stylesheet" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css" type="text/css">
 <style>
 .gantt_container, .gantt_tooltip {
     background-color: #fff;
     font-family: Arial;
     font-size: 15px !important;
   }
+.gantt_tooltip{
+ z-index: 999999999 !important;
+}
 </style>
 @endsection
 
@@ -29,7 +32,7 @@
 {{-- <script type="text/javascript" src="https://zehntech.github.io/zt-gantt/gantt.js"></script> --}}
 {{-- <script src="{{asset('assets/libs/zt-gantt/gantt.js')}}"></script>
 <script src="{{asset('assets/libs/zt-gantt/gantt.js')}}"></script> --}}
-<script src="http://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
+<script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
 @endsection
 
 @section('page-script')
@@ -65,8 +68,8 @@
       //   progress: 0
       // });
       //
-    //   {"id":1, "text":"Project #2", "start_date":"01-04-2018", "duration":"18", "progress": 0.4, "open": true, color:"#CD545B"},
-      project.contracts.forEach((contract) => {
+     //   {"id":1, "text":"Project #2", "start_date":"01-04-2018", "duration":"18", "progress": 0.4, "open": true, color:"#CD545B"},
+      rawData.forEach((contract) => {
         // update min and max dates
         if(minDate == null || new Date(contract.start_date) < new Date(minDate)){
           minDate = contract.start_date;
@@ -77,8 +80,10 @@
         // end update min and max dates
         let contractData = {
           id: 'Contract:' + contract.id,
-          text: `<b>Project : ${project.name} : </b> ${contract.subject}`,
-          projectName: project.name,
+          text: `${contract.subject}`,
+          projectName: contract.project?.name,
+          assignableType: contract.assignable_type ? contract.assignable_type.split('\\')[2] : null,
+          assignable: contract.assignable?.name ?? contract.assignable?.first_name + ' ' + contract.assignable?.last_name,
           // parent: 'Project:' + project.id,
           type: "Contract",
           duration: calculateDateDifference(contract.start_date, contract.end_date),
@@ -105,7 +110,9 @@
             text: phase.name,
             parent: 'Contract:' + contract.id,
             contractName: contract.subject,
-            projectName: project.name,
+            projectName: contract.project?.name,
+            assignableType: contract.assignable_type ? contract.assignable_type.split('\\')[2] : null,
+            assignable: contract.assignable?.name ?? contract.assignable?.first_name + ' ' + contract.assignable?.last_name,
             status: phase.status,
             // calculate from start date and end date and current date
             progress: calculateProgressPercentage(phase.start_date, phase.due_date),
@@ -170,6 +177,13 @@
             gantt.deleteTask(task.id);
           });
         }catch(e){
+          try{
+          gantt.eachTask(function(task) {
+            if(task.id)
+            gantt.deleteTask(task.id);
+          });
+          }catch(e){
+          }
         }
         gantt.parse({
           "data": data,
@@ -310,113 +324,6 @@
     gantt.deleteMarker(window.todayMarkerId);
   }
 
-  // gantt.attachEvent("onBeforeTaskDisplay", function(id, task) {
-  //   var searchTerm = $('[name="search_task"]').val().trim();
-
-  //   // If no search term, display all tasks
-  //   if (!searchTerm) {
-  //     return true;
-  //   }
-
-  //   // Check if the search term matches the task's text, start date, or end date
-  //   return (
-  //     task.text.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
-  //   );
-  // });
-
-  // function searchTask(){
-  //   gantt.render();
-  // }
-
-
-	var zoomConfig_old = {
-		levels: [
-			// hours
-			{
-				name:"hour",
-				scale_height: 27,
-				scales:[
-					{unit:"day", step: 1, format:"%d %M"},
-					{unit:"hour", step: 1, format:"%H:%i"},
-				]
-			},
-			// days
-			{
-				name:"day",
-				scale_height: 27,
-				scales:[
-					{unit: "day", step: 1, format: "%d %M"}
-				]
-			},
-			// weeks
-			{
-				name:"week",
-				scale_height: 50,
-				scales:[
-					{unit: "week", step: 1, format: function (date) {
-						var dateToStr = gantt.date.date_to_str("%d %M");
-						var endDate = gantt.date.add(date, -6, "day");
-						var weekNum = gantt.date.date_to_str("%W")(date);
-						return "#" + weekNum + ", " + dateToStr(date) + " - " + dateToStr(endDate);
-					}},
-					{unit: "day", step: 1, format: "%j %D"}
-				]
-			},
-			// months
-			{
-				name:"month",
-				scale_height: 50,
-				scales:[
-					{unit: "month", step: 1, format: "%F, %Y"},
-					{unit: "week", step: 1, format: function (date) {
-						var dateToStr = gantt.date.date_to_str("%d %M");
-						var endDate = gantt.date.add(gantt.date.add(date, 1, "week"), -1, "day");
-						return dateToStr(date) + " - " + dateToStr(endDate);
-					}}
-				]
-			},
-			// years
-      			{
-				name:"year",
-				scale_height: 50,
-				scales:[
-					{unit: "year", step: 1, format: "%Y"}
-				]
-			},
-			{
-				name:"year",
-				scale_height: 50,
-				scales:[
-					{unit: "year", step: 5, format: function (date) {
-						var dateToStr = gantt.date.date_to_str("%Y");
-						var endDate = gantt.date.add(gantt.date.add(date, 5, "year"), -1, "day");
-						return dateToStr(date) + " - " + dateToStr(endDate);
-					}}
-				]
-			},
-			// decades
-			{
-				name:"year",
-				scale_height: 50,
-				scales:[
-					{unit: "year", step: 100, format: function (date) {
-						var dateToStr = gantt.date.date_to_str("%Y");
-						var endDate = gantt.date.add(gantt.date.add(date, 100, "year"), -1, "day");
-						return dateToStr(date) + " - " + dateToStr(endDate);
-					}},
-					{unit: "year", step: 10, format: function (date) {
-						var dateToStr = gantt.date.date_to_str("%Y");
-						var endDate = gantt.date.add(gantt.date.add(date, 10, "year"), -1, "day");
-						return dateToStr(date) + " - " + dateToStr(endDate);
-					}},
-				]
-			},
-		],
-		element: function(){
-			return gantt.$root.querySelector(".gantt_task");
-		}
-	};
-
 const zoomConfig = {
     levels: [
         {
@@ -555,12 +462,9 @@ gantt.templates.task_text = function(start, end, task){
 // };
 gantt.templates.tooltip_text = function(start,end,task){
    var formatDate = gantt.date.date_to_str("%d-%m-%Y"); // Customize the date format here
-    // return task.text+"<br/><b>Duration:</b> " + task.duration+"<br/><b>Progress:</b> " + task.progress +"%"+"<br/><b>Start Date:</b> " + formatDate(task.start_date) +
-    //        "<br/><b>End Date:</b> " + formatDate(task.end_date)+`<br/>
-    //        ${Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) > 0 ? '<b>Remaining Days:</b>' + Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) : ''}
-    //        `;
     return `
-        <b>Project:</b>${task.projectName}<br/>
+        ${task.projectName ? `<b>Project:</b>${task.projectName}<br/>` : ''}
+        ${task.assignableType ? `<b>${task.assignableType}:</b>${task.assignable}<br/>` : ''}
         ${task.type == 'Phase' ? `<b>Contract:</b>${task.contractName}<br/>` : ''}
         <b>${task.type}:</b>${task.text}<br/>
         <b>Start date:</b>
@@ -572,10 +476,6 @@ gantt.templates.tooltip_text = function(start,end,task){
         ${Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) > 0 ? '<b>Remaining Days:</b>' + Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) : ''}
     `;
 };
-
-
-
-
 
 gantt.config.columns = [
     {name:"text", label:"Contracts", width:"*", tree: true  },
@@ -593,63 +493,6 @@ gantt.config.columns = [
 gantt.parse({
 	"data": data,
 });
-
-
-
-
-let collapseCheckbox = document.querySelector("#collapse"),
-    autoSchedulingCheckbox = document.querySelector("#auto-scheduling"),
-    criticalPathCheckbox = document.querySelector("#critical-path"),
-    zoomToFitCheckbox = document.querySelector("#zoom-to-fit"),
-    scaleComboElement = document.getElementById("scale_combo");
-
-// collapseCheckbox.addEventListener("click", function () {
-//     let action = "expandAll";
-
-//     config.collapse = !config.collapse;
-//     toggleCheckbox(collapseCheckbox, config.collapse);
-
-//     if (config.collapse) {
-//         action = "collapseAll";
-//     }
-
-//     if (toolbarMenu[action]) {
-//         toolbarMenu[action]();
-//     }
-// });
-
-// autoSchedulingCheckbox.addEventListener("click", function () {
-//     let action = "toggleAutoScheduling";
-
-//     config.auto_scheduling = !config.auto_scheduling;
-//     toggleCheckbox(autoSchedulingCheckbox, config.auto_scheduling);
-
-//     if (toolbarMenu[action]) {
-//         toolbarMenu[action]();
-//     }
-// });
-
-// criticalPathCheckbox.addEventListener("click", function () {
-//     let action = "toggleCriticalPath";
-
-//     config.critical_path = !config.critical_path;
-//     toggleCheckbox(criticalPathCheckbox, config.critical_path);
-
-//     if (toolbarMenu[action]) {
-//         toolbarMenu[action]();
-//     }
-// });
-
-// zoomToFitCheckbox.addEventListener("click", function () {
-//     let action = "zoomToFit";
-
-//     config.zoom_to_fit = !config.zoom_to_fit;
-//     toggleCheckbox(zoomToFitCheckbox, config.zoom_to_fit);
-
-//     if (toolbarMenu[action]) {
-//         toolbarMenu[action]();
-//     }
-// });
 
 function changeZoom(e){
     let scaleValue = e.target.value;

@@ -24,7 +24,7 @@
 <script src={{asset('assets/js/custom/select2.js')}}></script>
 <script src={{asset('assets/js/custom/flatpickr.js')}}></script>
 <script>
-  window.active_project = '{{$contract->project_id}}';
+  window.active_project = '{{$contract->project_id ?? "project"}}';
   window.active_contract = '{{$contract->id}}';
 </script>
 @endsection
@@ -37,7 +37,7 @@
     <!-- Task Sidebar -->
     <div class="col app-email-sidebar border-end flex-grow-0" id="app-email-sidebar">
       <div class="btn-compost-wrapper d-grid">
-        <button class="btn btn-primary" data-toggle="ajax-modal" data-title="Add Phase" data-href="{{route('admin.projects.contracts.phases.create', [$project, $contract])}}">Add Phase</button>
+        <button class="btn btn-primary" data-toggle="ajax-modal" data-title="Add Phase" data-href="{{route('admin.projects.contracts.phases.create', ['project' => $project, $contract])}}">Add Phase</button>
       </div>
       <div class="email-filters py-2">
         <small class="fw-normal text-uppercase text-muted m-4">Phase Status</small>

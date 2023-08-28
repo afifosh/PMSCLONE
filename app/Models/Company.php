@@ -8,6 +8,7 @@ use Avatar;
 use Illuminate\Support\Facades\Storage;
 
 use Approval\Traits\RequiresApproval;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Company extends BaseModel
 {
@@ -535,7 +536,7 @@ class Company extends BaseModel
     return $this->hasMany(CompanyApprovalRequest::class, 'company_id');
   }
 
-  public function contracts()
+  public function contracts(): MorphMany
   {
     return $this->morphMany(Contract::class, 'assignable');
   }

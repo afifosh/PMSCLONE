@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Avatar;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Client extends Model
 {
@@ -47,7 +48,7 @@ class Client extends Model
     return $this->belongsTo(Country::class);
   }
 
-  public function contracts()
+  public function contracts(): MorphMany
   {
     return $this->morphMany(Contract::class, 'assignable');
   }

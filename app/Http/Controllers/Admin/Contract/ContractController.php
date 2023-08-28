@@ -12,6 +12,7 @@ use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ContractController extends Controller
 {
@@ -53,21 +54,150 @@ class ContractController extends Controller
       ->get();
 
     // top 5 companies by number of projects
-    $data['companiesByProjects'] = Company:://has('contracts')->
-    selectRaw('companies.name, count(contracts.id) as total, round(count(contracts.id) / (select count(*) from contracts where contracts.deleted_at Is NULL) * 100, 2) as percentage')
-    ->leftJoin('contracts', function($join){
-      $join->on('contracts.assignable_id', '=', 'companies.id')
-      ->where('contracts.assignable_type', '=', Company::class);
-    })
-    ->whereNull('contracts.deleted_at')
-    ->groupBy('companies.id', 'companies.name')
-    ->orderBy('total', 'desc')
-    ->limit(5)
-    ->get();
+    $data['companiesByProjects'] = $this->getCompaniesByProjects();
 
+
+    // top 5 contracts by value
+    $data['contractsByValue'] = $this->getContractsByValue();
+
+    // contracts by cycle time: less than 3 months, 3 months to 1 year, 1 year to 2 years, more than 2 years
+    $data['contractsByCycleTime'] = $this->getContractsByCycleTime();
+
+    // contracts count expiring in 30,60,90 days
+    $data['contractsByExpiryTime'] = $this->getContractsByExpiryTime();
+
+    // contracts by status
+    $data['contractsByStatus'] = $this->getContractsByStatus();
+
+    $data['contractsByDistribution'] = $this->getContractsByAssignees();
 
     return $dataTable->render('admin.pages.contracts.index', $data);
     // view('admin.pages.contracts.index');
+  }
+
+  protected function getContractsByAssignees()
+  {
+    // select contracts group by assignable_type
+    $data = Contract::selectRaw('assignable_type, COUNT(*) as contract_count')
+      ->groupBy('assignable_type')
+      ->get();
+
+    $data = $data->toArray();
+
+    return $data;
+  }
+
+  protected function getContractsByStatus()
+  {
+    $contracts = Contract::selectRaw('count(*) as total')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and end_date > now() then 1 end) as Active')
+      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as Paused')
+      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as Draft')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and end_date <= now() then 1 end) as Expired')
+      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as Terminateed')
+      ->selectRaw('count(case when deleted_at is not null then 1 end) as Trashed')
+      ->withTrashed()
+      ->first();
+
+    $contracts = $contracts->toArray();
+    unset($contracts['status']);
+
+    return $contracts;
+  }
+
+  protected function getContractsByValue()
+  {
+    $data['contractsByValue'] = Contract::selectRaw('contracts.subject, contracts.value')
+      ->whereNull('contracts.deleted_at')
+      ->orderBy('contracts.value', 'desc')
+      ->limit(5)
+      ->get();
+
+    $data['contractsByValue'] = array_merge($data['contractsByValue']->toArray(), array_fill(0, 5 - count($data['contractsByValue']), ['subject' => '', 'value' => 0,]));
+
+    return $data['contractsByValue'];
+  }
+
+  protected function getCompaniesByProjects()
+  {
+    $data['companiesByProjects'] = Company::selectRaw(
+      'companies.name,
+    sum(case when contracts.assignable_type = ? then 1 else 0 end) as total,
+    round(sum(case when contracts.assignable_type = ? then 1 else 0 end) /
+          (select count(*) from contracts where contracts.deleted_at Is NULL and contracts.assignable_type = ?) * 100, 2) as percentage',
+      [Company::class, Company::class, Company::class]
+    )
+      ->leftJoin('contracts', function ($join) {
+        $join->on('contracts.assignable_id', '=', 'companies.id')
+          ->where('contracts.assignable_type', '=', Company::class);
+      })
+      ->whereNull('contracts.deleted_at')
+      ->groupBy('companies.id', 'companies.name')
+      ->orderBy('total', 'desc')
+      ->limit(5)
+      ->get();
+
+    // data must have 5 indexs
+    $data['companiesByProjects'] = array_merge($data['companiesByProjects']->toArray(), array_fill(0, 5 - count($data['companiesByProjects']), ['name' => '', 'total' => 0, 'percentage' => 0]));
+
+    return $data['companiesByProjects'];
+  }
+
+  protected function getContractsByCycleTime()
+  {
+    $data['contractsByCycleTime'] = Contract::select(
+      DB::raw('CASE
+          WHEN DATEDIFF(end_date, start_date) < 90 THEN "less_than_3_months"
+          WHEN DATEDIFF(end_date, start_date) >= 90 AND DATEDIFF(end_date, start_date) <= 365 THEN "3_months_to_1_year"
+          WHEN DATEDIFF(end_date, start_date) > 365 AND DATEDIFF(end_date, start_date) <= 730 THEN "1_year_to_2_years"
+          ELSE "more_than_2_years"
+      END as time_period'),
+      DB::raw('COUNT(*) as contract_count')
+    )
+      ->groupBy('time_period')
+      ->get();
+
+    foreach ($data['contractsByCycleTime'] as $key => $value) {
+      $data['contractsByCycleTime'][$key]['time_period'] = str_replace('_', ' ', $value['time_period']);
+    }
+    // set default values for time periods with time period name and count 0
+    $timePeriods = ['less than 3 months', '3 months to 1 year', '1 year to 2 years', 'more than 2 years'];
+    foreach ($timePeriods as $timePeriod) {
+      if (!isset($data['contractsByCycleTime']->where('time_period', $timePeriod)->first()->time_period)) {
+        $data['contractsByCycleTime'][] = ['time_period' => $timePeriod, 'contract_count' => 0];
+      }
+    }
+
+    return $data['contractsByCycleTime'];
+  }
+
+  protected function getContractsByExpiryTime()
+  {
+    $data['contractsByExpiryTime'] = Contract::select(
+      DB::raw('CASE
+          WHEN DATEDIFF(end_date, now()) <= 30 THEN "30_days"
+          WHEN DATEDIFF(end_date, now()) > 30 AND DATEDIFF(end_date, now()) <= 60 THEN "60_days"
+          WHEN DATEDIFF(end_date, now()) > 60 AND DATEDIFF(end_date, now()) <= 90 THEN "90_days"
+      END as time_period'),
+      DB::raw('COUNT(*) as contract_count')
+    )
+      ->where('status', 'Active')
+      ->groupBy('time_period')
+      ->get();
+
+    $data['contractsByExpiryTime'] = $data['contractsByExpiryTime']->whereNotNull('time_period');
+
+    foreach ($data['contractsByExpiryTime'] as $key => $value) {
+      $data['contractsByExpiryTime'][$key]['time_period'] = str_replace('_', ' ', $value['time_period']);
+    }
+    // set default values for time periods with time period name and count 0
+    $timePeriods = ['30 days', '60 days', '90 days'];
+    foreach ($timePeriods as $timePeriod) {
+      if (!isset($data['contractsByExpiryTime']->where('time_period', $timePeriod)->first()->time_period)) {
+        $data['contractsByExpiryTime'][] = ['time_period' => $timePeriod, 'contract_count' => 0];
+      }
+    }
+    return $data['contractsByExpiryTime'];
   }
 
   public function projectContractsIndex(ContractsDataTable $dataTable, Project $project)
@@ -86,14 +216,8 @@ class ContractController extends Controller
     $data['contract'] = new Contract();
     $data['clients'] = Client::orderBy('id', 'desc')->pluck('email', 'id')->prepend(__('Select Client'), '');
 
-    if(request()->has('project')){
-      $data['projects'] = Project::where('id', request()->project)->first();
-      $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
-      $data['companies'] = ['' => 'Select Company'];
-    }else{
-      $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
-      $data['companies'] = ['' => 'Select Company'];
-    }
+    $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
+    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
   }
@@ -106,18 +230,18 @@ class ContractController extends Controller
     $data['assignable_id'] = $request->assign_to == 'Client' ? $request->client_id : $request->company_id;
     $data['assignable_type'] = $request->assign_to == 'Client' ? Client::class : Company::class;
 
-    if($request->isSavingDraft)
+    if ($request->isSavingDraft)
       $data['status'] = 'Draft';
 
     $contract = Contract::create($data + $request->validated());
 
-    if(!$request->isSavingDraft)
-    $contract->events()->create([
-      'event_type' => 'Created',
-      'modifications' => $request->validated(),
-      'description' => 'Contract Created',
-      'admin_id' => auth()->id(),
-    ]);
+    if (!$request->isSavingDraft)
+      $contract->events()->create([
+        'event_type' => 'Created',
+        'modifications' => $request->validated(),
+        'description' => 'Contract Created',
+        'admin_id' => auth()->id(),
+      ]);
 
     return $this->sendRes(__('Contract created successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
   }
@@ -141,13 +265,11 @@ class ContractController extends Controller
     $contract->load('project');
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
     $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
-    $data['companies'] = Company::when($contract->assignable_type == Company::class, function($q) use ($contract){
-      $q->where('id', $contract->assignable_id);
-    })->pluck('name', 'id')->prepend(__('Select Company'), '');
+    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
     $data['contract'] = $contract;
     $data['clients'] = Client::orderBy('id', 'desc')->pluck('email', 'id')->prepend(__('Select Client'), '');
     $data['statuses'] = $contract->getPossibleStatuses();
-    if($contract->status == 'Terminated')
+    if ($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
@@ -158,27 +280,27 @@ class ContractController extends Controller
    */
   public function update(ContractUpdateRequest $request, Contract $contract)
   {
-    if($contract->status == 'Draft' && !$request->isSavingDraft)
+    if ($contract->status == 'Draft' && !$request->isSavingDraft)
       $contract->events()->create([
         'event_type' => 'Created',
         'modifications' => $request->validated(),
         'description' => 'Contract Created',
         'admin_id' => auth()->id(),
       ]);
-    else{
-      if(!$request->isSavingDraft)
-      if($request->start_date != $contract->start_date || $request->end_date != $contract->end_date || $request->value != $contract->value){
-        $contract->saveEventLog($request, $contract);
-      }
+    else {
+      if (!$request->isSavingDraft)
+        if ($request->start_date != $contract->start_date || $request->end_date != $contract->end_date || $request->value != $contract->value) {
+          $contract->saveEventLog($request, $contract);
+        }
     }
 
     $data['assignable_id'] = $request->assign_to == 'Client' ? $request->client_id : $request->company_id;
     $data['assignable_type'] = $request->assign_to == 'Client' ? Client::class : Company::class;
 
-    if($request->isSavingDraft)
+    if ($request->isSavingDraft)
       $data['status'] = 'Draft';
-    else{
-      if($contract->status == 'Draft')
+    else {
+      if ($contract->status == 'Draft')
         $data['status'] = 'Active';
     }
 

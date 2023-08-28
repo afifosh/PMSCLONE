@@ -20,9 +20,10 @@
       {{ Form::label('project_id', __('Project'), ['class' => 'col-form-label']) }}
       {!! Form::select('project_id', $projects, $contract->project_id, [
         'class' => 'form-select globalOfSelect2',
-        'data-updateOptions' => 'ajax-options',
-        'data-href' => route('admin.projects.getCompanyByProject'),
-        'data-target' => '#project-company-select']) !!}
+        // 'data-updateOptions' => 'ajax-options',
+        // 'data-href' => route('admin.projects.getCompanyByProject'),
+        // 'data-target' => '#project-company-select'
+        ])!!}
     </div>
     <div class="form-group col-6">
       {{ Form::label('assign_to', __('Assign To'), ['class' => 'col-form-label']) }}
