@@ -94,7 +94,7 @@ class ProjectController extends Controller
     abort_if(!$project->isMine(), 403);
     $data['project'] = $project;
     $project->load(['contracts' => function($q){
-      $q->select('contracts.id', 'contracts.subject', 'contracts.project_id', 'contracts.status', 'contracts.start_date', 'contracts.end_date', 'assignable_type', 'assignable_id');
+      $q->where('status', '!=', 'Draft')->select('contracts.id', 'contracts.subject', 'contracts.project_id', 'contracts.status', 'contracts.start_date', 'contracts.end_date', 'assignable_type', 'assignable_id');
     }, 'contracts.phases' => function ($q) {
       $q->select('id', 'name', 'start_date', 'due_date', 'contract_id');
     }, 'contracts.assignable', 'contracts.project' => function ($q) {

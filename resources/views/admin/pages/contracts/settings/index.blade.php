@@ -35,7 +35,7 @@
       </div>
     @endif
     {{-- End notifiable users --}}
-    @if ($contract->status != 'Paused' && $contract->status != 'Terminated')
+    @if ($contract->status != 'Paused' && $contract->status != 'Terminated' && $contract->start_date != null)
       <div class="card mt-2">
         <h5 class="card-header">Pause Contract</h5>
           <div class="card-body">
@@ -68,12 +68,18 @@
                   </div>
                   <div class="col-3 d-none pause-durantion">
                     <div class="mb-3 d-flex">
-                      <span>
-                        <input type="number" id="unit-value" name="pause_for"class="form-control">
+                      <span class="w-50">
+                        <input type="number" id="unit-value" name="pause_for"class="form-control cusom_resum_parm">
                       </span>
-                      <span>
-                        {!! Form::select('custom_unit', ['Days' => 'Days', 'Weeks' => 'Weeks', 'Months'=> 'Months'], null, ['class' => 'form-select select2']) !!}
+                      <span class="w-50">
+                        {!! Form::select('custom_unit', ['Days' => 'Days', 'Weeks' => 'Weeks', 'Months'=> 'Months'], null, ['class' => 'form-select select2 cusom_resum_parm']) !!}
                       </span>
+                    </div>
+                    <div class="col">
+                      <div class="mb-3">
+                        <label for="" class="form-label">Will Resume On: </label>
+                        <input type="date" name="calculated_resumed_date" id="calculated_resumed_date" readonly class="form-control">
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -230,4 +236,19 @@
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    <script>
+        $('.cusom_resum_parm').change(function(){
+            var unit = $('select[name="custom_unit"]').val();
+            var value = $('input[name="pause_for"]').val();
+            var date = new Date();
+            if(unit == 'Days'){
+                date.setDate(date.getDate() + parseInt(value));
+            }else if(unit == 'Weeks'){
+                date.setDate(date.getDate() + (parseInt(value) * 7));
+            }else if(unit == 'Months'){
+                date.setMonth(date.getMonth() + parseInt(value));
+            }
+            $('#calculated_resumed_date').val(date.toISOString().slice(0,10));
+        });
+    </script>
 @endpush

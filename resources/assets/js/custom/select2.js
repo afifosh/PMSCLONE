@@ -1,4 +1,21 @@
 window.initSelect2 = function(){
+  $('.select2Remote').each(function (){
+    $(this).select2({
+      ajax: {
+        url: $(this).data('url'),
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            search: params.term,
+            page: params.current_page || 1
+          };
+        }
+      },
+      placeholder: $(this).data('placeholder'),
+      minimumInputLength: 3
+    });
+  })
   $('.select2').select2();
 
   var UsersSelect2 = $('.select2User');

@@ -15,8 +15,8 @@ return new class extends Migration
       $table->id();
       $table->foreignId('type_id')->nullable()->constrained('contract_types')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('cascade')->cascadeOnUpdate();
-      $table->string('assignable_type');
-      $table->unsignedBigInteger('assignable_id');
+      $table->string('assignable_type')->nullable();
+      $table->unsignedBigInteger('assignable_id')->nullable();
       $table->string('refrence_id', 100)->unique()->nullable();
       $table->string('subject', 100);
       $table->string('value', 100)->nullable();

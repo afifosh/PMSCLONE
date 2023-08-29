@@ -395,8 +395,10 @@
     companiesByProjectsChart.render();
   }
 
-  // top 5 contracts by Amount
   var topContractsByValueConfig = {
+    tooltipLabels: topContractsByValue.map(function (item) {
+      return item.subject;
+    }),
     series: [
       {
         // name: 'Contracts By Value',
@@ -423,24 +425,37 @@
     },
     dataLabels: {
       enabled: true,
-      // formatter: function (val) {
-      //   return val + "%";
-      // },
+      formatter: function (val) {
+        return val > 0 ? val : '';
+      },
       offsetY: -20,
       style: {
         fontSize: '12px',
-        colors: ['#304758']
+        colors: [labelColor]
       }
     },
     legend: {
       show: false
     },
     tooltip: {
-      enabled: false
+      enabled: true,
+      shared: false, // Set to true if you want to show a single tooltip for all series data points at a particular category
+      custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+        return (
+          '<div class="card p-2">' +
+          '<span><b>Contract:</b> ' +
+          topContractsByValueConfig.tooltipLabels[seriesIndex] +
+          '</span>' +
+          '<span><b>Value:</b> ' +
+          series[seriesIndex][dataPointIndex] +
+          '</span>' +
+          '</div>'
+        );
+      }
     },
     xaxis: {
       categories: topContractsByValue.map(function (item) {
-        return item.subject;
+        return item.id;
       }),
       position: 'bottom',
       axisBorder: {
@@ -461,8 +476,15 @@
           }
         }
       },
-      tooltip: {
-        enabled: false
+      labels: {
+        show: true,
+        style: {
+          colors: labelColor,
+          fontSize: '13px'
+        },
+        formatter: function (val) {
+          return val ? `Contract#${val}` : '';
+        }
       }
     },
     yaxis: {
@@ -473,9 +495,13 @@
         show: true
       },
       labels: {
-        show: true
+        show: true,
+        style: {
+          colors: labelColor,
+          fontSize: '13px'
+        }
         // formatter: function (val) {
-        //   return val + "%";
+        //   return val ;
         // }
       }
     }
@@ -485,6 +511,7 @@
   chart.render();
 
   // contracts by cycle time
+
   var contractsByCycleTimeConfig = {
     series: [
       {
@@ -512,13 +539,13 @@
     },
     dataLabels: {
       enabled: true,
-      // formatter: function (val) {
-      //   return val + "%";
-      // },
+      formatter: function (val) {
+        return val > 0 ? val : '';
+      },
       offsetY: -20,
       style: {
         fontSize: '12px',
-        colors: ['#304758']
+        colors: [labelColor]
       }
     },
     legend: {
@@ -532,32 +559,11 @@
         return item.time_period;
       }),
       position: 'bottom',
-      axisBorder: {
-        show: false
-      },
-      axisTicks: {
-        show: false
-      },
-      crosshairs: {
-        fill: {
-          type: 'gradient',
-          gradient: {
-            colorFrom: '#D8E3F0',
-            colorTo: '#BED1E6',
-            stops: [0, 100],
-            opacityFrom: 0.4,
-            opacityTo: 0.5
-          }
-        }
-      },
-      tooltip: {
-        enabled: false
-      },
       labels: {
         show: true,
         style: {
           fontSize: '12px',
-          colors: ['#304758']
+          colors: [labelColor]
         }
       }
     },
@@ -569,7 +575,11 @@
         show: true
       },
       labels: {
-        show: true
+        show: true,
+        style: {
+          colors: labelColor,
+          fontSize: '13px'
+        }
         // formatter: function (val) {
         //   return val + "%";
         // }
@@ -608,13 +618,13 @@
     },
     dataLabels: {
       enabled: true,
-      // formatter: function (val) {
-      //   return val + "%";
-      // },
+      formatter: function (val) {
+        return val > 0 ? val : '';
+      },
       offsetY: -20,
       style: {
         fontSize: '12px',
-        colors: ['#304758']
+        colors: [labelColor]
       }
     },
     legend: {
@@ -634,18 +644,6 @@
       axisTicks: {
         show: false
       },
-      crosshairs: {
-        fill: {
-          type: 'gradient',
-          gradient: {
-            colorFrom: '#D8E3F0',
-            colorTo: '#BED1E6',
-            stops: [0, 100],
-            opacityFrom: 0.4,
-            opacityTo: 0.5
-          }
-        }
-      },
       tooltip: {
         enabled: false
       },
@@ -653,7 +651,7 @@
         show: true,
         style: {
           fontSize: '12px',
-          colors: ['#304758']
+          colors: [labelColor]
         }
       }
     },
@@ -665,7 +663,11 @@
         show: true
       },
       labels: {
-        show: true
+        show: true,
+        style: {
+          colors: labelColor,
+          fontSize: '13px'
+        }
         // formatter: function (val) {
         //   return val + "%";
         // }

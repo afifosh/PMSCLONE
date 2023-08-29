@@ -15,7 +15,7 @@ class NotifiableUserController extends Controller
   {
     $config = (new SettingService())->getFormattedSettings('contract-notifications');
     $users = $contract->notifiableUsers()->pluck('admin_id')->toArray();
-    $users = array_merge($users, explode(',', $config['emails']));
+    $users = array_merge($users, explode(',', $config['emails'] ?? ''));
     $users = $users ? $users : [];
     $data['admins'] = Admin::whereNotIn('id', $users)->get();
     $data['contract'] = $contract;

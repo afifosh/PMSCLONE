@@ -144,3 +144,8 @@ function array_diff_assoc_recursive($array1, $array2)
   {
     return array_unique(remove_null_values($ids));
   }
+
+  function formatCurrency($amount)
+  {
+    return number_format($amount) . ' ' . config('app.currency');
+  }

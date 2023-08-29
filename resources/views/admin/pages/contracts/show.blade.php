@@ -177,48 +177,30 @@
 @include('admin.pages.contracts.header', ['tab' => 'overview'])
 <!-- User Profile Content -->
 <div class="row">
-  <div class="col-xl-4 col-lg-5 col-md-5">
+  <div class="col-xl-12 col-lg-5 col-md-5">
     <!-- About User -->
     <div class="card mb-4">
       <div class="card-body">
         <small class="card-text text-uppercase">About</small>
         <ul class="list-unstyled mb-4 mt-3">
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-user"></i><span class="fw-bold mx-2">Full Name:</span> <span>John Doe</span></li>
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-check"></i><span class="fw-bold mx-2">Status:</span> <span>Active</span></li>
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-crown"></i><span class="fw-bold mx-2">Role:</span> <span>Developer</span></li>
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">Country:</span> <span>USA</span></li>
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-file-description"></i><span class="fw-bold mx-2">Languages:</span> <span>English</span></li>
-        </ul>
-        <small class="card-text text-uppercase">Contacts</small>
-        <ul class="list-unstyled mb-4 mt-3">
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-phone-call"></i><span class="fw-bold mx-2">Contact:</span> <span>(123) 456-7890</span></li>
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-brand-skype"></i><span class="fw-bold mx-2">Skype:</span> <span>john.doe</span></li>
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-mail"></i><span class="fw-bold mx-2">Email:</span> <span>john.doe@example.com</span></li>
-        </ul>
-        <small class="card-text text-uppercase">Teams</small>
-        <ul class="list-unstyled mb-0 mt-3">
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-brand-angular text-danger me-2"></i>
-            <div class="d-flex flex-wrap"><span class="fw-bold me-2">Backend Developer</span><span>(126 Members)</span></div>
-          </li>
-          <li class="d-flex align-items-center"><i class="ti ti-brand-react-native text-info me-2"></i>
-            <div class="d-flex flex-wrap"><span class="fw-bold me-2">React Developer</span><span>(98 Members)</span></div>
-          </li>
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-user"></i><span class="fw-bold mx-2">Subject:</span> <span>{{$contract->subject}}</span></li>
+          @if ($contract->assignable_id != null && $contract->assignable_type != null)
+            <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">Assigned To ({{explode('\\', $contract->assignable_type)[2]}}):</span> <span>{{$contract->assignable->name ?? $contract->assignable->first_name .' '. $contract->assignable->last_name}}</span></li>
+          @endif
+          @if ($contract->project_id)
+            <li class="d-flex align-items-center mb-3"><i class="ti ti-user"></i><span class="fw-bold mx-2">Project:</span> <span>{{$contract->project->name ?? ''}}</span></li>
+          @endif
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-check"></i><span class="fw-bold mx-2">Status:</span> <span>{{$contract->status}}</span></li>
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-crown"></i><span class="fw-bold mx-2">Value:</span> <span>{{formatCurrency($contract->value)}}</span></li>
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">Start Date:</span> <span>{{formatDateTime($contract->start_date)}}</span></li>
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">End Date:</span> <span>{{formatDateTime($contract->end_date)}}</span></li>
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">Type:</span> <span>{{$contract->type->name ?? ''}}</span></li>
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">Refrence ID:</span> <span>{{$contract->refrence_id}}</span></li>
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">Description:</span> <span>{{$contract->description}}</span></li>
         </ul>
       </div>
     </div>
     <!--/ About User -->
-    <!-- Profile Overview -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <p class="card-text text-uppercase">Overview</p>
-        <ul class="list-unstyled mb-0">
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-check"></i><span class="fw-bold mx-2">Task Compiled:</span> <span>13.5k</span></li>
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-layout-grid"></i><span class="fw-bold mx-2">Projects Compiled:</span> <span>146</span></li>
-          <li class="d-flex align-items-center"><i class="ti ti-users"></i><span class="fw-bold mx-2">Connections:</span> <span>897</span></li>
-        </ul>
-      </div>
-    </div>
-    <!--/ Profile Overview -->
   </div>
   <div class="col-xl-8 col-lg-7 col-md-7">
     <!-- Activity Timeline -->
@@ -261,225 +243,6 @@
         </div>
       </div>
     </div>
-    <!--/ Activity Timeline -->
-    <div class="row">
-      <!-- Connections -->
-      <div class="col-lg-12 col-xl-6">
-        <div class="card card-action mb-4">
-          <div class="card-header align-items-center">
-            <h5 class="card-action-title mb-0">Connections</h5>
-            <div class="card-action-element">
-              <div class="dropdown">
-                <button type="button" class="btn dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical text-muted"></i></button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="javascript:void(0);">Share connections</a></li>
-                  <li><a class="dropdown-item" href="javascript:void(0);">Suggest edits</a></li>
-                  <li>
-                    <hr class="dropdown-divider">
-                  </li>
-                  <li><a class="dropdown-item" href="javascript:void(0);">Report bug</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <ul class="list-unstyled mb-0">
-              <li class="mb-3">
-                <div class="d-flex align-items-start">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/avatars/2.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">Cecilia Payne</h6>
-                      <small class="text-muted">45 Connections</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <button class="btn btn-label-primary btn-icon btn-sm"><i class="ti ti-user-check ti-xs"></i></button>
-                  </div>
-                </div>
-              </li>
-              <li class="mb-3">
-                <div class="d-flex align-items-start">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/avatars/3.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">Curtis Fletcher</h6>
-                      <small class="text-muted">1.32k Connections</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <button class="btn btn-primary btn-icon btn-sm"><i class="ti ti-user-x ti-xs"></i></button>
-                  </div>
-                </div>
-              </li>
-              <li class="mb-3">
-                <div class="d-flex align-items-start">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/avatars/10.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">Alice Stone</h6>
-                      <small class="text-muted">125 Connections</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <button class="btn btn-primary btn-icon btn-sm"><i class="ti ti-user-x ti-xs"></i></button>
-                  </div>
-                </div>
-              </li>
-              <li class="mb-3">
-                <div class="d-flex align-items-start">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/avatars/7.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">Darrell Barnes</h6>
-                      <small class="text-muted">456 Connections</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <button class="btn btn-label-primary btn-icon btn-sm"><i class="ti ti-user-check ti-xs"></i></button>
-                  </div>
-                </div>
-              <li class="mb-3">
-                <div class="d-flex align-items-start">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/avatars/12.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">Eugenia Moore</h6>
-                      <small class="text-muted">1.2k Connections</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <button class="btn btn-label-primary btn-icon btn-sm"><i class="ti ti-user-check ti-xs"></i></button>
-                  </div>
-                </div>
-              </li>
-              <li class="text-center">
-                <a href="javascript:;">View all connections</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <!--/ Connections -->
-      <!-- Teams -->
-      <div class="col-lg-12 col-xl-6">
-        <div class="card card-action mb-4">
-          <div class="card-header align-items-center">
-            <h5 class="card-action-title mb-0">Teams</h5>
-            <div class="card-action-element">
-              <div class="dropdown">
-                <button type="button" class="btn dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" aria-expanded="false"><i class="ti ti-dots-vertical text-muted"></i></button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="javascript:void(0);">Share teams</a></li>
-                  <li><a class="dropdown-item" href="javascript:void(0);">Suggest edits</a></li>
-                  <li>
-                    <hr class="dropdown-divider">
-                  </li>
-                  <li><a class="dropdown-item" href="javascript:void(0);">Report bug</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <ul class="list-unstyled mb-0">
-              <li class="mb-3">
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/icons/brands/react-label.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">React Developers</h6>
-                      <small class="text-muted">72 Members</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <a href="javascript:;"><span class="badge bg-label-danger">Developer</span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="mb-3">
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/icons/brands/support-label.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">Support Team</h6>
-                      <small class="text-muted">122 Members</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <a href="javascript:;"><span class="badge bg-label-primary">Support</span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="mb-3">
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/icons/brands/figma-label.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">UI Designers</h6>
-                      <small class="text-muted">7 Members</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <a href="javascript:;"><span class="badge bg-label-info">Designer</span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="mb-3">
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/icons/brands/vue-label.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">Vue.js Developers</h6>
-                      <small class="text-muted">289 Members</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <a href="javascript:;"><span class="badge bg-label-danger">Developer</span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="mb-3">
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar me-2">
-                      <img src="{{ asset('assets/img/icons/brands/twitter-label.png') }}" alt="Avatar" class="rounded-circle" />
-                    </div>
-                    <div class="me-2 ms-1">
-                      <h6 class="mb-0">Digital Marketing</h6>
-                      <small class="text-muted">24 Members</small>
-                    </div>
-                  </div>
-                  <div class="ms-auto">
-                    <a href="javascript:;"><span class="badge bg-label-secondary">Marketing</span></a>
-                  </div>
-                </div>
-              </li>
-              <li class="text-center">
-                <a href="javascript:;">View all teams</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <!--/ Teams -->
     </div>
     <!-- Projects table -->
     {{-- <div class="card mb-4">

@@ -29,7 +29,7 @@ class ContractsDataTable extends DataTable
         return view('admin.pages.contracts.action', compact('contract'));
       })
       ->addColumn('company_name', function($project){
-        return $project->assignable_type == Company::class ? $project->assignable->name : '-';
+        return $project->assignable_type == Company::class && $project->assignable ? $project->assignable->name : '-';
       })
       ->editColumn('project.name', function($project){
         return $project->project ? $project->project->name : '-';

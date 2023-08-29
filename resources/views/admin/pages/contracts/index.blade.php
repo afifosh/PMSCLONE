@@ -257,20 +257,74 @@ $configData = Helper::appClasses();
       </div>
       {{-- End Contracts By Cycle --}}
 
-      {{-- Contracts By Expiry Time --}}
-      <div class="col-12 col-xl-4 mt-2">
-        <div class="card h-100">
-          <div class="card-header d-flex align-items-center justify-content-between">
-            <h5 class="card-title m-0 me-2">{{__('Conracts By Expiry Time')}}</h5>
-          </div>
-          <div class="card-body row g-3">
-            <div class="col-md-12">
-              <div id="contractsByExpiryTime"></div>
+      <!-- Sales by Countries tabs-->
+          <div class="col-md-6 col-xl-4 col-xl-4 mt-2">
+            <div class="card h-100">
+              <div class="card-header d-flex justify-content-between pb-2 mb-1">
+                <div class="card-title mb-1">
+                  <h5 class="m-0 me-2">Contracts Expiring Soon</h5>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="nav-align-top">
+                  <ul class="nav nav-tabs nav-fill" role="tablist">
+                    <li class="nav-item">
+                      <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-ex-30-days" aria-selected="true">30 Days ({{count($expiringContractsList->where('end_date', '<', now()->addDays(30)))}})</button>
+                    </li>
+                    <li class="nav-item">
+                      <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-ex-60-days" aria-selected="false">60 Days ({{count($expiringContractsList->whereBetween('end_date', [now()->addDays(30), now()->addDays(60)]))}})</button>
+                    </li>
+                    <li class="nav-item">
+                      <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-ex-90-days" aria-selected="false">90 Days ({{count($expiringContractsList->whereBetween('end_date', [now()->addDays(60), now()->addDays(90)]))}})</button>
+                    </li>
+                  </ul>
+                  <div class="tab-content pb-0">
+                    <div class="tab-pane fade show active" id="navs-ex-30-days" role="tabpanel">
+                      <ul class="timeline timeline-advance timeline-advance mb-2 pb-1">
+                        @forelse ($expiringContractsList->where('end_date', '<', now()->addDays(30))  as $ec_30)
+                        <li class="timeline-item ps-4 border-left-dashed">
+                          <div class="timeline-event ps-0 pb-0">
+                            <h6 class="mb-0"><a href="{{route('admin.contracts.show', [$ec_30])}}">{{$ec_30->subject}}</a></h6>
+                            <p class="text-muted mb-0 text-nowrap"><b>Value: </b>{{formatCurrency($ec_30->value)}}, <b>Expiring At: </b>{{formatDateTime($ec_30->end_date)}}</p>
+                          </div>
+                        </li>
+                        @empty
+                        @endforelse
+                      </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="navs-ex-60-days" role="tabpanel">
+                      <ul class="timeline timeline-advance timeline-advance mb-2 pb-1">
+                        @forelse ($expiringContractsList->whereBetween('end_date', [now()->addDays(30), now()->addDays(60)])  as $ec_60)
+                        <li class="timeline-item ps-4 border-left-dashed">
+                          <div class="timeline-event ps-0 pb-0">
+                            <h6 class="mb-0"><a href="{{route('admin.contracts.show', [$ec_60])}}">{{$ec_60->subject}}</a></h6>
+                            <p class="text-muted mb-0 text-nowrap"><b>Value: </b>{{formatCurrency($ec_60->value)}}, <b>Expiring At: </b>{{formatDateTime($ec_60->end_date)}}</p>
+                          </div>
+                        </li>
+                        @empty
+                        @endforelse
+                      </ul>
+                    </div>
+                    <div class="tab-pane fade" id="navs-ex-90-days" role="tabpanel">
+                      <ul class="timeline timeline-advance timeline-advance mb-2 pb-1">
+                        @forelse ($expiringContractsList->whereBetween('end_date', [now()->addDays(60), now()->addDays(90)])  as $ec_90)
+                        <li class="timeline-item ps-4 border-left-dashed">
+                          <div class="timeline-event ps-0 pb-0">
+                            <h6 class="mb-0"><a href="{{route('admin.contracts.show', [$ec_90])}}">{{$ec_90->subject}}</a></h6>
+                            <p class="text-muted mb-0 text-nowrap"><b>Value: </b>{{formatCurrency($ec_90->value)}}, <b>Expiring At: </b>{{formatDateTime($ec_90->end_date)}}</p>
+                          </div>
+                        </li>
+                        @empty
+                        @endforelse
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      {{-- End Contracts By Expiry Time --}}
+      <!--/ Sales by Countries tabs -->
     </div>
 
 
@@ -299,6 +353,20 @@ $configData = Helper::appClasses();
           </div>
         </div>
       </div>
+      {{-- Contracts By Expiry Time --}}
+      <div class="col-12 col-xl-4 mt-2">
+        <div class="card h-100">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="card-title m-0 me-2">{{__('Conracts By Expiry Time')}}</h5>
+          </div>
+          <div class="card-body row g-3">
+            <div class="col-md-12">
+              <div id="contractsByExpiryTime"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{-- End Contracts By Expiry Time --}}
     </div>
     {{-- Types Graph End --}}
 @endif

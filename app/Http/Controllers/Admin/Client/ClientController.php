@@ -43,16 +43,16 @@ class ClientController extends Controller
     $request->validate([
       'first_name' => 'required|string|max:100',
       'last_name' => 'required|string|max:100',
-      'phone' => 'required|string|max:25',
+      'phone' => 'nullable|string|max:25',
       'email' => 'required|unique:clients,email|email|max:100',
-      'address' => 'required|string|max:255',
-      'state' => 'required|string|max:100',
-      'zip_code' => 'required|string|max:25',
-      'language' => 'required|string|max:25',
-      'country_id' => 'required|integer|exists:countries,id',
-      'currency' => 'required|string|max:100',
-      'timezone' => 'required|string|max:100',
-      'status' => 'required|string|max:100',
+      'address' => 'nullable|string|max:255',
+      'state' => 'nullable|string|max:100',
+      'zip_code' => 'nullable|string|max:25',
+      'language' => 'nullable|string|max:25',
+      'country_id' => 'nullable|integer|exists:countries,id',
+      'currency' => 'nullable|string|max:100',
+      'timezone' => 'nullable|string|max:100',
+      'status' => 'nullable|string|max:100',
     ]);
 
     Client::create($request->all());
@@ -91,16 +91,16 @@ class ClientController extends Controller
     $request->validate([
       'first_name' => 'required|string|max:100',
       'last_name' => 'required|string|max:100',
-      'phone' => 'required|string|max:25',
+      'phone' => 'nullable|string|max:25',
       'email' => 'required|unique:clients,email,' . $client->id . '|email|max:100',
-      'address' => 'required|string|max:255',
-      'state' => 'required|string|max:100',
-      'zip_code' => 'required|string|max:25',
-      'language' => 'required|string|max:25',
-      'country_id' => 'required|integer|exists:countries,id',
-      'currency' => 'required|string|max:100',
-      'timezone' => 'required|string|max:100',
-      'status' => 'required|string|max:100',
+      'address' => 'nullable|string|max:255',
+      'state' => 'nullable|string|max:100',
+      'zip_code' => 'nullable|string|max:25',
+      'language' => 'nullable|string|max:25',
+      'country_id' => 'nullable|integer|exists:countries,id',
+      'currency' => 'nullable|string|max:100',
+      'timezone' => 'nullable|string|max:100',
+      'status' => 'nullable|string|max:100',
     ]);
 
     $client->update($request->all());

@@ -19,7 +19,8 @@
     <div class="form-group col-6">
       {{ Form::label('project_id', __('Project'), ['class' => 'col-form-label']) }}
       {!! Form::select('project_id', $projects, $contract->project_id, [
-        'class' => 'form-select globalOfSelect2',
+        'class' => 'form-select globalOfSelect2Remote',
+        'data-url' => route('resource-select', ['Project'])
         // 'data-updateOptions' => 'ajax-options',
         // 'data-href' => route('admin.projects.getCompanyByProject'),
         // 'data-target' => '#project-company-select'
@@ -32,11 +33,17 @@
     {{-- customer --}}
     <div class="form-group col-6 {{$contract->assignable_type == 'App\Models\Client' ? 'd-none' : ''}}">
       {{ Form::label('company_id', __('Company'), ['class' => 'col-form-label']) }}
-      {!! Form::select('company_id', $companies, @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'project-company-select', 'class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('company_id', $companies, @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'project-company-select',
+      'class' => 'form-select globalOfSelect2Remote',
+      'data-url' => route('resource-select', ['Company'])
+      ]) !!}
     </div>
     <div class="form-group col-6 {{$contract->assignable_type != 'App\Models\Client' ? 'd-none' : ''}}">
       {{ Form::label('client_id', __('Client'), ['class' => 'col-form-label']) }}
-      {!! Form::select('client_id', $clients, @$contract->assignable_type == 'App\Models\Client' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select', 'class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('client_id', $clients, @$contract->assignable_type == 'App\Models\Client' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select',
+      'class' => 'form-select globalOfSelect2Remote',
+      'data-url' => route('resource-select', ['Client'])
+      ]) !!}
     </div>
     {{-- start date --}}
     <div class="form-group col-6">

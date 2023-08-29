@@ -158,6 +158,24 @@
     e.preventDefault();
     applyFilters();
   });
+  $(document).on('change', '[name="assigned_to_type"]', function(e){
+    if($(this).val() == 'Company'){
+      $('[name="companies[]"]').closest('.col').removeClass('d-none');
+      $('[name="contract_client"]').closest('.col').addClass('d-none');
+      $('[name="companies[]"]').val('0').trigger('change');
+      $('[name="contract_client"]').val('0').trigger('change');
+    }else if($(this).val() == 'Client'){
+      $('[name="companies[]"]').closest('.col').addClass('d-none');
+      $('[name="contract_client"]').closest('.col').removeClass('d-none');
+      $('[name="companies[]"]').val('0').trigger('change');
+      $('[name="contract_client"]').val('0').trigger('change');
+    }else{
+      $('[name="companies[]"]').closest('.col').addClass('d-none');
+      $('[name="contract_client"]').closest('.col').addClass('d-none');
+      $('[name="companies[]"]').val('0').trigger('change');
+      $('[name="contract_client"]').val('0').trigger('change');
+    }
+  })
   function applyFilters(){
     $.ajax({
       type: "get",
@@ -167,6 +185,8 @@
         status: $('[name="status"]').val(),
         companies: $('[name="companies[]"]').val(),
         search_q: $('[name="search_task"]').val(),
+        contract_type: $('[name="contract_type"]').val(),
+        contract_client: $('[name="contract_client"]').val(),
       },
       success: function (ganttProjects) {
         projects = ganttProjects;
@@ -179,11 +199,16 @@
         }catch(e){
           try{
           gantt.eachTask(function(task) {
-            if(task.id)
             gantt.deleteTask(task.id);
           });
           }catch(e){
           }
+        }
+        try{
+          gantt.eachTask(function(task) {
+            gantt.deleteTask(task.id);
+          });
+        }catch(e){
         }
         gantt.parse({
           "data": data,
@@ -308,7 +333,13 @@
   }
 
   function changeSidebar(elm){
-    gantt.config.grid_width = elm.checked;
+    gantt.config.show_grid = elm.checked;
+    gantt.render();
+  }
+
+  function toggleChart(elm)
+  {
+    gantt.config.show_chart = elm.checked;
     gantt.render();
   }
 
@@ -554,21 +585,35 @@ gantt.$task_data.style.cursor = 'grab';
       </div>
     </div>
     <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center row pb-2">
-          @if (!isset($project))
-            <div class="col-md-3">
+      <div class="row">
+        @if (!isset($project))
+            <div class="col">
               {!! Form::label('projects', 'Projects') !!}
-              {!! Form::select('projects[]', $projects, null, ['class' => 'form-select gantt_filter', 'data-placeholder' => 'Projects']) !!}
+              {!! Form::select('projects[]', $projects, null, ['class' => 'form-select select2 gantt_filter', 'data-placeholder' => 'Projects']) !!}
             </div>
-            <div class="col-md-3">
+            <div class="col">
               {!! Form::label('project Status', 'Contract Status') !!}
-              {!! Form::select('status', [null => 'All'] + $statuses, null, ['class' => 'form-select gantt_filter', 'data-placeholder' => 'Status']) !!}
+              {!! Form::select('status', [0 => 'All'] + $statuses, null, ['class' => 'form-select gantt_filter select2', 'data-placeholder' => 'Status']) !!}
             </div>
-            <div class="col-md-3">
+            <div class="col">
+              {!! Form::label('contract_type', 'Contract Type') !!}
+              {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select select2 gantt_filter', 'data-placeholder' => 'Type']) !!}
+            </div>
+            <div class="col">
+              {!! Form::label('assigned_to_type', 'Assigned To') !!}
+              {!! Form::select('assigned_to_type', ['Both' => 'Both', 'Client' => 'Client', 'Company' => 'Company'], null, ['class' => 'form-select select2', 'data-placeholder' => 'Assigned To']) !!}
+            </div>
+            <div class="col d-none">
               {!! Form::label('companies[]', 'Company') !!}
-              {!! Form::select('companies[]', $companies, null, ['class' => 'form-select gantt_filter', 'data-placeholder' => 'Company']) !!}
+              {!! Form::select('companies[]', $companies, null, ['class' => 'form-select select2 gantt_filter', 'data-placeholder' => 'Company']) !!}
+            </div>
+            <div class="col d-none">
+              {!! Form::label('clients[]', 'Clients') !!}
+              {!! Form::select('contract_client', $contractClients, null, ['class' => 'form-select select2 gantt_filter', 'data-placeholder' => 'Clients']) !!}
             </div>
           @endif
+      </div>
+        <div class="d-flex justify-content-between align-items-center row pb-2">
           <div class="col-md-3">
             {!! Form::label('search_task', 'Search') !!}
             {!! Form::text('search_task', null, ['class' => 'form-control gantt_filter', 'placeholder' => 'Search']) !!}
@@ -585,7 +630,7 @@ gantt.$task_data.style.cursor = 'grab';
               <option value="hours">Hours</option>
             </select>
           </div>
-          <div class="col-md-6 d-flex justify-content-between pt-4">
+          <div class="col-md-7 d-flex justify-content-between pt-4">
             <button class='btn btn-primary zoom_toggle' onclick="toggleMode(this)">Zoom to Fit</button>
             <button class="btn btn-primary" onclick="zoom_in()">Zoom In</button>
             <button class="btn btn-primary" onclick="zoom_out()">Zoom Out</button>
@@ -624,6 +669,18 @@ gantt.$task_data.style.cursor = 'grab';
                 </span>
               </span>
               <span class="switch-label">SideBar</span>
+            </label>
+            <label class="switch switch-lg">
+              <input type="checkbox" class="switch-input config-input" onchange="toggleChart(this)" checked>
+              <span class="switch-toggle-slider">
+                <span class="switch-on">
+                  <i class="ti ti-check"></i>
+                </span>
+                <span class="switch-off">
+                  <i class="ti ti-x"></i>
+                </span>
+              </span>
+              <span class="switch-label">Chart</span>
             </label>
           </div>
         </div>

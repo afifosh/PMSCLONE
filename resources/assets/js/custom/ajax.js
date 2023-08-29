@@ -499,6 +499,38 @@ window.initModalSelect2 = function(){
   $('.globalOfSelect2').select2({
     dropdownParent: $('#globalModal')
   });
+  $('.globalOfSelect2Remote').each(function (){
+    $(this).select2({
+      ajax: {
+        url: $(this).data('url'),
+        dataType: 'json',
+        delay: 500,
+        data: function (params) {
+          return {
+            q: params.term,
+            page: params.page || 1
+          };
+        },
+        processResults: function(data, params) {
+          return {
+              results: data.data,
+              pagination: {
+                  more: data.next_page_url ? true : false
+              }
+          };
+        }
+      },
+      placeholder: $(this).data('placeholder'),
+      minimumInputLength: 0,
+      dropdownParent: $('#globalModal'),
+      templateResult: function (option) {
+        return option.name;
+      },
+      templateSelection: function (option) {
+        return option.name;
+      }
+    });
+  })
 
   var UsersSelect2 = $('.globalOfSelect2User');
 

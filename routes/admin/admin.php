@@ -56,6 +56,7 @@ use App\Http\Controllers\Admin\Project\TaskFileController;
 use App\Http\Controllers\Admin\Project\TaskReminderController;
 use App\Http\Controllers\Admin\Project\TemplateTaskCheckItemController;
 use App\Http\Controllers\Admin\Project\TemplateTaskController;
+use App\Http\Controllers\Admin\ResourceSearchController;
 use App\Http\Controllers\Admin\Setting\ContractSettingController as SettingContractSettingController;
 use App\Http\Controllers\Admin\Setting\OauthGoogleController;
 use App\Http\Controllers\Admin\Setting\OauthMicrosoftController;
@@ -241,6 +242,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
+Route::get('/resource-select/{resource}', [ResourceSearchController::class, 'index'])->name('resource-select');
 
 Route::any('update-file/{file}', [OnlyOfficeController::class, 'updateFile'])->name('update-file');
 

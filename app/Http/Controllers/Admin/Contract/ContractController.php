@@ -71,6 +71,12 @@ class ContractController extends Controller
 
     $data['contractsByDistribution'] = $this->getContractsByAssignees();
 
+    // list of contracts expiring in 30, 60, 90 days
+    $data['expiringContractsList'] = Contract::where('status', 'Active')
+      ->where('end_date', '>', now())
+      ->where('end_date', '<', now()->addDays(90))
+      ->get();
+
     return $dataTable->render('admin.pages.contracts.index', $data);
     // view('admin.pages.contracts.index');
   }
@@ -107,13 +113,13 @@ class ContractController extends Controller
 
   protected function getContractsByValue()
   {
-    $data['contractsByValue'] = Contract::selectRaw('contracts.subject, contracts.value')
+    $data['contractsByValue'] = Contract::selectRaw('id, contracts.subject, contracts.value')
       ->whereNull('contracts.deleted_at')
       ->orderBy('contracts.value', 'desc')
       ->limit(5)
       ->get();
 
-    $data['contractsByValue'] = array_merge($data['contractsByValue']->toArray(), array_fill(0, 5 - count($data['contractsByValue']), ['subject' => '', 'value' => 0,]));
+    $data['contractsByValue'] = array_merge($data['contractsByValue']->toArray(), array_fill(0, 5 - count($data['contractsByValue']), ['id' => '', 'subject' => '', 'value' => 0,]));
 
     return $data['contractsByValue'];
   }
@@ -147,10 +153,11 @@ class ContractController extends Controller
   {
     $data['contractsByCycleTime'] = Contract::select(
       DB::raw('CASE
-          WHEN DATEDIFF(end_date, start_date) < 90 THEN "less_than_3_months"
-          WHEN DATEDIFF(end_date, start_date) >= 90 AND DATEDIFF(end_date, start_date) <= 365 THEN "3_months_to_1_year"
-          WHEN DATEDIFF(end_date, start_date) > 365 AND DATEDIFF(end_date, start_date) <= 730 THEN "1_year_to_2_years"
-          ELSE "more_than_2_years"
+          WHEN DATEDIFF(end_date, start_date) < 90 THEN "<90_Days"
+          WHEN DATEDIFF(end_date, start_date) >= 90 AND DATEDIFF(end_date, start_date) <= 365 THEN "1_Year"
+          WHEN DATEDIFF(end_date, start_date) > 365 AND DATEDIFF(end_date, start_date) <= 730 THEN "2_Years"
+          WHEN DATEDIFF(end_date, start_date) > 730 THEN "2_Years+"
+          Else "unknown"
       END as time_period'),
       DB::raw('COUNT(*) as contract_count')
     )
@@ -161,12 +168,23 @@ class ContractController extends Controller
       $data['contractsByCycleTime'][$key]['time_period'] = str_replace('_', ' ', $value['time_period']);
     }
     // set default values for time periods with time period name and count 0
-    $timePeriods = ['less than 3 months', '3 months to 1 year', '1 year to 2 years', 'more than 2 years'];
+    $timePeriods = ['<90 Days', '1 Year', '2 Years', '2 Years+'];
     foreach ($timePeriods as $timePeriod) {
       if (!isset($data['contractsByCycleTime']->where('time_period', $timePeriod)->first()->time_period)) {
         $data['contractsByCycleTime'][] = ['time_period' => $timePeriod, 'contract_count' => 0];
       }
     }
+
+    // sort by timePeriods array
+    $data['contractsByCycleTime'] = $data['contractsByCycleTime']->sortBy(function ($model) use ($timePeriods) {
+      return array_search($model['time_period'], $timePeriods);
+    });
+
+    $data['contractsByCycleTime'] = $data['contractsByCycleTime']->values()->all();
+    // remove unknown collection
+    $data['contractsByCycleTime'] = collect($data['contractsByCycleTime'])->filter(function ($value, $key) {
+      return $value['time_period'] != 'unknown';
+    })->values()->all();
 
     return $data['contractsByCycleTime'];
   }
@@ -197,6 +215,13 @@ class ContractController extends Controller
         $data['contractsByExpiryTime'][] = ['time_period' => $timePeriod, 'contract_count' => 0];
       }
     }
+
+    // sort by timePeriods array
+    $data['contractsByExpiryTime'] = $data['contractsByExpiryTime']->sortBy(function ($model) use ($timePeriods) {
+      return array_search($model['time_period'], $timePeriods);
+    });
+
+    $data['contractsByExpiryTime'] = $data['contractsByExpiryTime']->values()->all();
     return $data['contractsByExpiryTime'];
   }
 
@@ -214,10 +239,10 @@ class ContractController extends Controller
   {
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
     $data['contract'] = new Contract();
-    $data['clients'] = Client::orderBy('id', 'desc')->pluck('email', 'id')->prepend(__('Select Client'), '');
+    $data['clients'] = ['' => __('Select Client')];
 
-    $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
-    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
+    $data['projects'] = ['' => __('Select Project')];
+    $data['companies'] = ['' => 'Select Company'];
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
   }
@@ -264,10 +289,10 @@ class ContractController extends Controller
   {
     $contract->load('project');
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
-    $data['projects'] = Project::mine()->pluck('name', 'id')->prepend(__('Select Project'), '');
-    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id')->prepend('Select Company', '');
+    $data['projects'] = $contract->project_id ? Project::where('id', $contract->project_id)->pluck('name', 'id') : ['' => __('Select Project')];
+    $data['companies'] = Company::where('id', $contract->assignable_id)->pluck('name', 'id')->prepend('Select Company', '');
     $data['contract'] = $contract;
-    $data['clients'] = Client::orderBy('id', 'desc')->pluck('email', 'id')->prepend(__('Select Client'), '');
+    $data['clients'] = Client::where('id', $contract->assignable_id)->pluck('email', 'id')->prepend(__('Select Client'), '');
     $data['statuses'] = $contract->getPossibleStatuses();
     if ($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
