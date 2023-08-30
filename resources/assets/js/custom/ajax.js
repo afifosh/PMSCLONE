@@ -522,13 +522,7 @@ window.initModalSelect2 = function(){
       },
       placeholder: $(this).data('placeholder'),
       minimumInputLength: 0,
-      dropdownParent: $('#globalModal'),
-      templateResult: function (option) {
-        return option.name;
-      },
-      templateSelection: function (option) {
-        return option.name;
-      }
+      dropdownParent: $('#globalModal')
     });
   })
 
