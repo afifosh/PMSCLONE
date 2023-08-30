@@ -34,15 +34,15 @@
     <div class="form-group col-6 {{$contract->assignable_type == 'App\Models\Client' ? 'd-none' : ''}}">
       {{ Form::label('company_id', __('Company'), ['class' => 'col-form-label']) }}
       {!! Form::select('company_id', $companies, @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'project-company-select',
-      'class' => 'form-select globalOfSelect2Remote',
-      'data-url' => route('resource-select', ['Company'])
+      'class' => 'form-select globalOfSelect2UserRemote',
+      'data-url' => route('resource-select-user', ['Company'])
       ]) !!}
     </div>
     <div class="form-group col-6 {{$contract->assignable_type != 'App\Models\Client' ? 'd-none' : ''}}">
       {{ Form::label('client_id', __('Client'), ['class' => 'col-form-label']) }}
       {!! Form::select('client_id', $clients, @$contract->assignable_type == 'App\Models\Client' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select',
-      'class' => 'form-select globalOfSelect2Remote',
-      'data-url' => route('resource-select', ['Client'])
+      'class' => 'form-select globalOfSelect2UserRemote',
+      'data-url' => route('resource-select-user', ['Client'])
       ]) !!}
     </div>
     {{-- start date --}}
@@ -52,11 +52,19 @@
     </div>
     {{-- dute date --}}
     <div class="col-12 mt-2">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="cal-cont-end-date">
-        <label class="form-check-label" for="cal-cont-end-date">
-          Calculate End Date
-        </label>
+      <div class="d-flex">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="cont-has-end-date" @checked(!$contract->subject || $contract->end_date)>
+          <label class="form-check-label me-2" for="cont-has-end-date">
+            Has End Date
+          </label>
+        </div>
+        <div class="form-check end-date-sec {{!$contract->subject || $contract->end_date ? '' : 'd-none'}}">
+          <input class="form-check-input" type="checkbox" id="cal-cont-end-date">
+          <label class="form-check-label" for="cal-cont-end-date">
+            Calculate End Date
+          </label>
+        </div>
       </div>
     </div>
     <div class="d-none" id="end-date-cal-form">
@@ -72,7 +80,7 @@
       </div>
       <hr>
     </div>
-    <div class="form-group col-6">
+    <div class="form-group col-6 end-date-sec {{!$contract->subject || $contract->end_date ? '' : 'd-none'}}">
       {{ Form::label('end_date', __('End Date'), ['class' => 'col-form-label']) }}
       {!! Form::date('end_date', $contract->end_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('End Date')]) !!}
     </div>
@@ -138,6 +146,20 @@
   $(document).on('change', '[name="start_date"]', function(){
     calContEndDate();
   })
+
+  $(document).on('change', '#cont-has-end-date', function() {
+    if ($(this).is(':checked')) {
+      $('.end-date-sec').removeClass('d-none');
+      if($('#cal-cont-end-date').is(':checked')) {
+        $('#end-date-cal-form').removeClass('d-none');
+        calContEndDate();
+      }
+    } else {
+      $('.end-date-sec').addClass('d-none');
+      $('#end_date').val('');
+      $('#end-date-cal-form').addClass('d-none');
+    }
+  });
 
   $(document).on('change keyup', '.cal-cont-end-date', function() {
     calContEndDate();

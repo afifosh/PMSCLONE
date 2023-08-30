@@ -31,6 +31,7 @@ class Client extends Model
     'currency',
   ];
 
+  protected $appends = ['full_name', 'avatar'];
   public function getAvatarAttribute($value)
   {
     if (!$value)

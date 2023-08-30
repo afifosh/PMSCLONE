@@ -21,7 +21,22 @@ class CompanySeeder extends Seeder
   {
     $staticData = [
       ['name' => 'Company 1', 'email' => 'company1@email.com', 'website' => 'www.google.com'], // Attribute which you have static
-      ['name' => 'Company 2', 'email' => 'company2@email.com', 'website' => 'www.google2.com'] // Attribute which you have static
+      ['name' => 'Company 2', 'email' => 'company2@email.com', 'website' => 'www.google2.com'], // Attribute which you have static
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+      ['status' => 'active'],
+
     ];
 
     foreach($staticData as $compAttrToOverride){

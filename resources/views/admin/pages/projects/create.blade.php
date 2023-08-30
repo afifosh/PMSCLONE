@@ -48,19 +48,24 @@ $configData = Helper::appClasses();
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="companies" class="form-label">Company</label>
-                {!! Form::select('companies[]', $companies, $project->companies, ['class' => 'form-select select2', 'multiple' => 'multiple']) !!}
+                {!! Form::select('companies[]', isset($companies) ? $companies->pluck('email', 'id') : [], $project->companies, ['class' => 'form-select select2UserRemote', 'multiple' => 'multiple',
+                'data-url' => route('resource-select-user', ['Company'])], optionParams($companies ?? [])) !!}
               </div>
             </div>
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="program_id" class="form-label">Program</label>
-                {!! Form::select('program_id', $programs, $project->program_id, ['class' => 'form-select select2']) !!}
+                {!! Form::select('program_id', $programs ?? [], $project->program_id, ['class' => 'form-select select2Remote', 'data-placeholder' => 'Select Program',
+                'data-url' => route('resource-select', ['Program'])]) !!}
               </div>
             </div>
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="category_id" class="form-label">Category</label>
-                {!! Form::select('category_id', $categories, $project->category_id, ['class' => 'form-select select2']) !!}
+                {!! Form::select('category_id', $categories ?? [], $project->category_id, ['class' => 'form-select select2Remote',
+                'data-url' => route('resource-select',['ProjectCategory']),
+                'data-placeholder' => 'Select Category'
+                ]) !!}
               </div>
             </div>
             <div class="col-md-6">
@@ -99,16 +104,14 @@ $configData = Helper::appClasses();
                 {!! Form::select('status', $statuses, $project->status, ['class' => 'form-select select2']) !!}
               </div>
             </div>
-
-            @php
-              $optionParameters = collect($members)->mapWithKeys(function ($item) {
-                  return [$item['id'] => ['data-full_name' => $item['full_name'], 'data-avatar' => $item['avatar']]];
-              })->all();
-            @endphp
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="members" class="form-label">Members</label>
-                {!! Form::select('members[]', $members->pluck('email', 'id'), null, ['class' => 'form-select select2User', 'data-placeholder' => 'Select members', 'multiple' => 'multiple'], $optionParameters) !!}
+                {!! Form::select('members[]', isset($members) ? $members->pluck('email', 'id') : [], null, ['class' => 'form-select select2UserRemote',
+                'data-placeholder' => 'Select members',
+                'multiple' => 'multiple',
+                'data-url' => route('resource-select-user', ['Admin'])
+                ], optionParams($members ?? [])) !!}
               </div>
             </div>
             <div class="col-md-12">

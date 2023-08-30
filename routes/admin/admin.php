@@ -139,6 +139,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs.users', ProgramUserController::class);
 
     Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
+    Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     Route::resource('contracts', ContractController::class);
     Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
     Route::resource('contracts.notifiable-users', NotifiableUserController::class)->only(['create', 'store', 'destroy']);
@@ -243,6 +244,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
 Route::get('/resource-select/{resource}', [ResourceSearchController::class, 'index'])->name('resource-select');
+Route::get('/resource-select-user/{resource}', [ResourceSearchController::class, 'userSelect'])->name('resource-select-user');
 
 Route::any('update-file/{file}', [OnlyOfficeController::class, 'updateFile'])->name('update-file');
 

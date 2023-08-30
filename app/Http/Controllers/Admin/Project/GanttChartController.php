@@ -13,7 +13,7 @@ class GanttChartController extends Controller
 {
   public function index()
   {
-    $ganttProjects = Contract::where('status', '!=', 'Draft')->whereNotNull('start_date')->whereNotNull('end_date')->when(request()->projects, function ($q) {
+    $ganttProjects = Contract::when(request()->projects, function ($q) {
       $q->where('project_id', request()->projects)->whereNotNull('project_id');
     })
       ->when(request()->companies, function ($q) {
@@ -30,21 +30,7 @@ class GanttChartController extends Controller
             });
         });
       })
-      ->when(request()->status, function ($q) {
-        if (request()->status == 'Not started') {
-          $q->where('start_date', '>', now());
-        } elseif (request()->status == 'Expired') {
-          $q->where('end_date', '<', now());
-        } elseif (request()->status == 'Terminated') {
-          $q->where('status', 'Terminated');
-        } elseif (request()->status == 'Paused') {
-          $q->where('status', 'Paused');
-        } elseif (request()->status == 'Active') {
-          $q->where('status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now())->where('end_date', '>=', now()->addWeeks(2));
-        } elseif (request()->status == 'About To Expire') {
-          $q->where('status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addWeeks(2));
-        }
-      })
+      ->applyRequestFilters()
       ->when(request()->contract_type, function ($q) {
         $q->whereHas('type', function ($q) {
           $q->where('id', request()->contract_type);

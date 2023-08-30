@@ -21,6 +21,7 @@ class ContractController extends Controller
    */
   public function index(ContractsDataTable $dataTable)
   {
+    $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
     $data['contracts'] = Contract::selectRaw('count(*) as total')
       ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date > now() then 1 end) as active')
@@ -35,6 +36,12 @@ class ContractController extends Controller
       ->withTrashed()
       ->first();
 
+    return $dataTable->render('admin.pages.contracts.index', $data);
+    // view('admin.pages.contracts.index');
+  }
+
+  public function statistics()
+  {
     // top 5 contract types with highest number of contracts with % of contracts
     $data['contractTypes'] = ContractType::selectRaw('contract_types.name, count(contracts.id) as total, round(count(contracts.id) / (select count(*) from contracts where contracts.deleted_at Is NULL) * 100, 2) as percentage')
       ->leftJoin('contracts', 'contracts.type_id', '=', 'contract_types.id')
@@ -76,9 +83,7 @@ class ContractController extends Controller
       ->where('end_date', '>', now())
       ->where('end_date', '<', now()->addDays(90))
       ->get();
-
-    return $dataTable->render('admin.pages.contracts.index', $data);
-    // view('admin.pages.contracts.index');
+    return view('admin.pages.contracts.statistics', $data);
   }
 
   protected function getContractsByAssignees()

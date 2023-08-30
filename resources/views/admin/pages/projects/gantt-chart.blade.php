@@ -1,6 +1,6 @@
 @extends('admin/layouts/layoutMaster')
 
-@section('title', 'Task Templates')
+@section('title', 'Contracts Gantt Chart')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -9,10 +9,7 @@
 
 @section('page-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-projects-task-board.css')}}" />
-{{-- <link rel="stylesheet" href="https://zehntech.github.io/zt-gantt/style.css"/> --}}
-{{-- <link rel="stylesheet" href="https://zehntech.github.io/zt-gantt/gantt.css"/> --}}
-{{-- <link rel="stylesheet" href="{{asset('assets/libs/zt-gantt/gantt.css')}}" /> --}}
-<link rel="stylesheet" href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css" type="text/css">
+<link rel="stylesheet" href="{{asset('assets/libs/dhtmlxgantt/dhtmlxgantt.css')}}" type="text/css">
 <style>
 .gantt_container, .gantt_tooltip {
     background-color: #fff;
@@ -29,10 +26,7 @@
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
-{{-- <script type="text/javascript" src="https://zehntech.github.io/zt-gantt/gantt.js"></script> --}}
-{{-- <script src="{{asset('assets/libs/zt-gantt/gantt.js')}}"></script>
-<script src="{{asset('assets/libs/zt-gantt/gantt.js')}}"></script> --}}
-<script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
+<script src="{{asset('assets/libs/dhtmlxgantt/dhtmlxgantt.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -82,16 +76,18 @@
           id: 'Contract:' + contract.id,
           text: `${contract.subject}`,
           projectName: contract.project?.name,
-          assignableType: contract.assignable_type ? contract.assignable_type.split('\\')[2] : null,
-          assignable: contract.assignable?.name ?? contract.assignable?.first_name + ' ' + contract.assignable?.last_name,
+          assignableType: contract.assignable_id? (contract.assignable_type ? contract.assignable_type.split('\\')[2] : null) : null,
+          assignable: contract.assignable_id ? (contract.assignable?.name ?? contract.assignable?.first_name + ' ' + contract.assignable?.last_name) : null,
           // parent: 'Project:' + project.id,
           type: "Contract",
-          duration: calculateDateDifference(contract.start_date, contract.end_date),
+          duration: contract.start_date && contract.end_date ? calculateDateDifference(contract.start_date, contract.end_date) : null,
           status: contract.status,
           progress: calculateProgressPercentage(contract.start_date, contract.end_date),
-          start_date: new Date(contract.start_date),
-          // end_date: formateDate(contract.end_date),
+          start_date: contract.start_date ? new Date(contract.start_date) : '',
+          unscheduled:true && contract.start_date == null,
+          hasEndDate: true && contract.end_date != null,
           open: true,
+          rollup: true,
           color:"#CD545B"
         };
         data.push(contractData);
@@ -119,6 +115,7 @@
             type: "Phase",
             start_date: new Date(phase.start_date),
             duration: calculateDateDifference(phase.start_date, phase.due_date),
+            hasEndDate: true,
             // end_date: formateDate(phase.due_date),
             open: true,
           };
@@ -182,7 +179,7 @@
       url: route('admin.projects.gantt-chart.index'),
       data: {
         projects: $('[name="projects[]"]').val(),
-        status: $('[name="status"]').val(),
+        filter_status: $('[name="filter_status"]').val(),
         companies: $('[name="companies[]"]').val(),
         search_q: $('[name="search_task"]').val(),
         contract_type: $('[name="contract_type"]').val(),
@@ -191,30 +188,26 @@
       success: function (ganttProjects) {
         projects = ganttProjects;
         data = formateData(projects);
-        try{
-          gantt.eachTask(function(task) {
-            if(task.id)
-            gantt.deleteTask(task.id);
-          });
-        }catch(e){
-          try{
-          gantt.eachTask(function(task) {
-            gantt.deleteTask(task.id);
-          });
-          }catch(e){
-          }
-        }
-        try{
-          gantt.eachTask(function(task) {
-            gantt.deleteTask(task.id);
-          });
-        }catch(e){
-        }
+        remveAllTasks();
         gantt.parse({
           "data": data,
         });
       }
     });
+  }
+
+  function remveAllTasks(){
+    if(gantt.getTaskCount() == 0)
+      return;
+    else{
+      try{
+        gantt.eachTask(function(task) {
+              gantt.deleteTask(task.id);
+        });
+      }catch(e){
+      }
+      return remveAllTasks();
+    }
   }
 
 
@@ -495,15 +488,13 @@ gantt.templates.tooltip_text = function(start,end,task){
    var formatDate = gantt.date.date_to_str("%d-%m-%Y"); // Customize the date format here
     return `
         ${task.projectName ? `<b>Project:</b>${task.projectName}<br/>` : ''}
-        ${task.assignableType ? `<b>${task.assignableType}:</b>${task.assignable}<br/>` : ''}
+        ${task.assignableType && task.assignable ? `<b>${task.assignableType}:</b>${task.assignable}<br/>` : ''}
         ${task.type == 'Phase' ? `<b>Contract:</b>${task.contractName}<br/>` : ''}
         <b>${task.type}:</b>${task.text}<br/>
-        <b>Start date:</b>
-        ${formatDate(task.start_date)}<br/>
-        <b>End date:</b>
-        ${formatDate(task.end_date)}<br/>
+        ${!task.unscheduled ? `<b>Start date:</b>${formatDate(task.start_date)}<br/> ` : ''}
+        ${!task.unscheduled && task.hasEndDate ? `<b>End date:</b>${formatDate(task.end_date)}<br/>` : ''}
         <b>Status:</b>${task.status}<br/>
-        <b>Duration:</b> ${task.duration} ${task.duration > 1 ? "Days" : "Day"}<br/>
+        ${!task.unscheduled && task.hasEndDate ? `<b>Duration:</b> ${task.duration} ${task.duration > 1 ? "Days" : "Day"}<br/>` : ''}
         ${Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) > 0 ? '<b>Remaining Days:</b>' + Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) : ''}
     `;
 };
@@ -511,13 +502,15 @@ gantt.templates.tooltip_text = function(start,end,task){
 gantt.config.columns = [
     {name:"text", resize:true, label:"Contracts", width:"*", tree: true  },
     {name:"start_date", resize:true, label:"Start Date", align: "center" },
-    {name:"duration", resize:true, label:"Duration", align: "center" },
+    {name:"duration", resize:true, label:"Duration", align: "center" , template: function($task){
+      return $task.hasEndDate ? $task.duration : '-';
+    }},
     {
         name:"progress", resize:true,
         label:"Progress",
         align: "center",
         template: function(task) {
-            return (task.progress) + '%';  // Convert the progress to percentage
+            return task.hasEndDate ? (task.progress) + '%' : '-';  // Convert the progress to percentage
         }
     }
 ];
@@ -593,7 +586,7 @@ gantt.$task_data.style.cursor = 'grab';
             </div>
             <div class="col">
               {!! Form::label('project Status', 'Contract Status') !!}
-              {!! Form::select('status', [0 => 'All'] + $statuses, null, ['class' => 'form-select gantt_filter select2', 'data-placeholder' => 'Status']) !!}
+              {!! Form::select('filter_status', [0 => 'All'] + $statuses, null, ['class' => 'form-select gantt_filter select2', 'data-placeholder' => 'Status']) !!}
             </div>
             <div class="col">
               {!! Form::label('contract_type', 'Contract Type') !!}

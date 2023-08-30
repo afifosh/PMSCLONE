@@ -8,6 +8,7 @@ use App\Models\Contract;
 use App\Models\ContractPhase;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Date\Carbon;
 
@@ -52,13 +53,13 @@ class ProjectPhaseController extends Controller
 
   public function store($project, Contract $contract,Request $request)
   {
-    $contract->load('project');
+    $contract->load('project', 'phases');
     $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine(), 403);
 
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,contract_id,' . $contract->id,
-      'estimated_cost' => 'required|max:255',
+      'estimated_cost' => ['required', 'numeric', 'min:0','max:'.$contract->remaining_cost()],
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
       'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
@@ -87,13 +88,13 @@ class ProjectPhaseController extends Controller
 
   public function update($project, Request $request, Contract $contract, ContractPhase $phase)
   {
-    $contract->load('project');
+    $contract->load('project', 'phases');
     $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
 
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,' . $phase->id . ',id,contract_id,' . $contract->id,
-      'estimated_cost' => 'required|max:255',
+      'estimated_cost' => ['required', 'numeric', 'min:0','max:'.$contract->remaining_cost($phase->id)],
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
       'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,

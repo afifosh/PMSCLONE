@@ -35,6 +35,8 @@ class Company extends BaseModel
     'updated_at' => 'datetime:d M, Y',
   ];
 
+  protected $appends = ['avatar'];
+
   public function getAvatarAttribute($value)
   {
     if (!$value)

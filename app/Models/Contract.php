@@ -37,6 +37,7 @@ class Contract extends Model
     'Active',
     'About To Expire',
     'Expired',
+    'Draft',
     'Terminated',
     'Paused',
   ];
@@ -71,6 +72,26 @@ class Contract extends Model
     elseif($status == 'Terminated'){
       return ['Resumed', 'Terminated'];
     }
+  }
+
+  public function scopeApplyRequestFilters($q)
+  {
+    return $q->when(request()->filter_status, function ($q) {
+      if(request()->filter_status == 'Draft') return $q->where('status', 'Draft');
+      else if (request()->filter_status == 'Not started') {
+        $q->where('start_date', '>', now());
+      } elseif (request()->filter_status == 'Expired') {
+        $q->where('status', 'Active')->where('end_date', '<', now());
+      } elseif (request()->filter_status == 'Terminated') {
+        $q->where('status', 'Terminated');
+      } elseif (request()->filter_status == 'Paused') {
+        $q->where('status', 'Paused');
+      } elseif (request()->filter_status == 'Active') {
+        $q->where('status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now())->where('end_date', '>=', now()->addWeeks(2));
+      } elseif (request()->filter_status == 'About To Expire') {
+        $q->where('status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addWeeks(2));
+      }
+    });
   }
 
   public function type(): BelongsTo
@@ -127,6 +148,14 @@ class Contract extends Model
     elseif($status == 'Expired') return 'danger';
     elseif($status == 'Terminated') return 'danger';
     elseif($status == 'Paused') return 'warning';
+  }
+
+  public function remaining_cost($phase_to_ignore_id = null)
+  {
+    if($phase_to_ignore_id){
+      return $this->value - $this->phases()->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
+    }
+    return $this->value - $this->phases->sum('estimated_cost');
   }
 
   public function saveEventLog(ContractUpdateRequest $request, Contract $contract)

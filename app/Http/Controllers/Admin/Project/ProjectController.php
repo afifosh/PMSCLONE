@@ -36,11 +36,7 @@ class ProjectController extends Controller
    */
   public function create()
   {
-    $data['programs'] = Program::pluck('name', 'id')->prepend('Select Program', '');
-    $data['categories'] = ProjectCategory::pluck('name', 'id')->prepend('Select Category', '');
     $data['statuses'] = Project::STATUSES;
-    $data['members'] = Admin::get();
-    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id');
     $data['project'] = new Project;
 
     return view('admin.pages.projects.create', $data);
@@ -110,11 +106,12 @@ class ProjectController extends Controller
    */
   public function edit(Project $project)
   {
-    $data['programs'] = Program::pluck('name', 'id')->prepend('Select Program', '');
-    $data['categories'] = ProjectCategory::pluck('name', 'id')->prepend('Select Category', '');
+    $project->load(['members', 'companies']);
+    $data['programs'] = $project->program_id ? Program::where('id', $project->program_id)->pluck('name', 'id') : [];
+    $data['categories'] = $project->category_id ? ProjectCategory::pluck('name', 'id') : [];
     $data['statuses'] = Project::STATUSES;
-    $data['members'] = Admin::get();
-    $data['companies'] = Company::orderBy('id', 'desc')->pluck('name', 'id');
+    $data['members'] = $project->members;
+    $data['companies'] = $project->companies;
     $data['project'] = $project;
     return view('admin.pages.projects.create', $data);
   }

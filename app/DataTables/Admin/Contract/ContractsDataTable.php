@@ -65,6 +65,8 @@ class ContractsDataTable extends DataTable
       $q->where('project_id', $this->projectId);
     }
 
+    $q->applyRequestFilters();
+
     return $q;
   }
 

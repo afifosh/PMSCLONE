@@ -35,5 +35,6 @@ class DatabaseSeeder extends Seeder
         $this->call(NoteTagSeeder::class);
         $this->call(ContractTypeSeeder::class);
         $this->call(ClientSeeder::class);
+        $this->call(ContractSeeder::class);
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Country;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
@@ -41,10 +42,12 @@ class ClientController extends Controller
   public function store(Request $request)
   {
     $request->validate([
-      'first_name' => 'required|string|max:100',
+      'first_name' => ['required', 'string', 'max:100', Rule::unique('clients')->where(function ($query) use ($request) {
+        return $query->where('first_name', $request->first_name)->where('last_name', $request->last_name);
+      })],
       'last_name' => 'required|string|max:100',
       'phone' => 'nullable|string|max:25',
-      'email' => 'required|unique:clients,email|email|max:100',
+      'email' => 'nullable|unique:clients,email|email|max:100',
       'address' => 'nullable|string|max:255',
       'state' => 'nullable|string|max:100',
       'zip_code' => 'nullable|string|max:25',
@@ -53,6 +56,8 @@ class ClientController extends Controller
       'currency' => 'nullable|string|max:100',
       'timezone' => 'nullable|string|max:100',
       'status' => 'nullable|string|max:100',
+    ],[
+      'first_name.unique' => 'The name has already been taken.'
     ]);
 
     Client::create($request->all());
@@ -89,10 +94,12 @@ class ClientController extends Controller
   public function update(Request $request, Client $client)
   {
     $request->validate([
-      'first_name' => 'required|string|max:100',
+      'first_name' => ['required', 'string', 'max:100', Rule::unique('clients')->where(function ($query) use ($request, $client) {
+        return $query->where('first_name', $request->first_name)->where('last_name', $request->last_name)->where('id', '!=', $client->id);
+       })],
       'last_name' => 'required|string|max:100',
       'phone' => 'nullable|string|max:25',
-      'email' => 'required|unique:clients,email,' . $client->id . '|email|max:100',
+      'email' => 'nullable|unique:clients,email,' . $client->id . '|email|max:100',
       'address' => 'nullable|string|max:255',
       'state' => 'nullable|string|max:100',
       'zip_code' => 'nullable|string|max:25',
@@ -101,6 +108,8 @@ class ClientController extends Controller
       'currency' => 'nullable|string|max:100',
       'timezone' => 'nullable|string|max:100',
       'status' => 'nullable|string|max:100',
+    ],[
+      'first_name.unique' => 'The name has already been taken.'
     ]);
 
     $client->update($request->all());

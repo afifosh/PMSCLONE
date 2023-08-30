@@ -45,7 +45,7 @@ if (!function_exists('human_filesize')) {
 //   }
 // }
 
-if(!function_exists('transformModifiedData')) { // Get modified data from modidifications array
+if (!function_exists('transformModifiedData')) { // Get modified data from modidifications array
   function transformModifiedData($modifications)
   {
     foreach ($modifications as $key => $value) {
@@ -60,8 +60,8 @@ function collectModifiedFields($modifications)
   $mods = [];
   foreach ($modifications['fields']['modified'] as $key => $modified_field) {
     // dd($modified_field['value'], $modifications['fields']['original'][$key]['value']);
-    if($modified_field['value'] != $modifications['fields']['original'][$key]['value'])
-    $mods['fields'][$modified_field['id']] = $modified_field;
+    if ($modified_field['value'] != $modifications['fields']['original'][$key]['value'])
+      $mods['fields'][$modified_field['id']] = $modified_field;
   }
 
   return $mods;
@@ -103,49 +103,49 @@ function getCompanyStatusColor($status)
 }
 
 function array_diff_assoc_recursive($array1, $array2)
-  {
-    $difference=array();
-    foreach($array1 as $key => $value)
-    {
-      if( is_array($value) )
-      {
-        if( !isset($array2[$key]) || !is_array($array2[$key]) )
-        {
-          $difference[$key] = $value;
-        }
-        else
-        {
-          $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
-          if( !empty($new_diff) )
-            $difference[$key] = $new_diff;
-        }
-      }
-      elseif( !array_key_exists($key,$array2) || $array2[$key] !== $value )
-      {
+{
+  $difference = array();
+  foreach ($array1 as $key => $value) {
+    if (is_array($value)) {
+      if (!isset($array2[$key]) || !is_array($array2[$key])) {
         $difference[$key] = $value;
+      } else {
+        $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+        if (!empty($new_diff))
+          $difference[$key] = $new_diff;
       }
+    } elseif (!array_key_exists($key, $array2) || $array2[$key] !== $value) {
+      $difference[$key] = $value;
     }
-    return $difference;
   }
+  return $difference;
+}
 
-  function getAssetUrl($path)
-  {
-    return Storage::url($path);
-  }
+function getAssetUrl($path)
+{
+  return Storage::url($path);
+}
 
-  function remove_null_values($array)
-  {
-    return array_filter($array, function ($value) {
-      return !is_null($value);
-    });
-  }
+function remove_null_values($array)
+{
+  return array_filter($array, function ($value) {
+    return !is_null($value);
+  });
+}
 
-  function filterInputIds(array $ids): array
-  {
-    return array_unique(remove_null_values($ids));
-  }
+function filterInputIds(array $ids): array
+{
+  return array_unique(remove_null_values($ids));
+}
 
-  function formatCurrency($amount)
-  {
-    return number_format($amount) . ' ' . config('app.currency');
-  }
+function formatCurrency($amount)
+{
+  return number_format($amount) . ' ' . config('app.currency');
+}
+
+function optionParams($data)
+{
+  return collect($data ?? [])->mapWithKeys(function ($item) {
+    return [$item['id'] => ['data-full_name' => $item['full_name'] ? $item['full_name'] : $item['name'], 'data-avatar' => $item['avatar']]];
+  })->all();
+}

@@ -114,6 +114,11 @@
           "url": "/admin/projects/gantt-chart",
           "name": "Gantt Chart",
           "slug": "admin.projects.gantt-chart.index"
+        },
+        {
+          "url": "/admin/contracts/statistics",
+          "name": "Statistics",
+          "slug": "admin.contracts.statistics"
         }
       ]
     },
