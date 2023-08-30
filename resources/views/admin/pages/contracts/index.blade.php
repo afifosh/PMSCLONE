@@ -43,7 +43,7 @@ $configData = Helper::appClasses();
     const contractsByDistribution = {!! json_encode($contractsByDistribution) !!}
   </script>
   <script src="{{asset('assets/js/custom/admin-contracts-index.js')}}"></script>
-  <script src="{{asset('assets/js/dashboards-crm.js')}}"></script>
+  {{-- <script src="{{asset('assets/js/dashboards-crm.js')}}"></script> --}}
   <script>
   </script>
 @endif
@@ -62,7 +62,7 @@ $configData = Helper::appClasses();
       </div>
       <div class="card-body">
         <div class="row gy-3 d-md-flex justify-content-between">
-          <div class="col-md-2 col-6">
+          {{-- <div class="col-md-2 col-6">
             <div class="d-flex align-items-center">
               <div class="badge rounded-pill bg-label-primary me-3 p-2"><i class="ti ti-chart-pie-2 ti-sm"></i></div>
               <div class="card-info">
@@ -70,13 +70,22 @@ $configData = Helper::appClasses();
                 <small>{{__('Total')}}</small>
               </div>
             </div>
-          </div>
+          </div> --}}
           <div class="col-md-2 col-6">
             <div class="d-flex align-items-center">
               <div class="badge rounded-pill bg-label-info me-3 p-2"><i class="ti ti-users ti-sm"></i></div>
               <div class="card-info">
                 <h5 class="mb-0">{{$contracts['active']}}</h5>
                 <small>{{__('Active')}}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="d-flex align-items-center">
+              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+              <div class="card-info">
+                <h5 class="mb-0">{{$contracts['paused']}}</h5>
+                <small>{{__('Paused')}}</small>
               </div>
             </div>
           </div>
@@ -145,15 +154,6 @@ $configData = Helper::appClasses();
               <div class="card-info">
                 <h5 class="mb-0">{{$contracts['recently_added']}}</h5>
                 <small>{{__('Recently Added')}}</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-2 col-6">
-            <div class="d-flex align-items-center">
-              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
-              <div class="card-info">
-                <h5 class="mb-0">{{$contracts['paused']}}</h5>
-                <small>{{__('Paused')}}</small>
               </div>
             </div>
           </div>

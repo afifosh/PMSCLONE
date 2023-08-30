@@ -509,11 +509,11 @@ gantt.templates.tooltip_text = function(start,end,task){
 };
 
 gantt.config.columns = [
-    {name:"text", label:"Contracts", width:"*", tree: true  },
-    {name:"start_date", label:"Start Date", align: "center" },
-    {name:"duration", label:"Duration", align: "center" },
+    {name:"text", resize:true, label:"Contracts", width:"*", tree: true  },
+    {name:"start_date", resize:true, label:"Start Date", align: "center" },
+    {name:"duration", resize:true, label:"Duration", align: "center" },
     {
-        name:"progress",
+        name:"progress", resize:true,
         label:"Progress",
         align: "center",
         template: function(task) {
