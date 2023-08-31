@@ -399,6 +399,9 @@
     tooltipLabels: topContractsByValue.map(function (item) {
       return item.subject;
     }),
+    printable_values: topContractsByValue.map(function (item) {
+      return item.printable_value;
+    }),
     series: [
       {
         // name: 'Contracts By Value',
@@ -425,8 +428,8 @@
     },
     dataLabels: {
       enabled: true,
-      formatter: function (val) {
-        return val > 0 ? val : '';
+      formatter: function (val, data) {
+        return val > 0 ? topContractsByValueConfig.printable_values[data.dataPointIndex] : '';
       },
       offsetY: -20,
       style: {
@@ -447,7 +450,7 @@
           topContractsByValueConfig.tooltipLabels[seriesIndex] +
           '</span>' +
           '<span><b>Value:</b> ' +
-          series[seriesIndex][dataPointIndex] +
+          topContractsByValueConfig.printable_values[seriesIndex] +
           '</span>' +
           '</div>'
         );
