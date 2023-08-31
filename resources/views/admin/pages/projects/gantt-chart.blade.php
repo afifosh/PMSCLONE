@@ -19,6 +19,20 @@
 .gantt_tooltip{
  z-index: 999999999 !important;
 }
+/* highlight column on click */
+.highlighted-column {
+  background-color: #fff3a1;
+}
+
+.gantt_task_scale .gantt_scale_cell {
+  cursor: default;
+}
+
+.gantt_task_scale .gantt_scale_cell.highlighted-column {
+  color: #454545;
+  font-weight: bold;
+}
+/* End : highlight column on click */
 </style>
 @endsection
 
@@ -86,9 +100,11 @@
           start_date: contract.start_date ? new Date(contract.start_date) : '',
           unscheduled:true && contract.start_date == null,
           hasEndDate: true && contract.end_date != null,
+          type: contract.end_date == null ? 'milestone' : 'task',
           open: true,
           rollup: true,
-          color:"#CD545B"
+          color:"#CD545B",
+          remaining_days: contract.end_date ? Math.ceil((new Date(contract.end_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
         };
         data.push(contractData);
         // {"id":2, "text":"Task #1", "start_date":"02-04-2018", "duration":"8", "parent":"1", "progress":0.5, "open": true},
@@ -118,6 +134,7 @@
             hasEndDate: true,
             // end_date: formateDate(phase.due_date),
             open: true,
+            remaining_days: phase.due_date ? Math.ceil((new Date(phase.due_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
           };
           data.push(taskData);
         });
@@ -217,6 +234,34 @@
     //any custom logic here
     zoomToFit();
   });
+  // ****************************highlight column on click***************************
+  var selected_column = null;
+
+	gantt.attachEvent("onScaleClick", function (e, date) {
+		selected_column = date;
+		var pos = gantt.getScrollState();
+		gantt.render();
+		gantt.scrollTo(pos.x, pos.y);
+	});
+
+	function is_selected_column(column_date) {
+		if (selected_column && column_date.valueOf() == selected_column.valueOf()) {
+			return true;
+		}
+		return false;
+	}
+
+	gantt.templates.scale_cell_class = function (date) {
+		if (is_selected_column(date))
+			return "highlighted-column";
+	};
+	gantt.templates.timeline_cell_class = function (item, date) {
+		if (is_selected_column(date))
+			return "highlighted-column";
+	};
+  // ****************************End : highlight column on click***************************
+
+  // ****************************zoom to fit***************************
 	function toggleMode(toggle) {
 		gantt.$zoomToFit = !gantt.$zoomToFit;
 		if (gantt.$zoomToFit) {
@@ -466,6 +511,7 @@ const zoomConfig = {
 }
 	gantt.ext.zoom.init(zoomConfig);
 gantt.config.readonly = true;
+gantt.config.sort = true;
 	gantt.ext.zoom.setLevel("weeks");
 
 	gantt.$zoomToFit = false;
@@ -495,7 +541,7 @@ gantt.templates.tooltip_text = function(start,end,task){
         ${!task.unscheduled && task.hasEndDate ? `<b>End date:</b>${formatDate(task.end_date)}<br/>` : ''}
         <b>Status:</b>${task.status}<br/>
         ${!task.unscheduled && task.hasEndDate ? `<b>Duration:</b> ${task.duration} ${task.duration > 1 ? "Days" : "Day"}<br/>` : ''}
-        ${Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) > 0 ? '<b>Remaining Days:</b>' + Math.ceil((new Date(task.end_date) - new Date()) / (1000 * 60 * 60 * 24)) : ''}
+        ${task.remaining_days > 0 ? '<b>Remaining Days:</b>' + task.remaining_days : ''}
     `;
 };
 
@@ -504,6 +550,9 @@ gantt.config.columns = [
     {name:"start_date", resize:true, label:"Start Date", align: "center" },
     {name:"duration", resize:true, label:"Duration", align: "center" , template: function($task){
       return $task.hasEndDate ? $task.duration : '-';
+    }},
+    {name:"remaining_days", resize:true, label:"Days Left", align: "center" , template: function($task){
+      return $task.remaining_days > 0 ? $task.remaining_days : 0;
     }},
     {
         name:"progress", resize:true,
