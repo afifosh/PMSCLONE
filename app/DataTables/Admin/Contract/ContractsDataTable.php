@@ -37,8 +37,8 @@ class ContractsDataTable extends DataTable
       ->editColumn('type.name', function($project){
         return $project->type ? $project->type->name : '-';
       })
-      ->editColumn('value', function($project){
-        return $project->value ? $project->value : '-';
+      ->editColumn('value', function(Contract $contract){
+        return $contract->value ? $contract->printable_value : '-';
       })
       ->editColumn('start_date', function($project){
         return $project->start_date ? $project->start_date->format('d M, Y') : '-';
@@ -114,7 +114,7 @@ class ContractsDataTable extends DataTable
     return [
       Column::make('subject'),
       Column::make('type.name')->title('Type'),
-      Column::make('value')->title('Value('.config('app.currency').')'),
+      Column::make('value')->title('Value'),
       Column::make('start_date'),
       Column::make('end_date'),
       Column::make('phases_count')->title('Phases')->searchable(false),
@@ -126,7 +126,7 @@ class ContractsDataTable extends DataTable
       Column::make('company_name')->title('Company'),
       Column::make('project.name')->title('Project'),
       Column::make('type.name')->title('Type'),
-      Column::make('value')->title('Value('.config('app.currency').')'),
+      Column::make('value')->title('Value'),
       Column::make('start_date'),
       Column::make('end_date'),
       Column::make('phases_count')->title('Phases')->searchable(false),

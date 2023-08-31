@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Akaunting\Money\Money;
 
 class Contract extends Model
 {
@@ -23,6 +24,7 @@ class Contract extends Model
     'assignable_id',
     'refrence_id',
     'subject',
+    'currency',
     'value',
     'start_date',
     'end_date',
@@ -30,7 +32,7 @@ class Contract extends Model
     'status'
   ];
 
-  protected $appends = ['status'];
+  protected $appends = ['status', 'printable_value'];
 
   public const STATUSES = [
     'Not started',
@@ -48,6 +50,16 @@ class Contract extends Model
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
+
+  public function getValueAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setValueAttribute($value)
+  {
+    return $this->attributes['value'] = Money::{$this->currency ?? 'USD'}($value)->getAmount() * 100;
+  }
 
   public function getStatusAttribute()
   {
@@ -153,7 +165,7 @@ class Contract extends Model
   public function remaining_cost($phase_to_ignore_id = null)
   {
     if($phase_to_ignore_id){
-      return $this->value - $this->phases()->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
+      return $this->value - $this->phases->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
     }
     return $this->value - $this->phases->sum('estimated_cost');
   }
@@ -211,5 +223,15 @@ class Contract extends Model
     //     'admin_id' => auth()->id(),
     //   ]);
     // }
+  }
+
+  public function formatPhaseValue($value)
+  {
+    return Money::{$this->currency ?? 'USD'}($value)->getAmount();
+  }
+
+  public function getPrintableValueAttribute()
+  {
+    return Money::{$this->currency ?? 'USD'}($this->value, true)->format();
   }
 }

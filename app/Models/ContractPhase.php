@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Akaunting\Money\Money;
 
 class ContractPhase extends Model
 {
@@ -42,6 +43,16 @@ class ContractPhase extends Model
     'About To Expire' => 'warning',
     'Expired' => 'danger',
   ];
+
+  public function getEstimatedCostAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setEstimatedCostAttribute($value)
+  {
+    $this->attributes['estimated_cost'] = $value * 100;
+  }
 
   public function getStatusAttribute()
   {

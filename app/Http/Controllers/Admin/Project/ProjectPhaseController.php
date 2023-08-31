@@ -67,7 +67,7 @@ class ProjectPhaseController extends Controller
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
     ]);
 
-    $phase = $contract->phases()->create($request->only(['name', 'estimated_cost', 'description', 'status', 'start_date', 'due_date']));
+    $phase = $contract->phases()->create(['estimated_cost' => $contract->formatPhaseValue($request->estimated_cost)] + $request->only(['name', 'description', 'status', 'start_date', 'due_date']));
 
     $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
 
@@ -102,7 +102,7 @@ class ProjectPhaseController extends Controller
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
     ]);
 
-    $phase->update($request->only(['name', 'estimated_cost', 'description', 'status', 'start_date', 'due_date']));
+    $phase->update(['estimated_cost' => $contract->formatPhaseValue($request->estimated_cost)] + $request->only(['name', 'description', 'status', 'start_date', 'due_date']));
 
     $message = auth()->user()->name . ' updated phase: ' . $phase->name;
 

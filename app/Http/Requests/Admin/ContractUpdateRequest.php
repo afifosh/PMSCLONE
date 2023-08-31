@@ -30,6 +30,7 @@ class ContractUpdateRequest extends FormRequest
       'assign_to' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'in:Client,Company'],
       'client_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Client' && !$this->isSavingDraft), 'exists:clients,id'],
       'company_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && !$this->isSavingDraft), 'exists:companies,id'],
+      'currency' => [Rule::In(array_keys(config('money.currencies'))), 'min:0', 'max:92233720368547758'],
       'refrence_id' => 'nullable|unique:contracts,refrence_id,'.$this->contract->id.',id,deleted_at,NULL',
       'project_id' => ['nullable', 'exists:projects,id'],
       'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],

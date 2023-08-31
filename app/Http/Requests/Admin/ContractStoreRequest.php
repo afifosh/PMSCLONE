@@ -30,6 +30,7 @@ class ContractStoreRequest extends FormRequest
       'client_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Client' && $this->isSavingDraft == 0), 'exists:clients,id'],
       'company_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && $this->isSavingDraft == 0), 'exists:companies,id'],
       'project_id' => ['nullable', 'exists:projects,id'],
+      'currency' => [Rule::In(array_keys(config('money.currencies'))), 'min:0', 'max:92233720368547758'],
       'refrence_id' => 'nullable|unique:contracts,refrence_id',
       'start_date' => 'nullable|required_if:isSavingDraft,0|date',
       'end_date' => 'nullable|date|after_or_equal:start_date',

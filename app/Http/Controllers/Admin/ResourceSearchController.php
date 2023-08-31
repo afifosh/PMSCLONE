@@ -32,9 +32,14 @@ class ResourceSearchController extends Controller
         'search' => 'name',
         'select' => ['name as text', 'id']
       ],
+      'Currency' => []
     ];
     if (!isset($allowedResources[$resource])) {
       return $this->sendError('Invalid resource');
+    }
+
+    if ($resource == 'Currency') {
+      return $this->getCurrenciesList();
     }
 
     $model = 'App\Models\\' . $resource;
@@ -77,5 +82,26 @@ class ResourceSearchController extends Controller
         }
       });
     })->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
+  }
+
+  public function getCurrenciesList()
+  {
+    $q = request()->get('q');
+    $currencies = config('money.currencies');
+
+    $data = [
+      "current_page" => 1, "total" => 1, "per_page" => 2
+    ];
+
+    $data['data'] = collect($currencies)->filter(function ($currency, $symbol) use ($q) {
+      return strpos(strtolower($currency['name']), strtolower($q)) !== false || strpos(strtolower($symbol), strtolower($q)) !== false;
+    })->map(function ($currency, $symbol) {
+      return [
+        'id' => $symbol,
+        'text' => '(' . $symbol . ') - ' . $currency['name']
+      ];
+    })->values();
+
+    return $data;
   }
 }

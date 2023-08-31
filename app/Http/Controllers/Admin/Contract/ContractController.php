@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Contract;
 
+use Akaunting\Money\Money;
 use App\DataTables\Admin\Contract\ContractsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ContractStoreRequest;
@@ -89,7 +90,7 @@ class ContractController extends Controller
   protected function getContractsByAssignees()
   {
     // select contracts group by assignable_type
-    $data = Contract::selectRaw('assignable_type, COUNT(*) as contract_count')
+    $data = Contract::whereNotNull('assignable_type')->selectRaw('assignable_type, COUNT(*) as contract_count')
       ->groupBy('assignable_type')
       ->get();
 
@@ -111,14 +112,14 @@ class ContractController extends Controller
       ->first();
 
     $contracts = $contracts->toArray();
-    unset($contracts['status']);
+    unset($contracts['status'], $contracts['printable_value']);
 
     return $contracts;
   }
 
   protected function getContractsByValue()
   {
-    $data['contractsByValue'] = Contract::selectRaw('id, contracts.subject, contracts.value')
+    $data['contractsByValue'] = Contract::selectRaw('id, contracts.subject, contracts.value, contracts.currency')
       ->whereNull('contracts.deleted_at')
       ->orderBy('contracts.value', 'desc')
       ->limit(5)
@@ -245,6 +246,7 @@ class ContractController extends Controller
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
     $data['contract'] = new Contract();
     $data['clients'] = ['' => __('Select Client')];
+    $data['currency'] = ['USD' => '(USD) - US Dollar'];
 
     $data['projects'] = ['' => __('Select Project')];
     $data['companies'] = ['' => 'Select Company'];
@@ -297,6 +299,7 @@ class ContractController extends Controller
     $data['projects'] = $contract->project_id ? Project::where('id', $contract->project_id)->pluck('name', 'id') : ['' => __('Select Project')];
     $data['companies'] = Company::where('id', $contract->assignable_id)->pluck('name', 'id')->prepend('Select Company', '');
     $data['contract'] = $contract;
+    $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency. '.name')];
     $data['clients'] = Client::where('id', $contract->assignable_id)->pluck('email', 'id')->prepend(__('Select Client'), '');
     $data['statuses'] = $contract->getPossibleStatuses();
     if ($contract->status == 'Terminated')

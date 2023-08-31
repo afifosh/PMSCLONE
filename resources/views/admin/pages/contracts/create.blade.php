@@ -10,11 +10,6 @@
         {{ Form::label('subject', __('Subject'), ['class' => 'col-form-label']) }}
         {!! Form::text('subject', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Subject')]) !!}
     </div>
-    {{-- value --}}
-    <div class="form-group col-6">
-      {{ Form::label('value', __('Contract Value'), ['class' => 'col-form-label']) }}
-      {!! Form::number('value', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Contract Value')]) !!}
-    </div>
     {{-- project --}}
     <div class="form-group col-6">
       {{ Form::label('project_id', __('Project'), ['class' => 'col-form-label']) }}
@@ -25,6 +20,19 @@
         // 'data-href' => route('admin.projects.getCompanyByProject'),
         // 'data-target' => '#project-company-select'
         ])!!}
+    </div>
+    <div class="form-group col-6">
+      {{ Form::label('currency', __('Currency'), ['class' => 'col-form-label']) }}
+      {!! Form::select('currency', $currency ?? [], $contract->currency, [
+        'data-placeholder' => 'Select Currency',
+        'class' => 'form-select globalOfSelect2Remote',
+        'data-url' => route('resource-select', ['Currency'])
+        ])!!}
+    </div>
+    {{-- value --}}
+    <div class="form-group col-6">
+      {{ Form::label('value', __('Contract Value'), ['class' => 'col-form-label']) }}
+      {!! Form::number('value', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('0.00')]) !!}
     </div>
     <div class="form-group col-6">
       {{ Form::label('assign_to', __('Assign To'), ['class' => 'col-form-label']) }}
@@ -45,10 +53,24 @@
       'data-url' => route('resource-select-user', ['Client'])
       ]) !!}
     </div>
+    {{-- types --}}
+    <div class="form-group col-6">
+      {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
+      {!! Form::select('type_id', $types, $contract->type_id, ['class' => 'form-select globalOfSelect2']) !!}
+    </div>
+    <div class="form-group col-6">
+      {{ Form::label('refrence_id', __('Refrence Id'), ['class' => 'col-form-label']) }}
+      {!! Form::text('refrence_id', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Refrence Id')]) !!}
+    </div>
     {{-- start date --}}
     <div class="form-group col-6">
       {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
       {!! Form::date('start_date', $contract->start_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Start Date')]) !!}
+    </div>
+    {{-- end date --}}
+    <div class="form-group col-6 end-date-sec {{!$contract->subject || $contract->end_date ? '' : 'd-none'}}">
+      {{ Form::label('end_date', __('End Date'), ['class' => 'col-form-label']) }}
+      {!! Form::date('end_date', $contract->end_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('End Date')]) !!}
     </div>
     {{-- dute date --}}
     <div class="col-12 mt-2">
@@ -79,19 +101,6 @@
         </div>
       </div>
       <hr>
-    </div>
-    <div class="form-group col-6 end-date-sec {{!$contract->subject || $contract->end_date ? '' : 'd-none'}}">
-      {{ Form::label('end_date', __('End Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('end_date', $contract->end_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('End Date')]) !!}
-    </div>
-    {{-- types --}}
-    <div class="form-group col-6">
-      {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
-      {!! Form::select('type_id', $types, $contract->type_id, ['class' => 'form-select globalOfSelect2']) !!}
-    </div>
-    <div class="form-group col-6">
-      {{ Form::label('refrence_id', __('Refrence Id'), ['class' => 'col-form-label']) }}
-      {!! Form::text('refrence_id', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Refrence Id')]) !!}
     </div>
     {{-- description --}}
     <div class="form-group col-12">

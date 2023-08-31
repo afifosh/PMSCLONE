@@ -19,7 +19,8 @@ return new class extends Migration
       $table->unsignedBigInteger('assignable_id')->nullable();
       $table->string('refrence_id', 100)->unique()->nullable();
       $table->string('subject', 100);
-      $table->string('value', 100)->nullable();
+      $table->bigInteger('value')->default(0);
+      $table->string('currency', 100)->default('USD');
       $table->dateTime('start_date')->nullable();
       $table->dateTime('end_date')->nullable();
       $table->text('description')->nullable();
