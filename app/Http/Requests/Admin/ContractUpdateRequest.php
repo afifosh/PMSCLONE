@@ -33,7 +33,7 @@ class ContractUpdateRequest extends FormRequest
       'refrence_id' => 'nullable|unique:contracts,refrence_id,'.$this->contract->id.',id,deleted_at,NULL',
       'project_id' => ['nullable', 'exists:projects,id'],
       'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],
-      'end_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date', 'after_or_equal:start_date'],
+      'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
       'value' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft')],
       'description' => 'nullable|string|max:2000'
     ];

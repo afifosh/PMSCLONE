@@ -32,7 +32,7 @@ class ContractStoreRequest extends FormRequest
       'project_id' => ['nullable', 'exists:projects,id'],
       'refrence_id' => 'nullable|unique:contracts,refrence_id',
       'start_date' => 'nullable|required_if:isSavingDraft,0|date',
-      'end_date' => 'nullable|required_if:isSavingDraft,0|date|after_or_equal:start_date',
+      'end_date' => 'nullable|date|after_or_equal:start_date',
       'value' => 'nullable|required_if:isSavingDraft,0',
       'description' => 'nullable|string|max:2000',
     ];
