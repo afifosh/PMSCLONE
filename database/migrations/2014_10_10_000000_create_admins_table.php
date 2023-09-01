@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('state')->nullable();
             $table->string('zip_code')->nullable();
-            $table->string('language')->nullable();
+            $table->string('language')->default('en');
             $table->string('timezone')->nullable();
             $table->string('currency')->nullable();
             $table->rememberToken();

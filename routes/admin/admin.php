@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\Contract\ContractTypeController;
 use App\Http\Controllers\Admin\Contract\EventController;
 use App\Http\Controllers\Admin\Contract\NotifiableUserController;
 use App\Http\Controllers\Admin\Contract\PaymentScheduleController;
+use App\Http\Controllers\Admin\EmailTemplate\EmailTemplateController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
 use App\Http\Controllers\Admin\Partner\PatnerCompanyController;
@@ -240,6 +241,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
+    Route::get('email-templates/{id}/{lang?}', [EmailTemplateController::class, 'manageEmailLang'])->name('manage.email.language');
+    Route::resource('email_template', EmailTemplateController::class)->only(['update']);
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

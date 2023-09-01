@@ -165,49 +165,7 @@ class AdminAccountController extends Controller
   }
   public function languages()
   {
-    return [
-      'en' => 'English',
-      'fr' => 'French',
-      'es' => 'Spanish',
-      'de' => 'German',
-      'it' => 'Italian',
-      'pt' => 'Portuguese',
-      'ru' => 'Russian',
-      'ar' => 'Arabic',
-      'tr' => 'Turkish',
-      'zh' => 'Chinese',
-      'ja' => 'Japanese',
-      'ko' => 'Korean',
-      'id' => 'Indonesian',
-      'ms' => 'Malay',
-      'th' => 'Thai',
-      'vi' => 'Vietnamese',
-      'pl' => 'Polish',
-      'uk' => 'Ukrainian',
-      'nl' => 'Dutch',
-      'ro' => 'Romanian',
-      'hu' => 'Hungarian',
-      'cs' => 'Czech',
-      'el' => 'Greek',
-      'bg' => 'Bulgarian',
-      'fi' => 'Finnish',
-      'sv' => 'Swedish',
-      'da' => 'Danish',
-      'sk' => 'Slovak',
-      'no' => 'Norwegian',
-      'he' => 'Hebrew',
-      'hi' => 'Hindi',
-      'bn' => 'Bengali',
-      'fil' => 'Filipino',
-      'tl' => 'Filipino',
-      'my' => 'Burmese',
-      'km' => 'Khmer',
-      'zh-TW' => 'Chinese (Taiwan)',
-      'zh-CN' => 'Chinese (China)',
-      'zh-HK' => 'Chinese (Hong Kong)',
-      'zh-SG' => 'Chinese (Singapore)',
-      'zh-MO' => 'Chinese (Macau)',
-    ];
+    return config('languages');
   }
 
   public function currencies()

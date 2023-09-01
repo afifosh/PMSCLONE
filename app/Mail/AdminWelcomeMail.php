@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\EmailTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -11,52 +12,86 @@ use Illuminate\Queue\SerializesModels;
 
 class AdminWelcomeMail extends Mailable
 {
-    use Queueable, SerializesModels;
-    protected $user;
-    protected $data;
-    /**
-     * Create a new message instance.
-     *
-     * @return void
-     */
-    public function __construct($notifiable, $data)
-    {
-      $this->user = $notifiable;
-      $this->data = $data;
-    }
+  use Queueable, SerializesModels;
+  public $user;
+  public $data;
+  public $template;
+  /**
+   * Create a new message instance.
+   *
+   * @return void
+   */
+  public function __construct($notifiable, array $data)
+  {
+    $this->user = $notifiable;
+    $this->data = $data;
+    $this->template = EmailTemplate::where('slug', 'new_user')->with(['langTemplates' => function ($query) use ($notifiable) {
+      $query->where('lang', $notifiable->lang ? $notifiable->lang : 'en');
+    }])->first();
 
-    /**
-     * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
-     */
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'Welcome To Riyadh Art',
-        );
-    }
+    $this->template->langTemplates[0]->content = $this->replaceVariable($this->template->langTemplates[0]->content, $data + $this->user->toArray());
+  }
 
-    /**
-     * Get the message content definition.
-     *
-     * @return \Illuminate\Mail\Mailables\Content
-     */
-    public function content()
-    {
-        return new Content(
-            view: 'emails.admin.welcome',
-            with: [ 'email' => $this->user->email, 'password' => $this->data['password']]
-        );
-    }
+  /**
+   * Get the message envelope.
+   *
+   * @return \Illuminate\Mail\Mailables\Envelope
+   */
+  // public function envelope()
+  // {
+  //     return new Envelope(
+  //         subject: 'Welcome To Riyadh Art',
+  //     );
+  // }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array
-     */
-    public function attachments()
-    {
-        return [];
-    }
+  // /**
+  //  * Get the message content definition.
+  //  *
+  //  * @return \Illuminate\Mail\Mailables\Content
+  //  */
+  // public function content()
+  // {
+  //     return new Content(
+  //         view: 'emails.admin.welcome',
+  //         with: [ 'email' => $this->user->email, 'password' => $this->data['password']]
+  //     );
+  // }
+  public function build()
+  {
+    return $this->from(config('mail.from.address'), $this->template->from)->markdown('emails.admin.common_email_template')->subject($this->template->langTemplates[0]->subject)->with('content', $this->template->langTemplates[0]->content);
+  }
+
+  public function replaceVariable($content, $data)
+  {
+    $content = str_replace(
+      [
+        '{first_name}',
+        '{last_name}',
+        '{email}',
+        '{password}',
+        '{app_name}',
+        '{app_url}'
+      ],
+      [
+        $data['first_name'],
+        $data['last_name'],
+        $data['email'],
+        $data['password'],
+        config('app.name'),
+        config('app.url')
+      ],
+      $content
+    );
+    return $content;
+  }
+
+  // /**
+  //  * Get the attachments for the message.
+  //  *
+  //  * @return array
+  //  */
+  // public function attachments()
+  // {
+  //     return [];
+  // }
 }

@@ -127,6 +127,12 @@
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",
       "slug": "admin.core.settings.index"
+    },
+    {
+      "url": "admin/email-templates/1",
+      "name": "Email Templates",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "admin.manage.email.language"
     }
   ]
 }
