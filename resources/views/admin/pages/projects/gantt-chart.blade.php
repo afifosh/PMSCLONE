@@ -548,6 +548,9 @@ gantt.templates.tooltip_text = function(start,end,task){
 gantt.config.columns = [
     {name:"text", resize:true, label:"Contracts", width:"*", tree: true  },
     {name:"start_date", resize:true, label:"Start Date", align: "center" },
+    {name:"end_date", resize:true, label:"End Date", align: "center", template: function($task){
+      return $task.hasEndDate ? $task.end_date : '-';
+    }},
     {name:"duration", resize:true, label:"Duration", align: "center" , template: function($task){
       return $task.hasEndDate ? $task.duration : '-';
     }},
