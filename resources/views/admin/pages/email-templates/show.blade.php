@@ -18,9 +18,7 @@
 @section('page-script')
 <script>
   $(document).ready(function () {
-    $('.summernote-simple').summernote({
-      height: 300,
-    });
+    $('.summernote-simple').summernote();
         var styleEle = $("style#fixed");
       $("<style id=\"fixed\">.note-editor .dropdown-toggle::after { all: unset; } .note-editor .note-dropdown-menu { box-sizing: content-box; } .note-editor .note-modal-footer { box-sizing: content-box; }</style>")
       .prependTo("body");
@@ -71,7 +69,6 @@
                           @endforeach
                       </div>
                   </li>
-
               </ul>
           </div>
       </div>
@@ -81,248 +78,52 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body ">
-                    {{-- <div class="card"> --}}
                     {{Form::model($currEmailTempLang, array('route' => array('admin.email_template.update', $id), 'method' => 'PUT')) }}
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <h6 class="font-weight-bold pb-1">{{__('Placeholders')}}</h6>
-
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row text-xs">
-
+                                      <div class="row">
+                                        <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
+                                        <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
+                                        <p class="col-4">{{__('User Name')}} : <span class="pull-right text-primary">{user_name}</span></p>
+                                        <p class="col-4">{{__('User Email')}} : <span class="pull-right text-primary">{user_email}</span></p>
                                         @if($emailTemplate->slug=='new_user')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('First Name')}} : <span class="pull-right text-primary">{first_name}</span></p>
-                                                <p class="col-4">{{__('Last Name')}} : <span class="pull-right text-primary">{last_name}</span></p>
-                                                <p class="col-4">{{__('Email')}} : <span class="pull-right text-primary">{email}</span></p>
-                                                <p class="col-4">{{__('Password')}} : <span class="pull-right text-primary">{password}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='new_client')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Client Name')}} : <span class="pull-right text-primary">{client_name}</span></p>
-                                                <p class="col-4">{{__('Email')}} : <span class="pull-right text-primary">{client_email}</span></p>
-                                                <p class="col-4">{{__('Password')}} : <span class="pull-right text-primary">{client_password}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='new_support_ticket')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('User Name')}} : <span class="pull-right text-primary">{support_name}</span></p>
-                                                <p class="col-4">{{__('Support Title')}} : <span class="pull-right text-primary">{support_title}</span></p>
-                                                <p class="col-4">{{__('Support Priority')}} : <span class="pull-right text-primary">{support_priority}</span></p>
-                                                <p class="col-4">{{__('Support End Date')}} : <span class="pull-right text-primary">{support_end_date}</span></p>
-                                                <p class="col-4">{{__('Support Description')}} : <span class="pull-right text-primary">{support_description}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='new_contract')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Contract Subject')}} : <span class="pull-right text-primary">{contract_subject}</span></p>
-                                                <p class="col-4">{{__('Client Name')}} : <span class="pull-right text-primary">{contract_client}</span></p>
-                                                <p class="col-4">{{__('Contract Title')}} : <span class="pull-right text-primary">{contract_value}</span></p>
-                                                <p class="col-4">{{__('Contract Priority')}} : <span class="pull-right text-primary">{contract_start_date}</span></p>
-                                                <p class="col-4">{{__('Contract End Date')}} : <span class="pull-right text-primary">{contract_end_date}</span></p>
-                                                <p class="col-4">{{__('Contract Description')}} : <span class="pull-right text-primary">{contract_description}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='lead_assigned')
-                                            <div class="row">
-                                                <p class="col-4">{{__('Lead Name')}} : <span class="pull-right text-primary">{lead_name}</span></p>
-                                                <p class="col-4">{{__('Lead Email')}} : <span class="pull-right text-primary">{lead_email}</span></p>
-                                                <p class="col-4">{{__('Lead Subject')}} : <span class="pull-right text-primary">{lead_subject}</span></p>
-                                                <p class="col-4">{{__('Lead Pipeline')}} : <span class="pull-right text-primary">{lead_pipeline}</span></p>
-                                                <p class="col-4">{{__('Lead Stage')}} : <span class="pull-right text-primary">{lead_stage}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='deal_assigned')
-                                            <div class="row">
-                                                <p class="col-4">{{__('Deal Name')}} : <span class="pull-right text-primary">{deal_name}</span></p>
-                                                <p class="col-4">{{__('Deal Pipeline')}} : <span class="pull-right text-primary">{deal_pipeline}</span></p>
-                                                <p class="col-4">{{__('Deal Stage')}} : <span class="pull-right text-primary">{deal_stage}</span></p>
-                                                <p class="col-4">{{__('Deal Status')}} : <span class="pull-right text-primary">{deal_status}</span></p>
-                                                <p class="col-4">{{__('Deal Price')}} : <span class="pull-right text-primary">{deal_price}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='award_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Award Name')}} : <span class="pull-right text-primary">{award_name}</span></p>
-                                                <p class="col-4">{{__('Award Email')}} : <span class="pull-right text-primary">{award_email}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='customer_invoice_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Customer Name')}} : <span class="pull-right text-primary">{customer_name}</span></p>
-                                                <p class="col-4">{{__('Customer Email')}} : <span class="pull-right text-primary">{customer_email}</span></p>
-                                                <p class="col-4">{{__('Invoice Name')}} : <span class="pull-right text-primary">{invoice_name}</span></p>
-                                                <p class="col-4">{{__('Invoice Number')}} : <span class="pull-right text-primary">{invoice_number}</span></p>
-                                                <p class="col-4">{{__('Invoice Url')}} : <span class="pull-right text-primary">{invoice_url}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='new_invoice_payment')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Customer Name')}} : <span class="pull-right text-primary">{invoice_payment_name}</span></p>
-                                                <p class="col-4">{{__('Invoice Payment')}} : <span class="pull-right text-primary">{invoice_payment}</span></p>
-                                                <p class="col-4">{{__('Invoice Payment Amount')}} : <span class="pull-right text-primary">{invoice_payment_amount}</span></p>
-                                                <p class="col-4">{{__('Invoice Payment Date')}} : <span class="pull-right text-primary">{invoice_payment_date}</span></p>
-                                                <p class="col-4">{{__('Invoice Payment Method')}} : <span class="pull-right text-primary">{invoice_payment_method}</span></p>
-
-                                            </div>
-                                        @elseif($emailTemplate->slug=='new_payment_reminder')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Customer Name')}} : <span class="pull-right text-primary">{customer_name}</span></p>
-                                                <p class="col-4">{{__('Customer Email')}} : <span class="pull-right text-primary">{customer_email}</span></p>
-                                                <p class="col-4">{{__('Payment Reminder Name')}} : <span class="pull-right text-primary">{payment_reminder_name}</span></p>
-                                                <p class="col-4">{{__('Invoice Payment Number')}} : <span class="pull-right text-primary">{invoice_payment_number}</span></p>
-                                                <p class="col-4">{{__('Payment Due Amount')}} : <span class="pull-right text-primary">{invoice_payment_dueAmount}</span></p>
-                                                <p class="col-4">{{__('Payment Reminder Date')}} : <span class="pull-right text-primary">{payment_reminder_date}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='new_bill_payment')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Payment Name')}} : <span class="pull-right text-primary">{payment_name}</span></p>
-                                                <p class="col-4">{{__('Payment Bill')}} : <span class="pull-right text-primary">{payment_bill}</span></p>
-                                                <p class="col-4">{{__('Payment Amount')}} : <span class="pull-right text-primary">{payment_amount}</span></p>
-                                                <p class="col-4">{{__('Payment Date')}} : <span class="pull-right text-primary">{payment_date}</span></p>
-                                                <p class="col-4">{{__('Payment Method')}} : <span class="pull-right text-primary">{payment_method}</span></p>
-
-                                            </div>
-                                        @elseif($emailTemplate->slug=='bill_resent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Vendor Name')}} : <span class="pull-right text-primary">{vender_name}</span></p>
-                                                <p class="col-4">{{__('Vendor Email')}} : <span class="pull-right text-primary">{vender_email}</span></p>
-                                                <p class="col-4">{{__('Bill Name')}} : <span class="pull-right text-primary">{bill_name}</span></p>
-                                                <p class="col-4">{{__('Bill Number')}} : <span class="pull-right text-primary">{bill_number}</span></p>
-                                                <p class="col-4">{{__('Bill Url')}} : <span class="pull-right text-primary">{bill_url}</span></p>
-
-                                            </div>
-                                        @elseif($emailTemplate->slug=='proposal_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Proposal Name')}} : <span class="pull-right text-primary">{proposal_name}</span></p>
-                                                <p class="col-4">{{__('Proposal Email')}} : <span class="pull-right text-primary">{proposal_number}</span></p>
-                                                <p class="col-4">{{__('Proposal Url')}} : <span class="pull-right text-primary">{proposal_url}</span></p>
-
-
-                                            </div>
-                                        @elseif($emailTemplate->slug=='complaint_resent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Complaint Name')}} : <span class="pull-right text-primary">{complaint_name}</span></p>
-                                                <p class="col-4">{{__('Complaint Title')}} : <span class="pull-right text-primary">{complaint_title}</span></p>
-                                                <p class="col-4">{{__('Complaint Against')}} : <span class="pull-right text-primary">{complaint_against}</span></p>
-                                                <p class="col-4">{{__('Complaint Date')}} : <span class="pull-right text-primary">{complaint_date}</span></p>
-                                                <p class="col-4">{{__('Complaint Date')}} : <span class="pull-right text-primary">{complaint_description}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='leave_action_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Leave Name')}} : <span class="pull-right text-primary">{leave_name}</span></p>
-                                                <p class="col-4">{{__('Leave Status')}} : <span class="pull-right text-primary">{leave_status}</span></p>
-                                                <p class="col-4">{{__('Leave Reason')}} : <span class="pull-right text-primary">{leave_reason}</span></p>
-                                                <p class="col-4">{{__('Leave Start Date')}} : <span class="pull-right text-primary">{leave_start_date}</span></p>
-                                                <p class="col-4">{{__('Leave End Date')}} : <span class="pull-right text-primary">{leave_end_date}</span></p>
-                                                <p class="col-4">{{__('Leave Days')}} : <span class="pull-right text-primary">{total_leave_days}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='payslip_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Employee Name')}} : <span class="pull-right text-primary">{employee_name}</span></p>
-                                                <p class="col-4">{{__('Employee Email')}} : <span class="pull-right text-primary">{employee_email}</span></p>
-                                                <p class="col-4">{{__('Payslip Name')}} : <span class="pull-right text-primary">{payslip_name}</span></p>
-                                                <p class="col-4">{{__('Payslip Salary Month ')}} : <span class="pull-right text-primary">{payslip_salary_month}</span></p>
-                                                <p class="col-4">{{__('Payslip Url')}} : <span class="pull-right text-primary">{payslip_url}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='promotion_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p clss="col-4">{{__('Employee Name')}} : <span class="pull-right text-primary">{employee_name}</span></p>
-                                                <p class="col-4">{{__('Designation')}} : <span class="pull-right text-primary">{promotion_designation}</span></p>
-                                                <p class="col-4">{{__('Promotion Title')}} : <span class="pull-right text-primary">{promotion_title}</span></p>
-                                                <p class="col-4">{{__('Promotion Date')}} : <span class="pull-right text-primary">{promotion_date}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='resignation_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                {{--                                        <p class="col-4">{{__('Employee Name')}} : <span class="pull-right text-primary">{employee_name}</span></p>--}}
-                                                <p class="col-4">{{__('Employee Email')}} : <span class="pull-right text-primary">{resignation_email}</span></p>
-                                                <p class="col-4">{{__('Employee Name')}} : <span class="pull-right text-primary">{assign_user}</span></p>
-                                                <p class="col-4">{{__('Last Working Date')}} : <span class="pull-right text-primary">{resignation_date}</span></p>
-                                                <p class="col-4">{{__('Resignation Date')}} : <span class="pull-right text-primary">{notice_date}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='termination_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Employee Name')}} : <span class="pull-right text-primary">{termination_name}</span></p>
-                                                <p class="col-4">{{__('Employee Email')}} : <span class="pull-right text-primary">{termination_email}</span></p>
-                                                <p class="col-4">{{__('Notice Date')}} : <span class="pull-right text-primary">{notice_date}</span></p>
-                                                <p class="col-4">{{__('Termination Date')}} : <span class="pull-right text-primary">{termination_date}</span></p>
-                                                <p class="col-4">{{__('Termination Type')}} : <span class="pull-right text-primary">{termination_type}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='transfer_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Employee Name')}} : <span class="pull-right text-primary">{transfer_name}</span></p>
-                                                <p class="col-4">{{__('Employee Email')}} : <span class="pull-right text-primary">{transfer_email}</span></p>
-                                                <p class="col-4">{{__('Transfer Date')}} : <span class="pull-right text-primary">{transfer_date}</span></p>
-                                                <p class="col-4">{{__('Transfer Department')}} : <span class="pull-right text-primary">{transfer_department}</span></p>
-                                                <p class="col-4">{{__('Transfer Branch')}} : <span class="pull-right text-primary">{transfer_branch}</span></p>
-                                                <p class="col-4">{{__('Transfer Desciption')}} : <span class="pull-right text-primary">{transfer_description}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='trip_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Employee ')}} : <span class="pull-right text-primary">{trip_name}</span></p>
-                                                <p class="col-4">{{__('Purpose of Trip')}} : <span class="pull-right text-primary">{purpose_of_visit}</span></p>
-                                                <p class="col-4">{{__('Start Date')}} : <span class="pull-right text-primary">{start_date}</span></p>
-                                                <p class="col-4">{{__('End Date')}} : <span class="pull-right text-primary">{end_date}</span></p>
-                                                <p class="col-4">{{__('Country')}} : <span class="pull-right text-primary">{place_of_visit}</span></p>
-                                                <p class="col-4">{{__('Description')}} : <span class="pull-right text-primary">{trip_description}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='vender_bill_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Vendor Name')}} : <span class="pull-right text-primary">{vender_bill_name}</span></p>
-                                                <p class="col-4">{{__('Bill Number')}} : <span class="pull-right text-primary">{vender_bill_number}</span></p>
-                                                <p class="col-4">{{__('Bill Url')}} : <span class="pull-right text-primary">{vender_bill_url}</span></p>
-                                            </div>
-                                        @elseif($emailTemplate->slug=='warning_sent')
-                                            <div class="row">
-                                                <p class="col-4">{{__('App Name')}} : <span class="pull-end text-primary">{app_name}</span></p>
-                                                <p class="col-4">{{__('App Url')}} : <span class="pull-right text-primary">{app_url}</span></p>
-                                                <p class="col-4">{{__('Employee Name')}} : <span class="pull-right text-primary">{employee_warning_name}</span></p>
-                                                <p class="col-4">{{__('Subject')}} : <span class="pull-right text-primary">{warning_subject}</span></p>
-                                                <p class="col-4">{{__('Description')}} : <span class="pull-right text-primary">{warning_description}</span></p>
-                                            </div>
-
-
-                                            @endif
-
+                                          <p class="col-4">{{__('Password')}} : <span class="pull-right text-primary">{password}</span></p>
+                                        @elseif($emailTemplate->slug=='two_factor_code')
+                                          <p class="col-4">{{__('Two Factor Code')}} : <span class="pull-end text-primary">{two_factor_code}</span></p>
+                                        @elseif($emailTemplate->slug=='verify_email')
+                                          <p class="col-4">{{__('Verification URL')}} : <span class="pull-end text-primary">{verification_url}</span></p>
+                                        @elseif($emailTemplate->slug=='reset_password')
+                                          <p class="col-4">{{__('Password Reset link')}} : <span class="pull-end text-primary">{password_reset_link}</span></p>
+                                          <p class="col-4">{{__('Link Expiry Time')}} : <span class="pull-end text-primary">{link_expiry_time}</span></p>
+                                        @elseif($emailTemplate->slug=='contract_task_reminder')
+                                          <p class="col-4">{{__('Task Subject')}} : <span class="pull-end text-primary">{task_subject}</span></p>
+                                          <p class="col-4">{{__('Set By Name')}} : <span class="pull-end text-primary">{reminder_set_by_name}</span></p>
+                                          <p class="col-4">{{__('Set By Email')}} : <span class="pull-end text-primary">{reminder_set_by_email}</span></p>
+                                          <p class="col-4">{{__('Task View URL')}} : <span class="pull-end text-primary">{task_view_url}</span></p>
+                                          <p class="col-4">{{__('Reminder Desc')}} : <span class="pull-end text-primary">{reminder_description}</span></p>
+                                        @elseif($emailTemplate->slug=='contract_expiry')
+                                          <p class="col-4">{{__('Subject')}} : <span class="pull-end text-primary">{contract_subject}</span></p>
+                                          <p class="col-4">{{__('End Date')}} : <span class="pull-end text-primary">{contract_end_date}</span></p>
+                                          <p class="col-4">{{__('View URL')}} : <span class="pull-end text-primary">{contract_view_url}</span></p>
+                                        @elseif($emailTemplate->slug=='contract_termination')
+                                          <p class="col-4">{{__('Subject')}} : <span class="pull-end text-primary">{contract_subject}</span></p>
+                                          <p class="col-4">{{__('View URL')}} : <span class="pull-end text-primary">{contract_view_url}</span></p>
+                                        @elseif(in_array($emailTemplate->slug, ['new_location_login', 'new_device_login', 'failed_login']))
+                                          <p class="col-4">{{__('Time')}} : <span class="pull-end text-primary">{time}</span></p>
+                                          <p class="col-4">{{__('IP Address')}} : <span class="pull-end text-primary">{ip_address}</span></p>
+                                          <p class="col-4">{{__('browser')}} : <span class="pull-end text-primary">{browser}</span></p>
+                                          <p class="col-4">{{__('Location City')}} : <span class="pull-end text-primary">{location_city}</span></p>
+                                          <p class="col-4">{{__('Location State')}} : <span class="pull-end text-primary">{location_state}</span></p>
+                                        @endif
+                                      </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group col-6">
                             {{ Form::label('subject', __('Subject'), ['class' => 'col-form-label text-dark']) }}
                             {{ Form::text('subject', null, ['class' => 'form-control font-style', 'required' => 'required']) }}
@@ -331,26 +132,19 @@
                             {{ Form::label('from', __('From'), ['class' => 'col-form-label text-dark']) }}
                             {{ Form::text('from', $emailTemplate->from, ['class' => 'form-control font-style', 'required' => 'required']) }}
                         </div>
-
-
                         <div class="form-group col-12">
                             {{ Form::label('content', __('Email Message'), ['class' => 'col-form-label text-dark']) }}
                             {{ Form::textarea('content', $currEmailTempLang->content, ['class' => 'summernote-simple', 'required' => 'required']) }}
                         </div>
-
-
                         <div class="modal-footer">
                             {{ Form::hidden('lang', $template_lang) }}
                             <button class="btn btn-primary">{{__('Save Changes')}}</button>
                         </div>
-
                         {{ Form::close() }}
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-
 @endsection
 

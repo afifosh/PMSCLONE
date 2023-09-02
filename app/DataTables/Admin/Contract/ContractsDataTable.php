@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin\Contract;
 
+use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
@@ -28,8 +29,14 @@ class ContractsDataTable extends DataTable
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
-      ->addColumn('company_name', function($project){
-        return $project->assignable_type == Company::class && $project->assignable ? $project->assignable->name : '-';
+      ->addColumn('assigned_to', function($project){
+        if($project->assignable instanceof Company){
+          return view('admin._partials.sections.company-avatar', ['company' => $project->assignable]);
+        }else if($project->assignable instanceof Client){
+          return view('admin._partials.sections.client-info', ['user' => $project->assignable]);
+        }else{
+          return '-';
+        }
       })
       ->editColumn('project.name', function($project){
         return $project->project ? $project->project->name : '-';
@@ -46,9 +53,15 @@ class ContractsDataTable extends DataTable
       ->editColumn('end_date', function($project){
         return $project->end_date ? $project->end_date->format('d M, Y') : '-';
       })
-      ->filterColumn('company_name', function($query, $keyword){
+      ->filterColumn('assigned_to', function($query, $keyword){
         $query->whereHasMorph('assignable', Company::class, function($q) use($keyword){
-          $q->where('name', 'like', '%'.$keyword.'%');
+          $q->where('name', 'like', '%'.$keyword.'%')->orWhere('email', 'like', '%'.$keyword.'%');
+        })->orWhereHasMorph('assignable', Client::class, function($q) use($keyword){
+          $q->where(function($q) use($keyword){
+            $q->where('first_name', 'like', '%'.$keyword.'%')
+              ->orWhere('last_name', 'like', '%'.$keyword.'%')
+              ->orWhere('email', 'like', '%'.$keyword.'%');
+          });
         });
       })
       ->rawColumns(['subject']);
@@ -59,7 +72,7 @@ class ContractsDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    $q = $model->with(['project', 'type', 'assignable'])->withCount('phases')->newQuery();
+    $q = $model->with(['type', 'assignable'])->withCount('phases')->newQuery();
 
     if ($this->projectId) {
       $q->where('project_id', $this->projectId);
@@ -110,21 +123,9 @@ class ContractsDataTable extends DataTable
    */
   public function getColumns(): array
   {
-    if($this->projectId)
     return [
       Column::make('subject'),
-      Column::make('type.name')->title('Type'),
-      Column::make('value')->title('Value'),
-      Column::make('start_date'),
-      Column::make('end_date'),
-      Column::make('phases_count')->title('Phases')->searchable(false),
-      Column::make('status'),
-    ];
-
-    return [
-      Column::make('subject'),
-      Column::make('company_name')->title('Company'),
-      Column::make('project.name')->title('Project'),
+      Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
       Column::make('value')->title('Value'),
       Column::make('start_date'),

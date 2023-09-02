@@ -609,6 +609,10 @@ document.addEventListener('mousemove', function(e) {
 });
 
 gantt.$task_data.style.cursor = 'grab';
+
+$(document).ready(function () {
+  $(".gantt-chart-select2").select2({dropdownParent: $('#gantt-chart-card')});
+});
 </script>
 @endsection
 
@@ -626,32 +630,32 @@ gantt.$task_data.style.cursor = 'grab';
         </ul>
       </div>
     </div>
-    <div class="card-body">
+    <div class="card-body" id="gantt-chart-card">
       <div class="row">
         @if (!isset($project))
             <div class="col">
               {!! Form::label('projects', 'Projects') !!}
-              {!! Form::select('projects[]', $projects, null, ['class' => 'form-select select2 gantt_filter', 'data-placeholder' => 'Projects']) !!}
+              {!! Form::select('projects[]', $projects, null, ['class' => 'form-select gantt-chart-select2 gantt_filter', 'data-placeholder' => 'Projects', 'data-dropdownParent' => '$("#gantt-chart-card")']) !!}
             </div>
             <div class="col">
               {!! Form::label('project Status', 'Contract Status') !!}
-              {!! Form::select('filter_status', [0 => 'All'] + $statuses, null, ['class' => 'form-select gantt_filter select2', 'data-placeholder' => 'Status']) !!}
+              {!! Form::select('filter_status', [0 => 'All'] + $statuses, null, ['class' => 'form-select gantt_filter gantt-chart-select2', 'data-placeholder' => 'Status']) !!}
             </div>
             <div class="col">
               {!! Form::label('contract_type', 'Contract Type') !!}
-              {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select select2 gantt_filter', 'data-placeholder' => 'Type']) !!}
+              {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select gantt-chart-select2 gantt_filter', 'data-placeholder' => 'Type']) !!}
             </div>
             <div class="col">
               {!! Form::label('assigned_to_type', 'Assigned To') !!}
-              {!! Form::select('assigned_to_type', ['Both' => 'Both', 'Client' => 'Client', 'Company' => 'Company'], null, ['class' => 'form-select select2', 'data-placeholder' => 'Assigned To']) !!}
+              {!! Form::select('assigned_to_type', ['Both' => 'Both', 'Client' => 'Client', 'Company' => 'Company'], null, ['class' => 'form-select gantt-chart-select2', 'data-placeholder' => 'Assigned To']) !!}
             </div>
             <div class="col d-none">
               {!! Form::label('companies[]', 'Company') !!}
-              {!! Form::select('companies[]', $companies, null, ['class' => 'form-select select2 gantt_filter', 'data-placeholder' => 'Company']) !!}
+              {!! Form::select('companies[]', $companies, null, ['class' => 'form-select gantt-chart-select2 gantt_filter', 'data-placeholder' => 'Company']) !!}
             </div>
             <div class="col d-none">
               {!! Form::label('clients[]', 'Clients') !!}
-              {!! Form::select('contract_client', $contractClients, null, ['class' => 'form-select select2 gantt_filter', 'data-placeholder' => 'Clients']) !!}
+              {!! Form::select('contract_client', $contractClients, null, ['class' => 'form-select gantt-chart-select2 gantt_filter', 'data-placeholder' => 'Clients']) !!}
             </div>
           @endif
       </div>

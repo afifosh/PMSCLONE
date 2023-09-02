@@ -149,3 +149,22 @@ function optionParams($data)
     return [$item['id'] => ['data-full_name' => $item['full_name'] ? $item['full_name'] : $item['name'], 'data-avatar' => $item['avatar']]];
   })->all();
 }
+
+function siteInfoTemplate()
+{
+  return [
+    'App Name' => '{app_name}',
+    'App Url' => '{app_url}',
+  ];
+}
+
+function replaceSiteInfo($template)
+{
+  return str_replace(array_values(siteInfoTemplate()), [config('app.name'), config('app.url')], $template);
+}
+
+function replaceStrVariables($template, $data)
+{
+  $template = replaceSiteInfo($template);
+  return str_replace(array_keys($data), array_values($data), $template);
+}

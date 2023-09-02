@@ -2,12 +2,12 @@
 
 namespace App\Notifications\Admin;
 
-use App\Models\Task;
+use App\Mail\CommonMail;
+use App\Models\EmailTemplate;
 use App\Models\TaskReminder as ModelsTaskReminder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class TaskReminder extends Notification implements ShouldQueue
@@ -40,15 +40,25 @@ class TaskReminder extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail($notifiable)
     {
-        return (new MailMessage)
-                    ->subject('Task Reminder')
-                    ->greeting('Hello' . ' ' . ucwords($notifiable->first_name) . ',')
-                    ->line('This is a reminder for the task: ' . $this->taskReminder->task->subject)
-                    ->line('Description: ' . $this->taskReminder->description)
-                    ->line('Set By: ' . $this->taskReminder->sender->name)
-                    ->action('View Task', route('admin.projects.tasks.index', $this->taskReminder->task->project_id));
+      $template = EmailTemplate::where('slug', 'contract_task_reminder')->with(['langTemplates' => function ($query) use ($notifiable) {
+        $query->where('lang', $notifiable->lang ? $notifiable->lang : 'en');
+      }])->first();
+
+      $strTemp = [
+        '{user_name}' => $notifiable->first_name . ' ' . $notifiable->last_name,
+        '{user_email}' => $notifiable->email,
+        '{task_subject}' => @$this->taskReminder->task->subject ?? 'N/A',
+        '{reminder_description}' => @$this->taskReminder->description ?? 'N/A',
+        '{reminder_set_by_name}' => @$this->taskReminder->sender->name ?? 'N/A',
+        '{reminder_set_by_email}' => @$this->taskReminder->sender->email ?? 'N/A',
+        '{task_view_url}' => route('admin.projects.tasks.index', @$this->taskReminder->task->project_id) ?? 'N/A',
+      ];
+
+      $template->langTemplates[0]->content = replaceStrVariables($template->langTemplates[0]->content, $strTemp);
+
+      return (new CommonMail($notifiable, $template))->to($notifiable->email);
     }
 
     /**

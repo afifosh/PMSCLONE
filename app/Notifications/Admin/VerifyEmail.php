@@ -2,12 +2,10 @@
 
 namespace App\Notifications\Admin;
 
+use App\Mail\CommonMail;
 use App\Models\EmailTemplate;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailBase;
 use Illuminate\Bus\Queueable;
@@ -31,5 +29,28 @@ class VerifyEmail extends VerifyEmailBase implements ShouldQueue
         'hash' => sha1($notifiable->getEmailForVerification()),
       ]
     );
+  }
+
+  public function toMail($notifiable)
+  {
+    $verificationUrl = $this->verificationUrl($notifiable);
+
+    if (static::$toMailCallback) {
+      return call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
+    }
+
+    $template = EmailTemplate::where('slug', 'verify_email')->with(['langTemplates' => function ($query) use ($notifiable) {
+      $query->where('lang', $notifiable->lang ? $notifiable->lang : 'en');
+    }])->first();
+
+    $strTemp = [
+      '{user_name}' => $notifiable->first_name . ' ' . $notifiable->last_name,
+      '{user_email}' => $notifiable->email,
+      '{verification_link}' => $verificationUrl,
+    ];
+
+    $template->langTemplates[0]->content = replaceStrVariables($template->langTemplates[0]->content, $strTemp);
+
+    return (new CommonMail($notifiable, $template))->to($notifiable->email);
   }
 }

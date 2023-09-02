@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\EmailTemplate;
 use App\Models\EmailTemplateLang;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class EmailTemplateSeeder extends Seeder
@@ -22,17 +21,25 @@ class EmailTemplateSeeder extends Seeder
   {
     // Email Template
     $emailTemplate = [
-      'New User',
-      'New Client',
+      'new_user' => 'New User',
+      'contract_expiry' => 'Contract Expiry',
+      'contract_task_reminder' => 'Contract Task Reminder',
+      'reset_password' => 'Reset Password',
+      'verify_email' => 'Verify Email',
+      'failed_login' => 'Failed Login',
+      'new_device_login' => 'New Device Login',
+      'new_location_login' => 'New Location Login',
+      'lost_recover_code' => 'Lost Recovery Code',
+      'two_factor_code' => 'Two Factor Code',
     ];
-    foreach ($emailTemplate as $eTemp) {
+    foreach ($emailTemplate as $slug => $eTemp) {
       $emailTemp = EmailTemplate::where('name', $eTemp)->count();
       if ($emailTemp == 0) {
         EmailTemplate::create(
           [
             'name' => $eTemp,
             'from' => env('APP_NAME'),
-            'slug' => strtolower(str_replace(' ', '_', $eTemp)),
+            'slug' => $slug,
             'created_by' => 1,
           ]
         );
@@ -43,64 +50,862 @@ class EmailTemplateSeeder extends Seeder
       'new_user' => [
         'subject' => 'New User',
         'lang' => [
-          'ar' => '<p>مرحبا،&nbsp;<br>مرحبا بك في {app_name}.</p><p><b>البريد الإلكتروني </b>: {email}<br><b>كلمه السر</b> : {password}</p><p>{app_url}</p><p>شكر،<br>{app_name}</p>',
-          'zh' => '<p>您好，<br>欢迎使用 {app_name}。</p><p><b>电子邮件 </b>：{email}<br><b>密码</b>：{password} </p><p>{app_url}</p><p>谢谢，<br>{app_name}</p>',
-          'da' => '<p>Hej,&nbsp;<br>Velkommen til {app_name}.</p><p><b>E-mail </b>: {email}<br><b>Adgangskode</b> : {password}</p><p>{app_url}</p><p>Tak,<br>{app_name}</p>',
-          'de' => '<p>Hallo,&nbsp;<br>Willkommen zu {app_name}.</p><p><b>Email </b>: {email}<br><b>Passwort</b> : {password}</p><p>{app_url}</p><p>Vielen Dank,<br>{app_name}</p>',
-          'en' => '<p>Hello,&nbsp;<br>Welcome to {app_name}.</p><p><b>Email </b>: {email}<br><b>Password</b> : {password}</p><p>{app_url}</p><p>Thanks,<br>{app_name}</p>',
-          'es' => '<p>Hola,&nbsp;<br>Bienvenido a {app_name}.</p><p><b>Correo electrónico </b>: {email}<br><b>Contraseña</b> : {password}</p><p>{app_url}</p><p>Gracias,<br>{app_name}</p>',
-          'fr' => '<p>Bonjour,&nbsp;<br>Bienvenue à {app_name}.</p><p><b>Email </b>: {email}<br><b>Mot de passe</b> : {password}</p><p>{app_url}</p><p>Merci,<br>{app_name}</p>',
-          'he' => '<p>שלום,&nbsp;<br>ברוכים הבאים אל {app_name}.</p><p><b>דוא"ל </b>: {email}<br><b>סיסמה</b> : {password} </p><p>{app_url}</p><p>תודה,<br>{app_name}</p>',
-          'it' => '<p>Ciao,&nbsp;<br>Benvenuto a {app_name}.</p><p><b>E-mail </b>: {email}<br><b>Parola d\'ordine</b> : {password}</p><p>{app_url}</p><p>Grazie,<br>{app_name}</p>',
-          'ja' => '<p>こんにちは、&nbsp;<br>へようこそ {app_name}.</p><p><b>Eメール </b>: {email}<br><b>パスワード</b> : {password}</p><p>{app_url}</p><p>おかげで、<br>{app_name}</p>',
-          'nl' => '<p>Hallo,&nbsp;<br>Welkom bij {app_name}.</p><p><b>E-mail </b>: {email}<br><b>Wachtwoord</b> : {password}</p><p>{app_url}</p><p>Bedankt,<br>{app_name}</p>',
-          'pl' => '<p>Witaj,&nbsp;<br>Witamy w {app_name}.</p><p><b>E-mail </b>: {email}<br><b>Hasło</b> : {password}</p><p>{app_url}</p><p>Dzięki,<br>{app_name}</p>',
-          'ru' => '<p>Привет,&nbsp;<br>Добро пожаловать в {app_name}.</p><p><b>Электронное письмо </b>: {email}<br><b>пароль</b> : {password}</p><p>{app_url}</p><p>Спасибо,<br>{app_name}</p>',
-          'pt' => '<p>Olá,<br>Bem-vindo ao {app_name}.</p><p><b>E-mail </b>: {email}<br><b>Senha</b> : {password}</p><p>{app_url}</p><p>Obrigada,<br>{app_name}</p>',
-          'tr' => '<p>Merhaba,&nbsp;<br>{app_name} e hoş geldiniz.</p><p><b>E-posta </b>: {email}<br><b>Şifre</b> : {şifre} </p><p>{app_url}</p><p>Teşekkürler,<br>{app_name}</p>',
-          'pt-br' => '<p>Olá,<br>Bem-vindo ao {app_name}.</p><p><b>E-mail </b>: {email}<br><b>Senha</b> : {password}</p><p>{app_url}</p><p>Obrigada,<br>{app_name}</p>',
-
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+                <tbody>
+                  <tr>
+                    <td align="center" valign="top">
+                      <!-- Table Card Open // -->
+                      <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+                        <tbody>
+                          <tr>
+                            <!-- Header Top Border // -->
+                            <td height="3" style="background-color:#003CE5;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                              <!-- Hero Image // -->
+                              <a href="#" target="_blank" style="text-decoration:none;">
+                                <img src="http://weekly.grapestheme.com/notify/img/hero-img/blue/heroFill/user-welcome.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                              </a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center" valign="top" style="padding-bottom: 5px; padding-left: 20px; padding-right: 20px;" class="mainTitle">
+                              <!-- Main Title Text // -->
+                              <h2 class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">
+                                Welcome to Riyadh Art!
+                              </h2>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center" valign="top" style="padding-bottom: 30px; padding-left: 20px; padding-right: 20px;" class="subTitle">
+                              <!-- Sub Title Text // -->
+                              <h4 class="text" style="color:#999999; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                                Getting Started With Riyadh Art</h4>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tablCatagoryLinks" style="">
+                                <tbody><tr>
+                                  <td align="center" valign="top" style="padding-bottom:20px;" class="catagoryLinks">
+                                    <a href="#" target="_blank" style="display:inline-block;">
+                                      <img src="http://weekly.grapestheme.com/notify/img/icons/catagory-1.png" alt="" width="60" border="0" style="height:auto; width:100%; max-width:60px; margin-left:2px; margin-right:2px">
+                                    </a>
+                                    <a href="#" target="_blank" style="display:inline-block;">
+                                      <img src="http://weekly.grapestheme.com/notify/img/icons/catagory-2.png" alt="" width="60" border="0" style="height:auto; width:100%; max-width:60px; margin-left:2px; margin-right:2px">
+                                    </a>
+                                    <a href="#" target="_blank" style="display:inline-block;">
+                                      <img src="http://weekly.grapestheme.com/notify/img/icons/catagory-3.png" alt="" width="60" border="0" style="height:auto; width:100%; max-width:60px; margin-left:2px; margin-right:2px">
+                                    </a>
+                                    <a href="#" target="_blank" style="display:inline-block;">
+                                      <img src="http://weekly.grapestheme.com/notify/img/icons/catagory-4.png" alt="" width="60" border="0" style="height:auto; width:100%; max-width:60px; margin-left:2px; margin-right:2px">
+                                    </a>
+                                  </td>
+                                </tr>
+                              </tbody></table>
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableTitleDescription" style="">
+                                <tbody><tr>
+                                  <td align="center" valign="top" style="padding-bottom:10px;" class="mediumTitle">
+                                    <!-- Medium Title Text // -->
+                                    <p class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">
+                                      Explore our trending Category
+                                    </p>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td align="center" valign="top" style="padding-bottom: 20px;" class="description">
+                                    <!-- Description Text// -->
+                                    <p class="text" style="color: rgb(102, 102, 102); font-family: " open="" sans",="" helvetica,="" arial,="" sans-serif;="" font-size:="" 14px;="" font-style:="" normal;="" letter-spacing:="" line-height:="" 22px;="" text-transform:="" none;="" text-align:="" center;="" padding:="" 0px;="" margin:="" 0px;"=""><b>Your Credentials are</b><br><b>Email:</b> {email}<br><b>Password:</b><span style="font-weight: 400;"> {password}<br>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Thank you for joining with Notify, We have more than a 6 million Readers Each Month, keeping you up to date with what’s going on in the world.
+                                    </span></p>
+                                  </td>
+                                </tr>
+                              </tbody></table>
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButton" style="">
+                                <tbody><tr>
+                                  <td align="center" valign="top" style="padding-top:20px;padding-bottom:20px;">
+                                    <!-- Button Table // -->
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0">
+                                      <tbody><tr>
+                                        <td align="center" class="ctaButton" style="background-color:#003CE5;padding-top:12px;padding-bottom:12px;padding-left:35px;padding-right:35px;border-radius:50px">
+                                          <!-- Button Link // -->
+                                          <a class="text" href="{app_url}" style="color:#FFFFFF; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                            Explore Now
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </tbody></table>
+                                  </td>
+                                </tr>
+                              </tbody></table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td align="center" valign="middle" style="padding-bottom: 40px;" class="emailRegards">
+                                      <!-- Image and Link // -->
+                                      <a href="#" target="_blank" style="text-decoration:none;">
+                                          <img mc:edit="signature" src="http://grapestheme.com/notify/img//other/signature.png" alt="" width="150" border="0" style="width:100%;
+                                                max-width:150px; height:auto; display:block;">
+                                      </a>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <!-- Table Card Close// -->
+                      <!-- Space -->
+                      <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                        <tbody>
+                          <tr>
+                            <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                </tr>
+              </tbody>
+            </table>',
         ],
       ],
-      'new_client' => [
-        'subject' => 'New Client',
+      'contract_expiry' => [
+        'subject' => 'Contract Expired',
         'lang' => [
-          'ar' => '<p>مرحبا { client_name } ، </p><p>أنت الآن Client ..</p><p>البريد الالكتروني : { client_email } </p><p>كلمة السرية : { client_password }</p><p>{ app_url }</p><p>شكرا</p><p>{ app_name }</p>',
-          'zh' => '<p><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Hello {client_name}，</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">scotstyle ="color: rgb(29， 28， 29); font-family: Slack-Lata， Slack-Fractions， appleLogo ， sans-serif; font-size: 15px; font-variant-ligatures: font-ligatures; backgrou-color: rgb(248， 248， 248);">您现在是 Client..</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">《 b data-stringify-type="bold" style ="boxit " style: inherit ; color: rgb(29， 28， 29); font-family: Slack-lato，松弛 - 分数， appleLogo ， sans-serif; font-size: 15px; font-variant-ligatures: 常用 - ligatures; 背景色:rgb(248， 248， 248);">Email</b><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">: {client_email}</span><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">style ="box-size: inherit ; color: rgb(29， 28， 29); font-family: Slack-lato， slack-馏分， appleLogo， sans-serif; font-size: 15px; font-variant-ligatures: 普通 - ligatures; 背景色:rgb(248， 248， 248);"><b data-stringify-type="bold" style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Password</b><b data-stringify-type="bold" style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">style ="color : rgb(29， 28， 29); font-family: Slack-lato，松弛-分数， appleLogo， sans-serif; font-size: 15px; font -variant-ligatures: 普通 - ligatures; 背景色:rgb(248， 248， 248);"> : {client_password}</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">{app_url}</span><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">style="box-sizessis : inherit ; color: rgb(29， 28， 29); 字体系列:slack-lato，松弛分数， appleLogo ， sans-serif; 字体大小: 15px; 字体-变体-连接图: 公共连接 ; 背景色:rgb(248， 248， 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">谢谢，</span><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">style ="box-size: inherit ; color: rgb(29， 28， 29); font-family: Slack-lato， slack-馏分， appleLogo， sans-serif; font-size: 15px; font-variant-ligatures: 普通 - ligatures; 背景色:rgb(248， 248， 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">{app_name}</span><br></p>',
-          'da' => '<p>Hej { client_name },</p><p> Du er nu klient ..</p><p>E-mail: { client_email } </p><p>Password: { client_password }</p><p>{ app_url }</p><p>Tak.</p><p>{ app_name }</p>',
-          'de' => '<p>Hallo {client_name}, </p><p>Sie sind jetzt Client ..</p><p>E-Mail: {client_email}</p><p> Kennwort: {client_password}</p><p>{app_url}</p><p>Danke,</p><p>{Anwendungsname}</p>',
-          'en' => '<p><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Hello {client_name},</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">You are now Client..</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><b data-stringify-type="bold" style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Email&nbsp;</b><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">: {client_email}</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><b data-stringify-type="bold" style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Password</b><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">&nbsp;: {client_password}</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">{app_url}</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Thanks,</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">{app_name}</span><br></p>',
-          'es' => '<p>Hola {nombre_cliente},</p><p> ahora es Cliente ..</p><p>Correo electrónico: {client_email}</p><p> Contraseña: {client_password}</p><p>{app_url}</p><p>Gracias,</p><p>{app_name}</p>',
-          'fr' => '<p>Bonjour { client_name }, </p><p>Vous êtes maintenant Client ..</p><p>Adresse électronique: { client_email } </p><p>Mot de passe: { client_password }</p><p>{ app_url }</p><p>Merci,</p><p>{ app_name }</p>',
-          'he' => '<p><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">הלו {client_name},</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span סגנון = " צבע: rgb (29, 28, 29); משפחת פונט: Sמחסור-Lato, ססור-שברים, appleלוגו, appleLogo, sans-serif; גודל גופן: 15px; גלגולי גופן: 15px; צבע-כללי רקע: rgb (248, 248, 248, 248); אתה עכשיו לקוח ...</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><b data-stringify-type = "מודגש" סגנון = "מודגש", צבע: צבע: rgb (29, 28, 29, 29); משפחת פונט: Slack-Lato, Slack-Fractions, AppleLogo, sans-serif; גודל גופן: 15px; גופנים-גלידות: צבע רקע: rgb: rgb (248, 248, 248, 248); #nbsp;</b><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">: {client_ייל}</span><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">: {client_ייל}</span><br לסגנון = " תיבה: צבע: צבע: צבע: rgb (29, 28, 29); משפחה: Slack-Lato, Slack-Fractions, appleLogo, appleLogo, sans-serif; גודל גופן: 15px; גופן-יוני ליגריות: rgb-צבע רקע: rgb (248, 248, 248, 248);<b data-stringify-type="bold" style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">סיסמה</b><span סגנון = " צבע: rgb (29, 28, 29); Slack-Lato, Slack-Lato, Slack-Fractions, appleLogo, appleLogo, applelogo, appleLogo, pleLogo, applelogo, applelogo, appleLogo, sans-serif; גופן = 15px; #15px; צבע רקע: rgb (248, 248, 248); &nbsp;: {client_password}</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">{app_url}</span><br לסגנון = " תיבה-גודל: צבע: צבע: rgb (29, 28, 29); משפחת פונט: Slack-Lato, Slack-Fractions, appleLogo, appleלוגו, זנות-גודל גופן: 15px; צבע רקע: 15px; צבע רקע: rgb: rgb (248, 248, 248, 248);<span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">תודה,</span><br סטייל = " תיבה: rgb: צבע: rgb (29, 28, 29); משפחת פונט: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; גופן-גודל גופן: 15px; גופן-variant-קשירה: צבע רקע משותף: rgb (248, 248, 248);<span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">{app_name}</span><br></p>',
-          'it' => '<p>Hello {client_name}, </p><p>Tu ora sei Client ..</p><p>Email: {client_email} </p><p>Password: {client_password}</p><p>{app_url}</p><p>Grazie,</p><p>{app_name}</p>',
-          'ja' => '<p>こんにちは {client_name} 、</p><p>お客様になりました。</p><p>E メール : {client_email}</p><p> パスワード : {client_password}</p><p>{app_url}</p><p>ありがとう。</p><p>{app_name}</p>',
-          'nl' => '<p>Hallo { client_name }, </p><p>U bent nu Client ..</p><p>E-mail: { client_email } </p><p>Wachtwoord: { client_password }</p><p>{ app_url }</p><p>Bedankt.</p><p>{ app_name }</p>',
-          'pl' => '<p>Witaj {client_name }, </p><p>jesteś teraz Client ..</p><p>E-mail: {client_email }</p><p> Hasło: {client_password }</p><p>{app_url }</p><p>Dziękuję,</p><p>{app_name }</p>',
-          'ru' => '<p>Hello { client_name }, </p><p>Вы теперь клиент ..</p><p>Адрес электронной почты: { client_email } </p><p>Пароль: { client_password }</p><p>{ app_url }</p><p>Спасибо.</p><p>{ app_name }</p><p>Olá {client_name}, </p><p>Você agora é Client ..</p><p>E-mail: {client_email} </p><p>Senha: {client_password}</p><p>{app_url}</p><p>Obrigado,</p><p>{app_name}</p>',
-          'pt' => '<p>Olá {client_name}, </p><p>Você agora é Client ..</p><p>E-mail: {client_email} </p><p>Senha: {client_password}</p><p>{app_url}</p><p>Obrigado,</p><p>{app_name}</p>',
-          'tr' => '<p><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Merhaba { client_name },</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span style = " color: rgb (29, 28, 29); font-family: Sack-Lato, Slack-Fragactions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb (248, 248, 248); "> Rgb (248, 248, 248); "> Artık Müşteri ..</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><b data-stringify-type = "bold" style = " box-boyutlandırma: devral; renk: rgb (29, 28, 29); font-family: Seksime-Lato, Seksiks-Frarits, appleLogo, sans-serif; font-size: 15px; font-variant-color: common-ligatures; background-color: rgb (248, 248, 248); "> E-posta &nbsp;</b><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">: { client_email }</span><br style = " box-boyutlandırma: devral; renk: rgb (29, 28, 29); font-family: Seksime-Lato, Sack-Frations, appleLogo, sans-serif; font-size: 15px; font-variant-ligatürler: common-ligatures; background-color: rgb (248, 248, 248); "><b data-stringify-type="bold" style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Parola</b><span style = " color: rgb (29, 28, 29); font-family: Seksime-lato, Seksi-Frations, appleLogo, sans-serif; font-size: 15px; font-variant-ligatür: common-ligature; background-color: rgb (248, 248, 248); "> &nbsp;: { client_password }</span><br style="box-sizing: inherit; color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);"><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">{ app_url }</span><br style = " box-boyutlandırma: devral; renk: rgb (29, 28, 29); font-family: Seksi-Lato, sack-Frations, appleLogo, sans-serif; font-size: 15px; font-variant-ligatürler: common-ligatures; background-color: rgb (248, 248, 248); "><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">Teşekkürler,</span><br style = " box-boyutlandırma: devral; color: rgb (29, 28, 29); font-family: Seksime-Lapo, Seksime-Frations, appleLogo, sans-serif; font-size: 15px; font-variant-ligatürler: common-ligatures; background-color: rgb (248, 248, 248); "><span style="color: rgb(29, 28, 29); font-family: Slack-Lato, Slack-Fractions, appleLogo, sans-serif; font-size: 15px; font-variant-ligatures: common-ligatures; background-color: rgb(248, 248, 248);">{ app_name }</span><br></p>',
-          'pt-br' => '<p>Olá {client_name}, </p><p>Você agora é Client ..</p><p>E-mail: {client_email} </p><p>Senha: {client_password}</p><p>{app_url}</p><p>Obrigado,</p><p>{app_name}</p>',
-        ],
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#003CE5;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="http://weekly.grapestheme.com/notify/img/hero-img/blue/heroFill/notification-reminder.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 5px; padding-left: 20px; padding-right: 20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Reminder
+                    </h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 30px; padding-left: 20px; padding-right: 20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Your contract: {contract_subject} is expired.</h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Expiry Date</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">
+                            {contract_end_date}
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Plan
+                          </p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">
+                            PRO Platinum
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Plan Price
+                          </p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">
+                            $19/month
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:"Open Sans", Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            The services you are used due for renewal within next 7 Days 11/06/2020. Kindly login to your account at Notify and renew them to avoid suspension.
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButtonDate">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:5px;">
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color:#003CE5;padding-top:12px;padding-bottom:12px;padding-left:35px;padding-right:35px;border-radius:50px">
+                                <!-- Button Link // -->
+                                <a class="text" href="{contract_view_url}" target="_blank" style="color:#FFFFFF; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                  View Contract
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="infoDate">
+                          <!-- Info Date // -->
+                          <p class="text" style="color:#000000; font-family:"Open Sans", Helvetica, Arial, sans-serif; font-size:11px; font-weight:700; font-style:normal; letter-spacing:normal; line-height:20px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Expired at:&nbsp;{contract_end_date}</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="http://grapestheme.com/notify/img//other/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
+        ]
+      ],
+      'contract_task_reminder' => [
+        'subject' => 'Contract Task Reminder',
+        'lang' => [
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#003CE5;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="http://weekly.grapestheme.com/notify/img/hero-img/blue/heroFill/notification-reminder.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom:5px;padding-left:20px;padding-right:20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Reminder
+                    </h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom:30px;padding-left:20px;padding-right:20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">You have a reminder about the task: {task_subject}</h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Reminder Was Set By</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">
+                            {reminder_set_by_name}
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Plan</p></td></tr></tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:"Open Sans", Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            {reminder_description}
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButtonDate">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:5px;">
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color:#003CE5;padding-top:12px;padding-bottom:12px;padding-left:35px;padding-right:35px;border-radius:50px">
+                                <!-- Button Link // -->
+                                <a class="text" href="#" target="_blank" style="color:#FFFFFF; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                  Go to My Renewals
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="infoDate">
+                          <!-- Info Date // -->
+                          <p class="text" style="color:#000000; font-family:"Open Sans", Helvetica, Arial, sans-serif; font-size:11px; font-weight:700; font-style:normal; letter-spacing:normal; line-height:20px; text-transform:none; text-align:center; padding:0; margin:0"><br></p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="http://grapestheme.com/notify/img//other/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
+        ]
+      ],
+      'reset_password' => [
+        'subject' => 'Reset Password',
+        'lang' => [
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#003CE5;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="http://weekly.grapestheme.com/notify/img/hero-img/blue/heroFill/user-reset-password.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom:5px;padding-left:20px;padding-right:20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Reset Password
+                    </h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom:30px;padding-left:20px;padding-right:20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                      We\'ve received your request to<br>change your password.
+                    </h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="line-height: 22px; text-align: center; padding: 0px; margin: 0px;"><font color="#666666" face="Open Sans, Helvetica, Arial, sans-serif"><span style="font-size: 14px;">
+                            Click on the button below to reset your password, you have&nbsp;</span></font><span style="text-align: var(--bs-body-text-align); font-size: 14px;"><font color="#666666" face="Open Sans, Helvetica, Arial, sans-serif">{link_expiry_time}</font></span></p><p class="text" style="color: rgb(102, 102, 102); font-family: &quot;Open Sans&quot;, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; padding: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;">&nbsp;hours to pick your password. After that, you\'ll have to ask for a new one.<br></p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:"Open Sans", Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Or using this Link: <a href="{password_reset_link}" target="_blank">&nbsp;{password_reset_link}</a>
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButton">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:20px;">
+
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color:#003CE5;padding-top:12px;padding-bottom:12px;padding-left:35px;padding-right:35px;border-radius:50px">
+                                <!-- Button Link // -->
+                                <a class="text" href="{password_reset_link}" target="_blank" style="color:#FFFFFF; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                  Reset Password
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="http://grapestheme.com/notify/img//other/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
+        ]
+      ],
+      'verify_email' => [
+        'subject' => 'Verify Email',
+        'lang' => [
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#003CE5;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="http://weekly.grapestheme.com/notify/img/hero-img/blue/heroFill/user-account.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom:5px;padding-left:20px;padding-right:20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Hi "{user_name}"
+                    </h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom:30px;padding-left:20px;padding-right:20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Verify Your Email Account
+                    </h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:"Open Sans", Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Thanks for siging up on {app_name}. Please click verify button to activate your account.
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButton">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:20px;">
+
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color:#003CE5;padding-top:12px;padding-bottom:12px;padding-left:35px;padding-right:35px;border-radius:50px">
+                                <!-- Button Link // -->
+                                <a class="text" href="{verification_url}" target="_blank" style="color:#FFFFFF; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">Verify Email
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="http://grapestheme.com/notify/img//other/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
+        ]
+      ],
+      'failed_login' => [
+        'subject' => 'Failed Login',
+        'lang' => [
+          'en' => 'test'
+        ]
+      ],
+      'new_device_login' => [
+        'subject' => 'New Device Login',
+        'lang' => [
+          'en' => 'test'
+        ]
+      ],
+      'new_location_login' => [
+        'subject' => 'New Location Login',
+        'lang' => [
+          'en' => 'test'
+        ]
+      ],
+      'lost_recover_code' => [
+        'subject' => 'Lost Recovery Code',
+        'lang' => [
+          'en' => 'test'
+        ]
+      ],
+      'two_factor_code' => [
+        'subject' => 'Two Factor Code',
+        'lang' => [
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#003CE5;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="http://weekly.grapestheme.com/notify/img/hero-img/blue/heroFill/user-code.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 5px; padding-left: 20px; padding-right: 20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">Two Factor Code</h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 30px; padding-left: 20px; padding-right: 20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">Please provide two factor code auth code to login.&nbsp;</h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableMediumTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="mediumTitle">
+                          <!-- Medium Title Text // -->
+                          <p class="text" style="color:#3f4b97; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:34px; font-weight:300; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                            USE CODE : {two_factore_code}</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:"Open Sans", Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Click on the button below to activate code, this is your requested account key code to log in with your email address ({user_email})
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButton" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:20px;">
+
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color: rgb(0, 60, 229); padding: 12px 35px; border-radius: 50px;">
+                                <!-- Button Link // -->
+                                <a class="text" href="#" target="_blank" style="color:#FFFFFF; font-family:"Poppins", Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                  Activate Code
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="http://grapestheme.com/notify/img//other/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
+        ]
       ],
     ];
 
     $email = EmailTemplate::all();
 
     foreach ($email as $e) {
-      foreach ($defaultTemplate[$e->slug]['lang'] as $lang => $content) {
-        $emailNoti = EmailTemplateLang::where('parent_id', $e->id)->where('lang', $lang)->count();
-        if ($emailNoti == 0) {
-          EmailTemplateLang::create(
-            [
-              'parent_id' => $e->id,
-              'lang' => $lang,
-              'subject' => $defaultTemplate[$e->slug]['subject'],
-              'content' => $content,
-            ]
-          );
+      if (isset($defaultTemplate[$e->slug]))
+        foreach ($defaultTemplate[$e->slug]['lang'] as $lang => $content) {
+          $emailNoti = EmailTemplateLang::where('parent_id', $e->id)->where('lang', $lang)->count();
+          if ($emailNoti == 0) {
+            EmailTemplateLang::create(
+              [
+                'parent_id' => $e->id,
+                'lang' => $lang,
+                'subject' => $defaultTemplate[$e->slug]['subject'],
+                'content' => $content,
+              ]
+            );
+          }
         }
-      }
     }
   }
 }

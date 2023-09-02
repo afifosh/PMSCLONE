@@ -103,6 +103,23 @@ class Contract extends Model
       } elseif (request()->filter_status == 'About To Expire') {
         $q->where('status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addWeeks(2));
       }
+    })->when(request()->companies, function ($q) {
+      $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);
+    })
+    ->when(request()->contract_client, function ($q) {
+      $q->where('assignable_type', Client::class)->where('assignable_id', request()->contract_client);
+    })
+    ->when(request()->search_q, function ($q) {
+      $q->where(function ($q) {
+        $q->where('subject', 'like', '%' . request()->search_q . '%')
+          ->orWhereHas('phases', function ($q) {
+            $q->where('name', 'like', '%' . request()->search_q . '%');
+          });
+      });
+    })->when(request()->contract_type, function ($q) {
+      $q->whereHas('type', function ($q) {
+        $q->where('id', request()->contract_type);
+      });
     });
   }
 

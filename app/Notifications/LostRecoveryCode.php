@@ -2,9 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Mail\CommonMail;
+use App\Models\EmailTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class LostRecoveryCode extends Notification implements ShouldQueue
@@ -41,23 +42,23 @@ class LostRecoveryCode extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
 
-        $codes = json_decode(decrypt($notifiable->two_factor_recovery_codes), true);
+      $template = EmailTemplate::where('slug', 'lost_recovery_code')->with(['langTemplates' => function ($query) use ($notifiable) {
+        $query->where('lang', $notifiable->lang ? $notifiable->lang : 'en');
+      }])->first();
 
+      $strTemp = [
+        '{user_name}' => $notifiable->first_name . ' ' . $notifiable->last_name,
+        '{user_email}' => $notifiable->email,
+      ];
 
-        // Generate a file with the recovery codes
-        $fileContent = implode(PHP_EOL, $codes);
-        $fileName = '2fa-recovery-codes.txt';
-    
+      $template->langTemplates[0]->content = replaceStrVariables($template->langTemplates[0]->content, $strTemp);
 
-    
-        return (new MailMessage)
-                    ->subject('Two-Factor Recovery Code')
-                    ->greeting('Hello' . ' ' . ucwords($notifiable->first_name) . ',')
-                    ->line('Here are your Two-Factor Recovery Code:')
-                    ->attachData($fileContent, $fileName, ['mime' => 'text/plain'])
-                    ->line('These codes can be used to recover your account if you lose your two-factor authentication device.')
-                    ->line('Please keep them in a secure place.')
-                    ->line('Thank you for using our application!');
+      // Generate a file with the recovery codes
+      $codes = json_decode(decrypt($notifiable->two_factor_recovery_codes), true);
+      $fileContent = implode(PHP_EOL, $codes);
+      $fileName = '2fa-recovery-codes.txt';
+
+      return (new CommonMail($notifiable, $template))->to($notifiable->email)->attachData($fileContent, $fileName, ['mime' => 'text/plain']);
     }
 
     /**

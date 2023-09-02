@@ -4,8 +4,8 @@ namespace App\Notifications\Admin;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-
-use App\Mail\Admin\ContractExpiryMail;
+use App\Mail\CommonMail;
+use App\Models\EmailTemplate;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
@@ -36,9 +36,24 @@ class ContractExpiryNotification extends Notification implements ShouldQueue
   /**
    * Get the mail representation of the notification.
    */
-  public function toMail(object $notifiable)
+
+  public function toMail($notifiable)
   {
-    return (new ContractExpiryMail($notifiable, $this->contract))->to($notifiable->email);
+    $template = EmailTemplate::where('slug', 'contract_expiry')->with(['langTemplates' => function ($query) use ($notifiable) {
+      $query->where('lang', $notifiable->lang ? $notifiable->lang : 'en');
+    }])->first();
+
+    $strTemp = [
+      '{user_name}' => $notifiable->first_name . ' ' . $notifiable->last_name,
+      '{user_email}' => $notifiable->email,
+      '{contract_subject}' => @$this->contract->subject ?? 'N/A',
+      '{contract_end_date}' => @$this->contract->end_date ?? 'N/A',
+      '{contract_view_url}' => route('admin.contracts.show', $this->contract->id) ?? 'N/A',
+    ];
+
+    $template->langTemplates[0]->content = replaceStrVariables($template->langTemplates[0]->content, $strTemp);
+
+    return (new CommonMail($notifiable, $template))->to($notifiable->email);
   }
 
   /**

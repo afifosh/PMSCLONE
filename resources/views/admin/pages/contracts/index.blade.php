@@ -157,20 +157,36 @@ $configData = Helper::appClasses();
 @endif
     <div class="card mt-3">
       <h5 class="card-header">Search Filter</h5>
-      <form class="js-datatable-filter-form">
-        <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
-          @isset($contract_statuses)
-            <div class="col-md-4 user_role">
-              <select name="filter_status" class="form-select select2" data-placeholder="Select Status">
-                @forelse ($contract_statuses as $i => $status)
-                  <option value="{{$i}}"> {{$status}} </option>
-                @empty
-                @endforelse
-              </select>
+      @if (!isset($project))
+        <form class="js-datatable-filter-form">
+          <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
+            <div class="col">
+              {!! Form::label('projects', 'Projects') !!}
+              {!! Form::select('projects[]', $projects, null, ['class' => 'form-select select2', 'data-placeholder' => 'Projects', 'data-dropdownParent' => '$("#gantt-chart-card")']) !!}
             </div>
-          @endisset
-        </div>
-      </form>
+            <div class="col">
+              {!! Form::label('project Status', 'Contract Status') !!}
+              {!! Form::select('filter_status', [0 => 'All'] + $contract_statuses, null, ['class' => 'form-select select2', 'data-placeholder' => 'Status']) !!}
+            </div>
+            <div class="col">
+              {!! Form::label('contract_type', 'Contract Type') !!}
+              {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select select2', 'data-placeholder' => 'Type']) !!}
+            </div>
+            <div class="col">
+              {!! Form::label('assigned_to_type', 'Assigned To') !!}
+              {!! Form::select('assigned_to_type', ['Both' => 'Both', 'Client' => 'Client', 'Company' => 'Company'], null, ['class' => 'form-select select2', 'data-placeholder' => 'Assigned To']) !!}
+            </div>
+            <div class="col d-none">
+              {!! Form::label('companies', 'Company') !!}
+              {!! Form::select('companies', $companies, null, ['class' => 'form-select select2', 'data-placeholder' => 'Company']) !!}
+            </div>
+            <div class="col d-none">
+              {!! Form::label('clients', 'Clients') !!}
+              {!! Form::select('contract_client', $contractClients, null, ['class' => 'form-select select2', 'data-placeholder' => 'Clients']) !!}
+            </div>
+          </div>
+        </form>
+      @endif
       <div class="card-body">
         {{$dataTable->table()}}
       </div>
@@ -183,6 +199,24 @@ $configData = Helper::appClasses();
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script>
       $(document).ready(function () {
+          $(document).on('change', '[name="assigned_to_type"]', function(e){
+            if($(this).val() == 'Company'){
+              $('[name="companies"]').closest('.col').removeClass('d-none');
+              $('[name="contract_client"]').closest('.col').addClass('d-none');
+              $('[name="companies"]').val('0').trigger('change');
+              $('[name="contract_client"]').val('0').trigger('change');
+            }else if($(this).val() == 'Client'){
+              $('[name="companies"]').closest('.col').addClass('d-none');
+              $('[name="contract_client"]').closest('.col').removeClass('d-none');
+              $('[name="companies"]').val('0').trigger('change');
+              $('[name="contract_client"]').val('0').trigger('change');
+            }else{
+              $('[name="companies"]').closest('.col').addClass('d-none');
+              $('[name="contract_client"]').closest('.col').addClass('d-none');
+              $('[name="companies"]').val('0').trigger('change');
+              $('[name="contract_client"]').val('0').trigger('change');
+            }
+          })
           $('.js-datatable-filter-form :input').on('change', function (e) {
               window.LaravelDataTables["contracts-table"].draw();
           });

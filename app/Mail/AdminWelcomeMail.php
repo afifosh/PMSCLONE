@@ -6,8 +6,6 @@ use App\Models\EmailTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class AdminWelcomeMail extends Mailable
@@ -32,30 +30,6 @@ class AdminWelcomeMail extends Mailable
     $this->template->langTemplates[0]->content = $this->replaceVariable($this->template->langTemplates[0]->content, $data + $this->user->toArray());
   }
 
-  /**
-   * Get the message envelope.
-   *
-   * @return \Illuminate\Mail\Mailables\Envelope
-   */
-  // public function envelope()
-  // {
-  //     return new Envelope(
-  //         subject: 'Welcome To Riyadh Art',
-  //     );
-  // }
-
-  // /**
-  //  * Get the message content definition.
-  //  *
-  //  * @return \Illuminate\Mail\Mailables\Content
-  //  */
-  // public function content()
-  // {
-  //     return new Content(
-  //         view: 'emails.admin.welcome',
-  //         with: [ 'email' => $this->user->email, 'password' => $this->data['password']]
-  //     );
-  // }
   public function build()
   {
     return $this->from(config('mail.from.address'), $this->template->from)->markdown('emails.admin.common_email_template')->subject($this->template->langTemplates[0]->subject)->with('content', $this->template->langTemplates[0]->content);
@@ -84,14 +58,4 @@ class AdminWelcomeMail extends Mailable
     );
     return $content;
   }
-
-  // /**
-  //  * Get the attachments for the message.
-  //  *
-  //  * @return array
-  //  */
-  // public function attachments()
-  // {
-  //     return [];
-  // }
 }
