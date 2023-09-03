@@ -17,9 +17,21 @@ return new class extends Migration
             $table->id();
             $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
             $table->string('name')->unique();
-            $table->string('website')->unique();
+            $table->string('website')->unique()->nullable();   
             $table->string('avatar')->nullable();
             $table->string('email')->nullable();
+
+            $table->enum('type', ['Company', 'Person']); // Add enum column
+
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('zip')->nullable();
+            $table->string('country')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('vat_number')->nullable();
+            $table->string('gst_number')->nullable();            
+
             $table->enum('status', ['active', 'disabled', 'pending']);
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('verified_at')->nullable();
