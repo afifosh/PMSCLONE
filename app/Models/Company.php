@@ -27,12 +27,16 @@ class Company extends BaseModel
 
   public const DT_ID = 'companies_datatable';
 
-  protected $fillable = ['name', 'email', 'status', 'added_by', 'website'];
+ // protected $fillable = ['name', 'email', 'status', 'added_by', 'website'];
+  protected $fillable = ['name', 'email', 'status', 'added_by', 'website', 'type', 'address', 'city', 'state', 'zip', 'country', 'phone', 'vat_number', 'gst_number'];
+
+
 
   protected $casts = [
     'verified_at' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
+    // 'type' => 'string', // or 'int', depending on the column type in your database
   ];
 
   protected $appends = ['avatar'];

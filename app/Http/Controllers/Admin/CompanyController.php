@@ -38,12 +38,18 @@ class CompanyController extends Controller
 
   public function store(Request $request)
   {
+    // $type = $request->input('type');
+    // dd(  $type);
+    // dd($request->all());
     $att = $request->validate([
       'name' => ['required', 'string', 'max:255', 'unique:companies,name'],
-      'website' => ['required', 'string', 'max:255', 'unique:companies,website'],
-      'email' => ['required', 'string', 'max:255', 'unique:companies,email'],
-      'status' => 'required',
+      // 'website' => ['required', 'string', 'max:255', 'unique:companies,website'],
+      // 'email' => ['required', 'string', 'max:255', 'unique:companies,email'],
+      // 'status' => 'required',
+      'type' => 'required|in:Company,Person',
     ]);
+
+
     if (Company::create($att + ['added_by' => auth()->id()])) {
       return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);
     }
@@ -79,12 +85,21 @@ class CompanyController extends Controller
 
   public function update(Request $request, Company $company)
   {
+    // $att = $request->validate([
+    //   'name' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
+    //   'website' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
+    //   'email' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
+    //   'status' => 'required',
+    // ]);
+
     $att = $request->validate([
       'name' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
-      'website' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
-      'email' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
-      'status' => 'required',
+      // 'website' => ['required', 'string', 'max:255', 'unique:companies,website'],
+      // 'email' => ['required', 'string', 'max:255', 'unique:companies,email'],
+      // 'status' => 'required',
+      'type' => 'required|in:Company,Person',
     ]);
+
     $company->update($att);
     // auth()->user()->approve($company->modifications()->first());
     // $company->approve('name');

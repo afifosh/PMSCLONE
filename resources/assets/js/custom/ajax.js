@@ -226,16 +226,19 @@ $(document).on('click', '[data-form="ajax-form"]', function (e) {
 
 const inputs = form[0].querySelectorAll('input, select, textarea');
 for (const input of inputs) {
-  if(input.type === 'radio')
-    continue;
   if (input.type === 'checkbox') {
     if (!input.checked) {
       fd.append(input.name, '');
+    }
+  } else if (input.type === 'radio') {
+    if (input.checked) {
+      fd.append(input.name, input.value);
     }
   } else {
     fd.append(input.name, input.value);
   }
 }
+
 
   $.ajax({
     type: 'POST',

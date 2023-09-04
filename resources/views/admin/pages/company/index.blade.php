@@ -44,4 +44,5 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>
 @endpush
