@@ -35,6 +35,17 @@
       'WebSocketRouter' => 'BeyondCode\\LaravelWebSockets\\Facades\\WebSocketRouter',
     ),
   ),
+  'dipeshsukhia/laravel-country-state-city-data' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'DipeshSukhia\\LaravelCountryStateCityData\\LaravelCountryStateCityDataServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'LaravelCountryStateCityData' => 'DipeshSukhia\\LaravelCountryStateCityData\\LaravelCountryStateCityDataFacade',
+    ),
+  ),
   'imanghafoori/laravel-password-history' => 
   array (
     'providers' => 

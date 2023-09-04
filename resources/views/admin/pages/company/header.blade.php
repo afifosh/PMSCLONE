@@ -17,16 +17,13 @@
               @endif</h4>
               <ul class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
                 <li class="list-inline-item">
-                  <i class='ti ti-color-swatch'></i> UX Designer
+                  <i class='ti ti-color-swatch'></i> <b>Type:</b> {{$company->type}}
                 </li>
                 <li class="list-inline-item">
-                  <i class='ti ti-map-pin'></i> Vatican City
-                </li>
-                <li class="list-inline-item">
-                  <i class='ti ti-calendar'></i> Joined April 2021</li>
+                  <i class='ti ti-calendar'></i> <b>Joined: </b> {{formatDateTime($company->created_at)}}</li>
               </ul>
             </div>
-            <div>
+            {{-- <div>
               <div class="d-flex justify-content-between">
                 <span class="">Setup Progress</span>
                 <span>{{$company->step_completed_count}}/5</span>
@@ -34,7 +31,7 @@
               <div class="progress" style="height:10px; width:300px">
                 <div class="progress-bar" role="progressbar" style="width: {{($company->step_completed_count/5)*100}}%" aria-valuenow="{{($company->step_completed_count/5)*100}}" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
-            </div>
+            </div> --}}
           </div>
         </div>
       </div>
@@ -48,7 +45,7 @@
   <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
       <li class="nav-item"><a class="nav-link {{$tab == 'profile' ? 'active disabled' : ''}}" href="{{ route('admin.companies.show', $company) }}"><i class='ti ti-user-check ti-xs me-1'></i> Profile</a></li>
-      <li class="nav-item"><a class="nav-link {{$tab == 'users' ? 'active disabled' : ''}}" href="{{ route('admin.companies.showUsers', ['company' => $company]) }}"><i class='ti ti-users ti-xs me-1'></i> Users</a></li>
+      <li class="nav-item"><a class="nav-link {{$tab == 'users' ? 'active disabled' : ''}}" href="{{ route('admin.companies.contacts.index', ['company' => $company]) }}"><i class='ti ti-users ti-xs me-1'></i> Contacts</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'invitations' ? 'active disabled' : ''}}" href="{{ route('admin.companies.showInvitations', ['company' => $company]) }}"><i class='ti ti-link ti-xs me-1'></i> Invitations</a></li>
     </ul>
   </div>

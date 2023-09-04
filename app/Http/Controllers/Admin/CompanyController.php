@@ -6,8 +6,11 @@ use App\DataTables\Admin\CompaniesDataTable;
 use App\DataTables\Admin\Company\InvitationsDataTable;
 use App\DataTables\Admin\Company\UsersDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\Company;
+use App\Models\Country;
 use App\Models\Role;
+use App\Models\State;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -32,21 +35,30 @@ class CompanyController extends Controller
 
   public function create()
   {
-    $company = new Company();
-    return $this->sendRes('success', ['view_data' => view('admin.pages.company.edit', compact('company'))->render()]);
+    $data['company'] = new Company();
+    $data['countries'] = ['' => 'Select Country'];
+    $data['states'] = ['' => 'Select State'];
+    $data['cities'] = ['' => 'Select City'];
+    return $this->sendRes('success', ['view_data' => view('admin.pages.company.edit', $data)->render(), 'JsMethods' => ['initIntlTel']]);
   }
 
   public function store(Request $request)
   {
-    // $type = $request->input('type');
-    // dd(  $type);
-    // dd($request->all());
     $att = $request->validate([
       'name' => ['required', 'string', 'max:255', 'unique:companies,name'],
-      // 'website' => ['required', 'string', 'max:255', 'unique:companies,website'],
-      // 'email' => ['required', 'string', 'max:255', 'unique:companies,email'],
+      'website' => ['nullable', 'string', 'max:255', 'unique:companies,website'],
+      'email' => ['nullable', 'string', 'max:255', 'unique:companies,email'],
       // 'status' => 'required',
       'type' => 'required|in:Company,Person',
+      'phone' => 'nullable|phone',
+      'phone_country' => 'required_with:phone',
+      'address' => 'nullable|string|max:255',
+      'city_id' => 'nullable|exists:cities,id',
+      'state_id' => 'nullable|exists:states,id',
+      'zip' => 'nullable|string|max:255',
+      'country_id' => 'nullable|exists:countries,id',
+      'vat_number' => 'nullable|string|max:255',
+      'gst_number' => 'nullable|string|max:255',
     ]);
 
 
@@ -61,17 +73,6 @@ class CompanyController extends Controller
       return $dataTable->render('admin.pages.company.show-profile', compact('company'));
   }
 
-  public function showUsers(Company $company, UsersDataTable $dataTable)
-  {
-    $company->load(['detail', 'addresses', 'bankAccounts', 'contacts', 'kycDocs']);
-    $dataTable->company_id = $company->id;
-    $data['statuses'] = User::distinct()->pluck('status', 'status');
-    $data['roles'] = Role::where('guard_name', 'web')->distinct()->pluck('name');
-    $data['company'] = $company;
-    return $dataTable->render('admin.pages.company.users.index', $data);
-    // return view('admin.pages.company.users.index');
-  }
-
   public function showInvitations(Company $company, InvitationsDataTable $dataTable)
   {
     $company->load(['detail', 'addresses', 'bankAccounts', 'contacts', 'kycDocs']);
@@ -80,24 +81,30 @@ class CompanyController extends Controller
 
   public function edit(Company $company)
   {
-    return $this->sendRes('success', ['view_data' => view('admin.pages.company.edit', compact('company'))->render()]);
+    $data['company'] = $company;
+    $data['countries'] = $company->country_id ? Country::where('id', $company->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
+    $data['states'] = $company->state_id ? State::where('id', $company->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
+    $data['cities'] = $company->city_id ? City::where('id', $company->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
+    return $this->sendRes('success', ['view_data' => view('admin.pages.company.edit', $data)->render(), 'JsMethods' => ['initIntlTel']]);
   }
 
   public function update(Request $request, Company $company)
   {
-    // $att = $request->validate([
-    //   'name' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
-    //   'website' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
-    //   'email' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
-    //   'status' => 'required',
-    // ]);
-
     $att = $request->validate([
       'name' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
-      // 'website' => ['required', 'string', 'max:255', 'unique:companies,website'],
-      // 'email' => ['required', 'string', 'max:255', 'unique:companies,email'],
+      'website' => ['nullable', 'string', 'max:255', Rule::unique('companies')->ignore($company->id)],
+      'email' => ['nullable', 'string', 'max:255', Rule::unique('companies')->ignore($company->id)],
       // 'status' => 'required',
       'type' => 'required|in:Company,Person',
+      'phone' => 'nullable|phone',
+      'phone_country' => 'required_with:phone',
+      'address' => 'nullable|string|max:255',
+      'city_id' => 'nullable|exists:cities,id',
+      'state_id' => 'nullable|exists:states,id',
+      'zip' => 'nullable|string|max:255',
+      'country_id' => 'nullable|exists:countries,id',
+      'vat_number' => 'nullable|string|max:255',
+      'gst_number' => 'nullable|string|max:255',
     ]);
 
     $company->update($att);

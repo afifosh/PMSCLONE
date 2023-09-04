@@ -162,7 +162,11 @@ $configData = Helper::appClasses();
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
             <div class="col">
               {!! Form::label('projects', 'Projects') !!}
-              {!! Form::select('projects[]', $projects, null, ['class' => 'form-select select2', 'data-placeholder' => 'Projects', 'data-dropdownParent' => '$("#gantt-chart-card")']) !!}
+              {!! Form::select('projects', $projects, null, ['class' => 'form-select select2', 'data-placeholder' => 'Projects']) !!}
+            </div>
+            <div class="col">
+              {!! Form::label('programs', 'Programs') !!}
+              {!! Form::select('programs', $programs, null, ['class' => 'form-select select2', 'data-placeholder' => 'Programs']) !!}
             </div>
             <div class="col">
               {!! Form::label('project Status', 'Contract Status') !!}

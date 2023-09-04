@@ -16,21 +16,21 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('state_id')->nullable()->constrained('states')->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete()->cascadeOnUpdate();
             $table->string('name')->unique();
-            $table->string('website')->unique()->nullable();   
+            $table->string('website')->unique()->nullable();
             $table->string('avatar')->nullable();
             $table->string('email')->nullable();
 
             $table->enum('type', ['Company', 'Person']); // Add enum column
 
             $table->string('address')->nullable();
-            $table->string('city')->nullable();
-            $table->string('state')->nullable();
             $table->string('zip')->nullable();
-            $table->string('country')->nullable();
             $table->string('phone')->nullable();
             $table->string('vat_number')->nullable();
-            $table->string('gst_number')->nullable();            
+            $table->string('gst_number')->nullable();
 
             $table->enum('status', ['active', 'disabled', 'pending']);
             $table->timestamp('approved_at')->nullable();

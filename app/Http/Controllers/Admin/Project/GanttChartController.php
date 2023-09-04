@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ContractType;
+use App\Models\Program;
 use App\Models\Project;
 
 class GanttChartController extends Controller
@@ -30,12 +31,13 @@ class GanttChartController extends Controller
     $statuses = Contract::STATUSES;
     $statuses = array_combine($statuses, $statuses);
 
-    $projects = Project::mine()->whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
+    $projects = Project::has('contracts')->pluck('name', 'id')->prepend('All', '0');
     $contractTypes = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
     $contractClients = Client::whereHas('contracts')->pluck('email', 'id')->prepend('All', '0');
 
     $companies = Company::has('contracts')->pluck('name', 'id')->prepend('All', '0');
+    $programs = Program::has('contracts')->pluck('name', 'id')->prepend('All', '0');
 
-    return view('admin.pages.projects.gantt-chart', compact('ganttProjects', 'statuses', 'projects', 'companies', 'contractTypes', 'contractClients'));
+    return view('admin.pages.projects.gantt-chart', compact('ganttProjects', 'statuses', 'projects', 'companies', 'contractTypes', 'contractClients', 'programs'));
   }
 }

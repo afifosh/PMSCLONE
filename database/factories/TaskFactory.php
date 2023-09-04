@@ -20,8 +20,8 @@ class TaskFactory extends Factory
     return [
       'subject' => $this->faker->word,
       'description' => $this->faker->paragraph,
-      'start_date' => $this->faker->dateTime,
-      'due_date' => $this->faker->dateTime,
+      'start_date' => $this->faker->dateTime(),
+      'due_date' => $this->faker->dateTime(),
       'tags' => [$this->faker->word],
       'priority' => $this->faker->randomElement(['low', 'medium', 'high']),
       'status' => $this->faker->randomElement(['not started', 'in progress', 'on hold', 'awaiting feedback', 'completed']),

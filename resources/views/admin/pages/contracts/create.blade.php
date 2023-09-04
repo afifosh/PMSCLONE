@@ -34,23 +34,20 @@
       {{ Form::label('value', __('Contract Value'), ['class' => 'col-form-label']) }}
       {!! Form::number('value', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('0.00')]) !!}
     </div>
+    {{-- program --}}
     <div class="form-group col-6">
-      {{ Form::label('assign_to', __('Assign To'), ['class' => 'col-form-label']) }}
-      {!! Form::select('assign_to', ['Company' => 'Company', 'Client' => 'Client'], @$contract->assignable_type == 'App\Models\Client' ? 'Client' : 'Company', ['id' => 'project-assign-to', 'class' => 'form-select globalOfSelect2']) !!}
-    </div>
-    {{-- customer --}}
-    <div class="form-group col-6 {{$contract->assignable_type == 'App\Models\Client' ? 'd-none' : ''}}">
-      {{ Form::label('company_id', __('Company'), ['class' => 'col-form-label']) }}
-      {!! Form::select('company_id', $companies, @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'project-company-select',
-      'class' => 'form-select globalOfSelect2UserRemote',
-      'data-url' => route('resource-select-user', ['Company'])
+      {{ Form::label('program_id', __('Program'), ['class' => 'col-form-label']) }}
+      {!! Form::select('program_id', $programs ?? [], $contract->program_id, [
+      'class' => 'form-select globalOfSelect2Remote',
+      'data-url' => route('resource-select', ['Program'])
       ]) !!}
     </div>
-    <div class="form-group col-6 {{$contract->assignable_type != 'App\Models\Client' ? 'd-none' : ''}}">
-      {{ Form::label('client_id', __('Client'), ['class' => 'col-form-label']) }}
-      {!! Form::select('client_id', $clients, @$contract->assignable_type == 'App\Models\Client' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select',
+    {{-- customer --}}
+    <div class="form-group col-6">
+      {{ Form::label('company_id', __('Client'), ['class' => 'col-form-label']) }}
+      {!! Form::select('company_id', $companies, @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select',
       'class' => 'form-select globalOfSelect2UserRemote',
-      'data-url' => route('resource-select-user', ['Client'])
+      'data-url' => route('resource-select-user', ['Company'])
       ]) !!}
     </div>
     {{-- types --}}

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Program extends BaseModel
 {
@@ -45,5 +46,10 @@ class Program extends BaseModel
     public function parent()
     {
       return $this->belongsTo(Program::class, 'parent_id', 'id');
+    }
+
+    public function contracts(): HasMany
+    {
+      return $this->hasMany(Contract::class, 'program_id', 'id');
     }
 }

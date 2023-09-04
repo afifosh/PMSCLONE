@@ -25,7 +25,7 @@ class CompaniesDataTable extends DataTable
         return view('admin._partials.sections.company-avatar', compact('company'));
       })
       ->editColumn('added_by', function ($company) {
-        return $company->addedBy->email ?? '-';
+        return $company->addedBy ? view('admin._partials.sections.user-info', ['user' => $company->addedBy]) : '-';
       })
       ->editColumn('step_completed_count', function ($company) {
         $perc = ($company->step_completed_count/5)*100;
@@ -43,7 +43,9 @@ class CompaniesDataTable extends DataTable
       })
       ->filterColumn('added_by', function($query, $keyword){
         return $query->whereHas('addedBy', function($q) use ($keyword){
-          return $q->where('email', 'like', '%'.$keyword.'%');
+          return $q->where('email', 'like', '%'.$keyword.'%')
+            ->orWhere('first_name', 'like', '%'.$keyword.'%')
+            ->orWhere('last_name', 'like', '%'.$keyword.'%');
         });
       })
       ->setRowId('id')
@@ -95,11 +97,11 @@ class CompaniesDataTable extends DataTable
     $buttons = [];
     if (auth('admin')->user()->can('create company') && !$this->approval_requests)
       $buttons[] = [
-        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create New Company</span>',
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Client</span>',
         'className' =>  'btn btn-primary mx-3',
         'attr' => [
           'data-toggle' => "ajax-modal",
-          'data-title' => 'Create New Company',
+          'data-title' => 'Add Client',
           'data-href' => route('admin.companies.create')
         ]
       ];
@@ -115,7 +117,6 @@ class CompaniesDataTable extends DataTable
       >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->addAction(['width' => '80px'])
-      ->orderBy(0, 'DESC')
       ->parameters([
         'buttons' => $buttons,
         "scrollX" => true
@@ -132,7 +133,7 @@ class CompaniesDataTable extends DataTable
     return [
       // Column::make('id'),
       Column::make('name')->title(__('Bussines Legal Name')),
-      // Column::make('website'),
+      Column::make('type'),
       Column::make('source'),
       Column::make('added_by'),
       // Column::make('step_completed_count')->title(__('Setup'))->orderable(false)->searchable(false),

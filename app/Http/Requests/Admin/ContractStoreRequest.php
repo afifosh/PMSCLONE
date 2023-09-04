@@ -26,10 +26,9 @@ class ContractStoreRequest extends FormRequest
       'isSavingDraft' => 'nullable',
       'subject' => 'required|string|max:100',
       'type_id' => 'nullable|required_if:isSavingDraft,0|exists:contract_types,id',
-      'assign_to' => 'nullable|required_if:isSavingDraft,0|in:Client,Company',
-      'client_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Client' && $this->isSavingDraft == 0), 'exists:clients,id'],
-      'company_id' => ['nullable', Rule::requiredIf($this->assign_to == 'Company' && $this->isSavingDraft == 0), 'exists:companies,id'],
+      'company_id' => ['nullable', Rule::requiredIf($this->isSavingDraft == 0), 'exists:companies,id'],
       'project_id' => ['nullable', 'exists:projects,id'],
+      'program_id' => ['nullable', 'exists:programs,id'],
       'currency' => [Rule::In(array_keys(config('money.currencies'))), 'min:0', 'max:92233720368547758'],
       'refrence_id' => 'nullable|unique:contracts,refrence_id',
       'start_date' => 'nullable|required_if:isSavingDraft,0|date',
@@ -43,8 +42,6 @@ class ContractStoreRequest extends FormRequest
   {
     return [
       'type_id.required_if' => 'Please select contract type',
-      'assign_to.required_if' => 'Please select assign to',
-      'client_id.required_if' => 'Please select client',
       'company_id.required_if' => 'Please select company',
       'project_id.required_if' => 'Please select project',
       'project_id.required' => 'Please select project',

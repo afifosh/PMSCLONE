@@ -32,6 +32,20 @@ class ResourceSearchController extends Controller
         'search' => 'name',
         'select' => ['name as text', 'id']
       ],
+      'Country' => [
+        'search' => 'name',
+        'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id']
+      ],
+      'State' => [
+        'search' => 'name',
+        'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id'],
+        'dependent_column' => 'country_id'
+      ],
+      'City' => [
+        'search' => 'name',
+        'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id'],
+        'dependent_column' => 'state_id'
+      ],
       'Currency' => []
     ];
     if (!isset($allowedResources[$resource])) {
@@ -48,7 +62,10 @@ class ResourceSearchController extends Controller
 
     return $query->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
       $q->where($allowedResources[$resource]['search'], 'like', '%' . request()->get('q') . '%');
-    })->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
+    })->when(request()->dependent_id, function ($q) use ($allowedResources, $resource) {
+      $q->where($allowedResources[$resource]['dependent_column'], request()->dependent_id);
+    })
+    ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
   }
 
   public function userSelect($resource)

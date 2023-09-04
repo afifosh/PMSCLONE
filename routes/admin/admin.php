@@ -115,14 +115,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('users', AdminUsersController::class);
     Route::resource('clients', ClientController::class);
 
-    Route::get('companies/{company}/users', [CompanyController::class, 'showUsers'])->name('companies.showUsers');
+    // Route::get('companies/{company}/users', [CompanyController::class, 'showUsers'])->name('companies.showUsers');
     Route::get('companies/{company}/invitations', [CompanyController::class, 'showInvitations'])->name('companies.showInvitations');
     Route::resource('companies', CompanyController::class);
+    Route::resource('companies.contacts', UserController::class);
     Route::resource('companies.contact-persons', ContactPersonController::class);
     Route::match(['get', 'post'], 'company-invitations/{company_invitation}/revoke', [InvitationController::class, 'revokeInvitation'])->name('company-invitations.revoke');
     Route::get('/company-invitations/{company_invitation}/logs', [InvitationController::class, 'invitationLogs'])->name('company-invitations.logs');
     Route::resource('company-invitations', InvitationController::class);
-    Route::resource('company-users', UserController::class);
+    // Route::resource('company-users', UserController::class);
 
     Route::prefix('partner')->name('partner.')->group(function () {
       Route::resource('companies', PatnerCompanyController::class);

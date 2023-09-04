@@ -381,7 +381,9 @@ for (const input of inputs) {
             var target = $(form.find('[name="'+ts3+'"]'));
           }
           target.addClass('invalid');
-          if((target.hasClass('globalOfSelect2') || target.hasClass('select2User') || target.hasClass('select2')) && target.next('.select2-container').length) {
+          if(target.hasClass('ignore-ajax-error'))
+            return;
+          if(target.next('.select2-container').length) {
               $(error).insertAfter(target.next('.select2-container'));
           }else if(target.parent().hasClass('input-group')){
             target.siblings().addClass('invalid');
@@ -512,7 +514,8 @@ window.initModalSelect2 = function(){
         data: function (params) {
           return {
             q: params.term,
-            page: params.page || 1
+            page: params.page || 1,
+            dependent_id: $(this).data('dependent_id') ? $('#'+$(this).data('dependent_id')).val() : null,
           };
         },
         processResults: function(data, params) {

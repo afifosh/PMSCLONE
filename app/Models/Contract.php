@@ -22,6 +22,7 @@ class Contract extends Model
     'project_id',
     'assignable_type',
     'assignable_id',
+    'program_id',
     'refrence_id',
     'subject',
     'currency',
@@ -119,6 +120,14 @@ class Contract extends Model
     })->when(request()->contract_type, function ($q) {
       $q->whereHas('type', function ($q) {
         $q->where('id', request()->contract_type);
+      });
+    })->when(request()->projects, function ($q) {
+      $q->whereHas('project', function ($q) {
+        $q->where('id', request()->projects);
+      });
+    })->when(request()->programs, function ($q) {
+      $q->whereHas('program', function ($q) {
+        $q->where('id', request()->programs);
       });
     });
   }
@@ -250,5 +259,10 @@ class Contract extends Model
   public function getPrintableValueAttribute()
   {
     return Money::{$this->currency ?? 'USD'}($this->value, true)->format();
+  }
+
+  public function program(): BelongsTo
+  {
+    return $this->belongsTo(Program::class);
   }
 }

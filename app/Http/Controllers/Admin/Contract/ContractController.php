@@ -11,6 +11,7 @@ use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ContractType;
+use App\Models\Program;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,7 @@ class ContractController extends Controller
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
     $data['contractClients'] = Client::whereHas('contracts')->pluck('email', 'id')->prepend('All', '0');
     $data['companies'] = Company::has('contracts')->pluck('name', 'id')->prepend('All', '0');
+    $data['programs'] = Program::has('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
     $data['contracts'] = Contract::selectRaw('count(*) as total')
@@ -254,7 +256,8 @@ class ContractController extends Controller
     $data['currency'] = ['USD' => '(USD) - US Dollar'];
 
     $data['projects'] = ['' => __('Select Project')];
-    $data['companies'] = ['' => 'Select Company'];
+    $data['companies'] = ['' => 'Select Client'];
+    $data['programs'] = ['' => 'Select Program'];
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
   }
@@ -264,8 +267,8 @@ class ContractController extends Controller
    */
   public function store(ContractStoreRequest $request)
   {
-    $data['assignable_id'] = $request->assign_to == 'Client' ? $request->client_id : $request->company_id;
-    $data['assignable_type'] = $request->assign_to == 'Client' ? Client::class : Company::class;
+    $data['assignable_id'] = $request->company_id;
+    $data['assignable_type'] = Company::class;
 
     if ($request->isSavingDraft)
       $data['status'] = 'Draft';
@@ -302,10 +305,10 @@ class ContractController extends Controller
     $contract->load('project');
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
     $data['projects'] = $contract->project_id ? Project::where('id', $contract->project_id)->pluck('name', 'id') : ['' => __('Select Project')];
-    $data['companies'] = Company::where('id', $contract->assignable_id)->pluck('name', 'id')->prepend('Select Company', '');
+    $data['programs'] = $contract->program_id ? Program::where('id', $contract->program_id)->pluck('name', 'id') : ['' => __('Select program')];
+    $data['companies'] = Company::where('id', $contract->assignable_id)->pluck('name', 'id')->prepend('Select Client', '');
     $data['contract'] = $contract;
     $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency. '.name')];
-    $data['clients'] = Client::where('id', $contract->assignable_id)->pluck('email', 'id')->prepend(__('Select Client'), '');
     $data['statuses'] = $contract->getPossibleStatuses();
     if ($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
@@ -332,8 +335,8 @@ class ContractController extends Controller
         }
     }
 
-    $data['assignable_id'] = $request->assign_to == 'Client' ? $request->client_id : $request->company_id;
-    $data['assignable_type'] = $request->assign_to == 'Client' ? Client::class : Company::class;
+    $data['assignable_id'] = $request->company_id;
+    $data['assignable_type'] = Company::class;
 
     if ($request->isSavingDraft)
       $data['status'] = 'Draft';

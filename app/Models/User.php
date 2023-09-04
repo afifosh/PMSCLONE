@@ -44,6 +44,13 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable, Locali
         'password',
         'status',
         'avatar',
+        'country_id',
+        'state_id',
+        'city_id',
+        'gender',
+        'job_title',
+        'is_primary',
+        'can_login',
         'password_changed_at',
         'email_verified_at',
     ];

@@ -11,6 +11,12 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2/build/css/intlTelInput.css">
+<style>
+  .iti--show-flags {
+    width: 100%;
+  }
+</style>
 @endsection
 
 @section('page-style')
@@ -22,11 +28,45 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{asset('assets/libs/intlTelInput/intlTelInput.js')}}"></script>
 @endsection
 
 @section('page-script')
 <script src={{asset('assets/js/custom/admin-roles-permissions.js')}}></script>
 <script src={{asset('assets/js/custom/select2.js')}}></script>
+<script>
+  function initIntlTel(){
+    var input = document.querySelector("#phone");
+    window.itiPhone = intlTelInput(input, {
+      utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2/build/js/utils.js",
+      initialCountry: "auto",
+    });
+    if($(input).val() != ''){
+      checkUtilInitialized();
+    }
+  }
+  function checkUtilInitialized() {
+    if (window.intlTelInputUtils) {
+      validatePhone()
+    } else {
+      setTimeout(checkUtilInitialized, 50); // wait 50 ms
+    }
+  }
+  $(document).on('keyup', '#phone', function(){
+    validatePhone()
+  });
+  function validatePhone(){
+    var isValid = itiPhone.isValidNumber();
+    $('#phone').val(itiPhone.getNumber());
+    if(isValid){
+      $('#itiPhone').text('')
+      $('#itiPhoneCountry').val(itiPhone.getSelectedCountryData().iso2)
+    }else{
+      $('#itiPhone').text('Invalid phone number')
+      $('#itiPhone').css('color', 'red')
+    }
+  }
+</script>
 @endsection
 
 @section('content')

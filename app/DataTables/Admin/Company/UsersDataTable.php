@@ -31,7 +31,7 @@ class UsersDataTable extends DataTable
                   </div>
                   <div class="d-flex flex-column">
                     <span class="text-body text-truncate">
-                      <span class="fw-semibold"><a href="'.route('admin.company-users.show', $row->id).'">'.htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8').'</a></span>
+                      <span class="fw-semibold"><a href="'.route('admin.companies.contacts.show', [$row->company_id, $row->id]).'">'.htmlspecialchars($row->full_name, ENT_QUOTES, 'UTF-8').'</a></span>
                     </span>
                     <small class="text-muted">'.htmlspecialchars($row->email, ENT_QUOTES, 'UTF-8').'</small>
                   </div>
@@ -53,7 +53,7 @@ class UsersDataTable extends DataTable
         return $row->email_verified_at ? '<i class="ti fs-4 ti-shield-check text-success"></i>' : '<i class="ti fs-4 ti-shield-x text-danger"></i>';
       })
       ->addColumn('action', function (User $user) {
-        return view('pages.users.action', compact('user'));
+        return view('admin.pages.company.users.action', ['user' => $user, 'company' => $user->company_id]);
       })
       ->filterColumn('user', function($query, $keyword) {
         $sql = "CONCAT(users.first_name,' ',users.last_name, ' ',users.email)  like ?";
@@ -126,16 +126,15 @@ class UsersDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    // if (auth('admin')->user()->can(true))
-    //   $buttons[] = [
-    //     'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New User</span>',
-    //     'className' =>  'btn btn-primary mx-3',
-    //     'attr' => [
-    //       'data-toggle' => "ajax-modal",
-    //       'data-title' => 'Add User',
-    //       'data-href' => route('users.create')
-    //     ]
-    //   ];
+      $buttons[] = [
+        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New User</span>',
+        'className' =>  'btn btn-primary mx-3',
+        'attr' => [
+          'data-toggle' => "ajax-modal",
+          'data-title' => 'Add User',
+          'data-href' => route('admin.companies.contacts.create', $this->company_id)
+        ]
+      ];
     $script = "data.companies = $('input[name=filter_companies]'); data.status = $('input[name=filter_status]').val(); data.roles = $('input[name=filer_roles]').val();";
     return $this->builder()
       ->setTableId(User::DT_ID)
@@ -148,7 +147,7 @@ class UsersDataTable extends DataTable
       <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
       >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
-      // ->addAction(['width' => '80px'])
+      ->addAction(['width' => '80px'])
       ->orderBy(0, 'DESC')
       ->parameters([
         'buttons' => $buttons,
