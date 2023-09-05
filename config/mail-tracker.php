@@ -77,7 +77,7 @@ return [
     /**
      * Determines whether the body of the email is logged in the sent_emails table
      */
-    'log-content' => true,
+    'log-content' => false,
 
     /**
      * What queue should we dispatch our tracking jobs to?  Null will use the default queue.
