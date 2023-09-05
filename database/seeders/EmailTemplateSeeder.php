@@ -753,25 +753,672 @@ class EmailTemplateSeeder extends Seeder
       'failed_login' => [
         'subject' => 'Failed Login',
         'lang' => [
-          'en' => 'test'
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#cd545b;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="https://pms.afifosh.com/assets/img/mail/notification-reminder.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 5px; padding-left: 20px; padding-right: 20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Unusual Activity</h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 30px; padding-left: 20px; padding-right: 20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Your account is attempted to logged in.</h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Location</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">State: {location_state}
+                          <br>City:&nbsp;{location_city}</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Browser</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">
+                            {browser}
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Time</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="line-height: 26px; padding: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"><font face="Poppins, Helvetica, Arial, sans-serif"><span style="font-size: 18px;">{time}</span></font></p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:\'Open Sans\', Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Your account is attempted to logged in. Please secure your account, if you did not did this&nbsp;</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButtonDate">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:5px;">
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color:#cd545b;padding-top:12px;padding-bottom:12px;padding-left:35px;padding-right:35px;border-radius:50px">
+                                <!-- Button Link // -->
+                                <a class="text" href="{app_url}" target="_blank" style="color:#FFFFFF; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                  Secure Now
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="infoDate">
+                          <!-- Info Date // -->
+                          <p class="text" style="color:#000000; font-family:\'Open Sans\', Helvetica, Arial, sans-serif; font-size:11px; font-weight:700; font-style:normal; letter-spacing:normal; line-height:20px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Attempted at:&nbsp;{time}</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="https://pms.afifosh.com/assets/img/mail/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
         ]
       ],
       'new_device_login' => [
         'subject' => 'New Device Login',
         'lang' => [
-          'en' => 'test'
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#cd545b;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="https://pms.afifosh.com/assets/img/mail/notification-reminder.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 5px; padding-left: 20px; padding-right: 20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Unusual Activity</h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 30px; padding-left: 20px; padding-right: 20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Your account is logged in from a new device.</h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Location</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">State: {location_state}
+                          <br>City:&nbsp;{location_city}</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Browser</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">
+                            {browser}
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Time</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="line-height: 26px; padding: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"><font face="Poppins, Helvetica, Arial, sans-serif"><span style="font-size: 18px;">{time}</span></font></p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:\'Open Sans\', Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Your account is logged in from unknown device. Please secure your account, if you did not did this&nbsp;</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButtonDate">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:5px;">
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color:#cd545b;padding-top:12px;padding-bottom:12px;padding-left:35px;padding-right:35px;border-radius:50px">
+                                <!-- Button Link // -->
+                                <a class="text" href="{app_url}" target="_blank" style="color:#FFFFFF; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                  View Activity
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="infoDate">
+                          <!-- Info Date // -->
+                          <p class="text" style="color:#000000; font-family:\'Open Sans\', Helvetica, Arial, sans-serif; font-size:11px; font-weight:700; font-style:normal; letter-spacing:normal; line-height:20px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Attempted at:&nbsp;{time}</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="https://pms.afifosh.com/assets/img/mail/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
         ]
       ],
       'new_location_login' => [
         'subject' => 'New Location Login',
         'lang' => [
-          'en' => 'test'
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#cd545b;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="https://pms.afifosh.com/assets/img/mail/notification-reminder.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 5px; padding-left: 20px; padding-right: 20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Unusual Activity</h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 30px; padding-left: 20px; padding-right: 20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                      Your account is logged in from a new location.</h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Location</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">State: {location_state}
+                          <br>City:&nbsp;{location_city}</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Browser</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:18px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:26px; text-transform:none; text-align:center; padding:0; margin:0">
+                            {browser}
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableSmllTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom:10px;" class="smllTitle">
+                          <!-- Small Title Text // -->
+                          <p class="text" style="color:#777777; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Time</p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="smllSubTitle">
+                          <!-- Info Title Text // -->
+                          <p class="text" style="line-height: 26px; padding: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;"><font face="Poppins, Helvetica, Arial, sans-serif"><span style="font-size: 18px;">{time}</span></font></p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDivider">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:40px;">
+                          <!-- Divider // -->
+                          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody><tr>
+                              <td height="1" style="background-color:#E5E5E5;font-size:1px;line-height:1px;" class="divider">&nbsp;</td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:\'Open Sans\', Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">Your account is logged in from unknown location. Please secure your account, if you did not did this&nbsp;</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButtonDate">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:5px;">
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color:#cd545b;padding-top:12px;padding-bottom:12px;padding-left:35px;padding-right:35px;border-radius:50px">
+                                <!-- Button Link // -->
+                                <a class="text" href="{app_url}" target="_blank" style="color:#FFFFFF; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                  View Activity
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center" valign="top" style="padding-bottom:20px;" class="infoDate">
+                          <!-- Info Date // -->
+                          <p class="text" style="color:#000000; font-family:\'Open Sans\', Helvetica, Arial, sans-serif; font-size:11px; font-weight:700; font-style:normal; letter-spacing:normal; line-height:20px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Attempted at:&nbsp;{time}</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="https://pms.afifosh.com/assets/img/mail/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
         ]
       ],
       'lost_recover_code' => [
         'subject' => 'Lost Recovery Code',
         'lang' => [
-          'en' => 'test'
+          'en' => '<table border="0" cellpadding="0" cellspacing="0" style="max-width:600px;" width="100%" class="wrapperBody">
+          <tbody><tr>
+            <td align="center" valign="top">
+
+              <!-- Table Card Open // -->
+              <table border="0" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-color:#E5E5E5; border-style:solid; border-width:0 1px 1px 1px;" width="100%" class="tableCard">
+
+                <tbody><tr>
+                  <!-- Header Top Border // -->
+                  <td height="3" style="background-color:#cd545b;font-size:1px;line-height:3px;" class="topBorder">&nbsp;</td>
+                </tr>
+
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 20px;" class="imgHero">
+                    <!-- Hero Image // -->
+                    <a href="#" target="_blank" style="text-decoration:none;">
+                      <img src="https://pms.afifosh.com/assets/img/mail/user-code.png" width="600" alt="" border="0" style="width:100%; max-width:600px; height:auto; display:block;">
+                    </a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 5px; padding-left: 20px; padding-right: 20px;" class="mainTitle">
+                    <!-- Main Title Text // -->
+                    <h2 class="text" style="color:#000000; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:28px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:36px; text-transform:none; text-align:center; padding:0; margin:0">Recovery Codes</h2>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-bottom: 30px; padding-left: 20px; padding-right: 20px;" class="subTitle">
+                    <!-- Sub Title Text // -->
+                    <h4 class="text" style="color:#999999; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:16px; font-weight:500; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">Please provide two factor code auth code to login.&nbsp;</h4>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" valign="top" style="padding-left:20px;padding-right:20px;" class="containtTable ui-sortable">
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableMediumTitle" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="mediumTitle">
+                          <!-- Medium Title Text // -->
+                          <p class="text" style="color:#3f4b97; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:34px; font-weight:300; font-style:normal; letter-spacing:normal; line-height:24px; text-transform:none; text-align:center; padding:0; margin:0">
+                            USE CODE&nbsp;</p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableDescription" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-bottom: 20px;" class="description">
+                          <!-- Description Text// -->
+                          <p class="text" style="color:#666666; font-family:\'Open Sans\', Helvetica, Arial, sans-serif; font-size:14px; font-weight:400; font-style:normal; letter-spacing:normal; line-height:22px; text-transform:none; text-align:center; padding:0; margin:0">
+                            Click on the button below to activate code, this is your requested account key code to log in with your email address ({user_email})
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="tableButton" style="">
+                      <tbody><tr>
+                        <td align="center" valign="top" style="padding-top:20px;padding-bottom:20px;">
+
+                          <!-- Button Table // -->
+                          <table align="center" border="0" cellpadding="0" cellspacing="0">
+                            <tbody><tr>
+                              <td align="center" class="ctaButton" style="background-color: #cd545b; padding: 12px 35px; border-radius: 50px;">
+                                <!-- Button Link // -->
+                                <a class="text" href="#" target="_blank" style="color:#FFFFFF; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
+                                  Activate Code
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody></table>
+
+                        </td>
+                      </tr>
+                    </tbody></table>
+
+                  </td>
+                </tr>
+
+                <tr>
+                  <td height="20" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+
+                <tr><td align="center" valign="middle" style="padding-bottom:40px" class="emailRegards">
+                            <!-- Image and Link // -->
+                            <a href="#" target="_blank" style="text-decoration:none;">
+                                <img mc:edit="signature" src="https://pms.afifosh.com/assets/img/mail/signature.png" alt="" width="150" border="0" style="width:100%;
+    max-width:150px; height:auto; display:block;">
+                            </a>
+                        </td>
+    </tr>
+              </tbody></table>
+              <!-- Table Card Close// -->
+
+              <!-- Space -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" class="space">
+                <tbody><tr>
+                  <td height="30" style="font-size:1px;line-height:1px;">&nbsp;</td>
+                </tr>
+              </tbody></table>
+
+            </td>
+          </tr>
+        </tbody></table>'
         ]
       ],
       'two_factor_code' => [
