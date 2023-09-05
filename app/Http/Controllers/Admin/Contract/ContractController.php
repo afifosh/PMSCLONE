@@ -27,15 +27,15 @@ class ContractController extends Controller
     $data['projects'] = Project::mine()->whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
     $data['contractClients'] = Client::whereHas('contracts')->pluck('email', 'id')->prepend('All', '0');
-    $data['companies'] = Company::has('contracts')->pluck('name', 'id')->prepend('All', '0');
+    $data['companies'] = Company::has('contracts')->get(['id', 'name', 'type']);;
     $data['programs'] = Program::has('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
     $data['contracts'] = Contract::selectRaw('count(*) as total')
-      ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date > now() then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status != "Draft" and end_date <= now() then 1 end) as expired')
-      ->selectRaw('count(case when deleted_at is null and status != "Draft" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 MONTH) then 1 end) as expiring_soon')
-      ->selectRaw('count(case when deleted_at is null and status != "Draft" and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and end_date > now() then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and end_date <= now() then 1 end) as expired')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 WEEK) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
       ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
       ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
@@ -213,6 +213,8 @@ class ContractController extends Controller
       DB::raw('COUNT(*) as contract_count')
     )
       ->where('status', 'Active')
+      ->where('end_date', '>', now())
+      ->where('end_date', '<=', now()->addDays(90))
       ->groupBy('time_period')
       ->get();
 

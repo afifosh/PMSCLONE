@@ -33,11 +33,22 @@
       }
     }
   $(function () {
+    initModalSelect2();
     var input = document.querySelector("#phone");
     window.itiPhone = intlTelInput(input, {
       utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
       initialCountry: "auto",
-    });
+      geoIpLookup: function(success) {
+        fetch("https://api.country.is")
+          .then(function(response) {
+            if (!response.ok) return success("");
+            return response.json();
+          })
+          .then(function(ipdata) {
+            success(ipdata.country);
+          });
+        },
+      });
   });
   $('#phone').keyup(function (e) {
     validatePhone()
@@ -112,11 +123,6 @@
                 <input class="form-control" type="text" name="last_name" id="lastName" value="{{ old('last_name') ?? auth()->user()->last_name }}" />
                 @error('last_name')<div class="text-danger">{{ $message }}</div>@enderror
               </div>
-              {{-- <div class="mb-3 col-md-6">
-                <label for="email" class="form-label">E-mail</label>
-                <input class="form-control" type="text" id="email" name="email" value="{{old('email') ?? auth()->user()->email}}" placeholder="Email" />
-                @error('email')<div class="text-danger">{{ $message }}</div>@enderror
-              </div> --}}
               <div class="mb-3 col-md-6">
                 <label class="form-label" for="phone">Phone Number</label>
                   <input type="text" id="phone" name="phone" class="form-control" value="{{old('phone') ?? auth()->user()->phone}}"/>
@@ -134,25 +140,36 @@
                 @error('address')<div class="text-danger">{{ $message }}</div>@enderror
               </div>
               <div class="mb-3 col-md-6">
-                <label for="state" class="form-label">State</label>
-                <input class="form-control" type="text" id="state" name="state" value="{{ old('state') ?? auth()->user()->state }}" placeholder="California" />
-                @error('state')<div class="text-danger">{{ $message }}</div>@enderror
-              </div>
-              <div class="mb-3 col-md-6">
                 <label for="zipCode" class="form-label">Zip Code</label>
                 <input type="text" class="form-control" id="zipCode" name="zip_code" value="{{ old('zip_code') ?? auth()->user()->zip_code }}" placeholder="231465" maxlength="6" />
                 @error('zip_code')<div class="text-danger">{{ $message }}</div>@enderror
               </div>
-              <div class="mb-3 col-md-6">
-                <label class="form-label" for="country">Country</label>
-                <select id="country" name="country_id" class="select2 form-select">
-                  <option value="">Select</option>
-                  @forelse ($countries as $country)
-                      <option value="{{ $country->id }}" {{old('country_id') == $country->id || $country->id == auth()->user()->country_id ? 'selected' : '' }}>{{ $country->name }}</option>
-                  @empty
-                  @endforelse
-                </select>
-                @error('country_id')<div class="text-danger">{{ $message }}</div>@enderror
+              <div class="mb-3 col-6">
+                {{ Form::label('country_id', __('Country'), ['class' => 'form-label']) }}
+                {!! Form::select('country_id', $countries, auth()->user()->country_id, [
+                'class' => 'form-select globalOfSelect2Remote',
+                'data-url' => route('resource-select', ['Country']),
+                'id' => 'user-countries-id',
+                ]) !!}
+              </div>
+              {{-- states --}}
+              <div class="mb-3 col-6">
+                {{ Form::label('state_id', __('State'), ['class' => 'form-label']) }}
+                {!! Form::select('state_id', $states, auth()->user()->state_id, [
+                'class' => 'form-select globalOfSelect2Remote',
+                'data-url' => route('resource-select', ['State']),
+                'data-dependent_id' => 'user-countries-id',
+                'id' => 'user-state-id',
+                ]) !!}
+              </div>
+              {{-- cities --}}
+              <div class="mb-3 col-6">
+                {{ Form::label('city_id', __('City'), ['class' => 'form-label']) }}
+                {!! Form::select('city_id', $cities, auth()->user()->city_id, [
+                'class' => 'form-select globalOfSelect2Remote',
+                'data-url' => route('resource-select', ['City']),
+                'data-dependent_id' => 'user-state-id'
+                ]) !!}
               </div>
               <div class="mb-3 col-md-6">
                 <label for="language" class="form-label">Language</label>

@@ -24,7 +24,7 @@ class ContractStoreRequest extends FormRequest
   {
     return [
       'isSavingDraft' => 'nullable',
-      'subject' => 'required|string|max:100',
+      'subject' => 'required|string',
       'type_id' => 'nullable|required_if:isSavingDraft,0|exists:contract_types,id',
       'company_id' => ['nullable', Rule::requiredIf($this->isSavingDraft == 0), 'exists:companies,id'],
       'project_id' => ['nullable', 'exists:projects,id'],

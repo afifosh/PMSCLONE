@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('designation_id')->nullable()->constrained('company_designations')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('state_id')->nullable()->constrained('states')->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete()->cascadeOnUpdate();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('phone')->nullable();
@@ -25,7 +27,6 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->string('address')->nullable();
-            $table->string('state')->nullable();
             $table->string('zip_code')->nullable();
             $table->string('language')->default('en');
             $table->string('timezone')->nullable();

@@ -177,16 +177,26 @@ $configData = Helper::appClasses();
               {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select select2', 'data-placeholder' => 'Type']) !!}
             </div>
             <div class="col">
-              {!! Form::label('assigned_to_type', 'Assigned To') !!}
-              {!! Form::select('assigned_to_type', ['Both' => 'Both', 'Client' => 'Client', 'Company' => 'Company'], null, ['class' => 'form-select select2', 'data-placeholder' => 'Assigned To']) !!}
-            </div>
-            <div class="col d-none">
-              {!! Form::label('companies', 'Company') !!}
-              {!! Form::select('companies', $companies, null, ['class' => 'form-select select2', 'data-placeholder' => 'Company']) !!}
-            </div>
-            <div class="col d-none">
-              {!! Form::label('clients', 'Clients') !!}
-              {!! Form::select('contract_client', $contractClients, null, ['class' => 'form-select select2', 'data-placeholder' => 'Clients']) !!}
+              {!! Form::label('companies[]', 'Client') !!}
+              <select name="companies[]" id="" class="form-select select2" data-placeholder='Client'>
+                <option value="0">All</option>
+                @if ($companies->where('type', 'Company')->count() > 0)
+                  <optgroup label="Companies">
+                    @forelse ($companies->where('type', 'Company') as $comp)
+                      <option value="{{$comp->id}}">{{$comp->name}}</option>
+                    @empty
+                    @endforelse
+                  </optgroup>
+                @endif
+                @if ($companies->where('type', 'Person')->count() > 0)
+                  <optgroup label="Person">
+                    @forelse ($companies->where('type', 'Person') as $comp)
+                      <option value="{{$comp->id}}">{{$comp->name}}</option>
+                    @empty
+                    @endforelse
+                  </optgroup>
+                @endif
+              </select>
             </div>
           </div>
         </form>
@@ -203,24 +213,6 @@ $configData = Helper::appClasses();
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script>
       $(document).ready(function () {
-          $(document).on('change', '[name="assigned_to_type"]', function(e){
-            if($(this).val() == 'Company'){
-              $('[name="companies"]').closest('.col').removeClass('d-none');
-              $('[name="contract_client"]').closest('.col').addClass('d-none');
-              $('[name="companies"]').val('0').trigger('change');
-              $('[name="contract_client"]').val('0').trigger('change');
-            }else if($(this).val() == 'Client'){
-              $('[name="companies"]').closest('.col').addClass('d-none');
-              $('[name="contract_client"]').closest('.col').removeClass('d-none');
-              $('[name="companies"]').val('0').trigger('change');
-              $('[name="contract_client"]').val('0').trigger('change');
-            }else{
-              $('[name="companies"]').closest('.col').addClass('d-none');
-              $('[name="contract_client"]').closest('.col').addClass('d-none');
-              $('[name="companies"]').val('0').trigger('change');
-              $('[name="contract_client"]').val('0').trigger('change');
-            }
-          })
           $('.js-datatable-filter-form :input').on('change', function (e) {
               window.LaravelDataTables["contracts-table"].draw();
           });

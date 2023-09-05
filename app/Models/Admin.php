@@ -56,7 +56,10 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     'status',
     'designation_id',
     'password_changed_at',
-    'email_verified_at'
+    'email_verified_at',
+    'country_id',
+    'state_id',
+    'city_id',
   ];
 
   public const AVATAR_PATH = 'admins-avatars';

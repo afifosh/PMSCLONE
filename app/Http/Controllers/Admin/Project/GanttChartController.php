@@ -35,7 +35,7 @@ class GanttChartController extends Controller
     $contractTypes = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
     $contractClients = Client::whereHas('contracts')->pluck('email', 'id')->prepend('All', '0');
 
-    $companies = Company::has('contracts')->pluck('name', 'id')->prepend('All', '0');
+    $companies = Company::has('contracts')->get(['id', 'name', 'type']);
     $programs = Program::has('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     return view('admin.pages.projects.gantt-chart', compact('ganttProjects', 'statuses', 'projects', 'companies', 'contractTypes', 'contractClients', 'programs'));

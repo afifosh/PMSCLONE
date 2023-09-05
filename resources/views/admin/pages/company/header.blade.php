@@ -17,7 +17,25 @@
               @endif</h4>
               <ul class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
                 <li class="list-inline-item">
-                  <i class='ti ti-color-swatch'></i> <b>Type:</b> {{$company->type}}
+                  @if($company->type == 'Company')
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building-skyscraper" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path d="M3 21l18 0"></path>
+                      <path d="M5 21v-14l8 -4v18"></path>
+                      <path d="M19 21v-10l-6 -4"></path>
+                      <path d="M9 9l0 .01"></path>
+                      <path d="M9 12l0 .01"></path>
+                      <path d="M9 15l0 .01"></path>
+                      <path d="M9 18l0 .01"></path>
+                    </svg>
+                  @elseif($company->type == 'Person')
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                      <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                    </svg>
+                  @endif
+                  {{$company->type}}
                 </li>
                 <li class="list-inline-item">
                   <i class='ti ti-calendar'></i> <b>Joined: </b> {{formatDateTime($company->created_at)}}</li>

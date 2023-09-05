@@ -68,7 +68,7 @@
   </div>
   <div>
     <div class="form-check col-12 mt-2">
-      <input class="form-check-input" type="checkbox" value="1" checked disabled>
+      <input class="form-check-input" type="checkbox" value="1" disabled>
       <label class="form-check-label">
         Mail Credentials to User
       </label>

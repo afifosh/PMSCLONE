@@ -7,7 +7,9 @@ use App\DataTables\NotificationsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Admin;
+use App\Models\City;
 use App\Models\Country;
+use App\Models\State;
 use App\Repositories\FileUploadRepository;
 use App\Support\Timezonelist;
 use Illuminate\Http\JsonResponse;
@@ -75,7 +77,9 @@ class AdminAccountController extends Controller
     $data['timezones'] = $this->timezones();
     $data['languages'] = $this->languages();
     $data['currencies'] = $this->currencies();
-    $data['countries'] = Country::get(['id', 'name']);
+    $data['countries'] = Country::where('id', auth()->user()->country_id)->pluck('name', 'id')->prepend('Select Country', '');
+    $data['states'] = State::where('id', auth()->user()->state_id)->pluck('name', 'id')->prepend('Select State', '');
+    $data['cities'] = City::where('id', auth()->user()->city_id)->pluck('name', 'id')->prepend('Select City', '');
 
     return view('admin.pages.account.account-edit-general', $data);
   }

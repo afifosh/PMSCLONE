@@ -40,6 +40,16 @@ $configData = Helper::appClasses();
     window.itiPhone = intlTelInput(input, {
       utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2/build/js/utils.js",
       initialCountry: "auto",
+      geoIpLookup: function(success) {
+        fetch("https://api.country.is")
+          .then(function(response) {
+            if (!response.ok) return success("");
+            return response.json();
+          })
+          .then(function(ipdata) {
+            success(ipdata.country);
+          });
+        },
     });
     if($(input).val() != ''){
       checkUtilInitialized();

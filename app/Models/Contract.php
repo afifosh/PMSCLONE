@@ -65,24 +65,22 @@ class Contract extends Model
   public function getStatusAttribute()
   {
     $value = $this->getRawOriginal('status');
-    if($value == 'Terminated' || $value == 'Paused' || $value == 'Draft') return $value;
-    elseif(!$this->end_date || !$this->start_date) return '';
-    elseif($this->end_date->isPast()) return 'Expired';
-    elseif($this->start_date->isFuture()) return 'Not started';
-    elseif(now() > $this->end_date->subWeeks(2)) return 'About To Expire';
-    elseif(now() >= $this->start_date) return 'Active';
+    if ($value == 'Terminated' || $value == 'Paused' || $value == 'Draft') return $value;
+    elseif (!$this->end_date || !$this->start_date) return '';
+    elseif ($this->end_date->isPast()) return 'Expired';
+    elseif ($this->start_date->isFuture()) return 'Not started';
+    elseif (now() > $this->end_date->subWeeks(2)) return 'About To Expire';
+    elseif (now() >= $this->start_date) return 'Active';
   }
 
   public function getPossibleStatuses()
   {
     $status = $this->getRawOriginal('status');
-    if($status == 'Active'){
+    if ($status == 'Active') {
       return ['Active', 'Paused', 'Terminated'];
-    }
-    elseif($status == 'Paused'){
+    } elseif ($status == 'Paused') {
       return ['Paused', 'Resumed', 'Terminated'];
-    }
-    elseif($status == 'Terminated'){
+    } elseif ($status == 'Terminated') {
       return ['Resumed', 'Terminated'];
     }
   }
@@ -90,7 +88,7 @@ class Contract extends Model
   public function scopeApplyRequestFilters($q)
   {
     return $q->when(request()->filter_status, function ($q) {
-      if(request()->filter_status == 'Draft') return $q->where('status', 'Draft');
+      if (request()->filter_status == 'Draft') return $q->where('status', 'Draft');
       else if (request()->filter_status == 'Not started') {
         $q->where('start_date', '>', now());
       } elseif (request()->filter_status == 'Expired') {
@@ -107,29 +105,29 @@ class Contract extends Model
     })->when(request()->companies, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);
     })
-    ->when(request()->contract_client, function ($q) {
-      $q->where('assignable_type', Client::class)->where('assignable_id', request()->contract_client);
-    })
-    ->when(request()->search_q, function ($q) {
-      $q->where(function ($q) {
-        $q->where('subject', 'like', '%' . request()->search_q . '%')
-          ->orWhereHas('phases', function ($q) {
-            $q->where('name', 'like', '%' . request()->search_q . '%');
-          });
+      ->when(request()->contract_client, function ($q) {
+        $q->where('assignable_type', Client::class)->where('assignable_id', request()->contract_client);
+      })
+      ->when(request()->search_q, function ($q) {
+        $q->where(function ($q) {
+          $q->where('subject', 'like', '%' . request()->search_q . '%')
+            ->orWhereHas('phases', function ($q) {
+              $q->where('name', 'like', '%' . request()->search_q . '%');
+            });
+        });
+      })->when(request()->contract_type, function ($q) {
+        $q->whereHas('type', function ($q) {
+          $q->where('id', request()->contract_type);
+        });
+      })->when(request()->projects, function ($q) {
+        $q->whereHas('project', function ($q) {
+          $q->where('id', request()->projects);
+        });
+      })->when(request()->programs, function ($q) {
+        $q->whereHas('program', function ($q) {
+          $q->where('id', request()->programs);
+        });
       });
-    })->when(request()->contract_type, function ($q) {
-      $q->whereHas('type', function ($q) {
-        $q->where('id', request()->contract_type);
-      });
-    })->when(request()->projects, function ($q) {
-      $q->whereHas('project', function ($q) {
-        $q->where('id', request()->projects);
-      });
-    })->when(request()->programs, function ($q) {
-      $q->whereHas('program', function ($q) {
-        $q->where('id', request()->programs);
-      });
-    });
   }
 
   public function type(): BelongsTo
@@ -180,17 +178,17 @@ class Contract extends Model
   public function getStatusColor()
   {
     $status = $this->status;
-    if($status == 'Active') return 'success';
-    elseif($status == 'Not started') return 'warning';
-    elseif($status == 'About To Expire') return 'warning';
-    elseif($status == 'Expired') return 'danger';
-    elseif($status == 'Terminated') return 'danger';
-    elseif($status == 'Paused') return 'warning';
+    if ($status == 'Active') return 'success';
+    elseif ($status == 'Not started') return 'warning';
+    elseif ($status == 'About To Expire') return 'warning';
+    elseif ($status == 'Expired') return 'danger';
+    elseif ($status == 'Terminated') return 'danger';
+    elseif ($status == 'Paused') return 'warning';
   }
 
   public function remaining_cost($phase_to_ignore_id = null)
   {
-    if($phase_to_ignore_id){
+    if ($phase_to_ignore_id) {
       return $this->value - $this->phases->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
     }
     return $this->value - $this->phases->sum('estimated_cost');
@@ -198,15 +196,22 @@ class Contract extends Model
 
   public function saveEventLog(ContractUpdateRequest $request, Contract $contract)
   {
-    if($contract->start_date->ne($request->start_date) || $contract->end_date->ne($request->end_date)){
+    $end_date_updated = false;
+    if(($contract->end_date && !$request->end_date)
+    || (!$contract->end_date && $request->end_date)
+    || ($contract->end_date && $request->end_date && $contract->end_date->ne($request->end_date))){
+      $end_date_updated = true;
+    }
+
+    if ($contract->start_date->ne($request->start_date) || $end_date_updated) {
       $modifications = ['old' => [], 'new' => []];
       $description = 'Contract Rescheduled From ';
-      if($contract->start_date->ne($request->start_date)){
+      if ($contract->start_date->ne($request->start_date)) {
         $modifications['old']['start_date'] = $contract->start_date;
         $modifications['new']['start_date'] = $request->start_date;
         $description .= 'Start Date:  ' . $contract->start_date->format('d M, Y') . ' to ' . $request->start_date;
       }
-      if($contract->end_date->ne($request->end_date)){
+      if ($end_date_updated) {
         $modifications['old']['end_date'] = $contract->end_date;
         $modifications['new']['end_date'] = $request->end_date;
         $description .= 'End Date:  ' . $contract->end_date->format('d M, Y') . ' to ' . $request->end_date;

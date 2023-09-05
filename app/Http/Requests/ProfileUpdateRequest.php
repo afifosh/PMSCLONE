@@ -27,13 +27,14 @@ class ProfileUpdateRequest extends FormRequest
           'last_name' => 'required|string|max:255',
           'phone' => 'phone',
           'phone_country' => 'required_with:phone',
-          'address' => 'required|string|max:255',
-          'state' => 'required|string|max:255',
-          'zip_code' => 'required|string|max:8',
-          'country_id' => 'required|exists:countries,id',
-          'language' => 'required|string|max:255',
-          'timezone' => 'required|string|max:255',
-          'currency' => 'required|string|max:255',
+          'address' => 'nullable|string|max:255',
+          'zip_code' => 'nullable|string|max:8',
+          'country_id' => 'nullable|exists:countries,id',
+          'state_id' => 'nullable|exists:states,id',
+          'city_id' => 'nullable|exists:cities,id',
+          'language' => 'nullable|string|max:255',
+          'timezone' => 'nullable|string|max:255',
+          'currency' => 'nullable|string|max:255',
         ];
     }
 

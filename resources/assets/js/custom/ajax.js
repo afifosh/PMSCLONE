@@ -529,7 +529,7 @@ window.initModalSelect2 = function(){
       },
       placeholder: $(this).data('placeholder'),
       minimumInputLength: 0,
-      dropdownParent: $('#globalModal')
+      dropdownParent: $(this).parent()
     });
   })
   // END select2 with remote data for global modal
@@ -563,14 +563,14 @@ window.initModalSelect2 = function(){
       },
       placeholder: $(this).data('placeholder'),
       minimumInputLength: 0,
-      dropdownParent: $('#globalModal')
+      dropdownParent: $(this).parent()
     });
   })
   function renderRemoteUser(option) {
     if (!option.id) {
       return option.text;
     }
-    return '<div class="d-flex justify-content-start align-items-center user-name"><div class="avatar-wrapper"><div class="avatar avatar-sm me-3"><img src="'+option.avatar+'"></div></div><div class="d-flex flex-column"><span class="text-body text-truncate"><span class="fw-semibold">'+option.full_name+'</span></span><small class="text-muted">'+option.text+'</small></div></div>';
+    return `<div class="d-flex justify-content-start align-items-center user-name"><div class="avatar-wrapper"><div class="avatar avatar-sm me-3"><img src="${option.avatar}"></div></div><div class="d-flex flex-column"><span class="text-body text-truncate"><span class="fw-semibold">${option.full_name}</span></span>${option.text ? `<small class="text-muted">${option.text}</small>` : ''}</div></div>`;
   }
   function renderRemoteSelectedUser(option) {
     if (option.full_name == undefined || option.full_name == null || option.full_name == '') {
