@@ -104,14 +104,14 @@
         <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;"
             width="600">
             <tr>
-                <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
+                <td style="line-height:0px;mso-line-height-rule:exactly;">
                     <div style="background:#ffffff;background-color:#ffffff;Margin:0px auto;max-width:600px;">
                         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
                             style="background:#ffffff;background-color:#ffffff;width:100%;">
                             <tbody>
                                 <tr>
                                     <td
-                                        style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0px;padding-left:0px;padding-right:0px;padding-top:0px;text-align:center;vertical-align:top;">
+                                        style="direction:ltr;padding:20px 0;padding-bottom:0px;padding-left:0px;padding-right:0px;padding-top:0px;text-align:center;vertical-align:top;">
                                         <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                             <tr>
                                                 <td class="" style="vertical-align:top;width:600px;">
@@ -122,12 +122,12 @@
                                                             width="100%">
                                                             <tr>
                                                                 <td
-                                                                    style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:40px;padding-left:0px;word-break:break-word;">
+                                                                    style="padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:40px;padding-left:0px;word-break:break-word;">
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td align="center"
-                                                                    style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:0px;word-break:break-word;">
+                                                                    style="padding:10px 25px;padding-top:0px;padding-bottom:0px;word-break:break-word;">
                                                                     <table border="0" cellpadding="0"
                                                                         cellspacing="0" role="presentation"
                                                                         style="border-collapse:collapse;border-spacing:0px;">
@@ -199,14 +199,14 @@
         <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;"
             width="600">
             <tr>
-                <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
+                <td style="line-height:0px;mso-line-height-rule:exactly;">
                     <div style="background:#ffffff;background-color:#ffffff;Margin:0px auto;max-width:600px;">
                         <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
                             style="background:#ffffff;background-color:#ffffff;width:100%;">
                             <tbody>
                                 <tr>
                                     <td
-                                        style="direction:ltr;font-size:0px;padding:20px 0px 20px 0px;padding-bottom:70px;padding-top:30px;text-align:center;vertical-align:top;">
+                                        style="direction:ltr;padding:20px 0px 20px 0px;padding-bottom:70px;padding-top:30px;text-align:center;vertical-align:top;">
                                         <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                             <tr>
                                                 <td class="" style="vertical-align:top;width:600px;">
@@ -217,7 +217,7 @@
                                                             width="100%">
                                                             <tr>
                                                                 <td align="left"
-                                                                    style="font-size:0px;padding:0px 25px 0px 25px;padding-top:0px;padding-right:50px;padding-bottom:0px;padding-left:50px;word-break:break-word;">
+                                                                    style="padding:0px 25px 0px 25px;padding-top:0px;padding-right:50px;padding-bottom:0px;padding-left:50px;word-break:break-word;">
                                                                     @yield('content')
                                                                 </td>
                                                             </tr>
