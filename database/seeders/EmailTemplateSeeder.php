@@ -1491,7 +1491,7 @@ class EmailTemplateSeeder extends Seeder
                           <!-- Button Table // -->
                           <table align="center" border="0" cellpadding="0" cellspacing="0">
                             <tbody><tr>
-                              <td align="center" class="ctaButton" style="background-color: rgb(0, 60, 229); padding: 12px 35px; border-radius: 50px;">
+                              <td align="center" class="ctaButton" style="background-color: #cd545b; padding: 12px 35px; border-radius: 50px;">
                                 <!-- Button Link // -->
                                 <a class="text" href="#" target="_blank" style="color:#FFFFFF; font-family:\'Poppins\', Helvetica, Arial, sans-serif; font-size:13px; font-weight:600; font-style:normal;letter-spacing:1px; line-height:20px; text-transform:uppercase; text-decoration:none; display:block">
                                   Activate Code
