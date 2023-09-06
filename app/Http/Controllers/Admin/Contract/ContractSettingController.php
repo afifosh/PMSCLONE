@@ -48,6 +48,30 @@ class ContractSettingController extends Controller
     return $this->sendRes('Contract Terminated Successfully', ['event' => 'page_reload']);
   }
 
+  public function undoTerminate(Contract $contract, Request $request)
+  {
+    $contract->load('events');
+    if($contract->status != 'Terminated' && $contract->events->where('event_type', 'Terminated')->whereNull('applied_at')->count() == 0)
+      return $this->sendError('Contract Not Terminated');
+
+    $contract->events()->create([
+      'event_type' => 'Undo Terminate',
+      'modifications' => [
+        'termination_reason' => $contract->termination_reason,
+        'termination_date' => $contract->termination_date,
+      ],
+      'description' => 'Contract Termination Cancelled',
+      'admin_id' => auth()->id(),
+    ]);
+
+    $contract->update(['status' => 'Active']);
+
+    // mark the termination event as applied
+    $contract->events()->where('event_type', 'Terminated')->whereNull('applied_at')->update(['applied_at' => now()]);
+
+    return $this->sendRes('Contract Termination Cancelled', ['event' => 'page_reload']);
+  }
+
   public function pause(Contract $contract, Request $request)
   {
     if($contract->status == 'Paused' || $contract->status == 'Terminated')
@@ -63,7 +87,7 @@ class ContractSettingController extends Controller
 
     if($request->pause_until == 'manual'){
       $description = 'Contract Paused Until Manual Resume';
-      $modifications = ['pause_until' => 'manual'];
+      $modifications = ['pause_until' => 'manual', 'pause_date' => now()];
     }else if($request->pause_until == 'custom_date'){
       $description = 'Contract Paused Until '.$request->custom_date_value;
       $modifications = ['pause_until' => $request->custom_date_value, 'pause_date' => now()];
@@ -82,6 +106,16 @@ class ContractSettingController extends Controller
     $contract->update(['status' => 'Paused']);
 
     return $this->sendRes('Contract Paused Successfully', ['event' => 'page_reload']);
+  }
+
+  public function resume(Contract $contract, Request $request)
+  {
+    if($contract->status != 'Paused')
+      return $this->sendError('Contract Not Paused');
+
+    $contract->resume();
+
+    return $this->sendRes('Contract Resumed Successfully', ['event' => 'page_reload']);
   }
 
   public function sendTerminateNotification($contract, $isImmediate = true)

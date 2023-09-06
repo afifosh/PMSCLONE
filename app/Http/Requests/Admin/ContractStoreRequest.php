@@ -29,11 +29,11 @@ class ContractStoreRequest extends FormRequest
       'company_id' => ['nullable', Rule::requiredIf($this->isSavingDraft == 0), 'exists:companies,id'],
       'project_id' => ['nullable', 'exists:projects,id'],
       'program_id' => ['nullable', 'exists:programs,id'],
-      'currency' => [Rule::In(array_keys(config('money.currencies'))), 'min:0', 'max:92233720368547758'],
+      'currency' => [Rule::In(array_keys(config('money.currencies'))), 'required_if:isSavingDraft,0'],
+      'value' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'min:0', 'max:92233720368547758'],
       'refrence_id' => 'nullable|unique:contracts,refrence_id',
       'start_date' => 'nullable|required_if:isSavingDraft,0|date',
       'end_date' => 'nullable|date|after_or_equal:start_date',
-      'value' => 'nullable|required_if:isSavingDraft,0',
       'description' => 'nullable|string|max:2000',
     ];
   }

@@ -39,22 +39,24 @@
               <div class="d-flex flex-wrap justify-content-start">
                   <!--begin::Stats-->
                   <div class="d-flex flex-wrap">
-                      <!--begin::Stat-->
-                      <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-3 mb-3">
-                          <!--begin::Number-->
-                          <div class="d-flex align-items-center">
-                              <div class="fs-6 fw-bold">{{formatDateTime($contract->start_date)}}</div>
-                          </div>
-                          <!--end::Number-->
+                    @if ($contract->start_date)
+                        <!--begin::Stat-->
+                          <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-3 mb-3">
+                            <!--begin::Number-->
+                            <div class="d-flex align-items-center">
+                                <div class="fs-6 fw-bold">{{formatDateTime($contract->start_date)}}</div>
+                            </div>
+                            <!--end::Number-->
 
-                          <!--begin::Label-->
-                          <div class="fw-semibold text-muted">Start Date</div>
-                          <!--end::Label-->
-                      </div>
-                      <!--end::Stat-->
-
+                            <!--begin::Label-->
+                            <div class="fw-semibold text-muted">Start Date</div>
+                            <!--end::Label-->
+                           </div>
+                        <!--end::Stat-->
+                    @endif
                       <!--begin::Stat-->
-                      <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-3 mb-3">
+                      @if ($contract->end_date)
+                        <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-3 mb-3">
                           <!--begin::Number-->
                           <div class="d-flex align-items-center">
                             <div class="fs-6 fw-bold">{{formatDateTime($contract->end_date)}}</div>
@@ -64,21 +66,24 @@
                           <!--begin::Label-->
                           <div class="fw-semibold text-muted">End Date</div>
                           <!--end::Label-->
-                      </div>
+                        </div>
+                      @endif
                       <!--end::Stat-->
 
                       <!--begin::Stat-->
-                      <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-3 mb-3">
+                      @if ($contract->value)
+                        <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-3 mb-3">
                           <!--begin::Number-->
                           <div class="d-flex align-items-center">
-                            <div class="fs-6 fw-bold">{{config('app.currency')}} {{$contract->value}}</div>
+                            <div class="fs-6 fw-bold">{{$contract->printable_value}}</div>
                           </div>
                           <!--end::Number-->
 
                           <!--begin::Label-->
                           <div class="fw-semibold text-muted">Value</div>
                           <!--end::Label-->
-                      </div>
+                        </div>
+                      @endif
                       <!--end::Stat-->
                   </div>
                   <!--end::Stats-->

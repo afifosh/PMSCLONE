@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Akaunting\Money\Money;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class Contract extends Model
 {
@@ -194,66 +196,166 @@ class Contract extends Model
     return $this->value - $this->phases->sum('estimated_cost');
   }
 
-  public function saveEventLog(ContractUpdateRequest $request, Contract $contract)
+  public function saveEventLog(ContractUpdateRequest|Request $request, Contract $contract): void
   {
+    $start_date_updated = false;
     $end_date_updated = false;
+    $value_updated = $contract->value != $request->value;
+    $c_start_date = $contract->start_date ? $contract->start_date->format('d M, Y') : 'NULL';
+    $c_end_date = $contract->end_date ? $contract->end_date->format('d M, Y') : 'NULL';
     if(($contract->end_date && !$request->end_date)
     || (!$contract->end_date && $request->end_date)
-    || ($contract->end_date && $request->end_date && $contract->end_date->ne($request->end_date))){
+    || ($contract->end_date && $request->end_date && !$contract->end_date->isSameDay($request->end_date))){
       $end_date_updated = true;
     }
+    if(($contract->start_date && !$request->start_date)
+    || (!$contract->start_date && $request->start_date)
+    || ($contract->start_date && $request->start_date && !$contract->start_date->isSameDay($request->start_date))){
+      $start_date_updated = true;
+    }
 
-    if ($contract->start_date->ne($request->start_date) || $end_date_updated) {
-      $modifications = ['old' => [], 'new' => []];
-      $description = 'Contract Rescheduled From ';
-      if ($contract->start_date->ne($request->start_date)) {
-        $modifications['old']['start_date'] = $contract->start_date;
-        $modifications['new']['start_date'] = $request->start_date;
-        $description .= 'Start Date:  ' . $contract->start_date->format('d M, Y') . ' to ' . $request->start_date;
-      }
-      if ($end_date_updated) {
-        $modifications['old']['end_date'] = $contract->end_date;
-        $modifications['new']['end_date'] = $request->end_date;
-        $description .= 'End Date:  ' . $contract->end_date->format('d M, Y') . ' to ' . $request->end_date;
-      }
-
+    //End Date Revised
+    if(!$start_date_updated && $end_date_updated && !$value_updated){
+      // dd(Carbon::parse($request->end_date)->format('d M, Y'));
       $contract->events()->create([
-        'event_type' => 'Rescheduled',
-        'modifications' => $modifications,
-        'description' => $description,
+        'event_type' => 'End Date Revised',
+        'modifications' => [
+          'old' => ['end_date' => $contract->end_date],
+          'new' => ['end_date' => $request->end_date],
+        ],
+        'description' => 'Contract End Date Revised From ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y'),
+        'admin_id' => auth()->id(),
+      ]);
+    }
+    // Start Date Revised
+    else if($start_date_updated && !$end_date_updated && !$value_updated){
+      $contract->events()->create([
+        'event_type' => 'Start Date Revised',
+        'modifications' => [
+          'old' => ['start_date' => $contract->start_date],
+          'new' => ['start_date' => $request->start_date],
+        ],
+        'description' => 'Contract Start Date Revised From ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y'),
         'admin_id' => auth()->id(),
       ]);
     }
 
-    // if($request->status != $contract->getRawOriginal('status')){
-    //   $contract->events()->create([
-    //     'event_type' => $request->status,
-    //     'modifications' => [
-    //       'old' => ['status' => $contract->getRawOriginal('status')],
-    //       'new' => ['status' => $request->status],
-    //     ],
-    //     'description' => 'Contract ' . $request->status,
-    //     'admin_id' => auth()->id(),
-    //   ]);
-    // }
+    // Rescheduled
+    else if($start_date_updated && $end_date_updated && !$value_updated){
+      $contract->events()->create([
+        'event_type' => 'Rescheduled',
+        'modifications' => [
+          'old' => ['start_date' => $contract->start_date, 'end_date' => $contract->end_date],
+          'new' => ['start_date' => $request->start_date, 'end_date' => $request->end_date],
+        ],
+        'description' => 'Contract Rescheduled From Start Date: ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and From End Date:  ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y'),
+        'admin_id' => auth()->id(),
+      ]);
+    }
 
-    // if($request->status == 'Terminated' && $request->termination_reason){
-    //   $event = $contract->events()->where('event_type', 'Terminated')->latest()->first();
-    //   $event->modifications = array_merge($event->modifications, ['termination_reason' => $request->termination_reason]);
-    //   $event->save();
-    // }
+    // Amount Increased
+    else if(!$start_date_updated && !$end_date_updated && $value_updated && $request->value > $contract->value){
+      $contract->events()->create([
+        'event_type' => 'Amount Increased',
+        'modifications' => [
+          'old' => ['value' => $contract->value],
+          'new' => ['value' => $request->value],
+        ],
+        'description' => 'Contract Amount Increased From ' . $contract->value . ' to ' . $request->value,
+        'admin_id' => auth()->id(),
+      ]);
+    }
 
-    // if($request->value != $contract->value){
-    //   $contract->events()->create([
-    //     'event_type' => 'Amount Updated',
-    //     'modifications' => [
-    //       'old' => ['value' => $contract->value],
-    //       'new' => ['value' => $request->value],
-    //     ],
-    //     'description' => 'Contract Amount Updated From ' . $contract->value . ' to ' . $request->value,
-    //     'admin_id' => auth()->id(),
-    //   ]);
-    // }
+    // Amount Decreased
+    else if(!$start_date_updated && !$end_date_updated && $value_updated && $request->value < $contract->value){
+      $contract->events()->create([
+        'event_type' => 'Amount Decreased',
+        'modifications' => [
+          'old' => ['value' => $contract->value],
+          'new' => ['value' => $request->value],
+        ],
+        'description' => 'Contract Amount Decreased From ' . $contract->value . ' to ' . $request->value,
+        'admin_id' => auth()->id(),
+      ]);
+    }
+
+    // Rescheduled And Amount Increased
+    else if($start_date_updated && $end_date_updated && $value_updated && $request->value > $contract->value){
+      $contract->events()->create([
+        'event_type' => 'Rescheduled And Amount Increased',
+        'modifications' => [
+          'old' => ['start_date' => $contract->start_date, 'end_date' => $contract->end_date, 'value' => $contract->value],
+          'new' => ['start_date' => $request->start_date, 'end_date' => $request->end_date, 'value' => $request->value],
+        ],
+        'description' => 'Contract Rescheduled From Start Date: ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and From End Date:  ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y') . ' and Amount Increased From ' . $contract->value . ' to ' . $request->value,
+        'admin_id' => auth()->id(),
+      ]);
+    }
+
+    // Rescheduled And Amount Decreased
+    else if($start_date_updated && $end_date_updated && $value_updated && $request->value < $contract->value){
+      $contract->events()->create([
+        'event_type' => 'Rescheduled And Amount Decreased',
+        'modifications' => [
+          'old' => ['start_date' => $contract->start_date, 'end_date' => $contract->end_date, 'value' => $contract->value],
+          'new' => ['start_date' => $request->start_date, 'end_date' => $request->end_date, 'value' => $request->value],
+        ],
+        'description' => 'Contract Rescheduled From Start Date: ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and From End Date:  ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y') . ' and Amount Decreased From ' . $contract->value . ' to ' . $request->value,
+        'admin_id' => auth()->id(),
+      ]);
+    }
+
+    // Start Date Revised And Amount Increased
+    else if($start_date_updated && !$end_date_updated && $value_updated && $request->value > $contract->value){
+      $contract->events()->create([
+        'event_type' => 'Start Date Revised And Amount Increased',
+        'modifications' => [
+          'old' => ['start_date' => $contract->start_date, 'value' => $contract->value],
+          'new' => ['start_date' => $request->start_date, 'value' => $request->value],
+        ],
+        'description' => 'Contract Start Date Revised From ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and Amount Increased From ' . $contract->value . ' to ' . $request->value,
+        'admin_id' => auth()->id(),
+      ]);
+    }
+
+    // Start Date Revised And Amount Decreased
+    else if($start_date_updated && !$end_date_updated && $value_updated && $request->value < $contract->value){
+      $contract->events()->create([
+        'event_type' => 'Start Date Revised And Amount Decreased',
+        'modifications' => [
+          'old' => ['start_date' => $contract->start_date, 'value' => $contract->value],
+          'new' => ['start_date' => $request->start_date, 'value' => $request->value],
+        ],
+        'description' => 'Contract Start Date Revised From ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and Amount Decreased From ' . $contract->value . ' to ' . $request->value,
+        'admin_id' => auth()->id(),
+      ]);
+    }
+
+    // End Date Revised And Amount Increased
+    else if(!$start_date_updated && $end_date_updated && $value_updated && $request->value > $contract->value){
+      $contract->events()->create([
+        'event_type' => 'End Date Revised And Amount Increased',
+        'modifications' => [
+          'old' => ['end_date' => $contract->end_date, 'value' => $contract->value],
+          'new' => ['end_date' => $request->end_date, 'value' => $request->value],
+        ],
+        'description' => 'Contract End Date Revised From ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y') . ' and Amount Increased From ' . $contract->value . ' to ' . $request->value,
+        'admin_id' => auth()->id(),
+      ]);
+    }
+
+    // End Date Revised And Amount Decreased
+    else if(!$start_date_updated && $end_date_updated && $value_updated && $request->value < $contract->value){
+      $contract->events()->create([
+        'event_type' => 'End Date Revised And Amount Decreased',
+        'modifications' => [
+          'old' => ['end_date' => $contract->end_date, 'value' => $contract->value],
+          'new' => ['end_date' => $request->end_date, 'value' => $request->value],
+        ],
+        'description' => 'Contract End Date Revised From ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y') . ' and Amount Decreased From ' . $contract->value . ' to ' . $request->value,
+        'admin_id' => auth()->id(),
+      ]);
+    }
   }
 
   public function formatPhaseValue($value)
@@ -269,5 +371,30 @@ class Contract extends Model
   public function program(): BelongsTo
   {
     return $this->belongsTo(Program::class);
+  }
+
+  public function resume(): void
+  {
+    $contract = $this;
+    $discription = 'Contract Resumed' . (auth()->id() ? ' Manually' : ' By System');
+
+    // update the contract end date if it has paused more than 1 day
+    $event = $contract->events()->where('event_type', 'Paused')->whereNull('applied_at')->first();
+
+    $pausedDays = now()->diffInDays($event->modifications['pause_date']);
+    // if($pausedDays > 0){
+      $contract->update(['end_date' => $contract->end_date ? $contract->end_date->addDays($pausedDays) : null, 'status' => 'Active']);
+      $discription .=  ' after '.$pausedDays.' days and new end date is '.$contract->end_date->format('d M, Y');
+    // }
+
+    $contract->events()->create([
+      'event_type' => 'Resumed',
+      'modifications' => ['pause_until' => null, 'pause_date' => null],
+      'description' => $discription,
+      'admin_id' => auth()->id(),
+    ]);
+
+    // mark the pause event as applied
+    $contract->events()->where('event_type', 'Paused')->whereNull('applied_at')->update(['applied_at' => now()]);
   }
 }

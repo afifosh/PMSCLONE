@@ -330,12 +330,12 @@ class ContractController extends Controller
         'description' => 'Contract Created',
         'admin_id' => auth()->id(),
       ]);
-    else {
-      if (!$request->isSavingDraft)
-        if ($request->start_date != $contract->start_date || $request->end_date != $contract->end_date || $request->value != $contract->value) {
-          $contract->saveEventLog($request, $contract);
-        }
-    }
+    // else {
+    //   if (!$request->isSavingDraft)
+    //     if ($request->start_date != $contract->start_date || $request->end_date != $contract->end_date || $request->value != $contract->value) {
+    //       $contract->saveEventLog($request, $contract);
+    //     }
+    // }
 
     $data['assignable_id'] = $request->company_id;
     $data['assignable_type'] = Company::class;

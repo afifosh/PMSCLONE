@@ -177,8 +177,8 @@ $configData = Helper::appClasses();
               {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select select2', 'data-placeholder' => 'Type']) !!}
             </div>
             <div class="col">
-              {!! Form::label('companies[]', 'Client') !!}
-              <select name="companies[]" id="" class="form-select select2" data-placeholder='Client'>
+              {!! Form::label('companies', 'Client') !!}
+              <select name="companies" id="" class="form-select select2" data-placeholder='Client'>
                 <option value="0">All</option>
                 @if ($companies->where('type', 'Company')->count() > 0)
                   <optgroup label="Companies">

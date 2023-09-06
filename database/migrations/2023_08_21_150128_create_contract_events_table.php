@@ -20,17 +20,23 @@ return new class extends Migration
         'Created',
         'Paused',
         'Resumed',
-        'Extended',
-        'Shortened',
+        'Start Date Revised',
+        'End Date Revised',
         'Rescheduled',
         'Terminated',
+        'Undo Terminate',
         'Amount Increased',
         'Amount Decreased',
         'Rescheduled And Amount Increased',
-        'Rescheduled And Amount Decreased'
+        'Rescheduled And Amount Decreased',
+        'Start Date Revised And Amount Increased',
+        'Start Date Revised And Amount Decreased',
+        'End Date Revised And Amount Increased',
+        'End Date Revised And Amount Decreased',
       ]);
       $table->json('modifications')->nullable();
       $table->text('description')->nullable();
+      $table->dateTime('applied_at')->nullable(); // are the future events applied or not, if applied then when. like scheduled termination, scheduled resume,
       $table->timestamps();
     });
   }

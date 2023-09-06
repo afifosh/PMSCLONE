@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\ContractController;
 use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
+use App\Http\Controllers\Admin\Contract\ContractTermController;
 use App\Http\Controllers\Admin\Contract\ContractTypeController;
 use App\Http\Controllers\Admin\Contract\EventController;
 use App\Http\Controllers\Admin\Contract\NotifiableUserController;
@@ -143,11 +144,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     Route::resource('contracts', ContractController::class);
+    Route::resource('contracts.terms', ContractTermController::class)->only(['edit', 'update']); // reschedule and value update
     Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
     Route::resource('contracts.notifiable-users', NotifiableUserController::class)->only(['create', 'store', 'destroy']);
     Route::resource('contracts.events', EventController::class)->only(['index']);
     Route::put('contracts/{contract}/terminate', [ContractSettingController::class, 'terminate'])->name('contracts.terminate');
+    Route::put('contracts/{contract}/undo-terminate', [ContractSettingController::class, 'undoTerminate'])->name('contracts.undo-terminate');
     Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');
+    Route::put('contracts/{contract}/resume', [ContractSettingController::class, 'resume'])->name('contracts.resume');
     Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
     // Route::resource('contracts.phases', ContractPhaseController::class);
     Route::resource('contract-types', ContractTypeController::class);

@@ -29,11 +29,12 @@ class ContractTerminationCommand extends Command
   {
     $settingsClass = new ContractSettingController();
     Contract::where('status', '!=','Terminated')->whereHas('events', function($q){
-      $q->where('event_type', 'Terminated')->where('modifications->termination_date', '<=', now());
+      $q->where('event_type', 'Terminated')->where('modifications->termination_date', '<=', now())->whereNull('applied_at');
     })->chunk(100, function($contracts) use ($settingsClass){
       foreach($contracts as $contract){
         $settingsClass->sendTerminateNotification($contract);
         $contract->update(['status' => 'Terminated']);
+        $contract->events()->where('event_type', 'Terminated')->whereNull('applied_at')->update(['applied_at' => now()]);
       }
     });
   }

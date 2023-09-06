@@ -6,10 +6,7 @@ use App\Models\ContractEvent;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class EventsDataTable extends DataTable
@@ -26,6 +23,9 @@ class EventsDataTable extends DataTable
       ->editColumn('actioner', function ($event) {
         return view('admin._partials.sections.user-info', ['user' => $event->actioner]);
       })
+      // ->addColumn('action', function($event){
+      //   return view('admin.pages.contracts.events.action', ['event' => $event]);
+      // })
       ->filterColumn('actioner', function ($query, $keyword) {
         $query->whereHas('actioner', function ($query) use ($keyword) {
           $query->where('first_name', 'like', '%' . $keyword . '%')
@@ -59,6 +59,18 @@ class EventsDataTable extends DataTable
    */
   public function html(): HtmlBuilder
   {
+    $buttons = [];
+    if($this->contract->getRawOriginal('status') == 'Active')
+    $buttons[] = [
+      'text' => '<span>Edit Terms</span>',
+      'className' =>  'btn btn-primary mx-3',
+      'attr' => [
+        'data-toggle' => "ajax-modal",
+        'data-title' => 'Edit Contract Terms',
+        'data-href' => route('admin.contracts.terms.edit', [$this->contract->id, 0])
+      ]
+    ];
+
     return $this->builder()
       ->setTableId('events-table')
       ->columns($this->getColumns())
@@ -73,7 +85,7 @@ class EventsDataTable extends DataTable
       ->orderBy(0, 'DESC')
       ->responsive(true)
       ->parameters([
-        'buttons' => [],
+        'buttons' => $buttons,
         "scrollX" => true
       ]);
   }

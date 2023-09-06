@@ -28,13 +28,13 @@ class ContractUpdateRequest extends FormRequest
       'subject' => 'required|string',//|max:100|unique:contracts,subject,' . $this->contract->id . ',id,deleted_at,NULL,project_id,' . $this->contract->project_id,
       'type_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'exists:contract_types,id'],
       'company_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft), 'exists:companies,id'],
-      'currency' => [Rule::In(array_keys(config('money.currencies'))), 'min:0', 'max:92233720368547758'],
+      'currency' => [Rule::In(array_keys(config('money.currencies'))), 'required_if:isSavingDraft,0'],
+      'value' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'min:0', 'max:92233720368547758'],
       'refrence_id' => 'nullable|unique:contracts,refrence_id,'.$this->contract->id.',id,deleted_at,NULL',
       'project_id' => ['nullable', 'exists:projects,id'],
       'program_id' => ['nullable', 'exists:programs,id'],
       'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],
       'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-      'value' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft')],
       'description' => 'nullable|string|max:2000'
     ];
   }

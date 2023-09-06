@@ -25,82 +25,86 @@
 @include('admin.pages.contracts.header', ['tab' => 'settings'])
 <!-- User Profile Content -->
 <div class="row">
-  <div class="col-12">
-    {{-- notifiable users --}}
-    @if ($contract->status != 'Terminated')
-      <div class="card mt-3">
-        <div class="card-body">
-          {{$dataTable->table()}}
-        </div>
-      </div>
-    @endif
-    {{-- End notifiable users --}}
-    @if ($contract->status != 'Paused' && $contract->status != 'Terminated' && $contract->start_date != null)
-      <div class="card mt-2">
-        <h5 class="card-header">Pause Contract</h5>
+  @if($contract->status != 'Expired')
+    <div class="col-12">
+      {{-- notifiable users --}}
+      @if ($contract->status != 'Terminated')
+        <div class="card mt-3">
           <div class="card-body">
-            <form method="post" action="{{route('admin.contracts.pause', [$contract])}}">
-              @method('PUT')
-              <div class="row ms-3">
-                <div class="row">
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="pause_until" value="manual" id="pause-manual" checked>
-                    <label class="form-check-label" for="pause-manual">
-                      Pause Until I Resume
-                    </label>
-                  </div>
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="pause_until" value="custom_date" id="pause-custom">
-                    <label class="form-check-label" for="pause-custom">
-                      Pause Until a specific date
-                    </label>
-                  </div>
-                  <div class="col-3 d-none pause-durantion">
-                    <div class="mb-3">
-                      <input type="date" id="custom-date-value" name="custom_date_value" class="form-control flatpickr" data-flatpickr='{"minDate": "today"}' placeholder="Select Date">
+            {{$dataTable->table()}}
+          </div>
+        </div>
+      @endif
+      {{-- End notifiable users --}}
+      @if ($contract->status != 'Paused' && $contract->status != 'Terminated' && $contract->start_date != null)
+        <div class="card mt-2">
+          <h5 class="card-header">Pause Contract</h5>
+            <div class="card-body">
+              <form method="post" action="{{route('admin.contracts.pause', [$contract])}}">
+                @method('PUT')
+                <div class="row ms-3">
+                  <div class="row">
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="radio" name="pause_until" value="manual" id="pause-manual" checked>
+                      <label class="form-check-label" for="pause-manual">
+                        Pause Until I Resume
+                      </label>
                     </div>
-                  </div>
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="pause_until" value="custom_unit" id="pause-days">
-                    <label class="form-check-label" for="pause-days">
-                      Pause For
-                    </label>
-                  </div>
-                  <div class="col-3 d-none pause-durantion">
-                    <div class="mb-3 d-flex">
-                      <span class="w-50">
-                        <input type="number" id="unit-value" name="pause_for"class="form-control cusom_resum_parm">
-                      </span>
-                      <span class="w-50">
-                        {!! Form::select('custom_unit', ['Days' => 'Days', 'Weeks' => 'Weeks', 'Months'=> 'Months'], null, ['class' => 'form-select select2 cusom_resum_parm']) !!}
-                      </span>
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="radio" name="pause_until" value="custom_date" id="pause-custom">
+                      <label class="form-check-label" for="pause-custom">
+                        Pause Until a specific date
+                      </label>
                     </div>
-                    <div class="col">
+                    <div class="col-3 d-none pause-durantion">
                       <div class="mb-3">
-                        <label for="" class="form-label">Will Resume On: </label>
-                        <input type="date" name="calculated_resumed_date" id="calculated_resumed_date" readonly class="form-control">
+                        <input type="date" id="custom-date-value" name="custom_date_value" class="form-control flatpickr" data-flatpickr='{"minDate": "today"}' placeholder="Select Date">
+                      </div>
+                    </div>
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="radio" name="pause_until" value="custom_unit" id="pause-days">
+                      <label class="form-check-label" for="pause-days">
+                        Pause For
+                      </label>
+                    </div>
+                    <div class="col-3 d-none pause-durantion">
+                      <div class="mb-3 d-flex">
+                        <span class="w-50">
+                          <input type="number" id="unit-value" name="pause_for"class="form-control cusom_resum_parm">
+                        </span>
+                        <span class="w-50">
+                          {!! Form::select('custom_unit', ['Days' => 'Days', 'Weeks' => 'Weeks', 'Months'=> 'Months'], null, ['class' => 'form-select select2 cusom_resum_parm']) !!}
+                        </span>
+                      </div>
+                      <div class="col">
+                        <div class="mb-3">
+                          <label for="" class="form-label">Will Resume On: </label>
+                          <input type="date" name="calculated_resumed_date" id="calculated_resumed_date" readonly class="form-control">
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <button type="button" data-form="ajax-form" class="mt-3 btn btn-primary">Pause Contract</button>
-            </form>
-          </div>
-      </div>
-    @endif
-    @if ($contract->status == 'Paused')
-      <div class="card mt-2">
-        <h5 class="card-header">Resume Contract</h5>
-          <div class="card-body">
-            <form method="post" action="{{route('admin.contracts.pause', [$contract])}}">
-              @method('PUT')
-              @if ($contract->events->where('event_type', 'Paused')->count())
-              @php
-                  $lastPaused = $contract->events->where('event_type', 'Paused')->last();
-              @endphp
-                @if ($lastPaused->modifications['pause_until'] == 'manual')
-                  <p>Contract Is paused until you resume it</p>
+                <button type="button" data-form="ajax-form" class="mt-3 btn btn-primary">Pause Contract</button>
+              </form>
+            </div>
+        </div>
+      @endif
+      @if ($contract->status == 'Paused')
+        <div class="card mt-2">
+          <h5 class="card-header">Resume Contract</h5>
+            <div class="card-body">
+              <form method="post" action="{{route('admin.contracts.resume', [$contract])}}">
+                @method('PUT')
+                @if ($contract->events->where('event_type', 'Paused')->count())
+                @php
+                    $lastPaused = $contract->events->where('event_type', 'Paused')->last();
+                @endphp
+                  @if ($lastPaused->modifications['pause_until'] == 'manual')
+                    <p>Contract Is paused until you resume it</p>
+                  @else
+                  <p>Contract is scheduled to be resumed at {{\Carbon\Carbon::parse($lastPaused->modifications['pause_until'])->format('d M, Y')}}</p>
+                  @endif
                   <div class="row ms-3">
                     <div class="row">
                       <div class="form-check">
@@ -111,75 +115,96 @@
                       </div>
                     </div>
                   </div>
-                @else
-                <p>Contract is scheduled to be resumed at</p>
                 @endif
-              @endif
-              <button type="button" data-form="ajax-form" class="mt-3 btn btn-primary">Resume Contract</button>
-            </form>
-          </div>
-      </div>
-    @endif
-    <div class="card mt-3">
-      <h5 class="card-header">Terminate Contract</h5>
-      @if ($contract->events->where('event_type', 'Terminated')->count())
-        <div class="card-body">
-          <div class="mb-3 col-12 mb-0">
-            <div class="alert alert-danger">
-              <h5 class="alert-heading mb-1">Contract Terminated</h5>
+                <button type="button" data-form="ajax-form" class="mt-3 btn btn-primary disabled resume_now_submit">Resume Contract</button>
+              </form>
+            </div>
+        </div>
+      @endif
+      <div class="card mt-3">
+        <h5 class="card-header">Terminate Contract</h5>
+        @if ($contract->events->where('event_type', 'Terminated')->whereNull('applied_at')->count() || $contract->status == 'Terminated')
+          <div class="card-body">
+            <div class="mb-3 col-12 mb-0">
+              <div class="alert alert-danger d-flex justify-content-between">
+                <h5 class="alert-heading mb-1">{{$contract->status == 'Terminated' ? __('Contract Terminated') : __('Contract Scheduled For Termination')}}</h5>
+                <button class="btn btn-primary" data-undo-termination="{{route('admin.contracts.undo-terminate', ['contract' => $contract->id])}}" >Undo Termination</button>
+              </div>
             </div>
           </div>
-        </div>
-      @else
+        @elseif($contract->getRawOriginal('status') == 'Active')
+          <div class="card-body">
+            <div class="mb-3 col-12 mb-0">
+              <div class="alert alert-warning">
+                <h5 class="alert-heading mb-1">Are you sure you want to Terminate the contract?</h5>
+                <p class="mb-0">Once you terminated your contract, there is no going back. Please be certain.</p>
+              </div>
+            </div>
+            <form method="post" action="{{route('admin.contracts.terminate', [$contract])}}">
+              @method('PUT')
+              <div class="row ms-3">
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" name="contract_termination" id="contract-termination" />
+                  <label class="form-check-label" for="contract-termination">I confirm terminate contract</label>
+                </div>
+                <div class="d-none el-terminate row">
+                  <hr>
+                  <div class="form-check mb-4">
+                    <input class="form-check-input" type="radio" name="terminate_date" value="now" id="terminate-now" checked>
+                    <label class="form-check-label" for="terminate-now">
+                      Terminate Immediately
+                    </label>
+                  </div>
+                  {{-- <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="terminate_date" value="custom" id="terminate-date">
+                    <label class="form-check-label" for="terminate-date">
+                      Terminate on a specific date
+                    </label>
+                  </div> --}}
+                  <div class="mb-3 col-6 d-none">
+                    <input type="date" name="custom_date" id="custom-termination-date" class="form-control flatpickr" placeholder="Termination Date" data-flatpickr='{"minDate" : "today"}'>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-6 d-none el-terminate">
+                    <label for="termination-reason">Termination Reason</b></label>
+                    <input id="termination-reason" class="form-control" type="text" name="reason" placeholder="Termination Reason">
+                  </div>
+                  <div class="form-group col-6 d-none el-terminate">
+                    <label for="terminate-confirmation-text">Please Type <b>Delete/{{$contract->subject}}</b></label>
+                    <input id="terminate-confirmation-text" data-confirm-del="Delete/{{$contract->subject}}" class="form-control" type="text" name="verificatoin-text">
+                  </div>
+                </div>
+              </div>
+              <button type="button" id="terminate-submit" data-form="ajax-form" class="mt-3 btn btn-primary disabled">Terminate Contract</button>
+            </form>
+          </div>
+        @else
+          <div class="card-body">
+            <div class="mb-3 col-12 mb-0">
+              <div class="alert alert-warning">
+                <h5 class="alert-heading mb-1">Contract is not active</h5>
+                <p class="mb-0">You can only terminate active contracts.</p>
+              </div>
+            </div>
+          </div>
+        @endif
+      </div>
+    </div>
+  @else
+    <div class="col-12">
+      <div class="card mt-3">
         <div class="card-body">
           <div class="mb-3 col-12 mb-0">
             <div class="alert alert-warning">
-              <h5 class="alert-heading mb-1">Are you sure you want to Terminate the contract?</h5>
-              <p class="mb-0">Once you terminated your contract, there is no going back. Please be certain.</p>
+              <h5 class="alert-heading mb-1">Contract is Expired</h5>
+              <p class="mb-0">You can only manage active contracts.</p>
             </div>
           </div>
-          <form method="post" action="{{route('admin.contracts.terminate', [$contract])}}">
-            @method('PUT')
-            <div class="row ms-3">
-              <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" name="contract_termination" id="contract-termination" />
-                <label class="form-check-label" for="contract-termination">I confirm terminate contract</label>
-              </div>
-              <div class="d-none el-terminate row">
-                <hr>
-                <div class="form-check mb-4">
-                  <input class="form-check-input" type="radio" name="terminate_date" value="now" id="terminate-now" checked>
-                  <label class="form-check-label" for="terminate-now">
-                    Terminate Immediately
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input class="form-check-input" type="radio" name="terminate_date" value="custom" id="terminate-date">
-                  <label class="form-check-label" for="terminate-date">
-                    Terminate on a specific date
-                  </label>
-                </div>
-                <div class="mb-3 col-6 d-none">
-                  <input type="date" name="custom_date" id="custom-termination-date" class="form-control flatpickr" placeholder="Termination Date" data-flatpickr='{"minDate" : "today"}'>
-                </div>
-              </div>
-              <div class="row">
-                <div class="form-group col-6 d-none el-terminate">
-                  <label for="termination-reason">Termination Reason</b></label>
-                  <input id="termination-reason" class="form-control" type="text" name="reason" placeholder="Termination Reason">
-                </div>
-                <div class="form-group col-6 d-none el-terminate">
-                  <label for="terminate-confirmation-text">Please Type <b>Delete/{{$contract->subject}}</b></label>
-                  <input id="terminate-confirmation-text" data-confirm-del="Delete/{{$contract->subject}}" class="form-control" type="text" name="verificatoin-text">
-                </div>
-              </div>
-            </div>
-            <button type="button" id="terminate-submit" data-form="ajax-form" class="mt-3 btn btn-primary disabled">Terminate Contract</button>
-          </form>
         </div>
-        @endif
+      </div>
     </div>
-  </div>
+  @endif
 </div>
 <!--/ User Profile Content -->
 @endsection
@@ -250,5 +275,61 @@
             }
             $('#calculated_resumed_date').val(date.toISOString().slice(0,10));
         });
+        $(document).on('change', '#resume_now', function(){
+            if($(this).is(':checked')){
+                $('.resume_now_submit').removeClass('disabled');
+            }else{
+                $('.resume_now_submit').addClass('disabled');
+            }
+        });
+    </script>
+    <script>
+      $(document).on('click', '[data-undo-termination]', function () {
+      dtrModal = $('.dtr-bs-modal.show');
+      var url = $(this).data('undo-termination');
+
+      // hide responsive modal in small screen
+      if (dtrModal.length) {
+        dtrModal.modal('hide');
+      }
+
+      // sweetalert for confirmation of delete
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Undo',
+        customClass: {
+          confirmButton: 'btn btn-primary me-3',
+          cancelButton: 'btn btn-label-secondary'
+        },
+        buttonsStyling: false
+      }).then(function (result) {
+        if (result.value) {
+          // delete the data
+          $.ajax({
+            type: 'PUT',
+            url: url,
+            success: function (response) {
+              if (response.success) {
+                if(!response.data.disable_alert)
+                  toast_success(response.message)
+                if(response.data.event == 'page_reload'){
+                  setTimeout(function() { // wait for 1 second
+                    location.reload(); // then reload the page
+                  }, 1000);
+                }
+              } else {
+                toast_danger(response.message)
+              }
+            },
+            error: function (error) {
+              console.log(error);
+            }
+          });
+        }
+      });
+    });
     </script>
 @endpush

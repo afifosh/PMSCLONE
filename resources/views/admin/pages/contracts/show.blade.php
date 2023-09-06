@@ -191,7 +191,7 @@
             <li class="d-flex align-items-center mb-3"><i class="ti ti-user"></i><span class="fw-bold mx-2">Project:</span> <span>{{$contract->project->name ?? ''}}</span></li>
           @endif
           <li class="d-flex align-items-center mb-3"><i class="ti ti-check"></i><span class="fw-bold mx-2">Status:</span> <span>{{$contract->status}}</span></li>
-          <li class="d-flex align-items-center mb-3"><i class="ti ti-crown"></i><span class="fw-bold mx-2">Value:</span> <span>{{formatCurrency($contract->value)}}</span></li>
+          <li class="d-flex align-items-center mb-3"><i class="ti ti-crown"></i><span class="fw-bold mx-2">Value:</span> <span>{{$contract->printable_value}}</span></li>
           <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">Start Date:</span> <span>{{formatDateTime($contract->start_date)}}</span></li>
           <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">End Date:</span> <span>{{formatDateTime($contract->end_date)}}</span></li>
           <li class="d-flex align-items-center mb-3"><i class="ti ti-flag"></i><span class="fw-bold mx-2">Type:</span> <span>{{$contract->type->name ?? ''}}</span></li>
