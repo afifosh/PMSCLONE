@@ -1337,8 +1337,8 @@ return [
             'code'                => 682,
             'precision'           => 2,
             'subunit'             => 100,
-            'symbol'              => 'ر.س',
-            'symbol_first'        => true,
+            'symbol'              => 'SAR', //'ر.س',
+            'symbol_first'        => true, // false to make on left
             'decimal_mark'        => '.',
             'thousands_separator' => ',',
         ],

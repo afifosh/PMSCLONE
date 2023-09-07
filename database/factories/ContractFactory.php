@@ -22,7 +22,8 @@ class ContractFactory extends Factory
   {
     $assignToCompany = $this->faker->boolean();
     $assignToNone = $this->faker->boolean();
-    $startdate = $this->faker->boolean(90);
+    $endDate = $this->faker->boolean(90);
+    $isDraft = $this->faker->boolean(30);
     return [
       'type_id' => ContractType::inRandomOrder()->first()->id,
       'project_id' => $this->faker->boolean() ?  Project::inRandomOrder()->first()->id : null,
@@ -31,10 +32,10 @@ class ContractFactory extends Factory
       'refrence_id' => $this->faker->unique()->sentence(),
       'subject' => $this->faker->sentence(),
       'value' => rand(1000, 10000),
-      'start_date' => $startdate ? $this->faker->dateTimeBetween('-2 years', '-1 years') : null,
-      'end_date' => $startdate ? $this->faker->dateTimeBetween('now', '2 years') : null,
+      'start_date' => $isDraft ? null : $this->faker->dateTimeBetween('-2 years', '-1 years'),
+      'end_date' => $endDate ? $this->faker->dateTimeBetween('now', '2 years') : null,
       'description' => $this->faker->paragraph(),
-      'status' => $this->faker->randomElement(['Active', 'Draft', 'Terminated'])
+      'status' => $isDraft ? 'Draft' : $this->faker->randomElement(['Active', 'Draft', 'Terminated'])
     ];
   }
 }

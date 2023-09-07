@@ -21,7 +21,7 @@ return new class extends Migration
       $table->string('refrence_id', 100)->unique()->nullable();
       $table->string('subject');
       $table->bigInteger('value')->default(0);
-      $table->string('currency', 5)->default('USD');
+      $table->string('currency', 5)->default('SAR');
       $table->dateTime('start_date')->nullable();
       $table->dateTime('end_date')->nullable();
       $table->text('description')->nullable();
