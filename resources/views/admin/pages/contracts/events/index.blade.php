@@ -46,7 +46,15 @@
           <div class="d-flex align-items-center">
             <div class="badge rounded-pill bg-label-info me-3 p-2"><i class="ti ti-users ti-sm"></i></div>
             <div class="card-info">
-              <h5 class="mb-0">{{$summary->whereIn('event_type', ['Extended', 'Shortened', 'Rescheduled', 'Rescheduled And Amount Increased', 'Rescheduled And Amount Decreased'])->sum('total')}}</h5>
+              <h5 class="mb-0">{{$summary->whereIn('event_type', ['Start Date Revised',
+                'End Date Revised',
+                'Rescheduled',
+                'Rescheduled And Amount Increased',
+                'Rescheduled And Amount Decreased',
+                'Start Date Revised And Amount Increased',
+                'Start Date Revised And Amount Decreased',
+                'End Date Revised And Amount Increased',
+                'End Date Revised And Amount Decreased',])->sum('total')}}</h5>
               <small>{{__('Rescheduled')}}</small>
             </div>
           </div>
@@ -55,7 +63,14 @@
           <div class="d-flex align-items-center">
             <div class="badge rounded-pill bg-label-danger me-3 p-2"><i class="ti ti-shopping-cart ti-sm"></i></div>
             <div class="card-info">
-              <h5 class="mb-0">{{$summary->whereIn('event_type', ['Amount Increased', 'Amount Decreased', 'Rescheduled And Amount Increased', 'Rescheduled And Amount Decreased'])->sum('total')}}</h5>
+              <h5 class="mb-0">{{$summary->whereIn('event_type', ['Amount Increased',
+                'Amount Decreased',
+                'Rescheduled And Amount Increased',
+                'Rescheduled And Amount Decreased',
+                'Start Date Revised And Amount Increased',
+                'Start Date Revised And Amount Decreased',
+                'End Date Revised And Amount Increased',
+                'End Date Revised And Amount Decreased',])->sum('total')}}</h5>
               <small>{{__('Value Updated')}}</small>
             </div>
           </div>

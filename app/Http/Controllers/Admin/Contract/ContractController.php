@@ -42,7 +42,7 @@ class ContractController extends Controller
       ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
       ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
       ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
-      ->selectRaw('(SELECT COUNT(DISTINCT contract_id) FROM contract_events WHERE event_type Like "%Revised%") as rescheduled')
+      ->selectRaw('(SELECT COUNT(DISTINCT contract_id) FROM contract_events WHERE event_type Like "%Revised%" OR event_type Like "%Rescheduled%") as rescheduled')
       ->withTrashed()
       ->first();
 
