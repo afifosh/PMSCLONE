@@ -32,15 +32,17 @@ class ContractController extends Controller
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
     $data['contracts'] = Contract::selectRaw('count(*) as total')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and end_date > now() then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and end_date <= now() then 1 end) as expired')
+      // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
       ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 WEEK) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
       ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
       ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
       ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
       ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
-      ->selectRaw('(SELECT COUNT(DISTINCT contract_id) FROM contract_events WHERE event_type IN ("Extended", "Shortened", "Rescheduled", "Rescheduled And Amount Increased", "Rescheduled And Amount Decreased")) as rescheduled')
+      ->selectRaw('(SELECT COUNT(DISTINCT contract_id) FROM contract_events WHERE event_type Like "%Revised%") as rescheduled')
       ->withTrashed()
       ->first();
 
@@ -88,6 +90,7 @@ class ContractController extends Controller
 
     // list of contracts expiring in 30, 60, 90 days
     $data['expiringContractsList'] = Contract::where('status', 'Active')
+      ->whereNotNull('end_date')
       ->where('end_date', '>', now())
       ->where('end_date', '<', now()->addDays(90))
       ->get();
@@ -109,10 +112,11 @@ class ContractController extends Controller
   protected function getContractsByStatus()
   {
     $contracts = Contract::selectRaw('count(*) as total')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and end_date > now() then 1 end) as Active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as Active')
       ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as Paused')
       ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as Draft')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and end_date <= now() then 1 end) as Expired')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as Expired')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as Not_Started')
       ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as Terminateed')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as Trashed')
       ->withTrashed()

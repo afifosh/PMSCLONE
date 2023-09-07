@@ -68,11 +68,35 @@ class Contract extends Model
   {
     $value = $this->getRawOriginal('status');
     if ($value == 'Terminated' || $value == 'Paused' || $value == 'Draft') return $value;
-    elseif(!$this->start_date) return 'Draft'; // just for extra protection otherwise start date is required in otherthan draft.
-    elseif ($this->end_date && $this->end_date->isPast()) return 'Expired';
-    elseif ($this->start_date->isFuture()) return 'Not started';
-    elseif ($this->end_date && now() > $this->end_date->subWeeks(2)) return 'About To Expire';
-    elseif (now() >= $this->start_date) return 'Active';
+    //elseif(!$this->start_date) return 'Draft'; // just for extra protection otherwise start date is required in otherthan draft.
+    // elseif ($this->end_date && $this->end_date->isPast()) return 'Expired';
+    // elseif ($this->start_date->isFuture()) return 'Not started';
+    // elseif ($this->end_date && now() > $this->end_date->subWeeks(2)) return 'About To Expire';
+    // elseif (now() >= $this->start_date) return 'Active';
+
+    if($this->end_date === null && $this->start_date === null)
+    return '';
+
+    if ($this->end_date == null && $this->start_date) {
+        if ($this->start_date->isSameDay(today())) {
+            return "Active";
+        } elseif ($this->start_date->isFuture()) {
+            return "Not Started";
+        } else {
+            return "Expired";
+        }
+    } else {
+        if ($this->end_date->isPast()) {
+            return "Expired";
+        } elseif ($this->start_date->isFuture()) {
+            return "Not Started";
+        } elseif (now()->diffInDays($this->end_date) <= 14) {
+            return "About To Expire";
+        } else {
+            return "Active";
+        }
+    }
+
   }
 
   public function getPossibleStatuses()

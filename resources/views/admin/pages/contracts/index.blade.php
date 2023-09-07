@@ -75,6 +75,15 @@ $configData = Helper::appClasses();
           </div>
           <div class="col-md-2 col-6">
             <div class="d-flex align-items-center">
+              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+              <div class="card-info">
+                <h5 class="mb-0">{{$contracts['not_started']}}</h5>
+                <small>{{__('Not Started')}}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="d-flex align-items-center">
               <div class="badge rounded-pill bg-label-danger me-3 p-2"><i class="ti ti-shopping-cart ti-sm"></i></div>
               <div class="card-info">
                 <h5 class="mb-0">{{$contracts['expired']}}</h5>
@@ -97,15 +106,6 @@ $configData = Helper::appClasses();
               <div class="card-info">
                 <h5 class="mb-0">{{$contracts['draft']}}</h5>
                 <small>{{__('Draft')}}</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-2 col-6">
-            <div class="d-flex align-items-center">
-              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
-              <div class="card-info">
-                <h5 class="mb-0">{{$contracts['trashed']}}</h5>
-                <small>{{__('Trashed')}}</small>
               </div>
             </div>
           </div>
@@ -147,6 +147,15 @@ $configData = Helper::appClasses();
               <div class="card-info">
                 <h5 class="mb-0">{{$contracts['rescheduled']}}</h5>
                 <small>{{__('Rescheduled')}}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <div class="d-flex align-items-center">
+              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+              <div class="card-info">
+                <h5 class="mb-0">{{$contracts['trashed']}}</h5>
+                <small>{{__('Trashed')}}</small>
               </div>
             </div>
           </div>
