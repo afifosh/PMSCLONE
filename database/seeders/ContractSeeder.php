@@ -15,6 +15,13 @@ class ContractSeeder extends Seeder
   public function run(): void
   {
     Contract::factory()->count(20)->create()->each(function ($contract) {
+      if($contract->status != 'Draft'){
+        $contract->events()->create([
+          'event_type' => 'Created',
+          'modifications' => $contract->toArray(),
+          'description' => 'Contract Created',
+        ]);
+      }
 
       ContractPhase::factory()->count(1)->create([
         'contract_id' => $contract->id,

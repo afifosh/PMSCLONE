@@ -21,6 +21,9 @@ class EventsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('actioner', function ($event) {
+        if(!$event->actioner)
+        return 'System';
+
         return view('admin._partials.sections.user-info', ['user' => $event->actioner]);
       })
       // ->addColumn('action', function($event){
