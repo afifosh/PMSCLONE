@@ -71,7 +71,7 @@ class Contract extends Model
     elseif(!$this->start_date) return 'Draft'; // just for extra protection otherwise start date is required in otherthan draft.
     elseif ($this->end_date && $this->end_date->isPast()) return 'Expired';
     elseif ($this->start_date->isFuture()) return 'Not started';
-    elseif (now() > $this->end_date->subWeeks(2)) return 'About To Expire';
+    elseif ($this->end_date && now() > $this->end_date->subWeeks(2)) return 'About To Expire';
     elseif (now() >= $this->start_date) return 'Active';
   }
 
