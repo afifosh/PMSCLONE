@@ -16,6 +16,10 @@ class Controller extends BaseController
 
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    public function __construct() {
+
+    }
+
     public function sendRes($message = 'Success', $data = [], $http_code = 200)
     {
       return response()->json(['success' => true,'message' => __($message), 'data' => $data], $http_code);

@@ -71,5 +71,14 @@ class Kernel extends HttpKernel
         'passwordMustNotBeExpired' => \App\Http\Middleware\EnsurePasswordNotExpired::class,
         'passwordMustBeExpired' => \App\Http\Middleware\PasswordMustBeExpired::class,
         'companyMustBeEditable' => \App\Http\Middleware\EnsureCompanyIsEditable::class,
+
+        //[growcrm] - [invoices]
+        'invoicesMiddlewareIndex' => \App\Http\Middleware\Invoices\Index::class,
+        'invoicesMiddlewareCreate' => \App\Http\Middleware\Invoices\Create::class,
+        'invoicesMiddlewareEdit' => \App\Http\Middleware\Invoices\Edit::class,
+        'invoicesMiddlewareShow' => \App\Http\Middleware\Invoices\Show::class,
+        'invoicesMiddlewareDestroy' => \App\Http\Middleware\Invoices\Destroy::class,
+        'invoicesMiddlewareBulkEdit' => \App\Http\Middleware\Invoices\BulkEdit::class,
+        'invoicesMiddlewareGeneralSingleActions' => \App\Http\Middleware\Invoices\GeneralSingleActions::class,
     ];
 }

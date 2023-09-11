@@ -62,6 +62,7 @@ use App\Http\Controllers\Admin\ResourceSearchController;
 use App\Http\Controllers\Admin\Setting\ContractSettingController as SettingContractSettingController;
 use App\Http\Controllers\Admin\Setting\OauthGoogleController;
 use App\Http\Controllers\Admin\Setting\OauthMicrosoftController;
+use App\Http\Controllers\Invoices;
 use Modules\Core\Http\Controllers\OAuthController;
 use Modules\MailClient\Http\Controllers\OAuthEmailAccountController;
 
@@ -249,6 +250,43 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('email-templates/{id}/{lang?}', [EmailTemplateController::class, 'manageEmailLang'])->name('manage.email.language');
     Route::resource('email_template', EmailTemplateController::class)->only(['update']);
   });
+});
+Route::middleware('auth:admin')->group(function(){
+    Route::group(['prefix' => 'invoices'], function () {
+      Route::any("/search", [Invoices::class, "index"]);
+      Route::post("/delete", [Invoices::class, "destroy"]);//->middleware(['demoModeCheck']);
+      Route::get("/change-category", [Invoices::class, "changeCategory"]);
+      Route::post("/change-category", [Invoices::class, "changeCategoryUpdate"]);
+      Route::get("/add-payment", [Invoices::class, "addPayment"]);
+      Route::post("/add-payment", [Invoices::class, "addPayment"]);
+      Route::get("/{invoice}/clone", [Invoices::class, "createClone"])->where('invoice', '[0-9]+');
+      Route::post("/{invoice}/clone", [Invoices::class, "storeClone"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/stop-recurring", [Invoices::class, "stopRecurring"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/attach-project", [Invoices::class, "attachProject"])->where('invoice', '[0-9]+');
+      Route::post("/{invoice}/attach-project", [Invoices::class, "attachProjectUpdate"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/detach-project", [Invoices::class, "dettachProject"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/email-client", [Invoices::class, "emailClient"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/download-pdf", [Invoices::class, "downloadPDF"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/recurring-settings", [Invoices::class, "recurringSettings"])->where('invoice', '[0-9]+');
+      Route::post("/{invoice}/recurring-settings", [Invoices::class, "recurringSettingsUpdate"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/edit-invoice", [Invoices::class, "show"])->where('invoice', '[0-9]+')->middleware(['invoicesMiddlewareEdit', 'invoicesMiddlewareShow']);
+      Route::post("/{invoice}/edit-invoice", [Invoices::class, "saveInvoice"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/pdf", [Invoices::class, "show"])->where('invoice', '[0-9]+')->middleware(['invoicesMiddlewareShow']);
+      Route::get("/{invoice}/publish", [Invoices::class, "publishInvoice"])->where('invoice', '[0-9]+')->middleware(['invoicesMiddlewareEdit', 'invoicesMiddlewareShow']);
+      Route::get("/{invoice}/resend", [Invoices::class, "resendInvoice"])->where('invoice', '[0-9]+')->middleware(['invoicesMiddlewareEdit', 'invoicesMiddlewareShow']);
+      Route::get("/{invoice}/stripe-payment", [Invoices::class, "paymentStripe"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/paypal-payment", [Invoices::class, "paymentPaypal"])->where('invoice', '[0-9]+');
+      Route::get("/timebilling/{project}/", "Timebilling@index")->where('project', '[0-9]+');
+      Route::get("/{invoice}/razorpay-payment", [Invoices::class, "paymentRazorpay"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/mollie-payment", [Invoices::class, "paymentMollie"])->where('invoice', '[0-9]+');
+      Route::get("/{invoice}/tap-payment", [Invoices::class, "paymentTap"])->where('invoice', '[0-9]+');
+      Route::post("/{invoice}/attach-files", [Invoices::class, "attachFiles"])->where('estimate', '[0-9]+');
+      Route::get("/delete-attachment", [Invoices::class, "deleteFile"]);
+      Route::post("/{invoice}/change-tax-type", [Invoices::class, "updateTaxType"])->where('invoice', '[0-9]+');
+      //view from email link
+      Route::get("/redirect/{invoice}", [Invoices::class, "redirectURL"])->where('invoice', '[0-9]+');
+  });
+  Route::resource('invoices', Invoices::class);
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
 Route::get('/resource-select/{resource}', [ResourceSearchController::class, 'index'])->name('resource-select');
