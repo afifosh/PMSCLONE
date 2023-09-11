@@ -281,13 +281,18 @@ class ContractController extends Controller
 
     $contract = Contract::create($data + $request->validated());
 
-    if (!$request->isSavingDraft)
+    if (!$request->isSavingDraft){
       $contract->events()->create([
         'event_type' => 'Created',
         'modifications' => $request->validated(),
         'description' => 'Contract Created',
         'admin_id' => auth()->id(),
       ]);
+
+      $contract->phases()->create([
+        'name' => 'Phase 1'
+      ]);
+    }
 
     return $this->sendRes(__('Contract created successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
   }

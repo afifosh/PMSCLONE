@@ -72,7 +72,7 @@ class ContractsDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    $q = $model->with(['type', 'assignable'])->withCount('phases')->newQuery();
+    $q = $model->with(['type', 'assignable'])->newQuery();
 
     if ($this->projectId) {
       $q->where('project_id', $this->projectId);
@@ -130,7 +130,7 @@ class ContractsDataTable extends DataTable
       Column::make('value')->title('Value'),
       Column::make('start_date'),
       Column::make('end_date'),
-      Column::make('phases_count')->title('Phases')->searchable(false),
+      // Column::make('milestones_count')->title('Milestones')->searchable(false),
       Column::make('status'),
     ];
   }

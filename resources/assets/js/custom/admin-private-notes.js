@@ -160,11 +160,11 @@
     }
     initSelect2();
   });
-  function refreshPhaseList(project_id){
+  function refreshMilestoneList(project_id){
     project_id = project_id || window.active_project;
     $.ajax({
       type: "get",
-      url: route('admin.projects.phases.index', {project: project_id}),
+      url: route('admin.projects.milestones.index', {project: project_id}),
       success: function (response) {
         $('.tasks-list').html(response.data.view_data)
         $('.myTasksCount').text(response.data.myTasksCount)

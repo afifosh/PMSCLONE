@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('contract_payment_schedules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('contract_id')->constrained()->cascadeOnDelete();
-            $table->enum('type', ['Phase', 'Recurring']);
+            $table->enum('type', ['Milestone', 'Recurring']);
             $table->string('recurrence')->nullable();
             $table->timestamps();
         });

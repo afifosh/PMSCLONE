@@ -108,7 +108,7 @@
           <li class="nav-item"><a class="nav-link py-3 {{$tab == 'overview' ? 'active' : ''}}" href="{{route('admin.contracts.show', [$contract])}}"><i class='ti ti-user-check ti-xs me-1'></i> Overview</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'events' ? 'active' : ''}}" href="{{route('admin.contracts.events.index', [$contract])}}"><i class='ti ti-users ti-xs me-1'></i> Events</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'phases' ? 'active' : ''}}" href="{{route('admin.contracts.phases.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Phases</a></li>
-      <li class="nav-item"><a class="nav-link py-3 disabled {{$tab == 'milestones' ? 'active' : ''}}" href="{{route('admin.contracts.settings.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Milestones</a></li>
+      <li class="nav-item"><a class="nav-link py-3 {{$tab == 'milestones' ? 'active' : ''}}" href="{{route('admin.contracts.phases.milestones.index', [$contract, 'phase'])}}"><i class='ti ti-link ti-xs me-1'></i> Milestones</a></li>
       <li class="nav-item"><a class="nav-link py-3 disabled {{$tab == 'files' ? 'active' : ''}}" href="{{route('admin.contracts.settings.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Files</a></li>
       <li class="nav-item"><a class="nav-link py-3 disabled {{$tab == 'activity' ? 'active' : ''}}" href="{{route('admin.contracts.settings.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Activity</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'settings' ? 'active' : ''}}" href="{{route('admin.contracts.settings.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Settings</a></li>

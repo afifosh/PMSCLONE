@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\ContractController;
-use App\Http\Controllers\Admin\Contract\ContractPhaseController;
+use App\Http\Controllers\Admin\Contract\ContractMilestoneController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
 use App\Http\Controllers\Admin\Contract\ContractTermController;
 use App\Http\Controllers\Admin\Contract\ContractTypeController;
@@ -45,11 +45,12 @@ use App\Models\RFPFile;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
+use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Project\GanttChartController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
-use App\Http\Controllers\Admin\Project\ProjectPhaseController;
+use App\Http\Controllers\Admin\Project\ProjectMilestoneController;
 use App\Http\Controllers\Admin\Project\ProjectTaskController;
 use App\Http\Controllers\Admin\Project\ProjectTemplateController;
 use App\Http\Controllers\Admin\Project\TaskBoardController;
@@ -137,11 +138,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::get('projects/gantt-chart', [GanttChartController::class, 'index'])->name('projects.gantt-chart.index');
     Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
-    Route::put('projects/{project}/contracts/{contract}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.contracts.sort-phases');
+    Route::put('projects/{project}/contracts/{contract}/sort-milestones', [ProjectMilestoneController::class, 'sortMilestones'])->name('projects.contracts.sort-milestones');
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
 
-    Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
+    Route::get('contracts/{contract}/phases/{phase}/milestones', [ProjectMilestoneController::class, 'contractMilestones'])->name('contracts.phases.milestones.index');
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     Route::resource('contracts', ContractController::class);
     Route::resource('contracts.terms', ContractTermController::class)->only(['edit', 'update']); // reschedule and value update
@@ -157,7 +158,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('contract-types', ContractTypeController::class);
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
-    Route::resource('projects.contracts.phases', ProjectPhaseController::class);
+    Route::resource('contracts.phases', ContractPhaseController::class);
+    Route::resource('projects.contracts.phases.milestones', ProjectMilestoneController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');
     Route::get('projects/{project}/gantt-chart', [ProjectController::class, 'ganttChart'])->name('projects.gantt-chart');
     Route::resource('projects', ProjectController::class);

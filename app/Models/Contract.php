@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Akaunting\Money\Money;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Contract extends Model
 {
@@ -137,7 +138,7 @@ class Contract extends Model
       ->when(request()->search_q, function ($q) {
         $q->where(function ($q) {
           $q->where('subject', 'like', '%' . request()->search_q . '%')
-            ->orWhereHas('phases', function ($q) {
+            ->orWhereHas('milestones', function ($q) {
               $q->where('name', 'like', '%' . request()->search_q . '%');
             });
         });
@@ -171,9 +172,14 @@ class Contract extends Model
     return $this->belongsTo(Project::class);
   }
 
+  public function milestones(): HasManyThrough
+  {
+    return $this->hasManyThrough(ContractMilestone::class, ContractPhase::class, 'contract_id', 'phase_id');
+  }
+
   public function phases(): HasMany
   {
-    return $this->hasMany(ContractPhase::class)->orderBy('order');
+    return $this->hasMany(ContractPhase::class);
   }
 
   public function events(): HasMany
@@ -212,12 +218,12 @@ class Contract extends Model
     elseif ($status == 'Paused') return 'warning';
   }
 
-  public function remaining_cost($phase_to_ignore_id = null)
+  public function remaining_cost($milestone_to_ignore_id = null)
   {
-    if ($phase_to_ignore_id) {
-      return $this->value - $this->phases->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
+    if ($milestone_to_ignore_id) {
+      return $this->value - $this->milestones->where('id', '!=', $milestone_to_ignore_id)->sum('estimated_cost');
     }
-    return $this->value - $this->phases->sum('estimated_cost');
+    return $this->value - $this->milestones->sum('estimated_cost');
   }
 
   public function saveEventLog(ContractUpdateRequest|Request $request, Contract $contract): void
@@ -382,7 +388,7 @@ class Contract extends Model
     }
   }
 
-  public function formatPhaseValue($value)
+  public function formatMilestoneValue($value)
   {
     return Money::{$this->currency ?? 'USD'}($value)->getAmount();
   }
