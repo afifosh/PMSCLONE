@@ -27,7 +27,7 @@ class ChangeRequestStoreRequest extends FormRequest
       'description' => 'nullable|string',
       'value_action' => 'required|string|in:inc,dec,unchanged',
       'value_change' => 'nullable|required_if:value_action,inc,dec|numeric',
-      'currency' => ['required', 'string', Rule::in(array_keys(config('money.currencies')))],
+      'currency' => ['nullable','required', 'string', Rule::in(array_keys(config('money.currencies')))],
       'timeline_action' => 'required|string|in:inc,dec,unchanged',
       'new_end_date' => 'nullable|required_if:timeline_action,inc,dec|date|after:'.$this->contract->start_date,
     ];
