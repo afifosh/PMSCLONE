@@ -427,4 +427,9 @@ class Contract extends Model
     // mark the pause event as applied
     $contract->events()->where('event_type', 'Paused')->whereNull('applied_at')->update(['applied_at' => now()]);
   }
+
+  public function changeRequests(): HasMany
+  {
+    return $this->hasMany(ContractChangeRequest::class);
+  }
 }

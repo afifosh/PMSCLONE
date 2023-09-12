@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Company\KycDocumentController;
 use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
+use App\Http\Controllers\Admin\Contract\ChangeRequestController;
 use App\Http\Controllers\Admin\Contract\ContractController;
 use App\Http\Controllers\Admin\Contract\ContractMilestoneController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
@@ -146,6 +147,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     Route::resource('contracts', ContractController::class);
     Route::resource('contracts.terms', ContractTermController::class)->only(['edit', 'update']); // reschedule and value update
+    Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
+    Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
+    Route::post('contracts/{contract}/change-requests/{change_request}/reject', [ChangeRequestController::class, 'reject'])->name('contracts.change-requests.reject');
     Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
     Route::resource('contracts.notifiable-users', NotifiableUserController::class)->only(['create', 'store', 'destroy']);
     Route::resource('contracts.events', EventController::class)->only(['index']);

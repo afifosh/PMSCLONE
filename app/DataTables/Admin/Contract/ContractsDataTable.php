@@ -23,7 +23,7 @@ class ContractsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('subject', function ($contract) {
+      ->editColumn('id', function ($contract) {
         return view('admin.pages.contracts.name', compact('contract'));
       })
       ->addColumn('action', function ($contract) {
@@ -64,7 +64,7 @@ class ContractsDataTable extends DataTable
           });
         });
       })
-      ->rawColumns(['subject']);
+      ->rawColumns(['id']);
   }
 
   /**
@@ -124,7 +124,7 @@ class ContractsDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      Column::make('subject'),
+      Column::make('id')->title('Contract'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
       Column::make('value')->title('Value'),

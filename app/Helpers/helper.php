@@ -168,3 +168,11 @@ function replaceStrVariables($template, $data)
   $template = replaceSiteInfo($template);
   return str_replace(array_keys($data), array_values($data), $template);
 }
+
+function runtimeContractIdFormat($contract_id = '') {
+  if (is_numeric($contract_id)) {
+      return 'CNT-' . str_pad($contract_id, 8, '0', STR_PAD_LEFT);
+  } else {
+      return '---';
+  }
+}

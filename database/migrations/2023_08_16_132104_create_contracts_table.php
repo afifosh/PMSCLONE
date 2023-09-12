@@ -18,6 +18,7 @@ return new class extends Migration
       $table->foreignId('program_id')->nullable()->constrained('programs')->onDelete('cascade')->cascadeOnUpdate();
       $table->string('assignable_type')->nullable();
       $table->unsignedBigInteger('assignable_id')->nullable();
+      $table->boolean('visible_to_client')->default(false);
       $table->string('refrence_id', 100)->unique()->nullable();
       $table->string('subject');
       $table->bigInteger('value')->default(0);

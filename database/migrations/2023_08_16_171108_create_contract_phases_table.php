@@ -15,6 +15,7 @@ return new class extends Migration
       $table->id();
       $table->foreignId('contract_id')->constrained()->cascadeOnDelete();
       $table->string('name')->nullable();
+      $table->enum('type', ['Initial Phase', 'Change Request'])->default('Initial Phase');
       $table->enum('status', ['Active', 'Completed', 'Cancelled'])->default('Active');
       $table->timestamps();
     });
