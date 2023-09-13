@@ -59,11 +59,10 @@
 
 </div>
 <div class="row rr-rule d-none">
-  <div class="form-group col-6">
+  {{-- <div class="form-group col-6">
     {{ Form::label('start_date', __('Contract Start Date'), ['class' => 'col-form-label']) }}
     {!! Form::date('start_date', $contract->start_date, ['class' => 'form-control', 'disabled','placeholder' => __('Start Date')]) !!}
   </div>
-  {{-- due date --}}
   <div class="form-group col-6">
     {{ Form::label('due_date', __('Contract Due Date'), ['class' => 'col-form-label']) }}
     {!! Form::date('due_date', $contract->end_date, ['class' => 'form-control', 'disabled', 'placeholder' => __('Due Date')]) !!}
@@ -79,7 +78,7 @@
   <div class="form-group col-12">
     {{ Form::label('rrule_cycle_count', __('Cycle Count'), ['class' => 'col-form-label']) }}
     {!! Form::text('rrule_cycle_count', null, ['class' => 'form-control', 'placeholder' => 'Cycle Count']) !!}
-  </div>
+  </div> --}}
 </div>
 <div class="col-md-12 mt-3">
   <div class="mb-3">

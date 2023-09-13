@@ -83,7 +83,7 @@
     },
     {
       "name": "Contracts",
-      "slug": ["admin.contracts.", "admin.contract-types", "admin.projects.gantt-chart.index"],
+      "slug": ["admin.contracts.", "admin.contract-types", "admin.projects.gantt-chart.index", "admin.contract-categories.index", "admin.change-requests.index"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "submenu": [
         {
@@ -92,9 +92,19 @@
           "slug": "admin.contracts.index"
         },
         {
+          "url": "/admin/contracts/change-requests",
+          "name": "Change Requests",
+          "slug": "admin.change-requests.index"
+        },
+        {
           "url": "/admin/contract-types",
           "name": "Contract Types",
           "slug": "admin.contract-types.index"
+        },
+        {
+          "url": "/admin/contract-categories",
+          "name": "Contract Categories",
+          "slug": "admin.contract-categories.index"
         },
         {
           "url": "/admin/projects/gantt-chart",

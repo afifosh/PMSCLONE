@@ -176,3 +176,11 @@ function runtimeContractIdFormat($contract_id = '') {
       return '---';
   }
 }
+
+function runtimeChangeReqIdFormat($change_req_id = '') {
+  if (is_numeric($change_req_id)) {
+      return 'CHRQ-' . str_pad($change_req_id, 4, '0', STR_PAD_LEFT);
+  } else {
+      return '---';
+  }
+}

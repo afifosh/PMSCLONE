@@ -21,11 +21,13 @@ class Contract extends Model
   use HasFactory, SoftDeletes, HasEnum;
 
   protected $fillable = [
+    'category_id',
     'type_id',
     'project_id',
     'assignable_type',
     'assignable_id',
     'program_id',
+    'signature_date',
     'refrence_id',
     'subject',
     'currency',
@@ -49,6 +51,7 @@ class Contract extends Model
   ];
 
   protected $casts = [
+    'signature_date' => 'datetime:d M, Y',
     'start_date' => 'datetime:d M, Y',
     'end_date' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
@@ -155,6 +158,11 @@ class Contract extends Model
           $q->where('id', request()->programs);
         });
       });
+  }
+
+  public function category(): BelongsTo
+  {
+    return $this->belongsTo(ContractCategory::class);
   }
 
   public function type(): BelongsTo

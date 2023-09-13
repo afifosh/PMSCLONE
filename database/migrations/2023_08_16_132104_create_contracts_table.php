@@ -13,6 +13,7 @@ return new class extends Migration
   {
     Schema::create('contracts', function (Blueprint $table) {
       $table->id();
+      $table->foreignId('category_id')->nullable()->constrained('contract_categories')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('type_id')->nullable()->constrained('contract_types')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('program_id')->nullable()->constrained('programs')->onDelete('cascade')->cascadeOnUpdate();
@@ -25,6 +26,7 @@ return new class extends Migration
       $table->string('currency', 5)->default('SAR');
       $table->dateTime('start_date')->nullable();
       $table->dateTime('end_date')->nullable();
+      $table->dateTime('signature_date')->nullable();
       $table->text('description')->nullable();
       $table->enum('status', ['Active', 'Paused', 'Terminated', 'Draft'])->default('Active'); // active status will be used for further calculations(upcoming, expired, about to expire)
       $table->softDeletes();

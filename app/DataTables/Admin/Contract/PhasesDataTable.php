@@ -25,6 +25,9 @@ class PhasesDataTable extends DataTable
     ->editColumn('name', function ($phase) {
       return '<a href="' . route('admin.contracts.phases.milestones.index', [$this->contract, $phase]) . '">' . $phase->name . '</a>';
     })
+    ->editColumn('change_request_id', function ($phase) {
+      return $phase->change_request_id ? runtimeChangeReqIdFormat($phase->change_request_id) : '-';
+    })
     ->rawColumns(['name']);
   }
 
@@ -68,6 +71,8 @@ class PhasesDataTable extends DataTable
     return [
       Column::make('name'),
       Column::make('milestones_count')->title('Milestones'),
+      Column::make('change_request_id')->title('Change Request'),
+      Column::make('type'),
       Column::make('status'),
       Column::make('created_at'),
       Column::make('updated_at'),

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Project;
 
+use App\DataTables\Admin\Contract\MilestonesDataTable;
 use App\Events\Admin\ProjectMilestoneUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
@@ -11,31 +12,25 @@ use Illuminate\Http\Request;
 
 class ProjectMilestoneController extends Controller
 {
-  public function index($project, Contract $contract, $phase)
+  public function index($project, Contract $contract, ContractPhase $phase, MilestonesDataTable $dataTable)
   {
-    $phase = $phase == 'phase' ? $contract->phases()->latest()->first() : $contract->phases()->findOrFail($phase);
-    $phase->load('milestones');
+    $dataTable->phase = $phase;
     $project = $contract->project ?? 'project';
 
     // abort_if(!$project->isMine(), 403);
 
-    $milestone_statuses = ContractMilestone::STATUSES;
-    $colors = ContractMilestone::STATUSCOLORS;
-
-    if(request()->ajax()){
-      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.milestones.milestone-list', compact('contract', 'project', 'milestone_statuses', 'colors', 'phase'))->render()]);
-    }
     $page = 'Project';
     if(request()->route()->getName() == 'admin.contracts.phases.milestones.index'){
       $page = 'Contract';
       $contract->load('notifiableUsers');
     }
+    return $dataTable->render('admin.pages.contracts.milestones.index', compact('contract', 'project', 'phase', 'page'));
 
     return view('admin.pages.contracts.milestones.index', compact('contract', 'project', 'milestone_statuses', 'colors', 'page', 'phase'));
   }
 
-  public function contractMilestones(Contract $contract, $phase){
-    return $this->index('project', $contract, $phase);
+  public function contractMilestones(Contract $contract, ContractPhase $phase, MilestonesDataTable $dataTable){
+    return $this->index('project', $contract, $phase, $dataTable);
   }
 
   public function create($project, Contract $contract, ContractPhase $phase)
@@ -73,7 +68,7 @@ class ProjectMilestoneController extends Controller
     if($contract->project)
     broadcast(new ProjectMilestoneUpdated($project, 'milestone-list', $message))->toOthers();
 
-    return $this->sendRes(__('Milestone Created Successfully'), ['event' => 'functionCall', 'function' => 'refreshMilestoneList', 'close' => 'globalModal']);
+    return $this->sendRes(__('Milestone Created Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);
   }
 
   public function edit($project,Contract $contract, ContractPhase $phase, ContractMilestone $milestone)
@@ -108,7 +103,7 @@ class ProjectMilestoneController extends Controller
     if($contract->project)
     broadcast(new ProjectMilestoneUpdated($project, 'milestone-list', $message))->toOthers();
 
-    return $this->sendRes(__('Milestone Updated Successfully'), ['event' => 'functionCall', 'function' => 'refreshMilestoneList', 'close' => 'globalModal']);
+    return $this->sendRes(__('Milestone Updated Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);
   }
 
   public function destroy($project, Contract $contract, ContractPhase $phase, ContractMilestone $milestone)
@@ -124,7 +119,7 @@ class ProjectMilestoneController extends Controller
     if($contract->project)
     broadcast(new ProjectMilestoneUpdated($project, 'milestone-list', $message))->toOthers();
 
-    return $this->sendRes(__('Milestone Deleted Successfully'), ['event' => 'functionCall', 'function' => 'refreshMilestoneList']);
+    return $this->sendRes(__('Milestone Deleted Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);
   }
 
 public function sortMilestones($project, Contract $contract, $phase, Request $request)

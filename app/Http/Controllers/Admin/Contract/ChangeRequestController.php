@@ -12,9 +12,15 @@ class ChangeRequestController extends Controller
 {
   public function index(Contract $contract, ChangeRequestsDataTable $dataTable)
   {
+    $data['contract'] = $contract;
+    if($contract)
     $dataTable->contract = $contract;
 
-    return $dataTable->render('admin.pages.contracts.change-requests.index', compact('contract'));
+    if(!$contract->id){
+      $data['contracts'] = Contract::has('changeRequests')->pluck('subject', 'id')->prepend('All', '0');
+    }
+
+    return $dataTable->render('admin.pages.contracts.change-requests.index', $data);
     // view('admin.pages.contracts.change-requests.index')
   }
 
@@ -66,6 +72,7 @@ class ChangeRequestController extends Controller
     $contract->phases()->create([
       'name' => 'Phase '. ($contract->phases()->count() + 1),
       'type' => 'Change Request',
+      'change_request_id' => $changeRequest->id,
     ]);
 
     $changeRequest->update([

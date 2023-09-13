@@ -20,6 +20,12 @@ class ChangeRequestsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
+    ->editColumn('id', function ($change_request) {
+      return $change_request->id ? runtimeChangeReqIdFormat($change_request->id) : '-';
+    })
+    ->editColumn('contract_id', function ($change_request) {
+      return view('admin.pages.contracts.name', ['contract_id' => $change_request->contract_id]);
+    })
     ->addColumn('sender', function($change_order) {
       if(!$change_order->sender) return '-';
       if($change_order->sender_type == 'App\Models\Admin') {
@@ -45,7 +51,9 @@ class ChangeRequestsDataTable extends DataTable
    */
   public function query(ContractChangeRequest $model): QueryBuilder
   {
-    return $model->where('contract_id', $this->contract->id)->with('sender')->newQuery();
+    return $model->when($this->contract->id, function ($q){
+      $q->where('contract_id', $this->contract->id);
+    })->with('sender')->applyRequestFilters()->newQuery();
   }
 
   /**
@@ -54,6 +62,7 @@ class ChangeRequestsDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
+    if($this->contract->id)
     $buttons[] = [
       'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Request</span>',
       'className' =>  'btn btn-primary mx-3',
@@ -88,7 +97,7 @@ class ChangeRequestsDataTable extends DataTable
    */
   public function getColumns(): array
   {
-    return [
+    $columns = [
       Column::make('sender'),
       Column::make('old_value')->title('Old Amount'),
       Column::make('new_value')->title('New Amount'),
@@ -97,6 +106,13 @@ class ChangeRequestsDataTable extends DataTable
       Column::make('created_at')->title('Ordered At'),
       Column::make('status')->title('Status'),
     ];
+
+    if(!$this->contract->id)
+    array_unshift($columns, Column::make('contract_id')->title('Contract'));
+    else
+    array_unshift($columns, Column::make('id')->title('Change Request'));
+
+    return $columns;
   }
 
   /**

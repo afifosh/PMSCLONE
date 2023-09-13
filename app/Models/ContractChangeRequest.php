@@ -80,4 +80,14 @@ class ContractChangeRequest extends Model
   {
     return Money::{$this->new_currency ?? 'USD'}($this->new_value, true)->format();
   }
+
+  public function scopeApplyRequestFilters($q)
+  {
+    $q->when(request()->filter_status, function($q){
+      $q->where('status', request()->filter_status);
+    });
+    $q->when(request()->filter_contract, function($q){
+      $q->where('contract_id', request()->filter_contract);
+    });
+  }
 }

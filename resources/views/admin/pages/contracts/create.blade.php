@@ -55,9 +55,18 @@
       {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
       {!! Form::select('type_id', $types, $contract->type_id, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
+    {{-- categories --}}
+    <div class="form-group col-6">
+      {{ Form::label('category_id', __('Contract Category'), ['class' => 'col-form-label']) }}
+      {!! Form::select('category_id', $categories, $contract->category_id, ['class' => 'form-select globalOfSelect2']) !!}
+    </div>
     <div class="form-group col-6">
       {{ Form::label('refrence_id', __('Refrence Id'), ['class' => 'col-form-label']) }}
       {!! Form::text('refrence_id', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Refrence Id')]) !!}
+    </div>
+    <div class="form-group col-6">
+      {{ Form::label('signature_date', __('Signature Date'), ['class' => 'col-form-label']) }}
+      {!! Form::date('signature_date', $contract->signature_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Signature Date')]) !!}
     </div>
     {{-- start date --}}
     <div class="form-group col-6">

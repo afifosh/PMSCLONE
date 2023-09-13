@@ -54,7 +54,7 @@
     {{-- due date --}}
     <div class="form-group col-6 new-end-date d-none">
       {{ Form::label('new_end_date', __('New End Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('new_end_date', null, ['class' => 'form-control', 'placeholder' => __('End Date')]) !!}
+      {!! Form::date('new_end_date', null, ['class' => 'form-control flatpickr', 'placeholder' => __('End Date')]) !!}
     </div>
     <div class="d-flex mt-2">
       <div class="form-check me-2">
@@ -215,6 +215,6 @@
       $('.timeline_change').removeClass('is-invalid');
       $('input[name="new_end_date"]').val(nval);
     // }
-
+    initFlatPickr();
   }
 </script>

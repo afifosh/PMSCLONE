@@ -10,6 +10,7 @@ use App\Http\Requests\Admin\ContractUpdateRequest;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
+use App\Models\ContractCategory;
 use App\Models\ContractType;
 use App\Models\Program;
 use App\Models\Project;
@@ -257,6 +258,7 @@ class ContractController extends Controller
   public function create()
   {
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
+    $data['categories'] = ContractCategory::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Category'), '');
     $data['contract'] = new Contract();
     $data['clients'] = ['' => __('Select Client')];
     $data['currency'] = ['USD' => '(USD) - US Dollar'];
@@ -315,6 +317,7 @@ class ContractController extends Controller
   {
     $contract->load('project');
     $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Contract Type'), '');
+    $data['categories'] = ContractCategory::orderBy('id', 'desc')->pluck('name', 'id')->prepend(__('Select Category'), '');
     $data['projects'] = $contract->project_id ? Project::where('id', $contract->project_id)->pluck('name', 'id') : ['' => __('Select Project')];
     $data['programs'] = $contract->program_id ? Program::where('id', $contract->program_id)->pluck('name', 'id') : ['' => __('Select program')];
     $data['companies'] = Company::where('id', $contract->assignable_id)->pluck('name', 'id')->prepend('Select Client', '');

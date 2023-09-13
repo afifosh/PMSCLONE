@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Change Orders')
+@section('title', 'Contract Categories')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -12,7 +12,6 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/apex-charts/apex-charts.css')}}" />
 @endsection
 
 @section('page-style')
@@ -25,7 +24,6 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -34,24 +32,8 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@includeWhen($contract->id, 'admin.pages.contracts.header', ['tab' => 'change-requests'])
   <div class="mt-3  col-12">
-    <div class="card h-100">
-      @if (isset($contracts))
-        <h5 class="card-header">Change Requests</h5>
-        <form class="js-datatable-filter-form">
-          <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
-            <div class="col-4">
-              {!! Form::label('filter_contract', 'Contracts') !!}
-              {!! Form::select('filter_contract', $contracts, null, ['class' => 'form-select select2', 'data-placeholder' => 'Contracts']) !!}
-            </div>
-            <div class="col-4">
-              {!! Form::label('filter_status', 'Status') !!}
-              {!! Form::select('filter_status', [0 => 'All', 'Pending' => 'Pending', 'Approved' => 'Approved', 'Rejected' => 'Rejected'], null, ['class' => 'form-select select2', 'data-placeholder' => 'Status']) !!}
-            </div>
-          </div>
-        </form>
-      @endif
+    <div class="card">
       <div class="card-body">
         {{$dataTable->table()}}
       </div>
@@ -62,17 +44,4 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
-    <script>
-      $(document).ready(function () {
-          $('.js-datatable-filter-form :input').on('change', function (e) {
-              window.LaravelDataTables["change-requests-table"].draw();
-          });
-
-          $('#change-requests-table').on('preXhr.dt', function ( e, settings, data ) {
-              $('.js-datatable-filter-form :input').each(function () {
-                  data[$(this).prop('name')] = $(this).val();
-              });
-          });
-      });
-    </script>
 @endpush

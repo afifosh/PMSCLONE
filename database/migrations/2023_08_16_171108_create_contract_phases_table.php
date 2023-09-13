@@ -14,6 +14,7 @@ return new class extends Migration
     Schema::create('contract_phases', function (Blueprint $table) {
       $table->id();
       $table->foreignId('contract_id')->constrained()->cascadeOnDelete();
+      $table->string('change_request_id')->nullable();
       $table->string('name')->nullable();
       $table->enum('type', ['Initial Phase', 'Change Request'])->default('Initial Phase');
       $table->enum('status', ['Active', 'Completed', 'Cancelled'])->default('Active');

@@ -11,6 +11,8 @@ class ContractPhase extends Model
 
   protected $fillable = [
     'name',
+    'type',
+    'change_request_id'
   ];
 
   protected $casts = [

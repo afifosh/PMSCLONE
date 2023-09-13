@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\ChangeRequestController;
+use App\Http\Controllers\Admin\Contract\ContractCategoryController;
 use App\Http\Controllers\Admin\Contract\ContractController;
 use App\Http\Controllers\Admin\Contract\ContractMilestoneController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
@@ -145,6 +146,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::get('contracts/{contract}/phases/{phase}/milestones', [ProjectMilestoneController::class, 'contractMilestones'])->name('contracts.phases.milestones.index');
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
+    Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
     Route::resource('contracts', ContractController::class);
     Route::resource('contracts.terms', ContractTermController::class)->only(['edit', 'update']); // reschedule and value update
     Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
@@ -160,6 +162,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
     // Route::resource('contracts.phases', ContractPhaseController::class);
     Route::resource('contract-types', ContractTypeController::class);
+    Route::resource('contract-categories', ContractCategoryController::class);
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
     Route::resource('contracts.phases', ContractPhaseController::class);

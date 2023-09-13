@@ -24,7 +24,7 @@ class ContractsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('id', function ($contract) {
-        return view('admin.pages.contracts.name', compact('contract'));
+        return view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
       })
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));

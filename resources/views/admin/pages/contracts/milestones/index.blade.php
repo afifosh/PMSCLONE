@@ -5,6 +5,9 @@
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 @endsection
 
 @section('page-style')
@@ -17,6 +20,9 @@
 <script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="https://rawgit.com/bevacqua/dragula/master/dist/dragula.js"></script>
+<script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -42,12 +48,12 @@ console.log(rrule.rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5
 @section('content')
 @includeWhen($page == 'Project', 'admin.pages.projects.navbar', ['tab' => 'milestones'])
 @includeWhen($page == 'Contract', 'admin.pages.contracts.header', ['tab' => 'milestones'])
-<div class="app-email mt-3 card">
+{{-- <div class="app-email mt-3 card">
   <div class="row g-0">
     <!-- Task Sidebar -->
     <div class="col app-email-sidebar border-end flex-grow-0" id="app-email-sidebar">
       <div class="btn-compost-wrapper d-grid">
-        <button class="btn btn-primary" data-toggle="ajax-modal" data-title="Add Milestone" data-href="{{route('admin.projects.contracts.phases.milestones.create', ['project' => $project, $contract, $phase])}}">Add Milestone</button>
+        <button class="btn btn-primary" data-toggle="ajax-modal" data-title="Add Milestone" data-href="{{}}">Add Milestone</button>
       </div>
       <div class="email-filters py-2">
         <small class="fw-normal text-uppercase text-muted m-4">Milestone Status</small>
@@ -106,5 +112,15 @@ console.log(rrule.rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5
     </div>
     <!-- /Task List -->
   </div>
+</div> --}}
+<div class="card mt-3">
+  <div class="card-body">
+    {{$dataTable->table()}}
+  </div>
 </div>
 @endsection
+@push('scripts')
+    {{$dataTable->scripts()}}
+    <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+@endpush
+
