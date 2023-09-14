@@ -27,9 +27,9 @@ class ChangeRequestController extends Controller
   public function create(Contract $contract)
   {
     $change_order = new ContractChangeRequest();
-    $currency = config('money.currencies.'.$contract->currency ?? 'USD');
+    $currency = config('money.currencies.'.$contract->currency ?? config('money.defaults.currency'));
 
-    $currency = [$contract->currency ?? 'USD' => $currency['name']];
+    $currency = [$contract->currency ?? config('money.defaults.currency') => $currency['name']];
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.change-requests.create', compact('contract', 'change_order', 'currency'))->render()]);
   }

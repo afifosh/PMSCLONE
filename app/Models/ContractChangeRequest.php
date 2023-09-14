@@ -58,7 +58,7 @@ class ContractChangeRequest extends Model
 
   public function setOldValueAttribute($value)
   {
-    return $this->attributes['old_value'] = Money::{$this->old_currency ?? 'USD'}($value)->getAmount() * 100;
+    return $this->attributes['old_value'] = Money::{$this->old_currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
   }
 
   public function getNewValueAttribute($value)
@@ -68,17 +68,17 @@ class ContractChangeRequest extends Model
 
   public function setNewValueAttribute($value)
   {
-    return $this->attributes['new_value'] = Money::{$this->new_currency ?? 'USD'}($value)->getAmount() * 100;
+    return $this->attributes['new_value'] = Money::{$this->new_currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
   }
 
   public function pritableOldValue()
   {
-    return Money::{$this->old_currency ?? 'USD'}($this->old_value, true)->format();
+    return Money::{$this->old_currency ?? config('money.defaults.currency')}($this->old_value, true)->format();
   }
 
   public function pritableNewValue()
   {
-    return Money::{$this->new_currency ?? 'USD'}($this->new_value, true)->format();
+    return Money::{$this->new_currency ?? config('money.defaults.currency')}($this->new_value, true)->format();
   }
 
   public function scopeApplyRequestFilters($q)

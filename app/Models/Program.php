@@ -4,8 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Akaunting\Money\Money;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Vuer\LaravelBalance\Models\AccountBalance;
+use Vuer\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;
 
-class Program extends BaseModel
+class Program extends BaseModel implements AccountBalanceHolderInterface
 {
     use HasFactory;
 
@@ -52,4 +56,25 @@ class Program extends BaseModel
     {
       return $this->hasMany(Contract::class, 'program_id', 'id');
     }
+
+    public function accountBalances()
+  {
+    return $this->morphMany(AccountBalance::class, 'holder');
+  }
+
+  public function defaultCurrencyAccount(): HasOne
+  {
+    return $this->hasOne(AccountBalance::class, 'holder_id')->where('holder_type', self::class);
+  }
+
+  public function getAccount(string $currency): ?AccountBalance
+  {
+    return $this->accountBalances()->where('currency', $currency)->first();
+  }
+
+  public function addAccountBalance(AccountBalance $accountBalance)
+  {
+    $accountBalance->holder()->associate($this);
+    $accountBalance->save();
+  }
 }

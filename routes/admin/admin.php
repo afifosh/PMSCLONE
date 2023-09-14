@@ -48,6 +48,9 @@ use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
 use App\Http\Controllers\Admin\Contract\ContractPhaseController;
+use App\Http\Controllers\Admin\Finance\FinancialYearController;
+use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
+use App\Http\Controllers\Admin\Finance\ProgramAccountController;
 use App\Http\Controllers\Admin\Project\GanttChartController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
@@ -257,6 +260,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
     Route::get('email-templates/{id}/{lang?}', [EmailTemplateController::class, 'manageEmailLang'])->name('manage.email.language');
     Route::resource('email_template', EmailTemplateController::class)->only(['update']);
+
+    Route::prefix('finances')->name('finances.')->group(function(){
+      Route::resource('financial-years', FinancialYearController::class);
+      Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store']);
+      Route::resource('program-accounts', ProgramAccountController::class)->only(['index']);
+    });
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

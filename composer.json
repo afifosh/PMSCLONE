@@ -64,6 +64,7 @@
     "symfony/html-sanitizer": "^6.3",
     "tightenco/ziggy": "^1.6",
     "torann/geoip": "^3.0",
+    "vuer/laravel-balance": "^0.3.1",
     "webpatser/laravel-countries": "^1.5",
     "willdurand/email-reply-parser": "^2.10",
     "yajra/laravel-datatables": "^10.1",

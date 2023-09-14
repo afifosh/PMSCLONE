@@ -599,7 +599,7 @@ window.initModalSelect2 = function(){
       },
       placeholder: $(this).data('placeholder'),
       minimumInputLength: 0,
-      dropdownParent: $(this).parent()
+      dropdownParent: $('#globalModal')
     });
   })
   // END select2 with remote data for global modal

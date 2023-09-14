@@ -65,7 +65,7 @@ class Contract extends Model
 
   public function setValueAttribute($value)
   {
-    return $this->attributes['value'] = Money::{$this->currency ?? 'USD'}($value)->getAmount() * 100;
+    return $this->attributes['value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
   }
 
   public function getStatusAttribute()
@@ -398,12 +398,12 @@ class Contract extends Model
 
   public function formatMilestoneValue($value)
   {
-    return Money::{$this->currency ?? 'USD'}($value)->getAmount();
+    return Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount();
   }
 
   public function getPrintableValueAttribute()
   {
-    return Money::{$this->currency ?? 'USD'}($this->value, true)->format();
+    return Money::{$this->currency ?? config('money.defaults.currency')}($this->value, true)->format();
   }
 
   public function program(): BelongsTo

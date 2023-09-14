@@ -119,6 +119,23 @@
       ]
     },
     {
+      "name": "Finances",
+      "slug": ["admin.finances."],
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "submenu": [
+        {
+          "url": "/admin/finances/financial-years",
+          "name": "Financial Years",
+          "slug": "admin.finances.financial-years.index"
+        },
+        {
+          "url": "/admin/finances/program-accounts",
+          "name": "Program Accounts",
+          "slug": "admin.finances.program-accounts.index"
+        }
+      ]
+    },
+    {
       "url": "admin/app/settings",
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",

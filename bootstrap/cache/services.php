@@ -92,6 +92,7 @@
     88 => 'Laravolt\\Avatar\\ServiceProvider',
     89 => 'App\\Providers\\CustomBladeDirectiveServiceProvider',
     90 => 'Mavinoo\\Batch\\BatchServiceProvider',
+    91 => 'Vuer\\LaravelBalance\\BalanceServiceProvider',
   ),
   'eager' => 
   array (
@@ -169,6 +170,7 @@
     71 => 'Laravolt\\Avatar\\ServiceProvider',
     72 => 'App\\Providers\\CustomBladeDirectiveServiceProvider',
     73 => 'Mavinoo\\Batch\\BatchServiceProvider',
+    74 => 'Vuer\\LaravelBalance\\BalanceServiceProvider',
   ),
   'deferred' => 
   array (
