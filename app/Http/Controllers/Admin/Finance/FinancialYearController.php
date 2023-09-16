@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Admin\Finance;
 use App\DataTables\Admin\Finance\FinancialYearsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\FinancialYear;
+use App\Support\LaravelBalance\Dto\TransactionDto;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Vuer\LaravelBalance\Services\Accountant;
-use Vuer\LaravelBalance\Services\TransactionProcessor;
-use Money\Currency;
+use App\Support\LaravelBalance\Services\Accountant;
+use App\Support\LaravelBalance\Services\TransactionProcessor;
+use Akaunting\Money\Currency;
 
 class FinancialYearController extends Controller
 {
@@ -62,9 +63,21 @@ class FinancialYearController extends Controller
 
     $financialYear = FinancialYear::create($validated);
 
-    $account = $this->accountant->getAccountOrCreate($financialYear, new Currency($validated['currency']));
+    // get year digits of start date and end date of financial year
+    $syear = date('Y', strtotime($financialYear->start_date));
+    $eyear = date('Y', strtotime($financialYear->end_date));
 
-    $this->transactionProcessor->create($account, new \Vuer\LaravelBalance\Dto\TransactionDto($financialYear->getRawOriginal('initial_balance'), 1));
+    $account_number = $this->accountant->createUniqueAccountNumber(null, $syear.$eyear);
+
+    $this->accountant->createAccount($financialYear, ['currency' => $request->currency, 'account_number' => $account_number]);
+    // dd($account->holders);
+    // $account_number = $this->accountant->createUniqueAccountNumber(null, $syear.$eyear);
+    // $account = $this->accountant->createAccount($financialYear, ['currency' => $request->currency, 'account_number' => $account_number]);
+    // $account_number = $this->accountant->createUniqueAccountNumber(null, $syear.$eyear);
+    // $account = $this->accountant->createAccount($financialYear, ['currency' => $request->currency, 'account_number' => $account_number]);
+
+
+    // $this->transactionProcessor->create($account, new TransactionDto($financialYear->getRawOriginal('initial_balance'), 1));
 
 
     return $this->sendRes(__('Financial year created successfully'), ['event' => 'table_reload', 'table_id' => 'financial-years-table', 'close' => 'globalModal']);

@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Akaunting\Money\Money;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Vuer\LaravelBalance\Models\AccountBalance;
-use Vuer\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;
+use App\Support\LaravelBalance\Models\AccountBalance;
+use App\Support\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class FinancialYear extends Model implements AccountBalanceHolderInterface
 {
@@ -33,7 +34,7 @@ class FinancialYear extends Model implements AccountBalanceHolderInterface
       return null;
     }
 
-    return Money::{$this->defaultCurrencyAccount->currency}($value, false)->format();
+    return Money::{$this->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($value, false)->format();
   }
 
   public function setInitialBalanceAttribute($value)
@@ -48,12 +49,19 @@ class FinancialYear extends Model implements AccountBalanceHolderInterface
 
   public function accountBalances()
   {
-    return $this->morphMany(AccountBalance::class, 'holder');
+    // this -> account_balance_holders -> account_balance morphicmany
+    return $this->morphToMany(AccountBalance::class, 'holder', 'account_balance_holders', 'holder_id', 'account_balance_id');
   }
 
-  public function defaultCurrencyAccount(): HasOne
+  public function accountBalance()
   {
-    return $this->hasOne(AccountBalance::class, 'holder_id')->where('holder_type', self::class);
+    // this -> account_balance_holders -> account_balance take latest one
+    return $this->morphToMany(AccountBalance::class, 'holder', 'account_balance_holders', 'holder_id', 'account_balance_id')->latest();//->latestOfMany();
+  }
+
+  public function defaultCurrencyAccount()
+  {
+    return $this->morphToMany(AccountBalance::class, 'holder', 'account_balance_holders', 'holder_id', 'account_balance_id')->latest();
   }
 
   public function getAccount(string $currency): ?AccountBalance
@@ -63,7 +71,6 @@ class FinancialYear extends Model implements AccountBalanceHolderInterface
 
   public function addAccountBalance(AccountBalance $accountBalance)
   {
-    $accountBalance->holder()->associate($this);
-    $accountBalance->save();
+    //
   }
 }

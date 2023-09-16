@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Akaunting\Money\Money;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Vuer\LaravelBalance\Models\AccountBalance;
-use Vuer\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;
+use App\Support\LaravelBalance\Models\AccountBalance;
+use App\Support\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;
 
 class Program extends BaseModel implements AccountBalanceHolderInterface
 {

@@ -6,10 +6,11 @@ use App\DataTables\Admin\Finance\FinancialYearTransactionsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\FinancialYear;
 use App\Models\Program;
+use App\Support\LaravelBalance\Dto\TransactionDto;
 use Illuminate\Http\Request;
-use Vuer\LaravelBalance\Services\Accountant;
-use Vuer\LaravelBalance\Services\TransactionProcessor;
-use Money\Currency;
+use App\Support\LaravelBalance\Services\Accountant;
+use App\Support\LaravelBalance\Services\TransactionProcessor;
+use Akaunting\Money\Currency;
 
 class FinancialYearTransactionController extends Controller
 {
@@ -57,11 +58,11 @@ class FinancialYearTransactionController extends Controller
 
     $financialYear->load('defaultCurrencyAccount');
 
-    $this->transactionProcessor->create($financialYear->defaultCurrencyAccount, new \Vuer\LaravelBalance\Dto\TransactionDto($validated['amount'], $validated['type'] == 3 ? 2 : 1));
+    $this->transactionProcessor->create($financialYear->defaultCurrencyAccount, new TransactionDto($validated['amount'], $validated['type'] == 3 ? 2 : 1));
 
     if($validated['type'] == 3){
       $account = $this->accountant->getAccountOrCreate(Program::find($request->program_id), new Currency($financialYear->defaultCurrencyAccount->currency));
-      $this->transactionProcessor->create($account, new \Vuer\LaravelBalance\Dto\TransactionDto(-$validated['amount'], 2));
+      $this->transactionProcessor->create($account, new TransactionDto(-$validated['amount'], 2));
     }
 
     return $this->sendRes('Transaction added successfully', ['event' => 'table_reload', 'table_id' => 'financial-years-table', 'close' => 'globalModal']);

@@ -20,6 +20,9 @@ class FinancialYearsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
+      ->addColumn('account_number', function($financialYear){
+        return $financialYear->defaultCurrencyAccount[0]->account_number;
+      })
       ->editColumn('label', function($financialYear){
         return view('admin.pages.finances.financial-years.label', compact('financialYear'));
       })
@@ -27,7 +30,7 @@ class FinancialYearsDataTable extends DataTable
         return view('admin.pages.finances.financial-years.action', compact('financialYear'));
       })
       ->addColumn('balance', function($financialYear){
-        return Money::{$financialYear->defaultCurrencyAccount->currency ?? config('money.defaults.currency')}($financialYear->defaultCurrencyAccount->balance, false)->format();
+        return Money::{$financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($financialYear->defaultCurrencyAccount[0]->balance, false)->format();
       });
   }
 
@@ -80,6 +83,7 @@ class FinancialYearsDataTable extends DataTable
   public function getColumns(): array
   {
     return [
+      Column::make('account_number'),
       Column::make('label'),
       Column::make('start_date'),
       Column::make('end_date'),

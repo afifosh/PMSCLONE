@@ -193,7 +193,6 @@ return [
         Laravolt\Avatar\ServiceProvider::class,
         App\Providers\CustomBladeDirectiveServiceProvider::class,
         Mavinoo\Batch\BatchServiceProvider::class,
-        Vuer\LaravelBalance\BalanceServiceProvider::class,
     ],
 
     /*

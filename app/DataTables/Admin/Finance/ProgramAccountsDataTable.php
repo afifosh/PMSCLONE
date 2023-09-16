@@ -7,7 +7,7 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
-use Vuer\LaravelBalance\Models\AccountBalance;
+use App\Support\LaravelBalance\Models\AccountBalance;
 use Akaunting\Money\Money;
 
 class ProgramAccountsDataTable extends DataTable
