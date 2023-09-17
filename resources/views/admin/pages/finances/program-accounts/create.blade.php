@@ -28,6 +28,7 @@
           'data-url' => route('resource-select', ['Program'])
           ])!!}
 </div>
+
 <div class="mt-3">
     <div class="btn-flt float-end">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>

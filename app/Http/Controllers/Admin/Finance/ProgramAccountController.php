@@ -31,7 +31,8 @@ class ProgramAccountController extends Controller
 
   public function index(ProgramAccountsDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.finances.program-accounts.index');
+    $accounts =AccountBalance::all();
+    return $dataTable->render('admin.pages.finances.program-accounts.index', compact('accounts'));
     // view('admin.pages.finances.program-accounts.index')
   }
 
