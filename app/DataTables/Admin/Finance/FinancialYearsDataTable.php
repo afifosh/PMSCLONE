@@ -21,7 +21,10 @@ class FinancialYearsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->addColumn('account_number', function($financialYear){
-        return $financialYear->defaultCurrencyAccount[0]->account_number;
+          // Use a regular expression to insert '-' after every 4 digits
+          $accountNumber = $financialYear->defaultCurrencyAccount[0]->account_number;
+          $formattedAccountNumber = preg_replace("/(\d{4})(?=\d)/", "$1-", $accountNumber); 
+        return $formattedAccountNumber;
       })
       ->editColumn('label', function($financialYear){
         return view('admin.pages.finances.financial-years.label', compact('financialYear'));
