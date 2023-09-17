@@ -82,7 +82,7 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
   public function getAvatarAttribute($value)
   {
     if(!$value)
-      return Avatar::create($this->name)->toBase64();
+      return Avatar::create($this->program_code ? $this->program_code : $this->name)->toBase64();
     return $value;
   }
     
