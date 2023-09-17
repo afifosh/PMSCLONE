@@ -8,6 +8,7 @@ use Akaunting\Money\Money;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Support\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;
+use Avatar;
 
 class Program extends BaseModel implements AccountBalanceHolderInterface
 {
@@ -77,4 +78,12 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
     $accountBalance->holder()->associate($this);
     $accountBalance->save();
   }
+
+  public function getAvatarAttribute($value)
+  {
+    if(!$value)
+      return Avatar::create($this->name)->toBase64();
+    return $value;
+  }
+    
 }
