@@ -19,7 +19,7 @@ class AccountBalanceHolder extends Model
     'account_balance_id',
   ];
 
-  public function holder()
+  public function holders()
   {
     return $this->morphTo();
   }

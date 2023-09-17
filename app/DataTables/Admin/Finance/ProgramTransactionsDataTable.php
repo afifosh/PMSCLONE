@@ -2,17 +2,17 @@
 
 namespace App\DataTables\Admin\Finance;
 
+use Akaunting\Money\Money;
+use App\Support\LaravelBalance\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
-use App\Support\LaravelBalance\Models\Transaction;
-use Akaunting\Money\Money;
 
-class FinancialYearTransactionsDataTable extends DataTable
+class ProgramTransactionsDataTable extends DataTable
 {
-  public $financialYear;
+  public $programAccount;
   /**
    * Build the DataTable class.
    *
@@ -25,10 +25,10 @@ class FinancialYearTransactionsDataTable extends DataTable
       return runtimeTransIdFormat($transaction->id);
     })
     ->editColumn('amount', function($transaction){
-      return Money::{$this->financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($transaction->amount, false)->format();
+      return Money::{$this->programAccount->currency ?? config('money.defaults.currency')}($transaction->amount, false)->format();
     })
     ->editColumn('remaining_balance', function($transaction){
-      return Money::{$this->financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($transaction->remaining_balance, false)->format();
+      return Money::{$this->programAccount->currency ?? config('money.defaults.currency')}($transaction->remaining_balance, false)->format();
     })
     ->editColumn('action', function($transaction){
       return view('admin.pages.finances.financial-years.transactions.action', compact('transaction'));
@@ -47,7 +47,7 @@ class FinancialYearTransactionsDataTable extends DataTable
    */
   public function query(Transaction $model): QueryBuilder
   {
-    return $model->where('account_balance_id', $this->financialYear->defaultCurrencyAccount[0]->id)->with('accountBalance')->newQuery();
+    return $model->where('account_balance_id', $this->programAccount->id)->with('accountBalance')->newQuery();
   }
 
   /**
@@ -58,7 +58,7 @@ class FinancialYearTransactionsDataTable extends DataTable
     $buttons = [];
 
     return $this->builder()
-      ->setTableId('financial-years-table')
+      ->setTableId('program-transactions-table')
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
@@ -96,6 +96,6 @@ class FinancialYearTransactionsDataTable extends DataTable
    */
   protected function filename(): string
   {
-    return 'FinancialYearTransactions_' . date('YmdHis');
+    return 'ProgramTransactions_' . date('YmdHis');
   }
 }

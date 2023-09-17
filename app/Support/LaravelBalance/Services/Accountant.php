@@ -31,7 +31,7 @@ class Accountant
 
   /**
    * @param AccountBalanceHolderInterface|Collection $accountBalanceHolder
-   * @param array $data ['currency' => 'USD', 'account_number' => '1234567890']
+   * @param array $data ['currency' => 'USD', 'account_number' => '1234567890', 'name' => 'My Account']
    * @return AccountBalance
    * @throws AccountBalanceLogicException
    */
@@ -46,6 +46,9 @@ class Accountant
     $accountBalance = AccountBalance::create([
       'currency' => $data['currency'] ?? config('money.defaults.currency'),
       'account_number' => $data['account_number'] ?? null,
+      'name' => $data['name'] ?? null,
+      'creator_id' => auth()->id(),
+      'creator_type' => get_class(auth()->user()),
     ]);
 
     if ($accountBalanceHolder instanceof Collection) {

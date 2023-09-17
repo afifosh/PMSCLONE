@@ -15,7 +15,7 @@ class CreateAccountBalanceSetupTables extends Migration
     {
         Schema::create('account_balances', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('account_number', 20)->unique();
+            $table->string('account_number', 16)->unique();
             $table->string('name', 255)->nullable();
             $table->char('currency', 3);
             $table->bigInteger('balance')->default(0);
@@ -35,10 +35,12 @@ class CreateAccountBalanceSetupTables extends Migration
             $table->foreignId('account_balance_id')->constrained('account_balances');
             $table->foreignId('account_balance_extra_id')->nullable()->constrained('account_balances');
             $table->bigInteger('amount')->default(0);
-            $table->string('description')->nullable();
+            $table->bigInteger('remaining_balance')->default(0);
+            $table->string('title')->nullable();
             $table->json('data')->nullable();
-            $table->integer('type')->unsigned()->nullable()->comment('1-flow, 2-transfer'); // 1 - flow (debit, credit), 2 - transfer (in, out)
-            $table->timestamp('created_at');
+            $table->string('description')->nullable();
+            $table->enum('type', ['Credit', 'Debit']);
+            $table->timestamps();
         });
     }
 

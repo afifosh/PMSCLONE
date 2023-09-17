@@ -184,3 +184,11 @@ function runtimeChangeReqIdFormat($change_req_id = '') {
       return '---';
   }
 }
+
+function runtimeTransIdFormat($transaction_id = '') {
+  if (is_numeric($transaction_id)) {
+      return 'TRX-' . str_pad($transaction_id, 4, '0', STR_PAD_LEFT);
+  } else {
+      return '---';
+  }
+}

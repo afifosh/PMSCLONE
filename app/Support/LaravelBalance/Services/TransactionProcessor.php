@@ -38,6 +38,7 @@ class TransactionProcessor
         $balance = $accountBalance->getBalance();
         $balance = $balance->add($transaction->getAmount());
         $accountBalance->updateBalance($balance);
+        $transaction->remaining_balance = $balance->getAmount();
 
         // Save models.
         $transaction->save();

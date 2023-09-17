@@ -1,20 +1,18 @@
-{!! Form::model($financialYear, ['route' => ['admin.finances.financial-years.transactions.store', [$financialYear->id, 'type' => request()->type]], 'method' => 'POST']) !!}
+{!! Form::model($programAccount, ['route' => ['admin.finances.program-accounts.transactions.store', [$programAccount, 'type' => request()->type]], 'method' => 'POST']) !!}
 
 <div class="row">
     {{-- Amount --}}
     <div class="form-group col-6">
       {{ Form::label('this_account', request()->type == 'deposit' ? __('To Account') : __('From Account'), ['class' => 'col-form-label']) }}
-      {!! Form::text('this_account', $financialYear->name, ['class' => 'form-control', 'disabled','placeholder' => __('Account')]) !!}
+      {!! Form::text('this_account', $programAccount->name, ['class' => 'form-control', 'placeholder' => __('Account'), 'disabled']) !!}
     </div>
 
-    @if(request()->type == 'transfer')
     <div class="form-group col-6">
-      {{ Form::label('account_id', __('To Account'), ['class' => 'col-form-label']) }}
+      {{ Form::label('account_id', request()->type != 'deposit' ? __('To Account') : __('From Account'), ['class' => 'col-form-label']) }}
       {!! Form::select('account_id', [], null, ['class' => 'form-control globalOfSelect2Remote',
-      'data-url' => route('resource-select', ['resource' => 'AccountBalance', 'except' => $financialYear->id]),
+      'data-url' => route('resource-select', ['resource' => 'AccountBalance', 'except' => $programAccount->id]),
       'placeholer' => __('Select Account')]) !!}
     </div>
-    @endif
     {{-- Amount --}}
     <div class="form-group col-6">
         {{ Form::label('amount', __('Amount'), ['class' => 'col-form-label']) }}
@@ -34,12 +32,3 @@
 </div>
 {!! Form::close() !!}
 </div>
-<script>
-  $(document).on('change', 'select[name="type"]', function() {
-    if ($(this).val() == 3) {
-      $('.transfer-program').removeClass('d-none');
-    } else {
-      $('.transfer-program').addClass('d-none');
-    }
-  });
-</script>

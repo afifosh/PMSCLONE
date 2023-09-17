@@ -20,15 +20,13 @@ class ProgramAccountsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-    ->editColumn('created_at', function($account){
-      return date(' h:i A d M, Y', strtotime($account->created_at));
-    })
-    ->editColumn('updated_at', function($account){
-      return date(' h:i A d M, Y', strtotime($account->updated_at));
+    ->editColumn('account_number', function($account){
+      return '<a href="'.route('admin.finances.program-accounts.transactions.index', $account->id).'">'.$account->account_number.'</a>';
     })
     ->editColumn('balance', function($account){
       return Money::{$account->currency ?? config('money.defaults.currency')}($account->balance, false)->format();
-    });
+    })
+    ->rawColumns(['account_number']);
   }
 
   /**
@@ -36,7 +34,7 @@ class ProgramAccountsDataTable extends DataTable
    */
   public function query(AccountBalance $model): QueryBuilder
   {
-    return $model->where('holder_type', 'App\Models\Program')->with('holder')->newQuery();
+    return $model->has('programs')->with('related.holders')->newQuery();
   }
 
   /**
@@ -45,9 +43,18 @@ class ProgramAccountsDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
+    $buttons[] = [
+      'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Account</span>',
+      'className' =>  'btn btn-primary mx-3',
+      'attr' => [
+        'data-toggle' => "ajax-modal",
+        'data-title' => 'Create Account',
+        'data-href' => route('admin.finances.program-accounts.create')
+      ]
+    ];
 
     return $this->builder()
-      ->setTableId('financial-years-table')
+      ->setTableId('program-accounts-table')
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
@@ -71,8 +78,9 @@ class ProgramAccountsDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      Column::make('id'),
-      Column::make('holder.name')->title('Program'),
+      Column::make('account_number'),
+      Column::make('name')->title('Account Name'),
+      Column::make('currency'),
       Column::make('balance'),
       Column::make('created_at'),
       Column::make('updated_at'),

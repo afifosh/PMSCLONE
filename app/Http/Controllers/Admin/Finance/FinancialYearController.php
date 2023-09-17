@@ -67,17 +67,15 @@ class FinancialYearController extends Controller
     $syear = date('Y', strtotime($financialYear->start_date));
     $eyear = date('Y', strtotime($financialYear->end_date));
 
-    $account_number = $this->accountant->createUniqueAccountNumber(null, $syear.$eyear);
+    $account_number = $this->accountant->createUniqueAccountNumber(null, $syear . $eyear);
 
-    $this->accountant->createAccount($financialYear, ['currency' => $request->currency, 'account_number' => $account_number]);
-    // dd($account->holders);
-    // $account_number = $this->accountant->createUniqueAccountNumber(null, $syear.$eyear);
-    // $account = $this->accountant->createAccount($financialYear, ['currency' => $request->currency, 'account_number' => $account_number]);
-    // $account_number = $this->accountant->createUniqueAccountNumber(null, $syear.$eyear);
-    // $account = $this->accountant->createAccount($financialYear, ['currency' => $request->currency, 'account_number' => $account_number]);
+    $account = $this->accountant->createAccount($financialYear, ['currency' => $request->currency, 'name' => $request->label, 'account_number' => $account_number]);
 
-
-    // $this->transactionProcessor->create($account, new TransactionDto($financialYear->getRawOriginal('initial_balance'), 1));
+    $this->transactionProcessor->create($account, new TransactionDto(
+      $financialYear->getRawOriginal('initial_balance'),
+      'Credit',
+      'Initial Balance',
+    ));
 
 
     return $this->sendRes(__('Financial year created successfully'), ['event' => 'table_reload', 'table_id' => 'financial-years-table', 'close' => 'globalModal']);
@@ -97,8 +95,8 @@ class FinancialYearController extends Controller
   public function edit(FinancialYear $financialYear)
   {
     $financialYear->load('defaultCurrencyAccount');
-    $currency = [$financialYear->defaultCurrencyAccount->currency => '(' . $financialYear->defaultCurrencyAccount->currency . ') - ' . config('money.currencies.' . $financialYear->defaultCurrencyAccount->currency . '.name')];
-    $selected_currency = $financialYear->defaultCurrencyAccount->currency;
+    $currency = [$financialYear->defaultCurrencyAccount[0]->currency => '(' . $financialYear->defaultCurrencyAccount[0]->currency . ') - ' . config('money.currencies.' . $financialYear->defaultCurrencyAccount[0]->currency . '.name')];
+    $selected_currency = $financialYear->defaultCurrencyAccount[0]->currency;
     return $this->sendRes('success', ['view_data' => view('admin.pages.finances.financial-years.create', compact('financialYear', 'currency'))->render()]);
   }
 
@@ -117,8 +115,8 @@ class FinancialYearController extends Controller
     $financialYear->update($validated);
 
     $financialYear->load('defaultCurrencyAccount');
-    $financialYear->defaultCurrencyAccount->forceFill(['currency' => $request->currency]);
-    $financialYear->defaultCurrencyAccount->save();
+    $financialYear->defaultCurrencyAccount[0]->forceFill(['currency' => $request->currency, 'name' => $request->label]);
+    $financialYear->defaultCurrencyAccount[0]->save();
 
     return $this->sendRes(__('Financial year updated successfully'), ['event' => 'table_reload', 'table_id' => 'financial-years-table', 'close' => 'globalModal']);
   }

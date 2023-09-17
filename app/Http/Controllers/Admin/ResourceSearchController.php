@@ -46,6 +46,10 @@ class ResourceSearchController extends Controller
         'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id'],
         'dependent_column' => 'state_id'
       ],
+      'AccountBalance' => [
+        'search' => 'name',
+        'select' => ['name as text', 'id']
+      ],
       'Currency' => []
     ];
     if (!isset($allowedResources[$resource])) {
@@ -58,12 +62,19 @@ class ResourceSearchController extends Controller
 
     $model = 'App\Models\\' . $resource;
 
+    if($resource == 'AccountBalance') {
+      $model = 'App\Support\LaravelBalance\Models\\' . $resource;
+    }
+
     $query = $model::query();
 
     return $query->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
       $q->where($allowedResources[$resource]['search'], 'like', '%' . request()->get('q') . '%');
     })->when(request()->dependent_id, function ($q) use ($allowedResources, $resource) {
       $q->where($allowedResources[$resource]['dependent_column'], request()->dependent_id);
+    })
+    ->when(request()->except, function ($q) use ($allowedResources, $resource) {
+      $q->where('id', '!=', request()->except);
     })
     ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
   }

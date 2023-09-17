@@ -5,11 +5,9 @@ namespace App\Support\LaravelBalance\Models;
 use Illuminate\Database\Eloquent\Model;
 use Akaunting\Money\Currency;
 use Akaunting\Money\Money;
-use App\Support\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Program;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Support\Facades\Config;
 
 class AccountBalance extends Model
 {
@@ -21,9 +19,17 @@ class AccountBalance extends Model
     protected $table = 'account_balances';
 
     protected $fillable = [
+      'name',
       'account_number',
       'currency',
       'balance',
+      'creator_id',
+      'creator_type',
+    ];
+
+    protected $casts = [
+      'created_at' => 'datetime:d M, Y',
+      'updated_at' => 'datetime:d M, Y',
     ];
 
     public function setAccountNumberAttribute($value)
@@ -43,6 +49,16 @@ class AccountBalance extends Model
       return $accountNumber;
     }
 
+    public function printableBalance()
+    {
+      return Money::{$this->currency}($this->balance, false)->format();
+    }
+
+    public function printableAccountNumber()
+    {
+      return preg_replace('/^(\d{4})(\d{4})(\d{4})(\d{4})$/', '$1 $2 $3 $4', $this->account_number);
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -51,50 +67,42 @@ class AccountBalance extends Model
     //     return $this->hasMany(Transaction::class);
     // }
 
-
-    /**
-     * get account balance holders (AccountBalanceHolderInterface)
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
-     */
-    public function holders(): MorphToMany
+    public function related(): HasMany
     {
-      return $this->morphToMany(AccountBalanceHolder::class, 'holder', 'account_balance_holders', 'account_balance_id', 'holder_id');
+      return $this->hasMany(AccountBalanceHolder::class);
     }
 
-    /**
-     * return collection of AccountBalanceHolderInterface
-     */
-    // public function getHolders(): Collection
-    // {
-    //     return $this->holders()->get();
-    // }
+    public function programs(): MorphToMany
+    {
+      return $this->morphedByMany(Program::class, 'holder', 'account_balance_holders', 'account_balance_id', 'holder_id');
+    }
 
     /**
      * @return Money
      */
-    // public function getBalance(): Money
-    // {
-    //     return new Money($this->balance, $this->getCurrency());
-    // }
+    public function getBalance(): Money
+    {
+        return new Money($this->balance ? $this->balance : 0, $this->getCurrency());
+    }
 
     /**
      * @return Currency
      */
-    // public function getCurrency(): Currency
-    // {
-    //     return new Currency($this->currency);
-    // }
+    public function getCurrency(): Currency
+    {
+        return new Currency($this->currency);
+    }
 
     /**
      * @param Transaction $transaction
      */
-    // public function addTransaction(Transaction $transaction)
-    // {
-    //     $transaction->setAccountBalance($this);
-    // }
+    public function addTransaction(Transaction $transaction)
+    {
+        $transaction->setAccountBalance($this);
+    }
 
-    // public function updateBalance(Money $balance)
-    // {
-    //     $this->balance = $balance->getAmount();
-    // }
+    public function updateBalance(Money $balance)
+    {
+        $this->balance = $balance->getAmount();
+    }
 }

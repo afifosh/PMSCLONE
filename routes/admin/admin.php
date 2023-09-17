@@ -48,6 +48,7 @@ use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
 use App\Http\Controllers\Admin\Contract\ContractPhaseController;
+use App\Http\Controllers\Admin\Finance\ProgramTransactionController;
 use App\Http\Controllers\Admin\Finance\FinancialYearController;
 use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
 use App\Http\Controllers\Admin\Finance\ProgramAccountController;
@@ -263,8 +264,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::prefix('finances')->name('finances.')->group(function(){
       Route::resource('financial-years', FinancialYearController::class);
-      Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store']);
-      Route::resource('program-accounts', ProgramAccountController::class)->only(['index']);
+      Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store', 'show']);
+      Route::resource('program-accounts', ProgramAccountController::class)->only(['index', 'create', 'store']);
+      Route::resource('program-accounts.transactions', ProgramTransactionController::class)->only(['index', 'create', 'store']);
     });
   });
 });
