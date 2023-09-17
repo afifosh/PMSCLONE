@@ -20,9 +20,35 @@ class ProgramAccountsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-    ->editColumn('account_number', function($account){
-      return '<a href="'.route('admin.finances.program-accounts.transactions.index', $account->id).'">'.$account->account_number.'</a>';
+    ->editColumn('account_number', function($account) {
+          // Use a regular expression to insert '-' after every 4 digits
+          $formattedAccountNumber = preg_replace("/(\d{4})(?=\d)/", "$1-",  $account->account_number);
+        return '<a href="'.route('admin.finances.program-accounts.transactions.index', $account->id).'">'.$formattedAccountNumber.'</a>';
     })
+    ->addColumn('account_holder', function($account) {
+        // Ensure that the relationship is loaded to optimize performance
+        if (!$account->relationLoaded('programs')) {
+          $account->load('programs');
+      }
+
+      // // Fetch the names of the programs and concatenate them.
+      // return $account->programs->pluck('name')->implode(', ');
+        // Iterate through each program and format the output
+        // Iterate through each program and format the output
+        $programsOutput = $account->programs->map(function($program) {
+          $name = htmlspecialchars($program->name, ENT_QUOTES, 'UTF-8');
+          $avatarSrc = $program->avatar; // Get the program's avatar
+      
+          return "<li data-bs-toggle='tooltip' data-popup='tooltip-custom' data-bs-placement='top' class='avatar pull-up' aria-label='$name' data-bs-original-title='$name'>
+              <img class='avatar avatar-sm rounded-circle' src='$avatarSrc' alt='$name'/>
+          </li>";
+      });
+      
+      return "<ul class='list-unstyled m-0 d-flex align-items-center avatar-group'>" . $programsOutput->implode('') . "</ul>"; // Wrap the list items in an unordered list
+ 
+      
+      })->escapeColumns([])
+
     ->editColumn('balance', function($account){
       return Money::{$account->currency ?? config('money.defaults.currency')}($account->balance, false)->format();
     })
@@ -80,6 +106,7 @@ class ProgramAccountsDataTable extends DataTable
     return [
       Column::make('account_number'),
       Column::make('name')->title('Account Name'),
+      Column::make('account_holder')->title('Account Holder'),
       Column::make('currency'),
       Column::make('balance'),
       Column::make('created_at'),
