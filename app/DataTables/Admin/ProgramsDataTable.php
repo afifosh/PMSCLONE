@@ -22,7 +22,9 @@ class ProgramsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('name', function ($row) {
-        return '<a href="'.route('admin.programs.show', $row).'">'.htmlspecialchars(substr($row->name, 0, 100), ENT_QUOTES, 'UTF-8').'</a>';
+       // return '<a href="'.route('admin.programs.show', $row).'">'.htmlspecialchars(substr($row->name, 0, 100), ENT_QUOTES, 'UTF-8').'</a>';
+        return "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'><span class='mx-2'>".htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8')."</span>";
+  
       })
       ->addColumn('parent', function (Program $program) {
         return @$program->parent->name ?? '-';
