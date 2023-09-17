@@ -87,7 +87,7 @@ class FinancialYearsDataTable extends DataTable
   {
     return [
       Column::make('account_number'),
-      Column::make('label'),
+      // Column::make('label'),
       Column::make('start_date'),
       Column::make('end_date'),
       Column::make('initial_balance'),
