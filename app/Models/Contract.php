@@ -28,6 +28,9 @@ class Contract extends Model
     'assignable_id',
     'program_id',
     'signature_date',
+    'account_balance_id',
+    'remaining_amount',
+    'invoice_method',
     'refrence_id',
     'subject',
     'currency',
@@ -66,6 +69,16 @@ class Contract extends Model
   public function setValueAttribute($value)
   {
     return $this->attributes['value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
+  }
+
+  public function getRemainingAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setRemainingAmountAttribute($value)
+  {
+    return $this->attributes['remaining_amount'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
   }
 
   public function getStatusAttribute()
@@ -183,6 +196,16 @@ class Contract extends Model
   public function milestones(): HasManyThrough
   {
     return $this->hasManyThrough(ContractMilestone::class, ContractPhase::class, 'contract_id', 'phase_id');
+  }
+
+  public function initialPhase(): HasOne
+  {
+    return $this->hasOne(ContractPhase::class)->where('phase_type', 'Initial Phase');
+  }
+
+  public function initialPhaseMilstones(): HasManyThrough
+  {
+    return $this->hasManyThrough(ContractMilestone::class, ContractPhase::class, 'contract_id', 'phase_id')->where('phase_type', 'Initial Phase');
   }
 
   public function phases(): HasMany

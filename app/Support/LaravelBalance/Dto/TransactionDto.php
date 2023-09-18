@@ -9,6 +9,7 @@ class TransactionDto
   private ?string $transaction_title;
   private ?string $description;
   private array $data;
+  private array $relatedMorph;
   /**
    * TransactionDto constructor.
    *
@@ -19,13 +20,14 @@ class TransactionDto
    * @param array $data
    */
 
-  public function __construct(int $amount, string $type, string $transaction_title = null, string $description = null, array $data = [])
+  public function __construct(int $amount, string $type, string $transaction_title = null, string $description = null, array $data = [], array $relatedMorph = [])
   {
     $this->amount = $amount;
     $this->type = $type;
     $this->transaction_title = $transaction_title;
     $this->description = $description;
     $this->data = $data;
+    $this->relatedMorph = $relatedMorph;
   }
 
   /**
@@ -67,5 +69,14 @@ class TransactionDto
   public function getData(): array
   {
     return $this->data;
+  }
+
+  /**
+   * @return array
+   */
+
+  public function getRelatedMorph(): array
+  {
+    return $this->relatedMorph;
   }
 }

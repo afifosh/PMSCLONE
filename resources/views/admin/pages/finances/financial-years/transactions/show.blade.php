@@ -37,6 +37,15 @@
       <p class="mb-0 text-muted f-14 w-30 text-capitalize">Title : </p>
       <p class="mb-0 text-dark-grey f-14 w-70 text-wrap">{{$transaction->title}}</p>
   </div>
+  {{-- {{dd($transaction->related)}} --}}
+  @if ($transaction->related != null)
+    <div class="col-12 px-0 pb-3 d-lg-flex d-md-flex d-block">
+      <p class="mb-0 text-muted f-14 w-30 text-capitalize">Related : </p>
+      @if ($transaction->related_type == 'App\Models\Contract')
+        <p class="mb-0 text-dark-grey f-14 w-70 text-wrap"><a href="{{route('admin.contracts.show', $transaction->related->id)}}" target="_blank">{{$transaction->related->subject}}</a></p>
+      @endif
+    </div>
+  @endif
 
     <div class="col-12 px-0 pb-3 d-lg-flex d-md-flex d-block">
         <p class="mb-0 text-muted f-14 w-30 text-capitalize">Note : </p>

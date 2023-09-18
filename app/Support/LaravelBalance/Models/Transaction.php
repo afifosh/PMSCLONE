@@ -36,7 +36,9 @@ class Transaction extends Model
     'title',
     'data',
     'remaining_balance',
-    'description'
+    'description',
+    'related_type',
+    'related_id',
   ];
 
   protected $casts = [
@@ -90,5 +92,10 @@ class Transaction extends Model
   public function getType(): string
   {
     return $this->type;
+  }
+
+  public function related()
+  {
+    return $this->morphTo();
   }
 }

@@ -47,6 +47,34 @@ class SettingService extends BaseService
         });
     }
 
+    public function seedData($context = 'app', array $settings = [])
+    {
+      return collect(array_keys($settings))->map(function ($key) use ($settings, $context) {
+        if (is_null($settings[$key]) && $key != 'enable_timeout') {
+            return true;
+        }
+
+        $setting = app(SettingRepository::class)
+            ->createSettingInstance($key, $context);
+
+        if(is_array($settings[$key])){
+          $settings[$key] = implode(',', filterInputIds($settings[$key]));
+        }
+
+        $this->setModel($setting);
+
+        if ($locale = request()->get('language')) {
+            session()->put('locale', $locale);
+        }
+
+        return parent::save([
+            'name' => $key,
+            'value' => $settings[$key],
+            'context' => $context
+        ]);
+      });
+    }
+
 
     public function getFormattedSettings($context = 'app')
     {

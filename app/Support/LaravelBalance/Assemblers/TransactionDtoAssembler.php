@@ -15,6 +15,8 @@ class TransactionDtoAssembler
     $transactionModel->title = $transactionDto->getTransactionTitle();
     $transactionModel->data = $transactionDto->getData();
     $transactionModel->description = $transactionDto->getDescription();
+    $transactionModel->related_type = $transactionDto->getRelatedMorph()['type'] ?? null;
+    $transactionModel->related_id = $transactionDto->getRelatedMorph()['id'] ?? null;
 
     return $transactionModel;
   }

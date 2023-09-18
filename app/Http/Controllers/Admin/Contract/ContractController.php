@@ -14,11 +14,14 @@ use App\Models\ContractCategory;
 use App\Models\ContractType;
 use App\Models\Program;
 use App\Models\Project;
-use Illuminate\Http\Request;
+use App\Support\LaravelBalance\Dto\TransactionDto;
+use App\Support\LaravelBalance\Models\AccountBalance;
+use App\Traits\FiananceTrait;
 use Illuminate\Support\Facades\DB;
 
 class ContractController extends Controller
 {
+  use FiananceTrait;
   /**
    * Display a listing of the resource.
    */
@@ -28,7 +31,7 @@ class ContractController extends Controller
     $data['projects'] = Project::mine()->whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
     $data['contractClients'] = Client::whereHas('contracts')->pluck('email', 'id')->prepend('All', '0');
-    $data['companies'] = Company::has('contracts')->get(['id', 'name', 'type']);;
+    $data['companies'] = Company::has('contracts')->orderBy('type')->get(['id', 'name', 'type']);;
     $data['programs'] = Program::has('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
@@ -281,7 +284,19 @@ class ContractController extends Controller
     if ($request->isSavingDraft)
       $data['status'] = 'Draft';
 
-    $contract = Contract::create($data + $request->validated());
+    $contract = Contract::create($data + ['remaining_amount' => $request->value] + $request->validated());
+
+    $this->transactionProcessor->create(
+      AccountBalance::find($request->account_balance_id),
+      new TransactionDto(
+        -$request->value * 100,
+        'Debit',
+        'Contract Commitment',
+        '',
+        [],
+        ['type' => Contract::class, 'id' => $contract->id]
+      )
+    );
 
     if (!$request->isSavingDraft){
       $contract->events()->create([

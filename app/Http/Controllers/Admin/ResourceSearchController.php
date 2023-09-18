@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\LaravelBalance\Models\AccountBalance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -48,7 +49,10 @@ class ResourceSearchController extends Controller
       ],
       'AccountBalance' => [
         'search' => 'name',
-        'select' => ['name as text', 'id']
+        'select' => ['name as text', 'id'],
+        'dependent_column' => [
+          'program_id' => 'where has program',
+        ]
       ],
       'Currency' => []
     ];
@@ -62,8 +66,8 @@ class ResourceSearchController extends Controller
 
     $model = 'App\Models\\' . $resource;
 
-    if($resource == 'AccountBalance') {
-      $model = 'App\Support\LaravelBalance\Models\\' . $resource;
+    if ($resource == 'AccountBalance') {
+      return $this->accountBalanceSelect($allowedResources);
     }
 
     $query = $model::query();
@@ -73,10 +77,27 @@ class ResourceSearchController extends Controller
     })->when(request()->dependent_id, function ($q) use ($allowedResources, $resource) {
       $q->where($allowedResources[$resource]['dependent_column'], request()->dependent_id);
     })
-    ->when(request()->except, function ($q) use ($allowedResources, $resource) {
-      $q->where('id', '!=', request()->except);
+      ->when(request()->except, function ($q) use ($allowedResources, $resource) {
+        $q->where('id', '!=', request()->except);
+      })
+      ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
+  }
+
+  protected function accountBalanceSelect($allowedResources)
+  {
+    $resource = 'AccountBalance';
+    return AccountBalance::when(request()->dependent == 'programId', function ($q) {
+      $q->whereHas('programs', function ($q) {
+        $q->where('programs.id', request()->dependent_id);
+      });
     })
-    ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
+      ->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
+        $q->where($allowedResources[$resource]['search'], 'like', '%' . request()->get('q') . '%');
+      })
+      ->when(request()->except, function ($q) use ($allowedResources, $resource) {
+        $q->where('id', '!=', request()->except);
+      })
+      ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
   }
 
   public function userSelect($resource)

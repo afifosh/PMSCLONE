@@ -566,6 +566,12 @@ $(document).on('click', '[data-toggle="confirm-action"]', function () {
     }
   });
 });
+
+// reset dependent select2 on change of parent select2
+$(document).on('change', '.dependent-select', function(){
+  $('[data-dependent_id="'+$(this).attr('id')+'"]').val('').trigger('change');
+})
+
 window.initModalSelect2 = function(){
   if(typeof select2 == 'undefined')
   {

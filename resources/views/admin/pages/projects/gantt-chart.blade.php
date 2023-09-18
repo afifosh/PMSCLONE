@@ -108,7 +108,7 @@
         };
         data.push(contractData);
         // {"id":2, "text":"Task #1", "start_date":"02-04-2018", "duration":"8", "parent":"1", "progress":0.5, "open": true},
-        contract.phases.forEach((phase) => {
+        contract.milestones.forEach((phase) => {
           // update min and max dates
           if(new Date(phase.start_date) < new Date(minDate)){
             minDate = phase.start_date;
