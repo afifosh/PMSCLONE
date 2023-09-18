@@ -13,8 +13,10 @@ use App\Http\Controllers\Admin\Company\KycDocumentController;
 use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
+use App\Http\Controllers\Admin\Contract\ChangeRequestController;
+use App\Http\Controllers\Admin\Contract\ContractCategoryController;
 use App\Http\Controllers\Admin\Contract\ContractController;
-use App\Http\Controllers\Admin\Contract\ContractPhaseController;
+use App\Http\Controllers\Admin\Contract\ContractMilestoneController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
 use App\Http\Controllers\Admin\Contract\ContractTermController;
 use App\Http\Controllers\Admin\Contract\ContractTypeController;
@@ -45,11 +47,16 @@ use App\Models\RFPFile;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
+use App\Http\Controllers\Admin\Contract\ContractPhaseController;
+use App\Http\Controllers\Admin\Finance\ProgramTransactionController;
+use App\Http\Controllers\Admin\Finance\FinancialYearController;
+use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
+use App\Http\Controllers\Admin\Finance\ProgramAccountController;
 use App\Http\Controllers\Admin\Project\GanttChartController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
-use App\Http\Controllers\Admin\Project\ProjectPhaseController;
+use App\Http\Controllers\Admin\Project\ProjectMilestoneController;
 use App\Http\Controllers\Admin\Project\ProjectTaskController;
 use App\Http\Controllers\Admin\Project\ProjectTemplateController;
 use App\Http\Controllers\Admin\Project\TaskBoardController;
@@ -138,14 +145,18 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::get('projects/gantt-chart', [GanttChartController::class, 'index'])->name('projects.gantt-chart.index');
     Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
-    Route::put('projects/{project}/contracts/{contract}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.contracts.sort-phases');
+    Route::put('projects/{project}/contracts/{contract}/sort-milestones', [ProjectMilestoneController::class, 'sortMilestones'])->name('projects.contracts.sort-milestones');
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
 
-    Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
+    Route::get('contracts/{contract}/phases/{phase}/milestones', [ProjectMilestoneController::class, 'contractMilestones'])->name('contracts.phases.milestones.index');
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
+    Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
     Route::resource('contracts', ContractController::class);
     Route::resource('contracts.terms', ContractTermController::class)->only(['edit', 'update']); // reschedule and value update
+    Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
+    Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
+    Route::post('contracts/{contract}/change-requests/{change_request}/reject', [ChangeRequestController::class, 'reject'])->name('contracts.change-requests.reject');
     Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
     Route::resource('contracts.notifiable-users', NotifiableUserController::class)->only(['create', 'store', 'destroy']);
     Route::resource('contracts.events', EventController::class)->only(['index']);
@@ -156,9 +167,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
     // Route::resource('contracts.phases', ContractPhaseController::class);
     Route::resource('contract-types', ContractTypeController::class);
+    Route::resource('contract-categories', ContractCategoryController::class);
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
-    Route::resource('projects.contracts.phases', ProjectPhaseController::class);
+    Route::resource('contracts.phases', ContractPhaseController::class);
+    Route::resource('projects.contracts.phases.milestones', ProjectMilestoneController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');
     Route::get('projects/{project}/gantt-chart', [ProjectController::class, 'ganttChart'])->name('projects.gantt-chart');
     Route::resource('projects', ProjectController::class);
@@ -249,6 +262,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
     Route::get('email-templates/{id}/{lang?}', [EmailTemplateController::class, 'manageEmailLang'])->name('manage.email.language');
     Route::resource('email_template', EmailTemplateController::class)->only(['update']);
+
+    Route::prefix('finances')->name('finances.')->group(function(){
+      Route::resource('financial-years', FinancialYearController::class);
+      Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store', 'show']);
+      Route::resource('program-accounts', ProgramAccountController::class)->only(['index', 'create', 'store']);
+      Route::resource('program-accounts.transactions', ProgramTransactionController::class)->only(['index', 'create', 'store']);
+    });
   });
 });
 Route::middleware('auth:admin')->group(function(){

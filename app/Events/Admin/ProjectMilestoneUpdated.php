@@ -8,7 +8,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ProjectPhaseUpdated implements ShouldBroadcast
+class ProjectMilestoneUpdated implements ShouldBroadcast
 {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -47,6 +47,6 @@ class ProjectPhaseUpdated implements ShouldBroadcast
 
     public function broadcastAs(): string
     {
-        return 'project-phase-updated';
+        return 'project-milestone-updated';
     }
 }

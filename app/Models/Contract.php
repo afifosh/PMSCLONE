@@ -14,17 +14,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Akaunting\Money\Money;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Contract extends Model
 {
   use HasFactory, SoftDeletes, HasEnum;
 
   protected $fillable = [
+    'category_id',
     'type_id',
     'project_id',
     'assignable_type',
     'assignable_id',
     'program_id',
+    'signature_date',
+    'account_balance_id',
+    'remaining_amount',
+    'invoice_method',
     'refrence_id',
     'subject',
     'currency',
@@ -48,6 +54,7 @@ class Contract extends Model
   ];
 
   protected $casts = [
+    'signature_date' => 'datetime:d M, Y',
     'start_date' => 'datetime:d M, Y',
     'end_date' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
@@ -61,7 +68,17 @@ class Contract extends Model
 
   public function setValueAttribute($value)
   {
-    return $this->attributes['value'] = Money::{$this->currency ?? 'USD'}($value)->getAmount() * 100;
+    return $this->attributes['value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
+  }
+
+  public function getRemainingAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setRemainingAmountAttribute($value)
+  {
+    return $this->attributes['remaining_amount'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
   }
 
   public function getStatusAttribute()
@@ -137,7 +154,7 @@ class Contract extends Model
       ->when(request()->search_q, function ($q) {
         $q->where(function ($q) {
           $q->where('subject', 'like', '%' . request()->search_q . '%')
-            ->orWhereHas('phases', function ($q) {
+            ->orWhereHas('milestones', function ($q) {
               $q->where('name', 'like', '%' . request()->search_q . '%');
             });
         });
@@ -156,6 +173,11 @@ class Contract extends Model
       });
   }
 
+  public function category(): BelongsTo
+  {
+    return $this->belongsTo(ContractCategory::class);
+  }
+
   public function type(): BelongsTo
   {
     return $this->belongsTo(ContractType::class);
@@ -171,9 +193,24 @@ class Contract extends Model
     return $this->belongsTo(Project::class);
   }
 
+  public function milestones(): HasManyThrough
+  {
+    return $this->hasManyThrough(ContractMilestone::class, ContractPhase::class, 'contract_id', 'phase_id');
+  }
+
+  public function initialPhase(): HasOne
+  {
+    return $this->hasOne(ContractPhase::class)->where('phase_type', 'Initial Phase');
+  }
+
+  public function initialPhaseMilstones(): HasManyThrough
+  {
+    return $this->hasManyThrough(ContractMilestone::class, ContractPhase::class, 'contract_id', 'phase_id')->where('phase_type', 'Initial Phase');
+  }
+
   public function phases(): HasMany
   {
-    return $this->hasMany(ContractPhase::class)->orderBy('order');
+    return $this->hasMany(ContractPhase::class);
   }
 
   public function events(): HasMany
@@ -212,12 +249,12 @@ class Contract extends Model
     elseif ($status == 'Paused') return 'warning';
   }
 
-  public function remaining_cost($phase_to_ignore_id = null)
+  public function remaining_cost($milestone_to_ignore_id = null)
   {
-    if ($phase_to_ignore_id) {
-      return $this->value - $this->phases->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
+    if ($milestone_to_ignore_id) {
+      return $this->value - $this->milestones->where('id', '!=', $milestone_to_ignore_id)->sum('estimated_cost');
     }
-    return $this->value - $this->phases->sum('estimated_cost');
+    return $this->value - $this->milestones->sum('estimated_cost');
   }
 
   public function saveEventLog(ContractUpdateRequest|Request $request, Contract $contract): void
@@ -382,14 +419,14 @@ class Contract extends Model
     }
   }
 
-  public function formatPhaseValue($value)
+  public function formatMilestoneValue($value)
   {
-    return Money::{$this->currency ?? 'USD'}($value)->getAmount();
+    return Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount();
   }
 
   public function getPrintableValueAttribute()
   {
-    return Money::{$this->currency ?? 'USD'}($this->value, true)->format();
+    return Money::{$this->currency ?? config('money.defaults.currency')}($this->value, true)->format();
   }
 
   public function program(): BelongsTo
@@ -420,5 +457,10 @@ class Contract extends Model
 
     // mark the pause event as applied
     $contract->events()->where('event_type', 'Paused')->whereNull('applied_at')->update(['applied_at' => now()]);
+  }
+
+  public function changeRequests(): HasMany
+  {
+    return $this->hasMany(ContractChangeRequest::class);
   }
 }

@@ -4,7 +4,9 @@ return [
 
     'defaults' => [
 
-        'currency'  => env('MONEY_DEFAULTS_CURRENCY', 'USD'),
+        'currency'  => env('MONEY_DEFAULTS_CURRENCY', 'SAR'),
+
+        'currencyText' => env('MONEY_DEFAULTS_CURRENCY_TEXT', '(SAR) - Saudi Riyal'),
 
         'convert'   => env('MONEY_DEFAULTS_CONVERT', false),
 

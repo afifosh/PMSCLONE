@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminRolesPermissionsSeeder::class);
         $this->call(UserRolesPermissionsSeeder::class);
         $this->call(AdminSeeder::class);
+        $this->call(DefaultSettingsSeeder::class);
         $this->call(HRSeeder::class);
         $this->call(CompanySeeder::class);
         $this->call(ProgramSeeder::class);
@@ -33,6 +34,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(KycDocumentSeeder::class);
         $this->call(EmailPermissionsSeeder::class);
         $this->call(NoteTagSeeder::class);
+        $this->call(ContractCategorySeeder::class);
         $this->call(ContractTypeSeeder::class);
         $this->call(ClientSeeder::class);
         $this->call(ContractSeeder::class);

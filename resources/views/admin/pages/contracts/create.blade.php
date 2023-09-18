@@ -38,8 +38,19 @@
     <div class="form-group col-6">
       {{ Form::label('program_id', __('Program'), ['class' => 'col-form-label']) }}
       {!! Form::select('program_id', $programs ?? [], $contract->program_id, [
+      'class' => 'form-select globalOfSelect2Remote dependent-select',
+      'data-url' => route('resource-select', ['Program']),
+      'id' => 'contract-program-selected-id'
+      ]) !!}
+    </div>
+    {{-- Account --}}
+    <div class="form-group col-6">
+      {{ Form::label('account_balance_id', __('Account'), ['class' => 'col-form-label']) }}
+      {!! Form::select('account_balance_id', $account_balanaces ?? [], $contract->account_balance_id, [
       'class' => 'form-select globalOfSelect2Remote',
-      'data-url' => route('resource-select', ['Program'])
+      'data-url' => route('resource-select', ['AccountBalance', 'dependent' => 'programId']),
+      'data-dependent_id' => 'contract-program-selected-id',
+      'data-placeholder' => __('Select Account'),
       ]) !!}
     </div>
     {{-- customer --}}
@@ -55,9 +66,23 @@
       {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
       {!! Form::select('type_id', $types, $contract->type_id, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
+    {{-- categories --}}
+    <div class="form-group col-6">
+      {{ Form::label('category_id', __('Contract Category'), ['class' => 'col-form-label']) }}
+      {!! Form::select('category_id', $categories, $contract->category_id, ['class' => 'form-select globalOfSelect2']) !!}
+    </div>
     <div class="form-group col-6">
       {{ Form::label('refrence_id', __('Refrence Id'), ['class' => 'col-form-label']) }}
       {!! Form::text('refrence_id', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Refrence Id')]) !!}
+    </div>
+    <div class="form-group col-6">
+      {{ Form::label('signature_date', __('Signature Date'), ['class' => 'col-form-label']) }}
+      {!! Form::date('signature_date', $contract->signature_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Signature Date')]) !!}
+    </div>
+    {{-- invoicing method --}}
+    <div class="form-group col-6">
+      {{ Form::label('invoicing_method', __('Invoicing Method'), ['class' => 'col-form-label']) }}
+      {!! Form::select('invoicing_method', ['Recuring' => 'Recuring', 'Milestone Based' => 'Milestone Based'], $contract->invoicing_method, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
     {{-- start date --}}
     <div class="form-group col-6">

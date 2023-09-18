@@ -23,8 +23,8 @@ class ContractsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('subject', function ($contract) {
-        return view('admin.pages.contracts.name', compact('contract'));
+      ->editColumn('id', function ($contract) {
+        return view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
       })
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
@@ -64,7 +64,7 @@ class ContractsDataTable extends DataTable
           });
         });
       })
-      ->rawColumns(['subject']);
+      ->rawColumns(['id']);
   }
 
   /**
@@ -72,7 +72,7 @@ class ContractsDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    $q = $model->with(['type', 'assignable'])->withCount('phases')->newQuery();
+    $q = $model->with(['type', 'assignable'])->newQuery();
 
     if ($this->projectId) {
       $q->where('project_id', $this->projectId);
@@ -110,7 +110,7 @@ class ContractsDataTable extends DataTable
         >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->addAction(['width' => '80px'])
-      ->orderBy(0, 'DESC')
+      ->orderBy([0, 'desc'])
       ->responsive(true)
       ->parameters([
         'buttons' => $buttons,
@@ -124,13 +124,13 @@ class ContractsDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      Column::make('subject'),
+      Column::make('id')->title('Contract'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
       Column::make('value')->title('Value'),
       Column::make('start_date'),
       Column::make('end_date'),
-      Column::make('phases_count')->title('Phases')->searchable(false),
+      // Column::make('milestones_count')->title('Milestones')->searchable(false),
       Column::make('status'),
     ];
   }

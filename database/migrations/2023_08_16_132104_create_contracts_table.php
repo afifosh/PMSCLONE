@@ -13,17 +13,23 @@ return new class extends Migration
   {
     Schema::create('contracts', function (Blueprint $table) {
       $table->id();
+      $table->foreignId('category_id')->nullable()->constrained('contract_categories')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('type_id')->nullable()->constrained('contract_types')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('program_id')->nullable()->constrained('programs')->onDelete('cascade')->cascadeOnUpdate();
+      $table->foreignId('account_balance_id')->nullable()->constrained('account_balances')->onDelete('cascade')->cascadeOnUpdate();
       $table->string('assignable_type')->nullable();
       $table->unsignedBigInteger('assignable_id')->nullable();
+      $table->boolean('visible_to_client')->default(false);
       $table->string('refrence_id', 100)->unique()->nullable();
       $table->string('subject');
-      $table->bigInteger('value')->default(0);
       $table->string('currency', 5)->default('SAR');
+      $table->bigInteger('value')->default(0);
+      $table->bigInteger('remaining_amount')->default(0);
+      $table->enum('invoicing_method', ['Recuring', 'Milestone Based'])->default('Milestone Based');
       $table->dateTime('start_date')->nullable();
       $table->dateTime('end_date')->nullable();
+      $table->dateTime('signature_date')->nullable();
       $table->text('description')->nullable();
       $table->enum('status', ['Active', 'Paused', 'Terminated', 'Draft'])->default('Active'); // active status will be used for further calculations(upcoming, expired, about to expire)
       $table->softDeletes();

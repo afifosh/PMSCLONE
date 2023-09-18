@@ -43,6 +43,27 @@ class ContractTermController extends Controller
 
     $contract->saveEventLog($request, $contract);
 
+    $last_phase = $contract->phases()->where('status', 'Active')->with('milestones')->latest()->first();
+    $last_phase->forceFill(['status' => 'Cancelled']);
+    $last_phase->save();
+
+    $phaseNew = $contract->phases()->create([
+      'name' => 'Phase '. ($contract->phases()->count() + 1),
+    ]);
+
+    // clone milestones from last phase
+    if($last_phase){
+      foreach($last_phase->milestones as $milestone){
+        $phaseNew->milestones()->create([
+          'name' => $milestone->name,
+          'estimated_cost' => $milestone->estimated_cost,
+          'description' => $milestone->description,
+          'start_date' => $milestone->start_date,
+          'due_date' => $milestone->due_date,
+        ]);
+      }
+    }
+
     $contract->update($att);
 
     return $this->sendRes(__('Contract updated successfully'), ['event' => 'table_reload', 'table_id' => 'events-table', 'close' => 'globalModal']);

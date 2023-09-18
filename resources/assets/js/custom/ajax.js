@@ -496,6 +496,82 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
     }
   });
 });
+$(document).on('click', '[data-toggle="confirm-action"]', function () {
+  dtrModal = $('.dtr-bs-modal.show');
+  var url = $(this).data('href');
+  var confirmation = $(this).data('confirmation') ? $(this).data('confirmation') : 'Are you sure?';
+  var confirmationDesc = $(this).data('confirmation-desc') ? $(this).data('confirmation-desc') : "You won't be able to revert this!";
+  var cBtn = $(this).data('confirm-btn') ? $(this).data('confirm-btn') : 'Yes';
+  var method = $(this).data('method') ? $(this).data('method') : 'POST';
+
+  // hide responsive modal in small screen
+  if (dtrModal.length) {
+    dtrModal.modal('hide');
+  }
+
+  // sweetalert for confirmation of delete
+  Swal.fire({
+    title: confirmation,
+    text: confirmationDesc,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: cBtn,
+    customClass: {
+      confirmButton: 'btn btn-primary me-3',
+      cancelButton: 'btn btn-label-secondary'
+    },
+    buttonsStyling: false
+  }).then(function (result) {
+    if (result.value) {
+      // delete the data
+      $.ajax({
+        type: method,
+        url: url,
+        success: function (response) {
+          if (response.success) {
+            if(!response.data.disable_alert)
+              toast_success(response.message)
+            if (response.data.event == 'table_reload') {
+              if (response.data.table_id != undefined && response.data.table_id != null && response.data.table_id != '') {
+                $('#' + response.data.table_id).DataTable().ajax.reload();
+              } else {
+                $('#dataTableBuilder').DataTable().ajax.reload();
+              }
+            }
+            if(response.data.event == 'page_reload'){
+              setTimeout(function() { // wait for 1 second
+                location.reload(); // then reload the page
+              }, 1000);
+            }
+            if(response.data.event == 'redirect'){
+              setTimeout(function() { // wait for 1 second
+                window.location.href = response.data.url;
+              }, 1000);
+            }
+            if(response.data.event == 'functionCall'){
+              // call the function whose name is in the response.data.function
+              if(typeof response.data.function_params != "undefined" && response.data.function_params != null && response.data.function_params != '')
+              typeof window[response.data.function] == "function" ? window[response.data.function](response.data.function_params) : null;
+              else
+              typeof window[response.data.function] == "function" ? window[response.data.function]() : null;
+            }
+          } else {
+            toast_danger(response.message)
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        }
+      });
+    }
+  });
+});
+
+// reset dependent select2 on change of parent select2
+$(document).on('change', '.dependent-select', function(){
+  $('[data-dependent_id="'+$(this).attr('id')+'"]').val('').trigger('change');
+})
+
 window.initModalSelect2 = function(){
   if(typeof select2 == 'undefined')
   {
@@ -529,7 +605,7 @@ window.initModalSelect2 = function(){
       },
       placeholder: $(this).data('placeholder'),
       minimumInputLength: 0,
-      dropdownParent: $(this).parent()
+      dropdownParent: $('#globalModal')
     });
   })
   // END select2 with remote data for global modal
@@ -632,6 +708,7 @@ $(document).on('click', '[data-toggle="ajax-modal"]', function () {
           eval(response.data.JsMethods[i]+'()');
         }
       }
+      $('[data-bs-toggle="tooltip"]').tooltip();
       $('#globalModal').modal('show');
     },
   });

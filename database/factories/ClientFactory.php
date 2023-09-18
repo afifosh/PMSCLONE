@@ -27,7 +27,7 @@ class ClientFactory extends Factory
       'zip_code' => $this->faker->postcode,
       'language' => 'en',
       'timezone' => 'Africa/Accra',
-      'currency' => 'USD',
+      'currency' => 'SAR',
       'status' => 'Active'
     ];
   }

@@ -342,10 +342,19 @@ function runtimeBillTaxTypeURL($bill = '') {
  */
 function runtimeInvoiceIdFormat($bill_invoiceid = '') {
   //add the zero's
-  $prefix = config('system.settings_invoices_prefix');
+  $prefix = 'INV-'; //config('system.settings_invoices_prefix');
   //return
   if (is_numeric($bill_invoiceid)) {
       return $prefix . str_pad($bill_invoiceid, 6, '0', STR_PAD_LEFT);
+
+  } else {
+      return '---';
+  }
+}
+
+function runtimeContractIdFormat($contract_id = '') {
+  if (is_numeric($contract_id)) {
+      return 'CNT-' . str_pad($contract_id, 8, '0', STR_PAD_LEFT);
   } else {
       return '---';
   }
@@ -732,4 +741,19 @@ function runtimeLineItemTaxStatus($value = '') {
 
 function clean($string){
 return $string;
+}
+function runtimeChangeReqIdFormat($change_req_id = '') {
+  if (is_numeric($change_req_id)) {
+      return 'CHRQ-' . str_pad($change_req_id, 4, '0', STR_PAD_LEFT);
+  } else {
+      return '---';
+  }
+}
+
+function runtimeTransIdFormat($transaction_id = '') {
+  if (is_numeric($transaction_id)) {
+      return 'TRX-' . str_pad($transaction_id, 4, '0', STR_PAD_LEFT);
+  } else {
+      return '---';
+  }
 }
