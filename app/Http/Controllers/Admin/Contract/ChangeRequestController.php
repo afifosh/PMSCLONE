@@ -7,9 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contract\ChangeRequestStoreRequest;
 use App\Models\Contract;
 use App\Models\ContractChangeRequest;
+use App\Support\LaravelBalance\Dto\TransactionDto;
+use App\Support\LaravelBalance\Models\AccountBalance;
+use App\Traits\FinanceTrait;
 
 class ChangeRequestController extends Controller
 {
+  use FinanceTrait;
+
   public function index(Contract $contract, ChangeRequestsDataTable $dataTable)
   {
     $data['contract'] = $contract;
@@ -63,6 +68,13 @@ class ChangeRequestController extends Controller
   {
     abort_if($changeRequest->status != 'Pending', 403, 'You can not reject this change request');
 
+    /*
+    * update the account balance of the contract and remaining amount
+    */
+    if($contract->value != $changeRequest->new_value){
+      $this->updateAccountBalance($contract, $changeRequest);
+    }
+
     $contract->update([
       'value' => $changeRequest->new_value,
       'currency' => $changeRequest->new_currency,
@@ -82,6 +94,26 @@ class ChangeRequestController extends Controller
     ]);
 
     return $this->sendRes('Change Request Approved Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table']);
+  }
+
+  protected function updateAccountBalance(Contract $contract, $changeRequest)
+  {
+    if($contract->value != $changeRequest->new_value){
+      $this->transactionProcessor->create(
+        AccountBalance::find($contract->account_balance_id),
+        new TransactionDto(
+          -($changeRequest->new_value - $contract->value) * 100,
+          $changeRequest->new_value > $contract->value ? 'Debit' : 'Credit',
+          'Contract Commitment - Updated',
+          '',
+          [],
+          ['type' => Contract::class, 'id' => $contract->id]
+        )
+      );
+
+      $contract->update(['remaining_amount' => $contract->remaining_amount + ($changeRequest->new_value - $contract->value)]);
+    }
+
   }
 
   public function reject(Contract $contract, ContractChangeRequest $changeRequest)
