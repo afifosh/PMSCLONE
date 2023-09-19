@@ -90,7 +90,7 @@ class UpdateResponse implements Responsable {
                 $jsondata['dom_attributes'][] = [
                     'selector' => '#InvoiceTitleAttached',
                     'attr' => 'href',
-                    'value' =>  url('invoices/'.$invoice->bill_projectid),
+                    'value' =>  url('admin/invoices/'.$invoice->bill_projectid),
                 ];
                 $jsondata['dom_visibility'][] = [
                     'selector' => '#InvoiceTitleAttached',

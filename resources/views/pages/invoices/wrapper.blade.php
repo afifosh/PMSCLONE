@@ -2,6 +2,8 @@
 @section('page-style')
 <link href="{{asset('assets/css/invoices/bootstrap.min.css')}}" rel="stylesheet">
 <link rel="stylesheet" href="{{asset('assets/css/invoices/vendor.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 
 
 <!--ICONS-->
@@ -19,8 +21,17 @@
 
 @endsection
 @section('page-script')
-
+<script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
+<script src={{asset('assets/js/custom/select2.js')}}></script>
+<script src={{asset('assets/js/custom/flatpickr.js')}}></script>
 <script type="text/javascript">
+$.ajaxSetup({
+  headers: {
+    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  },
+  async: true
+});
   //name space & settings
   NX = (typeof NX == 'undefined') ? {} : NX;
   NXJS = (typeof NXJS == 'undefined') ? {} : NXJS;

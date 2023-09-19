@@ -68,7 +68,7 @@ class InvoiceStoreUpdate extends FormRequest {
                 ],
                 'bill_projectid' => [
                     'nullable',
-                    Rule::exists('projects', 'id'),
+                    Rule::exists('contracts', 'id'),
                 ],
             ];
         }

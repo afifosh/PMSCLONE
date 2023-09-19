@@ -31,9 +31,9 @@ class StoreCloneResponse implements Responsable {
             $$key = $value;
         }
 
-        
+
         //redirect to invoice page
-        $jsondata['redirect_url'] = url("/invoices/$id");
+        $jsondata['redirect_url'] = url("admin/invoices/$id");
 
         //response
         return response()->json($jsondata);

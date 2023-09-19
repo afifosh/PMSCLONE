@@ -33,7 +33,7 @@ function NXbootstrap($self, action) {
     NX.varInitialProjectProgress = 0;
 
     //because we have added tinymce in common vendor.js - we must sent paths for it to use
-    tinyMCE.baseURL = NX.site_url + "/public/vendor/js/tinymce";
+    tinyMCE.baseURL = NX.site_url + "/vendor/tinymce";
     tinyMCE.suffix = '.min';
 
 
@@ -505,7 +505,8 @@ $(document).ready(function () {
  * @param numeric tinyMCESelector optional element selector
  * ---------------------------------------------------------*/
 function nxTinyMCEBasic(tinyMCEHeight = 400, tinyMCESelector = '.tinymce-textarea') {
-
+console.log('test');
+return true;
     //file upload url
     if (typeof NX.system_type != 'undefined' && NX.system_type == "landlord") {
         var fileupload_url = NX.site_url + '/app-admin/upload-tinymce-image';
@@ -519,9 +520,9 @@ function nxTinyMCEBasic(tinyMCEHeight = 400, tinyMCESelector = '.tinymce-textare
     tinymce.init({
         selector: tinyMCESelector,
         language: NX.system_language,
-        mode: 'exact',
-        theme: "modern",
-        skin: 'light',
+        // mode: 'exact',
+        // theme: "modern",
+        // skin: 'light',
         branding: false,
         resize: true,
         menubar: false,

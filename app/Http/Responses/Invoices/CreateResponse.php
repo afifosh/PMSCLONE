@@ -45,6 +45,12 @@ class CreateResponse implements Responsable {
         $jsondata['postrun_functions'][] = [
             'value' => 'NXInvoiceCreate',
         ];
+        $jsondata['postrun_functions'][] = [
+          'value' => 'initModalSelect2',
+        ];
+        $jsondata['postrun_functions'][] = [
+          'value' => 'initFlatPickr',
+        ];
 
         //ajax response
         return response()->json($jsondata);

@@ -33,7 +33,7 @@ class UpdateTaxtypeResponse implements Responsable {
 
         request()->session()->flash('success-notification-long', __('lang.request_has_been_completed'));
 
-        $jsondata['redirect_url'] = url("/invoices/$bill_id/edit-invoice");
+        $jsondata['redirect_url'] = url("admin/invoices/$bill_id/edit-invoice");
 
         //response
         return response()->json($jsondata);

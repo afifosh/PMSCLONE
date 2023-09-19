@@ -325,12 +325,12 @@ function runtimeBillTaxTypeURL($bill = '') {
 
   //estimate
   if ($bill->bill_type == 'estimate') {
-      return url('/estimates/' . $bill->bill_estimateid . '/change-tax-type');
+      return url('/admin/estimates/' . $bill->bill_estimateid . '/change-tax-type');
   }
 
   //invoice
   if ($bill->bill_type == 'invoice') {
-      return url('/invoices/' . $bill->bill_invoiceid . '/change-tax-type');
+      return url('/admin/invoices/' . $bill->bill_invoiceid . '/change-tax-type');
   }
 }
 
@@ -695,12 +695,12 @@ function runtimeURLBillAttachFiles($bill = '') {
 
   //estimate
   if ($bill->bill_type == 'estimate') {
-      return url('/estimates/' . $bill->bill_estimateid . '/attach-files');
+      return url('/admin/estimates/' . $bill->bill_estimateid . '/attach-files');
   }
 
   //invoice
   if ($bill->bill_type == 'invoice') {
-      return url('/invoices/' . $bill->bill_invoiceid . '/attach-files');
+      return url('/admin/invoices/' . $bill->bill_invoiceid . '/attach-files');
   }
 }
 

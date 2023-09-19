@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\Contract;
 use App\Models\User;
 use App\Support\LaravelBalance\Models\AccountBalance;
 use Illuminate\Http\Request;
@@ -33,6 +35,13 @@ class ResourceSearchController extends Controller
         'search' => 'name',
         'select' => ['name as text', 'id']
       ],
+      'Contract' => [
+        'search' => 'subject',
+        'select' => ['subject as text', 'id'],
+        'dependent_column' => [
+          'company_id'
+        ],
+      ],
       'Country' => [
         'search' => 'name',
         'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id']
@@ -62,13 +71,13 @@ class ResourceSearchController extends Controller
 
     if ($resource == 'Currency') {
       return $this->getCurrenciesList();
+    } elseif ($resource == 'AccountBalance') {
+      return $this->accountBalanceSelect($allowedResources);
+    } elseif ($resource == 'Contract') {
+      return $this->contractSelect($allowedResources);
     }
 
     $model = 'App\Models\\' . $resource;
-
-    if ($resource == 'AccountBalance') {
-      return $this->accountBalanceSelect($allowedResources);
-    }
 
     $query = $model::query();
 
@@ -77,6 +86,21 @@ class ResourceSearchController extends Controller
     })->when(request()->dependent_id, function ($q) use ($allowedResources, $resource) {
       $q->where($allowedResources[$resource]['dependent_column'], request()->dependent_id);
     })
+      ->when(request()->except, function ($q) use ($allowedResources, $resource) {
+        $q->where('id', '!=', request()->except);
+      })
+      ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
+  }
+
+  protected function contractSelect($allowedResources)
+  {
+    $resource = 'Contract';
+    return Contract::when(request()->dependent == 'company_id', function ($q) {
+      $q->where('assignable_type', Company::class)->where('assignable_id', request()->dependent_id);
+    })
+      ->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
+        $q->where($allowedResources[$resource]['search'], 'like', '%' . request()->get('q') . '%');
+      })
       ->when(request()->except, function ($q) use ($allowedResources, $resource) {
         $q->where('id', '!=', request()->except);
       })

@@ -32,7 +32,7 @@ class SaveResponse implements Responsable {
         }
 
         //rediect to invoice
-        $jsondata['redirect_url'] = url('invoices/' . $invoice->bill_invoiceid);
+        $jsondata['redirect_url'] = url('admin/invoices/' . $invoice->bill_invoiceid);
 
         //flash notice
         request()->session()->flash('success-notification', __('lang.request_has_been_completed'));

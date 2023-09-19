@@ -143,12 +143,12 @@
                         <!--[invoice] download pdf-->
                         @if($bill->bill_type == 'invoice')
                         <a class="btn btn-secondary btn-outline"
-                            href="{{ url('/invoices/'.$bill->bill_invoiceid.'/pdf') }}" download>
+                            href="{{ url('admin/invoices/'.$bill->bill_invoiceid.'/pdf') }}" download>
                             <span><i class="mdi mdi-download"></i> {{ cleanLang(__('lang.download')) }}</span> </a>
                         @else
                         <!--[estimate] download pdf-->
                         <a class="btn btn-secondary btn-outline"
-                            href="{{ url('/estimates/'.$bill->bill_estimateid.'/pdf') }}" download>
+                            href="{{ url('admin/estimates/'.$bill->bill_estimateid.'/pdf') }}" download>
                             <span><i class="mdi mdi-download"></i> {{ cleanLang(__('lang.download')) }}</span> </a>
                         @endif
                         <!--[invoice] - make payment-->
@@ -202,19 +202,19 @@
                         @if($bill->bill_type == 'invoice')
                         <!--cancel-->
                         <a class="btn btn-secondary btn-sm"
-                            href="{{ url('/invoices/'.$bill->bill_invoiceid) }}">@lang('lang.exit_editing_mode')</a>
+                            href="{{ url('admin/invoices/'.$bill->bill_invoiceid) }}">@lang('lang.exit_editing_mode')</a>
                         <!--save changes-->
                         <button class="btn btn-danger btn-sm"
-                            data-url="{{ url('/invoices/'.$bill->bill_invoiceid.'/edit-invoice') }}" data-type="form"
+                            data-url="{{ url('admin/invoices/'.$bill->bill_invoiceid.'/edit-invoice') }}" data-type="form"
                             data-form-id="bill-form-container" data-ajax-type="post" id="billing-save-button">
                             @lang('lang.save_changes')
                         </button>
                         @else
                         <a class="btn btn-secondary btn-sm billing-mode-only-item"
-                            href="{{ url('/estimates/'.$bill->bill_estimateid) }}">@lang('lang.exit_editing_mode')</a>
+                            href="{{ url('admin/estimates/'.$bill->bill_estimateid) }}">@lang('lang.exit_editing_mode')</a>
                         <!--save changes-->
                         <a class="btn btn-danger btn-sm" href="javascript:void(0);"
-                            data-url="{{ url('/estimates/'.$bill->bill_estimateid.'/edit-estimate?estimate_mode='.request('estimate_mode')) }}"
+                            data-url="{{ url('admin/estimates/'.$bill->bill_estimateid.'/edit-estimate?estimate_mode='.request('estimate_mode')) }}"
                             data-type="form" data-form-id="bill-form-container" data-ajax-type="post"
                             data-loading-target="documents-side-panel-billing-content"
                             data-loading-class="loading"

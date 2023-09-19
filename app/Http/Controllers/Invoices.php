@@ -213,7 +213,7 @@ class Invoices extends Controller {
     public function redirectURL($id) {
 
         //final destination
-        $end_point_url = url("/invoices/$id");
+        $end_point_url = url("/admin/invoices/$id");
 
         //if user is logged in, redirect to the endpoing
         if (auth()->check()) {
@@ -1080,7 +1080,7 @@ class Invoices extends Controller {
             'amount' => $invoice->invoice_balance,
             'currency' => config('system.settings_stripe_currency'),
             'invoice_id' => $invoice->bill_invoiceid,
-            'cancel_url' => url('invoices/' . $invoice->bill_invoiceid), //in future, this can be bulk payments page
+            'cancel_url' => url('admin/invoices/' . $invoice->bill_invoiceid), //in future, this can be bulk payments page
         ];
 
         //create a new stripe session
@@ -1114,7 +1114,7 @@ class Invoices extends Controller {
             'item_name' => __('lang.invoice_payment'),
             'invoice_id' => $invoice->bill_invoiceid,
             'ipn_url' => url('/api/paypal/ipn'),
-            'cancel_url' => url('invoices/' . $invoice->bill_invoiceid), //in future, this can be bulk payments page
+            'cancel_url' => url('admin/invoices/' . $invoice->bill_invoiceid), //in future, this can be bulk payments page
         ];
 
         //create a new paypal session
@@ -1233,7 +1233,7 @@ class Invoices extends Controller {
             'invoice_id' => $invoice->bill_invoiceid,
             'webhooks_url' => url('/api/mollie/webhooks'),
             'thank_you_url' => url('payments/thankyou/tap'),
-            'cancel_url' => url('invoices/' . $invoice->bill_invoiceid), //in future, this can be bulk payments page
+            'cancel_url' => url('admin/invoices/' . $invoice->bill_invoiceid), //in future, this can be bulk payments page
         ];
 
         //create a new tap session
@@ -1442,7 +1442,7 @@ class Invoices extends Controller {
             'mainmenu_client_billing' => 'active',
             'submenu_invoices' => 'active',
             'sidepanel_id' => 'sidepanel-filter-invoices',
-            'dynamic_search_url' => url('invoices/search?action=search&invoiceresource_id=' . request('invoiceresource_id') . '&invoiceresource_type=' . request('invoiceresource_type')),
+            'dynamic_search_url' => url('admin/invoices/search?action=search&invoiceresource_id=' . request('invoiceresource_id') . '&invoiceresource_type=' . request('invoiceresource_type')),
             'add_button_classes' => 'add-edit-invoice-button',
             'load_more_button_route' => 'invoices',
             'source' => 'list',
@@ -1450,8 +1450,8 @@ class Invoices extends Controller {
         //default modal settings (modify for sepecif sections)
         $page += [
             'add_modal_title' => __('lang.add_invoice'),
-            'add_modal_create_url' => url('invoices/create?invoiceresource_id=' . request('invoiceresource_id') . '&invoiceresource_type=' . request('invoiceresource_type')),
-            'add_modal_action_url' => url('invoices?invoiceresource_id=' . request('invoiceresource_id') . '&invoiceresource_type=' . request('invoiceresource_type')),
+            'add_modal_create_url' => url('admin/invoices/create?invoiceresource_id=' . request('invoiceresource_id') . '&invoiceresource_type=' . request('invoiceresource_type')),
+            'add_modal_action_url' => url('admin/invoices?invoiceresource_id=' . request('invoiceresource_id') . '&invoiceresource_type=' . request('invoiceresource_type')),
             'add_modal_action_ajax_class' => '',
             'add_modal_action_ajax_loading_target' => 'commonModalBody',
             'add_modal_action_method' => 'POST',

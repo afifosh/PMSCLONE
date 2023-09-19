@@ -17,7 +17,7 @@
 @endif
 <!--child invoice-->
 @if($bill->bill_recurring_child == 'yes')
-<a href="{{ url('invoices/'.$bill->bill_recurring_parent_id) }}">
+<a href="{{ url('admin/invoices/'.$bill->bill_recurring_parent_id) }}">
     <i class="ti-back-right text-success" data-toggle="tooltip" data-html="true"
         title="{{ cleanLang(__('lang.invoice_automatically_created_from_recurring')) }} <br>(#{{ runtimeInvoiceIdFormat($bill->bill_recurring_parent_id) }})"></i>
 </a>

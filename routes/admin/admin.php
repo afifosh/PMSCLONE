@@ -271,7 +271,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     });
   });
 });
-Route::middleware('auth:admin')->group(function(){
+Route::middleware('auth:admin')->prefix('admin/')->group(function(){
     Route::group(['prefix' => 'invoices'], function () {
       Route::any("/search", [Invoices::class, "index"]);
       Route::post("/delete", [Invoices::class, "destroy"]);//->middleware(['demoModeCheck']);

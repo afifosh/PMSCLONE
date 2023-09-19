@@ -30,9 +30,9 @@ class StoreResponse implements Responsable {
         foreach ($this->payload as $key => $value) {
             $$key = $value;
         }
-        
+
         //redirect to invoice page
-        $jsondata['redirect_url'] = url("/invoices/$id/edit-invoice");
+        $jsondata['redirect_url'] = url("admin/invoices/$id/edit-invoice");
 
         //response
         return response()->json($jsondata);

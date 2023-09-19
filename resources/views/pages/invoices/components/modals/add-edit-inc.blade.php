@@ -23,81 +23,23 @@
                     <label
                         class="col-sm-12 col-lg-3 text-left control-label col-form-label  required">{{ cleanLang(__('lang.client')) }}*</label>
                     <div class="col-sm-12 col-lg-9">
-                        <!--select2 basic search-->
-                        <select name="bill_clientid" id="bill_clientid"
-                            class="clients_and_projects_toggle form-control form-control-sm js-select2-basic-search-modal select2-hidden-accessible"
-                            data-projects-dropdown="bill_projectid" data-feed-request-type="clients_projects"
-                            data-ajax--url="{{ url('/') }}/feed/company_names">
-                            <option value="1">1</option>
-                            <!--regular invoices-->
-                            @if(isset($invoice->bill_clientid) && $invoice->bill_clientid != '')
-                            <option value="{{ $invoice->bill_clientid ?? '' }}">{{ $invoice->client_company_name }}
-                            </option>
-                            @endif
-                            <!--creating invoice from an expense-->
-                            @if(config('visibility.invoice_from_expense_client_name'))
-                            <option value="{{ $expense->expense_clientid ?? '' }}">{{ $expense->client_company_name }}
-                            </option>
-                            @endif
-                        </select>
+                          {!! Form::select('bill_clientid', $clients ?? [], @$invoice->bill_clientid, ['id' => 'client_id-select',
+                          'class' => 'form-select globalOfSelect2UserRemote dependent-select required',
+                          'data-url' => route('resource-select-user', ['Company'])
+                          ]) !!}
                     </div>
                 </div>
-                <!--projects-->
                 <div class="form-group row">
-                    <label
-                        class="col-sm-12 col-lg-3 text-left control-label col-form-label">{{ cleanLang(__('lang.project')) }}</label>
-                    <div class="col-sm-12 col-lg-9">
-                        <select class="select2-basic form-control form-control-sm dynamic_bill_projectid" data-allow-clear="true"
-                            id="bill_projectid" name="bill_projectid" disabled>
-                        </select>
-                    </div>
-                </div>
+                  <label class="col-sm-12 col-lg-3 text-left control-label col-form-label">{{ __('Contract') }}</label>
+                  <div class="col-sm-12 col-lg-9">
+                    {!! Form::select('contract_id', $companies ?? [], @$invoice->contract_id, [
+                      'class' => 'form-select globalOfSelect2Remote required',
+                      'data-url' => route('resource-select', ['Contract', 'dependent' => 'company_id']),
+                      'data-dependent_id' => 'client_id-select',
+                      ]) !!}
+                  </div>
+              </div>
             </div>
-
-            <!--new client-->
-            <div class="client-selector-container hidden" id="client-new-container">
-                <div class="form-group row">
-                    <label
-                        class="col-sm-12 col-lg-4 text-left control-label col-form-label required">{{ cleanLang(__('lang.company_name')) }}*</label>
-                    <div class="col-sm-12 col-lg-8">
-                        <input type="text" class="form-control form-control-sm" id="client_company_name"
-                            name="client_company_name">
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label
-                        class="col-sm-12 col-lg-4 text-left control-label col-form-label required">{{ cleanLang(__('lang.first_name')) }}*</label>
-                    <div class="col-sm-12 col-lg-8">
-                        <input type="text" class="form-control form-control-sm" id="first_name" name="first_name"
-                            placeholder="">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label
-                        class="col-sm-12 col-lg-4 text-left control-label col-form-label required">{{ cleanLang(__('lang.last_name')) }}*</label>
-                    <div class="col-sm-12 col-lg-8">
-                        <input type="text" class="form-control form-control-sm" id="last_name" name="last_name"
-                            placeholder="">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label
-                        class="col-sm-12 col-lg-4 text-left control-label col-form-label required">{{ cleanLang(__('lang.email_address')) }}*</label>
-                    <div class="col-sm-12 col-lg-8">
-                        <input type="text" class="form-control form-control-sm" id="email" name="email" placeholder="">
-                    </div>
-                </div>
-            </div>
-
-            <!--option buttons-->
-            <div class="client-selector-links">
-                <a href="javascript:void(0)" class="client-type-selector" data-type="new"
-                    data-target-container="client-new-container">@lang('lang.new_client')</a> |
-                <a href="javascript:void(0)" class="client-type-selector active" data-type="existing"
-                    data-target-container="client-existing-container">@lang('lang.existing_client')</a>
-            </div>
-
             <!--client type indicator-->
             <input type="hidden" name="client-selection-type" id="client-selection-type" value="existing">
         </div>
@@ -111,8 +53,8 @@
             <label
                 class="col-sm-12 col-lg-3 text-left control-label col-form-label required">{{ cleanLang(__('lang.invoice_date')) }}*</label>
             <div class="col-sm-12 col-lg-9">
-                <input type="text" class="form-control  form-control-sm pickadate" name="bill_date_add_edit"
-                    autocomplete="off" value="{{ runtimeDatepickerDate($invoice->bill_date ?? '') }}">
+                <input type="date" class="form-control  form-control-sm flatpickr" name="bill_date"
+                    value="{{ runtimeDatepickerDate($invoice->bill_date ?? '') }}">
                 <input class="mysql-date" type="hidden" name="bill_date" id="bill_date_add_edit"
                     value="{{ $invoice->bill_date ?? '' }}">
             </div>
@@ -123,8 +65,8 @@
             <label
                 class="col-sm-12 col-lg-3 text-left control-label col-form-label required">{{ cleanLang(__('lang.due_date')) }}*</label>
             <div class="col-sm-12 col-lg-9">
-                <input type="text" class="form-control form-control-sm pickadate" name="bill_due_date_add_edit"
-                    autocomplete="off" value="{{ runtimeDatepickerDate($invoice->bill_due_date ?? '') }}">
+                <input type="date" class="form-control form-control-sm flatpickr" name="bill_due_date"
+                    value="{{ runtimeDatepickerDate($invoice->bill_due_date ?? '') }}">
                 <input class="mysql-date" type="hidden" name="bill_due_date" id="bill_due_date_add_edit"
                     value="{{ $invoice->bill_due_date ?? '' }}">
             </div>
@@ -134,7 +76,7 @@
 
         <!--clients projects-->
         {{-- @if(config('visibility.invoice_modal_clients_projects')) --}}
-        <div class="form-group row">
+        {{-- <div class="form-group row">
             <label
                 class="col-sm-12 col-lg-3 text-left control-label col-form-label  required">{{ cleanLang(__('lang.project')) }}*</label>
             <div class="col-sm-12 col-lg-9">
@@ -144,11 +86,11 @@
                     @endforeach
                 </select>
             </div>
-        </div>
+        </div> --}}
         {{-- @endif --}}
 
         <!--invoice category-->
-        <div class="form-group row">
+        {{-- <div class="form-group row">
             <label
                 class="col-sm-12 col-lg-3 text-left control-label col-form-label  required">{{ cleanLang(__('lang.category')) }}*</label>
             <div class="col-sm-12 col-lg-9">
@@ -160,7 +102,7 @@
                     @endforeach
                 </select>
             </div>
-        </div>
+        </div> --}}
 
         <div class="line"></div>
 
