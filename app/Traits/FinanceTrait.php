@@ -5,7 +5,7 @@ namespace App\Traits;
 use App\Support\LaravelBalance\Services\Accountant;
 use App\Support\LaravelBalance\Services\TransactionProcessor;
 
-trait FiananceTrait
+trait FinanceTrait
 {
 
   /**

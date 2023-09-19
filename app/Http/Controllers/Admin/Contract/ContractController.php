@@ -16,12 +16,12 @@ use App\Models\Program;
 use App\Models\Project;
 use App\Support\LaravelBalance\Dto\TransactionDto;
 use App\Support\LaravelBalance\Models\AccountBalance;
-use App\Traits\FiananceTrait;
+use App\Traits\FinanceTrait;
 use Illuminate\Support\Facades\DB;
 
 class ContractController extends Controller
 {
-  use FiananceTrait;
+  use FinanceTrait;
   /**
    * Display a listing of the resource.
    */
@@ -286,19 +286,19 @@ class ContractController extends Controller
 
     $contract = Contract::create($data + ['remaining_amount' => $request->value] + $request->validated());
 
-    $this->transactionProcessor->create(
-      AccountBalance::find($request->account_balance_id),
-      new TransactionDto(
-        -$request->value * 100,
-        'Debit',
-        'Contract Commitment',
-        '',
-        [],
-        ['type' => Contract::class, 'id' => $contract->id]
-      )
-    );
+    if (!$request->isSavingDraft) {
+      $this->transactionProcessor->create(
+        AccountBalance::find($request->account_balance_id),
+        new TransactionDto(
+          -$request->value * 100,
+          'Debit',
+          'Contract Commitment',
+          '',
+          [],
+          ['type' => Contract::class, 'id' => $contract->id]
+        )
+      );
 
-    if (!$request->isSavingDraft){
       $contract->events()->create([
         'event_type' => 'Created',
         'modifications' => $request->validated(),
@@ -337,8 +337,9 @@ class ContractController extends Controller
     $data['programs'] = $contract->program_id ? Program::where('id', $contract->program_id)->pluck('name', 'id') : ['' => __('Select program')];
     $data['companies'] = Company::where('id', $contract->assignable_id)->pluck('name', 'id')->prepend('Select Client', '');
     $data['contract'] = $contract;
-    $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency. '.name')];
+    $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
     $data['statuses'] = $contract->getPossibleStatuses();
+    $data['account_balanaces'] = $contract->account_balance_id ? AccountBalance::where('id', $contract->account_balance_id)->pluck('name', 'id') : [];
     if ($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
 
@@ -350,19 +351,31 @@ class ContractController extends Controller
    */
   public function update(ContractUpdateRequest $request, Contract $contract)
   {
-    if ($contract->status == 'Draft' && !$request->isSavingDraft)
+    abort_if($contract->status != 'Draft' && $request->isSavingDraft, 400, 'You can not save draft for this contract');
+
+    /*
+    * if the contract is draft and now it is not draft then create transaction and event
+    */
+    if ($contract->status == 'Draft' && !$request->isSavingDraft) {
+      $this->transactionProcessor->create(
+        AccountBalance::find($request->account_balance_id),
+        new TransactionDto(
+          -$request->value * 100,
+          'Debit',
+          'Contract Commitment',
+          '',
+          [],
+          ['type' => Contract::class, 'id' => $contract->id]
+        )
+      );
+
       $contract->events()->create([
         'event_type' => 'Created',
         'modifications' => $request->validated(),
         'description' => 'Contract Created',
         'admin_id' => auth()->id(),
       ]);
-    // else {
-    //   if (!$request->isSavingDraft)
-    //     if ($request->start_date != $contract->start_date || $request->end_date != $contract->end_date || $request->value != $contract->value) {
-    //       $contract->saveEventLog($request, $contract);
-    //     }
-    // }
+    }
 
     $data['assignable_id'] = $request->company_id;
     $data['assignable_type'] = Company::class;
@@ -372,11 +385,61 @@ class ContractController extends Controller
     else {
       if ($contract->status == 'Draft')
         $data['status'] = 'Active';
+      else {
+        // contract is not draft so gonna update the account and value of contract if it is changed
+        $this->updateValueAndAccount($contract, $request);
+      }
     }
 
     $contract->update($data + $request->validated());
 
     return $this->sendRes(__('Contract updated successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
+  }
+
+  protected function updateValueAndAccount(Contract $contract, $request): void
+  {
+    // if only contract amount is changed then update the account transaction
+    if ($contract->account_balance_id == $request->account_balance_id && $contract->value != $request->value) {
+      $this->transactionProcessor->create(
+        AccountBalance::find($request->account_balance_id),
+        new TransactionDto(
+          -($request->value - $contract->value) * 100,
+          $request->value > $contract->value ? 'Debit' : 'Credit',
+          'Contract Commitment - Updated',
+          '',
+          [],
+          ['type' => Contract::class, 'id' => $contract->id]
+        )
+      );
+    }else if($contract->account_balance_id != $request->account_balance_id){
+      // if account is changed then do opposite transaction from old account and create new transaction in new account
+      $this->transactionProcessor->create(
+        AccountBalance::find($contract->account_balance_id),
+        new TransactionDto(
+          $contract->value * 100,
+          'Credit',
+          'Contract Account Changed',
+          'Contract Billing Account Changed so amount is credited back to old account',
+          [],
+          ['type' => Contract::class, 'id' => $contract->id]
+        )
+      );
+
+      $this->transactionProcessor->create(
+        AccountBalance::find($request->account_balance_id),
+        new TransactionDto(
+          -$request->value * 100,
+          'Debit',
+          'Contract Commitment',
+          'Contract Billing Account Changed so amount is debited from new account',
+          [],
+          ['type' => Contract::class, 'id' => $contract->id]
+        )
+      );
+    }
+
+    // update contract remaining amount
+    $contract->update(['remaining_amount' => $contract->remaining_amount + ($request->value - $contract->value)]);
   }
 
   /**
