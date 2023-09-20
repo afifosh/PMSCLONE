@@ -120,7 +120,7 @@
     },
     {
       "name": "Finances",
-      "slug": ["admin.finances."],
+      "slug": ["admin.finances.", "admin.invoices."],
       "icon": "menu-icon tf-icons ti ti-settings",
       "submenu": [
         {
@@ -132,6 +132,16 @@
           "url": "/admin/finances/program-accounts",
           "name": "Program Accounts",
           "slug": "admin.finances.program-accounts.index"
+        },
+        {
+          "url": "/admin/finances/taxes",
+          "name": "Taxes",
+          "slug": "admin.finances.taxes.index"
+        },
+        {
+          "url": "/admin/invoices",
+          "name": "Invoices",
+          "slug": "admin.invoices.index"
         }
       ]
     },

@@ -72,7 +72,7 @@ class AccountBalance extends Model
       return $this->hasMany(AccountBalanceHolder::class);
     }
 
-    public function programs(): MorphToMany
+    public function programs()
     {
       return $this->morphedByMany(Program::class, 'holder', 'account_balance_holders', 'account_balance_id', 'holder_id');
     }

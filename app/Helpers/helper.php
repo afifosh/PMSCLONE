@@ -192,3 +192,11 @@ function runtimeTransIdFormat($transaction_id = '') {
       return '---';
   }
 }
+
+function runtimeInvIdFormat($invoice_id = '') {
+  if (is_numeric($invoice_id)) {
+      return 'INV-' . str_pad($invoice_id, 6, '0', STR_PAD_LEFT);
+  } else {
+      return '---';
+  }
+}
