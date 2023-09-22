@@ -47,8 +47,8 @@ class Accountant
       'currency' => $data['currency'] ?? config('money.defaults.currency'),
       'account_number' => $data['account_number'] ?? null,
       'name' => $data['name'] ?? null,
-      'creator_id' => auth()->id(),
-      'creator_type' => get_class(auth()->user()),
+      'creator_id' => auth()->id() ?? null,
+      'creator_type' => auth()->check() ? get_class(auth()->user()) : null,
     ]);
 
     if ($accountBalanceHolder instanceof Collection) {

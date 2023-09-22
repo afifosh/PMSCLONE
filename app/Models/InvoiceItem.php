@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class InvoiceItem extends Model
 {
@@ -14,6 +15,7 @@ class InvoiceItem extends Model
     'invoiceable_type',
     'invoiceable_id',
     'amount',
+    'total_tax_amount',
     'description',
   ];
 
@@ -31,5 +33,17 @@ class InvoiceItem extends Model
   public function invoiceable()
   {
     return $this->morphTo();
+  }
+
+  public function taxes(): BelongsToMany
+  {
+    return $this->belongsToMany(Tax::class, 'invoice_taxes')->withPivot('amount', 'type');
+  }
+
+  public function updateTaxAmount(): void
+  {
+    $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount');
+    $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount');
+    $this->update(['total_tax_amount' => $fixed_tax + ($this->invoiceable->estimated_cost * $percent_tax / 100)]);
   }
 }

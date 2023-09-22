@@ -142,6 +142,11 @@
           "url": "/admin/invoices",
           "name": "Invoices",
           "slug": "admin.invoices.index"
+        },
+        {
+          "url": "/admin/finances/payments",
+          "name": "Payments",
+          "slug": "admin.finances.payments.index"
         }
       ]
     },

@@ -4,6 +4,7 @@
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 @endsection
 
 @section('page-style')
@@ -12,6 +13,7 @@
 
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -19,6 +21,7 @@
 <script src="{{asset('assets/js/offcanvas-send-invoice.js')}}"></script>
 <script src="{{asset('assets/js/app-invoice-edit.js')}}"></script>
 <script src="{{asset('assets/js/custom/flatpickr.js')}}"></script>
+<script src="{{asset('assets/js/custom/select2.js')}}"></script>
 <script>
   function reloadMilestonesList(){
     $.ajax({
@@ -26,13 +29,68 @@
       type: "GET",
       success: function(data) {
         $('#billing-items-container').html(data.data.view_data);
+        $('.invoice-calculations').html(data.data.summary);
+        initSelect2()
       }
     });
   }
+
+  function update_tax_type(){
+    const val = $('[name="is_summary_tax_mock"]').val();
+    $('input[name="is_summary_tax"]').val(val);
+    $('#summary_update_from').submit();
+  }
+
+  $(document).on('change', '.invoice_taxes', function(){
+    var item_id = $(this).data('item-id');
+    var taxes = $(this).val();
+    $.ajax({
+      url: route('admin.invoices.tax-rates.store', { invoice: {{$invoice->id}}}),
+      type: "POST",
+      data: {
+        item_id: item_id,
+        taxes: taxes
+      },
+      success: function(data) {
+        reloadMilestonesList();
+      }
+    });
+  })
+
+  function updateSummaryTax(){
+    var taxes = [];
+    $('[name="invoice_taxes[]"]:checked').each(function(){
+      taxes.push($(this).val());
+    })
+    $.ajax({
+      url: route('admin.invoices.tax-rates.store', { invoice: {{$invoice->id}}}),
+      type: "POST",
+      data: {
+        taxes: taxes
+      },
+      success: function(data) {
+        reloadMilestonesList();
+        $('#tax-rates').popover('hide');
+      }
+    });
+  }
+
+  $(document).ready(function() {
+      var options = {
+          html: true,
+          content: $('[data-name="popover-tax-rates"]'),
+          placement: 'top'
+      }
+      var exampleEl = document.getElementById('tax-rates')
+      var popover = new bootstrap.Popover(exampleEl, options)
+  })
 </script>
 @endsection
 
 @section('content')
+<form action="{{route('admin.invoices.update', [$invoice])}}" method="POST">
+  @method('PUT')
+  @csrf
 <div class="row invoice-edit">
   <!-- Invoice Edit-->
   <div class="col-lg-9 col-12 mb-lg-0 mb-4">
@@ -99,7 +157,7 @@
 
         <hr class="my-3 mx-n4" />
 
-        <form class="source-item pt-4 px-0 px-sm-4">
+        <div class="source-item pt-4 px-0 px-sm-4">
           <div class="col-12">
             <div class="table-responsive m-t-40 invoice-table-wrapper editing clear-both">
                 <table class="table table-hover invoice-table editing">
@@ -112,8 +170,9 @@
                             </th>
                             <th class="text-left x-rate bill_col_rate">Amount</th>
                             <!--tax-->
-                            <th class="text-left x-tax bill_col_tax ">
-                                Tax</th>
+                            @if (!$invoice->is_summary_tax)
+                              <th class="text-left x-tax bill_col_tax ">Tax</th>
+                            @endif
                             <!--total-->
                             <th class="text-right x-total bill_col_total" id="bill_col_total">Total
                             </th>
@@ -130,7 +189,7 @@
               <button type="button" class="btn btn-primary" data-title="{{__('Add Milestones')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Milestones</button>
             </div>
           </div>
-        </form>
+        </div>
 
         <hr class="my-3 mx-n4" />
 
@@ -139,22 +198,61 @@
           </div>
           <div class="col-md-6 d-flex justify-content-end">
             <div class="invoice-calculations">
-              <div class="d-flex justify-content-between mb-2">
-                <span class="w-px-100">Subtotal:</span>
-                <span class="fw-semibold">$5000.25</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="w-px-100">Discount:</span>
-                <span class="fw-semibold">$00.00</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="w-px-100">Tax:</span>
-                <span class="fw-semibold">$100.00</span>
-              </div>
-              <hr />
-              <div class="d-flex justify-content-between">
-                <span class="w-px-100">Total:</span>
-                <span class="fw-semibold">$5100.25</span>
+              @include('admin.pages.invoices.items.summary')
+            </div>
+          </div>
+        </div>
+
+        <div class="row p-sm-2 pe-4">
+          <div class="col-12 d-flex justify-content-end">
+            @if ($invoice->is_summary_tax)
+              <section class="center">
+                <div hidden>
+                    <div data-name="popover-tax-rates">
+                      <div class="d-flex justify-content-between">
+                        <b>Tax Rates</b>
+                        <button type="button" class="btn-close" onclick="$('#tax-rates').popover('hide');" aria-label="Close"></button>
+                      </div>
+                      <hr class="m-0">
+                      <div class="mt-2">
+                        @forelse ($tax_rates as $tax)
+                        <div class="form-check">
+                          <input class="form-check-input" name="invoice_taxes[]" type="checkbox" value="{{$tax->id}}" id="tax-{{$tax->id}}">
+                          <label class="form-check-label" for="tax-{{$tax->id}}">
+                            {{$tax->name}} ({{$tax->amount}}{{$tax->type == 'Percent' ? '%' : ''}})
+                          </label>
+                        </div>
+                        @empty
+                        @endforelse
+                      </div>
+                      <div class="d-flex justify-content-end mt-2">
+                        <button class="btn btn-primary btn-sm" onclick="updateSummaryTax()">Update</button>
+                      </div>
+                    </div>
+                </div>
+                <button id="tax-rates" type="button" tabindex="0" class="btn btn-sm btn-outline-primary rounded-pill" data-bs-toggle="popover">Tax Rates</button>
+              </section>
+            @endif
+            <div class="dropdown dropup">
+              <button class="btn btn-outline-primary dropdown-toggle rounded-pill btn-sm" type="button" id="tax-type" data-bs-toggle="dropdown" aria-expanded="false">
+                Tax Type
+              </button>
+              <div>
+                <div class="dropdown-menu p-2" aria-labelledby="tax-type">
+                  <div class="d-flex justify-content-between">
+                    <b>Tax Type</b>
+                  </div>
+                  <hr class="m-0">
+                  <div class="my-3 m-2">
+                    <select class="form-select form-select-sm" name="is_summary_tax_mock">
+                      <option @selected($invoice->is_summary_tax) value="1">Summary</option>
+                      <option @selected(!$invoice->is_summary_tax) value="0">Inline</option>
+                    </select>
+                  </div>
+                  <div class="d-flex justify-content-end mt-2">
+                    <button class="btn btn-primary btn-sm" type="button" onclick="update_tax_type()">Update</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -179,19 +277,21 @@
   <div class="col-lg-3 col-12 invoice-actions">
     <div class="card mb-4">
       <div class="card-body">
-        <button class="btn btn-primary d-grid w-100" data-bs-toggle="offcanvas" data-bs-target="#sendInvoiceOffcanvas">
-          <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Send Invoice</span>
+        <button class="btn btn-primary d-grid w-100" type="button" data-form="ajax-form">
+          <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Save Invoice</span>
         </button>
-        <div class="d-flex my-2">
-          <a href="{{url('app/invoice/preview')}}" class="btn btn-label-secondary w-100 me-2">Preview</a>
-          <button type="button" class="btn btn-label-secondary w-100">Save</button>
-        </div>
-        <button class="btn btn-primary d-grid w-100" data-bs-toggle="offcanvas" data-bs-target="#addPaymentOffcanvas">
+        <button class="btn btn-primary d-grid mt-2 w-100" data-bs-toggle="offcanvas" type="button" data-bs-target="#addPaymentOffcanvas">
           <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
         </button>
       </div>
     </div>
   </div>
+</form>
+  <form id="summary_update_from" action="{{route('admin.invoices.update', [$invoice, 'update_tax_type' => 1])}}" method="POST">
+    @method('PUT')
+    @csrf
+    {!! Form::hidden('is_summary_tax', 1,) !!}
+  </form>
   <!-- /Invoice Actions -->
 </div>
 

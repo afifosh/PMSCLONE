@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Invoice;
 use App\Http\Controllers\Controller;
 use App\Models\ContractMilestone;
 use App\Models\Invoice;
+use App\Models\Tax;
 use Illuminate\Http\Request;
 
 class InvoiceItemController extends Controller
@@ -12,11 +13,14 @@ class InvoiceItemController extends Controller
   public function index(Invoice $invoice)
   {
     $data['invoice'] = $invoice;
-
+    $data['tax_rates'] = Tax::get();
     if(request()->mode == 'edit'){
       $data['invoice']->load('items.invoiceable');
 
-      return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit-list', $data)->render()]);
+      return $this->sendRes('success', [
+        'view_data' => view('admin.pages.invoices.items.edit-list', $data)->render(),
+        'summary' => view('admin.pages.invoices.items.summary', $data)->render()
+      ]);
     }
 
     return view('admin.pages.invoices.items.index', $data);
@@ -49,6 +53,7 @@ class InvoiceItemController extends Controller
     }
 
     $invoice->milestones()->syncWithoutDetaching($data);
+    $invoice->updateSubtotal();
 
     return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'reloadMilestonesList', 'close' => 'globalModal']);
   }
@@ -56,6 +61,7 @@ class InvoiceItemController extends Controller
   public function destroy(Invoice $invoice, $invoiceItem)
   {
     $invoice->items()->where('id', $invoiceItem)->delete();
+    $invoice->updateSubtotal();
 
     return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'reloadMilestonesList']);
   }

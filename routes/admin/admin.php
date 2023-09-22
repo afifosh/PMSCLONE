@@ -51,10 +51,12 @@ use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Finance\ProgramTransactionController;
 use App\Http\Controllers\Admin\Finance\FinancialYearController;
 use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
+use App\Http\Controllers\Admin\Finance\PaymentController;
 use App\Http\Controllers\Admin\Finance\ProgramAccountController;
 use App\Http\Controllers\Admin\Finance\TaxController;
 use App\Http\Controllers\Admin\Invoice\InvoiceController;
 use App\Http\Controllers\Admin\Invoice\InvoiceItemController;
+use App\Http\Controllers\Admin\Invoice\InvoiceTaxController;
 use App\Http\Controllers\Admin\Project\GanttChartController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
@@ -272,6 +274,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
       Route::resource('program-accounts', ProgramAccountController::class)->only(['index', 'create', 'store']);
       Route::resource('program-accounts.transactions', ProgramTransactionController::class)->only(['index', 'create', 'store']);
       Route::resource('taxes', TaxController::class);
+      Route::resource('payments', PaymentController::class);
     });
 
     // Invoice Routes
@@ -280,6 +283,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     // });
     Route::resource('invoices', InvoiceController::class);
     Route::resource('invoices.invoice-items', InvoiceItemController::class);
+    Route::resource('invoices.tax-rates', InvoiceTaxController::class);
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

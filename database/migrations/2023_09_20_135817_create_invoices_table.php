@@ -18,8 +18,12 @@ return new class extends Migration
       $table->date('invoice_date');
       $table->date('due_date');
       $table->date('sent_date')->nullable()->comment('Date the invoice was sent to the client');
+      $table->boolean('is_summary_tax')->default(true);
       $table->nullableMorphs('creator');
       $table->bigInteger('subtotal')->default(0);
+      $table->bigInteger('total_tax')->default(0);
+      $table->bigInteger('total')->default(0);
+      $table->bigInteger('paid_amount')->default(0);
       $table->text('note')->nullable();
       $table->text('terms')->nullable();
       $table->enum('status', ['Draft', 'Sent', 'Paid', 'Partial paid','Cancelled'])->default('draft');

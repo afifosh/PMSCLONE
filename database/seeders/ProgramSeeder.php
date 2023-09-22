@@ -5,12 +5,14 @@ namespace Database\Seeders;
 use App\Models\Admin;
 use App\Models\Program;
 use App\Models\RFPDraft;
+use App\Traits\FinanceTrait;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
 class ProgramSeeder extends Seeder
 {
+  use FinanceTrait;
     /**
      * Run the database seeds.
      *
@@ -54,97 +56,97 @@ class ProgramSeeder extends Seeder
             'parent_id' => null,
             'program_code' => 'UAL',
             'description' => 'Four touring pavilions to encourage dialogue with the community about culture, art.  Each pavilion will include digital art and cultural programming and is a blend of gallery, open-air classroom, workshop, lecture and socializing space that opens up a world of creativity for all. ',
-          ],      
+          ],
           [
             'name' => 'Joyous Gardens',
             'parent_id' => null,
             'program_code' => 'JOY',
             'description' => 'Joyous Gardens provide spaces for creative play as a core part of the healthy and vibrant urban life in Riyadh.  Featuring artistic-designed playgrounds and urban elements located in the parks all over the city, the green areas of the city are transformed into vibrant, inspiring and educational places that spark creativity and adventure and encourage exploration of the natural world. ',
-          ],   
+          ],
           [
             'name' => 'Jewels in Riyadh',
             'parent_id' => null,
             'program_code' => 'JEW',
             'description' => 'Jewels in Riyadh transforms the city into an open-air gallery for Contemporary Public Art, offering twenty-four permanent artworks by great art masters to prove contemporary sculpture’s ability in transforming urban spaces and the city.  The choice to place these monumental artworks in civic as well as historical sites generates a natural fusion between the history of Riyadh, its present and its future. ',
-          ],   
+          ],
           [
             'name' => 'Welcoming Gateways',
             'parent_id' => null,
             'program_code' => 'WEL',
             'description' => 'A suite of massive artworks interventions sided along key access routes to the city heralding the entrance to Riyadh as a City of Culture. Riyadh’s Welcoming Gateways set the tone for a city where art, architecture and creativity are essential components of a vibrant and global city.  Welcoming Gateways will develop contemporary gateways to the City of Riyadh, as landmarks for incoming and outgoing travelers and citizens. International Architecture firms and local artists collaboration. ',
-          ],   
+          ],
           [
             'name' => 'Art on the Move',
             'parent_id' => null,
             'program_code' => 'AOM',
             'description' => 'A series of distinctive large-scale and high-impact art interventions designed to support the wayfinding experience of Riyadh.  Artworks will be integrated into the core infrastructure of the city, such as intersections and roundabouts and placed at major roads and rail intersections to provide a truly joyful every day experience.  19 locations, 19 artworks ',
-          ],   
+          ],
           [
             'name' => 'Art in Transit',
             'parent_id' => null,
             'program_code' => 'AIT',
             'description' => 'The Art in Transit program integrates public art into the core fabric of Riyadh’s Metro, BRT and Bus systems with stations, stops, platforms and infrastructure offering opportunities for artistic interventions. The public art will make the public and commuters feel welcome, create highly distinctive locations and ensure that every journey is an experience.',
-          ],   
+          ],
           [
             'name' => 'Urban Flow',
             'parent_id' => null,
             'program_code' => 'UFL',
             'description' => 'Urban Flow integrates public art into the fabric of the citywide network of pedestrian walkways, bridges and footpaths, enticing citizens to experience art and the city on their own terms.',
-          ],   
+          ],
           [
             'name' => 'Hidden River',
             'parent_id' => null,
             'program_code' => 'HDR',
             'description' => '',
-          ],   
+          ],
           [
             'name' => 'Hidden River Art Trail',
             'parent_id' => null,
             'program_code' => 'HAT',
             'description' => 'The Hidden River Art Trail will create a red thread that runs through the Wadis and the City, engaging residents and visitors through the permanent installation of the sculptures conceived by performing artists during Tuwaiq Sculpture, activating synergy between Riyadh Art Programs.',
-          ],    
+          ],
           [
             'name' => 'Hidden River Illuminated Bridges',
             'parent_id' => null,
             'program_code' => 'HIB',
             'description' => 'Light Artists and Designers illuminate key bridges across the city and highlight not only the structural configuration of their creative canvas, but the bridge itself as a physical, social and emotional connector within the landscape. A distinctive and vibrant experience for everybody.',
-          ],   
+          ],
           [
             'name' => 'Garden City',
             'parent_id' => null,
             'program_code' => 'GAR',
             'description' => 'This is a sculpture park for the 21st century, inviting new interpretations of art, technology and environmental engagement for Riyadh’s residents and visitors.',
-          ],   
+          ],
           [
             'name' => 'Riyadh Icon',
             'parent_id' => null,
             'program_code' => 'ICO',
             'description' => 'This ambitious international commission is a visual symbol of the cultural aspirations of Vision 2030 and it heralds a new era of Saudi intention to celebrate a global community that sparks creativity, ignites the art movement, encourages self-expression, and creates an inclusive culture.',
-          ],   
+          ],
           [
             'name' => 'Noor Riyadh',
             'parent_id' => null,
             'program_code' => 'NOO',
             'description' => 'Noor Riyadh is a citywide annual festival of light and art that nurtures creativity, promotes talent and delivers awe-inspiring experiences.',
-          ],   
+          ],
           [
             'name' => 'West Gateway',
             'parent_id' => null,
             'program_code' => 'WST',
             'description' => '',
-          ],  
+          ],
           [
             'name' => 'River of Light',
             'parent_id' => null,
             'program_code' => 'RIV',
             'description' => '',
-          ],   
+          ],
           [
             'name' => 'Tuwaiq Sculpture Symposium',
             'parent_id' => null,
             'program_code' => 'TSS',
             'description' => 'Tuwaiq Sculpture is an annual sculpture symposium that brings local and international artists together to create public artworks in a live setting. Through an interactive program of workshops, school visits, and talks, Tuwaiq Sculpture engages diverse communities and bolsters cultural exchanges. The symposium culminates in an on-site exhibition, with the sculptures enriching the Riyadh Art collection and later becoming a permanent feature of the Saudi capital’s urban fabric.',
-          ],                                                                                     
+          ],
         ],
       ],
       // Add more predefined values as needed
@@ -167,9 +169,14 @@ class ProgramSeeder extends Seeder
 
           $childProgram->users()->attach(Admin::where('id', '!=', 1)->inRandomOrder()->limit(3)->get(), ['added_by' => 1]);
           //$childProgram->users()->attach(Admin::where('id', 1)->get(), ['added_by' => 1]);
-            
+
         }
       }
+
+      $this->accountant->createAccount(
+        $parentProgram,
+        ['currency' => 'SAR', 'name' => $parentProgram->name]
+      );
     }
   }
-}    
+}

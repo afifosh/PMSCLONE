@@ -42,6 +42,11 @@ class ResourceSearchController extends Controller
           'company_id'
         ],
       ],
+      'Invoice' => [
+        'search' => 'id',
+        // concat INV-0000 and total - paid_amount
+        'select' => [DB::raw("CONCAT('INV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/100) as text"), 'id'],
+      ],
       'Country' => [
         'search' => 'name',
         'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id']

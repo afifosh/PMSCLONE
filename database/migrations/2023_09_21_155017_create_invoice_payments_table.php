@@ -11,13 +11,13 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('invoice_items', function (Blueprint $table) {
+    Schema::create('invoice_payments', function (Blueprint $table) {
       $table->id();
       $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
-      $table->nullableMorphs('invoiceable');
-      $table->unsignedBigInteger('amount')->default(0)->comment('Amount without tax');
-      $table->unsignedBigInteger('total_tax_amount')->default(0);
-      $table->string('description')->nullable();
+      $table->string('transaction_id')->nullable();
+      $table->date('payment_date');
+      $table->bigInteger('amount')->default(0);
+      $table->text('note')->nullable();
       $table->timestamps();
     });
   }
@@ -27,6 +27,6 @@ return new class extends Migration
    */
   public function down(): void
   {
-    Schema::dropIfExists('invoice_items');
+    Schema::dropIfExists('invoice_payments');
   }
 };

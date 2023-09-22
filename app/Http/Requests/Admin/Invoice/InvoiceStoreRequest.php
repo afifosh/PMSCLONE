@@ -21,6 +21,19 @@ class InvoiceStoreRequest extends FormRequest
    */
   public function rules(): array
   {
+    if(request()->update_tax_type)
+      return [
+        'is_summary_tax' => 'required|in:0,1',
+      ];
+
+    if(request()->method() == 'PUT')
+      return [
+        'invoice_date' => 'required|date',
+        'due_date' => 'required|date',
+        'note' => 'nullable|string',
+        'terms' => 'nullable|string',
+      ];
+
     return [
       'company_id' => 'required|exists:companies,id',
       'contract_id' => 'required|exists:contracts,id',
