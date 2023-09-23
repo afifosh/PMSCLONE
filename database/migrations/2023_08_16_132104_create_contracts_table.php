@@ -26,7 +26,7 @@ return new class extends Migration
       $table->string('currency', 5)->default('SAR');
       $table->bigInteger('value')->default(0);
       $table->bigInteger('remaining_amount')->default(0);
-      $table->enum('invoicing_method', ['Recuring', 'Milestone Based'])->default('Milestone Based');
+      $table->enum('invoicing_method', ['Recuring', 'Phase Based'])->default('Phase Based');
       $table->dateTime('start_date')->nullable();
       $table->dateTime('end_date')->nullable();
       $table->dateTime('signature_date')->nullable();

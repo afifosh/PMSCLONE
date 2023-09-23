@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin\Finance;
 use App\DataTables\Admin\Finance\PaymentsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Finance\PaymentStoreRequest;
+use App\Models\Company;
+use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use Illuminate\Http\Request;
@@ -12,9 +14,19 @@ use PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Constant\Periodic\Pa
 
 class PaymentController extends Controller
 {
-  public function index(PaymentsDataTable $dataTable)
+  public function index(PaymentsDataTable $dataTable, null|string $model = null)
   {
-    return $dataTable->render('admin.pages.finances.payment.index');
+    $data = [];
+
+    if (request()->route()->getName() == 'admin.companies.payments.index') {
+      $dataTable->filterBy = Company::findOrFail(request()->route('company'));
+      $data['company'] = $dataTable->filterBy;
+    } elseif (request()->route()->getName() == 'admin.contracts.payments.index') {
+      $dataTable->filterBy = Contract::findOrFail(request()->route('contract'));
+      $data['contract'] = $dataTable->filterBy;
+    }
+
+    return $dataTable->render('admin.pages.finances.payment.index', $data);
     // return view('admin.pages.finances.payment.index');
   }
 
@@ -44,7 +56,7 @@ class PaymentController extends Controller
     $data['invoicePayment'] = $payment;
     $data['invoice'] = $payment->invoice;
     $data['invoice'] = [
-      $payment->invoice_id => runtimeInvIdFormat($payment->invoice_id) . ' - Unpaid ' . $data['invoice']->total- $data['invoice']->paid_amount
+      $payment->invoice_id => runtimeInvIdFormat($payment->invoice_id) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount
     ];
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.create', $data)->render()]);

@@ -70,27 +70,27 @@
           end_date: formateDate(contract.end_date),
         };
         data.push(contractData);
-        contract.phases.forEach((phase) => {
+        contract.stages.forEach((stage) => {
           // update min and max dates
-          if(new Date(phase.start_date) < new Date(minDate)){
-            minDate = phase.start_date;
+          if(new Date(stage.start_date) < new Date(minDate)){
+            minDate = stage.start_date;
           }
-          if(new Date(phase.due_date) > new Date(maxDate)){
-            maxDate = phase.due_date;
+          if(new Date(stage.due_date) > new Date(maxDate)){
+            maxDate = stage.due_date;
           }
           // end update min and max dates
           let taskData = {
-            id: 'Phase:' + phase.id,
-            text: phase.name,
+            id: 'Stage:' + stage.id,
+            text: stage.name,
             parent: 'Contract:' + contract.id,
             contractName: contract.subject,
             projectName: project.name,
-            status: phase.status,
+            status: stage.status,
             // calculate from start date and end date and current date
-            progress: calculateProgressPercentage(phase.start_date, phase.due_date),
-            type: "Phase",
-            start_date: formateDate(phase.start_date),
-            end_date: formateDate(phase.due_date),
+            progress: calculateProgressPercentage(stage.start_date, stage.due_date),
+            type: "Stage",
+            start_date: formateDate(stage.start_date),
+            end_date: formateDate(stage.due_date),
           };
           data.push(taskData);
         });
@@ -294,7 +294,7 @@
   ZT_Gantt.templates.tooltip_text = function (start, end, task) {
     return `
         <b>Project:</b>${task.projectName}<br/>
-        ${task.type == 'Phase' ? `<b>Contract:</b>${task.contractName}<br/>` : ''}
+        ${task.type == 'Stage' ? `<b>Contract:</b>${task.contractName}<br/>` : ''}
         <b>${task.type}:</b>${task.text}<br/>
         <b>Start date:</b>
         ${ZT_Gantt.formatDateToString("%d-%m-%y", task.start_date)}<br/>

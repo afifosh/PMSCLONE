@@ -43,26 +43,9 @@ class ContractTermController extends Controller
 
     $contract->saveEventLog($request, $contract);
 
-    $last_phase = $contract->phases()->where('status', 'Active')->with('milestones')->latest()->first();
-    $last_phase->forceFill(['status' => 'Cancelled']);
-    $last_phase->save();
-
-    $phaseNew = $contract->phases()->create([
-      'name' => 'Phase '. ($contract->phases()->count() + 1),
-    ]);
-
-    // clone milestones from last phase
-    if($last_phase){
-      foreach($last_phase->milestones as $milestone){
-        $phaseNew->milestones()->create([
-          'name' => $milestone->name,
-          'estimated_cost' => $milestone->estimated_cost,
-          'description' => $milestone->description,
-          'start_date' => $milestone->start_date,
-          'due_date' => $milestone->due_date,
-        ]);
-      }
-    }
+    $last_stage = $contract->stages()->where('status', 'Active')->with('phases')->latest()->first();
+    $last_stage->forceFill(['status' => 'Cancelled']);
+    $last_stage->save();
 
     $contract->update($att);
 

@@ -5,15 +5,31 @@ namespace App\Http\Controllers\Admin\Invoice;
 use App\DataTables\Admin\Invoice\InvoicesDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\InvoiceStoreRequest;
+use App\Models\Company;
+use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\Tax;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
-  public function index(InvoicesDataTable $dataTable)
+  public function index(InvoicesDataTable $dataTable, null|string $model = null)
   {
-    return $dataTable->render('admin.pages.invoices.index');
+    $data = [];
+
+    if(request()->route()->getName() == 'admin.contracts.invoices.index'){
+      $dataTable->filterBy = Contract::findOrFail(request()->route('contract'));
+      $data['contract'] = $dataTable->filterBy;
+    }
+    elseif(request()->route()->getName() == 'admin.companies.invoices.index'){
+      $dataTable->filterBy = Company::findOrFail(request()->route('company'));
+      $data['company'] = $dataTable->filterBy;
+    }else {
+      $data['summary'] = Invoice::selectRaw('SUM(total) as total, SUM(paid_amount) as paid_amount, SUM(total - paid_amount)/100 as due_amount')->first();
+      $data['overdue'] = Invoice::where('due_date', '<', now())->where('status', '!=', 'Paid')->count();
+    }
+
+    return $dataTable->render('admin.pages.invoices.index', $data);
     // view('admin.pages.invoices.index');
   }
 

@@ -605,7 +605,7 @@ window.initModalSelect2 = function(){
       },
       placeholder: $(this).data('placeholder'),
       minimumInputLength: 0,
-      dropdownParent: $('#globalModal')
+      dropdownParent: $(this).closest('#globalModal').length > 0 ? $('#globalModal') : $(this).parent()
     });
   })
   // END select2 with remote data for global modal
@@ -639,7 +639,7 @@ window.initModalSelect2 = function(){
       },
       placeholder: $(this).data('placeholder'),
       minimumInputLength: 0,
-      dropdownParent: $(this).parent()
+      dropdownParent: $(this).closest('#globalModal').length > 0 ? $('#globalModal') : $(this).parent()
     });
   })
   function renderRemoteUser(option) {

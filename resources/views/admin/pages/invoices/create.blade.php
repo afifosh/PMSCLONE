@@ -34,16 +34,6 @@
         {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
         {!! Form::text('due_date', null, ['class' => 'form-control flatpickr', 'placeholder' => __('Due Date')]) !!}
     </div>
-    {{-- Note --}}
-    <div class="form-group col-12">
-        {{ Form::label('note', __('Note'), ['class' => 'col-form-label']) }}
-        {!! Form::textarea('note', null, ['class' => 'form-control', 'rows' => 3, 'placeholder' => __('Note')]) !!}
-    </div>
-    {{-- Terms --}}
-    <div class="form-group col-12">
-        {{ Form::label('terms', __('Terms'), ['class' => 'col-form-label']) }}
-        {!! Form::textarea('terms', null, ['class' => 'form-control', 'rows' => 3, 'placeholder' => __('Terms')]) !!}
-    </div>
 </div>
 <div class="mt-3">
     <div class="btn-flt float-end">

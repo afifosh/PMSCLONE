@@ -16,7 +16,7 @@ use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\ChangeRequestController;
 use App\Http\Controllers\Admin\Contract\ContractCategoryController;
 use App\Http\Controllers\Admin\Contract\ContractController;
-use App\Http\Controllers\Admin\Contract\ContractMilestoneController;
+use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
 use App\Http\Controllers\Admin\Contract\ContractTermController;
 use App\Http\Controllers\Admin\Contract\ContractTypeController;
@@ -47,7 +47,7 @@ use App\Models\RFPFile;
 use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
-use App\Http\Controllers\Admin\Contract\ContractPhaseController;
+use App\Http\Controllers\Admin\Contract\ContractStageController;
 use App\Http\Controllers\Admin\Finance\ProgramTransactionController;
 use App\Http\Controllers\Admin\Finance\FinancialYearController;
 use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
@@ -61,7 +61,7 @@ use App\Http\Controllers\Admin\Project\GanttChartController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
 use App\Http\Controllers\Admin\Project\ProjectController;
-use App\Http\Controllers\Admin\Project\ProjectMilestoneController;
+use App\Http\Controllers\Admin\Project\ProjectPhaseController;
 use App\Http\Controllers\Admin\Project\ProjectTaskController;
 use App\Http\Controllers\Admin\Project\ProjectTemplateController;
 use App\Http\Controllers\Admin\Project\TaskBoardController;
@@ -130,6 +130,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     // Route::get('companies/{company}/users', [CompanyController::class, 'showUsers'])->name('companies.showUsers');
     Route::get('companies/{company}/invitations', [CompanyController::class, 'showInvitations'])->name('companies.showInvitations');
+    Route::get('companies/{company}/inovices', [InvoiceController::class, 'index'])->name('companies.invoices.index');
+    Route::get('companies/{company}/payments', [PaymentController::class, 'index'])->name('companies.payments.index');
     Route::resource('companies', CompanyController::class);
     Route::resource('companies.contacts', UserController::class);
     Route::resource('companies.contact-persons', ContactPersonController::class);
@@ -149,13 +151,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::get('projects/gantt-chart', [GanttChartController::class, 'index'])->name('projects.gantt-chart.index');
     Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
-    Route::put('projects/{project}/contracts/{contract}/sort-milestones', [ProjectMilestoneController::class, 'sortMilestones'])->name('projects.contracts.sort-milestones');
+    Route::put('projects/{project}/contracts/{contract}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.contracts.sort-phases');
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
 
-    Route::get('contracts/{contract}/phases/{phase}/milestones', [ProjectMilestoneController::class, 'contractMilestones'])->name('contracts.phases.milestones.index');
+    Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
+    Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');
+    Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');
     Route::resource('contracts', ContractController::class);
     Route::resource('contracts.terms', ContractTermController::class)->only(['edit', 'update']); // reschedule and value update
     Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
@@ -169,13 +173,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');
     Route::put('contracts/{contract}/resume', [ContractSettingController::class, 'resume'])->name('contracts.resume');
     Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
-    // Route::resource('contracts.phases', ContractPhaseController::class);
+    // Route::resource('contracts.stages', ContractStageController::class);
     Route::resource('contract-types', ContractTypeController::class);
     Route::resource('contract-categories', ContractCategoryController::class);
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
-    Route::resource('contracts.phases', ContractPhaseController::class);
-    Route::resource('projects.contracts.phases.milestones', ProjectMilestoneController::class);
+    Route::resource('contracts.stages', ContractStageController::class);
+    Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');
     Route::get('projects/{project}/gantt-chart', [ProjectController::class, 'ganttChart'])->name('projects.gantt-chart');
     Route::resource('projects', ProjectController::class);

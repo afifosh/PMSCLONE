@@ -91,29 +91,28 @@ class Contract extends Model
     // elseif ($this->end_date && now() > $this->end_date->subWeeks(2)) return 'About To Expire';
     // elseif (now() >= $this->start_date) return 'Active';
 
-    if($this->end_date === null && $this->start_date === null)
-    return '';
+    if ($this->end_date === null && $this->start_date === null)
+      return '';
 
     if ($this->end_date == null && $this->start_date) {
-        if ($this->start_date->isSameDay(today())) {
-            return "Active";
-        } elseif ($this->start_date->isFuture()) {
-            return "Not Started";
-        } else {
-            return "Expired";
-        }
+      if ($this->start_date->isSameDay(today())) {
+        return "Active";
+      } elseif ($this->start_date->isFuture()) {
+        return "Not Started";
+      } else {
+        return "Expired";
+      }
     } else {
-        if ($this->end_date->isPast()) {
-            return "Expired";
-        } elseif ($this->start_date->isFuture()) {
-            return "Not Started";
-        } elseif (now()->diffInDays($this->end_date) <= 14) {
-            return "About To Expire";
-        } else {
-            return "Active";
-        }
+      if ($this->end_date->isPast()) {
+        return "Expired";
+      } elseif ($this->start_date->isFuture()) {
+        return "Not Started";
+      } elseif (now()->diffInDays($this->end_date) <= 14) {
+        return "About To Expire";
+      } else {
+        return "Active";
+      }
     }
-
   }
 
   public function getPossibleStatuses()
@@ -154,7 +153,7 @@ class Contract extends Model
       ->when(request()->search_q, function ($q) {
         $q->where(function ($q) {
           $q->where('subject', 'like', '%' . request()->search_q . '%')
-            ->orWhereHas('milestones', function ($q) {
+            ->orWhereHas('phases', function ($q) {
               $q->where('name', 'like', '%' . request()->search_q . '%');
             });
         });
@@ -193,24 +192,24 @@ class Contract extends Model
     return $this->belongsTo(Project::class);
   }
 
-  public function milestones(): HasManyThrough
-  {
-    return $this->hasManyThrough(ContractMilestone::class, ContractPhase::class, 'contract_id', 'phase_id');
-  }
-
-  public function initialPhase(): HasOne
-  {
-    return $this->hasOne(ContractPhase::class)->where('phase_type', 'Initial Phase');
-  }
-
-  public function initialPhaseMilstones(): HasManyThrough
-  {
-    return $this->hasManyThrough(ContractMilestone::class, ContractPhase::class, 'contract_id', 'phase_id')->where('phase_type', 'Initial Phase');
-  }
-
   public function phases(): HasMany
   {
     return $this->hasMany(ContractPhase::class);
+  }
+
+  public function initialStage(): HasOne
+  {
+    return $this->hasOne(ContractStage::class)->where('stage_type', 'Initial Stage');
+  }
+
+  public function initialStageMilstones(): HasManyThrough
+  {
+    return $this->hasManyThrough(ContractPhase::class, ContractStage::class, 'contract_id', 'stage_id')->where('stage_type', 'Initial Stage');
+  }
+
+  public function stages(): HasMany
+  {
+    return $this->hasMany(ContractStage::class);
   }
 
   public function events(): HasMany
@@ -249,12 +248,12 @@ class Contract extends Model
     elseif ($status == 'Paused') return 'warning';
   }
 
-  public function remaining_cost($milestone_to_ignore_id = null)
+  public function remaining_cost($phase_to_ignore_id = null)
   {
-    if ($milestone_to_ignore_id) {
-      return $this->value - $this->milestones->where('id', '!=', $milestone_to_ignore_id)->sum('estimated_cost');
+    if ($phase_to_ignore_id) {
+      return $this->value - $this->phases->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
     }
-    return $this->value - $this->milestones->sum('estimated_cost');
+    return $this->value - $this->phases->sum('estimated_cost');
   }
 
   public function saveEventLog(ContractUpdateRequest|Request $request, Contract $contract): void
@@ -264,19 +263,21 @@ class Contract extends Model
     $value_updated = $contract->value != $request->value;
     $c_start_date = $contract->start_date ? $contract->start_date->format('d M, Y') : 'NULL';
     $c_end_date = $contract->end_date ? $contract->end_date->format('d M, Y') : 'NULL';
-    if(($contract->end_date && !$request->end_date)
-    || (!$contract->end_date && $request->end_date)
-    || ($contract->end_date && $request->end_date && !$contract->end_date->isSameDay($request->end_date))){
+    if (($contract->end_date && !$request->end_date)
+      || (!$contract->end_date && $request->end_date)
+      || ($contract->end_date && $request->end_date && !$contract->end_date->isSameDay($request->end_date))
+    ) {
       $end_date_updated = true;
     }
-    if(($contract->start_date && !$request->start_date)
-    || (!$contract->start_date && $request->start_date)
-    || ($contract->start_date && $request->start_date && !$contract->start_date->isSameDay($request->start_date))){
+    if (($contract->start_date && !$request->start_date)
+      || (!$contract->start_date && $request->start_date)
+      || ($contract->start_date && $request->start_date && !$contract->start_date->isSameDay($request->start_date))
+    ) {
       $start_date_updated = true;
     }
 
     //End Date Revised
-    if(!$start_date_updated && $end_date_updated && !$value_updated){
+    if (!$start_date_updated && $end_date_updated && !$value_updated) {
       // dd(Carbon::parse($request->end_date)->format('d M, Y'));
       $contract->events()->create([
         'event_type' => 'End Date Revised',
@@ -289,7 +290,7 @@ class Contract extends Model
       ]);
     }
     // Start Date Revised
-    else if($start_date_updated && !$end_date_updated && !$value_updated){
+    else if ($start_date_updated && !$end_date_updated && !$value_updated) {
       $contract->events()->create([
         'event_type' => 'Start Date Revised',
         'modifications' => [
@@ -302,7 +303,7 @@ class Contract extends Model
     }
 
     // Rescheduled
-    else if($start_date_updated && $end_date_updated && !$value_updated){
+    else if ($start_date_updated && $end_date_updated && !$value_updated) {
       $contract->events()->create([
         'event_type' => 'Rescheduled',
         'modifications' => [
@@ -315,7 +316,7 @@ class Contract extends Model
     }
 
     // Amount Increased
-    else if(!$start_date_updated && !$end_date_updated && $value_updated && $request->value > $contract->value){
+    else if (!$start_date_updated && !$end_date_updated && $value_updated && $request->value > $contract->value) {
       $contract->events()->create([
         'event_type' => 'Amount Increased',
         'modifications' => [
@@ -328,7 +329,7 @@ class Contract extends Model
     }
 
     // Amount Decreased
-    else if(!$start_date_updated && !$end_date_updated && $value_updated && $request->value < $contract->value){
+    else if (!$start_date_updated && !$end_date_updated && $value_updated && $request->value < $contract->value) {
       $contract->events()->create([
         'event_type' => 'Amount Decreased',
         'modifications' => [
@@ -341,7 +342,7 @@ class Contract extends Model
     }
 
     // Rescheduled And Amount Increased
-    else if($start_date_updated && $end_date_updated && $value_updated && $request->value > $contract->value){
+    else if ($start_date_updated && $end_date_updated && $value_updated && $request->value > $contract->value) {
       $contract->events()->create([
         'event_type' => 'Rescheduled And Amount Increased',
         'modifications' => [
@@ -354,7 +355,7 @@ class Contract extends Model
     }
 
     // Rescheduled And Amount Decreased
-    else if($start_date_updated && $end_date_updated && $value_updated && $request->value < $contract->value){
+    else if ($start_date_updated && $end_date_updated && $value_updated && $request->value < $contract->value) {
       $contract->events()->create([
         'event_type' => 'Rescheduled And Amount Decreased',
         'modifications' => [
@@ -367,7 +368,7 @@ class Contract extends Model
     }
 
     // Start Date Revised And Amount Increased
-    else if($start_date_updated && !$end_date_updated && $value_updated && $request->value > $contract->value){
+    else if ($start_date_updated && !$end_date_updated && $value_updated && $request->value > $contract->value) {
       $contract->events()->create([
         'event_type' => 'Start Date Revised And Amount Increased',
         'modifications' => [
@@ -380,7 +381,7 @@ class Contract extends Model
     }
 
     // Start Date Revised And Amount Decreased
-    else if($start_date_updated && !$end_date_updated && $value_updated && $request->value < $contract->value){
+    else if ($start_date_updated && !$end_date_updated && $value_updated && $request->value < $contract->value) {
       $contract->events()->create([
         'event_type' => 'Start Date Revised And Amount Decreased',
         'modifications' => [
@@ -393,7 +394,7 @@ class Contract extends Model
     }
 
     // End Date Revised And Amount Increased
-    else if(!$start_date_updated && $end_date_updated && $value_updated && $request->value > $contract->value){
+    else if (!$start_date_updated && $end_date_updated && $value_updated && $request->value > $contract->value) {
       $contract->events()->create([
         'event_type' => 'End Date Revised And Amount Increased',
         'modifications' => [
@@ -406,7 +407,7 @@ class Contract extends Model
     }
 
     // End Date Revised And Amount Decreased
-    else if(!$start_date_updated && $end_date_updated && $value_updated && $request->value < $contract->value){
+    else if (!$start_date_updated && $end_date_updated && $value_updated && $request->value < $contract->value) {
       $contract->events()->create([
         'event_type' => 'End Date Revised And Amount Decreased',
         'modifications' => [
@@ -419,7 +420,12 @@ class Contract extends Model
     }
   }
 
-  public function formatMilestoneValue($value)
+  public function formatPhaseValue($value)
+  {
+    return Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount();
+  }
+
+  public function formatStageValue($value)
   {
     return Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount();
   }
@@ -444,8 +450,8 @@ class Contract extends Model
 
     $pausedDays = now()->diffInDays($event->modifications['pause_date']);
     // if($pausedDays > 0){
-      $contract->update(['end_date' => $contract->end_date ? $contract->end_date->addDays($pausedDays) : null, 'status' => 'Active']);
-      $discription .=  ' after '.$pausedDays.' days and new end date is '.$contract->end_date->format('d M, Y');
+    $contract->update(['end_date' => $contract->end_date ? $contract->end_date->addDays($pausedDays) : null, 'status' => 'Active']);
+    $discription .=  ' after ' . $pausedDays . ' days and new end date is ' . $contract->end_date->format('d M, Y');
     // }
 
     $contract->events()->create([

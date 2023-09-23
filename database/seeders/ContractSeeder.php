@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Contract;
-use App\Models\ContractMilestone;
+use App\Models\ContractPhase;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -23,7 +23,7 @@ class ContractSeeder extends Seeder
         ]);
       }
 
-      // ContractMilestone::factory()->count(1)->create([
+      // ContractPhase::factory()->count(1)->create([
       //   'contract_id' => $contract->id,
       //   'estimated_cost' => $contract->value - 100,
       //   'start_date' => $contract->start_date ? $contract->start_date : now(),

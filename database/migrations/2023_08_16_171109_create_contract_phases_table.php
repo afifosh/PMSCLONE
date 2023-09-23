@@ -11,15 +11,17 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('contract_milestones', function (Blueprint $table) {
+    Schema::create('contract_phases', function (Blueprint $table) {
       $table->id();
-      $table->foreignId('phase_id')->constrained('contract_phases')->cascadeOnDelete()->cascadeOnUpdate();
+      $table->foreignId('contract_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+      $table->foreignId('stage_id')->nullable()->constrained('contract_stages')->cascadeOnDelete()->cascadeOnUpdate();
       $table->string('name');
       $table->text('description')->nullable();
       $table->bigInteger('estimated_cost')->default(0);
       $table->bigInteger('order')->default(0);
       $table->dateTime('start_date');
       $table->dateTime('due_date');
+      $table->boolean('is_committed')->default(false);
       $table->timestamps();
     });
   }
@@ -29,6 +31,6 @@ return new class extends Migration
    */
   public function down(): void
   {
-    Schema::dropIfExists('contract_milestones');
+    Schema::dropIfExists('contract_phases');
   }
 };

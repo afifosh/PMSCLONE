@@ -3,17 +3,17 @@
 namespace App\DataTables\Admin\Contract;
 
 use App\Models\ContractPhase;
-use App\Models\Phase;
+use App\Models\ContractStage;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
 class PhasesDataTable extends DataTable
 {
-  public $contract;
+  public $stage;
+  public $contract_id;
   /**
    * Build the DataTable class.
    *
@@ -22,13 +22,9 @@ class PhasesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-    ->editColumn('name', function ($phase) {
-      return '<a href="' . route('admin.contracts.phases.milestones.index', [$this->contract, $phase]) . '">' . $phase->name . '</a>';
-    })
-    ->editColumn('change_request_id', function ($phase) {
-      return $phase->change_request_id ? runtimeChangeReqIdFormat($phase->change_request_id) : '-';
-    })
-    ->rawColumns(['name']);
+    ->editColumn('action', function($phase){
+      return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $this->stage, 'contract_id' => $this->contract_id])->render();
+    });
   }
 
   /**
@@ -36,7 +32,10 @@ class PhasesDataTable extends DataTable
    */
   public function query(ContractPhase $model): QueryBuilder
   {
-    return $model->where('contract_id', $this->contract->id)->withCount('milestones')->newQuery();
+    // stage is type of ContractStage
+    return $model->when($this->stage instanceof ContractStage, function($q){
+      $q->where('stage_id', $this->stage->id);
+    })->newQuery();
   }
 
   /**
@@ -44,21 +43,33 @@ class PhasesDataTable extends DataTable
    */
   public function html(): HtmlBuilder
   {
+    $buttons = [];
+    // if ($this->contract->getRawOriginal('status') == 'Active')
+      $buttons[] = [
+        'text' => '<span>Add Phase</span>',
+        'className' =>  'btn btn-primary mx-3',
+        'attr' => [
+          'data-toggle' => "ajax-modal",
+          'data-title' => 'Add Phase',
+          'data-href' => route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $this->contract_id, $this->stage->id ?? 'stage'])
+        ]
+      ];
+
     return $this->builder()
-      ->setTableId('phases-table')
+      ->setTableId('milstones-table')
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
         '
-        <"row mx-2"<"col-md-2"<"me-3"l>>
-        <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
-        >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
+      <"row mx-2"<"col-md-2"<"me-3"l>>
+      <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
+      >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
-      // ->addAction(['width' => '80px'])
+      ->addAction(['width' => '80px'])
       ->orderBy(0, 'DESC')
       ->responsive(true)
       ->parameters([
-        'buttons' => [],
+        'buttons' => $buttons,
         "scrollX" => true
       ]);
   }
@@ -70,9 +81,9 @@ class PhasesDataTable extends DataTable
   {
     return [
       Column::make('name'),
-      Column::make('milestones_count')->title('Milestones'),
-      Column::make('change_request_id')->title('Change Request'),
-      Column::make('type'),
+      Column::make('start_date'),
+      Column::make('due_date')->title('End Date'),
+      Column::make('estimated_cost'),
       Column::make('status'),
       Column::make('created_at'),
       Column::make('updated_at'),

@@ -57,10 +57,10 @@ class Invoice extends Model
     return $this->hasMany(InvoiceItem::class);
   }
 
-  public function milestones()
+  public function phases()
   {
-    return $this->morphedByMany(ContractMilestone::class, 'invoiceable', 'invoice_items', 'invoice_id', 'invoiceable_id')->withPivot('amount', 'description');
-    // return $this->belongsToMany(ContractMilestone::class, 'invoice_items', 'invoice_id', 'invoiceable_id')->where('invoiceable_type', ContractMilestone::class);
+    return $this->morphedByMany(ContractPhase::class, 'invoiceable', 'invoice_items', 'invoice_id', 'invoiceable_id')->withPivot('amount', 'description');
+    // return $this->belongsToMany(ContractPhase::class, 'invoice_items', 'invoice_id', 'invoiceable_id')->where('invoiceable_type', ContractPhase::class);
   }
 
   public function payments()

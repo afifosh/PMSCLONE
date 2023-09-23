@@ -81,12 +81,6 @@ class ChangeRequestController extends Controller
       'end_date' => $changeRequest->new_end_date,
     ]);
 
-    $contract->phases()->create([
-      'name' => 'Phase '. ($contract->phases()->count() + 1),
-      'type' => 'Change Request',
-      'change_request_id' => $changeRequest->id,
-    ]);
-
     $changeRequest->update([
       'status' => 'Approved',
       'reviewed_by' => auth()->id(),

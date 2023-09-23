@@ -91,7 +91,7 @@ class ProjectController extends Controller
     $data['project'] = $project;
     $project->load(['contracts' => function($q){
       $q->where('status', '!=', 'Draft')->select('contracts.id', 'contracts.subject', 'contracts.project_id', 'contracts.status', 'contracts.start_date', 'contracts.end_date', 'assignable_type', 'assignable_id');
-    }, 'contracts.milestones' => function ($q) {
+    }, 'contracts.phases' => function ($q) {
       $q->select('id', 'name', 'start_date', 'due_date', 'contract_id');
     }, 'contracts.assignable', 'contracts.project' => function ($q) {
       $q->select('id', 'name');

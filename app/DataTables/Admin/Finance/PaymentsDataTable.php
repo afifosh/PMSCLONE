@@ -2,6 +2,8 @@
 
 namespace App\DataTables\Admin\Finance;
 
+use App\Models\Company;
+use App\Models\Contract;
 use App\Models\InvoicePayment;
 use App\Models\Payment;
 use Google\Service\AIPlatformNotebooks\Runtime;
@@ -13,6 +15,11 @@ use Yajra\DataTables\Services\DataTable;
 
 class PaymentsDataTable extends DataTable
 {
+  /*
+  * @var null|App\Models\Company|App\Models\Contract
+  */
+  public $filterBy = null;
+
   /**
    * Build the DataTable class.
    *
@@ -35,7 +42,19 @@ class PaymentsDataTable extends DataTable
    */
   public function query(InvoicePayment $model): QueryBuilder
   {
-    return $model->newQuery();
+    $query = $model->newQuery();
+
+    if ($this->filterBy instanceof Contract) {
+      $query->whereHas('invoice', function ($q) {
+        $q->where('contract_id', $this->filterBy->id);
+      });
+    } else if ($this->filterBy instanceof Company) {
+      $query->whereHas('invoice', function ($q) {
+        $q->where('company_id', $this->filterBy->id);
+      });
+    }
+
+    return $query;
   }
 
   /**

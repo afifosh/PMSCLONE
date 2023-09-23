@@ -70,12 +70,15 @@ class CompanyController extends Controller
   public function show(Company $company, InvitationsDataTable $dataTable)
   {
     $company->load(['detail', 'addresses', 'bankAccounts', 'contacts', 'kycDocs']);
-      return $dataTable->render('admin.pages.company.show-profile', compact('company'));
+
+    return $dataTable->render('admin.pages.company.show-profile', compact('company'));
+    // view('admin.pages.company.show-profile', compact('company'));
   }
 
   public function showInvitations(Company $company, InvitationsDataTable $dataTable)
   {
     $company->load(['detail', 'addresses', 'bankAccounts', 'contacts', 'kycDocs']);
+
     return $dataTable->render('admin.pages.company.show-invitations', compact('company'));
   }
 
@@ -85,6 +88,7 @@ class CompanyController extends Controller
     $data['countries'] = $company->country_id ? Country::where('id', $company->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
     $data['states'] = $company->state_id ? State::where('id', $company->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
     $data['cities'] = $company->city_id ? City::where('id', $company->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
+
     return $this->sendRes('success', ['view_data' => view('admin.pages.company.edit', $data)->render(), 'JsMethods' => ['initIntlTel']]);
   }
 
@@ -111,7 +115,7 @@ class CompanyController extends Controller
     // auth()->user()->approve($company->modifications()->first());
     // $company->approve('name');
     // if ($company->update($att)) {
-      return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);
+    return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Company::DT_ID, 'close' => 'globalModal']);
     // }
   }
 

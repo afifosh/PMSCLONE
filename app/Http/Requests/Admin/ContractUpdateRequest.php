@@ -36,7 +36,7 @@ class ContractUpdateRequest extends FormRequest
       'refrence_id' => 'nullable|unique:contracts,refrence_id,'.$this->contract->id.',id,deleted_at,NULL',
       'project_id' => ['nullable', 'exists:projects,id'],
       'program_id' => ['nullable', 'exists:programs,id'],
-      'invoicing_method' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'in:Recuring,Milestone Based'],
+      'invoicing_method' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'in:Recuring,Phase Based'],
       'account_balance_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'exists:account_balances,id', new AccountHasHolder($this->program_id, 'programs')],
       'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],
       'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],

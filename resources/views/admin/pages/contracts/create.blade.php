@@ -82,7 +82,7 @@
     {{-- invoicing method --}}
     <div class="form-group col-6">
       {{ Form::label('invoicing_method', __('Invoicing Method'), ['class' => 'col-form-label']) }}
-      {!! Form::select('invoicing_method', ['Recuring' => 'Recuring', 'Milestone Based' => 'Milestone Based'], $contract->invoicing_method, ['class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('invoicing_method', ['Recuring' => 'Recuring', 'Phase Based' => 'Phase Based'], $contract->invoicing_method, ['class' => 'form-select globalOfSelect2']) !!}
     </div>
     {{-- start date --}}
     <div class="form-group col-6">

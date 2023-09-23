@@ -130,7 +130,7 @@ class ContractsDataTable extends DataTable
       Column::make('value')->title('Value'),
       Column::make('start_date'),
       Column::make('end_date'),
-      // Column::make('milestones_count')->title('Milestones')->searchable(false),
+      // Column::make('phases_count')->title('Phases')->searchable(false),
       Column::make('status'),
     ];
   }

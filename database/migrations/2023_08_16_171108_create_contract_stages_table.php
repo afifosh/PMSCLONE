@@ -11,12 +11,14 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('contract_phases', function (Blueprint $table) {
+    Schema::create('contract_stages', function (Blueprint $table) {
       $table->id();
       $table->foreignId('contract_id')->constrained()->cascadeOnDelete();
-      $table->string('change_request_id')->nullable();
       $table->string('name')->nullable();
-      $table->enum('type', ['Initial Phase', 'Change Request'])->default('Initial Phase');
+      $table->date('start_date')->nullable();
+      $table->date('due_date')->nullable();
+      $table->bigInteger('estimated_cost')->default(0);
+      $table->text('description')->nullable();
       $table->enum('status', ['Active', 'Completed', 'Cancelled'])->default('Active');
       $table->timestamps();
     });
@@ -27,6 +29,6 @@ return new class extends Migration
    */
   public function down(): void
   {
-    Schema::dropIfExists('contract_phases');
+    Schema::dropIfExists('contract_stages');
   }
 };

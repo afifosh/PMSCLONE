@@ -35,7 +35,7 @@
             <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
               <span class="align-middle ms-2">All</span>
             </a>
-            {{-- <div class="badge bg-label-success rounded-pill badge-center">{{$project->phases->count()}}</div> --}}
+            {{-- <div class="badge bg-label-success rounded-pill badge-center">{{$project->stages->count()}}</div> --}}
           </li>
           @forelse ($tags as $tag)
             <li class="d-flex justify-content-between" data-target="{{slug($tag->name)}}">

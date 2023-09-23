@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Invoice;
 
 use App\Http\Controllers\Controller;
-use App\Models\ContractMilestone;
+use App\Models\ContractPhase;
 use App\Models\Invoice;
 use App\Models\Tax;
 use Illuminate\Http\Request;
@@ -19,7 +19,8 @@ class InvoiceItemController extends Controller
 
       return $this->sendRes('success', [
         'view_data' => view('admin.pages.invoices.items.edit-list', $data)->render(),
-        'summary' => view('admin.pages.invoices.items.summary', $data)->render()
+        'summary' => view('admin.pages.invoices.items.summary', $data)->render(),
+        'balance_summary' => view('admin.pages.invoices.balance-summary', $data)->render(),
       ]);
     }
 
@@ -30,7 +31,7 @@ class InvoiceItemController extends Controller
   {
     $data['invoice'] = $invoice;
 
-    $data['milestones'] = $invoice->contract->milestones;
+    $data['phases'] = $invoice->contract->phases;
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.create', $data)->render()]);
   }
@@ -38,24 +39,24 @@ class InvoiceItemController extends Controller
   public function store(Request $request, Invoice $invoice)
   {
     $request->validate([
-      'milestones' => 'required|array',
-      'milestones.*' => 'nullable|exists:contract_milestones,id',
+      'phases' => 'required|array',
+      'phases.*' => 'nullable|exists:contract_phases,id',
     ]);
 
-    $milestones = filterInputIds($request->milestones);
+    $phases = filterInputIds($request->phases);
 
-    $pivot_amounts = ContractMilestone::whereIn('id', $milestones)->pluck('estimated_cost', 'id')->toArray();
+    $pivot_amounts = ContractPhase::whereIn('id', $phases)->pluck('estimated_cost', 'id')->toArray();
 
     // formate data for pivot table
     $data = [];
-    foreach ($milestones as $milestone) {
-      $data[$milestone] = ['amount' => $pivot_amounts[$milestone]];
+    foreach ($phases as $phase) {
+      $data[$phase] = ['amount' => $pivot_amounts[$phase]];
     }
 
-    $invoice->milestones()->syncWithoutDetaching($data);
+    $invoice->phases()->syncWithoutDetaching($data);
     $invoice->updateSubtotal();
 
-    return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'reloadMilestonesList', 'close' => 'globalModal']);
+    return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
 
   public function destroy(Invoice $invoice, $invoiceItem)
@@ -63,6 +64,6 @@ class InvoiceItemController extends Controller
     $invoice->items()->where('id', $invoiceItem)->delete();
     $invoice->updateSubtotal();
 
-    return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'reloadMilestonesList']);
+    return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
   }
 }

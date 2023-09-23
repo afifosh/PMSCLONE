@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Invoices')
+@section('title', 'Stages')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -12,6 +12,7 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/apex-charts/apex-charts.css')}}" />
 @endsection
 
 @section('page-style')
@@ -24,6 +25,7 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -32,14 +34,15 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-
-@includeWhen(isset($contract),'admin.pages.contracts.header', ['tab' => 'invoices'])
-@includeWhen(isset($company),'admin.pages.company.header', ['tab' => 'invoices'])
-{{-- Include Default Header --}}
-@includeWhen(!isset($contract) && !isset($company), 'admin.pages.invoices.header')
-
+@include('admin.pages.contracts.header', ['tab' => 'stages'])
   <div class="mt-3  col-12">
-    <div class="card">
+    {{-- Stats Start --}}
+    <div class="card h-100">
+      <div class="card-header">
+        <div class="d-flex justify-content-between mb-3">
+          <h5 class="card-title mb-0">{{__('Contract Stages')}}</h5>
+        </div>
+      </div>
       <div class="card-body">
         {{$dataTable->table()}}
       </div>
@@ -50,4 +53,17 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    <script>
+      $(document).ready(function () {
+          $('.js-datatable-filter-form :input').on('change', function (e) {
+              window.LaravelDataTables["contracts-table"].draw();
+          });
+
+          $('#contracts-table').on('preXhr.dt', function ( e, settings, data ) {
+              $('.js-datatable-filter-form :input').each(function () {
+                  data[$(this).prop('name')] = $(this).val();
+              });
+          });
+      });
+    </script>
 @endpush

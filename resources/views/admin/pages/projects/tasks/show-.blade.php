@@ -6,27 +6,27 @@
                 <h4 class="bold font-medium mbot15 tw-mt-0">Related: <a
                         href="https://perfexcrm.com/demo/admin/projects/view/1" target="_blank">#1 - Build Website -
                         Leffler-Kuhic</a>
-                    <div class="mtop5 mbot20 font-normal">Milestone: <span
-                            class="task-single-menu task-menu-milestones">
+                    <div class="mtop5 mbot20 font-normal">Phase: <span
+                            class="task-single-menu task-menu-phases">
                             <span class="trigger pointer manual-popover text-has-action" data-original-title=""
                                 title="">
                                 Integration Test </span>
                             <span class="content-menu hide">
                                 <ul>
                                     <li>
-                                        <a href="#" onclick="task_change_milestone(1,6); return false;">
+                                        <a href="#" onclick="task_change_phase(1,6); return false;">
                                             Planning </a>
                                     </li>
                                     <li>
-                                        <a href="#" onclick="task_change_milestone(2,6); return false;">
+                                        <a href="#" onclick="task_change_phase(2,6); return false;">
                                             Design </a>
                                     </li>
                                     <li>
-                                        <a href="#" onclick="task_change_milestone(3,6); return false;">
+                                        <a href="#" onclick="task_change_phase(3,6); return false;">
                                             Development </a>
                                     </li>
                                     <li>
-                                        <a href="#" onclick="task_change_milestone(5,6); return false;">
+                                        <a href="#" onclick="task_change_phase(5,6); return false;">
                                             Production Test </a>
                                     </li>
                                 </ul>

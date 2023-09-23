@@ -23,13 +23,14 @@
 <script src="{{asset('assets/js/custom/flatpickr.js')}}"></script>
 <script src="{{asset('assets/js/custom/select2.js')}}"></script>
 <script>
-  function reloadMilestonesList(){
+  function reloadPhasesList(){
     $.ajax({
       url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit' }),
       type: "GET",
       success: function(data) {
         $('#billing-items-container').html(data.data.view_data);
         $('.invoice-calculations').html(data.data.summary);
+        $('#balance-summary').html(data.data.balance_summary);
         initSelect2()
       }
     });
@@ -52,7 +53,7 @@
         taxes: taxes
       },
       success: function(data) {
-        reloadMilestonesList();
+        reloadPhasesList();
       }
     });
   })
@@ -69,7 +70,7 @@
         taxes: taxes
       },
       success: function(data) {
-        reloadMilestonesList();
+        reloadPhasesList();
         $('#tax-rates').popover('hide');
       }
     });
@@ -134,8 +135,8 @@
 
         <hr class="my-3 mx-n4" />
 
-        <div class="row p-sm-4 p-0">
-          <div class="col-">
+        <div class="p-sm-4 p-0 d-flex justify-content-between">
+          <div>
             <table>
               <tbody>
                 <tr>
@@ -151,6 +152,13 @@
                   </td>
                 </tr>
               </tbody>
+            </table>
+          </div>
+          <div>
+            <table>
+                <tbody id="balance-summary">
+                  @include('admin.pages.invoices.balance-summary')
+                </tbody>
             </table>
           </div>
         </div>
@@ -186,7 +194,7 @@
         </div>
           <div class="row pb-4">
             <div class="col-12 mt-4">
-              <button type="button" class="btn btn-primary" data-title="{{__('Add Milestones')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Milestones</button>
+              <button type="button" class="btn btn-primary" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
             </div>
           </div>
         </div>

@@ -32,6 +32,9 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
+
+@includeWhen(isset($contract),'admin.pages.contracts.header', ['tab' => 'payments'])
+@includeWhen(isset($company),'admin.pages.company.header', ['tab' => 'payments'])
   <div class="mt-3  col-12">
     <div class="card">
       <div class="card-body">

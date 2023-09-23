@@ -2,6 +2,8 @@
 
 namespace App\DataTables\Admin\Invoice;
 
+use App\Models\Company;
+use App\Models\Contract;
 use App\Models\Invoice;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -12,6 +14,11 @@ use Yajra\DataTables\Services\DataTable;
 
 class InvoicesDataTable extends DataTable
 {
+  /*
+  * @var null|App\Models\Company|App\Models\Contract
+  */
+  public $filterBy = null;
+
   /**
    * Build the DataTable class.
    *
@@ -20,8 +27,8 @@ class InvoicesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('id', function($inv){
-        return '<a href="'.route('admin.invoices.edit', $inv->id).'">'.runtimeInvIdFormat($inv->id).'</a>';
+      ->editColumn('id', function ($inv) {
+        return '<a href="' . route('admin.invoices.edit', $inv->id) . '">' . runtimeInvIdFormat($inv->id) . '</a>';
       })
       ->editColumn('company_id', function ($invoice) {
         return view('admin._partials.sections.company-avatar', ['company' => $invoice->company])->render();
@@ -29,10 +36,10 @@ class InvoicesDataTable extends DataTable
       ->editColumn('contract_id', function ($invoice) {
         return $invoice->contract->subject;
       })
-      ->editColumn('action', function($invoice){
+      ->editColumn('action', function ($invoice) {
         return view('admin.pages.invoices.action', ['invoice' => $invoice]);
       })
-      ->addColumn('total', function($invoice){
+      ->addColumn('total', function ($invoice) {
         return view('admin.pages.invoices.total-column', ['invoice' => $invoice]);
       })
       ->rawColumns(['company_id', 'id']);
@@ -43,7 +50,15 @@ class InvoicesDataTable extends DataTable
    */
   public function query(Invoice $model): QueryBuilder
   {
-    return $model->with(['company', 'contract'])->newQuery();
+    $query = $model->with(['company', 'contract']);
+    // if filterBy is instance of Contract
+    if ($this->filterBy instanceof Contract) {
+      $query->where('contract_id', $this->filterBy->id);
+    }else if($this->filterBy instanceof Company){
+      $query->where('company_id', $this->filterBy->id);
+    }
+
+    return $query->newQuery();
   }
 
   /**

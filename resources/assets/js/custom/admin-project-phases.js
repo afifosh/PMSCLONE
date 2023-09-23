@@ -160,18 +160,18 @@
       }
     }
     initSelect2();
-    Echo.private(`projects.${active_project}`).listen('.project-milestone-updated', e => {
-      const update_on = ['milestone-list'];
+    Echo.private(`projects.${active_project}`).listen('.project-phase-updated', e => {
+      const update_on = ['phase-list'];
       if(update_on.includes(e.modifiedTab)){
-        refreshMilestoneList();
+        refreshPhaseList();
       }
     });
   });
-  function refreshMilestoneList(project_id){
+  function refreshPhaseList(project_id){
     project_id = project_id || window.active_project;
     $.ajax({
       type: "get",
-      url: route('admin.projects.contracts.phases.milestones.index', {project: project_id, contract: active_contract, phase: active_phase}),
+      url: route('admin.projects.contracts.stages.phases.index', {project: project_id, contract: active_contract, stage: active_stage}),
       success: function (response) {
         $('.tasks-list').html(response.data.view_data)
         $('.myTasksCount').text(response.data.myTasksCount)
@@ -226,24 +226,24 @@
       $('.task').each(function (index, element) {
         sortedTasks.push($(element).data('id'));
       });
-      const uniqueMilestones = [];
+      const uniquePhases = [];
       const seenIds = new Set();
 
       sortedTasks.forEach(id => {
           if (!seenIds.has(id)) {
-              uniqueMilestones.push(id);
+              uniquePhases.push(id);
               seenIds.add(id);
           }
       });
 
       $.ajax({
         type: "put",
-        url: route('admin.projects.contracts.sort-milestones', {project : active_project, contract: active_contract}),
+        url: route('admin.projects.contracts.sort-phases', {project : active_project, contract: active_contract}),
         data: {
-          milestones: uniqueMilestones
+          phases: uniquePhases
         },
         complete: function(data) {
-          refreshMilestoneList();
+          refreshPhaseList();
         }
       });
     })

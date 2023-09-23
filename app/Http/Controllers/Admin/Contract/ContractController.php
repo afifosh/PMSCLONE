@@ -305,10 +305,6 @@ class ContractController extends Controller
         'description' => 'Contract Created',
         'admin_id' => auth()->id(),
       ]);
-
-      $contract->phases()->create([
-        'name' => 'Phase 1'
-      ]);
     }
 
     return $this->sendRes(__('Contract created successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);

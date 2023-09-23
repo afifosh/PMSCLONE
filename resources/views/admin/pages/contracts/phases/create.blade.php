@@ -1,18 +1,18 @@
-@if ($milestone->id)
-    {!! Form::model($milestone, ['route' => ['admin.projects.contracts.phases.milestones.update', ['project' => $project, 'contract' => $contract, 'milestone' => $milestone->id, 'phase' => $phase]], 'method' => 'PUT']) !!}
+@if ($phase->id)
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.update', ['project' => $project, 'contract' => $contract, 'phase' => $phase->id, 'stage' => $stage]], 'method' => 'PUT']) !!}
 @else
-    {!! Form::model($milestone, ['route' => ['admin.projects.contracts.phases.milestones.store',  ['project' => $project, 'contract' => $contract, 'phase' => $phase]], 'method' => 'POST']) !!}
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.store',  ['project' => $project, 'contract' => $contract, 'stage' => $stage]], 'method' => 'POST']) !!}
 @endif
 
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="add-milestone" value="single" id="add-milestone" checked>
-  <label class="form-check-label" for="add-milestone">
+  <input class="form-check-input" type="radio" name="add-phase" value="single" id="add-phase" checked>
+  <label class="form-check-label" for="add-phase">
     Single
   </label>
 </div>
 <div class="form-check">
-  <input class="form-check-input" type="radio" name="add-milestone" value="rule" id="add-milestone-rule" >
-  <label class="form-check-label" for="add-milestone-rule">
+  <input class="form-check-input" type="radio" name="add-phase" value="rule" id="add-phase-rule" >
+  <label class="form-check-label" for="add-phase-rule">
     Rule
   </label>
 </div>
@@ -28,17 +28,17 @@
   {{-- start date --}}
   <div class="form-group col-6">
     {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('start_date', $milestone->start_date, ['class' => 'form-control flatpickr', 'id' => 'start_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Start Date')]) !!}
+    {!! Form::date('start_date', $phase->start_date, ['class' => 'form-control flatpickr', 'id' => 'start_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Start Date')]) !!}
   </div>
   {{-- due date --}}
   <div class="form-group col-6">
     {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('due_date', $milestone->due_date, ['class' => 'form-control flatpickr', 'id' => 'milestone_end_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Due Date')]) !!}
+    {!! Form::date('due_date', $phase->due_date, ['class' => 'form-control flatpickr', 'id' => 'phase_end_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Due Date')]) !!}
   </div>
   <div class="col-12 mt-2">
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="cal-milestone-end-date">
-      <label class="form-check-label" for="cal-milestone-end-date">
+      <input class="form-check-input" type="checkbox" id="cal-phase-end-date">
+      <label class="form-check-label" for="cal-phase-end-date">
         Calculate End Date
       </label>
     </div>
@@ -49,8 +49,8 @@
       <label for="" class="form-label">After From Start Date</label>
       <div class="d-flex">
         <div class="d-flex w-100">
-          <input id="cont-add-count" type="number"  class="form-control cal-milestone-end-date">
-          {!! Form::select('null', ['Days' => 'Day(s)', 'Weeks' => 'Week(s)', 'Months' => 'Month(s)', 'Years' => 'Year(s)'], null, ['class' => 'cont-add-unit cal-milestone-end-date input-group-text form-select globalOfSelect2']) !!}
+          <input id="cont-add-count" type="number"  class="form-control cal-phase-end-date">
+          {!! Form::select('null', ['Days' => 'Day(s)', 'Weeks' => 'Week(s)', 'Months' => 'Month(s)', 'Years' => 'Year(s)'], null, ['class' => 'cont-add-unit cal-phase-end-date input-group-text form-select globalOfSelect2']) !!}
         </div>
       </div>
     </div>
@@ -97,7 +97,7 @@
 </div>
 
 <script>
-  $(document).on('change', '#cal-milestone-end-date', function() {
+  $(document).on('change', '#cal-phase-end-date', function() {
     if ($(this).is(':checked')) {
       $('#end-date-cal-form').removeClass('d-none');
       calContEndDate();
@@ -112,11 +112,11 @@
     calContEndDate();
   })
 
-  $(document).on('change keyup', '.cal-milestone-end-date', function() {
+  $(document).on('change keyup', '.cal-phase-end-date', function() {
     calContEndDate();
   });
 
-  $(document).on('change', '[name="add-milestone"]', function() {
+  $(document).on('change', '[name="add-phase"]', function() {
     if ($(this).val() == 'rule') {
       $('.rr-single').addClass('d-none');
       $('.rr-rule').removeClass('d-none');
@@ -144,9 +144,9 @@
       } else if(unit == 'Years') {
         endDate.setFullYear(endDate.getFullYear() + parseInt(count));
       }
-      $('#milestone_end_date').val(endDate.toISOString().slice(0, 10));
+      $('#phase_end_date').val(endDate.toISOString().slice(0, 10));
     }else{
-      $('#milestone_end_date').val('');
+      $('#phase_end_date').val('');
     }
     initFlatPickr();
   }

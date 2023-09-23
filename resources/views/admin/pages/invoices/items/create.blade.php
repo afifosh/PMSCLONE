@@ -5,19 +5,19 @@
     <table class="table">
       <thead>
         <tr>
-          <th>{!! Form::checkbox('checkAll', 1, 0, ['class' => 'form-check-input milestone-check-all']) !!}</th>
-          <th scope="col">Milestone</th>
+          <th>{!! Form::checkbox('checkAll', 1, 0, ['class' => 'form-check-input phase-check-all']) !!}</th>
+          <th scope="col">Phase</th>
           <th scope="col">Cost</th>
           <th scope="col">Status</th>
         </tr>
       </thead>
       <tbody>
-        @forelse ($milestones as $milestone)
+        @forelse ($phases as $phase)
         <tr class="">
-          <th>{!! Form::checkbox('milestones[]', $milestone->id, 0, ['class' => 'form-check-input milestone-item']) !!}</th>
-          <td>{{$milestone->name}}</td>
-          <td>{{$milestone->estimated_cost}}</td>
-          <td>{{$milestone->status}}</td>
+          <th>{!! Form::checkbox('phases[]', $phase->id, 0, ['class' => 'form-check-input phase-item']) !!}</th>
+          <td>{{$phase->name}}</td>
+          <td>{{$phase->estimated_cost}}</td>
+          <td>{{$phase->status}}</td>
         </tr>
         @empty
         @endforelse
@@ -35,18 +35,18 @@
 </div>
 <script>
   $(document).ready(function() {
-    $('.milestone-check-all').on('change', function() {
+    $('.phase-check-all').on('change', function() {
       if ($(this).is(':checked')) {
-        $('.milestone-item').prop('checked', true);
+        $('.phase-item').prop('checked', true);
       } else {
-        $('.milestone-item').prop('checked', false);
+        $('.phase-item').prop('checked', false);
       }
     });
-    $('.milestone-item').on('change', function() {
-      if ($('.milestone-item:checked').length == $('.milestone-item').length) {
-        $('.milestone-check-all').prop('checked', true);
+    $('.phase-item').on('change', function() {
+      if ($('.phase-item:checked').length == $('.phase-item').length) {
+        $('.phase-check-all').prop('checked', true);
       } else {
-        $('.milestone-check-all').prop('checked', false);
+        $('.phase-check-all').prop('checked', false);
       }
     });
   });
