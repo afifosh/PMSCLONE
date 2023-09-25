@@ -5,14 +5,20 @@
   <!--description-->
   <td class="text-left x-description bill_col_description">{{$item->invoiceable->name}}
   </td>
-  <td class="text-left x-rate bill_col_rate">{{$item->amount}}</td>
+  <td class="text-left x-rate bill_col_rate">@money($item->amount, $invoice->contract->currency, true)</td>
   <!--tax-->
   @if (!$invoice->is_summary_tax)
-    <td class="text-left" style="max-width: 70px;">
+    <td class="text-left" style="max-width: 170px;">
       <div class="mb-3">
         <select class="form-select invoice_taxes select2" data-item-id="{{$item->id}}" name="invoice_taxes[]" multiple data-placeholder="{{__('Select Tax')}}">
           @forelse ($tax_rates as $tax)
-            <option @selected($item->taxes->contains($tax)) value="{{$tax->id}}">{{$tax->name}} ({{$tax->amount}}{{$tax->type == 'Percent' ? '%' : ''}})</option>
+            <option @selected($item->taxes->contains($tax)) value="{{$tax->id}}">{{$tax->name}} (
+              @if($tax->type != 'Percent')
+                @money($tax->amount, $invoice->contract->currency, true)
+              @else
+                {{$tax->amount}}%
+              @endif
+            )</option>
           @empty
           @endforelse
         </select>
@@ -20,7 +26,7 @@
     </td>
   @endif
   <!--total-->
-  <td class="text-right x-total bill_col_total" id="bill_col_total">{{$item->amount + $item->total_tax_amount}}
+  <td class="text-right x-total bill_col_total" id="bill_col_total">@money($item->amount + $item->total_tax_amount, $invoice->contract->currency, true)
   </td>
 </tr>
 @empty

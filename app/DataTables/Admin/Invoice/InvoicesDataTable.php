@@ -58,7 +58,7 @@ class InvoicesDataTable extends DataTable
       $query->where('company_id', $this->filterBy->id);
     }
 
-    return $query->newQuery();
+    return $query->applyRequestFilters()->newQuery();
   }
 
   /**

@@ -27,6 +27,8 @@ class InvoiceController extends Controller
     }else {
       $data['summary'] = Invoice::selectRaw('SUM(total) as total, SUM(paid_amount) as paid_amount, SUM(total - paid_amount)/100 as due_amount')->first();
       $data['overdue'] = Invoice::where('due_date', '<', now())->where('status', '!=', 'Paid')->count();
+      $data['contracts'] = Contract::has('invoices')->pluck('subject', 'id')->prepend('All', '');
+      $data['companies'] = Company::has('contracts.invoices')->get(['name', 'id', 'type'])->prepend('All', '');
     }
 
     return $dataTable->render('admin.pages.invoices.index', $data);
@@ -44,7 +46,7 @@ class InvoiceController extends Controller
   {
     $invoice = Invoice::create($request->validated());
 
-    return $this->sendRes('success', ['event' => 'redirect', 'url' => route('admin.invoices.edit', $invoice)]);
+    return $this->sendRes('Invoice Added Successfully', ['event' => 'redirect', 'url' => route('admin.invoices.edit', $invoice)]);
   }
 
   public function show(Invoice $invoice)
@@ -70,11 +72,26 @@ class InvoiceController extends Controller
       $invoice->updateTaxAmount();
 
       return back()->with('success', 'Tax type updated successfully');
+    }elseif($request->update_discount){
+      if($request->discount_type == 'Percentage'){
+        $data['discount_amount'] = $invoice->subtotal * $request->discount_value / 100;
+        $data['discount_percentage'] = $request->discount_value;
+      }else{
+        $data['discount_amount'] = $request->discount_value;
+        $data['discount_percentage'] = 0;
+      }
+      $invoice->update($data);
+
+      return $this->sendRes('Discount updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
+    }elseif($request->update_adjustment){
+      $invoice->update($request->validated());
+
+      return $this->sendRes('Adjustment updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     }
 
     $invoice->update(['status' => 'Sent'] + $request->validated());
 
-    return $this->sendRes('success', ['event' => 'redirect', 'url' => route('admin.invoices.index')]);
+    return $this->sendRes('Invoice Updated Successfully', ['event' => 'redirect', 'url' => route('admin.invoices.index')]);
   }
 
   public function destroy(Invoice $invoice)

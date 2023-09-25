@@ -24,6 +24,9 @@ class PaymentController extends Controller
     } elseif (request()->route()->getName() == 'admin.contracts.payments.index') {
       $dataTable->filterBy = Contract::findOrFail(request()->route('contract'));
       $data['contract'] = $dataTable->filterBy;
+    } elseif (request()->route()->getName() == 'admin.invoices.payments.index' && request()->accepts == 'view_data') {
+      $data['invoice'] = Invoice::with('payments')->findOrFail(request()->route('invoice'));
+      return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.index-table', $data)->render()]);
     }
 
     return $dataTable->render('admin.pages.finances.payment.index', $data);

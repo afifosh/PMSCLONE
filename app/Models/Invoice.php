@@ -26,6 +26,12 @@ class Invoice extends Model
     'is_summary_tax',
     'note',
     'terms',
+    'discount_type',
+    'discount_percentage',
+    'discount_amount',
+    'adjustment_type',
+    'adjustment_percentage',
+    'adjustment_amount',
     'status'
   ];
 
@@ -103,6 +109,16 @@ class Invoice extends Model
     $this->attributes['paid_amount'] = round($value * 100, 0);
   }
 
+  public function getTotalTaxAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setTotalTaxAttribute($value)
+  {
+    $this->attributes['total_tax'] = round($value * 100, 0);
+  }
+
   public function updateItemsTaxType(): void
   {
     $this->items->each(function ($item) {
@@ -128,5 +144,14 @@ class Invoice extends Model
     }
 
     $this->updateSubtotal();
+  }
+
+  public function scopeApplyRequestFilters($q)
+  {
+    $q->when(request()->filter_company, function($q){
+      $q->where('company_id', request()->filter_company);
+    })->when(request()->filter_contract, function($q){
+      $q->where('contract_id', request()->filter_contract);
+    });
   }
 }

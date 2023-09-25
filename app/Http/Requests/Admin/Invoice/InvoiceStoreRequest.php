@@ -26,6 +26,25 @@ class InvoiceStoreRequest extends FormRequest
         'is_summary_tax' => 'required|in:0,1',
       ];
 
+    elseif(request()->update_discount){
+      return [
+        'discount_type' => 'required|in:Fixed,Percentage',
+        'discount_value' => ['required', 'numeric', function($attribute, $value, $fail){
+          if(request()->discount_type == 'Percentage' && ($value > 100 || $value < 0))
+            $fail('Discount percentage must be between 0 and 100');
+          elseif(request()->discount_type == 'Fixed' && ($value > $this->invoice->subtotal || $value < 0))
+            $fail('Discount amount must be between 0 and invoice subtotal');
+        }],
+      ];
+    }
+
+    elseif(request()->update_adjustment){
+      return [
+        'adjustment_description' => 'required|string|max:255',
+        'adjustment_amount' => ['required', 'numeric'],
+      ];
+    }
+
     if(request()->method() == 'PUT')
       return [
         'invoice_date' => 'required|date',

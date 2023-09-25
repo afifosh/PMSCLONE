@@ -38,6 +38,7 @@ class Contract extends Model
     'start_date',
     'end_date',
     'description',
+    'visible_to_client',
     'status'
   ];
 
@@ -127,6 +128,11 @@ class Contract extends Model
     }
   }
 
+  public function invoices(): HasMany
+  {
+    return $this->hasMany(Invoice::class);
+  }
+
   public function scopeApplyRequestFilters($q)
   {
     return $q->when(request()->filter_status, function ($q) {
@@ -195,6 +201,11 @@ class Contract extends Model
   public function phases(): HasMany
   {
     return $this->hasMany(ContractPhase::class);
+  }
+
+  public function directPhases(): HasMany
+  {
+    return $this->hasMany(ContractPhase::class)->whereNull('stage_id')->where('is_committed', true);
   }
 
   public function initialStage(): HasOne

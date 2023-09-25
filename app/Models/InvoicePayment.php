@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class InvoicePayment extends Model
 {
@@ -36,5 +37,10 @@ class InvoicePayment extends Model
   public function setAmountAttribute($value)
   {
     $this->attributes['amount'] = round($value * 100, 0);
+  }
+
+  public function contract()
+  {
+    return $this->hasOneThrough(Contract::class, Invoice::class, 'id', 'id', 'invoice_id', 'contract_id');
   }
 }

@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
@@ -29,38 +30,38 @@ class ContractsDataTable extends DataTable
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
-      ->addColumn('assigned_to', function($project){
-        if($project->assignable instanceof Company){
+      ->addColumn('assigned_to', function ($project) {
+        if ($project->assignable instanceof Company) {
           return view('admin._partials.sections.company-avatar', ['company' => $project->assignable]);
-        }else if($project->assignable instanceof Client){
+        } else if ($project->assignable instanceof Client) {
           return view('admin._partials.sections.client-info', ['user' => $project->assignable]);
-        }else{
+        } else {
           return '-';
         }
       })
-      ->editColumn('project.name', function($project){
+      ->editColumn('project.name', function ($project) {
         return $project->project ? $project->project->name : '-';
       })
-      ->editColumn('type.name', function($project){
+      ->editColumn('type.name', function ($project) {
         return $project->type ? $project->type->name : '-';
       })
-      ->editColumn('value', function(Contract $contract){
-        return $contract->value ? $contract->printable_value : '-';
+      ->editColumn('value', function (Contract $contract) {
+        return view('admin.pages.contracts.value-column', compact('contract'));
       })
-      ->editColumn('start_date', function($project){
+      ->editColumn('start_date', function ($project) {
         return $project->start_date ? $project->start_date->format('d M, Y') : '-';
       })
-      ->editColumn('end_date', function($project){
+      ->editColumn('end_date', function ($project) {
         return $project->end_date ? $project->end_date->format('d M, Y') : '-';
       })
-      ->filterColumn('assigned_to', function($query, $keyword){
-        $query->whereHasMorph('assignable', Company::class, function($q) use($keyword){
-          $q->where('name', 'like', '%'.$keyword.'%')->orWhere('email', 'like', '%'.$keyword.'%');
-        })->orWhereHasMorph('assignable', Client::class, function($q) use($keyword){
-          $q->where(function($q) use($keyword){
-            $q->where('first_name', 'like', '%'.$keyword.'%')
-              ->orWhere('last_name', 'like', '%'.$keyword.'%')
-              ->orWhere('email', 'like', '%'.$keyword.'%');
+      ->filterColumn('assigned_to', function ($query, $keyword) {
+        $query->whereHasMorph('assignable', Company::class, function ($q) use ($keyword) {
+          $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
+        })->orWhereHasMorph('assignable', Client::class, function ($q) use ($keyword) {
+          $q->where(function ($q) use ($keyword) {
+            $q->where('first_name', 'like', '%' . $keyword . '%')
+              ->orWhere('last_name', 'like', '%' . $keyword . '%')
+              ->orWhere('email', 'like', '%' . $keyword . '%');
           });
         });
       })
@@ -77,6 +78,18 @@ class ContractsDataTable extends DataTable
     if ($this->projectId) {
       $q->where('project_id', $this->projectId);
     }
+
+    $q->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+      ->select(
+        'contracts.*',
+        DB::raw(
+          'SUM(invoices.total)/100 as total,
+          SUM(invoices.paid_amount)/100 as paid_amount,
+          sum(invoices.total - invoices.paid_amount)/100 as due_amount,
+          sum(invoices.total_tax)/100 as total_tax,
+          (sum(invoices.paid_amount)/sum(contracts.value))*100 as paid_percent'
+        )
+      )->groupBy('contracts.id');
 
     $q->applyRequestFilters();
 
@@ -95,7 +108,7 @@ class ContractsDataTable extends DataTable
       'attr' => [
         'data-toggle' => "ajax-modal",
         'data-title' => 'Create Contract',
-        'data-href' => route('admin.contracts.create',['project' => $this->projectId])
+        'data-href' => route('admin.contracts.create', ['project' => $this->projectId])
       ]
     ];
 
@@ -127,7 +140,8 @@ class ContractsDataTable extends DataTable
       Column::make('id')->title('Contract'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
-      Column::make('value')->title('Value'),
+      Column::make('value')->title('Amount'),
+      Column::make('paid_percent')->title('Paid')->searchable(false),
       Column::make('start_date'),
       Column::make('end_date'),
       // Column::make('phases_count')->title('Phases')->searchable(false),

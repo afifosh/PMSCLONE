@@ -40,6 +40,7 @@ class ContractUpdateRequest extends FormRequest
       'account_balance_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'exists:account_balances,id', new AccountHasHolder($this->program_id, 'programs')],
       'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],
       'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+      'visible_to_client' => 'nullable|boolean',
       'description' => 'nullable|string|max:2000'
     ];
   }
@@ -70,6 +71,7 @@ class ContractUpdateRequest extends FormRequest
       'end_date.required' => 'Please select end date',
       'value.required_if' => 'Please enter value',
       'value.required' => 'Please enter value',
+      'category_id.required_if' => 'Please select contract category'
     ];
   }
 }

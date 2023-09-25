@@ -39,6 +39,7 @@ class ContractStoreRequest extends FormRequest
       'refrence_id' => 'nullable|unique:contracts,refrence_id',
       'start_date' => 'nullable|required_if:isSavingDraft,0|date',
       'end_date' => 'nullable|date|after_or_equal:start_date',
+      'visible_to_client' => 'nullable|boolean',
       'description' => 'nullable|string|max:2000',
     ];
   }

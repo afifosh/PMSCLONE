@@ -100,7 +100,7 @@
           start_date: contract.start_date ? new Date(contract.start_date) : '',
           unscheduled:true && contract.start_date == null,
           hasEndDate: true && contract.end_date != null,
-          type: contract.end_date == null ? 'phase' : 'task',
+          // type: contract.end_date == null ? 'Contract' : 'stage',
           open: true,
           rollup: true,
           color:"#CD545B",
@@ -108,7 +108,7 @@
         };
         data.push(contractData);
         // {"id":2, "text":"Task #1", "start_date":"02-04-2018", "duration":"8", "parent":"1", "progress":0.5, "open": true},
-        contract.phases.forEach((stage) => {
+        contract.stages.forEach((stage) => {
           // update min and max dates
           if(new Date(stage.start_date) < new Date(minDate)){
             minDate = stage.start_date;
@@ -137,6 +137,76 @@
             remaining_days: stage.due_date ? Math.ceil((new Date(stage.due_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
           };
           data.push(taskData);
+
+          /*
+          * contract.stages.phases
+          */
+
+          stage.phases.forEach((phase) => {
+            // update min and max dates
+            if(new Date(phase.start_date) < new Date(minDate)){
+              minDate = phase.start_date;
+            }
+            if(new Date(phase.due_date) > new Date(maxDate)){
+              maxDate = phase.due_date;
+            }
+            // end update min and max dates
+            let phaseData = {
+              id: 'Phase:' + phase.id,
+              text: phase.name,
+              parent: 'Stage:' + stage.id,
+              contractName: contract.subject,
+              projectName: contract.project?.name,
+              assignableType: contract.assignable_type ? contract.assignable_type.split('\\')[2] : null,
+              assignable: contract.assignable?.name ?? contract.assignable?.first_name + ' ' + contract.assignable?.last_name,
+              status: phase.status,
+              // calculate from start date and end date and current date
+              progress: calculateProgressPercentage(phase.start_date, phase.due_date),
+              type: "Phase",
+              start_date: new Date(phase.start_date),
+              duration: calculateDateDifference(phase.start_date, phase.due_date),
+              hasEndDate: true,
+              // end_date: formateDate(phase.due_date),
+              open: true,
+              remaining_days: phase.due_date ? Math.ceil((new Date(phase.due_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
+            };
+            data.push(phaseData);
+          });
+        });
+
+        /*
+        * contract.directPhases
+        */
+
+        contract.direct_phases.forEach((phase) => {
+          // update min and max dates
+          if(new Date(phase.start_date) < new Date(minDate)){
+            minDate = phase.start_date;
+          }
+          if(new Date(phase.due_date) > new Date(maxDate)){
+            maxDate = phase.due_date;
+          }
+          // end update min and max dates
+          let directPhaseData = {
+            id: 'Phase:' + phase.id,
+            text: phase.name,
+            parent: 'Contract:' + contract.id,
+            contractName: contract.subject,
+            projectName: contract.project?.name,
+            assignableType: contract.assignable_type ? contract.assignable_type.split('\\')[2] : null,
+            assignable: contract.assignable?.name ?? contract.assignable?.first_name + ' ' + contract.assignable?.last_name,
+            status: phase.status,
+            // calculate from start date and end date and current date
+            progress: calculateProgressPercentage(phase.start_date, phase.due_date),
+            type: "phase",
+            start_date: new Date(phase.start_date),
+            duration: calculateDateDifference(phase.start_date, phase.due_date),
+            hasEndDate: true,
+            // end_date: formateDate(phase.due_date),
+            open: true,
+            remaining_days: phase.due_date ? Math.ceil((new Date(phase.due_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
+          };
+          data.push(directPhaseData);
         });
       });
     });

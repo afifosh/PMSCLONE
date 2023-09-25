@@ -124,6 +124,18 @@
       </div>
       <hr>
     </div>
+    <div class="form-group col-6">
+      <label class="switch d-flex flex-column">
+        {{ Form::label('visible_to_client', __('Visible to client'), ['class' => 'col-form-label']) }}
+        {{ Form::checkbox('visible_to_client', 1, $contract->visible_to_client,['class' => 'switch-input is-invalid'])}}
+        {{-- <input type="checkbox" class="switch-input is-invalid" checked /> --}}
+        <span class="switch-toggle-slider position-relative mt-2">
+          <span class="switch-on"></span>
+          <span class="switch-off"></span>
+        </span>
+        <span class="switch-label"></span>
+      </label>
+    </div>
     {{-- description --}}
     <div class="form-group col-12">
       {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}

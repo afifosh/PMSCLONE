@@ -24,6 +24,7 @@ class ContractFactory extends Factory
     $assignToNone = $this->faker->boolean();
     $endDate = $this->faker->boolean(90);
     $isDraft = $this->faker->boolean(30);
+    $value = rand(1000, 10000);
     return [
       'type_id' => ContractType::inRandomOrder()->first()->id,
       'project_id' => $this->faker->boolean() ?  Project::inRandomOrder()->first()->id : null,
@@ -31,7 +32,8 @@ class ContractFactory extends Factory
       'assignable_id' => $assignToNone? null : ($assignToCompany ? Company::inRandomOrder()->first()->id : Client::inRandomOrder()->first()->id),
       'refrence_id' => $this->faker->unique()->sentence(),
       'subject' => $this->faker->sentence(),
-      'value' => rand(1000, 10000),
+      'value' => $value,
+      'remaining_amount' => $value,
       'start_date' => $isDraft ? null : $this->faker->dateTimeBetween('-2 years', '-1 years'),
       'end_date' => $endDate ? $this->faker->dateTimeBetween('now', '2 years') : null,
       'description' => $this->faker->paragraph(),

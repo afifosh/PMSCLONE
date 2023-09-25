@@ -130,7 +130,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     // Route::get('companies/{company}/users', [CompanyController::class, 'showUsers'])->name('companies.showUsers');
     Route::get('companies/{company}/invitations', [CompanyController::class, 'showInvitations'])->name('companies.showInvitations');
-    Route::get('companies/{company}/inovices', [InvoiceController::class, 'index'])->name('companies.invoices.index');
+    Route::get('companies/{company}/invoices', [InvoiceController::class, 'index'])->name('companies.invoices.index');
     Route::get('companies/{company}/payments', [PaymentController::class, 'index'])->name('companies.payments.index');
     Route::resource('companies', CompanyController::class);
     Route::resource('companies.contacts', UserController::class);
@@ -285,6 +285,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     // Route::prefix('invoices')->name('invoices.')->group(function(){
 
     // });
+    Route::get('invoices/{invoice}/payments', [PaymentController::class, 'index'])->name('invoices.payments.index');
     Route::resource('invoices', InvoiceController::class);
     Route::resource('invoices.invoice-items', InvoiceItemController::class);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);

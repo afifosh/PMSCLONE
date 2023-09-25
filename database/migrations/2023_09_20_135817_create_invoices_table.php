@@ -26,6 +26,12 @@ return new class extends Migration
       $table->bigInteger('paid_amount')->default(0);
       $table->text('note')->nullable();
       $table->text('terms')->nullable();
+      $table->enum('discount_type', ['Fixed', 'Percentage'])->nullable();
+      $table->integer('discount_percentage')->default(0);
+      $table->bigInteger('discount_amount')->default(0);
+      $table->enum('adjustment_type', ['Fixed', 'Percentage'])->nullable();
+      $table->integer('adjustment_percentage')->default(0);
+      $table->bigInteger('adjustment_amount')->default(0);
       $table->enum('status', ['Draft', 'Sent', 'Paid', 'Partial paid','Cancelled'])->default('draft');
       $table->timestamps();
     });

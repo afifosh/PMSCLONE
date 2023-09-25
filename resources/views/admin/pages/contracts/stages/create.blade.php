@@ -58,14 +58,14 @@
     <div class="form-check">
       <input class="form-check-input" type="checkbox" id="is_committed" name="is_committed">
       <label class="form-check-label" for="is_committed">
-        Is Committed
+        Is Allowable
       </label>
     </div>
   </div>
-  {{-- committed Amount --}}
+  {{-- Allowable Amount --}}
   <div class="form-group col-6 d-none committed-amount">
-    {{ Form::label('committed_amount', __('Committed Amount'), ['class' => 'col-form-label']) }}
-    {!! Form::number('committed_amount', null, ['class' => 'form-control', 'placeholder' => __('Committed Amount')]) !!}
+    {{ Form::label('committed_amount', __('Allowable Amount'), ['class' => 'col-form-label']) }}
+    {!! Form::number('committed_amount', null, ['class' => 'form-control', 'placeholder' => __('Allowable Amount')]) !!}
   </div>
 
 </div>

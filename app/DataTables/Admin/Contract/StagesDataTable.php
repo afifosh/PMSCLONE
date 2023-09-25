@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin\Contract;
 
+use Akaunting\Money\View\Components\Money;
 use App\Models\ContractStage;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -23,6 +24,9 @@ class StagesDataTable extends DataTable
       ->editColumn('name', function ($stage) {
         return '<a href="' . route('admin.contracts.stages.phases.index', [$this->contract, $stage]) . '">' . $stage->name . '</a>';
       })
+      ->editColumn('estimated_cost', function ($stage) {
+        return Money($stage->estimated_cost, $stage->contract->currency, true);
+      })
       ->rawColumns(['name']);
   }
 
@@ -31,7 +35,10 @@ class StagesDataTable extends DataTable
    */
   public function query(ContractStage $model): QueryBuilder
   {
-    return $model->where('contract_id', $this->contract->id)->withCount('phases')->newQuery();
+    return $model->where('contract_id', $this->contract->id)->withCount('phases')
+    ->with(['contract' => function ($q){
+      $q->select(['contracts.id', 'currency']);
+    }])->newQuery();
   }
 
   /**

@@ -56,7 +56,7 @@ class InvoiceItemController extends Controller
     $invoice->phases()->syncWithoutDetaching($data);
     $invoice->updateSubtotal();
 
-    return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+    return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
 
   public function destroy(Invoice $invoice, $invoiceItem)
@@ -64,6 +64,6 @@ class InvoiceItemController extends Controller
     $invoice->items()->where('id', $invoiceItem)->delete();
     $invoice->updateSubtotal();
 
-    return $this->sendRes('success', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
+    return $this->sendRes('Item Removed', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
   }
 }

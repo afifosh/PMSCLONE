@@ -45,7 +45,10 @@ class StageStoreRequest extends FormRequest
       'start_date.after_or_equal' => 'The start date must be a date after or equal to contract start date.',
       'due_date.after' => 'The due date must be a date after start date.',
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.',
-      'committed_amount.required_if' => 'The committed amount is required',
+      'committed_amount.required_if' => 'The Allowable amount is required',
+      'committed_amount.max' => 'The Allowable amount must be less than or equal to remaining amount.',
+      'committed_amount.min' => 'The Allowable amount must be greater than or equal to 0.',
+      'committed_amount.numeric' => 'The Allowable amount must be a number.'
     ];
   }
 }

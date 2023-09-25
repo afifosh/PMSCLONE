@@ -280,6 +280,7 @@ class ContractController extends Controller
   {
     $data['assignable_id'] = $request->company_id;
     $data['assignable_type'] = Company::class;
+    $data['visible_to_client'] = $request->boolean('visible_to_client');
 
     if ($request->isSavingDraft)
       $data['status'] = 'Draft';
@@ -375,6 +376,7 @@ class ContractController extends Controller
 
     $data['assignable_id'] = $request->company_id;
     $data['assignable_type'] = Company::class;
+    $data['visible_to_client'] = $request->boolean('visible_to_client');
 
     if ($request->isSavingDraft)
       $data['status'] = 'Draft';

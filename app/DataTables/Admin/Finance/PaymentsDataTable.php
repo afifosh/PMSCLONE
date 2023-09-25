@@ -2,8 +2,10 @@
 
 namespace App\DataTables\Admin\Finance;
 
+use Akaunting\Money\Money;
 use App\Models\Company;
 use App\Models\Contract;
+use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\Payment;
 use Google\Service\AIPlatformNotebooks\Runtime;
@@ -16,7 +18,7 @@ use Yajra\DataTables\Services\DataTable;
 class PaymentsDataTable extends DataTable
 {
   /*
-  * @var null|App\Models\Company|App\Models\Contract
+  * @var null|App\Models\Company|App\Models\Contract|App\Models\Invoice
   */
   public $filterBy = null;
 
@@ -30,6 +32,9 @@ class PaymentsDataTable extends DataTable
     return (new EloquentDataTable($query))
       ->editColumn('invoice_id', function ($invoicePayment) {
         return '<a href="' . route('admin.invoices.edit', $invoicePayment->invoice_id) . '">' . runtimeInvIdFormat($invoicePayment->invoice_id) . '</a>';
+      })
+      ->editColumn('amount', function ($invoicePayment) {
+        return Money($invoicePayment->amount, $invoicePayment->contract->currency, true);
       })
       ->addColumn('action', function($invoicePayment){
         return view('admin.pages.finances.payment.action', compact('invoicePayment'));
@@ -52,9 +57,13 @@ class PaymentsDataTable extends DataTable
       $query->whereHas('invoice', function ($q) {
         $q->where('company_id', $this->filterBy->id);
       });
+    } else if($this->filterBy instanceof Invoice){
+      $query->where('invoice_id', $this->filterBy->id);
     }
 
-    return $query;
+    return $query->with(['contract' => function($q){
+      $q->select(['contracts.id', 'currency']);
+    }]);
   }
 
   /**

@@ -24,7 +24,11 @@ class PhasesDataTable extends DataTable
     return (new EloquentDataTable($query))
     ->editColumn('action', function($phase){
       return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $this->stage, 'contract_id' => $this->contract_id])->render();
-    });
+    })
+    ->editColumn('estimated_cost', function($phase){
+      return Money($phase->estimated_cost, $phase->contract->currency, true);
+    })
+    ;
   }
 
   /**
@@ -35,7 +39,9 @@ class PhasesDataTable extends DataTable
     // stage is type of ContractStage
     return $model->when($this->stage instanceof ContractStage, function($q){
       $q->where('stage_id', $this->stage->id);
-    })->newQuery();
+    })->with(['contract' => function($q){
+      $q->select('contracts.id', 'currency');
+    }])->newQuery();
   }
 
   /**

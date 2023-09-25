@@ -12,7 +12,7 @@
           <div class="d-flex align-items-center">
             <div class="badge rounded-pill bg-label-info me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
             <div class="card-info">
-              <h5 class="mb-0">{{$summary['total']}}</h5>
+              <h5 class="mb-0">@money($summary['total'] ?? 0, null, true)</h5>
               <small>{{__('Total Amount')}}</small>
             </div>
           </div>
@@ -21,7 +21,7 @@
           <div class="d-flex align-items-center">
             <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
             <div class="card-info">
-              <h5 class="mb-0">{{$summary['paid_amount']}}</h5>
+              <h5 class="mb-0">@money($summary['paid_amount'] ?? 0, null, true)</h5>
               <small>{{__('Paid Amount')}}</small>
             </div>
           </div>
@@ -30,7 +30,7 @@
           <div class="d-flex align-items-center">
             <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
             <div class="card-info">
-              <h5 class="mb-0">{{$summary['due_amount']}}</h5>
+              <h5 class="mb-0">@money($summary['due_amount'] ?? 0, null, true)</h5>
               <small>{{__('Due Amount')}}</small>
             </div>
           </div>

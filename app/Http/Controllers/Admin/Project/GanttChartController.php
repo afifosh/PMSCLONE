@@ -18,11 +18,19 @@ class GanttChartController extends Controller
       $q->where('project_id', request()->projects)->whereNotNull('project_id');
     })
       ->applyRequestFilters()
-      ->with(['phases' => function ($q) {
-        $q->select('contract_phases.id', 'contract_phases.name', 'start_date', 'due_date', 'contract_id');
-      }, 'project' => function ($q) {
-        $q->select('projects.id', 'name');
-      }, 'assignable'])
+      ->with([
+        'directPhases' => function ($q) {
+          $q->select('contract_phases.id', 'contract_phases.name', 'start_date', 'due_date', 'contract_id');
+        },
+        'stages' => function ($q) {
+          $q->select('contract_stages.id', 'contract_stages.name', 'start_date', 'due_date', 'contract_id');
+        },
+        'stages.phases' => function ($q) {
+          $q->select('contract_phases.id', 'contract_phases.name', 'start_date', 'due_date', 'contract_id', 'stage_id');
+        }, 'project' => function ($q) {
+          $q->select('projects.id', 'name');
+        }, 'assignable'
+      ])
       ->select('contracts.id', 'contracts.subject', 'contracts.project_id', 'contracts.status', 'contracts.start_date', 'contracts.end_date', 'assignable_type', 'assignable_id')->get();
 
     if (request()->ajax()) {

@@ -83,7 +83,26 @@
           placement: 'top'
       }
       var exampleEl = document.getElementById('tax-rates')
+      if(exampleEl)
       var popover = new bootstrap.Popover(exampleEl, options)
+
+      // discount popover
+      var options = {
+          html: true,
+          content: $('[data-name="popover-invoice-discount"]'),
+          placement: 'top'
+      }
+      var elm = document.getElementById('invoice-discount')
+      var popover = new bootstrap.Popover(elm, options)
+
+      // adjustment popover
+      var options = {
+          html: true,
+          content: $('[data-name="popover-invoice-adjustment"]'),
+          placement: 'top'
+      }
+      var elm = document.getElementById('invoice-adjustment')
+      var popover = new bootstrap.Popover(elm, options)
   })
 </script>
 @endsection
@@ -213,6 +232,12 @@
 
         <div class="row p-sm-2 pe-4">
           <div class="col-12 d-flex justify-content-end">
+            <section class="center">
+              <button id="invoice-adjustment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Adjustment</button>
+            </section>
+            <section class="center">
+              <button id="invoice-discount" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Discount</button>
+            </section>
             @if ($invoice->is_summary_tax)
               <section class="center">
                 <div hidden>
@@ -227,7 +252,13 @@
                         <div class="form-check">
                           <input class="form-check-input" name="invoice_taxes[]" type="checkbox" value="{{$tax->id}}" id="tax-{{$tax->id}}">
                           <label class="form-check-label" for="tax-{{$tax->id}}">
-                            {{$tax->name}} ({{$tax->amount}}{{$tax->type == 'Percent' ? '%' : ''}})
+                            {{$tax->name}} (
+                              @if($tax->type != 'Percent')
+                                @money($tax->amount, $invoice->contract->currency, true)
+                              @else
+                                {{$tax->amount}}%
+                              @endif
+                            )
                           </label>
                         </div>
                         @empty
@@ -238,7 +269,7 @@
                       </div>
                     </div>
                 </div>
-                <button id="tax-rates" type="button" tabindex="0" class="btn btn-sm btn-outline-primary rounded-pill" data-bs-toggle="popover">Tax Rates</button>
+                <button id="tax-rates" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Tax Rates</button>
               </section>
             @endif
             <div class="dropdown dropup">
@@ -300,7 +331,57 @@
     @csrf
     {!! Form::hidden('is_summary_tax', 1,) !!}
   </form>
-  <!-- /Invoice Actions -->
+  {{-- discount Popover --}}
+  <div hidden>
+    <div data-name="popover-invoice-discount">
+      <form method="POST" action="{{route('admin.invoices.update', [$invoice, 'update_discount' => 1])}}">
+        @method('PUT')
+        <div class="d-flex justify-content-between">
+          <b>Discount</b>
+          <button type="button" class="btn-close" onclick="$('#invoice-discount').popover('hide');" aria-label="Close"></button>
+        </div>
+        <hr class="m-0">
+        <div>
+          <div class="form-group">
+            {{ Form::label('discount_type', __('Discount Type'), ['class' => 'col-form-label']) }}
+            {!! Form::select('discount_type', ['0' => 'Select Type', 'Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select']) !!}
+          </div>
+          <div class="form-group">
+            {{ Form::label('discount_value', __('Discount Value'), ['class' => 'col-form-label']) }}
+            {!! Form::number('discount_value', null, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <button class="btn btn-primary btn-sm" data-form="ajax-form">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {{-- adjustment Popover --}}
+  <div hidden>
+    <div data-name="popover-invoice-adjustment">
+      <form method="POST" action="{{route('admin.invoices.update', [$invoice, 'update_adjustment' => 1])}}">
+        <div class="d-flex justify-content-between">
+          <b>Adjustment</b>
+          <button type="button" class="btn-close" onclick="$('#invoice-adjustment').popover('hide');" aria-label="Close"></button>
+        </div>
+        <hr class="m-0">
+        <div>
+          <div class="form-group">
+            {{ Form::label('adjustment_description', __('Description'), ['class' => 'col-form-label']) }}
+            {!! Form::number('adjustment_description', null, ['class' => 'form-control']) !!}
+          </div>
+          <div class="form-group">
+            {{ Form::label('adjustment_amount', __('Adjustment Amount'), ['class' => 'col-form-label']) }}
+            {!! Form::number('adjustment_amount', null, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <button class="btn btn-primary btn-sm" data-form="ajax-form">Update</button>
+        </div>
+      </form>
+    </div>
+</div>
 </div>
 
 <!-- Offcanvas -->
