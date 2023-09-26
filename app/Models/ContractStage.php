@@ -42,4 +42,9 @@ class ContractStage extends Model
   {
     return $this->hasMany(ContractPhase::class, 'stage_id');
   }
+
+  public function remainingAmount()
+  {
+    return $this->estimated_cost - $this->phases->sum('estimated_cost');
+  }
 }

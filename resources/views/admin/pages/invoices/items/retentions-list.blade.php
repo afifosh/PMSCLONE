@@ -1,23 +1,21 @@
-{!! Form::open(['route' => ['admin.invoices.invoice-items.store', $invoice->id], 'method' => 'POST']) !!}
+{!! Form::open(['route' => ['admin.invoices.invoice-items.store', [$invoice->id, 'type' => 'retentions']], 'method' => 'POST']) !!}
 
 <div class="row">
   <div class="table-responsive">
     <table class="table">
       <thead>
         <tr>
-          <th>{!! Form::checkbox('checkAll', 1, 0, ['class' => 'form-check-input phase-check-all']) !!}</th>
-          <th scope="col">Phase</th>
-          <th scope="col">Cost</th>
-          <th scope="col">Status</th>
+          <th>{!! Form::checkbox('checkAll', 1, 0, ['class' => 'form-check-input retention-check-all']) !!}</th>
+          <th scope="col">Invoice</th>
+          <th scope="col">Retention Amount</th>
         </tr>
       </thead>
       <tbody>
-        @forelse ($phases as $phase)
+        @forelse ($invoices as $invoice)
         <tr class="">
-          <th>{!! Form::checkbox('phases[]', $phase->id, 0, ['class' => 'form-check-input phase-item']) !!}</th>
-          <td>{{$phase->name}}</td>
-          <td>@money($phase->estimated_cost, $phase->contract->currency, true)</td>
-          <td>{{$phase->status}}</td>
+          <th>{!! Form::checkbox('retentions[]', $invoice->id, 0, ['class' => 'form-check-input retention-item']) !!}</th>
+          <td>{{runtimeInvIdFormat($invoice->id)}}</td>
+          <td>@money(-$invoice->retention_amount, $invoice->contract->currency, true)</td>
         </tr>
         @empty
         @endforelse

@@ -24,7 +24,7 @@ class ContractsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('id', function ($contract) {
+      ->editColumn('contracts.id', function ($contract) {
         return view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
       })
       ->addColumn('action', function ($contract) {
@@ -81,7 +81,7 @@ class ContractsDataTable extends DataTable
 
     $q->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
       ->select(
-        'contracts.*',
+        'contracts.id', 'contracts.project_id', 'contracts.type_id', 'contracts.value', 'contracts.start_date', 'contracts.end_date', 'contracts.status', 'contracts.assignable_id', 'assignable_type',
         DB::raw(
           'SUM(invoices.total)/100 as total,
           SUM(invoices.paid_amount)/100 as paid_amount,
@@ -89,7 +89,7 @@ class ContractsDataTable extends DataTable
           sum(invoices.total_tax)/100 as total_tax,
           (sum(invoices.paid_amount)/sum(contracts.value))*100 as paid_percent'
         )
-      )->groupBy('contracts.id');
+      )->groupBy(['contracts.id', 'contracts.project_id', 'contracts.type_id', 'contracts.value', 'contracts.start_date', 'contracts.end_date', 'contracts.status', 'contracts.assignable_id', 'assignable_type']);
 
     $q->applyRequestFilters();
 
@@ -137,7 +137,7 @@ class ContractsDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      Column::make('id')->title('Contract'),
+      Column::make('contracts.id')->title('Contract'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
       Column::make('value')->title('Amount'),

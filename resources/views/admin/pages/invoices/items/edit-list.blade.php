@@ -3,7 +3,7 @@
   <!--action-->
   <td class="text-left x-action bill_col_action" data-toggle="ajax-delete" data-href={{route('admin.invoices.invoice-items.destroy', [$invoice,'invoice_item' => $item->id])}}><i class="ti ti-trash"></i> </td>
   <!--description-->
-  <td class="text-left x-description bill_col_description">{{$item->invoiceable->name}}
+  <td class="text-left x-description bill_col_description">{{$item->invoiceable->name ?? runtimeInvIdFormat($item->invoiceable_id)}}
   </td>
   <td class="text-left x-rate bill_col_rate">@money($item->amount, $invoice->contract->currency, true)</td>
   <!--tax-->

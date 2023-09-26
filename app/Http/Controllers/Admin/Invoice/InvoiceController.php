@@ -69,24 +69,38 @@ class InvoiceController extends Controller
       $invoice->update($request->validated());
       $invoice->taxes()->detach();
       $invoice->updateItemsTaxType();
-      $invoice->updateTaxAmount();
+      $invoice->reCalculateTotal();
 
       return back()->with('success', 'Tax type updated successfully');
     }elseif($request->update_discount){
       if($request->discount_type == 'Percentage'){
-        $data['discount_amount'] = $invoice->subtotal * $request->discount_value / 100;
+        $data['discount_amount'] = -($invoice->subtotal * $request->discount_value) / 100; //store negative value
         $data['discount_percentage'] = $request->discount_value;
       }else{
-        $data['discount_amount'] = $request->discount_value;
+        $data['discount_amount'] = -$request->discount_value; //store negative value
         $data['discount_percentage'] = 0;
       }
-      $invoice->update($data);
+      $invoice->update($data + ['discount_type' => $request->discount_type]);
 
       return $this->sendRes('Discount updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     }elseif($request->update_adjustment){
       $invoice->update($request->validated());
+      $invoice->reCalculateTotal();
 
       return $this->sendRes('Adjustment updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
+    }elseif($request->update_retention){
+      // retention is basically deduction after applying discount, taxes and adjustments from the total. Which will be paid later on.
+      if($request->retention_type == 'Percentage'){
+        $data['retention_amount'] = -($invoice->subtotal * $request->retention_value) / 100;
+        $data['retention_percentage'] = $request->retention_value;
+      }else{
+        $data['retention_amount'] = -$request->retention_value;
+        $data['retention_percentage'] = 0;
+      }
+      $invoice->update($data + ['retention_type' => $request->retention_type]);
+      $invoice->reCalculateTotal();
+
+      return $this->sendRes('Retention updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     }
 
     $invoice->update(['status' => 'Sent'] + $request->validated());

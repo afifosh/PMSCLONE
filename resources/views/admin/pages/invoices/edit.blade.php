@@ -103,6 +103,15 @@
       }
       var elm = document.getElementById('invoice-adjustment')
       var popover = new bootstrap.Popover(elm, options)
+
+      // retention popover
+      var options = {
+          html: true,
+          content: $('[data-name="popover-invoice-retention"]'),
+          placement: 'top'
+      }
+      var elm = document.getElementById('invoice-retention')
+      var popover = new bootstrap.Popover(elm, options)
   })
 </script>
 @endsection
@@ -214,6 +223,7 @@
           <div class="row pb-4">
             <div class="col-12 mt-4">
               <button type="button" class="btn btn-primary" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
+              <button type="button" class="btn btn-primary" data-title="{{__('Select Retentions')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice, 'type' => 'retentions'])}}">Add Retention</button>
             </div>
           </div>
         </div>
@@ -232,6 +242,9 @@
 
         <div class="row p-sm-2 pe-4">
           <div class="col-12 d-flex justify-content-end">
+            <section class="center">
+              <button id="invoice-retention" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Retention</button>
+            </section>
             <section class="center">
               <button id="invoice-adjustment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Adjustment</button>
             </section>
@@ -361,6 +374,7 @@
   <div hidden>
     <div data-name="popover-invoice-adjustment">
       <form method="POST" action="{{route('admin.invoices.update', [$invoice, 'update_adjustment' => 1])}}">
+        @method('PUT')
         <div class="d-flex justify-content-between">
           <b>Adjustment</b>
           <button type="button" class="btn-close" onclick="$('#invoice-adjustment').popover('hide');" aria-label="Close"></button>
@@ -369,7 +383,7 @@
         <div>
           <div class="form-group">
             {{ Form::label('adjustment_description', __('Description'), ['class' => 'col-form-label']) }}
-            {!! Form::number('adjustment_description', null, ['class' => 'form-control']) !!}
+            {!! Form::text('adjustment_description', null, ['class' => 'form-control']) !!}
           </div>
           <div class="form-group">
             {{ Form::label('adjustment_amount', __('Adjustment Amount'), ['class' => 'col-form-label']) }}
@@ -381,7 +395,33 @@
         </div>
       </form>
     </div>
-</div>
+  </div>
+  {{-- retention Popover --}}
+  <div hidden>
+    <div data-name="popover-invoice-retention">
+      <form method="POST" action="{{route('admin.invoices.update', [$invoice, 'update_retention' => 1])}}">
+        @method('PUT')
+        <div class="d-flex justify-content-between">
+          <b>Retention</b>
+          <button type="button" class="btn-close" onclick="$('#invoice-retention').popover('hide');" aria-label="Close"></button>
+        </div>
+        <hr class="m-0">
+        <div>
+          <div class="form-group">
+            {{ Form::label('retention_type', __('Retention Type'), ['class' => 'col-form-label']) }}
+            {!! Form::select('retention_type', ['0' => 'Select Type', 'Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select']) !!}
+          </div>
+          <div class="form-group">
+            {{ Form::label('retention_value', __('Retention Value'), ['class' => 'col-form-label']) }}
+            {!! Form::number('retention_value', null, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <button class="btn btn-primary btn-sm" data-form="ajax-form">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <!-- Offcanvas -->

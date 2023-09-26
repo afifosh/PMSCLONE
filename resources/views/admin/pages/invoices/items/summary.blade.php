@@ -2,6 +2,15 @@
   <span class="w-px-100">Subtotal:</span>
   <span class="fw-semibold">@money($invoice->subtotal, $invoice->contract->currency, true)</span>
 </div>
+
+@if($invoice->discount_amount != 0)
+  <div class="d-flex justify-content-between mb-2">
+    <span class="w-px-100">Discount @if ($invoice->discount_type == 'Percentage')({{$invoice->discount_percentage}}%)@endif</span>
+    <span class="fw-semibold">@money($invoice->discount_amount, $invoice->contract->currency, true)</span>
+  </div>
+@endif
+
+<hr>
 @forelse ($invoice->taxes as $tax)
 @continue($tax->pivot->invoice_item_id != null)
 <div class="d-flex justify-content-between mb-2">
@@ -20,6 +29,19 @@
   <span class="w-px-100">Total Tax:</span>
   <span class="fw-semibold">@money($invoice->total_tax, $invoice->contract->currency, true)</span>
 </div>
+<hr />
+@if($invoice->adjustment_amount != 0)
+  <div class="d-flex justify-content-between mb-2">
+    <span class="w-px-100">{{$invoice->adjustment_description}}:</span>
+    <span class="fw-semibold">@money($invoice->adjustment_amount, $invoice->contract->currency, true)</span>
+  </div>
+@endif
+@if($invoice->retention_amount != 0)
+  <div class="d-flex justify-content-between mb-2">
+    <span class="w-px-100">Retention @if ($invoice->retention_type == 'Percentage')({{$invoice->retention_percentage}}%)@endif:</span>
+    <span class="fw-semibold">@money($invoice->retention_amount, $invoice->contract->currency, true)</span>
+  </div>
+@endif
 <hr />
 <div class="d-flex justify-content-between">
   <span class="w-px-100">Total:</span>

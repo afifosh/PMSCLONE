@@ -45,6 +45,18 @@ class InvoiceStoreRequest extends FormRequest
       ];
     }
 
+    elseif(request()->update_retention){
+      return [
+        'retention_type' => 'required|in:Fixed,Percentage',
+        'retention_value' => ['nullable', 'numeric', function($attribute, $value, $fail){
+          if(request()->retention_type == 'Percentage' && ($value > 100 || $value < 0))
+            $fail('Retention percentage must be between 0 and 100');
+          elseif(request()->retention_type == 'Fixed' && ($value > $this->invoice->subtotal || $value < 0))
+            $fail('Retention amount must be between 0 and invoice subtotal');
+        }],
+      ];
+    }
+
     if(request()->method() == 'PUT')
       return [
         'invoice_date' => 'required|date',

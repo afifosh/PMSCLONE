@@ -396,6 +396,24 @@ class ContractController extends Controller
 
   protected function updateValueAndAccount(Contract $contract, $request): void
   {
+    // if the account_balance_id is null means added from seeder and now being updated from dashboard.
+    // So first create the commitment transaction and then update the account_balance_id
+    if($contract->account_balance_id == null){
+      $this->transactionProcessor->create(
+        AccountBalance::find($request->account_balance_id),
+        new TransactionDto(
+          -$contract->value * 100,
+          'Debit',
+          'Contract Commitment',
+          '',
+          [],
+          ['type' => Contract::class, 'id' => $contract->id]
+        )
+      );
+
+      $contract->update(['account_balance_id' => $request->account_balance_id]);
+    }
+
     // if only contract amount is changed then update the account transaction
     if ($contract->account_balance_id == $request->account_balance_id && $contract->value != $request->value) {
       $this->transactionProcessor->create(

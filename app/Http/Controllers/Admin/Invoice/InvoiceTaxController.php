@@ -30,7 +30,7 @@ class InvoiceTaxController extends Controller
       $item->updateTaxAmount();
     } else
       $invoice->taxes()->sync($sync_data);
-      $invoice->updateTaxAmount();
+      $invoice->reCalculateTotal();
 
     return $this->sendRes('success');
   }
