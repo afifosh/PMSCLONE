@@ -99,7 +99,7 @@ class InvoiceController extends Controller
         $data['retention_amount'] = 0;
         $data['retention_percentage'] = 0;
       } elseif ($retenion->type == 'Percent') {
-        $data['retention_amount'] = - ($invoice->subtotal * $retenion->amount) / 100;
+        $data['retention_amount'] = - (($invoice->total) * $retenion->amount) / 100;
         $data['retention_percentage'] = $retenion->amount;
       } else {
         $data['retention_amount'] = -$retenion->amount;

@@ -122,7 +122,7 @@
       url: route('admin.contracts.show', {contract: contract_id, getjson: true}),
       type: 'GET',
       success: function(data){
-        $('#contract-remaining-balance').text(data.remaining_amount);
+        $('#contract-remaining-balance').text(data.value);
       }
     })
   });
