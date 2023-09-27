@@ -277,6 +277,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
       Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store', 'show']);
       Route::resource('program-accounts', ProgramAccountController::class)->only(['index', 'create', 'store']);
       Route::resource('program-accounts.transactions', ProgramTransactionController::class)->only(['index', 'create', 'store']);
+      Route::get('retentions', [TaxController::class, 'retentions'])->name('retentions.index');
       Route::resource('taxes', TaxController::class);
       Route::resource('payments', PaymentController::class);
     });

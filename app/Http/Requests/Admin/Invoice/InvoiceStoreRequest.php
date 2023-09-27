@@ -47,15 +47,22 @@ class InvoiceStoreRequest extends FormRequest
 
     elseif(request()->update_retention){
       return [
-        'retention_type' => 'required|in:Fixed,Percentage',
-        'retention_value' => ['nullable', 'numeric', function($attribute, $value, $fail){
-          if(request()->retention_type == 'Percentage' && ($value > 100 || $value < 0))
-            $fail('Retention percentage must be between 0 and 100');
-          elseif(request()->retention_type == 'Fixed' && ($value > $this->invoice->subtotal || $value < 0))
-            $fail('Retention amount must be between 0 and invoice subtotal');
-        }],
+        'retention_id' => 'nullable|exists:taxes,id,is_retention,1',
+        // 'retention_type' => 'required|in:Fixed,Percentage',
+        // 'retention_value' => ['nullable', 'numeric', function($attribute, $value, $fail){
+        //   if(request()->retention_type == 'Percentage' && ($value > 100 || $value < 0))
+        //     $fail('Retention percentage must be between 0 and 100');
+        //   elseif(request()->retention_type == 'Fixed' && ($value > $this->invoice->subtotal || $value < 0))
+        //     $fail('Retention amount must be between 0 and invoice subtotal');
+        // }],
       ];
     }
+
+    elseif(request()->type == 'downpayment')
+      return [
+        'subtotal' => 'required|numeric|gt:0',
+        'description' => 'required|string|max:255',
+      ];
 
     if(request()->method() == 'PUT')
       return [
@@ -66,6 +73,9 @@ class InvoiceStoreRequest extends FormRequest
       ];
 
     return [
+      'type' => 'required|in:Regular,Down Payment',
+      'subtotal' => 'nullable|required_if:type,Down Payment|numeric'.(request()->type == 'Down Payment' ? '|gt:0' : ''),
+      'description' => 'nullable|required_if:type,Down Payment|string|max:255',
       'company_id' => 'required|exists:companies,id',
       'contract_id' => 'required|exists:contracts,id',
       'invoice_date' => 'required|date',
@@ -92,5 +102,9 @@ class InvoiceStoreRequest extends FormRequest
       'invoice_date.date' => 'Invoice date is not valid',
       'due_date.required' => 'Due date is required',
       'due_date.date' => 'Due date is not valid',
+      'subtotal.required_if' => 'Subtotal is required',
+      'subtotal.numeric' => 'Subtotal must be a number',
+      'subtotal.gt' => 'Subtotal must be greater than 0',
+      'discription.required_if' => 'Description is required',
     ];}
 }

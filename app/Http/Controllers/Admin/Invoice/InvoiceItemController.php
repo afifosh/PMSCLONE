@@ -62,7 +62,7 @@ class InvoiceItemController extends Controller
     // formate data for pivot table
     $data = [];
     foreach ($phases as $phase) {
-      $data[$phase] = ['amount' => $pivot_amounts[$phase]];
+      $data[$phase] = ['amount' => $pivot_amounts[$phase] * 100]; // convert to cents manually, setter is not working for pivot table
     }
 
     $invoice->phases()->syncWithoutDetaching($data);

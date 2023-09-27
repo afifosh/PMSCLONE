@@ -25,6 +25,26 @@ class InvoiceItem extends Model
     'updated_at' => 'datetime:d M, Y',
   ];
 
+  public function getAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setAmountAttribute($value)
+  {
+    $this->attributes['amount'] = round($value * 100);
+  }
+
+  public function getTotalTaxAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setTotalTaxAmountAttribute($value)
+  {
+    $this->attributes['total_tax_amount'] = round($value * 100);
+  }
+
   // public function invoice()
   // {
   //   return $this->belongsTo(Invoice::class);

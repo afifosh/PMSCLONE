@@ -25,16 +25,19 @@ class Invoice extends Model
     'paid_amount',
     'is_summary_tax',
     'note',
+    'description',
     'terms',
     'discount_type',
     'discount_percentage',
     'discount_amount',
     'adjustment_description',
     'adjustment_amount',
-    'retention_type',
+    'retention_id',
+    'retention_name',
     'retention_percentage',
     'retention_amount',
-    'status'
+    'status',
+    'type'
   ];
 
   protected $casts = [
@@ -165,7 +168,10 @@ class Invoice extends Model
 
   public function updateSubtotal(): void
   {
-    $subtotal = $this->items()->sum('amount');
+    $subtotal = $this->items()->sum('amount') / 100;
+    if(!$subtotal){
+      $this->update(['discount_amount' => 0]);
+    }
     // dd($subtotal, $this->discount_amount, $this->total_tax, $this->retention_amount, $this->adjustment_amount);
     $this->update([
       'subtotal' => $subtotal,

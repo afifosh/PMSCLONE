@@ -1,7 +1,7 @@
 @if ($tax->id)
     {!! Form::model($tax, ['route' => ['admin.finances.taxes.update', $tax->id], 'method' => 'PUT']) !!}
 @else
-    {!! Form::model($tax, ['route' => ['admin.finances.taxes.store'], 'method' => 'POST']) !!}
+    {!! Form::model($tax, ['route' => ['admin.finances.taxes.store', ['tax-type' => request()->type]], 'method' => 'POST']) !!}
 @endif
 
 <div class="row">

@@ -17,14 +17,13 @@ class InvoiceController extends Controller
   {
     $data = [];
 
-    if(request()->route()->getName() == 'admin.contracts.invoices.index'){
+    if (request()->route()->getName() == 'admin.contracts.invoices.index') {
       $dataTable->filterBy = Contract::findOrFail(request()->route('contract'));
       $data['contract'] = $dataTable->filterBy;
-    }
-    elseif(request()->route()->getName() == 'admin.companies.invoices.index'){
+    } elseif (request()->route()->getName() == 'admin.companies.invoices.index') {
       $dataTable->filterBy = Company::findOrFail(request()->route('company'));
       $data['company'] = $dataTable->filterBy;
-    }else {
+    } else {
       $data['summary'] = Invoice::selectRaw('SUM(total) as total, SUM(paid_amount) as paid_amount, SUM(total - paid_amount)/100 as due_amount')->first();
       $data['overdue'] = Invoice::where('due_date', '<', now())->where('status', '!=', 'Paid')->count();
       $data['contracts'] = Contract::has('invoices')->pluck('subject', 'id')->prepend('All', '');
@@ -44,7 +43,7 @@ class InvoiceController extends Controller
 
   public function store(InvoiceStoreRequest $request)
   {
-    $invoice = Invoice::create($request->validated());
+    $invoice = Invoice::create($request->validated() + ['total' => $request->subtotal]);
 
     return $this->sendRes('Invoice Added Successfully', ['event' => 'redirect', 'url' => route('admin.invoices.edit', $invoice)]);
   }
@@ -58,49 +57,69 @@ class InvoiceController extends Controller
   {
     $invoice->load('items.invoiceable', 'items.taxes');
     $data['invoice'] = $invoice;
-    $data['tax_rates'] = Tax::get();
+    $data['tax_rates'] = Tax::get(); // both retention and taxes, will be filtered in view
+
+    if($invoice->type != 'Regular'){
+      return view('admin.pages.invoices.edit-downpayment', $data);
+    }
 
     return view('admin.pages.invoices.edit', $data);
   }
 
   public function update(InvoiceStoreRequest $request, Invoice $invoice)
   {
-    if($request->update_tax_type){
+    if ($request->update_tax_type) {
       $invoice->update($request->validated());
       $invoice->taxes()->detach();
       $invoice->updateItemsTaxType();
       $invoice->reCalculateTotal();
 
       return back()->with('success', 'Tax type updated successfully');
-    }elseif($request->update_discount){
-      if($request->discount_type == 'Percentage'){
-        $data['discount_amount'] = -($invoice->subtotal * $request->discount_value) / 100; //store negative value
+    } elseif ($request->update_discount) {
+      if ($request->discount_type == 'Percentage') {
+        $data['discount_amount'] = - ($invoice->subtotal * $request->discount_value) / 100; //store negative value
         $data['discount_percentage'] = $request->discount_value;
-      }else{
+      } else {
         $data['discount_amount'] = -$request->discount_value; //store negative value
         $data['discount_percentage'] = 0;
       }
       $invoice->update($data + ['discount_type' => $request->discount_type]);
+      $invoice->reCalculateTotal();
 
       return $this->sendRes('Discount updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
-    }elseif($request->update_adjustment){
+    } elseif ($request->update_adjustment) {
       $invoice->update($request->validated());
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Adjustment updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
-    }elseif($request->update_retention){
+    } elseif ($request->update_retention) {
       // retention is basically deduction after applying discount, taxes and adjustments from the total. Which will be paid later on.
-      if($request->retention_type == 'Percentage'){
-        $data['retention_amount'] = -($invoice->subtotal * $request->retention_value) / 100;
-        $data['retention_percentage'] = $request->retention_value;
-      }else{
-        $data['retention_amount'] = -$request->retention_value;
+      $retenion = Tax::where('is_retention', true)->find($request->retention_id);
+      if (!$retenion) {
+        $data['retention_amount'] = 0;
+        $data['retention_percentage'] = 0;
+      } elseif ($retenion->type == 'Percent') {
+        $data['retention_amount'] = - ($invoice->subtotal * $retenion->amount) / 100;
+        $data['retention_percentage'] = $retenion->amount;
+      } else {
+        $data['retention_amount'] = -$retenion->amount;
         $data['retention_percentage'] = 0;
       }
-      $invoice->update($data + ['retention_type' => $request->retention_type]);
+      // if($request->retention_type == 'Percentage'){
+      //   $data['retention_amount'] = -($invoice->subtotal * $request->retention_value) / 100;
+      //   $data['retention_percentage'] = $request->retention_value;
+      // }else{
+      //   $data['retention_amount'] = -$request->retention_value;
+      //   $data['retention_percentage'] = 0;
+      // }
+      $invoice->update($data + ['retention_id' => $request->retention_id, 'retention_name' => $retenion->name ?? null]);
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Retention updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
+    }elseif($request->type == 'downpayment'){
+      $invoice->update($request->validated() + ['total' => $request->subtotal]);
+
+      return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
     }
 
     $invoice->update(['status' => 'Sent'] + $request->validated());

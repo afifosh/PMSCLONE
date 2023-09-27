@@ -15,6 +15,7 @@ return new class extends Migration
       $table->id();
       $table->foreignId('company_id')->constrained()->cascadeOnDelete();
       $table->foreignId('contract_id')->constrained()->cascadeOnDelete();
+      $table->enum('type', ['Regular', 'Down Payment'])->default('Regular');
       $table->date('invoice_date');
       $table->date('due_date');
       $table->date('sent_date')->nullable()->comment('Date the invoice was sent to the client');
@@ -24,6 +25,7 @@ return new class extends Migration
       $table->bigInteger('total_tax')->default(0);
       $table->bigInteger('total')->default(0);
       $table->bigInteger('paid_amount')->default(0);
+      $table->string('description')->nullable();
       $table->text('note')->nullable();
       $table->text('terms')->nullable();
       $table->enum('discount_type', ['Fixed', 'Percentage'])->nullable();
@@ -31,7 +33,8 @@ return new class extends Migration
       $table->bigInteger('discount_amount')->default(0);
       $table->string('adjustment_description')->nullable();
       $table->bigInteger('adjustment_amount')->default(0);
-      $table->enum('retention_type', ['Fixed', 'Percentage'])->nullable();
+      $table->foreignId('retention_id')->nullable()->constrained('taxes')->nullOnDelete();
+      $table->string('retention_name')->nullable();
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
       $table->enum('status', ['Draft', 'Sent', 'Paid', 'Partial paid','Cancelled'])->default('draft');

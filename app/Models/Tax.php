@@ -13,7 +13,8 @@ class Tax extends Model
     'name',
     'type',
     'amount',
-    'status'
+    'status',
+    'is_retention'
   ];
 
   protected $casts = [

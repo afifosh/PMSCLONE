@@ -17,9 +17,6 @@
 @endsection
 
 @section('page-script')
-<script src="{{asset('assets/js/offcanvas-add-payment.js')}}"></script>
-<script src="{{asset('assets/js/offcanvas-send-invoice.js')}}"></script>
-<script src="{{asset('assets/js/app-invoice-edit.js')}}"></script>
 <script src="{{asset('assets/js/custom/flatpickr.js')}}"></script>
 <script src="{{asset('assets/js/custom/select2.js')}}"></script>
 <script>
@@ -261,7 +258,7 @@
                       </div>
                       <hr class="m-0">
                       <div class="mt-2">
-                        @forelse ($tax_rates as $tax)
+                        @forelse ($tax_rates->where('is_retention', false) as $tax)
                         <div class="form-check">
                           <input class="form-check-input" name="invoice_taxes[]" type="checkbox" value="{{$tax->id}}" id="tax-{{$tax->id}}">
                           <label class="form-check-label" for="tax-{{$tax->id}}">
@@ -408,13 +405,29 @@
         <hr class="m-0">
         <div>
           <div class="form-group">
+            {{ Form::label('retention_id', __(' Retention'), ['class' => 'col-form-label']) }}
+            <select name="retention_id" id="retention_id" class="form-select select2">
+              <option value="">{{__('Select Retention')}}</option>
+              @forelse ($tax_rates->where('is_retention', true) as $ret)
+                <option value="{{$ret->id}}">{{$ret->name}} (
+                  @if ($ret->type != 'Percent')
+                      @money($ret->amount, $invoice->contract->currency, true)
+                  @else
+                      {{$ret->amount}}%
+                  @endif
+                )</option>
+              @empty
+              @endforelse
+            </select>
+          </div>
+          {{-- <div class="form-group">
             {{ Form::label('retention_type', __('Retention Type'), ['class' => 'col-form-label']) }}
             {!! Form::select('retention_type', ['0' => 'Select Type', 'Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select']) !!}
           </div>
           <div class="form-group">
             {{ Form::label('retention_value', __('Retention Value'), ['class' => 'col-form-label']) }}
             {!! Form::number('retention_value', null, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
-          </div>
+          </div> --}}
         </div>
         <div class="d-flex justify-content-end mt-2">
           <button class="btn btn-primary btn-sm" data-form="ajax-form">Update</button>
@@ -423,9 +436,4 @@
     </div>
   </div>
 </div>
-
-<!-- Offcanvas -->
-@include('_partials/_offcanvas/offcanvas-send-invoice')
-@include('_partials/_offcanvas/offcanvas-add-payment')
-<!-- /Offcanvas -->
 @endsection

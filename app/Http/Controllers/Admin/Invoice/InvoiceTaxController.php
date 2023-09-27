@@ -13,7 +13,7 @@ class InvoiceTaxController extends Controller
   {
     $request->validate([
       'taxes' => 'nullable|array',
-      'taxes.*' => 'nullable|exists:taxes,id',
+      'taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
     ]);
 
     $taxes = filterInputIds($request->taxes ?? []);

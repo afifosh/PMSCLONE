@@ -316,6 +316,9 @@ class ContractController extends Controller
    */
   public function show(Contract $contract)
   {
+    if(request()->getjson){
+      return response()->json($contract);
+    }
     $data['contract'] = $contract->load('notifiableUsers');
     $data['summary'] = $contract->events()->selectRaw('event_type, count(*) as total')->groupBy('event_type')->get();
 

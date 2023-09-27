@@ -29,16 +29,16 @@
   <span class="w-px-100">Total Tax:</span>
   <span class="fw-semibold">@money($invoice->total_tax, $invoice->contract->currency, true)</span>
 </div>
-<hr />
 @if($invoice->adjustment_amount != 0)
+<hr />
   <div class="d-flex justify-content-between mb-2">
     <span class="w-px-100">{{$invoice->adjustment_description}}:</span>
     <span class="fw-semibold">@money($invoice->adjustment_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif
-@if($invoice->retention_amount != 0)
+@if($invoice->retention_name != null)
   <div class="d-flex justify-content-between mb-2">
-    <span class="w-px-100">Retention @if ($invoice->retention_type == 'Percentage')({{$invoice->retention_percentage}}%)@endif:</span>
+    <span class="w-px-100">Retention ({{$invoice->retention_name}} @if ($invoice->retention_percentage){{$invoice->retention_percentage}}%@endif):</span>
     <span class="fw-semibold">@money($invoice->retention_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif

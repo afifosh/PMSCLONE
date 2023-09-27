@@ -29,10 +29,11 @@ class ChangeRequestController extends Controller
     // view('admin.pages.contracts.change-requests.index')
   }
 
-  public function create(Contract $contract)
+  public function create($contract)
   {
+    $contract = Contract::where('id', $contract)->firstOrNew();
     $change_order = new ContractChangeRequest();
-    $currency = config('money.currencies.'.$contract->currency ?? config('money.defaults.currency'));
+    $currency = config('money.currencies.'.($contract->currency ?? config('money.defaults.currency')));
 
     $currency = [$contract->currency ?? config('money.defaults.currency') => $currency['name']];
 
