@@ -21,9 +21,13 @@ class KycDocument extends Model
     'expiry_date_title',
     'is_expiry_date_required',
     'fields',
+    'workflow',
+    'contract_type_id',
+    'contract_category_id',
+    'client_type'
   ];
 
-  public const TYPES = ['date', 'email', 'file', 'number', 'tel','text', 'textarea'];
+  public const TYPES = ['date', 'email', 'file', 'number', 'tel', 'text', 'textarea'];
 
   public const VALIDATIONS = [
     'date' => ['date'],
@@ -43,4 +47,14 @@ class KycDocument extends Model
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
+
+  public function contractType()
+  {
+    return $this->belongsTo(ContractType::class);
+  }
+
+  public function contractCategory()
+  {
+    return $this->belongsTo(ContractCategory::class);
+  }
 }

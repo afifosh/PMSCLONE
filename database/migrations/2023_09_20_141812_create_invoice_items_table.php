@@ -18,6 +18,7 @@ return new class extends Migration
       $table->unsignedBigInteger('amount')->default(0)->comment('Amount without tax');
       $table->unsignedBigInteger('total_tax_amount')->default(0);
       $table->string('description')->nullable();
+      $table->unsignedInteger('order')->default(0);
       $table->timestamps();
     });
   }

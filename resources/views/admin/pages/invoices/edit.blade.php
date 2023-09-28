@@ -14,12 +14,33 @@
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/sortablejs/sortable.js')}}"></script>
 @endsection
 
 @section('page-script')
 <script src="{{asset('assets/js/custom/flatpickr.js')}}"></script>
 <script src="{{asset('assets/js/custom/select2.js')}}"></script>
 <script>
+  function initSortable() {
+    var sortable = Sortable.create(document.getElementById('billing-items-container'), {
+      handle: '.bi-drag',
+      group: 'shared',
+      animation: 150,
+      dataIdAttr: 'data-id',
+      onSort: function (/**Event*/evt) {
+        $.ajax({
+          url: route('admin.invoices.invoice-items.sort', { invoice: {{$invoice->id}}}),
+          type: "PUT",
+          data: {
+            items: sortable.toArray(),
+          },
+          success: function(res){
+          }
+        });
+      },
+
+    });
+  }
   function reloadPhasesList(){
     $.ajax({
       url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit' }),
@@ -74,6 +95,7 @@
   }
 
   $(document).ready(function() {
+    initSortable();
       var options = {
           html: true,
           content: $('[data-name="popover-tax-rates"]'),
@@ -197,14 +219,15 @@
                     <thead>
                         <tr>
                             <!--action-->
-                            <th class="text-left x-action bill_col_action"></th>
+                            <th class="text-left x-action bill_col_action">Action</th>
                             <!--description-->
-                            <th class="text-left x-description bill_col_description">Item
-                            </th>
-                            <th class="text-left x-rate bill_col_rate">Amount</th>
+                            <th class="text-left x-description bill_col_description">Item</th>
+                            <th class="text-left x-description bill_col_description">Price</th>
+                            <th class="text-left x-description bill_col_description">QTY</th>
+                            <th class="text-left x-rate bill_col_rate">Subtotal</th>
                             <!--tax-->
                             @if (!$invoice->is_summary_tax)
-                              <th class="text-left x-tax bill_col_tax ">Tax</th>
+                              <th class="" style="min-width: 180px;">Tax</th>
                             @endif
                             <!--total-->
                             <th class="text-right x-total bill_col_total" id="bill_col_total">Total
@@ -219,6 +242,7 @@
         </div>
           <div class="row pb-4">
             <div class="col-12 mt-4">
+              <button type="button" class="btn btn-primary" data-title="{{__('Add Item')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.custom-invoice-items.create',[$invoice])}}">Add Item</button>
               <button type="button" class="btn btn-primary" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
               <button type="button" class="btn btn-primary" data-title="{{__('Select Retentions')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice, 'type' => 'retentions'])}}">Add Retention</button>
             </div>

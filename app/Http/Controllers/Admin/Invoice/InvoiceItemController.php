@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Invoice;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\InvoiceItemsStoreReqeust;
 use App\Models\ContractPhase;
+use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
 use App\Models\Tax;
 use Illuminate\Http\Request;
@@ -84,7 +85,7 @@ class InvoiceItemController extends Controller
     // formate data for pivot table
     $data = [];
     foreach ($retentions as $retention) {
-      $data[$retention] = ['amount' => -$pivot_amounts[$retention]]; // it was negative in db so make it positive
+      $data[$retention] = ['amount' => -$pivot_amounts[$retention] * 100]; // it was negative in db so make it positive and then convert to cents manually, setter is not working for pivot table
     }
 
     $invoice->retentions()->syncWithoutDetaching($data);
@@ -96,7 +97,12 @@ class InvoiceItemController extends Controller
 
   public function destroy(Invoice $invoice, $invoiceItem)
   {
+    $item = $invoice->items()->find($invoiceItem);
+    if($item->invoiceable_type == CustomInvoiceItem::class)
+      $item->invoiceable->delete();
+
     $invoice->items()->where('id', $invoiceItem)->delete();
+
     $invoice->updateSubtotal();
 
     return $this->sendRes('Item Removed', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);

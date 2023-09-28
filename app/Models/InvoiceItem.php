@@ -17,6 +17,7 @@ class InvoiceItem extends Model
     'amount',
     'total_tax_amount',
     'description',
+    'order'
   ];
 
   protected $casts = [
@@ -64,6 +65,6 @@ class InvoiceItem extends Model
   {
     $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount');
     $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount');
-    $this->update(['total_tax_amount' => $fixed_tax + ($this->invoiceable->estimated_cost * $percent_tax / 100)]);
+    $this->update(['total_tax_amount' => $fixed_tax + ($this->invoiceable->estimated_cost ?? $this->invoiceable->total * $percent_tax / 100)]);
   }
 }

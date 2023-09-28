@@ -60,7 +60,7 @@ class ContractPhase extends Model
   {
     if($this->due_date->isPast()) return 'Expired';
     elseif($this->start_date->isFuture()) return 'Not started';
-    elseif(now() > $this->due_date->subWeeks(2)) return 'About To Expire';
+    elseif(now() > $this->due_date->subMonth()) return 'About To Expire';
     elseif(now() >= $this->start_date) return 'Active';
   }
 

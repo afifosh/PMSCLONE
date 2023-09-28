@@ -1,17 +1,27 @@
 @forelse ($invoice->items as $item)
-<tr>
+<tr data-id="{{$item->id}}">
   <!--action-->
-  <td class="text-left x-action bill_col_action" data-toggle="ajax-delete" data-href={{route('admin.invoices.invoice-items.destroy', [$invoice,'invoice_item' => $item->id])}}><i class="ti ti-trash"></i> </td>
-  <!--description-->
-  <td class="text-left x-description bill_col_description">{{$item->invoiceable->name ?? runtimeInvIdFormat($item->invoiceable_id)}}
+  <td class="cursor-pointer">
+    <span class="bi-drag pt-1 cursor-grab"><i class="ti ti-menu-2"></i></span>
+    <span data-toggle="ajax-delete" data-href={{route('admin.invoices.invoice-items.destroy', [$invoice,'invoice_item' => $item->id])}}><i class="ti ti-trash"></i> </span>
   </td>
-  <td class="text-left x-rate bill_col_rate">@money($item->amount, $invoice->contract->currency, true)</td>
+  <!--description-->
+  <td class="">{{$item->invoiceable->name ?? runtimeInvIdFormat($item->invoiceable_id)}}</td>
+  <td>
+    @if ($item->invoiceable_type == 'App\Models\CustomInvoiceItem')
+      @money($item->invoiceable->price, $invoice->contract->currency, true)
+    @else
+      @money($item->amount, $invoice->contract->currency, true)
+    @endif
+  </td>
+  <td>{{$item->invoiceable->quantity ?? 1}}</td>
+  <td class="">@money($item->amount, $invoice->contract->currency, true)</td>
   <!--tax-->
   @if (!$invoice->is_summary_tax)
     <td class="text-left" style="max-width: 170px;">
       <div class="mb-3">
         <select class="form-select invoice_taxes select2" data-item-id="{{$item->id}}" name="invoice_taxes[]" multiple data-placeholder="{{__('Select Tax')}}">
-          @forelse ($tax_rates as $tax)
+          @forelse ($tax_rates->where('is_retention', false) as $tax)
             <option @selected($item->taxes->contains($tax)) value="{{$tax->id}}">{{$tax->name}} (
               @if($tax->type != 'Percent')
                 @money($tax->amount, $invoice->contract->currency, true)

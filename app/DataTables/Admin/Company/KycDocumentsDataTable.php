@@ -43,7 +43,7 @@ class KycDocumentsDataTable extends DataTable
      */
     public function query(KycDocument $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->where('workflow', 'Company Kyc')->newQuery();
     }
 
     /**

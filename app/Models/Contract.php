@@ -108,7 +108,7 @@ class Contract extends Model
         return "Expired";
       } elseif ($this->start_date->isFuture()) {
         return "Not Started";
-      } elseif (now()->diffInDays($this->end_date) <= 14) {
+      } elseif (now()->diffInDays($this->end_date) <= 30) {
         return "About To Expire";
       } else {
         return "Active";
@@ -146,9 +146,9 @@ class Contract extends Model
       } elseif (request()->filter_status == 'Paused') {
         $q->where('status', 'Paused');
       } elseif (request()->filter_status == 'Active') {
-        $q->where('status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now())->where('end_date', '>=', now()->addWeeks(2));
+        $q->where('status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now());//->where('end_date', '>=', now()->addWeeks(2));
       } elseif (request()->filter_status == 'About To Expire') {
-        $q->where('status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addWeeks(2));
+        $q->where('status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addMonth());
       }
     })->when(request()->companies, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);

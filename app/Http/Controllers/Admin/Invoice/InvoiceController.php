@@ -133,4 +133,17 @@ class InvoiceController extends Controller
 
     return $this->sendRes('Invoice deleted successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table']);
   }
+
+  public function sortItems(Invoice $invoice, Request $request)
+  {
+    $request->validate([
+      'items' => 'required|array',
+      'items.*' => 'required|integer|exists:invoice_items,id,invoice_id,' . $invoice->id,
+    ]);
+
+    foreach($request->items as $order => $item_id){
+      $invoice->items()->where('id', $item_id)->update(['order' => $order]);
+    }
+
+  }
 }
