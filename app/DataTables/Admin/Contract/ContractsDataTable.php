@@ -71,33 +71,55 @@ class ContractsDataTable extends DataTable
       ->rawColumns(['id']);
   }
 
-  /**
-   * Get the query source of dataTable.
-   */
-  public function query(Contract $model): QueryBuilder
-  {
-    $q = $model->with(['type', 'assignable', 'category'])->newQuery();
+/**
+ * Get the query source of dataTable.
+ */
+public function query(Contract $model): QueryBuilder
+{
+    // Start the base query
+    $query = $model->newQuery()
+        ->select([
+            'contracts.id',
+            'contracts.refrence_id',
+            'contracts.project_id',
+            'contracts.type_id',
+            'contracts.value',
+            'contracts.start_date',
+            'contracts.end_date',
+            'contracts.status',
+            'contracts.assignable_id',
+            'assignable_type',
+            DB::raw('SUM(invoices.total)/100 as total'),
+            DB::raw('SUM(invoices.paid_amount)/100 as paid_amount'),
+            DB::raw('sum(invoices.total - invoices.paid_amount)/100 as due_amount'),
+            DB::raw('sum(invoices.total_tax)/100 as total_tax'),
+            DB::raw('(sum(invoices.paid_amount)/sum(contracts.value))*100 as paid_percent')
+        ])
+        ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+        ->groupBy([
+            'contracts.id',
+            'contracts.project_id',
+            'contracts.type_id',
+            'contracts.value',
+            'contracts.start_date',
+            'contracts.end_date',
+            'contracts.status',
+            'contracts.assignable_id',
+            'assignable_type'
+        ])
+        ->with(['type', 'assignable', 'category']);
 
+    // If a projectId is provided, filter by it
     if ($this->projectId) {
-      $q->where('project_id', $this->projectId);
+        $query->where('project_id', $this->projectId);
     }
 
-    $q->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
-      ->select(
-        'contracts.id', 'contracts.refrence_id', 'contracts.project_id', 'contracts.type_id', 'contracts.value', 'contracts.start_date', 'contracts.end_date', 'contracts.status', 'contracts.assignable_id', 'assignable_type',
-        DB::raw(
-          'SUM(invoices.total)/100 as total,
-          SUM(invoices.paid_amount)/100 as paid_amount,
-          sum(invoices.total - invoices.paid_amount)/100 as due_amount,
-          sum(invoices.total_tax)/100 as total_tax,
-          (sum(invoices.paid_amount)/sum(contracts.value))*100 as paid_percent'
-        )
-      )->groupBy(['contracts.id', 'contracts.project_id', 'contracts.type_id', 'contracts.value', 'contracts.start_date', 'contracts.end_date', 'contracts.status', 'contracts.assignable_id', 'assignable_type']);
+    // Apply any additional filters if necessary
+    $query->applyRequestFilters();
 
-    $q->applyRequestFilters();
+    return $query;
+}
 
-    return $q;
-  }
 
   /**
    * Optional method if you want to use the html builder.
