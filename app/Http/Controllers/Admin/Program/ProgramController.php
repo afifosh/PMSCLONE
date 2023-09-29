@@ -19,7 +19,8 @@ class ProgramController extends Controller
   {
     $data['program'] = new Program();
     // $data['programs'] = Program::where('parent_id', null)->pluck('name', 'id')->prepend('Select Program', '');
-    $data['programs'] = Program::where('id', '!=', $program->id)->pluck('name', 'id')->prepend(__('Select Program'), '');
+    $data['programs'] = $data['programs'] = Program::pluck('name', 'id')->prepend('Select Program', '');
+
     return $this->sendRes('success', ['view_data' => view('admin.pages.programs.edit', $data)->render()]);
   }
 
