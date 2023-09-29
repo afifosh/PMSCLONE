@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Akaunting\Money\Currency;
 use Akaunting\Money\Money;
 use App\Models\Program;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class AccountBalance extends Model
 {
+
+  use HasFactory;  
     /**
      * The database table used by the model.
      *
@@ -39,14 +42,14 @@ class AccountBalance extends Model
     }
 
     // create 16 digits unique account number
-    protected function createUniqueAccountNumber()
+    public static function createUniqueAccountNumber()
     {
-      $accountNumber = rand(1000000000000000, 9999999999999999);
-      $account = AccountBalance::where('account_number', $accountNumber)->exists();
-      if($account){
-        $this->createUniqueAccountNumber();
-      }
-      return $accountNumber;
+        do {
+            $accountNumber = rand(1000000000000000, 9999999999999999);
+            $exists = self::where('account_number', $accountNumber)->exists();
+        } while ($exists);
+    
+        return $accountNumber;
     }
 
     public function printableBalance()
@@ -105,4 +108,15 @@ class AccountBalance extends Model
     {
         $this->balance = $balance->getAmount();
     }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return \Database\Factories\AccountBalanceFactory::new();
+    }
+
 }

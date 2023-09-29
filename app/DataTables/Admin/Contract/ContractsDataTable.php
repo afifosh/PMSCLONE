@@ -45,6 +45,9 @@ class ContractsDataTable extends DataTable
       ->editColumn('type.name', function ($project) {
         return $project->type ? $project->type->name : '-';
       })
+      ->editColumn('category.name', function ($project) {
+        return $project->category ? $project->category->name : '-';
+      })      
       ->editColumn('value', function (Contract $contract) {
         return view('admin.pages.contracts.value-column', compact('contract'));
       })
@@ -73,7 +76,7 @@ class ContractsDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    $q = $model->with(['type', 'assignable'])->newQuery();
+    $q = $model->with(['type', 'assignable', 'category'])->newQuery();
 
     if ($this->projectId) {
       $q->where('project_id', $this->projectId);
@@ -138,10 +141,12 @@ class ContractsDataTable extends DataTable
   {
     return [
       Column::make('id')->title('Contract'),
+      Column::make('refrence_id')->title('Ref ID'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
+      Column::make('category.name')->title('Category'),
       Column::make('value')->title('Amount'),
-      Column::make('paid_percent')->title('Paid')->searchable(false),
+      // Column::make('paid_percent')->title('Paid')->searchable(false),
       Column::make('start_date'),
       Column::make('end_date'),
       // Column::make('phases_count')->title('Phases')->searchable(false),

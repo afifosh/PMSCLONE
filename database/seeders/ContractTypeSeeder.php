@@ -13,6 +13,27 @@ class ContractTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        ContractType::factory()->count(10)->create();
+
+        $contractTypeNames = [ 'Consulting Agreement',
+        'Service Level Agreement',
+        'Employment Contract',
+        'Non-Disclosure Agreement',
+        'Sales Contract',
+        'Lease Agreement',
+        'Partnership Agreement',
+        'Purchase Agreement',
+        'Vendor Agreement',
+        'Art Competition Agreement',
+        'Licensing Agreement',
+         'Purchase Order'];
+
+        foreach ( $contractTypeNames as $index => $name) {
+            $contractTypeData = [
+                'name' => $name
+            ];
+            
+            ContractType::create($contractTypeData);
+        }
+
     }
 }
