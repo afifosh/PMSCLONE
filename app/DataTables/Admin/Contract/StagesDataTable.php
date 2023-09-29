@@ -86,6 +86,8 @@ class StagesDataTable extends DataTable
       Column::make('estimated_cost')->title('Estimated Cost'),
       Column::make('phases_count')->title('Phases'),
       Column::make('status'),
+      Column::make('start_date'),
+      Column::make('due_date'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

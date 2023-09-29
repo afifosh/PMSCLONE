@@ -100,7 +100,7 @@
           start_date: contract.start_date ? new Date(contract.start_date) : '',
           unscheduled:true && contract.start_date == null,
           hasEndDate: true && contract.end_date != null,
-          // type: contract.end_date == null ? 'Contract' : 'stage',
+          type: contract.end_date != null ? 'Contract' : 'milestone',
           open: true,
           rollup: true,
           color:"#CD545B",
@@ -131,9 +131,10 @@
             type: "Stage",
             start_date: new Date(stage.start_date),
             duration: calculateDateDifference(stage.start_date, stage.due_date),
-            hasEndDate: true,
+            type: stage.due_date == null ? 'milestone' : 'Stage',
             // end_date: formateDate(stage.due_date),
             open: true,
+            hasEndDate: true && stage.due_date != null,
             remaining_days: stage.due_date ? Math.ceil((new Date(stage.due_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
           };
           data.push(taskData);
@@ -165,10 +166,11 @@
               type: "Phase",
               start_date: new Date(phase.start_date),
               duration: calculateDateDifference(phase.start_date, phase.due_date),
-              hasEndDate: true,
+              hasEndDate: true && phase.due_date != null,
               // end_date: formateDate(phase.due_date),
-              open: true,
+              open: true && phase.due_date != null,
               remaining_days: phase.due_date ? Math.ceil((new Date(phase.due_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
+              type: phase.due_date == null ? 'milestone' : 'Phase',
             };
             data.push(phaseData);
           });

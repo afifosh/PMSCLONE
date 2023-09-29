@@ -1,14 +1,26 @@
 @if ($change_order->id)
-    {!! Form::model($change_order, ['route' => ['admin.contracts.change-requests.update', ['contract' => $contract]], 'method' => 'PUT']) !!}
+    {!! Form::model($change_order, ['route' => ['admin.contracts.change-requests.update', ['contract' => $contract->id ?? 'contract']], 'method' => 'PUT']) !!}
 @else
-    {!! Form::model($change_order, ['route' => ['admin.contracts.change-requests.store',  ['contract' => $contract]], 'method' => 'POST']) !!}
+    {!! Form::model($change_order, ['route' => ['admin.contracts.change-requests.store',  ['contract' => $contract->id ?? 'contract']], 'method' => 'POST', 'id' => 'create-change-request-form']) !!}
 @endif
 
 <div class="form-check">
 <div class="row">
+  @if(!$contract->id)
+
+  <div class="mb-3">
+    {!! Form::label('contract_id', __('Select Contract'), ['class' => 'col-form-label']) !!}
+    {!! Form::select('contract_id', [], $contract->id ?? null, [
+      'data-placeholder' => 'Select Contract',
+      'class' => 'form-select globalOfSelect2Remote',
+      'data-url' => route('resource-select', ['Contract']),
+      'id' => 'contract_id'
+    ])!!}
+  </div>
+  @endif
   <div class="form-group col">
     <label for="current_amount" class='col-form-label'>Current Value</label>
-    {!! Form::text('current_amount', $contract->printable_value, ['class' => 'form-control', 'disabled','placeholder' => __('value'), 'data-value' => $contract->value]) !!}
+    {!! Form::text('current_amount', $contract->printable_value ?? null, ['class' => 'form-control', 'disabled','placeholder' => __('value'), 'data-value' => $contract->value ?? null]) !!}
   </div>
   <div class="form-group col-6 d-none n-value">
       <label for="new_value" class='col-form-label'>New Value</label>
@@ -37,16 +49,18 @@
   <div class="form-group col-12 val-calc d-none">
     <label for="value" class='col-form-label'>Value Change</label>
     <div class="d-flex">
-      {!! Form::number('value_change', null, ['class' => 'form-control value_change', 'placeholder' => __('Value')]) !!}
-      {!! Form::select('currency', $currency ?? [], $contract->currency, [
+      <div>
+        {!! Form::number('value_change', null, ['class' => 'form-control value_change', 'placeholder' => __('Value')]) !!}
+      </div>
+      {!! Form::select('currency', $currency ?? [], $contract->currency ?? null, [
         'data-placeholder' => 'Select Currency',
         'class' => 'form-select globalOfSelect2Remote value_change_currency',
         'data-url' => route('resource-select', ['Currency'])
         ])!!}
     </div>
   </div>
-  @if ($contract->end_date)
-  <hr class="mt-2">
+
+    <hr class="mt-2">
     <div class="form-group col">
       {{ Form::label('c_end_date', __('Current End Date'), ['class' => 'col-form-label']) }}
       {!! Form::date('c_end_date', $contract->end_date, ['class' => 'form-control', 'disabled','placeholder' => __('End Date')]) !!}
@@ -86,7 +100,6 @@
           ])!!}
       </div>
     </div>
-  @endif
 
   <div class="form-group col-12">
     <label for="reason" class='col-form-label'>Reason</label>
@@ -217,4 +230,25 @@
     // }
     initFlatPickr();
   }
+
+  $(document).on('change', '#contract_id', function(){
+    let contract_id = $(this).val();
+    if(contract_id){
+      $.ajax({
+        url: route('admin.contracts.show', {contract: contract_id, getjson: true}),
+        type: 'GET',
+        dataType: 'json',
+        success: function(data){
+          $('#create-change-request-form').attr('action', route('admin.contracts.change-requests.store', {contract: contract_id}));
+          $('input[name="current_amount"]').val(data.printable_value);
+          $('input[name="current_amount"]').data('value', data.value);
+          var end_date = new Date(data.end_date);
+          end_date = end_date.toISOString().split('T')[0];
+          $('input[name="c_end_date"]').val(end_date);
+          $('#unch-val-rd').prop('checked', true).trigger("click").change();
+          $('#unch-timeline-rd').prop('checked', true).trigger("click").change();
+        }
+      });
+    }
+  })
 </script>

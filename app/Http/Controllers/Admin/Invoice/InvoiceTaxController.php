@@ -13,7 +13,7 @@ class InvoiceTaxController extends Controller
   {
     $request->validate([
       'taxes' => 'nullable|array',
-      'taxes.*' => 'nullable|exists:taxes,id',
+      'taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
     ]);
 
     $taxes = filterInputIds($request->taxes ?? []);
@@ -30,7 +30,7 @@ class InvoiceTaxController extends Controller
       $item->updateTaxAmount();
     } else
       $invoice->taxes()->sync($sync_data);
-      $invoice->updateTaxAmount();
+      $invoice->reCalculateTotal();
 
     return $this->sendRes('success');
   }

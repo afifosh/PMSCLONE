@@ -256,7 +256,7 @@ class Company extends BaseModel
   public function POCKycDoc()
   {
     $modificationClass = config('approval.models.modification', \Approval\Models\Modification::class);
-    return $modificationClass::whereModifiableType(CompanyKycDoc::class)->whereJsonContains('modifications->company_id->modified', $this->id);
+    return $modificationClass::whereModifiableType(UploadedKycDoc::class)->whereJsonContains('modifications->company_id->modified', $this->id);
   }
 
   public function COMKycDoc()
@@ -269,7 +269,7 @@ class Company extends BaseModel
           $q->where('company_id', $this->id);
         })->orWhereJsonContains('modifications->company_id->modified', $this->id);
       });
-    })->whereModifiableType(CompanyKycDoc::class);
+    })->whereModifiableType(UploadedKycDoc::class);
   }
 
   public function POCmodifications()
@@ -342,7 +342,7 @@ class Company extends BaseModel
 
   public function kycDocs()
   {
-    return $this->hasMany(CompanyKycDoc::class);
+    return $this->hasMany(UploadedKycDoc::class);
   }
 
   public function scopeApplyRequestFilters($query)

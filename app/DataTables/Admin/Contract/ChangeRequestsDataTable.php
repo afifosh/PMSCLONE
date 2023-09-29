@@ -62,14 +62,13 @@ class ChangeRequestsDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    if($this->contract->id)
     $buttons[] = [
       'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Request</span>',
       'className' =>  'btn btn-primary mx-3',
       'attr' => [
         'data-toggle' => "ajax-modal",
         'data-title' => 'Create Change Request',
-        'data-href' => route('admin.contracts.change-requests.create', ['contract' => $this->contract->id])
+        'data-href' => route('admin.contracts.change-requests.create', ['contract' => $this->contract->id ?? 'contract'])
       ]
     ];
 

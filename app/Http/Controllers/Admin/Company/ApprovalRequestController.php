@@ -12,7 +12,7 @@ use App\Models\CompanyAddress;
 use App\Models\CompanyBankAccount;
 use App\Models\CompanyContact;
 use App\Models\CompanyDetail;
-use App\Models\CompanyKycDoc;
+use App\Models\UploadedKycDoc;
 use App\Models\Country;
 use App\Models\KycDocument;
 
@@ -86,7 +86,7 @@ class ApprovalRequestController extends Controller
       $data['documents'] = $company->POCKycDoc()->with('approvals.approver', 'disapprovals.disapprover')->withCount('approvals', 'disapprovals')->get();
       $data['approved_documents'] = $company->kycDocs()->with('modifications.approvals.approver', 'modifications.disapprovals.disapprover')->get();
       $data['requestedDocs'] = KycDocument::whereIn('required_from', [3, $company->getPOCLocalityType()])->where('status', 1)->get();
-      $data['docModel'] = new CompanyKycDoc ();
+      $data['docModel'] = new UploadedKycDoc ();
     }
 
     return view('admin.pages.company.approval-request.vertical.show', $data);

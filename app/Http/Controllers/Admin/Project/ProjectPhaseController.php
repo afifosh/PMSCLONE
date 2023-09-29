@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Project;
 use App\DataTables\Admin\Contract\PhasesDataTable;
 use App\Events\Admin\ProjectPhaseUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Contract\Phase\PhaseStoreRequest;
 use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\ContractStage;
@@ -42,30 +43,24 @@ class ProjectPhaseController extends Controller
     $stage = ContractStage::find($stage) ?? 'stage';
     $contract->load('project');
     $project = $contract->project ?? 'project';
+    // stage is instance of ContractStage then get stage remaining amount, else get contract remaining amount
+    $remaining_amount = $stage instanceof ContractStage ? $stage->remainingAmount() : $contract->remaining_amount;
     // abort_if(!$project->isMine(), 403);
 
     $phase = new ContractPhase();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'stage'))->render()]);
+    $title = $stage instanceof ContractStage ? 'Add Phase to ' . $stage->name : 'Add Phase to Contract As Commited Phase';
+
+    return $this->sendRes('success', ['modalTitle' => $title, 'view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'stage', 'remaining_amount'))->render()]);
   }
 
-  public function store($project, Contract $contract, $stage, Request $request)
+  public function store($project, Contract $contract, $stage, PhaseStoreRequest $request)
   {
     $contract->load('project');
     $stage = ContractStage::find($stage) ?? 'stage';
     $project = $contract->project ?? 'project';
-    $stage->load('contract');
+    // $stage->load('contract');
     // abort_if(!$project->isMine(), 403);
-
-    $request->validate([
-      'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id',
-      'estimated_cost' => ['required', 'numeric', 'min:0'], //, 'max:' . $contract->remaining_cost()
-      'description' => 'nullable|string|max:2000',
-      'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
-      'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
-    ], [
-      'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
-    ]);
 
     $phase = $contract->phases()->create(
       ['estimated_cost' => $contract->formatPhaseValue($request->estimated_cost), 'stage_id' => $stage->id ?? null]
@@ -105,7 +100,7 @@ class ProjectPhaseController extends Controller
       'estimated_cost' => ['required', 'numeric', 'min:0'], //'max:'.$contract->remaining_cost($phase->id)
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
-      'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
+      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $contract->end_date,
     ], [
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
     ]);

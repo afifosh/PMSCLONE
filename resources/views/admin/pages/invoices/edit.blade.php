@@ -14,15 +14,33 @@
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/sortablejs/sortable.js')}}"></script>
 @endsection
 
 @section('page-script')
-<script src="{{asset('assets/js/offcanvas-add-payment.js')}}"></script>
-<script src="{{asset('assets/js/offcanvas-send-invoice.js')}}"></script>
-<script src="{{asset('assets/js/app-invoice-edit.js')}}"></script>
 <script src="{{asset('assets/js/custom/flatpickr.js')}}"></script>
 <script src="{{asset('assets/js/custom/select2.js')}}"></script>
 <script>
+  function initSortable() {
+    var sortable = Sortable.create(document.getElementById('billing-items-container'), {
+      handle: '.bi-drag',
+      group: 'shared',
+      animation: 150,
+      dataIdAttr: 'data-id',
+      onSort: function (/**Event*/evt) {
+        $.ajax({
+          url: route('admin.invoices.invoice-items.sort', { invoice: {{$invoice->id}}}),
+          type: "PUT",
+          data: {
+            items: sortable.toArray(),
+          },
+          success: function(res){
+          }
+        });
+      },
+
+    });
+  }
   function reloadPhasesList(){
     $.ajax({
       url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit' }),
@@ -77,6 +95,7 @@
   }
 
   $(document).ready(function() {
+    initSortable();
       var options = {
           html: true,
           content: $('[data-name="popover-tax-rates"]'),
@@ -102,6 +121,15 @@
           placement: 'top'
       }
       var elm = document.getElementById('invoice-adjustment')
+      var popover = new bootstrap.Popover(elm, options)
+
+      // retention popover
+      var options = {
+          html: true,
+          content: $('[data-name="popover-invoice-retention"]'),
+          placement: 'top'
+      }
+      var elm = document.getElementById('invoice-retention')
       var popover = new bootstrap.Popover(elm, options)
   })
 </script>
@@ -191,14 +219,15 @@
                     <thead>
                         <tr>
                             <!--action-->
-                            <th class="text-left x-action bill_col_action"></th>
+                            <th class="text-left x-action bill_col_action">Action</th>
                             <!--description-->
-                            <th class="text-left x-description bill_col_description">Item
-                            </th>
-                            <th class="text-left x-rate bill_col_rate">Amount</th>
+                            <th class="text-left x-description bill_col_description">Item</th>
+                            <th class="text-left x-description bill_col_description">Price</th>
+                            <th class="text-left x-description bill_col_description">QTY</th>
+                            <th class="text-left x-rate bill_col_rate">Subtotal</th>
                             <!--tax-->
                             @if (!$invoice->is_summary_tax)
-                              <th class="text-left x-tax bill_col_tax ">Tax</th>
+                              <th class="" style="min-width: 180px;">Tax</th>
                             @endif
                             <!--total-->
                             <th class="text-right x-total bill_col_total" id="bill_col_total">Total
@@ -213,7 +242,9 @@
         </div>
           <div class="row pb-4">
             <div class="col-12 mt-4">
+              <button type="button" class="btn btn-primary" data-title="{{__('Add Item')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.custom-invoice-items.create',[$invoice])}}">Add Item</button>
               <button type="button" class="btn btn-primary" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
+              <button type="button" class="btn btn-primary" data-title="{{__('Select Retentions')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice, 'type' => 'retentions'])}}">Add Retention</button>
             </div>
           </div>
         </div>
@@ -233,6 +264,9 @@
         <div class="row p-sm-2 pe-4">
           <div class="col-12 d-flex justify-content-end">
             <section class="center">
+              <button id="invoice-retention" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Retention</button>
+            </section>
+            <section class="center">
               <button id="invoice-adjustment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Adjustment</button>
             </section>
             <section class="center">
@@ -248,7 +282,7 @@
                       </div>
                       <hr class="m-0">
                       <div class="mt-2">
-                        @forelse ($tax_rates as $tax)
+                        @forelse ($tax_rates->where('is_retention', false) as $tax)
                         <div class="form-check">
                           <input class="form-check-input" name="invoice_taxes[]" type="checkbox" value="{{$tax->id}}" id="tax-{{$tax->id}}">
                           <label class="form-check-label" for="tax-{{$tax->id}}">
@@ -298,12 +332,28 @@
         </div>
 
         <hr class="my-3 mx-n4" />
+        <div class="row px-0 px-sm-4">
+          <div class="col-12">
+            <div class="mb-3">
+              <label for="refrence_id" class="form-label fw-semibold">{{__('Refrence ID')}}</label>
+              <input type="text" name="refrence_id" id="refrence_id" value="{{$invoice->refrence_id}}" class="form-control" placeholder="{{__('Refrence ID')}}">
+            </div>
+          </div>
+        </div>
 
         <div class="row px-0 px-sm-4">
           <div class="col-12">
             <div class="mb-3">
               <label for="terms" class="form-label fw-semibold">Terms:</label>
-              <textarea class="form-control" rows="2" id="terms">{{$invoice->terms}}</textarea>
+              <textarea name="terms" class="form-control" rows="2" id="terms">{{$invoice->terms}}</textarea>
+            </div>
+          </div>
+        </div>
+        <div class="row px-0 px-sm-4">
+          <div class="col-12">
+            <div class="mb-3">
+              <label for="note" class="form-label fw-semibold">Note:</label>
+              <textarea name="note" class="form-control" rows="2" id="note">{{$invoice->note}}</textarea>
             </div>
           </div>
         </div>
@@ -361,6 +411,7 @@
   <div hidden>
     <div data-name="popover-invoice-adjustment">
       <form method="POST" action="{{route('admin.invoices.update', [$invoice, 'update_adjustment' => 1])}}">
+        @method('PUT')
         <div class="d-flex justify-content-between">
           <b>Adjustment</b>
           <button type="button" class="btn-close" onclick="$('#invoice-adjustment').popover('hide');" aria-label="Close"></button>
@@ -369,7 +420,7 @@
         <div>
           <div class="form-group">
             {{ Form::label('adjustment_description', __('Description'), ['class' => 'col-form-label']) }}
-            {!! Form::number('adjustment_description', null, ['class' => 'form-control']) !!}
+            {!! Form::text('adjustment_description', null, ['class' => 'form-control']) !!}
           </div>
           <div class="form-group">
             {{ Form::label('adjustment_amount', __('Adjustment Amount'), ['class' => 'col-form-label']) }}
@@ -381,11 +432,48 @@
         </div>
       </form>
     </div>
+  </div>
+  {{-- retention Popover --}}
+  <div hidden>
+    <div data-name="popover-invoice-retention">
+      <form method="POST" action="{{route('admin.invoices.update', [$invoice, 'update_retention' => 1])}}">
+        @method('PUT')
+        <div class="d-flex justify-content-between">
+          <b>Retention</b>
+          <button type="button" class="btn-close" onclick="$('#invoice-retention').popover('hide');" aria-label="Close"></button>
+        </div>
+        <hr class="m-0">
+        <div>
+          <div class="form-group">
+            {{ Form::label('retention_id', __(' Retention'), ['class' => 'col-form-label']) }}
+            <select name="retention_id" id="retention_id" class="form-select select2">
+              <option value="">{{__('Select Retention')}}</option>
+              @forelse ($tax_rates->where('is_retention', true) as $ret)
+                <option value="{{$ret->id}}">{{$ret->name}} (
+                  @if ($ret->type != 'Percent')
+                      @money($ret->amount, $invoice->contract->currency, true)
+                  @else
+                      {{$ret->amount}}%
+                  @endif
+                )</option>
+              @empty
+              @endforelse
+            </select>
+          </div>
+          {{-- <div class="form-group">
+            {{ Form::label('retention_type', __('Retention Type'), ['class' => 'col-form-label']) }}
+            {!! Form::select('retention_type', ['0' => 'Select Type', 'Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select']) !!}
+          </div>
+          <div class="form-group">
+            {{ Form::label('retention_value', __('Retention Value'), ['class' => 'col-form-label']) }}
+            {!! Form::number('retention_value', null, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
+          </div> --}}
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <button class="btn btn-primary btn-sm" data-form="ajax-form">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
-</div>
-
-<!-- Offcanvas -->
-@include('_partials/_offcanvas/offcanvas-send-invoice')
-@include('_partials/_offcanvas/offcanvas-add-payment')
-<!-- /Offcanvas -->
 @endsection

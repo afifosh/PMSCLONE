@@ -11,6 +11,8 @@ use Yajra\DataTables\Services\DataTable;
 
 class TaxesDataTable extends DataTable
 {
+  public $type = 'Tax';
+
   /**
    * Build the DataTable class.
    *
@@ -30,7 +32,7 @@ class TaxesDataTable extends DataTable
    */
   public function query(Tax $model): QueryBuilder
   {
-    return $model->newQuery();
+    return $model->where('is_retention', $this->type == 'Retention')->newQuery();
   }
 
   /**
@@ -40,12 +42,12 @@ class TaxesDataTable extends DataTable
   {
     $buttons = [];
     $buttons[] = [
-      'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Tax</span>',
+      'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add '. $this->type .'</span>',
       'className' =>  'btn btn-primary mx-3',
       'attr' => [
         'data-toggle' => "ajax-modal",
-        'data-title' => 'Add Tax ',
-        'data-href' => route('admin.finances.taxes.create')
+        'data-title' => 'Add '.$this->type,
+        'data-href' => route('admin.finances.taxes.create', ['type' => strtolower($this->type)])
       ]
     ];
 

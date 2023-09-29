@@ -39,7 +39,7 @@ class ContractController extends Controller
       // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
       ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
       ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 2 WEEK) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
       ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
       ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
@@ -316,6 +316,9 @@ class ContractController extends Controller
    */
   public function show(Contract $contract)
   {
+    if(request()->getjson){
+      return response()->json($contract);
+    }
     $data['contract'] = $contract->load('notifiableUsers');
     $data['summary'] = $contract->events()->selectRaw('event_type, count(*) as total')->groupBy('event_type')->get();
 
@@ -396,12 +399,7 @@ class ContractController extends Controller
 
   protected function updateValueAndAccount(Contract $contract, $request): void
   {
-  //   dd($request); 
-  //   if ($contract) {
-  //     dd($contract);  // This will halt the script and display the message if $accountBalance is null
-  // }
-
-  // if the account_balance_id is null means added from seeder and now being updated from dashboard.
+    // if the account_balance_id is null means added from seeder and now being updated from dashboard.
     // So first create the commitment transaction and then update the account_balance_id
     if($contract->account_balance_id == null){
       $this->transactionProcessor->create(
@@ -418,6 +416,7 @@ class ContractController extends Controller
 
       $contract->update(['account_balance_id' => $request->account_balance_id]);
     }
+
     // if only contract amount is changed then update the account transaction
     if ($contract->account_balance_id == $request->account_balance_id && $contract->value != $request->value) {
       $this->transactionProcessor->create(

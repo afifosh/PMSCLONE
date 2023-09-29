@@ -17,6 +17,7 @@ class InvoiceItem extends Model
     'amount',
     'total_tax_amount',
     'description',
+    'order'
   ];
 
   protected $casts = [
@@ -24,6 +25,26 @@ class InvoiceItem extends Model
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
+
+  public function getAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setAmountAttribute($value)
+  {
+    $this->attributes['amount'] = round($value * 100);
+  }
+
+  public function getTotalTaxAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setTotalTaxAmountAttribute($value)
+  {
+    $this->attributes['total_tax_amount'] = round($value * 100);
+  }
 
   // public function invoice()
   // {
@@ -44,6 +65,6 @@ class InvoiceItem extends Model
   {
     $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount');
     $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount');
-    $this->update(['total_tax_amount' => $fixed_tax + ($this->invoiceable->estimated_cost * $percent_tax / 100)]);
+    $this->update(['total_tax_amount' => $fixed_tax + ($this->invoiceable->estimated_cost ?? $this->invoiceable->total * $percent_tax / 100)]);
   }
 }

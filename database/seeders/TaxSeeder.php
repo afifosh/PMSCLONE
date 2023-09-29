@@ -13,5 +13,6 @@ class TaxSeeder extends Seeder
   public function run(): void
   {
     Tax::factory()->count(5)->create();
+    Tax::factory()->count(5)->create(['is_retention' => true]);
   }
 }

@@ -4,7 +4,7 @@
     {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.store',  ['project' => $project, 'contract' => $contract, 'stage' => $stage]], 'method' => 'POST']) !!}
 @endif
 
-<div class="form-check">
+{{-- <div class="form-check">
   <input class="form-check-input" type="radio" name="add-phase" value="single" id="add-phase" checked>
   <label class="form-check-label" for="add-phase">
     Single
@@ -15,7 +15,7 @@
   <label class="form-check-label" for="add-phase-rule">
     Rule
   </label>
-</div>
+</div> --}}
 <div class="row rr-single">
   <div class="form-group col-6">
       {{ Form::label('name', __('Name'), ['class' => 'col-form-label']) }}
@@ -23,17 +23,28 @@
   </div>
   <div class="form-group col-6">
     {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
+    <div class="dropdown open d-inline">
+      <span data-bs-toggle="dropdown" aria-haspopup="true">
+          <i class="fas fa-calculator"></i>
+      </span>
+      <div class="dropdown-menu p-3">
+        <div class="mb-3" data-content="percent-cal">
+          <label for="percent-value" class="form-label">Percentage (Balance: {{$remaining_amount}})</label>
+          <input type="number" name="percent-value" id="percent-value" data-balance="{{$remaining_amount}}" class="form-control" placeholder="10%">
+        </div>
+      </div>
+    </div>
     {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
   </div>
   {{-- start date --}}
   <div class="form-group col-6">
     {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('start_date', $phase->start_date, ['class' => 'form-control flatpickr', 'id' => 'start_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Start Date')]) !!}
+    {!! Form::date('start_date', $phase->start_date, ['class' => 'form-control flatpickr', 'id' => 'start_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'. (isset($stage->start_date) ? $stage->start_date : $contract->start_date) .'", "maxDate":"'. (isset($stage->due_date) ? $stage->due_date : $contract->end_date ).'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Start Date')]) !!}
   </div>
   {{-- due date --}}
   <div class="form-group col-6">
     {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('due_date', $phase->due_date, ['class' => 'form-control flatpickr', 'id' => 'phase_end_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Due Date')]) !!}
+    {!! Form::date('due_date', $phase->due_date, ['class' => 'form-control flatpickr', 'id' => 'phase_end_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'. (isset($stage->start_date) ? $stage->start_date : $contract->start_date) .'", "maxDate":"'. (isset($stage->due_date) ? $stage->due_date : $contract->end_date ).'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Due Date')]) !!}
   </div>
   <div class="col-12 mt-2">
     <div class="form-check">
@@ -150,4 +161,15 @@
     }
     initFlatPickr();
   }
+
+  $('#percent-value').on('change keyup', function(){
+    const percent = $(this).val();
+    const balance = $(this).data('balance');
+    if(percent && balance){
+      const estimatedCost = (balance * percent) / 100;
+      $('[name="estimated_cost"]').val(estimatedCost);
+    }else{
+      $('[name="estimated_cost"]').val('');
+    }
+  })
 </script>

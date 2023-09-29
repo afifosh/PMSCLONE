@@ -56,7 +56,7 @@
                           <small class="text-muted">{{ $log->created_at->diffForHumans() }}</small>
                       </div>
                       <p class="mb-2"> At @ {{ formatDateTime($log->created_at) }}</p>
-                      @if ($log->modifiable_type != 'App\Models\CompanyKycDoc')
+                      @if ($log->modifiable_type != 'App\Models\UploadedKycDoc')
                         {{-- <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-details-{{$log->id}}" aria-expanded="false" aria-controls="collapse-details-{{$log->id}}">
                           Details
                         </button>

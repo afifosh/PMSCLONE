@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\ChangeRequestController;
 use App\Http\Controllers\Admin\Contract\ContractCategoryController;
 use App\Http\Controllers\Admin\Contract\ContractController;
+use App\Http\Controllers\Admin\Contract\ContractDocumentController;
 use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
 use App\Http\Controllers\Admin\Contract\ContractTermController;
@@ -48,12 +49,14 @@ use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
 use App\Http\Controllers\Admin\Contract\ContractStageController;
+use App\Http\Controllers\Admin\ContractDoc\DocControlController;
 use App\Http\Controllers\Admin\Finance\ProgramTransactionController;
 use App\Http\Controllers\Admin\Finance\FinancialYearController;
 use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
 use App\Http\Controllers\Admin\Finance\PaymentController;
 use App\Http\Controllers\Admin\Finance\ProgramAccountController;
 use App\Http\Controllers\Admin\Finance\TaxController;
+use App\Http\Controllers\Admin\Invoice\CustomInvoiceItemController;
 use App\Http\Controllers\Admin\Invoice\InvoiceController;
 use App\Http\Controllers\Admin\Invoice\InvoiceItemController;
 use App\Http\Controllers\Admin\Invoice\InvoiceTaxController;
@@ -172,6 +175,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::put('contracts/{contract}/undo-terminate', [ContractSettingController::class, 'undoTerminate'])->name('contracts.undo-terminate');
     Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');
     Route::put('contracts/{contract}/resume', [ContractSettingController::class, 'resume'])->name('contracts.resume');
+    Route::post('contracts/{contract}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('contracts.upload-requested-doc');
     Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
     // Route::resource('contracts.stages', ContractStageController::class);
     Route::resource('contract-types', ContractTypeController::class);
@@ -179,7 +183,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
     Route::resource('contracts.stages', ContractStageController::class);
+    Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
     Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
+    Route::resource('contract-doc-controls', DocControlController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');
     Route::get('projects/{project}/gantt-chart', [ProjectController::class, 'ganttChart'])->name('projects.gantt-chart');
     Route::resource('projects', ProjectController::class);
@@ -277,6 +283,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
       Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store', 'show']);
       Route::resource('program-accounts', ProgramAccountController::class)->only(['index', 'create', 'store']);
       Route::resource('program-accounts.transactions', ProgramTransactionController::class)->only(['index', 'create', 'store']);
+      Route::get('retentions', [TaxController::class, 'retentions'])->name('retentions.index');
       Route::resource('taxes', TaxController::class);
       Route::resource('payments', PaymentController::class);
     });
@@ -286,8 +293,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     // });
     Route::get('invoices/{invoice}/payments', [PaymentController::class, 'index'])->name('invoices.payments.index');
+    Route::put('invoices/{invoice}/invoice-tems/sort', [InvoiceController::class, 'sortItems'])->name('invoices.invoice-items.sort');
     Route::resource('invoices', InvoiceController::class);
-    Route::resource('invoices.invoice-items', InvoiceItemController::class);
+    Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'destroy']);
+    Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
   });
 });

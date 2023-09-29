@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Company\CompanyProfile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Company\CompanyProfile\KycDocumentUpdateRequest;
-use App\Models\CompanyKycDoc;
+use App\Models\UploadedKycDoc;
 use App\Models\KycDocument;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Http\Request;
@@ -55,7 +55,7 @@ class DocumentController extends Controller
     $data = [];
     foreach ($document->fields as $field) {
       if ($field['type'] == 'file') {
-        $path = CompanyKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
+        $path = UploadedKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
         Storage::move(KycDocument::TEMP_PATH . '/' . auth()->user()->company_id . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
         $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
       } else {
@@ -86,7 +86,7 @@ class DocumentController extends Controller
       $data = [];
       foreach ($document->fields as $field) {
         if ($field['type'] == 'file' && Storage::exists(KycDocument::TEMP_PATH . '/' . auth()->user()->company_id . '/' . $request->{'fields.' . $field['id']})) {
-          $path = CompanyKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
+          $path = UploadedKycDoc::FILE_PATH . '/' . auth()->user()->company_id;
           Storage::move(KycDocument::TEMP_PATH . '/' . auth()->user()->company_id . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
           $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
         } else {

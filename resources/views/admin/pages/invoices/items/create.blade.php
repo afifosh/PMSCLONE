@@ -16,7 +16,7 @@
         <tr class="">
           <th>{!! Form::checkbox('phases[]', $phase->id, 0, ['class' => 'form-check-input phase-item']) !!}</th>
           <td>{{$phase->name}}</td>
-          <td>{{$phase->estimated_cost}}</td>
+          <td>@money($phase->estimated_cost, $phase->contract->currency, true)</td>
           <td>{{$phase->status}}</td>
         </tr>
         @empty
