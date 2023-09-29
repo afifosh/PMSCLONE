@@ -162,7 +162,7 @@ public function query(Contract $model): QueryBuilder
   public function getColumns(): array
   {
     return [
-      Column::make('id')->title('Contract'),
+      Column::make('contracts.id')->title('Contract'),
       Column::make('refrence_id')->title('Ref ID'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
