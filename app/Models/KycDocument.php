@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class KycDocument extends Model
 {
@@ -22,8 +24,6 @@ class KycDocument extends Model
     'is_expiry_date_required',
     'fields',
     'workflow',
-    'contract_type_id',
-    'contract_category_id',
     'client_type'
   ];
 
@@ -48,13 +48,18 @@ class KycDocument extends Model
     'updated_at' => 'datetime:d M, Y',
   ];
 
-  public function contractType()
+  public function contractTypes(): BelongsToMany
   {
-    return $this->belongsTo(ContractType::class);
+    return $this->belongsToMany(ContractType::class, KycDocumentContractType::class);
   }
 
-  public function contractCategory()
+  public function contractCategories(): BelongsToMany
   {
-    return $this->belongsTo(ContractCategory::class);
+    return $this->belongsToMany(ContractCategory::class, KycDocumentContractCategory::class);
+  }
+
+  public function uploadedDocs(): HasMany
+  {
+    return $this->hasMany(UploadedKycDoc::class, 'kyc_doc_id');
   }
 }

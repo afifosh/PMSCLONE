@@ -75,6 +75,10 @@
         {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
         {!! Form::text('due_date', null, ['class' => 'form-control flatpickr', 'placeholder' => __('Due Date')]) !!}
     </div>
+    <div class="form-group col-6">
+      {{ Form::label('refrence_id', __('Refrence ID'), ['class' => 'col-form-label']) }}
+      {!! Form::text('refrence_id', null, ['class' => 'form-control', 'placeholder' => __('Refrence ID')]) !!}
+    </div>
       {{-- amount --}}
       <div class="form-group col-6 downpayment-amount d-none">
           {{ Form::label('subtotal', __('Amount'), ['class' => 'col-form-label']) }}

@@ -37,7 +37,7 @@ class DocControlsDataTable extends DataTable
    */
   public function query(KycDocument $model): QueryBuilder
   {
-    return $model->where('workflow', 'Contract Required Docs')->with('contractType', 'contractCategory')->newQuery();
+    return $model->where('workflow', 'Contract Required Docs')->with('contractTypes', 'contractCategories')->newQuery();
   }
 
   /**
@@ -88,8 +88,8 @@ class DocControlsDataTable extends DataTable
       Column::make('id'),
       Column::make('title'),
       Column::make('client_type')->title('Required From'),
-      Column::make('contract_type.name')->title('Contract Type'),
-      Column::make('contract_category.name')->title('Category'),
+      // Column::make('contract_type.name')->title('Contract Type'),
+      // Column::make('contract_category.name')->title('Category'),
       Column::make('status'),
       Column::make('created_at'),
       Column::make('updated_at'),

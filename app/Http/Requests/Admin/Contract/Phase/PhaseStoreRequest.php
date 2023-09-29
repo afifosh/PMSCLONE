@@ -34,10 +34,10 @@ class PhaseStoreRequest extends FormRequest
       'description' => 'nullable|string|max:2000',
       // if phase is from contract stage then check if start date is after or equal to stage start date,
       //else check if start date is after or equal to contract start date
-      'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . (($stage instanceof ContractStage) ? $stage->start_date : $this->contract->start_date),
+      'start_date' => 'required|date'. (request()->due_date ? '|before_or_equal:due_date' : '' ).'|after_or_equal:' . (($stage instanceof ContractStage) ? $stage->start_date : $this->contract->start_date),
       // if phase is from contract stage then check if due date is after stage start date and before or equal to stage due date,
       //else check if due date is after contract start date and before or equal to contract due date
-      'due_date' => 'required|date|after:start_date|before_or_equal:' . (($stage instanceof ContractStage) ? $stage->due_date : $this->contract->end_date),
+      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . (($stage instanceof ContractStage) ? $stage->due_date : $this->contract->end_date),
     ];
 
   }

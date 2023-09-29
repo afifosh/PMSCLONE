@@ -100,7 +100,7 @@ class ProjectPhaseController extends Controller
       'estimated_cost' => ['required', 'numeric', 'min:0'], //'max:'.$contract->remaining_cost($phase->id)
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
-      'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
+      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $contract->end_date,
     ], [
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
     ]);

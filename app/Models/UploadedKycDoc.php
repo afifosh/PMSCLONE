@@ -6,9 +6,11 @@ use App\Traits\Approval\CompanyApprovalBaseLogic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CompanyKycDoc extends Model
+class UploadedKycDoc extends Model
 {
   use HasFactory, CompanyApprovalBaseLogic;
+
+  protected $table = 'uploaded_kyc_docs';
 
   protected $fillable = [
     'company_id',
@@ -37,5 +39,10 @@ class CompanyKycDoc extends Model
   public static function getModelName()
   {
     return 'KYC Doc';
+  }
+
+  public function docRequestable()
+  {
+    return $this->morphTo('doc_requestable', 'doc_requestable_id', 'doc_requestable_type');
   }
 }

@@ -16,8 +16,6 @@ return new class extends Migration
     Schema::create('kyc_documents', function (Blueprint $table) {
       $table->id();
       $table->enum('workflow', ['Company Kyc', 'Contract Required Docs'])->default('Company Kyc');
-      $table->foreignId('contract_category_id')->nullable()->constrained('contract_categories')->onDelete('cascade')->cascadeOnUpdate();
-      $table->foreignId('contract_type_id')->nullable()->constrained('contract_types')->onDelete('cascade')->cascadeOnUpdate();
       $table->enum('client_type', ['Person', 'Company', 'Both'])->default('Both');
       $table->string('title');
       $table->string('required_from');

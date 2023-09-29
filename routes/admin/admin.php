@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\ChangeRequestController;
 use App\Http\Controllers\Admin\Contract\ContractCategoryController;
 use App\Http\Controllers\Admin\Contract\ContractController;
+use App\Http\Controllers\Admin\Contract\ContractDocumentController;
 use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
 use App\Http\Controllers\Admin\Contract\ContractTermController;
@@ -174,6 +175,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::put('contracts/{contract}/undo-terminate', [ContractSettingController::class, 'undoTerminate'])->name('contracts.undo-terminate');
     Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');
     Route::put('contracts/{contract}/resume', [ContractSettingController::class, 'resume'])->name('contracts.resume');
+    Route::post('contracts/{contract}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('contracts.upload-requested-doc');
     Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
     // Route::resource('contracts.stages', ContractStageController::class);
     Route::resource('contract-types', ContractTypeController::class);
@@ -181,6 +183,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
     Route::resource('contracts.stages', ContractStageController::class);
+    Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
     Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
     Route::resource('contract-doc-controls', DocControlController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');

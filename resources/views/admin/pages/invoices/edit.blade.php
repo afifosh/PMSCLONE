@@ -332,12 +332,28 @@
         </div>
 
         <hr class="my-3 mx-n4" />
+        <div class="row px-0 px-sm-4">
+          <div class="col-12">
+            <div class="mb-3">
+              <label for="refrence_id" class="form-label fw-semibold">{{__('Refrence ID')}}</label>
+              <input type="text" name="refrence_id" id="refrence_id" value="{{$invoice->refrence_id}}" class="form-control" placeholder="{{__('Refrence ID')}}">
+            </div>
+          </div>
+        </div>
 
         <div class="row px-0 px-sm-4">
           <div class="col-12">
             <div class="mb-3">
               <label for="terms" class="form-label fw-semibold">Terms:</label>
-              <textarea class="form-control" rows="2" id="terms">{{$invoice->terms}}</textarea>
+              <textarea name="terms" class="form-control" rows="2" id="terms">{{$invoice->terms}}</textarea>
+            </div>
+          </div>
+        </div>
+        <div class="row px-0 px-sm-4">
+          <div class="col-12">
+            <div class="mb-3">
+              <label for="note" class="form-label fw-semibold">Note:</label>
+              <textarea name="note" class="form-control" rows="2" id="note">{{$invoice->note}}</textarea>
             </div>
           </div>
         </div>

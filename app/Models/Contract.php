@@ -480,4 +480,9 @@ class Contract extends Model
   {
     return $this->hasMany(ContractChangeRequest::class);
   }
+
+  public function uploadedDocs()
+  {
+    return $this->morphMany(UploadedKycDoc::class, 'doc_requestable');
+  }
 }

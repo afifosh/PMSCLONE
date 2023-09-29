@@ -37,7 +37,8 @@ class Invoice extends Model
     'retention_percentage',
     'retention_amount',
     'status',
-    'type'
+    'type',
+    'refrence_id'
   ];
 
   protected $casts = [

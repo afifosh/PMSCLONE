@@ -70,6 +70,7 @@ class InvoiceStoreRequest extends FormRequest
         'due_date' => 'required|date',
         'note' => 'nullable|string',
         'terms' => 'nullable|string',
+        'refrence_id' => 'nullable|string|max:255'
       ];
 
     return [
@@ -82,6 +83,7 @@ class InvoiceStoreRequest extends FormRequest
       'due_date' => 'required|date',
       'note' => 'nullable|string',
       'terms' => 'nullable|string',
+      'refrence_id' => 'nullable|string|max:255'
     ];
   }
 

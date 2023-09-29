@@ -26,8 +26,10 @@ class DocControllStoreRequest extends FormRequest
     return [
       'title' => ['required', 'string'],
       'client_type' => ['required', 'in:Person,Company,Both'],
-      'contract_type_id' => ['required', 'exists:contract_types,id'],
-      'contract_category_id' => ['required', 'exists:contract_categories,id'],
+      'contract_type_ids' => ['nullable', 'array'],
+      'contract_type_ids.*' => ['nullable', 'exists:contract_types,id'],
+      'contract_category_ids' => ['nullable', 'array'],
+      'contract_category_ids.*' => ['nullable', 'exists:contract_categories,id'],
       'status' => ['required', 'boolean'],
       'is_mendatory' => ['required', 'boolean'],
       'description' => ['nullable', 'string', 'max:2000'],
@@ -45,6 +47,11 @@ class DocControllStoreRequest extends FormRequest
   {
     return [
       'fields.*.label.required' => __('Label is required.'),
+      'fields.*.type.required' => __('Type is required.'),
+      'fields.*.type.in' => __('Type is invalid.'),
+      'fields.*.is_required.required' => __('Required is required.'),
+      'contract_type_ids.*.exists' => __('Contract type is invalid.'),
+      'contract_category_ids.*.exists' => __('Contract category is invalid.')
     ];
   }
 }

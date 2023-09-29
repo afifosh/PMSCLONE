@@ -13,9 +13,11 @@ return new class extends Migration
    */
   public function up()
   {
-    Schema::create('company_kyc_docs', function (Blueprint $table) {
+    Schema::create('uploaded_kyc_docs', function (Blueprint $table) {
       $table->id();
-      $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete()->cascadeOnUpdate();
+      $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete()->cascadeOnUpdate();
+      // Model which is requested to upload the document
+      $table->nullableMorphs('doc_requestable');
       $table->foreignId('kyc_doc_id')->constrained('kyc_documents')->cascadeOnDelete()->cascadeOnUpdate();
       $table->string('expiry_date')->nullable();
       $table->json('fields')->nullable();
@@ -30,6 +32,6 @@ return new class extends Migration
    */
   public function down()
   {
-    Schema::dropIfExists('company_kyc_docs');
+    Schema::dropIfExists('uploaded_kyc_docs');
   }
 };

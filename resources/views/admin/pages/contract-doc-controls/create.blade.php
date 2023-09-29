@@ -28,12 +28,12 @@
                         {{-- types --}}
                         <div class="form-group">
                           {{ Form::label('contract_type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
-                          {!! Form::select('contract_type_id', $contract_types, $kyc_document->contract_type_id, ['class' => 'form-select select2']) !!}
+                          {!! Form::select('contract_type_ids[]', $contract_types, $kyc_document->contractTypes->pluck('id')->toArray(), ['class' => 'form-select select2', 'multiple', 'data-placeholder' => __('Select Type')]) !!}
                         </div>
                         {{-- categories --}}
                         <div class="form-group">
                           {{ Form::label('contract_category_id', __('Contract Category'), ['class' => 'col-form-label']) }}
-                          {!! Form::select('contract_category_id', $contract_categories, $kyc_document->contract_category_id, ['class' => 'form-select select2']) !!}
+                          {!! Form::select('contract_category_ids[]', $contract_categories, $kyc_document->contractCategories->pluck('id')->toArray(), ['class' => 'form-select select2', 'multiple', 'data-placeholder' => __('Select Category')]) !!}
                         </div>
                         <div class="form-group mb-2">
                             <label for="status" class="required">{{ __('Status:') }}</label>

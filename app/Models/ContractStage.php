@@ -19,9 +19,47 @@ class ContractStage extends Model
   ];
 
   protected $casts = [
+    'start_date' => 'datetime:d M, Y',
+    'due_date' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
+
+  protected $appends = ['status'];
+
+  public function getStatusAttribute()
+  {
+    // if($this->due_date->isPast()) return 'Expired';
+    // elseif($this->start_date->isFuture()) return 'Not started';
+    // elseif(now() > $this->due_date->subMonth()) return 'About To Expire';
+    // elseif(now() >= $this->start_date) return 'Active';
+    $value = $this->getRawOriginal('status');
+
+    if ($value == 'Terminated' || $value == 'Paused' || $value == 'Draft') return $value;
+
+    if ($this->due_date === null && $this->start_date === null)
+      return '';
+
+    if ($this->due_date == null && $this->start_date) {
+      if ($this->start_date->isSameDay(today())) {
+        return "Active";
+      } elseif ($this->start_date->isFuture()) {
+        return "Not Started";
+      } else {
+        return "Expired";
+      }
+    } else {
+      if ($this->due_date->isPast()) {
+        return "Expired";
+      } elseif ($this->start_date->isFuture()) {
+        return "Not Started";
+      } elseif (now()->diffInDays($this->due_date) <= 30) {
+        return "About To Expire";
+      } else {
+        return "Active";
+      }
+    }
+  }
 
   public function getEstimatedCostAttribute($value)
   {

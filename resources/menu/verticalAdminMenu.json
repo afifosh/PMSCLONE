@@ -161,21 +161,10 @@
       ]
     },
     {
+      "url": "/admin/app/settings",
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": ["admin.core.settings.index", "admin.kyc-documents.index"],
-      "submenu": [
-        {
-          "url": "/admin/app/settings",
-          "name": "General Settings",
-          "slug": "admin.core.settings.index"
-        },
-        {
-          "url": "/admin/kyc-documents",
-          "name": "KYC Documents",
-          "slug": "admin.kyc-documents.index"
-        }
-      ]
+      "slug": "admin.core.settings.index"
     },
     {
       "url": "admin/email-templates/1",
