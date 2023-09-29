@@ -84,7 +84,7 @@ class ContractsDataTable extends DataTable
 
     $q->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
       ->select(
-        'contracts.id', 'contracts.project_id', 'contracts.type_id', 'contracts.value', 'contracts.start_date', 'contracts.end_date', 'contracts.status', 'contracts.assignable_id', 'assignable_type',
+        'contracts.id', 'contracts.refrence_id', 'contracts.project_id', 'contracts.type_id', 'contracts.value', 'contracts.start_date', 'contracts.end_date', 'contracts.status', 'contracts.assignable_id', 'assignable_type',
         DB::raw(
           'SUM(invoices.total)/100 as total,
           SUM(invoices.paid_amount)/100 as paid_amount,
