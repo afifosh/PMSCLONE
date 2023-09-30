@@ -44,7 +44,11 @@ class ContractStageController extends Controller
     // abort_if(!$project->isMine(), 403);
 
     $stage = $contract->stages()->create(
-      ['estimated_cost' => $contract->formatStageValue($request->estimated_cost + ($request->boolean('is_committed') ? $request->committed_amount : 0))]
+      [
+        'stage_amount' => $request->stage_amount,
+        'allowable_amount' => ($request->boolean('is_committed') ? $request->allowable_amount : 0),
+        'remaining_amount' => $request->stage_amount
+      ]
         + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
     );
 
@@ -52,14 +56,14 @@ class ContractStageController extends Controller
       $stage->phases()->create([
         'contract_id' => $stage->contract_id,
         'name' => $request->name . ' - Committed Phase',
-        'estimated_cost' => $contract->formatPhaseValue($request->committed_amount),
+        'estimated_cost' => $contract->formatPhaseValue($request->allowable_amount),
         'start_date' => $request->start_date,
         'due_date' => $request->due_date,
         'is_committed' => 1,
       ]);
     }
 
-    $contract->update(['remaining_amount' => $contract->remaining_amount - $stage->estimated_cost]);
+    $contract->update(['remaining_amount' => $contract->remaining_amount - $stage->stage_amount]);
 
     $message = auth()->user()->name . ' created a new stage: ' . $stage->name;
 
@@ -69,7 +73,7 @@ class ContractStageController extends Controller
     return $this->sendRes(__('Stage Created Successfully'), ['event' => 'table_reload', 'table_id' => 'stages-table', 'close' => 'globalModal']);
   }
 
-  public function edit($project, Contract $contract, ContractStage $stage)
+  public function edit(Contract $contract, ContractStage $stage)
   {
     $contract->load('project');
     $project = $contract->project ?? 'project';
@@ -86,7 +90,7 @@ class ContractStageController extends Controller
 
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_stages,name,' . $stage->id . ',id,contract_id,' . $contract->id,
-      'estimated_cost' => ['required', 'numeric', 'min:0', 'max:' . $contract->remaining_cost($stage->id)],
+      'stage_amount' => ['required', 'numeric', 'min:0', 'max:' . $contract->remaining_cost($stage->id)],
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
       'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
@@ -94,7 +98,33 @@ class ContractStageController extends Controller
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
     ]);
 
-    $stage->update(['estimated_cost' => $contract->formatStageValue($request->estimated_cost)] + $request->only(['name', 'description', 'status', 'start_date', 'due_date']));
+    $stageAmountDiff = $stage->stage_amount - $request->stage_amount;
+
+    $stage->update(
+      [
+        'stage_amount' => $request->stage_amount,
+        'allowable_amount' => ($request->boolean('is_committed') ? $request->allowable_amount : 0),
+        'remaining_amount' => $stage->remaining_amount - $stageAmountDiff
+      ]
+        + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
+    );
+
+    // update allowable amount of committed phase
+    if ($request->boolean('is_committed')) {
+      $stage->phases()->where('is_committed', 1)->updateOrCreate(
+        ['is_committed' => 1, 'contract_id' => $stage->contract_id],
+        [
+          'contract_id' => $stage->contract_id,
+          'name' => $request->name . ' - Committed Phase',
+          'estimated_cost' => $request->allowable_amount,
+          'start_date' => $request->start_date,
+          'due_date' => $request->due_date,
+          'is_committed' => 1,
+        ]
+      );
+    } else {
+      $stage->phases()->where('is_committed', 1)->delete();
+    }
 
     $message = auth()->user()->name . ' updated stage: ' . $stage->name;
 
@@ -109,6 +139,8 @@ class ContractStageController extends Controller
     $contract->load('project');
     $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine() || $stage->project_id != $project->id, 403);
+
+    $stage->phases()->delete();
 
     $stage->delete();
 

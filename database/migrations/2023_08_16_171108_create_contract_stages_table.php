@@ -17,7 +17,9 @@ return new class extends Migration
       $table->string('name')->nullable();
       $table->date('start_date')->nullable();
       $table->date('due_date')->nullable();
-      $table->bigInteger('estimated_cost')->default(0);
+      $table->bigInteger('stage_amount')->default(0);
+      $table->bigInteger('allowable_amount')->default(0);
+      $table->bigInteger('remaining_amount')->default(0);
       $table->text('description')->nullable();
       $table->enum('status', ['Active', 'Completed', 'Cancelled'])->default('Active');
       $table->timestamps();

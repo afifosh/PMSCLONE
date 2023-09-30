@@ -30,7 +30,7 @@ class PhaseStoreRequest extends FormRequest
       'name' => 'required|string|max:255|'. (($stage instanceof ContractStage) ? 'unique:contract_phases,name,NULL,id,contract_id,' . $this->contract->id : 'unique:contract_stages,name,NULL,id,contract_id,' . $this->contract->id),
       // if phase is from contract stage then check if estimated cost is less than stage remaining amount,
       //else check if estimated cost is less than contract remaining amount
-      'estimated_cost' => ['required', 'numeric', 'min:0' , 'max:' . (($stage instanceof ContractStage) ? $stage->remainingAmount() : $this->contract->remaining_amount)],
+      'estimated_cost' => ['required', 'numeric', 'min:0' , 'max:' . (($stage instanceof ContractStage) ? $stage->remaining_amount : $this->contract->remaining_amount)],
       'description' => 'nullable|string|max:2000',
       // if phase is from contract stage then check if start date is after or equal to stage start date,
       //else check if start date is after or equal to contract start date

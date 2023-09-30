@@ -18,16 +18,16 @@ class ProjectSeeder extends Seeder
    */
   public function run(): void
   {
-    // Project::factory(9)->create()->each(function ($project) {
-    //   $project->members()->attach(Admin::where('id', '!=', 1)->inRandomOrder()->limit(3)->get());
-    //   Task::factory(5)->create(['project_id' => $project->id])->each(function ($task) {
-    //     TaskFollower::factory(3)->create(['task_id' => $task->id]);
-    //     TaskAssignee::factory(3)->create(['task_id' => $task->id]);
-    //   });
-    //   // $project->tasks()->createMany(\App\Models\Task::factory(5)->make()->toArray())->each(function ($task) {
-    //   //   TaskFollower::factory(3)->create(['task_id' => $task->id]);
-    //   //   TaskAssignee::factory(3)->create(['task_id' => $task->id]);
-    //   // });
-    // });
+    Project::factory(9)->create()->each(function ($project) {
+      $project->members()->attach(Admin::where('id', '!=', 1)->inRandomOrder()->limit(3)->get());
+      Task::factory(5)->create(['project_id' => $project->id])->each(function ($task) {
+        TaskFollower::factory(3)->create(['task_id' => $task->id]);
+        TaskAssignee::factory(3)->create(['task_id' => $task->id]);
+      });
+      // $project->tasks()->createMany(\App\Models\Task::factory(5)->make()->toArray())->each(function ($task) {
+      //   TaskFollower::factory(3)->create(['task_id' => $task->id]);
+      //   TaskAssignee::factory(3)->create(['task_id' => $task->id]);
+      // });
+    });
   }
 }

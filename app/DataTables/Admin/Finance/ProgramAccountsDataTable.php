@@ -38,19 +38,22 @@ class ProgramAccountsDataTable extends DataTable
         $programsOutput = $account->programs->map(function($program) {
           $name = htmlspecialchars($program->name, ENT_QUOTES, 'UTF-8');
           $avatarSrc = $program->avatar; // Get the program's avatar
-      
+
           return "<li data-bs-toggle='tooltip' data-popup='tooltip-custom' data-bs-placement='top' class='avatar pull-up' aria-label='$name' data-bs-original-title='$name'>
               <img class='avatar avatar-sm rounded-circle' src='$avatarSrc' alt='$name'/>
           </li>";
       });
-      
+
       return "<ul class='list-unstyled m-0 d-flex align-items-center avatar-group'>" . $programsOutput->implode('') . "</ul>"; // Wrap the list items in an unordered list
- 
-      
+
+
       })->escapeColumns([])
 
     ->editColumn('balance', function($account){
       return Money::{$account->currency ?? config('money.defaults.currency')}($account->balance, false)->format();
+    })
+    ->editColumn('action', function($programAccount){
+      return view('admin.pages.finances.program-accounts.actions', compact('programAccount'));
     })
     ->rawColumns(['account_number']);
   }
@@ -89,7 +92,7 @@ class ProgramAccountsDataTable extends DataTable
               <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
               >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
-      // ->addAction(['width' => '80px'])
+      ->addAction(['width' => '80px'])
       ->orderBy(0, 'DESC')
       ->responsive(true)
       ->parameters([

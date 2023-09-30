@@ -8,7 +8,7 @@
     {{-- label --}}
     <div class="form-group col-6">
         {{ Form::label('label', __('Label'), ['class' => 'col-form-label']) }}
-        {!! Form::text('label', null, ['class' => 'form-control', 'placeholder' => __('Label')]) !!}
+        {!! Form::text('label', $accountBalance->name, ['class' => 'form-control', 'placeholder' => __('Label')]) !!}
     </div>
     <div class="form-group col-6">
       {{ Form::label('currency', __('Currency'), ['class' => 'col-form-label']) }}
@@ -21,7 +21,7 @@
     {{-- select programs --}}
     <div class="form-group col-12">
         {{ Form::label('holders', __('Holders'), ['class' => 'col-form-label']) }}
-        {!! Form::select('holders[]', $programs ?? [], $selected_programs ?? null, [
+        {!! Form::select('holders[]', $programs ?? [], isset($programs) ? array_keys($programs) : null, [
           'data-placeholder' => 'Select Programs',
           'class' => 'form-select globalOfSelect2Remote',
           'multiple' => 'multiple',

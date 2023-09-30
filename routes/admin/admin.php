@@ -281,7 +281,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::prefix('finances')->name('finances.')->group(function(){
       Route::resource('financial-years', FinancialYearController::class);
       Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store', 'show']);
-      Route::resource('program-accounts', ProgramAccountController::class)->only(['index', 'create', 'store']);
+      Route::resource('program-accounts', ProgramAccountController::class);
       Route::resource('program-accounts.transactions', ProgramTransactionController::class)->only(['index', 'create', 'store']);
       Route::get('retentions', [TaxController::class, 'retentions'])->name('retentions.index');
       Route::resource('taxes', TaxController::class);

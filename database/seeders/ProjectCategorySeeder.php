@@ -13,6 +13,6 @@ class ProjectCategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // ProjectCategory::factory(10)->create();
+        ProjectCategory::factory(10)->create();
     }
 }

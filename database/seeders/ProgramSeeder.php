@@ -54,19 +54,19 @@ class ProgramSeeder extends Seeder
             'parent_id' => null,
             'program_code' => 'UAL',
             'description' => 'Four touring pavilions to encourage dialogue with the community about culture, art.  Each pavilion will include digital art and cultural programming and is a blend of gallery, open-air classroom, workshop, lecture and socializing space that opens up a world of creativity for all. ',
-          ],      
+          ],
           [
             'name' => 'Joyous Gardens',
             'parent_id' => null,
             'program_code' => 'JOY',
             'description' => 'Joyous Gardens provide spaces for creative play as a core part of the healthy and vibrant urban life in Riyadh.  Featuring artistic-designed playgrounds and urban elements located in the parks all over the city, the green areas of the city are transformed into vibrant, inspiring and educational places that spark creativity and adventure and encourage exploration of the natural world. ',
-          ],   
+          ],
           [
             'name' => 'Jewels in Riyadh',
             'parent_id' => null,
             'program_code' => 'JEW',
             'description' => 'Jewels in Riyadh transforms the city into an open-air gallery for Contemporary Public Art, offering twenty-four permanent artworks by great art masters to prove contemporary sculpture’s ability in transforming urban spaces and the city.  The choice to place these monumental artworks in civic as well as historical sites generates a natural fusion between the history of Riyadh, its present and its future. ',
-          ],   
+          ],
           [
             'name' => 'Welcoming Gateways',
             'parent_id' => null,
@@ -100,29 +100,29 @@ class ProgramSeeder extends Seeder
             [
               'name' => 'King Salman Road Gateway',
               'parent_id' => null,
-              'program_code' => 'QSM',
+              'program_code' => 'KSM',
               'description' => '',
             ]
           ]
-          ], 
+          ],
           [
             'name' => 'Art on the Move',
             'parent_id' => null,
             'program_code' => 'AOM',
             'description' => 'A series of distinctive large-scale and high-impact art interventions designed to support the wayfinding experience of Riyadh.  Artworks will be integrated into the core infrastructure of the city, such as intersections and roundabouts and placed at major roads and rail intersections to provide a truly joyful every day experience.  19 locations, 19 artworks ',
-          ],   
+          ],
           [
             'name' => 'Art in Transit',
             'parent_id' => null,
             'program_code' => 'AIT',
             'description' => 'The Art in Transit program integrates public art into the core fabric of Riyadh’s Metro, BRT and Bus systems with stations, stops, platforms and infrastructure offering opportunities for artistic interventions. The public art will make the public and commuters feel welcome, create highly distinctive locations and ensure that every journey is an experience.',
-          ],   
+          ],
           [
             'name' => 'Urban Flow',
             'parent_id' => null,
             'program_code' => 'UFL',
             'description' => 'Urban Flow integrates public art into the fabric of the citywide network of pedestrian walkways, bridges and footpaths, enticing citizens to experience art and the city on their own terms.',
-          ],   
+          ],
           [
             'name' => 'Hidden River',
             'parent_id' => null,
@@ -148,13 +148,13 @@ class ProgramSeeder extends Seeder
             'parent_id' => null,
             'program_code' => 'GAR',
             'description' => 'This is a sculpture park for the 21st century, inviting new interpretations of art, technology and environmental engagement for Riyadh’s residents and visitors.',
-          ],   
+          ],
           [
             'name' => 'Riyadh Icon',
             'parent_id' => null,
             'program_code' => 'ICO',
             'description' => 'This ambitious international commission is a visual symbol of the cultural aspirations of Vision 2030 and it heralds a new era of Saudi intention to celebrate a global community that sparks creativity, ignites the art movement, encourages self-expression, and creates an inclusive culture.',
-          ],   
+          ],
           [
             'name' => 'Noor Riyadh',
             'parent_id' => null,
@@ -174,7 +174,7 @@ class ProgramSeeder extends Seeder
             'parent_id' => null,
             'program_code' => 'RIV',
             'description' => '',
-          ],   
+          ],
           [
             'name' => 'Tuwaiq Sculpture',
             'parent_id' => null,
@@ -189,7 +189,7 @@ class ProgramSeeder extends Seeder
                 // You can even nest more children here if required
               ],
             ],
-          ],                                                                                  
+          ],
         ],
       ],
       // Add more predefined values as needed
@@ -199,19 +199,19 @@ class ProgramSeeder extends Seeder
       $parentProgram = Program::factory()
           ->predefinedValues(Arr::except($parentValues, 'children'))
           ->create();
-  
+
       if (isset($parentValues['children']) && is_array($parentValues['children'])) {
           foreach ($parentValues['children'] as $childValues) {
               $childValues['parent_id'] = $parentProgram->id;
-  
+
               $childProgram = Program::factory()
                   ->predefinedValues(Arr::except($childValues, 'children'))
                   ->create();
-  
+
               if (isset($childValues['children']) && is_array($childValues['children'])) {
                   foreach ($childValues['children'] as $subChildValues) {
                       $subChildValues['parent_id'] = $childProgram->id;
-  
+
                       $subChildProgram = Program::factory()
                           ->predefinedValues(Arr::except($subChildValues, 'children'))
                           ->create();
@@ -220,9 +220,9 @@ class ProgramSeeder extends Seeder
           }
       }
   }
-  
 
-    
+
+
 
     // foreach ($predefinedValues as $parentValues) {
     //   $parentProgram = Program::factory()
@@ -241,9 +241,9 @@ class ProgramSeeder extends Seeder
 
     //       $childProgram->users()->attach(Admin::where('id', '!=', 1)->inRandomOrder()->limit(3)->get(), ['added_by' => 1]);
     //       //$childProgram->users()->attach(Admin::where('id', 1)->get(), ['added_by' => 1]);
-            
+
     //     }
     //   }
     // }
   }
-}    
+}

@@ -20,6 +20,7 @@ class CreateAccountBalanceSetupTables extends Migration
             $table->char('currency', 3);
             $table->bigInteger('balance')->default(0);
             $table->nullableMorphs('creator');
+            $table->softDeletes();
             $table->timestamps();
         });
 

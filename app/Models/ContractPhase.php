@@ -53,7 +53,7 @@ class ContractPhase extends Model
 
   public function setEstimatedCostAttribute($value)
   {
-    $this->attributes['estimated_cost'] = $value * 100;
+    $this->attributes['estimated_cost'] = round($value * 100);
   }
 
   public function getStatusAttribute()
@@ -92,6 +92,11 @@ class ContractPhase extends Model
   public function contract(): BelongsTo
   {
     return $this->belongsTo(Contract::class);
+  }
+
+  public function stage(): BelongsTo
+  {
+    return $this->belongsTo(ContractStage::class);
   }
 
   public function addedAsInvoiceItem()

@@ -9,19 +9,19 @@
       {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
   </div>
   <div class="form-group col-6">
-    {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
+    {{ Form::label('stage_amount', __('Stage Amount'), ['class' => 'col-form-label']) }}
     <div class="dropdown open d-inline">
       <span data-bs-toggle="dropdown" aria-haspopup="true">
           <i class="fas fa-calculator"></i>
       </span>
       <div class="dropdown-menu p-3">
         <div class="mb-3" data-content="percent-cal">
-          <label for="percent-value" class="form-label">Percentage (Balance: {{$contract->remaining_amount}})</label>
-          <input type="number" name="percent-value" id="percent-value" data-balance="{{$contract->remaining_amount}}" class="form-control" placeholder="10%">
+          <label for="percent-value" class="form-label">Percentage (Total: {{$contract->value}})</label>
+          <input type="number" name="percent-value" id="percent-value" data-balance="{{$contract->value}}" class="form-control" placeholder="10%">
         </div>
       </div>
     </div>
-    {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
+    {!! Form::number('stage_amount', null, ['class' => 'form-control', 'placeholder' => __('Stage Amount')]) !!}
   </div>
   {{-- start date --}}
   <div class="form-group col-6">
@@ -56,16 +56,16 @@
   </div>
   <div class="col-12 mt-2">
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="is_committed" name="is_committed">
+      <input class="form-check-input" type="checkbox" id="is_committed" name="is_committed" @checked($stage->allowable_amount)>
       <label class="form-check-label" for="is_committed">
         Is Allowable
       </label>
     </div>
   </div>
   {{-- Allowable Amount --}}
-  <div class="form-group col-6 d-none committed-amount">
-    {{ Form::label('committed_amount', __('Allowable Amount'), ['class' => 'col-form-label']) }}
-    {!! Form::number('committed_amount', null, ['class' => 'form-control', 'placeholder' => __('Allowable Amount')]) !!}
+  <div class="form-group col-6 {{$stage->allowable_amount ? '' : 'd-none'}} committed-amount">
+    {{ Form::label('allowable_amount', __('Allowable Amount'), ['class' => 'col-form-label']) }}
+    {!! Form::number('allowable_amount', null, ['class' => 'form-control', 'placeholder' => __('Allowable Amount')]) !!}
   </div>
 
 </div>
@@ -141,9 +141,9 @@
     const balance = $(this).data('balance');
     if(percent && balance){
       const estimatedCost = (balance * percent) / 100;
-      $('[name="estimated_cost"]').val(estimatedCost);
+      $('[name="stage_amount"]').val(estimatedCost);
     }else{
-      $('[name="estimated_cost"]').val('');
+      $('[name="stage_amount"]').val('');
     }
   })
 </script>

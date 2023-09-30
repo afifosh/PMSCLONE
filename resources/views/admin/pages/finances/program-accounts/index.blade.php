@@ -14,12 +14,6 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/swiper/swiper.css')}}" />
 <style>
-
-
-
-
-
-
 #credit-card {
 	font-family: var(--roboto_slab);
 	width: 100%;
@@ -27,7 +21,6 @@ $configData = Helper::appClasses();
 	perspective: 40rem;
 	border-radius: 10px;
 }
-
 #credit-card-body {
 	width: 100%;
 	border-radius: 10px;
@@ -35,7 +28,7 @@ $configData = Helper::appClasses();
 	transition: transform 0.7s;
 	position: relative;
 	transform-style: preserve-3d;
-	background: -webkit-linear-gradient-gradient(to right,  #000000, #243b55); 
+	background: -webkit-linear-gradient-gradient(to right,  #000000, #243b55);
 	background: linear-gradient(to right, #000000, #000);
 	color: #FAFAFA;
 	box-shadow:
@@ -46,16 +39,13 @@ $configData = Helper::appClasses();
 		0 41.8px 33.4px rgba(36,59,85, 0.086),
 		0 100px 80px rgba(36,59,85, 0.12);
 }
-
 #card-front, #card-back {
 	backface-visibility: hidden;
-	transform: rotateX(0deg);    
+	transform: rotateX(0deg);
 }
-
 #credit-card-body.flip {
 	transform: rotateY(-180deg)
 }
-
 #card-front {
 	display: grid;
 	height: 250px;
@@ -85,7 +75,7 @@ $configData = Helper::appClasses();
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: repeat(3, 1fr);
-	grid-template-areas: 
+	grid-template-areas:
 		"component-1 . component-2"
 		"component-3 . component-4"
 		". . component-5"
@@ -143,7 +133,7 @@ div[class ^= "component"] {
 	text-align: center;
 }
 #card_name {
-	grid-column: 1 / -1;	
+	grid-column: 1 / -1;
 }
 #card_name, #card_expiry_date {
 	text-transform: uppercase;
@@ -189,7 +179,6 @@ div[class ^= "component"] {
 	grid-column: 1 / -1;
 }
 
-
 #particles-js {
 	position: absolute;
 	height: 100%;
@@ -223,7 +212,7 @@ div[class ^= "component"] {
 
 
 
-</style>  
+</style>
 @endsection
 
 @section('page-style')
@@ -231,7 +220,6 @@ div[class ^= "component"] {
 @endsection
 
 @section('vendor-script')
-<script src="{{ asset(mix('assets/vendor/libs/jquery/jquery.js')) }}"></script>
 <script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
@@ -259,66 +247,37 @@ div[class ^= "component"] {
 <script src={{asset('assets/js/custom/select2.js')}}></script>
 <script src={{asset('assets/js/custom/flatpickr.js')}}></script>
 @endsection
-
 @section('content')
-
-
 <div class="row">
   <!-- Website Analytics -->
   <div class="col-lg-12 mb-4">
     <div class="swiper-container swiper-container-horizontal swiper" id="swiper-with-pagination-cards">
       <div class="swiper-wrapper">
-		@foreach($accounts as $account)
-			<div class="swiper-slide">
-				<div id="credit-card">
-					<div id="credit-card-body">
-						<div id="card-front">
-						<img width="70px" alt="visa card" class="card-logo" style="" src="data:image/svg+xml;charset=UTF-8,%3csvg width='35' height='20' version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 600 599.9' style='enable-background:new 0 0 600 599.9;' xml:space='preserve'%3e%3cstyle type='text/css'%3e .st0%7bfill:%23FFFFFF;%7d %3c/style%3e%3cg%3e%3cpath class='st0' d='M350.3,281.1c-4.3,4.3-10.1,6.7-16.2,6.7c-6.1,0-11.9-2.4-16.2-6.7c-8.9-8.9-8.9-23.4,0-32.4 c4.3-4.3,10.1-6.7,16.2-6.7c6.1,0,11.9,2.4,16.2,6.7C359.2,257.6,359.2,272.1,350.3,281.1 M276.4,287.8 c-12.6,0-22.9-10.3-22.9-22.9s10.3-22.9,22.9-22.9c12.6,0,22.9,10.3,22.9,22.9S289,287.8,276.4,287.8 M142,361.2l-44-15.3 l-15.1,43.6l-62.7-21.7l21.7-62.7l44,15.3l15.1-43.6l62.7,21.7L142,361.2z M557.5,259l42.5-18.7V84.5 c-27.9,82.9-101.6,142.9-193.8,142.9h-6.7L577.5,0H325.2v94.5h48.7v132.9H254.6V0h-84.9l-34.3,53.1l-6.3-6.5 c-2.7-2.8-7.2-5.8-13.2-8.8c-6-3-11.2-4.8-15.4-5.3l-11.3-1.3L108.6,0H0v223c1.5,0.1,3.1,0.1,4.7,0.1c9.1,0,17.5-0.9,25-2.7 c7.4-1.8,13.3-3.9,17.7-6.4c4.4-2.5,8.2-5.3,11.1-8.1c3.6-3.5,5.2-5.7,5.9-7c1-1.9,1.2-2.7,1.2-2.7c0-2.4-1.1-8.5-8.2-21.2 C51.5,164.8,44,155,35,145.8l-3.2-3.3l20.4-54.5l7.9,9.9c7.2,9,15.2,16.2,23.8,21.5c6.5-8.7,13.4-17,20.3-24.5 c8.4-9,17.4-17.5,27-25.1c9.8-7.8,20.3-14,31.1-18.5c11-4.5,22.1-6.8,32.9-6.8c14.4,0,25.5,4,33.1,11.8 c7.6,7.8,11.4,18.7,11.4,32.4c0,7.8-2.7,18.6-8.2,33.1c-5.3,13.9-11,25.6-16.9,34.6c-10.4,16-22.1,27.6-34.6,34.3 c-12.5,6.7-29.4,10.1-50.1,10.1c-14.7,0-28.2-1.9-40.1-5.7c-0.9,4.1-2.2,10.1-4.2,19.2c-5.2,22.2-15.8,40.6-31.6,54.7 c-14.8,13.2-33,20.3-54.1,21.4v165.4l307.8-155.9l37.8,74.5L0,549.5v50.4h196.2c-22.8-21-47.1-53.7-52.5-86.6 c-0.2-1.2-0.6-5.2,2.6-6.6c3.7-1.6,6.4,1.7,7.3,2.8c13,15.9,38.3,41.3,78.7,60.1c14.6,6.3,30.6,9.7,46.4,9.7 c21.9,0,41.2-6.3,55.9-18.3c27.7-22.6,47.1-57.8,53-96.6c5.6-36.4-4.2-69.5-14.3-104.7c-3.6-12.6-13-43.7,15.3-54.2 c25.1-9.3,42.3,16.6,47.6,31.4c11.8,32.5,18.7,66.9,19.9,99.6c1.7,44.9-6.5,108.2-55,154.3c-3.4,3.2-7,6.2-10.7,9.1h112.9 l-24.3-271.2l97.4-20.6l-19.1,291.8H600V271.2l-42.5,18.7l-52.8-23.2l-47.1,20.7l-11.4-25.9l58.4-25.7L557.5,259z'%3e%3c/path%3e%3cpath class='st0' d='M180,134.8c6.1-0.8,10.9-1.7,14.1-2.8c3-1,5.4-2.1,7.1-3.4c1.9-1.4,2.4-2.1,2.4-2.1c0.2-0.4,0.2-0.6,0.2-0.6 c0-7.2-2.1-13.2-6.5-18.2c-4-4.6-11.2-7-21.2-7c-11.3,0-24,3.1-37.5,9.1c-10.5,4.7-20.6,11.4-30.1,20.1c14,4,30.6,6,49.3,6 C166.3,136,173.7,135.6,180,134.8'%3e%3c/path%3e%3c/g%3e%3c/svg%3e">
-							<div class="card-chip mt-1">
-								<p class="mb-1" style="font-size: 0.55rem;color: #bbb;text-transform: uppercase;grid-column: 1 / -1;">Balance</p>
-								<h2 class="fs-36 text-white mb-sm-4 mb-3" style="grid-column: 1 / -1;font-size: 12px;text-align: left;background-clip: border-box;-webkit-background-clip: text;-webkit-text-fill-color: transparent;text-shadow: 1px 1px 1px rgb(255, 255, 255);">{{ $account->currency }} {{ $account->balance }}</h2>
-							</div>
-							<div id="card_no" style="">{{ $account->account_number }}</div>
-							<div class="card-labels card-holder-label">Account Name</div>
-
-							<div id="card_name" style="color: white;">{{ $account->name }}</div>
-
-							<div id="card_expiry_date"></div><div id="particles-js"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		@endforeach
-
-        {{-- <div class="swiper-slide">
-          <div id="credit-card">
-            <div id="credit-card-body">
-              <div id="card-front">
+        @foreach($accounts as $account)
+          <div class="swiper-slide">
+            <div id="credit-card">
+              <div id="credit-card-body">
+                <div id="card-front">
                 <img width="70px" alt="visa card" class="card-logo" style="" src="data:image/svg+xml;charset=UTF-8,%3csvg width='35' height='20' version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 600 599.9' style='enable-background:new 0 0 600 599.9;' xml:space='preserve'%3e%3cstyle type='text/css'%3e .st0%7bfill:%23FFFFFF;%7d %3c/style%3e%3cg%3e%3cpath class='st0' d='M350.3,281.1c-4.3,4.3-10.1,6.7-16.2,6.7c-6.1,0-11.9-2.4-16.2-6.7c-8.9-8.9-8.9-23.4,0-32.4 c4.3-4.3,10.1-6.7,16.2-6.7c6.1,0,11.9,2.4,16.2,6.7C359.2,257.6,359.2,272.1,350.3,281.1 M276.4,287.8 c-12.6,0-22.9-10.3-22.9-22.9s10.3-22.9,22.9-22.9c12.6,0,22.9,10.3,22.9,22.9S289,287.8,276.4,287.8 M142,361.2l-44-15.3 l-15.1,43.6l-62.7-21.7l21.7-62.7l44,15.3l15.1-43.6l62.7,21.7L142,361.2z M557.5,259l42.5-18.7V84.5 c-27.9,82.9-101.6,142.9-193.8,142.9h-6.7L577.5,0H325.2v94.5h48.7v132.9H254.6V0h-84.9l-34.3,53.1l-6.3-6.5 c-2.7-2.8-7.2-5.8-13.2-8.8c-6-3-11.2-4.8-15.4-5.3l-11.3-1.3L108.6,0H0v223c1.5,0.1,3.1,0.1,4.7,0.1c9.1,0,17.5-0.9,25-2.7 c7.4-1.8,13.3-3.9,17.7-6.4c4.4-2.5,8.2-5.3,11.1-8.1c3.6-3.5,5.2-5.7,5.9-7c1-1.9,1.2-2.7,1.2-2.7c0-2.4-1.1-8.5-8.2-21.2 C51.5,164.8,44,155,35,145.8l-3.2-3.3l20.4-54.5l7.9,9.9c7.2,9,15.2,16.2,23.8,21.5c6.5-8.7,13.4-17,20.3-24.5 c8.4-9,17.4-17.5,27-25.1c9.8-7.8,20.3-14,31.1-18.5c11-4.5,22.1-6.8,32.9-6.8c14.4,0,25.5,4,33.1,11.8 c7.6,7.8,11.4,18.7,11.4,32.4c0,7.8-2.7,18.6-8.2,33.1c-5.3,13.9-11,25.6-16.9,34.6c-10.4,16-22.1,27.6-34.6,34.3 c-12.5,6.7-29.4,10.1-50.1,10.1c-14.7,0-28.2-1.9-40.1-5.7c-0.9,4.1-2.2,10.1-4.2,19.2c-5.2,22.2-15.8,40.6-31.6,54.7 c-14.8,13.2-33,20.3-54.1,21.4v165.4l307.8-155.9l37.8,74.5L0,549.5v50.4h196.2c-22.8-21-47.1-53.7-52.5-86.6 c-0.2-1.2-0.6-5.2,2.6-6.6c3.7-1.6,6.4,1.7,7.3,2.8c13,15.9,38.3,41.3,78.7,60.1c14.6,6.3,30.6,9.7,46.4,9.7 c21.9,0,41.2-6.3,55.9-18.3c27.7-22.6,47.1-57.8,53-96.6c5.6-36.4-4.2-69.5-14.3-104.7c-3.6-12.6-13-43.7,15.3-54.2 c25.1-9.3,42.3,16.6,47.6,31.4c11.8,32.5,18.7,66.9,19.9,99.6c1.7,44.9-6.5,108.2-55,154.3c-3.4,3.2-7,6.2-10.7,9.1h112.9 l-24.3-271.2l97.4-20.6l-19.1,291.8H600V271.2l-42.5,18.7l-52.8-23.2l-47.1,20.7l-11.4-25.9l58.4-25.7L557.5,259z'%3e%3c/path%3e%3cpath class='st0' d='M180,134.8c6.1-0.8,10.9-1.7,14.1-2.8c3-1,5.4-2.1,7.1-3.4c1.9-1.4,2.4-2.1,2.4-2.1c0.2-0.4,0.2-0.6,0.2-0.6 c0-7.2-2.1-13.2-6.5-18.2c-4-4.6-11.2-7-21.2-7c-11.3,0-24,3.1-37.5,9.1c-10.5,4.7-20.6,11.4-30.1,20.1c14,4,30.6,6,49.3,6 C166.3,136,173.7,135.6,180,134.8'%3e%3c/path%3e%3c/g%3e%3c/svg%3e">
-                <div class="card-chip mt-1">
-                  				<p class="mb-1" style="font-size: 0.55rem;color: #bbb;text-transform: uppercase;grid-column: 1 / -1;">Balance</p>
-										<h2 class="fs-36 text-white mb-sm-4 mb-3" style="grid-column: 1 / -1;font-size: 12px;text-align: left;background-clip: border-box;-webkit-background-clip: text;-webkit-text-fill-color: transparent;text-shadow: 1px 1px 1px rgb(255, 255, 255);">$673,412673,412673,412.66</h2>
+                  <div class="card-chip mt-1">
+                    <p class="mb-1" style="font-size: 0.55rem;color: #bbb;text-transform: uppercase;grid-column: 1 / -1;">Balance</p>
+                    <h2 class="fs-36 text-white mb-sm-4 mb-3" style="grid-column: 1 / -1;font-size: 12px;text-align: left;background-clip: border-box;-webkit-background-clip: text;-webkit-text-fill-color: transparent;text-shadow: 1px 1px 1px rgb(255, 255, 255);">{{ $account->currency }} {{ $account->balance }}</h2>
+                  </div>
+                  <div id="card_no" style="">{{ $account->account_number }}</div>
+                  <div class="card-labels card-holder-label">Account Name</div>
+
+                  <div id="card_name" style="color: white;">{{ $account->name }}</div>
+
+                  <div id="card_expiry_date"></div><div id="particles-js"></div>
                 </div>
-                <div id="card_no" style="">7359576984709447</div>
-                <div class="card-labels card-holder-label">Account Name</div>
-                
-                <div id="card_name" style="color: white;">Riyadh Art</div>
-                
-                <div id="card_expiry_date"></div><div id="particles-js"></div>
               </div>
             </div>
           </div>
-        </div>           --}}
-       
+        @endforeach
       </div>
-
     </div>
   </div>
-  <!--/ Website Analytics -->
-
-
 </div>
-
   <div class="mt-3  col-12">
     <div class="card">
       <div class="card-body">
@@ -326,10 +285,8 @@ div[class ^= "component"] {
       </div>
     </div>
   </div>
-
 @endsection
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
-
 @endpush

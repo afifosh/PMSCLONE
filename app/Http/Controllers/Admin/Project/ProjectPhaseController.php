@@ -44,7 +44,7 @@ class ProjectPhaseController extends Controller
     $contract->load('project');
     $project = $contract->project ?? 'project';
     // stage is instance of ContractStage then get stage remaining amount, else get contract remaining amount
-    $remaining_amount = $stage instanceof ContractStage ? $stage->remainingAmount() : $contract->remaining_amount;
+    $remaining_amount = $stage instanceof ContractStage ? $stage->stage_amount : $contract->value;
     // abort_if(!$project->isMine(), 403);
 
     $phase = new ContractPhase();
@@ -63,12 +63,17 @@ class ProjectPhaseController extends Controller
     // abort_if(!$project->isMine(), 403);
 
     $phase = $contract->phases()->create(
-      ['estimated_cost' => $contract->formatPhaseValue($request->estimated_cost), 'stage_id' => $stage->id ?? null]
+      [
+        'estimated_cost' => $request->estimated_cost,
+        'stage_id' => $stage->id ?? null
+      ]
         + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
     );
 
-    // if stage is null, then it is commited phase so update contract remaining amount
-    if($phase->stage_id == null)
+    // If stage is null, then it is commited phase so update contract remaining amount
+    if ($stage instanceof ContractStage)
+      $stage->update(['remaining_amount' => $stage->remaining_amount - $phase->estimated_cost]);
+    else
       $contract->update(['remaining_amount' => $contract->remaining_amount - $phase->estimated_cost]);
 
     $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
@@ -85,8 +90,9 @@ class ProjectPhaseController extends Controller
     $contract->load('project');
     $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
+    $remaining_amount = $stage instanceof ContractStage ? $stage->stage_amount : $contract->value;
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage', 'remaining_amount'))->render()]);
   }
 
   public function update($project, Request $request, Contract $contract, $stage, ContractPhase $phase)
@@ -105,7 +111,20 @@ class ProjectPhaseController extends Controller
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
     ]);
 
+    $costDiff = $phase->estimated_cost - $request->estimated_cost;
+
     $phase->update(['estimated_cost' => $contract->formatPhaseValue($request->estimated_cost)] + $request->only(['name', 'description', 'status', 'start_date', 'due_date']));
+
+    if ($phase->stage_id) {
+      if($phase->is_committed){
+        $phase->stage->update(['allowable_amount' => $phase->stage->allowable_amount - $costDiff]);
+        $phase->contract->update(['remaining_amount' => $phase->contract->remaining_amount - $costDiff]);
+      }else{
+        $phase->stage->update(['remaining_amount' => $phase->stage->remaining_amount + $costDiff]);
+      }
+    } else {
+      $contract->update(['remaining_amount' => $contract->remaining_amount + $costDiff]);
+    }
 
     // TODO : if stage is null, then it is commited phase so update contract remaining amount
 
@@ -121,7 +140,19 @@ class ProjectPhaseController extends Controller
   {
     $contract->load('project');
     $project = $contract->project ?? 'project';
+    $phase->load('stage', 'contract');
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
+
+    if ($phase->stage_id) {
+      $data = [];
+      if ($phase->is_committed) {
+        $data['allowable_amount'] = $phase->stage->allowable_amount - $phase->estimated_cost;
+      } else {
+        $data['remaining_amount'] = $phase->stage->remaining_amount + $phase->estimated_cost;
+      }
+      $phase->stage->update($data);
+    } else
+      $contract->update(['remaining_amount' => $contract->remaining_amount + $phase->estimated_cost]);
 
     $phase->delete();
 

@@ -14,7 +14,9 @@ class ContractStage extends Model
     'type',
     'start_date',
     'due_date',
-    'estimated_cost',
+    'stage_amount',
+    'allowable_amount',
+    'remaining_amount',
     'description'
   ];
 
@@ -61,14 +63,34 @@ class ContractStage extends Model
     }
   }
 
-  public function getEstimatedCostAttribute($value)
+  public function getStageAmountAttribute($value)
   {
     return $value / 100;
   }
 
-  public function setEstimatedCostAttribute($value)
+  public function setStageAmountAttribute($value)
   {
-    $this->attributes['estimated_cost'] = round($value * 100);
+    $this->attributes['stage_amount'] = round($value * 100);
+  }
+
+  public function getAllowableAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setAllowableAmountAttribute($value)
+  {
+    $this->attributes['allowable_amount'] = round($value * 100);
+  }
+
+  public function getRemainingAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setRemainingAmountAttribute($value)
+  {
+    $this->attributes['remaining_amount'] = round($value * 100);
   }
 
   public function contract()
@@ -79,10 +101,5 @@ class ContractStage extends Model
   public function phases()
   {
     return $this->hasMany(ContractPhase::class, 'stage_id');
-  }
-
-  public function remainingAmount()
-  {
-    return $this->estimated_cost - $this->phases->sum('estimated_cost');
   }
 }

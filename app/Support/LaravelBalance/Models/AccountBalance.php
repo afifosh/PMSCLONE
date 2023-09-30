@@ -9,11 +9,12 @@ use App\Models\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AccountBalance extends Model
 {
 
-  use HasFactory;  
+  use HasFactory, SoftDeletes;
     /**
      * The database table used by the model.
      *
@@ -48,7 +49,7 @@ class AccountBalance extends Model
             $accountNumber = rand(1000000000000000, 9999999999999999);
             $exists = self::where('account_number', $accountNumber)->exists();
         } while ($exists);
-    
+
         return $accountNumber;
     }
 
