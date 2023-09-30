@@ -31,7 +31,7 @@ class ContractStoreRequest extends FormRequest
       'company_id' => ['nullable', 'required_if:isSavingDraft,0', 'exists:companies,id'],
       'project_id' => ['nullable', 'exists:projects,id'],
       'program_id' => ['nullable', 'required_if:isSavingDraft,0', 'exists:programs,id'],
-      'signature_date' => 'nullable|required_if:isSavingDraft,0|date',
+      'signature_date' => 'nullable|date',
       'currency' => [Rule::In(array_keys(config('money.currencies'))), 'required_if:isSavingDraft,0'],
       'value' => ['nullable', 'required_if:isSavingDraft,0', 'min:0', 'max:92233720368547758'],
       'invoicing_method' => ['nullable', 'required_if:isSavingDraft,0', 'in:Recuring,Phase Based'],
