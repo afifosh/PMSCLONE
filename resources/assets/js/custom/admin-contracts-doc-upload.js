@@ -234,6 +234,7 @@ $(document).on('click', '.account-image-reset', function () {
                 }
               });
               initDropzone();
+              initFlatPickr();
           });
         }
       });

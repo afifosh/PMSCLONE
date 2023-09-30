@@ -112,6 +112,11 @@
           "slug": "admin.projects.gantt-chart.index"
         },
         {
+          "url": "/admin/contracts/document-stats",
+          "name": "Contract Doc Stats",
+          "slug": "admin.contract-doc-stats.index"
+        },
+        {
           "url": "/admin/contract-doc-controls",
           "name": "Document Controls",
           "slug": "admin.contract-doc-controls.index"

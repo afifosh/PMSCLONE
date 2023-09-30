@@ -136,6 +136,21 @@
 @endsection
 
 @section('content')
+{{-- Alert Contract expired --}}
+@if(count($pendingDocs) > 0)
+  <div class="col-12 mb-4">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <h4 class="alert-heading">{{__('Contract Has Pending Documents')}}</h4>
+      <p class="mb-0">The following documents are missing from the contract.</p>
+      @forelse ($pendingDocs as $pd)
+        <li class="mb-0">{{$pd->title}}</>
+      @empty
+      @endforelse
+      <p class="mb-0 d-flex justify-content-end"><a class="btn btn-outline-danger" href="{{route('admin.contracts.pending-documents.index', [$invoice->contract])}}">Please upload here</a></p>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+@endif
 <form action="{{route('admin.invoices.update', [$invoice])}}" method="POST">
   @method('PUT')
   @csrf

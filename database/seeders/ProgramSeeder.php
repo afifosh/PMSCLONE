@@ -5,12 +5,14 @@ namespace Database\Seeders;
 use App\Models\Admin;
 use App\Models\Program;
 use App\Models\RFPDraft;
+use App\Traits\FinanceTrait;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
 class ProgramSeeder extends Seeder
 {
+  use FinanceTrait;
     /**
      * Run the database seeds.
      *
@@ -245,5 +247,12 @@ class ProgramSeeder extends Seeder
     //     }
     //   }
     // }
+
+    $program = Program::first();
+
+    $this->accountant->createAccount(
+      $program,
+      ['currency' => 'SAR', 'name' => $program->name]
+    );
   }
 }

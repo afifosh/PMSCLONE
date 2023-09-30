@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Contract;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Contract\DocumentUploadRequest;
 use App\Http\Requests\Admin\KycDocumentUpdateRequest;
 use App\Models\Company;
 use App\Models\Contract;
@@ -21,7 +22,7 @@ class ContractDocumentController extends Controller
   public function index(Contract $contract, Request $request)
   {
     $data['contract'] = $contract;
-    $data['requestable_documents'] = $data['documents'] = $this->pendingDocsQuery($contract)->get();
+    $data['requestable_documents'] = $data['documents'] = $contract->pendingDocs()->get();
 
     request()->document_id = request()->document_id ?? $data['requestable_documents'][0]->id ?? 0;
     if ($request->fields_only) {
@@ -73,38 +74,9 @@ class ContractDocumentController extends Controller
     return $this->sendRes('Uploaded Successfully', ['file_path' => $file_path]);
   }
 
-  private function pendingDocsQuery(Contract $contract)
+  public function store(DocumentUploadRequest $request, Contract $contract)
   {
-    return KycDocument::where('status', 1) // active
-      ->where('workflow', 'Contract Required Docs') // workflow
-      ->whereIn('client_type', array_merge(['Both'], ( $contract->assignable instanceof Company ?  [$contract->assignable->type] : []))) // filter by client type
-      ->where(function ($q) use ($contract) { // filter by contract type
-        $q->when($contract->type_id, function ($q) use ($contract) {
-          $q->whereHas('contractTypes', function ($q) use ($contract) {
-            $q->where('contract_types.id', $contract->type_id);
-          })->orHas('contractTypes', '=', 0);
-        });
-      })
-      ->where(function ($q) use ($contract) { // filter by contract category
-        $q->when($contract->category_id, function ($q) use ($contract) {
-          $q->whereHas('contractCategories', function ($q) use ($contract) {
-            $q->where('contract_categories.id', $contract->category_id);
-          })->orHas('contractCategories', '=', 0);
-        });
-      })
-      ->whereDoesntHave('uploadedDocs', function ($q) use ($contract) { // filter by uploaded docs
-        $q->where('doc_requestable_id', $contract->id)
-          ->where('doc_requestable_type', Contract::class)
-          ->where(function ($q) {
-            $q->whereNull('expiry_date')
-              ->orWhere('expiry_date', '>', now());
-          });
-      });
-  }
-
-  public function store(Request $request, Contract $contract)
-  {
-    $document = $this->pendingDocsQuery($contract)->findOrFail($request->document_id);
+    $document = $contract->pendingDocs()->findOrFail($request->document_id);
     $final_fields = [];
     $data = [];
     foreach ($document->fields as $field) {
@@ -120,7 +92,17 @@ class ContractDocumentController extends Controller
     if ($document->is_expirable) {
       $data['expiry_date'] = $request->expiry_date;
     }
-    $contract->uploadedDocs()->create($data + ['fields' => $final_fields, 'kyc_doc_id' => $document->id]);
+    $contract->uploadedDocs()->create(
+      [
+        'uploader_id' => auth()->id(),
+        'uploader_type' => get_class(auth()->user())
+      ]
+        + $data +
+        [
+          'fields' => $final_fields,
+          'kyc_doc_id' => $document->id
+        ]
+    );
 
     return $this->sendRes('Added Successfully', ['event' => 'page_reload']);
   }

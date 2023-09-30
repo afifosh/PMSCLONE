@@ -49,6 +49,8 @@ use App\Http\Controllers\Admin\MailClient\EmailAccountController;
 use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
 use App\Http\Controllers\Admin\Contract\ContractStageController;
+use App\Http\Controllers\Admin\Contract\DocumentStatController;
+use App\Http\Controllers\Admin\Contract\UploadedDocumentController;
 use App\Http\Controllers\Admin\ContractDoc\DocControlController;
 use App\Http\Controllers\Admin\Finance\ProgramTransactionController;
 use App\Http\Controllers\Admin\Finance\FinancialYearController;
@@ -158,6 +160,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
 
+    Route::get('contracts/document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
     Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
@@ -184,6 +187,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
     Route::resource('contracts.stages', ContractStageController::class);
     Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
+    Route::resource('contracts.uploaded-documents', UploadedDocumentController::class)->only(['index', 'show', 'destroy']);
     Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
     Route::resource('contract-doc-controls', DocControlController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');

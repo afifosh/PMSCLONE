@@ -16,15 +16,29 @@ class UploadedKycDoc extends Model
     'company_id',
     'kyc_doc_id',
     'fields',
+    'uploader_id',
+    'uploader_type',
     'expiry_date',
   ];
 
   protected $casts = [
     'fields' => 'array',
-    'expiry_date' => 'date',
+    'expiry_date' => 'datetime:d M, Y',
+    'created_at' => 'datetime:d M, Y',
+    'updated_at' => 'datetime:d M, Y'
   ];
 
-  public const FILE_PATH = 'kyc-docs/company';
+  protected $appends = ['status'];
+
+  public const FILE_PATH = 'requested-docs';
+
+  public function getStatusAttribute()
+  {
+    if ($this->expiry_date && $this->expiry_date->endOfDay()->isPast()) {
+      return 'Expired';
+    }
+    return 'Active';
+  }
 
   public function company()
   {
@@ -36,6 +50,11 @@ class UploadedKycDoc extends Model
     return $this->belongsTo(KycDocument::class);
   }
 
+  public function requestedDoc()
+  {
+    return $this->kycDoc();
+  }
+
   public static function getModelName()
   {
     return 'KYC Doc';
@@ -44,5 +63,10 @@ class UploadedKycDoc extends Model
   public function docRequestable()
   {
     return $this->morphTo('doc_requestable', 'doc_requestable_id', 'doc_requestable_type');
+  }
+
+  public function uploader()
+  {
+    return $this->morphTo();
   }
 }

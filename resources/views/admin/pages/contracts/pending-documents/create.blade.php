@@ -59,53 +59,39 @@
   </div>
   <div class="card-body">
     <div class="col-12 mb-4">
-      <div class="bs-stepper wizard-vertical vertical mt-2">
-        <div class="bs-stepper-header">
-          @forelse ($documents as $document)
-            {{-- @php
-              $doc = $approved_documents->where('kyc_doc_id', $document->id)->first();
-              if($doc){
-                $status = 'approved';
-                if(@$doc->modifications[0]){
-                  $status = 'Partially Approved';
-                  if($doc->modifications[0]->disapprovals->count()){
-                    $status = 'rejected';
-                  }
-                }
-              }
-              if(!$doc){
-                $doc = auth()->user()->company->POCKycDoc()->whereJsonContains('modifications->kyc_doc_id->modified', $document->id)->first();
-                if($doc && $doc->disapprovals->count()){
-                  $status = 'rejected';
-                }else{
-                  $status = 'pending';
-                }
-              }
-              $color = $status == 'approved' ? '#28C76F' : ($status == 'rejected' ? '#EA5455' : '#FF9F43') ;
-            @endphp --}}
-            <div class="step step-index-{{$loop->index}}" data-target="#kyc-docs-{{$document['id']}}" data-href="{{route('admin.contracts.pending-documents.index', ['contract' => $contract->id ,'document_id' => $document->id, 'fields_only' => true])}}">
-              <button type="button" class="step-trigger">
-                <span class="bs-stepper-circle" style="background-color: #FF9F43 !important">{{$loop->iteration}}</span>
-                <span class="bs-stepper-label">
-                  <span class="bs-stepper-title">{{$document->title}}</span>
-                  <span class="bs-stepper-subtitle">{{$document->description}}</span>
-                </span>
-              </button>
-            </div>
-          @empty
-          @endforelse
+      @if (count($documents))
+        <div class="bs-stepper wizard-vertical vertical mt-2">
+          <div class="bs-stepper-header">
+            @forelse ($documents as $document)
+              <div class="step step-index-{{$loop->index}}" data-target="#kyc-docs-{{$document['id']}}" data-href="{{route('admin.contracts.pending-documents.index', ['contract' => $contract->id ,'document_id' => $document->id, 'fields_only' => true])}}">
+                <button type="button" class="step-trigger">
+                  <span class="bs-stepper-circle" style="background-color: #FF9F43 !important">{{$loop->iteration}}</span>
+                  <span class="bs-stepper-label">
+                    <span class="bs-stepper-title">{{$document->title}}</span>
+                    <span class="bs-stepper-subtitle">{{$document->description}}</span>
+                  </span>
+                </button>
+              </div>
+            @empty
+            @endforelse
+          </div>
+          <div class="bs-stepper-content">
+            @forelse ($documents as $document)
+              <div id="kyc-docs-{{$document['id']}}" class="content">
+                @if ($document->id == request()->document_id)
+                  @include('admin.pages.contracts.pending-documents.fields');
+                @endif
+              </div>
+            @empty
+            @endforelse
+          </div>
         </div>
-        <div class="bs-stepper-content">
-          @forelse ($documents as $document)
-            <div id="kyc-docs-{{$document['id']}}" class="content">
-              @if ($document->id == request()->document_id)
-                @include('admin.pages.contracts.pending-documents.fields');
-              @endif
-            </div>
-          @empty
-          @endforelse
+      @else
+        <div class="alert alert-info">
+          <h4 class="alert-heading">All Done</h4>
+          <p class="mb-0">There are no pending documents for this contract.</p>
         </div>
-      </div>
+      @endif
     </div>
   </div>
 </div>

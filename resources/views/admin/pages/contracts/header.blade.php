@@ -112,8 +112,8 @@
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'phases' ? 'active' : ''}}" href="{{route('admin.contracts.stages.phases.index', [$contract, 'all'])}}"><i class='ti ti-link ti-xs me-1'></i> All Phases</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'invoices' ? 'active' : ''}}" href="{{route('admin.contracts.invoices.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Invoices</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'payments' ? 'active' : ''}}" href="{{route('admin.contracts.payments.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Payments</a></li>
+      <li class="nav-item"><a class="nav-link py-3 {{$tab == 'uploaded-documents' ? 'active' : ''}}" href="{{route('admin.contracts.uploaded-documents.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Uploaded Documents</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'pending-documents' ? 'active' : ''}}" href="{{route('admin.contracts.pending-documents.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Pending Documents</a></li>
-      <li class="nav-item"><a class="nav-link py-3 disabled {{$tab == 'activity' ? 'active' : ''}}" href="{{route('admin.contracts.settings.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Activity</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'settings' ? 'active' : ''}}" href="{{route('admin.contracts.settings.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Settings</a></li>
       </ul>
       <!--end::Nav-->

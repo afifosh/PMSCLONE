@@ -18,6 +18,7 @@ return new class extends Migration
       $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete()->cascadeOnUpdate();
       // Model which is requested to upload the document
       $table->nullableMorphs('doc_requestable');
+      $table->nullableMorphs('uploader');
       $table->foreignId('kyc_doc_id')->constrained('kyc_documents')->cascadeOnDelete()->cascadeOnUpdate();
       $table->string('expiry_date')->nullable();
       $table->json('fields')->nullable();

@@ -146,7 +146,7 @@ class Contract extends Model
       } elseif (request()->filter_status == 'Paused') {
         $q->where('status', 'Paused');
       } elseif (request()->filter_status == 'Active') {
-        $q->where('status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now());//->where('end_date', '>=', now()->addWeeks(2));
+        $q->where('status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now()); //->where('end_date', '>=', now()->addWeeks(2));
       } elseif (request()->filter_status == 'About To Expire') {
         $q->where('status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addMonth());
       }
@@ -484,5 +484,39 @@ class Contract extends Model
   public function uploadedDocs()
   {
     return $this->morphMany(UploadedKycDoc::class, 'doc_requestable');
+  }
+
+  public function requestedDocs()
+  {
+    return KycDocument::where('status', 1) // active
+    ->where('workflow', 'Contract Required Docs') // workflow
+    ->whereIn('client_type', array_merge(['Both'], ($this->assignable instanceof Company ?  [$this->assignable->type] : []))) // filter by client type
+    ->where(function ($q) { // filter by contract type
+      $q->when($this->type_id, function ($q) {
+        $q->whereHas('contractTypes', function ($q) {
+          $q->where('contract_types.id', $this->type_id);
+        })->orHas('contractTypes', '=', 0);
+      });
+    })
+    ->where(function ($q) { // filter by contract category
+      $q->when($this->category_id, function ($q) {
+        $q->whereHas('contractCategories', function ($q) {
+          $q->where('contract_categories.id', $this->category_id);
+        })->orHas('contractCategories', '=', 0);
+      });
+    });
+  }
+
+  public function pendingDocs()
+  {
+    return $this->requestedDocs()
+      ->whereDoesntHave('uploadedDocs', function ($q) { // filter by uploaded docs
+        $q->where('doc_requestable_id', $this->id)
+          ->where('doc_requestable_type', Contract::class)
+          ->where(function ($q) {
+            $q->whereNull('expiry_date')
+              ->orWhere('expiry_date', '>=', today());
+          });
+      });
   }
 }
