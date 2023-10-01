@@ -38,12 +38,12 @@ class DocumentStatsDataTable extends DataTable
   {
     $q = $model->withCount([
       'uploadedDocs as active_docs_count' => function ($q) {
-        $q->where('expiry_date', '<', now());
+        $q->where('expiry_date', '>', today());
       },
       'uploadedDocs as expired_docs_count' => function ($q) {
-        $q->where('expiry_date', '>', now());
+        $q->where('expiry_date', '<=', today());
       }
-    ])->newQuery();
+    ])->applyRequestFilters()->newQuery();
 
     return $q;
   }
@@ -54,7 +54,7 @@ class DocumentStatsDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     return $this->builder()
-      ->setTableId('uploaded-docs-table')
+      ->setTableId('contract-doc-stats-table')
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(

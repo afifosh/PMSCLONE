@@ -88,7 +88,7 @@ class CompaniesDataTable extends DataTable
       >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->addAction(['width' => '80px'])
-      ->orderBy(0, 'DESC')
+      ->orderBy([0, 'DESC'])
       ->parameters([
         'buttons' => $buttons,
         "scrollX" => true

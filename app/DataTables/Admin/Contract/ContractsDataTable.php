@@ -39,15 +39,15 @@ class ContractsDataTable extends DataTable
           return '-';
         }
       })
-      ->editColumn('project.name', function ($project) {
-        return $project->project ? $project->project->name : '-';
-      })
+      // ->editColumn('project.name', function ($project) {
+      //   return $project->project ? $project->project->name : '-';
+      // })
       ->editColumn('type.name', function ($project) {
         return $project->type ? $project->type->name : '-';
       })
       ->editColumn('category.name', function ($project) {
         return $project->category ? $project->category->name : '-';
-      })      
+      })
       ->editColumn('value', function (Contract $contract) {
         return view('admin.pages.contracts.value-column', compact('contract'));
       })
@@ -107,7 +107,7 @@ public function query(Contract $model): QueryBuilder
             'contracts.assignable_id',
             'assignable_type'
         ])
-        ->with(['type', 'assignable', 'category']);
+        ->with(['type', 'assignable.detail', 'category']);
 
     // If a projectId is provided, filter by it
     if ($this->projectId) {

@@ -80,7 +80,7 @@ class ProgramAccountController extends Controller
   {
     $request->validate([
       'label' => 'required|string',
-      'currency' => ['required', 'string', 'max:3', Rule::in(array_keys(config('money.currencies')))],
+      // 'currency' => ['required', 'string', 'max:3', Rule::in(array_keys(config('money.currencies')))],
       'holders' => 'required|array',
       'holders.*' => 'required|exists:programs,id'
     ],[
@@ -89,7 +89,7 @@ class ProgramAccountController extends Controller
 
     $programAccount->update([
       'name' => $request->label,
-      'currency' => $request->currency
+      // 'currency' => $request->currency
     ]);
 
     $programAccount->programs()->sync(filterInputIds($request->holders));

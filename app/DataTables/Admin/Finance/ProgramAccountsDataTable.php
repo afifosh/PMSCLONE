@@ -63,7 +63,7 @@ class ProgramAccountsDataTable extends DataTable
    */
   public function query(AccountBalance $model): QueryBuilder
   {
-    return $model->has('programs')->with('related.holders')->newQuery();
+    return $model->has('programs')->with('related.holders')->withCount('transactions')->newQuery();
   }
 
   /**
@@ -93,7 +93,7 @@ class ProgramAccountsDataTable extends DataTable
               >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->addAction(['width' => '80px'])
-      ->orderBy(0, 'DESC')
+      ->orderBy([0, 'DESC'])
       ->responsive(true)
       ->parameters([
         'buttons' => $buttons,

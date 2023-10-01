@@ -44,11 +44,11 @@ $configData = Helper::appClasses();
       @if (!isset($contract) && !isset($company))
         <form class="js-datatable-filter-form">
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
-            <div class="col-4">
+            <div class="col">
               {!! Form::label('filter_contract', 'Contract') !!}
               {!! Form::select('filter_contract', $contracts, '', ['class' => 'form-select select2']) !!}
             </div>
-            <div class="col-4">
+            <div class="col">
               {!! Form::label('filter_company', 'Client') !!}
               <select name="filter_company" id="" class="form-select select2">
                 <option value="0">All</option>
@@ -69,6 +69,14 @@ $configData = Helper::appClasses();
                   </optgroup>
                 @endif
               </select>
+            </div>
+            <div class="col">
+              {!! Form::label('filter_status', 'Status') !!}
+              {!! Form::select('filter_status', $invoice_statuses, '', ['class' => 'form-select select2']) !!}
+            </div>
+            <div class="col">
+              {!! Form::label('filter_type', 'Type') !!}
+              {!! Form::select('filter_type', $invoice_types, '', ['class' => 'form-select select2']) !!}
             </div>
           </div>
         </form>

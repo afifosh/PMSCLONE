@@ -15,6 +15,7 @@
       {!! Form::select('currency', $currency ?? [], $selected_currency ?? null, [
         'data-placeholder' => 'Select Currency',
         'class' => 'form-select globalOfSelect2Remote',
+        'disabled' => $accountBalance->id ? true : false,
         'data-url' => route('resource-select', ['Currency'])
         ])!!}
     </div>

@@ -114,7 +114,7 @@
         {
           "url": "/admin/contracts/document-stats",
           "name": "Contract Doc Stats",
-          "slug": "admin.contract-doc-stats.index"
+          "slug": "admin.contracts.document-stats.index"
         },
         {
           "url": "/admin/contract-doc-controls",

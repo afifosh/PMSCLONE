@@ -2,15 +2,12 @@
 
 namespace App\DataTables\Admin\Contract;
 
-use App\Models\UploadedDoc;
+use App\Models\Contract;
 use App\Models\UploadedKycDoc;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class UploadedDocsDataTable extends DataTable
@@ -36,6 +33,9 @@ class UploadedDocsDataTable extends DataTable
       ->addColumn('uploader', function ($doc) {
         return view('admin._partials.sections.user-info', ['user' => $doc->uploader]);
       })
+      ->orderColumn('status', function ($query, $order) {
+        $query->orderBy('expiry_date', $order);
+      })
       ->rawColumns(['status']);
   }
 
@@ -44,7 +44,19 @@ class UploadedDocsDataTable extends DataTable
    */
   public function query(UploadedKycDoc $model): QueryBuilder
   {
-    return $model->with('requestedDoc', 'uploader')->newQuery();
+    $uniqueId = UploadedKycDoc::where('doc_requestable_type', Contract::class)->where('doc_requestable_id', $this->contract->id)
+      ->selectRaw('MAX(id) as id')
+      ->groupBy('kyc_doc_id')
+      ->pluck('id')->toArray();
+
+    return $model->whereIn('id', $uniqueId)
+      ->with([
+        'requestedDoc',
+        'uploader',
+        'versions' => function ($q) {
+          $q->select(['id', 'kyc_doc_id'])->orderBy('id', 'DESC');
+        }
+      ])->withCount('versions')->newQuery();
   }
 
   /**
@@ -63,7 +75,7 @@ class UploadedDocsDataTable extends DataTable
         >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->addAction(['width' => '80px'])
-      ->orderBy(0, 'DESC')
+      ->orderBy([0, 'DESC'])
       ->responsive(true)
       ->parameters([
         'buttons' => [],
@@ -78,10 +90,11 @@ class UploadedDocsDataTable extends DataTable
   {
     return [
       Column::make('id'),
-      Column::make('requested_doc.title')->title('Title'),
+      Column::make('requested_doc.title')->title('Title')->sortable(false)->searchable(false),
       Column::make('uploader'),
-      Column::make('status'),
+      Column::make('status')->searchable(false),
       Column::make('expiry_date'),
+      Column::make('versions_count')->title('Versions')->searchable(false),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

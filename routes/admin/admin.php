@@ -187,7 +187,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
     Route::resource('contracts.stages', ContractStageController::class);
     Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
-    Route::resource('contracts.uploaded-documents', UploadedDocumentController::class)->only(['index', 'show', 'destroy']);
+    Route::resource('contracts.uploaded-documents', UploadedDocumentController::class);
     Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
     Route::resource('contract-doc-controls', DocControlController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');

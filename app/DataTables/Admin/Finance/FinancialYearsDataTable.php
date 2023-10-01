@@ -23,7 +23,7 @@ class FinancialYearsDataTable extends DataTable
       ->addColumn('account_number', function($financialYear){
           // Use a regular expression to insert '-' after every 4 digits
           $accountNumber = $financialYear->defaultCurrencyAccount[0]->account_number;
-          $formattedAccountNumber = preg_replace("/(\d{4})(?=\d)/", "$1-", $accountNumber); 
+          $formattedAccountNumber = preg_replace("/(\d{4})(?=\d)/", "$1-", $accountNumber);
         return $formattedAccountNumber;
       })
       ->editColumn('label', function($financialYear){
@@ -72,7 +72,7 @@ class FinancialYearsDataTable extends DataTable
           >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->addAction(['width' => '80px'])
-      ->orderBy(0, 'DESC')
+      ->orderBy([0, 'DESC'])
       ->responsive(true)
       ->parameters([
         'buttons' => $buttons,

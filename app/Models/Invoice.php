@@ -49,6 +49,19 @@ class Invoice extends Model
     'updated_at' => 'datetime:d M, Y',
   ];
 
+  const STATUSES = [
+    'Draft',
+    'Sent',
+    'Paid',
+    'Partial paid',
+    'Cancelled'
+  ];
+
+  const TYPES = [
+    'Regular',
+    'Down Payment'
+  ];
+
   public function company()
   {
     return $this->belongsTo(Company::class);
@@ -170,7 +183,7 @@ class Invoice extends Model
   public function updateSubtotal(): void
   {
     $subtotal = $this->items()->sum('amount') / 100;
-    if(!$subtotal){
+    if (!$subtotal) {
       $this->update(['discount_amount' => 0]);
     }
     // dd($subtotal, $this->discount_amount, $this->total_tax, $this->retention_amount, $this->adjustment_amount);
@@ -209,6 +222,10 @@ class Invoice extends Model
       $q->where('company_id', request()->filter_company);
     })->when(request()->filter_contract, function ($q) {
       $q->where('contract_id', request()->filter_contract);
+    })->when(request()->filter_status, function ($q) {
+      $q->where('status', request()->filter_status);
+    })->when(request()->filter_type, function ($q) {
+      $q->where('type', request()->filter_type);
     });
   }
 

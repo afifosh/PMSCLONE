@@ -43,6 +43,139 @@ $(document).on('click', '.account-image-reset', function () {
   $('#uploadedAvatar').attr('src', $('#uploadedAvatar').data('default'));
   $('.account-file-input').val('');
 });
+function initDropzone()
+  {
+    // previewTemplate: Updated Dropzone default previewTemplate
+    // ! Don't change it unless you really know what you are doing
+    const previewTemplate = `<div class="dz-preview dz-file-preview">
+        <div class="dz-details">
+          <div class="dz-thumbnail">
+            <img data-dz-thumbnail>
+            <span class="dz-nopreview">No preview</span>
+            <div class="dz-success-mark"></div>
+            <div class="dz-error-mark"></div>
+            <div class="dz-error-message"><span data-dz-errormessage></span></div>
+            <div class="progress">
+              <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+            </div>
+          </div>
+          <div class="dz-filename" data-dz-name></div>
+          <div class="dz-size" data-dz-size></div>
+        </div>
+      </div>`;
+
+  $('.dropzone').each(function(){
+    var $this = this;
+    const dropzone = new Dropzone($this, {
+      // const dropzoneMulti = new Dropzone('#dropzone-multi', {
+      previewTemplate: previewTemplate,
+      parallelUploads: 4,
+      maxFiles: 1,
+      addRemoveLinks: true,
+      chunking: true,
+      method: "POST",
+      maxFilesize: 100,
+      chunkSize: 1900000,
+      autoProcessQueue : true,
+      // If true, the individual chunks of a file are being uploaded simultaneously.
+      parallelChunkUploads: true,
+      retryChunks: true,
+      acceptedFiles: 'text/plain,application/*,image/*,video/*,audio/*',
+      url: $($this).data('upload-url'), //"{{ route('admin.draft-rfps.files.store', ['draft_rfp' => $draft_rfp]) }}",
+      headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function(file, response) {
+        $($($this).data('response')).val(response.data.file_path);
+        $($($this).data('response')+'is_new').val(1);
+          console.log(response);
+      },
+      init: function(){
+          /* Called once the file has been processed. It could have failed or succeded */
+          this.on("complete", function(file){
+
+          });
+          /* Called after the file is uploaded and sucessful */
+          this.on("sucess", function(file){
+
+          });
+          /* Called before the file is being sent */
+          this.on("sending", function(file){
+          });
+
+          this.on("addedfile", function() {
+            if (this.files[1]!=null){
+              this.removeFile(this.files[0]);
+            }
+          });
+
+          this.on("removedfile", function() {
+            $($($this).data('response')).val('');
+          });
+
+          this.on("maxfilesexceeded", function(file){
+              alert("No more files please!");
+          });
+
+          this.on("error", function(file, errorMessage, xhr){
+            // Check if the response is a validation error
+            if (xhr.status === 422) {
+              // Parse the validation errors from the response
+              var errors = JSON.parse(xhr.responseText).errors;
+
+              // Loop through the validation errors and add them to the file preview
+              $.each(errors, function(key, value) {
+                var error = value[0];
+                var dzError = $('<div>').addClass('dz-error-message').text(error);
+                $(file.previewElement).append(dzError);
+              });
+            }
+          })
+      }
+    });
+    if($($this).data('file-path')){
+      var imageUrl = $($this).data('file-path');
+      fetch(imageUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        var fileName = $($this).data('file-path').split("/").pop();
+        var fileSize = blob.size;
+
+        // Create a file object
+        var file = new File([blob], fileName, { type: blob.type });
+
+        // Add the file to the Dropzone
+        // dropzone.addFile(file);
+
+        // Create a thumbnail from the URL
+        // dropzone.createThumbnailFromUrl(file, imageUrl, function() {
+        //   // Do something when the thumbnail is created
+        // });
+        dropzone.emit("addedfile", file);
+        if(blob.type.includes('image')){
+          dropzone.emit("thumbnail", file, $($this).data('file-path'));
+        }
+        dropzone.emit("complete", file);
+        dropzone.files.push(file);
+        // file.classList.add('dz-success');
+        // file.classList.add('dz-complete');
+
+        // Tell Dropzone that the file has finished uploading
+        // dropzone.emit("complete", file);
+      });
+
+      // var img = document.createElement("img");
+      // img.src = $($this).data('file-path');
+      // console.log(img);
+      // dropzone.emit("addedfile", img);
+      // dropzone.emit("thumbnail", img, $($this).data('file-path'));
+      // dropzone.emit("complete", img);
+      // dropzone.files.push(img);
+      // img.classList.add('dz-success');
+      // img.classList.add('dz-complete');
+    }
+  });
+}
 (function () {
   // --------------------------------------------------------------------
   // Numbered Wizard
@@ -252,140 +385,6 @@ $(document).on('click', '.account-image-reset', function () {
   }
 
   initWizard();
-
-  function initDropzone()
-  {
-    // previewTemplate: Updated Dropzone default previewTemplate
-    // ! Don't change it unless you really know what you are doing
-    const previewTemplate = `<div class="dz-preview dz-file-preview">
-        <div class="dz-details">
-          <div class="dz-thumbnail">
-            <img data-dz-thumbnail>
-            <span class="dz-nopreview">No preview</span>
-            <div class="dz-success-mark"></div>
-            <div class="dz-error-mark"></div>
-            <div class="dz-error-message"><span data-dz-errormessage></span></div>
-            <div class="progress">
-              <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
-            </div>
-          </div>
-          <div class="dz-filename" data-dz-name></div>
-          <div class="dz-size" data-dz-size></div>
-        </div>
-      </div>`;
-
-    $('.dropzone').each(function(){
-      var $this = this;
-      const dropzone = new Dropzone($this, {
-        // const dropzoneMulti = new Dropzone('#dropzone-multi', {
-        previewTemplate: previewTemplate,
-        parallelUploads: 4,
-        maxFiles: 1,
-        addRemoveLinks: true,
-        chunking: true,
-        method: "POST",
-        maxFilesize: 100,
-        chunkSize: 1900000,
-        autoProcessQueue : true,
-        // If true, the individual chunks of a file are being uploaded simultaneously.
-        parallelChunkUploads: true,
-        retryChunks: true,
-        acceptedFiles: 'text/plain,application/*,image/*,video/*,audio/*',
-        url: $($this).data('upload-url'), //"{{ route('admin.draft-rfps.files.store', ['draft_rfp' => $draft_rfp]) }}",
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(file, response) {
-          $($($this).data('response')).val(response.data.file_path);
-          $($($this).data('response')+'is_new').val(1);
-            console.log(response);
-        },
-        init: function(){
-            /* Called once the file has been processed. It could have failed or succeded */
-            this.on("complete", function(file){
-
-            });
-            /* Called after the file is uploaded and sucessful */
-            this.on("sucess", function(file){
-
-            });
-            /* Called before the file is being sent */
-            this.on("sending", function(file){
-            });
-
-            this.on("addedfile", function() {
-              if (this.files[1]!=null){
-                this.removeFile(this.files[0]);
-              }
-            });
-
-            this.on("removedfile", function() {
-              $($($this).data('response')).val('');
-            });
-
-            this.on("maxfilesexceeded", function(file){
-                alert("No more files please!");
-            });
-
-            this.on("error", function(file, errorMessage, xhr){
-              // Check if the response is a validation error
-              if (xhr.status === 422) {
-                // Parse the validation errors from the response
-                var errors = JSON.parse(xhr.responseText).errors;
-
-                // Loop through the validation errors and add them to the file preview
-                $.each(errors, function(key, value) {
-                  var error = value[0];
-                  var dzError = $('<div>').addClass('dz-error-message').text(error);
-                  $(file.previewElement).append(dzError);
-                });
-              }
-            })
-        }
-      });
-      if($($this).data('file-path')){
-        var imageUrl = $($this).data('file-path');
-        fetch(imageUrl)
-        .then(response => response.blob())
-        .then(blob => {
-          var fileName = $($this).data('file-path').split("/").pop();
-          var fileSize = blob.size;
-
-          // Create a file object
-          var file = new File([blob], fileName, { type: blob.type });
-
-          // Add the file to the Dropzone
-          // dropzone.addFile(file);
-
-          // Create a thumbnail from the URL
-          // dropzone.createThumbnailFromUrl(file, imageUrl, function() {
-          //   // Do something when the thumbnail is created
-          // });
-          dropzone.emit("addedfile", file);
-          if(blob.type.includes('image')){
-            dropzone.emit("thumbnail", file, $($this).data('file-path'));
-          }
-          dropzone.emit("complete", file);
-          dropzone.files.push(file);
-          // file.classList.add('dz-success');
-          // file.classList.add('dz-complete');
-
-          // Tell Dropzone that the file has finished uploading
-          // dropzone.emit("complete", file);
-        });
-
-        // var img = document.createElement("img");
-        // img.src = $($this).data('file-path');
-        // console.log(img);
-        // dropzone.emit("addedfile", img);
-        // dropzone.emit("thumbnail", img, $($this).data('file-path'));
-        // dropzone.emit("complete", img);
-        // dropzone.files.push(img);
-        // img.classList.add('dz-success');
-        // img.classList.add('dz-complete');
-      }
-    });
-  }
 
   /**
    * Cards Actions

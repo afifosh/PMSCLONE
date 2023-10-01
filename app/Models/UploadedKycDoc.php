@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Approval\CompanyApprovalBaseLogic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UploadedKycDoc extends Model
 {
@@ -68,5 +69,12 @@ class UploadedKycDoc extends Model
   public function uploader()
   {
     return $this->morphTo();
+  }
+
+  public function versions(): HasMany
+  {
+    return $this->hasMany($this::class, 'kyc_doc_id', 'kyc_doc_id')
+    ->whereColumn('uploaded_kyc_docs.doc_requestable_type', 'uploaded_kyc_docs.doc_requestable_type')
+    ->whereColumn('uploaded_kyc_docs.doc_requestable_id', 'uploaded_kyc_docs.doc_requestable_id');
   }
 }

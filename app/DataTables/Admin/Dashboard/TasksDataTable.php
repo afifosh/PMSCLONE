@@ -78,7 +78,7 @@ class TasksDataTable extends DataTable
           <"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>
           >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
-      ->orderBy(0, 'desc')
+      ->orderBy([0, 'DESC'])
       ->parameters([
         'buttons' => $buttons,
         "scrollX" => true,

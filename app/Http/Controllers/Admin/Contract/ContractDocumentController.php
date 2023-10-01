@@ -35,6 +35,39 @@ class ContractDocumentController extends Controller
     }
   }
 
+  public function store(DocumentUploadRequest $request, Contract $contract)
+  {
+    $document = $contract->pendingDocs()->findOrFail($request->document_id);
+    $final_fields = [];
+    $data = [];
+    foreach ($document->fields as $field) {
+      if ($field['type'] == 'file') {
+        $path = UploadedKycDoc::FILE_PATH . '/contracts/' . $contract->id;
+        Storage::move(KycDocument::TEMP_PATH . '/contracts/' . $contract->id . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
+        $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
+      } else {
+        $field['value'] = $request->{'fields.' . $field['id']};
+      }
+      $final_fields[] = $field;
+    }
+    if ($document->is_expirable) {
+      $data['expiry_date'] = $request->expiry_date;
+    }
+    $contract->uploadedDocs()->create(
+      [
+        'uploader_id' => auth()->id(),
+        'uploader_type' => get_class(auth()->user())
+      ]
+        + $data +
+        [
+          'fields' => $final_fields,
+          'kyc_doc_id' => $document->id
+        ]
+    );
+
+    return $this->sendRes('Added Successfully', ['event' => 'page_reload']);
+  }
+
   public function uploadDocument(Contract $contract, Request $request, FileUploadRepository $file_repo)
   {
     $request->validate([
@@ -72,38 +105,5 @@ class ContractDocumentController extends Controller
     $file_path = $file_repo->addAttachment($file, $path);
 
     return $this->sendRes('Uploaded Successfully', ['file_path' => $file_path]);
-  }
-
-  public function store(DocumentUploadRequest $request, Contract $contract)
-  {
-    $document = $contract->pendingDocs()->findOrFail($request->document_id);
-    $final_fields = [];
-    $data = [];
-    foreach ($document->fields as $field) {
-      if ($field['type'] == 'file') {
-        $path = UploadedKycDoc::FILE_PATH . '/contracts/' . $contract->id;
-        Storage::move(KycDocument::TEMP_PATH . '/contracts/' . $contract->id . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
-        $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
-      } else {
-        $field['value'] = $request->{'fields.' . $field['id']};
-      }
-      $final_fields[] = $field;
-    }
-    if ($document->is_expirable) {
-      $data['expiry_date'] = $request->expiry_date;
-    }
-    $contract->uploadedDocs()->create(
-      [
-        'uploader_id' => auth()->id(),
-        'uploader_type' => get_class(auth()->user())
-      ]
-        + $data +
-        [
-          'fields' => $final_fields,
-          'kyc_doc_id' => $document->id
-        ]
-    );
-
-    return $this->sendRes('Added Successfully', ['event' => 'page_reload']);
   }
 }
