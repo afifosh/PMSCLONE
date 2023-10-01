@@ -153,29 +153,29 @@ class Contract extends Model
     })->when(request()->companies, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);
     })
-      ->when(request()->contract_client, function ($q) {
-        $q->where('assignable_type', Client::class)->where('assignable_id', request()->contract_client);
-      })
-      ->when(request()->search_q, function ($q) {
-        $q->where(function ($q) {
-          $q->where('subject', 'like', '%' . request()->search_q . '%')
-            ->orWhereHas('phases', function ($q) {
-              $q->where('name', 'like', '%' . request()->search_q . '%');
-            });
-        });
-      })->when(request()->contract_type, function ($q) {
-        $q->whereHas('type', function ($q) {
-          $q->where('id', request()->contract_type);
-        });
-      })->when(request()->projects, function ($q) {
-        $q->whereHas('project', function ($q) {
-          $q->where('id', request()->projects);
-        });
-      })->when(request()->programs, function ($q) {
-        $q->whereHas('program', function ($q) {
-          $q->where('id', request()->programs);
-        });
+    ->when(request()->contract_client, function ($q) {
+      $q->where('assignable_type', Client::class)->where('assignable_id', request()->contract_client);
+    })
+    ->when(request()->search_q, function ($q) {
+      $q->where(function ($q) {
+        $q->where('subject', 'like', '%' . request()->search_q . '%')
+          ->orWhereHas('phases', function ($q) {
+            $q->where('name', 'like', '%' . request()->search_q . '%');
+          });
       });
+    })->when(request()->contract_type, function ($q) {
+        $q->where('type_id', request()->contract_type);
+    })->when(request()->contract_category, function ($q) {
+        $q->where('category_id', request()->contract_category);
+    })->when(request()->projects, function ($q) {
+      $q->whereHas('project', function ($q) {
+        $q->where('id', request()->projects);
+      });
+    })->when(request()->programs, function ($q) {
+      $q->whereHas('program', function ($q) {
+        $q->where('id', request()->programs);
+      });
+    });
   }
 
   public function category(): BelongsTo
@@ -489,22 +489,22 @@ class Contract extends Model
   public function requestedDocs()
   {
     return KycDocument::where('status', 1) // active
-    ->where('workflow', 'Contract Required Docs') // workflow
-    ->whereIn('client_type', array_merge(['Both'], ($this->assignable instanceof Company ?  [$this->assignable->type] : []))) // filter by client type
-    ->where(function ($q) { // filter by contract type
-      $q->when($this->type_id, function ($q) {
-        $q->whereHas('contractTypes', function ($q) {
-          $q->where('contract_types.id', $this->type_id);
-        })->orHas('contractTypes', '=', 0);
+      ->where('workflow', 'Contract Required Docs') // workflow
+      ->whereIn('client_type', array_merge(['Both'], ($this->assignable instanceof Company ?  [$this->assignable->type] : []))) // filter by client type
+      ->where(function ($q) { // filter by contract type
+        $q->when($this->type_id, function ($q) {
+          $q->whereHas('contractTypes', function ($q) {
+            $q->where('contract_types.id', $this->type_id);
+          })->orHas('contractTypes', '=', 0);
+        });
+      })
+      ->where(function ($q) { // filter by contract category
+        $q->when($this->category_id, function ($q) {
+          $q->whereHas('contractCategories', function ($q) {
+            $q->where('contract_categories.id', $this->category_id);
+          })->orHas('contractCategories', '=', 0);
+        });
       });
-    })
-    ->where(function ($q) { // filter by contract category
-      $q->when($this->category_id, function ($q) {
-        $q->whereHas('contractCategories', function ($q) {
-          $q->where('contract_categories.id', $this->category_id);
-        })->orHas('contractCategories', '=', 0);
-      });
-    });
   }
 
   public function pendingDocs()

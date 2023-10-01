@@ -95,7 +95,7 @@ class ApprovalRequestsDataTable extends DataTable
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->addAction(['width' => '80px'])
-      ->orderBy(0, 'DESC')
+      ->orderBy([0, 'DESC'])
       ->responsive(true)
       ->parameters([
         "scrollX" => true,

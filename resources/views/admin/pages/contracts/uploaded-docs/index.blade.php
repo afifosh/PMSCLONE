@@ -13,6 +13,7 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/apex-charts/apex-charts.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
 @endsection
 
 @section('page-style')
@@ -26,11 +27,13 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
 @endsection
 
 @section('page-script')
 <script src={{asset('assets/js/custom/select2.js')}}></script>
 <script src={{asset('assets/js/custom/flatpickr.js')}}></script>
+<script src="{{asset('assets/js/custom/admin-contracts-doc-upload.js')}}"></script>
 @endsection
 
 @section('content')

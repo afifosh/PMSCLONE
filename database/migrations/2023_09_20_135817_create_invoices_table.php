@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Invoice;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
       $table->id();
       $table->foreignId('company_id')->constrained()->cascadeOnDelete();
       $table->foreignId('contract_id')->constrained()->cascadeOnDelete();
-      $table->enum('type', ['Regular', 'Down Payment'])->default('Regular');
+      $table->enum('type', Invoice::TYPES)->default('Regular');
       $table->date('invoice_date');
       $table->date('due_date');
       $table->date('sent_date')->nullable()->comment('Date the invoice was sent to the client');
@@ -38,7 +39,7 @@ return new class extends Migration
       $table->string('retention_name')->nullable();
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
-      $table->enum('status', ['Draft', 'Sent', 'Paid', 'Partial paid','Cancelled'])->default('draft');
+      $table->enum('status', Invoice::STATUSES)->default('draft');
       $table->timestamps();
     });
   }

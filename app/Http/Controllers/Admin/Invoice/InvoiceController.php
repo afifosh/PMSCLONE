@@ -28,6 +28,8 @@ class InvoiceController extends Controller
       $data['overdue'] = Invoice::where('due_date', '<', now())->where('status', '!=', 'Paid')->count();
       $data['contracts'] = Contract::has('invoices')->pluck('subject', 'id')->prepend('All', '');
       $data['companies'] = Company::has('contracts.invoices')->get(['name', 'id', 'type'])->prepend('All', '');
+      $data['invoice_types'] = ['' => __('All')] + array_combine(Invoice::TYPES, Invoice::TYPES);
+      $data['invoice_statuses'] = ['' => __('All')] + array_combine(Invoice::STATUSES, Invoice::STATUSES);
     }
 
     return $dataTable->render('admin.pages.invoices.index', $data);
