@@ -29,17 +29,23 @@ class Contract extends Model
     'program_id',
     'signature_date',
     'account_balance_id',
-    'remaining_amount',
     'invoice_method',
     'refrence_id',
     'subject',
     'currency',
     'value',
+    'total_tax_amount',
+    'remaining_amount',
     'start_date',
     'end_date',
     'description',
     'visible_to_client',
-    'status'
+    'status',
+    'tax_id',
+    'tax_value',
+    'tax_type',
+    'tax_name',
+    'tax_cal_method'
   ];
 
   protected $appends = ['status', 'printable_value'];
@@ -61,6 +67,26 @@ class Contract extends Model
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
+
+  public function getTotalTaxAmountAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setTotalTaxAmountAttribute($value)
+  {
+    return $this->attributes['total_tax_amount'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
+  }
+
+  public function getTaxValueAttribute($value)
+  {
+    return $value / 100;
+  }
+
+  public function setTaxValueAttribute($value)
+  {
+    return $this->attributes['tax_value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
+  }
 
   public function getValueAttribute($value)
   {

@@ -34,6 +34,8 @@ class ContractStoreRequest extends FormRequest
       'signature_date' => 'nullable|date',
       'currency' => [Rule::In(array_keys(config('money.currencies'))), 'required_if:isSavingDraft,0'],
       'value' => ['nullable', 'required_if:isSavingDraft,0', 'min:0', 'max:92233720368547758'],
+      'tax_id' => ['required', 'exists:taxes,id,is_retention,0'],
+      'tax_cal_method' => ['required', 'in:Exclusive,Inclusive'],
       'invoicing_method' => ['nullable', 'required_if:isSavingDraft,0', 'in:Recuring,Phase Based'],
       'account_balance_id' => ['nullable', 'required_if:isSavingDraft,0', 'exists:account_balances,id', new AccountHasHolder($this->program_id, 'programs')],
       'refrence_id' => 'nullable|unique:contracts,refrence_id',

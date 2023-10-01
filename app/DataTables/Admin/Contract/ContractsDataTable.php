@@ -101,7 +101,7 @@ public function query(Contract $model): QueryBuilder
             'contracts.id',
             'contracts.project_id',
             'contracts.type_id',
-            'contracts.category_id',            
+            'contracts.category_id',
             'contracts.value',
             'contracts.start_date',
             'contracts.end_date',

@@ -55,8 +55,10 @@ class UploadedDocumentController extends Controller
           Storage::move(KycDocument::TEMP_PATH . '/contracts/' . $contract->id . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
           $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
 
-          if (@$uploadedDocument->fields[$field['id']]['value'] && @Storage::exists($uploadedDocument->fields[$field['id']]['value'])) {
-            @Storage::delete($uploadedDocument->fields[$field['id']]['value']);
+          foreach($uploadedDocument->fields as $uploadedField) {
+            if($uploadedField['id'] == $field['id'] && $uploadedField['type'] == 'file' && $uploadedField['value'] && Storage::exists($uploadedField['value'])) {
+              @Storage::delete($uploadedField['value']);
+            }
           }
         } else {
           $field['value'] = $request->{'fields.' . $field['id']};

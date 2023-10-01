@@ -32,7 +32,17 @@
     {{-- value --}}
     <div class="form-group col-6">
       {{ Form::label('value', __('Contract Value'), ['class' => 'col-form-label']) }}
-      {!! Form::number('value', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('0.00')]) !!}
+      {!! Form::number('value', $contract->value + $contract->total_tax_amount, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('0.00')]) !!}
+    </div>
+    {{-- Tax Deduction Type --}}
+    <div class="form-group col-6">
+      {{ Form::label('tax_cal_method', __('Tax Type'), ['class' => 'col-form-label']) }}
+      {!! Form::select('tax_cal_method', $tax_cal_methods, $contract->tax_cal_method, ['class' => 'form-select globalOfSelect2']) !!}
+    </div>
+    {{-- Tax --}}
+    <div class="form-group col-6">
+      {{ Form::label('tax_id', __('Tax'), ['class' => 'col-form-label']) }}
+      {!! Form::select('tax_id', $taxes ?? [], $contract->tax_id, ['class' => 'form-select globalOfSelect2',])!!}
     </div>
     {{-- program --}}
     <div class="form-group col-6">

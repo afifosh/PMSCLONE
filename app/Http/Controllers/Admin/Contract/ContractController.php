@@ -18,6 +18,7 @@ use App\Support\LaravelBalance\Dto\TransactionDto;
 use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Traits\FinanceTrait;
 use Illuminate\Support\Facades\DB;
+use App\Models\Tax;
 
 class ContractController extends Controller
 {
@@ -269,6 +270,8 @@ class ContractController extends Controller
     $data['projects'] = ['' => __('Select Project')];
     $data['companies'] = ['' => 'Select Client'];
     $data['programs'] = ['' => 'Select Program'];
+    $data['taxes'] = Tax::where('is_retention', false)->pluck('name', 'id');
+    $data['tax_cal_methods'] = ['Inclusive' => 'Inclusive', 'Exclusive' => 'Exclusive'];
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
   }
@@ -285,7 +288,20 @@ class ContractController extends Controller
     if ($request->isSavingDraft)
       $data['status'] = 'Draft';
 
-    $contract = Contract::create($data + ['remaining_amount' => $request->value] + $request->validated());
+    $tax = Tax::find($request->tax_id);
+    $data['tax_type'] = $tax->type;
+    $data['tax_name'] = $tax->name;
+    $data['tax_value'] = $tax->amount;
+    if($request->tax_cal_method == 'Inclusive')
+    {
+      $data['value'] = $tax->type != 'Fixed' ? $request->value / (($tax->amount/100)+1) : $request->value - $tax->amount;
+      $data['total_tax_amount'] = $request->value - $data['value'];
+    }else{
+      $data['total_tax_amount'] = $tax->type == 'Fixed' ? $tax->amount : $request->value * $tax->amount/ 100;
+      $data['value'] = $request->value + $data['total_tax_amount'];
+    }
+
+    $contract = Contract::create($data + ['remaining_amount' => $data['value']] + $request->validated());
 
     if (!$request->isSavingDraft) {
       $this->transactionProcessor->create(
@@ -340,6 +356,8 @@ class ContractController extends Controller
     $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
     $data['statuses'] = $contract->getPossibleStatuses();
     $data['account_balanaces'] = $contract->account_balance_id ? AccountBalance::where('id', $contract->account_balance_id)->pluck('name', 'id') : [];
+    $data['taxes'] = Tax::where('is_retention', false)->pluck('name', 'id');
+    $data['tax_cal_methods'] = ['Inclusive' => 'Inclusive', 'Exclusive' => 'Exclusive'];
     if ($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
 
