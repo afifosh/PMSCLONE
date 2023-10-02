@@ -136,19 +136,19 @@ class Contract extends Model
   public function scopeApplyRequestFilters($q)
   {
     return $q->when(request()->filter_status, function ($q) {
-      if (request()->filter_status == 'Draft') return $q->where('status', 'Draft');
+      if (request()->filter_status == 'Draft') return $q->where('contracts.status', 'Draft');
       else if (request()->filter_status == 'Not started') {
         $q->where('start_date', '>', now());
       } elseif (request()->filter_status == 'Expired') {
-        $q->where('status', 'Active')->where('end_date', '<', now());
+        $q->where('contracts.status', 'Active')->where('end_date', '<', now());
       } elseif (request()->filter_status == 'Terminated') {
-        $q->where('status', 'Terminated');
+        $q->where('contracts.status', 'Terminated');
       } elseif (request()->filter_status == 'Paused') {
-        $q->where('status', 'Paused');
+        $q->where('contracts.status', 'Paused');
       } elseif (request()->filter_status == 'Active') {
-        $q->where('status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now()); //->where('end_date', '>=', now()->addWeeks(2));
+        $q->where('contracts.status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now()); //->where('end_date', '>=', now()->addWeeks(2));
       } elseif (request()->filter_status == 'About To Expire') {
-        $q->where('status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addMonth());
+        $q->where('contracts.status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addMonth());
       }
     })->when(request()->companies, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);
