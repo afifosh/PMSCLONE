@@ -27,6 +27,9 @@ class ContractsDataTable extends DataTable
       ->editColumn('contracts.id', function ($contract) {
         return view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
       })
+      ->editColumn('subject', function ($contract) {
+        return $contract->subject ? $contract->subject : '-';
+      })
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
@@ -81,6 +84,7 @@ public function query(Contract $model): QueryBuilder
         ->select([
             'contracts.id',
             'contracts.refrence_id',
+            'contracts.subject', // Add this line for the subject column
             'contracts.project_id',
             'contracts.type_id',
             'contracts.category_id',
@@ -99,6 +103,8 @@ public function query(Contract $model): QueryBuilder
         ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
         ->groupBy([
             'contracts.id',
+            'contracts.refrence_id',
+            'contracts.subject', // Add this line for the subject column                        
             'contracts.project_id',
             'contracts.type_id',
             'contracts.category_id',
@@ -165,6 +171,7 @@ public function query(Contract $model): QueryBuilder
   {
     return [
       Column::make('contracts.id')->title('Contract'),
+      Column::make('subject')->title('Subject'),
       Column::make('refrence_id')->title('Ref ID'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
