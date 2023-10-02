@@ -103,6 +103,8 @@ public function query(Contract $model): QueryBuilder
         ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
         ->groupBy([
             'contracts.id',
+            'contracts.refrence_id',
+            'contracts.subject', // Add this line for the subject column                        
             'contracts.project_id',
             'contracts.type_id',
             'contracts.category_id',            
