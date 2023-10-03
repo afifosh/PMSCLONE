@@ -41,7 +41,11 @@ class PhasesDataTable extends DataTable
       $q->where('stage_id', $this->stage->id);
     })->with(['contract' => function($q){
       $q->select('contracts.id', 'currency');
-    }])->newQuery();
+    }])
+    ->when($this->contract_id, function($q){
+      $q->where('contract_id', $this->contract_id);
+    })
+    ->newQuery();
   }
 
   /**

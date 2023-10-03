@@ -60,11 +60,9 @@
         parentHeightOffset: 0,
         type: 'donut'
       },
-      labels: ['Paused', 'Rescheduled', 'Value Updated', 'Terminated'],
+      labels: ['Paused', 'Terminated'],
       series: [
                 parseInt($('.paused-event-count').text()),
-                parseInt($('.rescheduled-event-count').text()),
-                parseInt($('.value-event-count').text()),
                 parseInt($('.terminated-event-count').text())
               ],
       colors: [
@@ -222,20 +220,10 @@
                   <div class="ms-auto fw-bold paused-event-count">{{$summary->where('event_type', 'Paused')->sum('total')}}</div>
                 </div>
                 <div class="d-flex fs-6 justify-content-between fw-semibold mb-3">
-                  <div class="bullet bg-primary mt-1 me-1"></div>
-                  <div class="text-muted me-5">Rescheduled</div>
-                  <div class="ms-auto fw-bold rescheduled-event-count">{{$summary->whereIn('event_type', ['Extended', 'Shortened', 'Rescheduled', 'Rescheduled And Amount Increased', 'Rescheduled And Amount Decreased'])->sum('total')}}</div>
-                </div>
-                <div class="d-flex fs-6 justify-content-between fw-semibold mb-3">
-                  <div class="bullet bg-success mt-1 me-1"></div>
-                  <div class="text-muted me-5">Value Updated</div>
-                  <div class="ms-auto fw-bold value-event-count">{{$summary->whereIn('event_type', ['Amount Increased','Amount Decreased','Rescheduled And Amount Increased','Rescheduled And Amount Decreased'])->sum('total')}}</div>
-                </div>
-                <div class="d-flex fs-6 justify-content-between fw-semibold mb-3">
                   <div class="bullet bg-secondary mt-1 me-1"></div>
                   <div class="text-muted me-5">Terminated</div>
                   <div class="ms-auto fw-bold terminated-event-count">{{$summary->where('event_type', 'Terminated')->sum('total')}}</div>
-                  <div class="d-none total-summary-event-count">{{$summary->whereIn('event_type', ['Paused', 'Terminated', 'Extended', 'Shortened', 'Rescheduled', 'Rescheduled And Amount Increased', 'Rescheduled And Amount Decreased'])->sum('total')}}</div>
+                  <div class="d-none total-summary-event-count">{{$summary->whereIn('event_type', ['Paused', 'Terminated'])->sum('total')}}</div>
                 </div>
               </div>
             </div>

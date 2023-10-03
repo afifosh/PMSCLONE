@@ -226,6 +226,8 @@ class Invoice extends Model
       $q->where('status', request()->filter_status);
     })->when(request()->filter_type, function ($q) {
       $q->where('type', request()->filter_type);
+    })->when(request()->has('haspayments'), function($q){
+      $q->has('payments');
     });
   }
 

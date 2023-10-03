@@ -131,8 +131,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('/users/{user}/editPassword', [AdminUsersController::class, 'editPassword'])->name('users.editPassword');
     Route::put('/users/{user}/updatePassword', [AdminUsersController::class, 'updatePassword'])->name('users.updatePassword');
     Route::resource('users', AdminUsersController::class);
-    Route::resource('clients', ClientController::class);
-
     // Route::get('companies/{company}/users', [CompanyController::class, 'showUsers'])->name('companies.showUsers');
     Route::get('companies/{company}/invitations', [CompanyController::class, 'showInvitations'])->name('companies.showInvitations');
     Route::get('companies/{company}/invoices', [InvoiceController::class, 'index'])->name('companies.invoices.index');
@@ -167,7 +165,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');
     Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');
     Route::resource('contracts', ContractController::class);
-    Route::resource('contracts.terms', ContractTermController::class)->only(['edit', 'update']); // reschedule and value update
     Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
     Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
     Route::post('contracts/{contract}/change-requests/{change_request}/reject', [ChangeRequestController::class, 'reject'])->name('contracts.change-requests.reject');

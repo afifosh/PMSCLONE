@@ -18,7 +18,6 @@ return new class extends Migration
       $table->date('start_date')->nullable();
       $table->date('due_date')->nullable();
       $table->bigInteger('stage_amount')->default(0);
-      $table->bigInteger('allowable_amount')->default(0);
       $table->bigInteger('remaining_amount')->default(0);
       $table->text('description')->nullable();
       $table->enum('status', ['Active', 'Completed', 'Cancelled'])->default('Active');

@@ -349,6 +349,21 @@ class Company extends BaseModel
   {
     $query->when(request()->has('filter_levels') && is_array(request()->filter_levels), function ($q) {
       $q->whereIn('approval_level', request()->filter_levels);
+    })
+    ->when(request()->except, function ($q) {
+      $q->where('id', '!=', request()->except);
+    })
+    ->when(request()->get('q'), function ($q) {
+      $q->where('name', 'like', '%' . request()->get('q') . '%');
+    })
+    ->when(request()->has('contracts'), function ($q) {
+      $q->has('contracts');
+    })
+    ->when(request()->has('hasinv'), function ($q) {
+      $q->has('contracts.invoices');
+    })
+    ->when(request()->has('haspayments'), function ($q) {
+      $q->has('contracts.invoices.payments');
     });
   }
 

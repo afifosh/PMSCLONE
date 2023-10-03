@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Finance\PaymentStoreRequest;
 use App\Models\Company;
 use App\Models\Contract;
+use App\Models\ContractCategory;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use Illuminate\Http\Request;
@@ -27,6 +28,10 @@ class PaymentController extends Controller
     } elseif (request()->route()->getName() == 'admin.invoices.payments.index' && request()->accepts == 'view_data') {
       $data['invoice'] = Invoice::with('payments')->findOrFail(request()->route('invoice'));
       return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.index-table', $data)->render()]);
+    }else{
+      $data['companies'] =Company::has('contracts.invoices.payments')->get(['name', 'id', 'type'])->prepend('All', '');
+      $data['invoice_types'] = ['' => 'All', 'Regular' => 'Regular', 'Down payment' => 'Down payment'];
+      $data['contract_categories'] = ContractCategory::pluck('name', 'id')->prepend('All', '');
     }
 
     return $dataTable->render('admin.pages.finances.payment.index', $data);

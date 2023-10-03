@@ -63,12 +63,6 @@ class ContractsDataTable extends DataTable
       ->filterColumn('assigned_to', function ($query, $keyword) {
         $query->whereHasMorph('assignable', Company::class, function ($q) use ($keyword) {
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
-        })->orWhereHasMorph('assignable', Client::class, function ($q) use ($keyword) {
-          $q->where(function ($q) use ($keyword) {
-            $q->where('first_name', 'like', '%' . $keyword . '%')
-              ->orWhere('last_name', 'like', '%' . $keyword . '%')
-              ->orWhere('email', 'like', '%' . $keyword . '%');
-          });
         });
       })
       ->rawColumns(['id']);
@@ -104,7 +98,7 @@ public function query(Contract $model): QueryBuilder
         ->groupBy([
             'contracts.id',
             'contracts.refrence_id',
-            'contracts.subject', // Add this line for the subject column                        
+            'contracts.subject', // Add this line for the subject column
             'contracts.project_id',
             'contracts.type_id',
             'contracts.category_id',

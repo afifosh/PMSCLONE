@@ -61,7 +61,7 @@ class PaymentsDataTable extends DataTable
       $query->where('invoice_id', $this->filterBy->id);
     }
 
-    return $query->with(['contract' => function($q){
+    return $query->applyRequestFilters()->with(['contract' => function($q){
       $q->select(['contracts.id', 'currency']);
     }]);
   }

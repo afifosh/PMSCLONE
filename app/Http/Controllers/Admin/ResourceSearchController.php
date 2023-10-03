@@ -19,9 +19,7 @@ class ResourceSearchController extends Controller
         'search' => 'name',
         'select' => ['id', 'name as text']
       ],
-      'Client' => [
-        'search' => 'email',
-        'select' => ['email as text', 'id']
+      'groupedCompany' => [
       ],
       'Project' => [
         'search' => 'name',
@@ -46,6 +44,7 @@ class ResourceSearchController extends Controller
         'search' => 'id',
         // concat INV-0000 and total - paid_amount
         'select' => [DB::raw("CONCAT('INV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/100) as text"), 'id'],
+        'dependent_column' => 'contract_id',
       ],
       'Country' => [
         'search' => 'name',
@@ -80,7 +79,8 @@ class ResourceSearchController extends Controller
       return $this->accountBalanceSelect($allowedResources);
     } elseif ($resource == 'Contract') {
       return $this->contractSelect($allowedResources);
-    }
+    } elseif ($resource == 'groupedCompany')
+      return $this->groupedCompanySelect($allowedResources);
 
     $model = 'App\Models\\' . $resource;
 
@@ -94,6 +94,7 @@ class ResourceSearchController extends Controller
       ->when(request()->except, function ($q) use ($allowedResources, $resource) {
         $q->where('id', '!=', request()->except);
       })
+      ->applyRequestFilters()
       ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
   }
 
@@ -109,6 +110,7 @@ class ResourceSearchController extends Controller
       ->when(request()->except, function ($q) use ($allowedResources, $resource) {
         $q->where('id', '!=', request()->except);
       })
+      ->applyRequestFilters()
       ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
   }
 
@@ -181,5 +183,42 @@ class ResourceSearchController extends Controller
     })->values();
 
     return $data;
+  }
+
+  public function groupedCompanySelect($allowedResources)
+  {
+    // get companies by type
+    $companies = Company::applyRequestFilters()->select(['id', 'name', 'type'])->orderBy('type')->paginate(15, ['*'], 'page', request()->get('page'));
+
+    // Create an array to store the formatted data
+    $formattedData = [];
+
+    // Initialize a variable to keep track of the current optgroup
+    $currentType = null;
+
+    foreach ($companies as $company) {
+      // Check if the type has changed, indicating a new optgroup
+      if ($company->type != $currentType) {
+        $currentType = $company->type;
+        $formattedData[] = [
+          'text' => $currentType,
+          'children' => [],
+        ];
+      }
+
+      // Add the company as a child of the current optgroup
+      $formattedData[count($formattedData) - 1]['children'][] = [
+        'id' => $company->id,
+        'text' => $company->name,
+      ];
+    }
+
+    // Return the formatted data as a JSON response
+    return response()->json([
+      'data' => $formattedData,
+      'pagination' => [
+        'more' => $companies->hasMorePages(),
+      ],
+    ]);
   }
 }

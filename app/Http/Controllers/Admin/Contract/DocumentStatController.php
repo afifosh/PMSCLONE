@@ -13,7 +13,6 @@ class DocumentStatController extends Controller
 {
   public function index(DocumentStatsDataTable $dataTable)
   {
-    $data['companies'] = Company::has('contracts')->get(['name', 'id', 'type'])->prepend('All', '');
     $data['contract_statuses'] = ['' => __('All')] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contract_categories'] = ContractCategory::pluck('name', 'id')->prepend('All', '');
     $data['contract_types'] = ContractType::pluck('name', 'id')->prepend('All', '');

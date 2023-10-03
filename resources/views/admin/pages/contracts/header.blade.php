@@ -109,7 +109,6 @@
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'events' ? 'active' : ''}}" href="{{route('admin.contracts.events.index', [$contract])}}"><i class='ti ti-users ti-xs me-1'></i> Events</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'change-requests' ? 'active' : ''}}" href="{{route('admin.contracts.change-requests.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Change Requests</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'stages' ? 'active' : ''}}" href="{{route('admin.contracts.stages.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Stages</a></li>
-      <li class="nav-item"><a class="nav-link py-3 {{$tab == 'phases' ? 'active' : ''}}" href="{{route('admin.contracts.stages.phases.index', [$contract, 'all'])}}"><i class='ti ti-link ti-xs me-1'></i> All Phases</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'invoices' ? 'active' : ''}}" href="{{route('admin.contracts.invoices.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Invoices</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'payments' ? 'active' : ''}}" href="{{route('admin.contracts.payments.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Payments</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'uploaded-documents' ? 'active' : ''}}" href="{{route('admin.contracts.uploaded-documents.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Uploaded Documents</a></li>

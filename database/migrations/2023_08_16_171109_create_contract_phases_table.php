@@ -21,7 +21,6 @@ return new class extends Migration
       $table->bigInteger('order')->default(0);
       $table->dateTime('start_date');
       $table->dateTime('due_date')->nullable();
-      $table->boolean('is_committed')->default(false);
       $table->timestamps();
     });
   }

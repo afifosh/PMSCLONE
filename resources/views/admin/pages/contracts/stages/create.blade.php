@@ -54,19 +54,6 @@
     </div>
     <hr>
   </div>
-  <div class="col-12 mt-2">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="is_committed" name="is_committed" @checked($stage->allowable_amount)>
-      <label class="form-check-label" for="is_committed">
-        Is Allowable
-      </label>
-    </div>
-  </div>
-  {{-- Allowable Amount --}}
-  <div class="form-group col-6 {{$stage->allowable_amount ? '' : 'd-none'}} committed-amount">
-    {{ Form::label('allowable_amount', __('Allowable Amount'), ['class' => 'col-form-label']) }}
-    {!! Form::number('allowable_amount', null, ['class' => 'form-control', 'placeholder' => __('Allowable Amount')]) !!}
-  </div>
 
 </div>
 <div class="col-md-12 mt-3">
@@ -94,14 +81,6 @@
       $('#end_date').val('');
       $('#end-date-cal-form').addClass('d-none');
       initFlatPickr();
-    }
-  });
-
-  $(document).on('change', '#is_committed', function() {
-    if ($(this).is(':checked')) {
-      $('.committed-amount').removeClass('d-none');
-    } else {
-      $('.committed-amount').addClass('d-none');
     }
   });
 

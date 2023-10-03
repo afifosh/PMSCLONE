@@ -43,4 +43,35 @@ class InvoicePayment extends Model
   {
     return $this->hasOneThrough(Contract::class, Invoice::class, 'id', 'id', 'invoice_id', 'contract_id');
   }
+
+  public function scopeApplyRequestFilters($q)
+  {
+    $q->when(request()->filter_company, function ($q) {
+      $q->whereHas('invoice', function ($q) {
+        $q->whereHas('contract', function ($q) {
+          $q->where('company_id', request()->filter_company);
+        });
+      });
+    })
+    ->when(request()->filter_contract_category, function ($q) {
+      $q->whereHas('invoice', function ($q) {
+        $q->whereHas('contract', function ($q) {
+          $q->where('category_id', request()->filter_contract_category);
+        });
+      });
+    })
+    ->when(request()->filter_contract, function ($q) {
+      $q->whereHas('invoice', function ($q) {
+        $q->where('contract_id', request()->filter_contract);
+      });
+    })
+    ->when(request()->filter_invoice_type, function ($q) {
+      $q->whereHas('invoice', function ($q) {
+        $q->where('type', request()->filter_invoice_type);
+      });
+    })
+    ->when(request()->filter_invoice, function ($q) {
+      $q->where('invoice_id', request()->filter_invoice);
+    });
+  }
 }

@@ -34,18 +34,12 @@ class Contract extends Model
     'subject',
     'currency',
     'value',
-    'total_tax_amount',
     'remaining_amount',
     'start_date',
     'end_date',
     'description',
     'visible_to_client',
-    'status',
-    'tax_id',
-    'tax_value',
-    'tax_type',
-    'tax_name',
-    'tax_cal_method'
+    'status'
   ];
 
   protected $appends = ['status', 'printable_value'];
@@ -67,26 +61,6 @@ class Contract extends Model
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
-
-  public function getTotalTaxAmountAttribute($value)
-  {
-    return $value / 100;
-  }
-
-  public function setTotalTaxAmountAttribute($value)
-  {
-    return $this->attributes['total_tax_amount'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
-  }
-
-  public function getTaxValueAttribute($value)
-  {
-    return $value / 100;
-  }
-
-  public function setTaxValueAttribute($value)
-  {
-    return $this->attributes['tax_value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
-  }
 
   public function getValueAttribute($value)
   {
@@ -179,9 +153,6 @@ class Contract extends Model
     })->when(request()->companies, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);
     })
-    ->when(request()->contract_client, function ($q) {
-      $q->where('assignable_type', Client::class)->where('assignable_id', request()->contract_client);
-    })
     ->when(request()->search_q, function ($q) {
       $q->where(function ($q) {
         $q->where('subject', 'like', '%' . request()->search_q . '%')
@@ -201,6 +172,8 @@ class Contract extends Model
       $q->whereHas('program', function ($q) {
         $q->where('id', request()->programs);
       });
+    })->when(request()->has('haspayments'), function($q){
+      $q->has('invoices.payments');
     });
   }
 
@@ -227,11 +200,6 @@ class Contract extends Model
   public function phases(): HasMany
   {
     return $this->hasMany(ContractPhase::class);
-  }
-
-  public function directPhases(): HasMany
-  {
-    return $this->hasMany(ContractPhase::class)->whereNull('stage_id')->where('is_committed', true);
   }
 
   public function initialStage(): HasOne
@@ -291,170 +259,6 @@ class Contract extends Model
       return $this->value - $this->phases->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
     }
     return $this->value - $this->phases->sum('estimated_cost');
-  }
-
-  public function saveEventLog(ContractUpdateRequest|Request $request, Contract $contract): void
-  {
-    $start_date_updated = false;
-    $end_date_updated = false;
-    $value_updated = $contract->value != $request->value;
-    $c_start_date = $contract->start_date ? $contract->start_date->format('d M, Y') : 'NULL';
-    $c_end_date = $contract->end_date ? $contract->end_date->format('d M, Y') : 'NULL';
-    if (($contract->end_date && !$request->end_date)
-      || (!$contract->end_date && $request->end_date)
-      || ($contract->end_date && $request->end_date && !$contract->end_date->isSameDay($request->end_date))
-    ) {
-      $end_date_updated = true;
-    }
-    if (($contract->start_date && !$request->start_date)
-      || (!$contract->start_date && $request->start_date)
-      || ($contract->start_date && $request->start_date && !$contract->start_date->isSameDay($request->start_date))
-    ) {
-      $start_date_updated = true;
-    }
-
-    //End Date Revised
-    if (!$start_date_updated && $end_date_updated && !$value_updated) {
-      // dd(Carbon::parse($request->end_date)->format('d M, Y'));
-      $contract->events()->create([
-        'event_type' => 'End Date Revised',
-        'modifications' => [
-          'old' => ['end_date' => $contract->end_date],
-          'new' => ['end_date' => $request->end_date],
-        ],
-        'description' => 'Contract End Date Revised From ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y'),
-        'admin_id' => auth()->id(),
-      ]);
-    }
-    // Start Date Revised
-    else if ($start_date_updated && !$end_date_updated && !$value_updated) {
-      $contract->events()->create([
-        'event_type' => 'Start Date Revised',
-        'modifications' => [
-          'old' => ['start_date' => $contract->start_date],
-          'new' => ['start_date' => $request->start_date],
-        ],
-        'description' => 'Contract Start Date Revised From ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y'),
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // Rescheduled
-    else if ($start_date_updated && $end_date_updated && !$value_updated) {
-      $contract->events()->create([
-        'event_type' => 'Rescheduled',
-        'modifications' => [
-          'old' => ['start_date' => $contract->start_date, 'end_date' => $contract->end_date],
-          'new' => ['start_date' => $request->start_date, 'end_date' => $request->end_date],
-        ],
-        'description' => 'Contract Rescheduled From Start Date: ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and From End Date:  ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y'),
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // Amount Increased
-    else if (!$start_date_updated && !$end_date_updated && $value_updated && $request->value > $contract->value) {
-      $contract->events()->create([
-        'event_type' => 'Amount Increased',
-        'modifications' => [
-          'old' => ['value' => $contract->value],
-          'new' => ['value' => $request->value],
-        ],
-        'description' => 'Contract Amount Increased From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // Amount Decreased
-    else if (!$start_date_updated && !$end_date_updated && $value_updated && $request->value < $contract->value) {
-      $contract->events()->create([
-        'event_type' => 'Amount Decreased',
-        'modifications' => [
-          'old' => ['value' => $contract->value],
-          'new' => ['value' => $request->value],
-        ],
-        'description' => 'Contract Amount Decreased From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // Rescheduled And Amount Increased
-    else if ($start_date_updated && $end_date_updated && $value_updated && $request->value > $contract->value) {
-      $contract->events()->create([
-        'event_type' => 'Rescheduled And Amount Increased',
-        'modifications' => [
-          'old' => ['start_date' => $contract->start_date, 'end_date' => $contract->end_date, 'value' => $contract->value],
-          'new' => ['start_date' => $request->start_date, 'end_date' => $request->end_date, 'value' => $request->value],
-        ],
-        'description' => 'Contract Rescheduled From Start Date: ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and From End Date:  ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y') . ' and Amount Increased From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // Rescheduled And Amount Decreased
-    else if ($start_date_updated && $end_date_updated && $value_updated && $request->value < $contract->value) {
-      $contract->events()->create([
-        'event_type' => 'Rescheduled And Amount Decreased',
-        'modifications' => [
-          'old' => ['start_date' => $contract->start_date, 'end_date' => $contract->end_date, 'value' => $contract->value],
-          'new' => ['start_date' => $request->start_date, 'end_date' => $request->end_date, 'value' => $request->value],
-        ],
-        'description' => 'Contract Rescheduled From Start Date: ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and From End Date:  ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y') . ' and Amount Decreased From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // Start Date Revised And Amount Increased
-    else if ($start_date_updated && !$end_date_updated && $value_updated && $request->value > $contract->value) {
-      $contract->events()->create([
-        'event_type' => 'Start Date Revised And Amount Increased',
-        'modifications' => [
-          'old' => ['start_date' => $contract->start_date, 'value' => $contract->value],
-          'new' => ['start_date' => $request->start_date, 'value' => $request->value],
-        ],
-        'description' => 'Contract Start Date Revised From ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and Amount Increased From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // Start Date Revised And Amount Decreased
-    else if ($start_date_updated && !$end_date_updated && $value_updated && $request->value < $contract->value) {
-      $contract->events()->create([
-        'event_type' => 'Start Date Revised And Amount Decreased',
-        'modifications' => [
-          'old' => ['start_date' => $contract->start_date, 'value' => $contract->value],
-          'new' => ['start_date' => $request->start_date, 'value' => $request->value],
-        ],
-        'description' => 'Contract Start Date Revised From ' . $c_start_date . ' to ' . Carbon::parse($request->start_date)->format('d M, Y') . ' and Amount Decreased From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // End Date Revised And Amount Increased
-    else if (!$start_date_updated && $end_date_updated && $value_updated && $request->value > $contract->value) {
-      $contract->events()->create([
-        'event_type' => 'End Date Revised And Amount Increased',
-        'modifications' => [
-          'old' => ['end_date' => $contract->end_date, 'value' => $contract->value],
-          'new' => ['end_date' => $request->end_date, 'value' => $request->value],
-        ],
-        'description' => 'Contract End Date Revised From ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y') . ' and Amount Increased From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
-
-    // End Date Revised And Amount Decreased
-    else if (!$start_date_updated && $end_date_updated && $value_updated && $request->value < $contract->value) {
-      $contract->events()->create([
-        'event_type' => 'End Date Revised And Amount Decreased',
-        'modifications' => [
-          'old' => ['end_date' => $contract->end_date, 'value' => $contract->value],
-          'new' => ['end_date' => $request->end_date, 'value' => $request->value],
-        ],
-        'description' => 'Contract End Date Revised From ' . $c_end_date . ' to ' . Carbon::parse($request->end_date)->format('d M, Y') . ' and Amount Decreased From ' . $contract->value . ' to ' . $request->value,
-        'admin_id' => auth()->id(),
-      ]);
-    }
   }
 
   public function formatPhaseValue($value)

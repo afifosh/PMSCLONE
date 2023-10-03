@@ -19,9 +19,6 @@ class GanttChartController extends Controller
     })
       ->applyRequestFilters()
       ->with([
-        'directPhases' => function ($q) {
-          $q->select('contract_phases.id', 'contract_phases.name', 'start_date', 'due_date', 'contract_id');
-        },
         'stages' => function ($q) {
           $q->select('contract_stages.id', 'contract_stages.name', 'start_date', 'due_date', 'contract_id');
         },
@@ -41,11 +38,9 @@ class GanttChartController extends Controller
 
     $projects = Project::has('contracts')->pluck('name', 'id')->prepend('All', '0');
     $contractTypes = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
-    $contractClients = Client::whereHas('contracts')->pluck('email', 'id')->prepend('All', '0');
 
-    $companies = Company::has('contracts')->get(['id', 'name', 'type']);
     $programs = Program::has('contracts')->pluck('name', 'id')->prepend('All', '0');
 
-    return view('admin.pages.projects.gantt-chart', compact('ganttProjects', 'statuses', 'projects', 'companies', 'contractTypes', 'contractClients', 'programs'));
+    return view('admin.pages.projects.gantt-chart', compact('ganttProjects', 'statuses', 'projects', 'contractTypes', 'programs'));
   }
 }

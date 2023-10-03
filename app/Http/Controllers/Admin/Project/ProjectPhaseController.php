@@ -54,12 +54,11 @@ class ProjectPhaseController extends Controller
     return $this->sendRes('success', ['modalTitle' => $title, 'view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'stage', 'remaining_amount'))->render()]);
   }
 
-  public function store($project, Contract $contract, $stage, PhaseStoreRequest $request)
+  public function store($project, Contract $contract, ContractStage $stage, PhaseStoreRequest $request)
   {
     $contract->load('project');
-    $stage = ContractStage::find($stage) ?? 'stage';
+    // $stage = ContractStage::find($stage) ?? 'stage';
     $project = $contract->project ?? 'project';
-    // $stage->load('contract');
     // abort_if(!$project->isMine(), 403);
 
     $phase = $contract->phases()->create(
@@ -70,11 +69,7 @@ class ProjectPhaseController extends Controller
         + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
     );
 
-    // If stage is null, then it is commited phase so update contract remaining amount
-    if ($stage instanceof ContractStage)
-      $stage->update(['remaining_amount' => $stage->remaining_amount - $phase->estimated_cost]);
-    else
-      $contract->update(['remaining_amount' => $contract->remaining_amount - $phase->estimated_cost]);
+    $stage->update(['remaining_amount' => $stage->remaining_amount - $phase->estimated_cost]);
 
     $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
 
@@ -84,9 +79,9 @@ class ProjectPhaseController extends Controller
     return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);
   }
 
-  public function edit($project, Contract $contract, $stage, ContractPhase $phase)
+  public function edit($project, Contract $contract, ContractStage $stage, ContractPhase $phase)
   {
-    $stage = ContractStage::find($stage) ?? 'stage';
+    // $stage = ContractStage::find($stage) ?? 'stage';
     $contract->load('project');
     $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
@@ -97,36 +92,25 @@ class ProjectPhaseController extends Controller
 
   public function update($project, Request $request, Contract $contract, $stage, ContractPhase $phase)
   {
-    $contract->load('project', 'phases');
+    $contract->load('project');
     $project = $contract->project ?? 'project';
+    $phase->load('stage');
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
 
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,' . $phase->id . ',id,stage_id,' . $phase->stage_id,
-      'estimated_cost' => ['required', 'numeric', 'min:0'], //'max:'.$contract->remaining_cost($phase->id)
+      'estimated_cost' => ['required', 'numeric', 'gt:0', 'max:' . $phase->stage->remaining_amount + $phase->estimated_cost],
       'description' => 'nullable|string|max:2000',
-      'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
-      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $contract->end_date,
+      'start_date' => 'required|date'. (request()->due_date ? '|before_or_equal:due_date' : '' ).'|after_or_equal:' . $phase->stage->start_date,
+      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $phase->stage->due_date,
     ], [
-      'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
+      'due_date.before_or_equal' => 'The due date must be a date before or equal to state due date.'
     ]);
 
     $costDiff = $phase->estimated_cost - $request->estimated_cost;
 
-    $phase->update(['estimated_cost' => $contract->formatPhaseValue($request->estimated_cost)] + $request->only(['name', 'description', 'status', 'start_date', 'due_date']));
-
-    if ($phase->stage_id) {
-      if($phase->is_committed){
-        $phase->stage->update(['allowable_amount' => $phase->stage->allowable_amount - $costDiff]);
-        $phase->contract->update(['remaining_amount' => $phase->contract->remaining_amount - $costDiff]);
-      }else{
-        $phase->stage->update(['remaining_amount' => $phase->stage->remaining_amount + $costDiff]);
-      }
-    } else {
-      $contract->update(['remaining_amount' => $contract->remaining_amount + $costDiff]);
-    }
-
-    // TODO : if stage is null, then it is commited phase so update contract remaining amount
+    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost']));
+    $phase->stage->update(['remaining_amount' => $phase->stage->remaining_amount + $costDiff]);
 
     $message = auth()->user()->name . ' updated phase: ' . $phase->name;
 
@@ -140,19 +124,10 @@ class ProjectPhaseController extends Controller
   {
     $contract->load('project');
     $project = $contract->project ?? 'project';
-    $phase->load('stage', 'contract');
+    $phase->load('stage');
     // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
 
-    if ($phase->stage_id) {
-      $data = [];
-      if ($phase->is_committed) {
-        $data['allowable_amount'] = $phase->stage->allowable_amount - $phase->estimated_cost;
-      } else {
-        $data['remaining_amount'] = $phase->stage->remaining_amount + $phase->estimated_cost;
-      }
-      $phase->stage->update($data);
-    } else
-      $contract->update(['remaining_amount' => $contract->remaining_amount + $phase->estimated_cost]);
+    $phase->stage->update(['remaining_amount' => $phase->stage->remaining_amount + $phase->estimated_cost]);
 
     $phase->delete();
 

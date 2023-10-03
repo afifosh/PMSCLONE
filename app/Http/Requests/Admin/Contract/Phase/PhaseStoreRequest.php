@@ -22,22 +22,12 @@ class PhaseStoreRequest extends FormRequest
    */
   public function rules(): array
   {
-    $stage = ContractStage::find($this->route('stage')) ?? collect([]);
-
     return [
-      // if phase is from contract stage then check if name is unique in contract stages and contract_id,
-      //else check if name is unique in contract phases
-      'name' => 'required|string|max:255|'. (($stage instanceof ContractStage) ? 'unique:contract_phases,name,NULL,id,contract_id,' . $this->contract->id : 'unique:contract_stages,name,NULL,id,contract_id,' . $this->contract->id),
-      // if phase is from contract stage then check if estimated cost is less than stage remaining amount,
-      //else check if estimated cost is less than contract remaining amount
-      'estimated_cost' => ['required', 'numeric', 'min:0' , 'max:' . (($stage instanceof ContractStage) ? $stage->remaining_amount : $this->contract->remaining_amount)],
+      'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,stage_id,' . $this->stage->id,
+      'estimated_cost' => ['required', 'numeric', 'gt:0' , 'max:' . $this->stage->remaining_amount],
       'description' => 'nullable|string|max:2000',
-      // if phase is from contract stage then check if start date is after or equal to stage start date,
-      //else check if start date is after or equal to contract start date
-      'start_date' => 'required|date'. (request()->due_date ? '|before_or_equal:due_date' : '' ).'|after_or_equal:' . (($stage instanceof ContractStage) ? $stage->start_date : $this->contract->start_date),
-      // if phase is from contract stage then check if due date is after stage start date and before or equal to stage due date,
-      //else check if due date is after contract start date and before or equal to contract due date
-      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . (($stage instanceof ContractStage) ? $stage->due_date : $this->contract->end_date),
+      'start_date' => 'required|date'. (request()->due_date ? '|before_or_equal:due_date' : '' ).'|after_or_equal:' . $this->stage->start_date,
+      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->stage->due_date,
     ];
 
   }

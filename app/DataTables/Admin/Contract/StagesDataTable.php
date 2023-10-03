@@ -28,10 +28,7 @@ class StagesDataTable extends DataTable
         return view('admin.pages.contracts.stages.value-column', compact('stage'));
       })
       // ->editColumn('total_amount', function ($stage) {
-      //   return Money($stage->stage_amount + $stage->allowable_amount, $stage->contract->currency, true);
-      // })
-      // ->editColumn('allowable_amount', function ($stage) {
-      //   return Money($stage->allowable_amount, $stage->contract->currency, true);
+      //   return Money($stage->stage_amount, $stage->contract->currency, true);
       // })
       // ->editColumn('remaining_amount', function ($stage) {
       //   return Money($stage->remaining_amount, $stage->contract->currency, true);
@@ -40,7 +37,7 @@ class StagesDataTable extends DataTable
         return view('admin.pages.contracts.stages.actions', compact('stage'));
       })
       ->filterColumn('total_amount', function ($query, $keyword) {
-        $query->whereRaw("stage_amount + allowable_amount like ?", ["%{$keyword}%"]);
+        $query->whereRaw("stage_amount like ?", ["%{$keyword}%"]);
       })
       ->filterColumn('phases_count', function ($query, $keyword){
         $query->has('phases', $keyword);
@@ -106,7 +103,7 @@ class StagesDataTable extends DataTable
       Column::make('total_amount')->title('Amount')->sortable(false)->searchable(false),
       Column::make('start_date'),
       Column::make('due_date'),
-      Column::make('created_at'),
+      // Column::make('created_at'),
       Column::make('updated_at'),
     ];
   }

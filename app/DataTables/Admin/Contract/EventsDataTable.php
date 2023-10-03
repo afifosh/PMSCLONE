@@ -63,16 +63,6 @@ class EventsDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    if($this->contract->getRawOriginal('status') == 'Active')
-    $buttons[] = [
-      'text' => '<span>Edit Terms</span>',
-      'className' =>  'btn btn-primary mx-3',
-      'attr' => [
-        'data-toggle' => "ajax-modal",
-        'data-title' => 'Edit Contract Terms',
-        'data-href' => route('admin.contracts.terms.edit', [$this->contract->id, 0])
-      ]
-    ];
 
     return $this->builder()
       ->setTableId('events-table')

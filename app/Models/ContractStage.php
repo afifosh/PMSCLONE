@@ -15,7 +15,6 @@ class ContractStage extends Model
     'start_date',
     'due_date',
     'stage_amount',
-    'allowable_amount',
     'remaining_amount',
     'description'
   ];
@@ -71,16 +70,6 @@ class ContractStage extends Model
   public function setStageAmountAttribute($value)
   {
     $this->attributes['stage_amount'] = round($value * 100);
-  }
-
-  public function getAllowableAmountAttribute($value)
-  {
-    return $value / 100;
-  }
-
-  public function setAllowableAmountAttribute($value)
-  {
-    $this->attributes['allowable_amount'] = round($value * 100);
   }
 
   public function getRemainingAmountAttribute($value)

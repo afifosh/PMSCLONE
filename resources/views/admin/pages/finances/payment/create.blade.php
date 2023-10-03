@@ -5,13 +5,36 @@
 @endif
 
 <div class="row">
+    {{-- Company --}}
+    <div class="form-group col-6">
+        {{ Form::label('company_id', __('Client'), ['class' => 'col-form-label']) }}
+        {!! Form::select('company_id', $companies ?? [], $selectedCompany ?? null, [
+        'data-placeholder' => __('Select Client'),
+        'class' => 'form-select globalOfSelect2Remote dependent-select',
+        'data-url' => route('resource-select', ['groupedCompany', 'hasinv']),
+        'id' => 'payment-company-id'
+        ])!!}
+    </div>
+
+      {{-- Contract --}}
+    <div class="form-group col-6">
+        {{ Form::label('contract_id', __('Contract'), ['class' => 'col-form-label']) }}
+        {!! Form::select('contract_id', $contracts ?? [], $selectedContract ?? null, [
+        'data-placeholder' => __('Select Contract'),
+        'class' => 'form-select globalOfSelect2Remote dependent-select',
+        'data-url' => route('resource-select', ['Contract', 'dependent' => 'company_id']),
+        'data-dependent_id' => 'payment-company-id',
+        'id' => 'payment-contract-id'
+        ])!!}
+    </div>
     {{-- invoice --}}
     <div class="form-group col-6">
         {{ Form::label('invoice_id', __('Invoice'), ['class' => 'col-form-label']) }}
         {!! Form::select('invoice_id', $invoice ?? [], $invoicePayment->invoice_id ?? null, [
         'data-placeholder' => 'Select Invoice',
         'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['Invoice'])
+        'data-url' => route('resource-select', ['Invoice', 'dependent' => 'contract_id']),
+        'data-dependent_id' => 'payment-contract-id',
         ])!!}
     </div>
 

@@ -145,15 +145,6 @@ $configData = Helper::appClasses();
             <div class="d-flex align-items-center">
               <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
               <div class="card-info">
-                <h5 class="mb-0">{{$contracts['rescheduled']}}</h5>
-                <small>{{__('Rescheduled')}}</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-2 col-6">
-            <div class="d-flex align-items-center">
-              <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
-              <div class="card-info">
                 <h5 class="mb-0">{{$contracts['trashed']}}</h5>
                 <small>{{__('Trashed')}}</small>
               </div>
@@ -187,25 +178,12 @@ $configData = Helper::appClasses();
             </div>
             <div class="col">
               {!! Form::label('companies', 'Client') !!}
-              <select name="companies" id="" class="form-select select2" data-placeholder='Client'>
-                <option value="0">All</option>
-                @if ($companies->where('type', 'Company')->count() > 0)
-                  <optgroup label="Companies">
-                    @forelse ($companies->where('type', 'Company') as $comp)
-                      <option value="{{$comp->id}}">{{$comp->name}}</option>
-                    @empty
-                    @endforelse
-                  </optgroup>
-                @endif
-                @if ($companies->where('type', 'Person')->count() > 0)
-                  <optgroup label="Person">
-                    @forelse ($companies->where('type', 'Person') as $comp)
-                      <option value="{{$comp->id}}">{{$comp->name}}</option>
-                    @empty
-                    @endforelse
-                  </optgroup>
-                @endif
-              </select>
+              {!! Form::select('companies', [], null, [
+                'class' => 'form-select select2Remote',
+                'data-placeholder' => 'All Clients',
+                'data-allow-clear' => 'true',
+                'data-url' => route('resource-select', ['groupedCompany', 'hascontracts']),
+                ]) !!}
             </div>
           </div>
         </form>

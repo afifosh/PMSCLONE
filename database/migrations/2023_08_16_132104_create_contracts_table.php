@@ -25,12 +25,7 @@ return new class extends Migration
       $table->string('subject');
       $table->string('currency', 5)->default('SAR');
       $table->bigInteger('value')->default(0);
-      $table->bigInteger('total_tax_amount')->default(0);
       $table->bigInteger('remaining_amount')->default(0);
-      $table->foreignId('tax_id')->nullable()->constrained('taxes')->onDelete('cascade')->cascadeOnUpdate();
-      $table->string('tax_name')->nullable();
-      $table->string('tax_type')->nullable();
-      $table->enum('tax_cal_method', ['Inclusive', 'Exclusive'])->default('Inclusive');
       $table->bigInteger('tax_value')->default(0);
       $table->enum('invoicing_method', ['Recuring', 'Phase Based'])->default('Phase Based');
       $table->dateTime('start_date')->nullable();

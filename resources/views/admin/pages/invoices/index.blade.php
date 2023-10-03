@@ -40,8 +40,8 @@ $configData = Helper::appClasses();
 
   <div class="mt-3  col-12">
     <div class="card">
-      <h5 class="card-header">Search Filter</h5>
       @if (!isset($contract) && !isset($company))
+        <h5 class="card-header">Search Filter</h5>
         <form class="js-datatable-filter-form">
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
             <div class="col">
@@ -50,25 +50,12 @@ $configData = Helper::appClasses();
             </div>
             <div class="col">
               {!! Form::label('filter_company', 'Client') !!}
-              <select name="filter_company" id="" class="form-select select2">
-                <option value="0">All</option>
-                @if ($companies->where('type', 'Company')->count() > 0)
-                  <optgroup label="Companies">
-                    @forelse ($companies->where('type', 'Company') as $comp)
-                      <option value="{{$comp->id}}">{{$comp->name}}</option>
-                    @empty
-                    @endforelse
-                  </optgroup>
-                @endif
-                @if ($companies->where('type', 'Person')->count() > 0)
-                  <optgroup label="Person">
-                    @forelse ($companies->where('type', 'Person') as $comp)
-                      <option value="{{$comp->id}}">{{$comp->name}}</option>
-                    @empty
-                    @endforelse
-                  </optgroup>
-                @endif
-              </select>
+              {!! Form::select('filter_company', [], [], [
+                'class' => 'form-select select2Remote',
+                'data-placeholder' => 'All',
+                'data-allow-clear' => 'true',
+                'data-url' => route('resource-select', ['groupedCompany', 'hasinv'])
+              ]) !!}
             </div>
             <div class="col">
               {!! Form::label('filter_status', 'Status') !!}

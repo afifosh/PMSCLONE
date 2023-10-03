@@ -175,41 +175,6 @@
             data.push(phaseData);
           });
         });
-
-        /*
-        * contract.directPhases
-        */
-
-        contract.direct_phases.forEach((phase) => {
-          // update min and max dates
-          if(new Date(phase.start_date) < new Date(minDate)){
-            minDate = phase.start_date;
-          }
-          if(new Date(phase.due_date) > new Date(maxDate)){
-            maxDate = phase.due_date;
-          }
-          // end update min and max dates
-          let directPhaseData = {
-            id: 'Phase:' + phase.id,
-            text: phase.name,
-            parent: 'Contract:' + contract.id,
-            contractName: contract.subject,
-            projectName: contract.project?.name,
-            assignableType: contract.assignable_type ? contract.assignable_type.split('\\')[2] : null,
-            assignable: contract.assignable?.name ?? contract.assignable?.first_name + ' ' + contract.assignable?.last_name,
-            status: phase.status,
-            // calculate from start date and end date and current date
-            progress: calculateProgressPercentage(phase.start_date, phase.due_date),
-            type: "phase",
-            start_date: new Date(phase.start_date),
-            duration: calculateDateDifference(phase.start_date, phase.due_date),
-            hasEndDate: true,
-            // end_date: formateDate(phase.due_date),
-            open: true,
-            remaining_days: phase.due_date ? Math.ceil((new Date(phase.due_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0,
-          };
-          data.push(directPhaseData);
-        });
       });
     });
 
@@ -705,25 +670,12 @@ gantt.$task_data.style.cursor = 'grab';
             </div>
             <div class="col">
               {!! Form::label('companies[]', 'Client') !!}
-              <select name="companies[]" id="" class="form-select select2 gantt_filter" data-placeholder='Client'>
-                <option value="0">All</option>
-                @if ($companies->where('type', 'Company')->count() > 0)
-                  <optgroup label="Companies">
-                    @forelse ($companies->where('type', 'Company') as $comp)
-                      <option value="{{$comp->id}}">{{$comp->name}}</option>
-                    @empty
-                    @endforelse
-                  </optgroup>
-                @endif
-                @if ($companies->where('type', 'Person')->count() > 0)
-                  <optgroup label="Person">
-                    @forelse ($companies->where('type', 'Person') as $comp)
-                      <option value="{{$comp->id}}">{{$comp->name}}</option>
-                    @empty
-                    @endforelse
-                  </optgroup>
-                @endif
-              </select>
+              {!! Form::select('companies[]', [], [], [
+                'class' => 'form-select select2Remote gantt_filter',
+                'data-placeholder' => 'All',
+                'data-allow-clear' => 'true',
+                'data-url' => route('resource-select', ['groupedCompany', 'hasContracts'])
+              ]) !!}
             </div>
           @endif
       </div>

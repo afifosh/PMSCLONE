@@ -14,7 +14,6 @@ class ContractPhase extends Model
   protected $fillable = [
     'contract_id',
     'stage_id',
-    'is_committed',
     'name',
     'estimated_cost',
     'start_date',
