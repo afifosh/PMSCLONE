@@ -53,6 +53,11 @@ class AccountBalance extends Model
         return $accountNumber;
     }
 
+    public function scopeApplyRequestFilters($query)
+    {
+      //
+    }
+
     public function printableBalance()
     {
       return Money::{$this->currency}($this->balance, false)->format();

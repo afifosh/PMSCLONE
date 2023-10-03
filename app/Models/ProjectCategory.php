@@ -16,6 +16,11 @@ class ProjectCategory extends Model
     'updated_at' => 'datetime:d M, Y',
   ];
 
+  public function scopeApplyRequestFilters($query)
+  {
+    //
+  }
+
   public function projects()
   {
     return $this->hasMany(Project::class, 'category_id');

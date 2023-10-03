@@ -5,6 +5,7 @@
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
 @endsection
 
 @section('page-style')
@@ -15,6 +16,7 @@
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/sortablejs/sortable.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -95,6 +97,7 @@
   }
 
   $(document).ready(function() {
+    initDropzone();
     initSortable();
       var options = {
           html: true,
@@ -132,6 +135,83 @@
       var elm = document.getElementById('invoice-retention')
       var popover = new bootstrap.Popover(elm, options)
   })
+
+  function initDropzone()
+  {
+    // previewTemplate: Updated Dropzone default previewTemplate
+    // ! Don't change it unless you really know what you are doing
+    const previewTemplate = `<div class="dz-preview dz-file-preview">
+        <div class="dz-details">
+          <div class="dz-thumbnail">
+            <img data-dz-thumbnail>
+            <span class="dz-nopreview">No preview</span>
+            <div class="dz-success-mark"></div>
+            <div class="dz-error-mark"></div>
+            <div class="dz-error-message"><span data-dz-errormessage></span></div>
+            <div class="progress">
+              <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+            </div>
+          </div>
+          <div class="dz-filename" data-dz-name></div>
+          <div class="dz-size" data-dz-size></div>
+        </div>
+      </div>`;
+
+    $('.dropzone').each(function(){
+      var $this = this;
+      const dropzone = new Dropzone($this, {
+        // const dropzoneMulti = new Dropzone('#dropzone-multi', {
+        previewTemplate: previewTemplate,
+        parallelUploads: 4,
+        maxFiles: 20,
+        addRemoveLinks: true,
+        chunking: true,
+        method: "POST",
+        maxFilesize: 100,
+        chunkSize: 1900000,
+        autoProcessQueue : true,
+        // If true, the individual chunks of a file are being uploaded simultaneously.
+        parallelChunkUploads: true,
+        retryChunks: true,
+        acceptedFiles: 'text/plain,application/*,image/*,video/*,audio/*',
+        url: $($this).data('upload-url'),
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(file, response) {
+            $('#file-upload').before(`<span id="attachment_button_${response.data.id}" class="btn btn-outline-primary mb-1 me-1 btn-sm"><a href="${response.data.url}">${response.data.name}</a>
+                <span data-toggle="ajax-delete" data-href="${response.data.del_url}"><i class="fa-regular fa-circle-xmark ps-2"></i></span>
+              </span>`);
+            this.removeFile(file);
+            if (this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
+              $('.dropzone').addClass('d-none');
+            }
+        },
+        init: function(){
+            this.on("maxfilesexceeded", function(file){
+                alert("No more files please!");
+            });
+            this.on("error", function(file, errorMessage, xhr){
+              // Check if the response is a validation error
+              if (xhr.status === 422) {
+                // Parse the validation errors from the response
+                var errors = JSON.parse(xhr.responseText).errors;
+
+                // Loop through the validation errors and add them to the file preview
+                $.each(errors, function(key, value) {
+                  var error = value[0];
+                  var dzError = $('<div>').addClass('dz-error-message').text(error);
+                  $(file.previewElement).append(dzError);
+                });
+              }
+            })
+        }
+      });
+    });
+  }
+  function removeMedia(id){
+    $('#attachment_button_'+id).remove();
+  }
 </script>
 @endsection
 
@@ -347,6 +427,35 @@
         </div>
 
         <hr class="my-3 mx-n4" />
+        {{-- <div class="row px-0 px-sm-4">
+          <div class="col-12">
+          </div>
+        </div> --}}
+
+        <div class="row px-0 px-sm-4">
+          <div class="col-12">
+            <div class="col-12 py-3">
+              <p>{{ __('Attachments :') }}</p>
+              @forelse ($invoice->media as $media)
+              <span id="attachment_button_{{$media->id}}" class="btn btn-outline-primary mb-1 btn-sm"><a href="{{$media->getDownloadUrl()}}">{{substr($media->filename, 0, 10)}}</a>
+                <span data-toggle="ajax-delete" data-href="{{route('admin.invoices.attachments.destroy', [$invoice, $media->id])}}"><i class="fa-regular fa-circle-xmark ps-2"></i></span>
+              </span>
+              @empty
+              @endforelse
+              <span id="file-upload" onclick="$('.dropzone').toggleClass('d-none');" class="btn btn-primary mb-1 btn-sm"><i class="fa-solid fa-circle-plus me-1"></i> {{__('Add Attachments')}}
+              </span>
+              <div class="dropzone d-none needsclick" data-upload-url="{{ route('admin.invoices.attachments.store', [$invoice])}}">
+                <div class="dz-message needsclick">
+                  <small class="h6">Drop the file here or click to upload </small>
+                </div>
+                <div class="fallback">
+                  <input name="file" type="file" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="row px-0 px-sm-4">
           <div class="col-12">
             <div class="mb-3">

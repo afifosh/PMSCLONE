@@ -598,7 +598,7 @@ window.initModalSelect2 = function(){
           return {
               results: data.data,
               pagination: {
-                  more: data.next_page_url ? true : false
+                more: data.pagination?.more ? true : (data.next_page_url ? true : false)
               }
           };
         }

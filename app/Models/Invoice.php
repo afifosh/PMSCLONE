@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Plank\Mediable\Mediable;
 
 class Invoice extends Model
 {
-  use HasFactory;
+  use HasFactory, Mediable;
 
   protected $fillable = [
     'company_id',
@@ -61,6 +62,8 @@ class Invoice extends Model
     'Regular',
     'Down Payment'
   ];
+
+  const FILES_PATH = 'invoices';
 
   public function company()
   {

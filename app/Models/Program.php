@@ -43,6 +43,12 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
       })->get();
     }
 
+    public function scopeApplyRequestFilters($query)
+    {
+      //
+    }
+
+
     public function users()
     {
       return $this->belongsToMany(Admin::class, ProgramUser::class, 'program_id', 'admin_id')->withTimestamps();
@@ -85,5 +91,5 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
       return Avatar::create($this->program_code ? $this->program_code : $this->name)->toBase64();
     return $value;
   }
-    
+
 }

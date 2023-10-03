@@ -58,6 +58,7 @@ use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
 use App\Http\Controllers\Admin\Finance\PaymentController;
 use App\Http\Controllers\Admin\Finance\ProgramAccountController;
 use App\Http\Controllers\Admin\Finance\TaxController;
+use App\Http\Controllers\Admin\Invoice\AttachmentController;
 use App\Http\Controllers\Admin\Invoice\CustomInvoiceItemController;
 use App\Http\Controllers\Admin\Invoice\InvoiceController;
 use App\Http\Controllers\Admin\Invoice\InvoiceItemController;
@@ -299,6 +300,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'destroy']);
     Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
+    Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

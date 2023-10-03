@@ -73,6 +73,11 @@ class Project extends Model
     }
   }
 
+  public function scopeApplyRequestFilters($query)
+  {
+    //
+  }
+
   public function program()
   {
     return $this->belongsTo(Program::class, 'program_id', 'id');

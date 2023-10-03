@@ -13,12 +13,11 @@
     {{-- project --}}
     <div class="form-group col-6">
       {{ Form::label('project_id', __('Project'), ['class' => 'col-form-label']) }}
-      {!! Form::select('project_id', $projects, $contract->project_id, [
+      {!! Form::select('project_id', $projects ?? [], $contract->project_id, [
         'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['Project'])
-        // 'data-updateOptions' => 'ajax-options',
-        // 'data-href' => route('admin.projects.getCompanyByProject'),
-        // 'data-target' => '#project-company-select'
+        'data-url' => route('resource-select', ['Project']),
+        'data-placeholder' => __('Select Project'),
+        'data-allow-clear' => 'true'
         ])!!}
     </div>
     <div class="form-group col-6">
@@ -26,7 +25,8 @@
       {!! Form::select('currency', $currency ?? [], $contract->currency, [
         'data-placeholder' => 'Select Currency',
         'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['Currency'])
+        'data-url' => route('resource-select', ['Currency']),
+        'data-allow-clear' => 'true'
         ])!!}
     </div>
     {{-- value --}}
@@ -40,7 +40,9 @@
       {!! Form::select('program_id', $programs ?? [], $contract->program_id, [
       'class' => 'form-select globalOfSelect2Remote dependent-select',
       'data-url' => route('resource-select', ['Program']),
-      'id' => 'contract-program-selected-id'
+      'id' => 'contract-program-selected-id',
+      'data-placeholder' => __('Select Program'),
+      'data-allow-clear' => 'true'
       ]) !!}
     </div>
     {{-- Account --}}
@@ -51,25 +53,36 @@
       'data-url' => route('resource-select', ['AccountBalance', 'dependent' => 'programId']),
       'data-dependent_id' => 'contract-program-selected-id',
       'data-placeholder' => __('Select Account'),
+      'data-allow-clear' => 'true'
       ]) !!}
     </div>
     {{-- customer --}}
     <div class="form-group col-6">
       {{ Form::label('company_id', __('Client'), ['class' => 'col-form-label']) }}
-      {!! Form::select('company_id', $companies, @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select',
+      {!! Form::select('company_id', $companies ?? [], @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select',
       'class' => 'form-select globalOfSelect2UserRemote',
-      'data-url' => route('resource-select-user', ['Company'])
+      'data-url' => route('resource-select-user', ['Company']),
+      'data-placeholder' => __('Select Client'),
+      'data-allow-clear' => 'true'
       ]) !!}
     </div>
     {{-- types --}}
     <div class="form-group col-6">
       {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
-      {!! Form::select('type_id', $types, $contract->type_id, ['class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('type_id', $types, $contract->type_id, [
+        'class' => 'form-select globalOfSelect2',
+        'data-placeholder' => __('Contract Type'),
+        'data-allow-clear' => 'true'
+      ]) !!}
     </div>
     {{-- categories --}}
     <div class="form-group col-6">
       {{ Form::label('category_id', __('Contract Category'), ['class' => 'col-form-label']) }}
-      {!! Form::select('category_id', $categories, $contract->category_id, ['class' => 'form-select globalOfSelect2']) !!}
+      {!! Form::select('category_id', $categories, $contract->category_id, [
+        'class' => 'form-select globalOfSelect2',
+        'data-placeholder' => __('Contract Category'),
+        'data-allow-clear' => 'true'
+      ]) !!}
     </div>
     <div class="form-group col-6">
       {{ Form::label('refrence_id', __('Refrence Id'), ['class' => 'col-form-label']) }}

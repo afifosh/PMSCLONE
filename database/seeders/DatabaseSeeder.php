@@ -38,7 +38,6 @@ class DatabaseSeeder extends Seeder
         $this->call(NoteTagSeeder::class);
         $this->call(ContractCategorySeeder::class);
         $this->call(ContractTypeSeeder::class);
-        $this->call(ClientSeeder::class);
         $this->call(ContractSeeder::class);
         $this->call(EmailTemplateSeeder::class);
         $this->call(AccountBalanceHolderSeeder::class);
