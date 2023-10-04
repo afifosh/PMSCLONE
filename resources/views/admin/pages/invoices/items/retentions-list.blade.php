@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="table-responsive">
-    <table class="table">
+    <table class="table" id="retentions-invoice-item-table">
       <thead>
         <tr>
           <th>{!! Form::checkbox('checkAll', 1, 0, ['class' => 'form-check-input retention-check-all']) !!}</th>
@@ -11,14 +11,14 @@
         </tr>
       </thead>
       <tbody>
-        @forelse ($invoices as $invoice)
+        {{-- @forelse ($invoices as $invoice)
         <tr class="">
           <th>{!! Form::checkbox('retentions[]', $invoice->id, 0, ['class' => 'form-check-input retention-item']) !!}</th>
           <td>{{runtimeInvIdFormat($invoice->id)}}</td>
           <td>@money(-$invoice->retention_amount, $invoice->contract->currency, true)</td>
         </tr>
         @empty
-        @endforelse
+        @endforelse --}}
       </tbody>
     </table>
   </div>

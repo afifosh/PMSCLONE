@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="table-responsive">
-    <table class="table">
+    <table class="table" id="phases-invoice-item-table">
       <thead>
         <tr>
           <th>{!! Form::checkbox('checkAll', 1, 0, ['class' => 'form-check-input phase-check-all']) !!}</th>
@@ -12,15 +12,6 @@
         </tr>
       </thead>
       <tbody>
-        @forelse ($phases as $phase)
-        <tr class="">
-          <th>{!! Form::checkbox('phases[]', $phase->id, 0, ['class' => 'form-check-input phase-item']) !!}</th>
-          <td>{{$phase->name}}</td>
-          <td>@money($phase->estimated_cost, $phase->contract->currency, true)</td>
-          <td>{{$phase->status}}</td>
-        </tr>
-        @empty
-        @endforelse
       </tbody>
     </table>
   </div>

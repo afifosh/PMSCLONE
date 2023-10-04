@@ -8,6 +8,7 @@ use App\Models\ContractPhase;
 use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
 use App\Models\Tax;
+use DataTables;
 use Illuminate\Http\Request;
 
 class InvoiceItemController extends Controller
@@ -34,18 +35,13 @@ class InvoiceItemController extends Controller
   {
     $data['invoice'] = $invoice;
 
-    if (request()->type != 'retentions') {
-      $data['phases'] = $invoice->contract->phases()->has('addedAsInvoiceItem', 0)->get();
-    } else
-      $data['invoices'] = Invoice::where('contract_id', $invoice->contract_id)
-        ->where('id', '!=', $invoice->id)
-        ->where('retention_amount', '!=', 0)
-        ->has('addedAsInvoiceItem', 0)
-        ->get();
+    if (request()->type == 'jsonData') {
+      return DataTables::eloquent($invoice->contract->phases()->has('addedAsInvoiceItem', 0))->toJson();
+    }
 
-    return $this->sendRes('success', ['view_data' => request()->type != 'retentions' ?
-      view('admin.pages.invoices.items.create', $data)->render()
-      : view('admin.pages.invoices.items.retentions-list', $data)->render()]);
+    return $this->sendRes('success', [
+      'view_data' => view('admin.pages.invoices.items.create', $data)->render(), 'JsMethods' => ['initPhasesDataTable']
+    ]);
   }
 
   public function store(InvoiceItemsStoreReqeust $request, Invoice $invoice)
@@ -55,10 +51,10 @@ class InvoiceItemController extends Controller
     $phases = filterInputIds($request->phases);
 
     $pivot_amounts = ContractPhase::whereIn('id', $phases)
-    ->where('contract_id', $invoice->contract_id)
-    ->has('addedAsInvoiceItem', 0)
-    ->pluck('estimated_cost', 'id')
-    ->toArray();
+      ->where('contract_id', $invoice->contract_id)
+      ->has('addedAsInvoiceItem', 0)
+      ->pluck('estimated_cost', 'id')
+      ->toArray();
 
     // formate data for pivot table
     $data = [];
@@ -77,10 +73,10 @@ class InvoiceItemController extends Controller
     $retentions = filterInputIds($request->retentions);
 
     $pivot_amounts = Invoice::whereIn('id', $retentions)
-    ->where('contract_id', $invoice->contract_id)
-    ->where('retention_amount', '!=', 0)
-    ->has('addedAsInvoiceItem', 0)
-    ->pluck('retention_amount', 'id')->toArray();
+      ->where('contract_id', $invoice->contract_id)
+      ->where('retention_amount', '!=', 0)
+      ->has('addedAsInvoiceItem', 0)
+      ->pluck('retention_amount', 'id')->toArray();
 
     // formate data for pivot table
     $data = [];
@@ -98,7 +94,7 @@ class InvoiceItemController extends Controller
   public function destroy(Invoice $invoice, $invoiceItem)
   {
     $item = $invoice->items()->find($invoiceItem);
-    if($item->invoiceable_type == CustomInvoiceItem::class)
+    if ($item->invoiceable_type == CustomInvoiceItem::class)
       $item->invoiceable->delete();
 
     $invoice->items()->where('id', $invoiceItem)->delete();

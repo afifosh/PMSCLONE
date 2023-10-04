@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 @endsection
 
 @section('page-style')
@@ -17,6 +19,7 @@
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/sortablejs/sortable.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/dropzone/dropzone.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -41,6 +44,23 @@
         });
       },
 
+    });
+  }
+  function initPhasesDataTable(){
+    $('#phases-invoice-item-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: route('admin.invoices.invoice-items.create', {'invoice' : {{$invoice->id}}, 'type': 'jsonData'}), // Replace with your route for fetching data
+        columns: [
+            { targets: 0, data: 'id',
+              render: function (data, type, row, meta) {
+                return '<input type="checkbox" class="form-check-input phase-item" name="phases[]" value="'+data+'">';
+              },
+              orderable: false, searchable: false},
+            { data: 'name', name: 'name' },
+            { data: 'estimated_cost', name: 'estimated_cost' },
+            { data: 'status', name: 'status' },
+        ]
     });
   }
   function reloadPhasesList(){
@@ -339,7 +359,6 @@
             <div class="col-12 mt-4">
               <button type="button" class="btn btn-primary" data-title="{{__('Add Item')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.custom-invoice-items.create',[$invoice])}}">Add Item</button>
               <button type="button" class="btn btn-primary" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
-              <button type="button" class="btn btn-primary" data-title="{{__('Select Retentions')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice, 'type' => 'retentions'])}}">Add Retention</button>
             </div>
           </div>
         </div>
