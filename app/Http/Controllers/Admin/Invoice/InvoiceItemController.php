@@ -46,47 +46,35 @@ class InvoiceItemController extends Controller
 
   public function store(InvoiceItemsStoreReqeust $request, Invoice $invoice)
   {
-    if ($request->type == 'retentions')
-      return $this->storeRetentions($request, $invoice);
     $phases = filterInputIds($request->phases);
 
     $pivot_amounts = ContractPhase::whereIn('id', $phases)
       ->where('contract_id', $invoice->contract_id)
       ->has('addedAsInvoiceItem', 0)
-      ->pluck('estimated_cost', 'id')
-      ->toArray();
+      ->with('taxes')
+      ->get();
 
     // formate data for pivot table
     $data = [];
     foreach ($phases as $phase) {
-      $data[$phase] = ['amount' => $pivot_amounts[$phase] * 1000]; // convert to cents manually, setter is not working for pivot table
+      $data[$phase] = [
+        'amount' => $pivot_amounts->where('id', $phase)->first()->estimated_cost * 1000
+      ]; // convert to cents manually, setter is not working for pivot table
     }
 
     $invoice->phases()->syncWithoutDetaching($data);
-    $invoice->updateSubtotal();
 
-    return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
-  }
+    foreach($pivot_amounts as $phase){
+      $invPhase = $invoice->items()->where('invoiceable_id', $phase->id)->first();
 
-  public function storeRetentions(InvoiceItemsStoreReqeust $request, Invoice $invoice)
-  {
-    $retentions = filterInputIds($request->retentions);
+      foreach($phase->taxes as $tax){
+        $invPhase->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $invoice->id]);
+      }
 
-    $pivot_amounts = Invoice::whereIn('id', $retentions)
-      ->where('contract_id', $invoice->contract_id)
-      ->where('retention_amount', '!=', 0)
-      ->has('addedAsInvoiceItem', 0)
-      ->pluck('retention_amount', 'id')->toArray();
-
-    // formate data for pivot table
-    $data = [];
-    foreach ($retentions as $retention) {
-      $data[$retention] = ['amount' => -$pivot_amounts[$retention] * 1000]; // it was negative in db so make it positive and then convert to cents manually, setter is not working for pivot table
+      $invPhase->updateTaxAmount();
     }
 
-    $invoice->retentions()->syncWithoutDetaching($data);
-
-    $invoice->updateSubtotal();
+    $invoice->updateTaxAmount();
 
     return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
@@ -99,7 +87,7 @@ class InvoiceItemController extends Controller
 
     $invoice->items()->where('id', $invoiceItem)->delete();
 
-    $invoice->updateSubtotal();
+    $invoice->updateTaxAmount();
 
     return $this->sendRes('Item Removed', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
   }

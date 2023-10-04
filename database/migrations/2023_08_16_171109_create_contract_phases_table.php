@@ -18,6 +18,8 @@ return new class extends Migration
       $table->string('name');
       $table->text('description')->nullable();
       $table->bigInteger('estimated_cost')->default(0);
+      $table->bigInteger('tax_amount')->default(0);
+      $table->bigInteger('total_cost')->default(0);
       $table->bigInteger('order')->default(0);
       $table->dateTime('start_date');
       $table->dateTime('due_date')->nullable();

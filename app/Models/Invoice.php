@@ -208,7 +208,7 @@ class Invoice extends Model
       $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount');
       $this->update(['total_tax' => $fixed_tax + (($this->subtotal + $this->discount_amount) * $percent_tax / 100)]);
     } else {
-      $fixed_tax = $this->items()->sum('invoice_items.total_tax_amount');
+      $fixed_tax = $this->items()->sum('invoice_items.total_tax_amount') / 1000;
       $this->update(['total_tax' => $fixed_tax]);
     }
 

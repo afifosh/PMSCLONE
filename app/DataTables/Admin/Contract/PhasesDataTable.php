@@ -28,7 +28,12 @@ class PhasesDataTable extends DataTable
     ->editColumn('estimated_cost', function($phase){
       return Money($phase->estimated_cost, $phase->contract->currency, true);
     })
-    ;
+    ->editColumn('tax_amount', function($phase){
+      return Money($phase->tax_amount, $phase->contract->currency, true);
+    })
+    ->editColumn('total_cost', function($phase){
+      return Money($phase->total_cost, $phase->contract->currency, true);
+    });
   }
 
   /**
@@ -94,6 +99,8 @@ class PhasesDataTable extends DataTable
       Column::make('start_date'),
       Column::make('due_date')->title('End Date'),
       Column::make('estimated_cost'),
+      Column::make('tax_amount'),
+      Column::make('total_cost'),
       Column::make('status'),
       Column::make('created_at'),
       Column::make('updated_at'),

@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\Contract\Phase\PhaseStoreRequest;
 use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\ContractStage;
+use App\Models\Tax;
 use Illuminate\Http\Request;
 
 class ProjectPhaseController extends Controller
@@ -48,10 +49,9 @@ class ProjectPhaseController extends Controller
     // abort_if(!$project->isMine(), 403);
 
     $phase = new ContractPhase();
+    $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
-    $title = $stage instanceof ContractStage ? 'Add Phase to ' . $stage->name : 'Add Phase to Contract As Commited Phase';
-
-    return $this->sendRes('success', ['modalTitle' => $title, 'view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'stage', 'remaining_amount'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'stage', 'remaining_amount', 'tax_rates'))->render()]);
   }
 
   public function store($project, Contract $contract, ContractStage $stage, PhaseStoreRequest $request)
@@ -69,6 +69,10 @@ class ProjectPhaseController extends Controller
         + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
     );
 
+    $this->storeTaxes($phase, $request->phase_taxes);
+
+    $phase->updateTaxAmount();
+
     $stage->update(['remaining_amount' => $stage->remaining_amount - $phase->estimated_cost]);
 
     $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
@@ -77,6 +81,18 @@ class ProjectPhaseController extends Controller
       broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
     return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);
+  }
+
+  protected function storeTaxes($phase, $taxes): void
+  {
+    $taxes = Tax::whereIn('id', filterInputIds($taxes))->where('is_retention', false)->where('status', 'Active')->get();
+
+    $sync_data = [];
+    foreach ($taxes as $rate) {
+      $sync_data[$rate->id] = ['amount' => $rate->amount, 'type' => $rate->type, 'contract_phase_id' => $phase->id];
+    }
+
+    $phase->taxes()->sync($sync_data);
   }
 
   public function edit($project, Contract $contract, ContractStage $stage, ContractPhase $phase)

@@ -58,8 +58,8 @@
               },
               orderable: false, searchable: false},
             { data: 'name', name: 'name' },
-            { data: 'estimated_cost', name: 'estimated_cost' },
-            { data: 'status', name: 'status' },
+            { data: 'total_cost', name: 'total_cost' },
+            { data: 'status', name: 'status', searchable: false },
         ]
     });
   }

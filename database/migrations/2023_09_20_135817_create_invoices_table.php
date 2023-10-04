@@ -21,7 +21,7 @@ return new class extends Migration
       $table->date('due_date');
       $table->date('sent_date')->nullable()->comment('Date the invoice was sent to the client');
       $table->string('refrence_id')->nullable();
-      $table->boolean('is_summary_tax')->default(true);
+      $table->boolean('is_summary_tax')->default(false);
       $table->nullableMorphs('creator');
       $table->bigInteger('subtotal')->default(0);
       $table->bigInteger('total_tax')->default(0);

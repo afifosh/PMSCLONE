@@ -36,6 +36,22 @@
     </div>
     {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
   </div>
+  {{-- taxes --}}
+  <div class="">
+    {{ Form::label('phase_taxes', __('Tax'), ['class' => 'col-form-label']) }}
+    <select class="form-select globalOfSelect2" name="phase_taxes[]" multiple data-placeholder="{{__('Select Tax')}}" data-allow-clear=true>
+      @forelse ($tax_rates->where('is_retention', false) as $tax)
+        <option @selected($phase->taxes->contains($tax)) value="{{$tax->id}}">{{$tax->name}} (
+          @if($tax->type != 'Percent')
+            @money($tax->amount, $phase->contract->currency, true)
+          @else
+            {{$tax->amount}}%
+          @endif
+        )</option>
+      @empty
+      @endforelse
+    </select>
+  </div>
   {{-- start date --}}
   <div class="form-group col-6">
     {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
