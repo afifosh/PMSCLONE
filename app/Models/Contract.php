@@ -174,6 +174,18 @@ class Contract extends Model
       });
     })->when(request()->has('haspayments'), function($q){
       $q->has('invoices.payments');
+    })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function($q){
+      try {
+        $date = Carbon::parse(explode(' to ', request()->date_range)[0]);
+        $q->where('start_date', '>=', $date);
+      } catch (\Exception $e) {
+      }
+    })->when(request()->date_range && @explode(' to ', request()->date_range)[1], function($q){
+      try {
+        $date = Carbon::parse(explode(' to ', request()->date_range)[1]);
+        $q->where('end_date', '<=', $date);
+      } catch (\Exception $e) {
+      }
     });
   }
 

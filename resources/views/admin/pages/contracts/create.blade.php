@@ -8,7 +8,7 @@
     {{-- Subject --}}
     <div class="form-group col-6">
         {{ Form::label('subject', __('Subject'), ['class' => 'col-form-label']) }}
-        {!! Form::text('subject', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Subject')]) !!}
+        {!! Form::text('subject', null, ['class' => 'form-control', 'placeholder' => __('Subject')]) !!}
     </div>
     {{-- project --}}
     <div class="form-group col-6">
@@ -32,7 +32,7 @@
     {{-- value --}}
     <div class="form-group col-6">
       {{ Form::label('value', __('Contract Value'), ['class' => 'col-form-label']) }}
-      {!! Form::number('value', $contract->value + $contract->total_tax_amount, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('0.00')]) !!}
+      {!! Form::number('value', $contract->value + $contract->total_tax_amount, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
     </div>
     {{-- program --}}
     <div class="form-group col-6">
@@ -100,12 +100,16 @@
     {{-- start date --}}
     <div class="form-group col-6">
       {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('start_date', $contract->start_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Start Date')]) !!}
+      {!! Form::date('start_date', $contract->start_date, [
+        'class' => 'form-control flatpickr',
+        'placeholder' => __('Start Date'),
+        'data-flatpickr' => '{"allowInput": true}'
+      ]) !!}
     </div>
     {{-- end date --}}
     <div class="form-group col-6 end-date-sec {{!$contract->subject || $contract->end_date ? '' : 'd-none'}}">
       {{ Form::label('end_date', __('End Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('end_date', $contract->end_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('End Date')]) !!}
+      {!! Form::date('end_date', $contract->end_date, ['class' => 'form-control flatpickr', 'placeholder' => __('End Date')]) !!}
     </div>
     {{-- dute date --}}
     <div class="col-12 mt-2">

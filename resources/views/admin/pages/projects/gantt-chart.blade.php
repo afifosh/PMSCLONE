@@ -45,6 +45,7 @@
 
 @section('page-script')
 <script src={{asset('assets/js/custom/select2.js')}}></script>
+<script src={{asset('assets/js/custom/flatpickr.js')}}></script>
 <script src={{asset('assets/js/cards-actions.js')}}></script>
 <script>
   function formateDate(dateString){
@@ -221,6 +222,7 @@
         contract_type: $('[name="contract_type"]').val(),
         contract_client: $('[name="contract_client"]').val(),
         programs: $('[name="programs"]').val(),
+        date_range: $('[name="date_range"]').val(),
       },
       success: function (ganttProjects) {
         projects = ganttProjects;
@@ -683,6 +685,15 @@ gantt.$task_data.style.cursor = 'grab';
           <div class="col-md-3">
             {!! Form::label('search_task', 'Search') !!}
             {!! Form::text('search_task', null, ['class' => 'form-control gantt_filter', 'placeholder' => 'Search']) !!}
+          </div>
+
+          <div class="col-md-3">
+            {!! Form::label('date_range', 'Date Range') !!}
+            {!! Form::text('date_range', null, [
+              'class' => 'form-control gantt_filter flatpickr',
+              'data-flatpickr' => '{"mode": "range"}',
+              'placeholder' => 'Date Range'
+            ]) !!}
           </div>
 
           <div class="{{!isset($project) ? 'mt-3' : ''}} col-3">
