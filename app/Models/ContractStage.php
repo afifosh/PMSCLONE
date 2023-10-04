@@ -72,9 +72,9 @@ class ContractStage extends Model
     $this->attributes['stage_amount'] = round($value * 1000);
   }
 
-  public function getRemainingAmountAttribute($value)
+  public function getRemainingAmountAttribute()
   {
-    return $value / 1000;
+      return $this->calculateRemainingAmount();
   }
 
   public function setRemainingAmountAttribute($value)
@@ -91,4 +91,17 @@ class ContractStage extends Model
   {
     return $this->hasMany(ContractPhase::class, 'stage_id');
   }
+
+  public function calculateRemainingAmount()
+  {
+      // Get total phases amount in the same format as it's stored in the database (multiplied by 1000)
+      $totalPhasesAmount = $this->phases->sum(function($phase) {
+          return $phase->getOriginal('estimated_cost');
+      });
+  
+      // Return the calculated remaining amount divided by 1000 to match your getter's format
+      return ($this->getOriginal('stage_amount') - $totalPhasesAmount) / 1000;
+  }
+  
+  
 }
