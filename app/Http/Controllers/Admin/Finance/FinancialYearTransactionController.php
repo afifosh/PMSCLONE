@@ -58,7 +58,7 @@ class FinancialYearTransactionController extends Controller
       return $this->sendErr('You cannot transfer to the same account.');
     }
 
-    $amount = Money::{$financialYear->currency ?? config('money.defaults.currency')}($validated['amount'] * 100, false)->getAmount();
+    $amount = Money::{$financialYear->currency ?? config('money.defaults.currency')}($validated['amount'] * 1000, false)->getAmount();
 
     if ($request->type == 'deposit' || $request->type == 'withdraw')
       $this->transactionProcessor->create(

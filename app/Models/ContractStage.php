@@ -64,22 +64,22 @@ class ContractStage extends Model
 
   public function getStageAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setStageAmountAttribute($value)
   {
-    $this->attributes['stage_amount'] = round($value * 100);
+    $this->attributes['stage_amount'] = round($value * 1000);
   }
 
   public function getRemainingAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setRemainingAmountAttribute($value)
   {
-    $this->attributes['remaining_amount'] = round($value * 100);
+    $this->attributes['remaining_amount'] = round($value * 1000);
   }
 
   public function contract()

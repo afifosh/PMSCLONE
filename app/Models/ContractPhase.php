@@ -47,12 +47,12 @@ class ContractPhase extends Model
 
   public function getEstimatedCostAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setEstimatedCostAttribute($value)
   {
-    $this->attributes['estimated_cost'] = round($value * 100);
+    $this->attributes['estimated_cost'] = round($value * 1000);
   }
 
   public function getStatusAttribute()

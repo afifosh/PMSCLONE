@@ -64,22 +64,22 @@ class Contract extends Model
 
   public function getValueAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setValueAttribute($value)
   {
-    return $this->attributes['value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
+    return $this->attributes['value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 1000;
   }
 
   public function getRemainingAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setRemainingAmountAttribute($value)
   {
-    return $this->attributes['remaining_amount'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 100;
+    return $this->attributes['remaining_amount'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 1000;
   }
 
   public function getStatusAttribute()

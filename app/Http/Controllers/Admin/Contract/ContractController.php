@@ -285,7 +285,7 @@ class ContractController extends Controller
       $this->transactionProcessor->create(
         AccountBalance::find($request->account_balance_id),
         new TransactionDto(
-          -$request->value * 100,
+          -$request->value * 1000, // convert to cents and up to 3 decimal places
           'Debit',
           'Contract Commitment',
           '',
@@ -354,7 +354,7 @@ class ContractController extends Controller
       $this->transactionProcessor->create(
         AccountBalance::find($request->account_balance_id),
         new TransactionDto(
-          -$request->value * 100,
+          -$request->value * 1000, // convert to cents and up to 3 decimal places
           'Debit',
           'Contract Commitment',
           '',
@@ -399,7 +399,7 @@ class ContractController extends Controller
       $this->transactionProcessor->create(
         AccountBalance::find($request->account_balance_id),
         new TransactionDto(
-          -$contract->value * 100,
+          -$contract->value * 1000, // convert to cents and up to 3 decimal places
           'Debit',
           'Contract Commitment',
           '',
@@ -416,7 +416,7 @@ class ContractController extends Controller
       $this->transactionProcessor->create(
         AccountBalance::find($request->account_balance_id),
         new TransactionDto(
-          -($request->value - $contract->value) * 100,
+          -($request->value - $contract->value) * 1000, // convert to cents and up to 3 decimal places
           $request->value > $contract->value ? 'Debit' : 'Credit',
           'Contract Commitment - Updated',
           '',
@@ -429,7 +429,7 @@ class ContractController extends Controller
       $this->transactionProcessor->create(
         AccountBalance::find($contract->account_balance_id),
         new TransactionDto(
-          $contract->value * 100,
+          $contract->value * 1000, // convert to cents and up to 3 decimal places
           'Credit',
           'Contract Account Changed',
           'Contract Billing Account Changed so amount is credited back to old account',
@@ -441,7 +441,7 @@ class ContractController extends Controller
       $this->transactionProcessor->create(
         AccountBalance::find($request->account_balance_id),
         new TransactionDto(
-          -$request->value * 100,
+          -$request->value * 1000, // convert to cents and up to 3 decimal places
           'Debit',
           'Contract Commitment',
           'Contract Billing Account Changed so amount is debited from new account',

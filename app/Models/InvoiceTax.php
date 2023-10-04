@@ -38,11 +38,11 @@ class InvoiceTax extends Model
 
   public function getAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setAmountAttribute($value)
   {
-    $this->attributes['amount'] = round($value * 100, 0);
+    $this->attributes['amount'] = round($value * 1000);
   }
 }

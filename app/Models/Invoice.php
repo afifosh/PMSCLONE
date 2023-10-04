@@ -108,72 +108,72 @@ class Invoice extends Model
 
   public function getSubtotalAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setSubtotalAttribute($value)
   {
-    $this->attributes['subtotal'] = round($value * 100, 0);
+    $this->attributes['subtotal'] = round($value * 1000);
   }
 
   public function getTotalAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setTotalAttribute($value)
   {
-    $this->attributes['total'] = round($value * 100, 0);
+    $this->attributes['total'] = round($value * 1000);
   }
 
   public function getPaidAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setPaidAmountAttribute($value)
   {
-    $this->attributes['paid_amount'] = round($value * 100, 0);
+    $this->attributes['paid_amount'] = round($value * 1000);
   }
 
   public function getTotalTaxAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setTotalTaxAttribute($value)
   {
-    $this->attributes['total_tax'] = round($value * 100, 0);
+    $this->attributes['total_tax'] = round($value * 1000);
   }
 
   public function getDiscountAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setDiscountAmountAttribute($value)
   {
-    $this->attributes['discount_amount'] = round($value * 100, 0);
+    $this->attributes['discount_amount'] = round($value * 1000);
   }
 
   public function getAdjustmentAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setAdjustmentAmountAttribute($value)
   {
-    $this->attributes['adjustment_amount'] = round($value * 100, 0);
+    $this->attributes['adjustment_amount'] = round($value * 1000);
   }
 
   public function getRetentionAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setRetentionAmountAttribute($value)
   {
-    $this->attributes['retention_amount'] = round($value * 100, 0);
+    $this->attributes['retention_amount'] = round($value * 1000);
   }
 
   public function updateItemsTaxType(): void
@@ -185,7 +185,7 @@ class Invoice extends Model
 
   public function updateSubtotal(): void
   {
-    $subtotal = $this->items()->sum('amount') / 100;
+    $subtotal = $this->items()->sum('amount') / 1000;
     if (!$subtotal) {
       $this->update(['discount_amount' => 0]);
     }
@@ -202,6 +202,7 @@ class Invoice extends Model
 
   public function updateTaxAmount(): void
   {
+    $this->updateSubtotal();
     if ($this->is_summary_tax) {
       $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount');
       $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount');

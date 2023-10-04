@@ -39,7 +39,7 @@ class FinancialYear extends Model implements AccountBalanceHolderInterface
 
   public function setInitialBalanceAttribute($value)
   {
-    return $this->attributes['initial_balance'] = $value * 100;
+    return $this->attributes['initial_balance'] = $value * 1000;
   }
 
   public function budget()

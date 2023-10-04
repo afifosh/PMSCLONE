@@ -23,23 +23,23 @@ class CustomInvoiceItem extends Model
 
   public function getPriceAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setPriceAttribute($value)
   {
-    $this->attributes['price'] = round($value * 100);
+    $this->attributes['price'] = round($value * 1000);
   }
 
   public function getTotalAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
 
   public function setTotalAttribute($value)
   {
-    $this->attributes['total'] = round($value * 100);
+    $this->attributes['total'] = round($value * 1000);
   }
 
   public function invoice()

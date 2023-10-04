@@ -28,22 +28,22 @@ class InvoiceItem extends Model
 
   public function getAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setAmountAttribute($value)
   {
-    $this->attributes['amount'] = round($value * 100);
+    $this->attributes['amount'] = round($value * 1000);
   }
 
   public function getTotalTaxAmountAttribute($value)
   {
-    return $value / 100;
+    return $value / 1000;
   }
 
   public function setTotalTaxAmountAttribute($value)
   {
-    $this->attributes['total_tax_amount'] = round($value * 100);
+    $this->attributes['total_tax_amount'] = round($value * 1000);
   }
 
   // public function invoice()

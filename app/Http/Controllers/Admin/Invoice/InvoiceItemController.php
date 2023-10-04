@@ -63,7 +63,7 @@ class InvoiceItemController extends Controller
     // formate data for pivot table
     $data = [];
     foreach ($phases as $phase) {
-      $data[$phase] = ['amount' => $pivot_amounts[$phase] * 100]; // convert to cents manually, setter is not working for pivot table
+      $data[$phase] = ['amount' => $pivot_amounts[$phase] * 1000]; // convert to cents manually, setter is not working for pivot table
     }
 
     $invoice->phases()->syncWithoutDetaching($data);
@@ -85,7 +85,7 @@ class InvoiceItemController extends Controller
     // formate data for pivot table
     $data = [];
     foreach ($retentions as $retention) {
-      $data[$retention] = ['amount' => -$pivot_amounts[$retention] * 100]; // it was negative in db so make it positive and then convert to cents manually, setter is not working for pivot table
+      $data[$retention] = ['amount' => -$pivot_amounts[$retention] * 1000]; // it was negative in db so make it positive and then convert to cents manually, setter is not working for pivot table
     }
 
     $invoice->retentions()->syncWithoutDetaching($data);
