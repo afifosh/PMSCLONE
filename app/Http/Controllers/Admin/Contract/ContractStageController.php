@@ -72,38 +72,29 @@ class ContractStageController extends Controller
 
   public function update(Request $request, Contract $contract, ContractStage $stage)
   {
-    $contract->load('project', 'stages');
+    $contract->load('project');
     $project = $contract->project ?? 'project';
-    // abort_if(!$project->isMine() || $stage->project_id != $project->id, 403);
-
-    // Calculate the total amount of all stages excluding the current one
-    $totalStagesAmountExcludingCurrent = $contract->stages->where('id', '!=', $stage->id)->sum('stage_amount');
-    $maxAllowedStageAmount = $contract->value - $totalStagesAmountExcludingCurrent;
-
-   // dd($totalStagesAmountExcludingCurrent . "    " . $contract->value);
+    $stage->load('phases');
 
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_stages,name,' . $stage->id . ',id,contract_id,' . $contract->id,
-      //'stage_amount' => ['required', 'numeric', 'gt:0', 'max:' . $contract->remaining_cost($stage->id)],
       'stage_amount' => [
         'required',
         'numeric',
-        'gt:0',
-        'lte:' . $maxAllowedStageAmount, // ensure the stage amount doesn't make total stages amount exceed contract value
+        'gte:' . $stage->stage_amount - $stage->remaining_amount,
+        'lte:' . $contract->remaining_cost($stage->stage_amount)
       ],
       'description' => 'nullable|string|max:2000',
-      'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
-      'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
+      'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date. '|before_or_equal:' . (optional($stage->phases->sortBy('start_date')->first())->start_date ?: $contract->end_date),
+      'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date .'|after_or_equal:' . (optional($stage->phases->sortByDesc('due_date')->first())->due_date ?: $contract->start_date),
     ], [
       'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
     ]);
 
-    $stageAmountDiff = $stage->stage_amount - $request->stage_amount;
-
     $stage->update(
       [
         'stage_amount' => $request->stage_amount,
-        'remaining_amount' => $stage->remaining_amount - $stageAmountDiff
+        'remaining_amount' => $stage->remaining_amount - ($stage->stage_amount - $request->stage_amount)
       ]
         + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
     );

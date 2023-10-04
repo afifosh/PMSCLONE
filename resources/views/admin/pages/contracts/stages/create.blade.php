@@ -111,7 +111,7 @@
       }
       $('#stage_end_date').val(endDate.toISOString().slice(0, 10));
     }else{
-      $('#stage_end_date').val('');
+      // $('#stage_end_date').val('');
     }
     initFlatPickr();
   }

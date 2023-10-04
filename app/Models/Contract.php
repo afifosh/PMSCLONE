@@ -265,12 +265,9 @@ class Contract extends Model
     elseif ($status == 'Paused') return 'warning';
   }
 
-  public function remaining_cost($phase_to_ignore_id = null)
+  public function remaining_cost($stage_cost = 0)
   {
-    if ($phase_to_ignore_id) {
-      return $this->value - $this->phases->where('id', '!=', $phase_to_ignore_id)->sum('estimated_cost');
-    }
-    return $this->value - $this->phases->sum('estimated_cost');
+    return $this->remaining_amount + $stage_cost;
   }
 
   public function formatPhaseValue($value)
