@@ -76,9 +76,21 @@ class ContractStageController extends Controller
     $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine() || $stage->project_id != $project->id, 403);
 
+    // Calculate the total amount of all stages excluding the current one
+    $totalStagesAmountExcludingCurrent = $contract->stages->where('id', '!=', $stage->id)->sum('stage_amount');
+    $maxAllowedStageAmount = $contract->value - $totalStagesAmountExcludingCurrent;
+
+   // dd($totalStagesAmountExcludingCurrent . "    " . $contract->value);
+
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_stages,name,' . $stage->id . ',id,contract_id,' . $contract->id,
-      'stage_amount' => ['required', 'numeric', 'gt:0', 'max:' . $contract->remaining_cost($stage->id)],
+      //'stage_amount' => ['required', 'numeric', 'gt:0', 'max:' . $contract->remaining_cost($stage->id)],
+      'stage_amount' => [
+        'required',
+        'numeric',
+        'gt:0',
+        'lte:' . $maxAllowedStageAmount, // ensure the stage amount doesn't make total stages amount exceed contract value
+      ],
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date,
       'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date,
