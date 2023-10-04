@@ -25,16 +25,22 @@ class PhasesDataTable extends DataTable
     ->editColumn('action', function($phase){
       return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $this->stage, 'contract_id' => $this->contract_id])->render();
     })
+    ->editColumn('invoice_id', function($phase){
+      $invoiceItem = $phase->addedAsInvoiceItem->first();
+      return $invoiceItem 
+          ? '<a href="' . route('admin.invoices.edit', $invoiceItem->invoice_id) . '">' . runtimeInvIdFormat($invoiceItem->invoice_id) . '</a>'
+          : 'N/A';
+    })
     ->editColumn('estimated_cost', function($phase){
       return Money($phase->estimated_cost, $phase->contract->currency, true);
-    })
-    ;
+    })->rawColumns(['invoice_id','action']);
+    
   }
 
   /**
    * Get the query source of dataTable.
    */
-  public function query(ContractPhase $model): QueryBuilder
+  public function queryss(ContractPhase $model): QueryBuilder
   {
     // stage is type of ContractStage
     return $model->when($this->stage instanceof ContractStage, function($q){
@@ -47,6 +53,37 @@ class PhasesDataTable extends DataTable
     })
     ->newQuery();
   }
+
+  public function querysss(ContractPhase $model): QueryBuilder
+  {
+      return $model->when($this->stage instanceof ContractStage, function($q){
+          $q->where('stage_id', $this->stage->id);
+      })
+      ->with('addedAsInvoiceItem')
+      ->when($this->contract_id, function($q){
+          $q->where('contract_id', $this->contract_id);
+      })
+      ->newQuery();
+  }
+ 
+  public function query(ContractPhase $model): QueryBuilder
+  {
+      return $model
+          ->leftjoin('invoice_items', function($join) {
+              $join->on('contract_phases.id', '=', 'invoice_items.invoiceable_id')
+                   ->where('invoice_items.invoiceable_type', ContractPhase::class);
+          })
+          ->when($this->stage instanceof ContractStage, function($q){
+              $q->where('stage_id', $this->stage->id);
+          })
+          ->with('addedAsInvoiceItem')
+          ->when($this->contract_id, function($q){
+              $q->where('contract_id', $this->contract_id);
+          })
+          ->select(['contract_phases.*', 'invoice_items.invoice_id as invoice_column_id']) 
+          ->newQuery();
+  }
+    
 
   /**
    * Optional method if you want to use the html builder.
@@ -95,6 +132,7 @@ class PhasesDataTable extends DataTable
       Column::make('due_date')->title('End Date'),
       Column::make('estimated_cost'),
       Column::make('status'),
+      Column::make('invoice_id')->title('Invoice ID')->orderable(true), // Add the new column for invoice_id
       Column::make('created_at'),
       Column::make('updated_at'),
     ];
