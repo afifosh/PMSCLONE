@@ -100,7 +100,7 @@ class ContractStage extends Model
       });
   
       // Return the calculated remaining amount divided by 1000 to match your getter's format
-      return ($this->getOriginal('stage_amount') - $totalPhasesAmount) / 1000;
+      return ($this->getOriginal('stage_amount') - $totalPhasesAmount);
   }
   
   
