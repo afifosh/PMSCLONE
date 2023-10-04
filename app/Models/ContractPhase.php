@@ -135,8 +135,8 @@ class ContractPhase extends Model
 
   public function updateTaxAmount(): void
   {
-    $fixed_tax = $this->taxes()->where('phase_taxes.type', 'Fixed')->sum('phase_taxes.amount');
-    $percent_tax = $this->taxes()->where('phase_taxes.type', 'Percent')->sum('phase_taxes.amount');
+    $fixed_tax = $this->taxes()->where('phase_taxes.type', 'Fixed')->sum('phase_taxes.amount') / 1000;
+    $percent_tax = $this->taxes()->where('phase_taxes.type', 'Percent')->sum('phase_taxes.amount') / 1000;
     $tax_amount = $fixed_tax + ($this->estimated_cost * $percent_tax / 100);
     $this->update(['tax_amount' => $tax_amount, 'total_cost' => $this->estimated_cost + $tax_amount]);
   }

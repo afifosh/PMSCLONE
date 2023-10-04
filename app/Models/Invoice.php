@@ -204,8 +204,8 @@ class Invoice extends Model
   {
     $this->updateSubtotal();
     if ($this->is_summary_tax) {
-      $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount');
-      $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount');
+      $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
+      $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
       $this->update(['total_tax' => $fixed_tax + (($this->subtotal + $this->discount_amount) * $percent_tax / 100)]);
     } else {
       $fixed_tax = $this->items()->sum('invoice_items.total_tax_amount') / 1000;

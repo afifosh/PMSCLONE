@@ -89,7 +89,7 @@ class ProjectPhaseController extends Controller
 
     $sync_data = [];
     foreach ($taxes as $rate) {
-      $sync_data[$rate->id] = ['amount' => $rate->amount, 'type' => $rate->type, 'contract_phase_id' => $phase->id];
+      $sync_data[$rate->id] = ['amount' => $rate->amount * 1000, 'type' => $rate->type, 'contract_phase_id' => $phase->id];
     }
 
     $phase->taxes()->sync($sync_data);

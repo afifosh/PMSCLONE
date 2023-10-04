@@ -21,4 +21,14 @@ class Tax extends Model
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
+
+  public function getAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setAmountAttribute($value)
+  {
+    $this->attributes['amount'] = $value * 1000;
+  }
 }

@@ -63,8 +63,8 @@ class InvoiceItem extends Model
 
   public function updateTaxAmount(): void
   {
-    $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount');
-    $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount');
+    $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
+    $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
 
     $this->update(['total_tax_amount' => $fixed_tax + (($this->invoiceable->estimated_cost ?? $this->invoiceable->total) * $percent_tax / 100)]);
   }
