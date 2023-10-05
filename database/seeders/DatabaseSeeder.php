@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ProjectSeeder::class);
         // $this->call(AccountBalanceHolderSeeder::class);
         // $this->call(WorkflowSeeder::class);
-        // $this->call(KycDocumentSeeder::class);
+        $this->call(KycDocumentSeeder::class);
         $this->call(EmailPermissionsSeeder::class);
         $this->call(NoteTagSeeder::class);
         $this->call(ContractCategorySeeder::class);
