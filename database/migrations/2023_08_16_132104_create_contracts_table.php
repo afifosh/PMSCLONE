@@ -25,7 +25,6 @@ return new class extends Migration
       $table->string('subject');
       $table->string('currency', 5)->default('SAR');
       $table->bigInteger('value')->default(0);
-      $table->bigInteger('remaining_amount')->default(0);
       $table->bigInteger('tax_value')->default(0);
       $table->enum('invoicing_method', ['Recuring', 'Phase Based'])->default('Phase Based');
       $table->dateTime('start_date')->nullable();

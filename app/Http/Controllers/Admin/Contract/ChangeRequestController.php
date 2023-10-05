@@ -105,8 +105,6 @@ class ChangeRequestController extends Controller
           ['type' => Contract::class, 'id' => $contract->id]
         )
       );
-
-      $contract->update(['remaining_amount' => $contract->remaining_amount + ($changeRequest->new_value - $contract->value)]);
     }
 
   }

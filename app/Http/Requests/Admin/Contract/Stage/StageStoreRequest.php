@@ -26,7 +26,7 @@ class StageStoreRequest extends FormRequest
       'stage_amount' => ['required', 'numeric', 'gt:0', 'max:' . $this->contract->remaining_amount],
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date'. (request()->due_date ? '|before_or_equal:due_date' : '' ).'|after_or_equal:' . $this->contract->start_date,
-      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->contract->end_date
+      'due_date' => 'nullable|date|after:start_date'. ($this->contract->end_date ? ('|before_or_equal:' . $this->contract->end_date) : ''),
     ];
   }
 

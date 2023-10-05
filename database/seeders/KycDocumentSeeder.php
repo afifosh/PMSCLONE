@@ -67,5 +67,67 @@ class KycDocumentSeeder extends Seeder
             }
         ]', true),
     ]);
+
+    /*
+    /* Contract Required Docs
+    */
+
+    KycDocument::create([
+      'workflow' => 'Contract Required Docs',
+      'title' => 'Certificate of Insurance',
+      'required_from' => 0, // from other workflow not related to contract but required for consistency
+      'client_type' => 'Both',
+      'status' => 1,
+      'description' => 'Certificate of Insurance Info',
+      'is_expirable' => 1,
+      'is_mendatory' => 1,
+      'expiry_date_title' => 'Expiry Date',
+      'is_expiry_date_required' => 1,
+      'fields' => json_decode('[
+            {
+                "id": "643a377453d30",
+                "type": "text",
+                "label": "CI Number",
+                "is_required": "1"
+            },
+            {
+                "id": "643a377453d31",
+                "type": "date",
+                "label": "CI Issue Date",
+                "is_required": "1"
+            },
+            {
+                "id": "643a377453d32",
+                "type": "file",
+                "label": "CI Certificate",
+                "is_required": "1"
+            }
+        ]', true),
+    ]);
+
+    KycDocument::create([
+      'workflow' => 'Contract Required Docs',
+      'title' => 'VAT Certificate',
+      'required_from' => 3, // from contract workflow
+      'client_type' => 'Company',
+      'status' => 1,
+      'description' => 'VAT Certificate Info',
+      'is_expirable' => 0,
+      'is_mendatory' => 1,
+      'fields' => json_decode('[
+            {
+                "id": "643a377453d40",
+                "type": "number",
+                "label": "VAT Number",
+                "is_required": "1"
+            },
+            {
+                "id": "643a377453d41",
+                "type": "file",
+                "label": "VAT Certificate",
+                "is_required": "1"
+            }
+        ]', true),
+    ]);
   }
 }

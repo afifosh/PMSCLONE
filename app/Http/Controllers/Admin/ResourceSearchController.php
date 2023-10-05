@@ -43,7 +43,7 @@ class ResourceSearchController extends Controller
       'Invoice' => [
         'search' => 'id',
         // concat INV-0000 and total - paid_amount
-        'select' => [DB::raw("CONCAT('INV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/100) as text"), 'id'],
+        'select' => [DB::raw("CONCAT('INV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/1000) as text"), 'id'],
         'dependent_column' => 'contract_id',
       ],
       'Country' => [

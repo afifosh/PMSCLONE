@@ -33,7 +33,6 @@ class ContractFactory extends Factory
       'refrence_id' => $this->faker->unique()->sentence(),
       'subject' => $this->faker->sentence(),
       'value' => $value,
-      'remaining_amount' => $value,
       'start_date' => $isDraft ? null : $this->faker->dateTimeBetween('-2 years', '-1 years'),
       'end_date' => $endDate ? $this->faker->dateTimeBetween('now', '2 years') : null,
       'description' => $this->faker->paragraph(),

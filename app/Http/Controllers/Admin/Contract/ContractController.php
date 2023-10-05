@@ -279,7 +279,7 @@ class ContractController extends Controller
     if ($request->isSavingDraft)
       $data['status'] = 'Draft';
 
-    $contract = Contract::create($data + ['remaining_amount' => $request->value] + $request->validated());
+    $contract = Contract::create($data + $request->validated());
 
     if (!$request->isSavingDraft) {
       $this->transactionProcessor->create(
@@ -450,9 +450,6 @@ class ContractController extends Controller
         )
       );
     }
-
-    // update contract remaining amount
-    $contract->update(['remaining_amount' => $contract->remaining_amount + ($request->value - $contract->value)]);
   }
 
   /**

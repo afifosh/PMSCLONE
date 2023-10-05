@@ -6,9 +6,9 @@ use App\DataTables\Admin\Contract\StagesDataTable;
 use App\Events\Admin\ProjectPhaseUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contract\Stage\StageStoreRequest;
+use App\Http\Requests\Admin\Contract\Stage\StageUpdateRequest;
 use App\Models\Contract;
 use App\Models\ContractStage;
-use Illuminate\Http\Request;
 
 class ContractStageController extends Controller
 {
@@ -43,15 +43,7 @@ class ContractStageController extends Controller
     $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine(), 403);
 
-    $stage = $contract->stages()->create(
-      [
-        'stage_amount' => $request->stage_amount,
-        'remaining_amount' => $request->stage_amount
-      ]
-        + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
-    );
-
-    $contract->update(['remaining_amount' => $contract->remaining_amount - $stage->stage_amount]);
+    $stage = $contract->stages()->create($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'stage_amount']));
 
     $message = auth()->user()->name . ' created a new stage: ' . $stage->name;
 
@@ -70,34 +62,13 @@ class ContractStageController extends Controller
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.stages.create', compact('contract', 'project', 'stage'))->render()]);
   }
 
-  public function update(Request $request, Contract $contract, ContractStage $stage)
+  public function update(StageUpdateRequest $request, Contract $contract, ContractStage $stage)
   {
     $contract->load('project');
     $project = $contract->project ?? 'project';
     $stage->load('phases');
 
-    $request->validate([
-      'name' => 'required|string|max:255|unique:contract_stages,name,' . $stage->id . ',id,contract_id,' . $contract->id,
-      'stage_amount' => [
-        'required',
-        'numeric',
-        'gte:' . $stage->stage_amount - $stage->remaining_amount,
-        'lte:' . $contract->remaining_cost($stage->stage_amount)
-      ],
-      'description' => 'nullable|string|max:2000',
-      'start_date' => 'required|date|before_or_equal:due_date|after_or_equal:' . $contract->start_date. '|before_or_equal:' . (optional($stage->phases->sortBy('start_date')->first())->start_date ?: $contract->end_date),
-      'due_date' => 'required|date|after:start_date|before_or_equal:' . $contract->end_date .'|after_or_equal:' . (optional($stage->phases->sortByDesc('due_date')->first())->due_date ?: $contract->start_date),
-    ], [
-      'due_date.before_or_equal' => 'The due date must be a date before or equal to contract end date.'
-    ]);
-
-    $stage->update(
-      [
-        'stage_amount' => $request->stage_amount,
-        'remaining_amount' => $stage->remaining_amount - ($stage->stage_amount - $request->stage_amount)
-      ]
-        + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
-    );
+    $stage->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'stage_amount']));
 
     $message = auth()->user()->name . ' updated stage: ' . $stage->name;
 

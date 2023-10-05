@@ -34,7 +34,6 @@ class Contract extends Model
     'subject',
     'currency',
     'value',
-    'remaining_amount',
     'start_date',
     'end_date',
     'description',
@@ -72,14 +71,9 @@ class Contract extends Model
     return $this->attributes['value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 1000;
   }
 
-  public function getRemainingAmountAttribute($value)
+  public function getRemainingAmountAttribute()
   {
-    return $value / 1000;
-  }
-
-  public function setRemainingAmountAttribute($value)
-  {
-    return $this->attributes['remaining_amount'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 1000;
+    return $this->value - $this->stages->sum('stage_amount');
   }
 
   public function getStatusAttribute()

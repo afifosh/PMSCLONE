@@ -6,6 +6,7 @@ use App\DataTables\Admin\Contract\PhasesDataTable;
 use App\Events\Admin\ProjectPhaseUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contract\Phase\PhaseStoreRequest;
+use App\Http\Requests\Admin\Contract\Phase\PhaseUpdateRequest;
 use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\ContractStage;
@@ -45,7 +46,7 @@ class ProjectPhaseController extends Controller
     $contract->load('project');
     $project = $contract->project ?? 'project';
     // stage is instance of ContractStage then get stage remaining amount, else get contract remaining amount
-    $remaining_amount = $stage instanceof ContractStage ? $stage->stage_amount : $contract->value;
+    $remaining_amount = $stage->remaining_amount;
     // abort_if(!$project->isMine(), 403);
 
     $phase = new ContractPhase();
@@ -62,7 +63,7 @@ class ProjectPhaseController extends Controller
     // abort_if(!$project->isMine(), 403);
 
     $phase = $contract->phases()->create(
-      ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'total_cost'])
+      ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost'])
     );
 
     $this->storeTaxes($phase, $request->phase_taxes);
@@ -97,14 +98,16 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
 
+    $remaining_amount = $stage->remaining_amount + $phase->total_cost;
+
     $contract->load('project');
     $project = $contract->project ?? 'project';
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage', 'tax_rates'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage', 'tax_rates', 'remaining_amount'))->render()]);
   }
 
-  public function update($project, Request $request, Contract $contract, $stage, ContractPhase $phase)
+  public function update($project, PhaseUpdateRequest $request, Contract $contract, $stage, ContractPhase $phase)
   {
     $contract->load('project');
     $project = $contract->project ?? 'project';
@@ -114,19 +117,7 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not update this phase because it is in paid invoice');
     }
 
-    $request->validate([
-      'name' => 'required|string|max:255|unique:contract_phases,name,' . $phase->id . ',id,stage_id,' . $phase->stage_id,
-      'total_cost' => ['required', 'numeric', 'gt:0', 'max:' . $phase->stage->remaining_amount + $phase->total_cost],
-      'phase_taxes' => 'nullable|array',
-      'phase_taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
-      'description' => 'nullable|string|max:2000',
-      'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $phase->stage->start_date,
-      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $phase->stage->due_date,
-    ], [
-      'due_date.before_or_equal' => 'The due date must be a date before or equal to state due date.'
-    ]);
-
-    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'total_cost']));
+    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost']));
 
     $this->storeTaxes($phase, $request->phase_taxes);
 

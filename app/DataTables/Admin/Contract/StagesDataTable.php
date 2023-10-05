@@ -30,9 +30,6 @@ class StagesDataTable extends DataTable
       // ->editColumn('total_amount', function ($stage) {
       //   return Money($stage->stage_amount, $stage->contract->currency, true);
       // })
-      // ->editColumn('remaining_amount', function ($stage) {
-      //   return Money($stage->remaining_amount, $stage->contract->currency, true);
-      // })
       ->addColumn('action', function($stage){
         return view('admin.pages.contracts.stages.actions', compact('stage'));
       })

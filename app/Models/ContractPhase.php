@@ -137,9 +137,9 @@ class ContractPhase extends Model
   {
     $fixed_tax = $this->taxes()->where('phase_taxes.type', 'Fixed')->sum('phase_taxes.amount');
     $percent_tax = $this->taxes()->where('phase_taxes.type', 'Percent')->sum('phase_taxes.amount');
-    $estimated_cost = ($this->total_cost / (1 + ($percent_tax/(100 * 1000)))) - $fixed_tax;
-    $tax_amount = $this->total_cost - $estimated_cost;
+    $tax_amount = $this->estimated_cost * ($percent_tax / (100 * 1000)) + $fixed_tax;
+    $total_cost = $this->estimated_cost + $tax_amount;
 
-    $this->update(['tax_amount' => $tax_amount, 'estimated_cost' => $estimated_cost]);
+    $this->update(['tax_amount' => $tax_amount, 'total_cost' => $total_cost]);
   }
 }

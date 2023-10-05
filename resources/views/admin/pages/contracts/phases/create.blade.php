@@ -22,7 +22,7 @@
       {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
   </div>
   <div class="form-group col-6">
-    {{ Form::label('total_cost', __('Phase Cost'), ['class' => 'col-form-label']) }}
+    {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
     <div class="dropdown open d-inline">
       <span data-bs-toggle="dropdown" aria-haspopup="true">
           <i class="fas fa-calculator"></i>
@@ -34,14 +34,14 @@
         </div>
       </div>
     </div>
-    {!! Form::number('total_cost', null, ['class' => 'form-control', 'placeholder' => __('Phase Cost')]) !!}
+    {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
   </div>
   {{-- taxes --}}
-  <div class="">
+  <div class="col-6">
     {{ Form::label('phase_taxes', __('Tax'), ['class' => 'col-form-label']) }}
     <select class="form-select globalOfSelect2" name="phase_taxes[]" multiple data-placeholder="{{__('Select Tax')}}" data-allow-clear=true>
       @forelse ($tax_rates->where('is_retention', false) as $tax)
-        <option @selected($phase->taxes->contains($tax)) value="{{$tax->id}}">{{$tax->name}} (
+        <option @selected($phase->taxes->contains($tax)) value="{{$tax->id}}" data-amount="{{$tax->amount}}" data-type={{$tax->type}}>{{$tax->name}} (
           @if($tax->type != 'Percent')
             @money($tax->amount, $phase->contract->currency, true)
           @else
@@ -51,6 +51,11 @@
       @empty
       @endforelse
     </select>
+  </div>
+  {{-- total cost --}}
+  <div class="form-group col-6">
+    {{ Form::label('total_cost', __('Total Cost'), ['class' => 'col-form-label']) }}
+    {!! Form::number('total_cost', null, ['class' => 'form-control', 'placeholder' => __('Total Cost'), 'disabled', 'data-max' => $remaining_amount])!!}
   </div>
   {{-- start date --}}
   <div class="form-group col-6">
@@ -183,9 +188,54 @@
     const balance = $(this).data('balance');
     if(percent && balance){
       const estimatedCost = (balance * percent) / 100;
-      $('[name="total_cost"]').val(estimatedCost);
+      $('[name="estimated_cost"]').val(estimatedCost);
     }else{
-      $('[name="total_cost"]').val('');
+      $('[name="estimated_cost"]').val('');
     }
   })
+
+  $(document).on('change click', '[name="phase_taxes[]"]', function(){
+    calculateTotalCost();
+  })
+  $(document).on('change keyup', '[name="estimated_cost"]', function(){
+    calculateTotalCost();
+  })
+
+  function calculateTotalCost()
+  {
+    const estimatedCost = $('[name="estimated_cost"]').val();
+    const taxes = $('[name="phase_taxes[]"]').val();
+    let totalCost = parseFloat(estimatedCost);
+    if(estimatedCost && taxes){
+      taxes.forEach(tax => {
+        const taxAmount = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('amount');
+        const taxType = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('type');
+        if(taxType == 'Percent'){
+          totalCost += (totalCost * taxAmount) / 100;
+        }else{
+          totalCost += taxAmount;
+        }
+      });
+    }
+    totalCost = totalCost.toFixed(3);
+    $('[name="total_cost"]').val(totalCost);
+    validateTotalCost();
+  }
+
+  $(document).on('change', '[name="total_cost"]', function(){
+    validateTotalCost();
+  })
+
+  function validateTotalCost(){
+    let $this = $('[name="total_cost"]');
+    $($this).parent().find('.validation-error').remove();
+    const totalCost = $($this).val();
+    const balance = $($this).data('max');
+    if(totalCost && balance){
+      // show validation error if total cost is greater than balance
+      if(totalCost > balance){
+        $($this).after('<div class="text-danger validation-error">The total cost must not be greater than '+balance+'.</div>');
+      }
+    }
+  }
 </script>
