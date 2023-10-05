@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
-<link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 @endsection
 
 @section('page-style')
@@ -17,12 +16,9 @@
 
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
-<script src="https://rawgit.com/bevacqua/dragula/master/dist/dragula.js"></script>
 <script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/sortablejs/sortable.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -38,10 +34,30 @@
 
 <script>
 $(document).ready(function(){
-
+  initSortable();
 console.log(rrule.rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5'));
 
 });
+function initSortable() {
+  var sortable = Sortable.create($('#phases-table tbody')[0], {
+    handle: '.bi-drag',
+    group: 'shared',
+    animation: 150,
+    dataIdAttr: 'data-id',
+    onSort: function (/**Event*/evt) {
+      $.ajax({
+        url: route('admin.projects.contracts.sort-phases', { project: window.active_project, contract: window.active_contract }),
+        type: "PUT",
+        data: {
+          phases: sortable.toArray(),
+        },
+        success: function(res){
+        }
+      });
+    },
+
+  });
+}
 </script>
 @endsection
 

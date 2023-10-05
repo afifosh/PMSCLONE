@@ -40,39 +40,18 @@ class PhasesDataTable extends DataTable
     })
     ->editColumn('total_cost', function($phase){
       return Money($phase->total_cost, $phase->contract->currency, true);
-    })->rawColumns(['invoice_id','action']);
+    })->rawColumns(['invoice_id','action'])
+    ->setRowAttr([
+      'data-id' => function($phase){
+        return $phase->id;
+      }
+    ]);
 
   }
 
   /**
    * Get the query source of dataTable.
    */
-  public function queryss(ContractPhase $model): QueryBuilder
-  {
-    // stage is type of ContractStage
-    return $model->when($this->stage instanceof ContractStage, function($q){
-      $q->where('stage_id', $this->stage->id);
-    })->with(['contract' => function($q){
-      $q->select('contracts.id', 'currency');
-    }])
-    ->when($this->contract_id, function($q){
-      $q->where('contract_id', $this->contract_id);
-    })
-    ->newQuery();
-  }
-
-  public function querysss(ContractPhase $model): QueryBuilder
-  {
-      return $model->when($this->stage instanceof ContractStage, function($q){
-          $q->where('stage_id', $this->stage->id);
-      })
-      ->with('addedAsInvoiceItem')
-      ->when($this->contract_id, function($q){
-          $q->where('contract_id', $this->contract_id);
-      })
-      ->newQuery();
-  }
-
   public function query(ContractPhase $model): QueryBuilder
   {
       return $model
@@ -105,7 +84,7 @@ class PhasesDataTable extends DataTable
       ];
 
     return $this->builder()
-      ->setTableId('milstones-table')
+      ->setTableId('phases-table')
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
@@ -115,11 +94,13 @@ class PhasesDataTable extends DataTable
       >t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
       )
       ->addAction(['width' => '80px'])
-      ->orderBy([0, 'DESC'])
       ->responsive(true)
       ->parameters([
         'buttons' => $buttons,
-        "scrollX" => true
+        "scrollX" => true,
+        "drawCallback" => "function (settings) {
+          initSortable();
+        }"
       ]);
   }
 
@@ -129,6 +110,7 @@ class PhasesDataTable extends DataTable
   public function getColumns(): array
   {
     return [
+      Column::make('order')->visible(false),
       Column::make('name'),
       Column::make('start_date'),
       Column::make('due_date')->title('End Date'),

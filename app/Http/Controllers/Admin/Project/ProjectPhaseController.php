@@ -73,7 +73,7 @@ class ProjectPhaseController extends Controller
     if ($contract->project)
       broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
-    return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
   }
 
   protected function storeTaxes($phase, $taxes): void
@@ -152,7 +152,7 @@ class ProjectPhaseController extends Controller
     if ($contract->project)
       broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
-    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
   }
 
   public function destroy($project, Contract $contract, $stage, ContractPhase $phase)
@@ -184,10 +184,10 @@ class ProjectPhaseController extends Controller
     if (@$contract->project->id)
       broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
-    return $this->sendRes(__('Phase Deleted Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Phase Deleted Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
   }
 
-  public function sortPhases($project, Contract $contract, $stage, Request $request)
+  public function sortPhases($project, Contract $contract, Request $request)
   {
     $contract->load('project');
     $project = $contract->project ?? 'project';
