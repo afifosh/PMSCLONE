@@ -18,14 +18,13 @@ return new class extends Migration
       $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('program_id')->nullable()->constrained('programs')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('account_balance_id')->nullable()->constrained('account_balances')->onDelete('cascade')->cascadeOnUpdate();
-      $table->string('assignable_type')->nullable();
-      $table->unsignedBigInteger('assignable_id')->nullable();
+      $table->nullableMorphs('assignable');
       $table->boolean('visible_to_client')->default(false);
       $table->string('refrence_id', 100)->unique()->nullable();
       $table->string('subject');
       $table->string('currency', 5)->default('SAR');
-      $table->bigInteger('value')->default(0);
-      $table->bigInteger('tax_value')->default(0);
+      $table->unsignedBigInteger('value')->default(0);
+      $table->unsignedBigInteger('tax_value')->default(0);
       $table->enum('invoicing_method', ['Recuring', 'Phase Based'])->default('Phase Based');
       $table->dateTime('start_date')->nullable();
       $table->dateTime('end_date')->nullable();

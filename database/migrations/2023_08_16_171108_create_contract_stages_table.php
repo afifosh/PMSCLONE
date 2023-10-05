@@ -19,6 +19,7 @@ return new class extends Migration
       $table->date('due_date')->nullable();
       $table->bigInteger('stage_amount')->default(0);
       $table->text('description')->nullable();
+      $table->boolean('is_budget_planned')->default(true);
       $table->enum('status', ['Active', 'Completed', 'Cancelled'])->default('Active');
       $table->timestamps();
     });

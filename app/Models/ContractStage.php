@@ -15,7 +15,8 @@ class ContractStage extends Model
     'start_date',
     'due_date',
     'stage_amount',
-    'description'
+    'description',
+    'is_budget_planned'
   ];
 
   protected $casts = [

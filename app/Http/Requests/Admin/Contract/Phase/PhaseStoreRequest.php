@@ -15,6 +15,11 @@ class PhaseStoreRequest extends FormRequest
     return true;
   }
 
+  public function prepareForValidation()
+  {
+    //
+  }
+
   /**
    * Get the validation rules that apply to the request.
    *
@@ -29,8 +34,18 @@ class PhaseStoreRequest extends FormRequest
 
     return [
       'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,stage_id,' . $this->stage->id,
-      'estimated_cost' => ['required', 'numeric', 'gt:0', 'max:' . $this->stage->remaining_amount - $tax_amount],
-      'total_cost' => ['required', 'numeric', 'gt:0', 'max:' . $this->stage->remaining_amount],
+      'estimated_cost' => [
+        'required',
+        'numeric',
+        ($this->stage->is_budget_planned ? 'gt:0' : 'gte:0'),
+        'max:' . ($this->stage->is_budget_planned ? ($this->stage->remaining_amount - $tax_amount) : ($this->contract->remaining_amount - $tax_amount))
+      ],
+      'total_cost' => [
+        'required',
+        'numeric',
+        ($this->stage->is_budget_planned ? 'gt:0' : 'gte:0'),
+        'max:' . ($this->stage->is_budget_planned ? ($this->stage->remaining_amount) : ($this->contract->remaining_amount))
+      ],
       'phase_taxes' => 'nullable|array',
       'phase_taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
       'description' => 'nullable|string|max:2000',

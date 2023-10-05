@@ -55,7 +55,7 @@
   {{-- total cost --}}
   <div class="form-group col-6">
     {{ Form::label('total_cost', __('Total Cost'), ['class' => 'col-form-label']) }}
-    {!! Form::number('total_cost', null, ['class' => 'form-control', 'placeholder' => __('Total Cost'), 'disabled', 'data-max' => $remaining_amount])!!}
+    {!! Form::number('total_cost', null, ['class' => 'form-control', 'placeholder' => __('Total Cost'), 'disabled', 'data-max' => $max_amount])!!}
   </div>
   {{-- start date --}}
   <div class="form-group col-6">
@@ -207,15 +207,19 @@
     const taxes = $('[name="phase_taxes[]"]').val();
     let totalCost = parseFloat(estimatedCost);
     if(estimatedCost && taxes){
+      var percentagTax = 0;
+      var fixedTax = 0;
       taxes.forEach(tax => {
         const taxAmount = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('amount');
         const taxType = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('type');
         if(taxType == 'Percent'){
-          totalCost += (totalCost * taxAmount) / 100;
+          percentagTax += taxAmount;
         }else{
-          totalCost += taxAmount;
+          fixedTax += taxAmount;
         }
       });
+      totalCost += (totalCost * percentagTax) / 100;
+      totalCost += fixedTax;
     }
     totalCost = totalCost.toFixed(3);
     $('[name="total_cost"]').val(totalCost);

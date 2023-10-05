@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Contract\Stage;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StageUpdateRequest extends FormRequest
 {
@@ -15,6 +16,16 @@ class StageUpdateRequest extends FormRequest
   }
 
   /**
+   * Prepare the data for validation.
+   */
+
+  public function prepareForValidation()
+  {
+    $this->merge([
+      'stage_amount' => $this->stage->is_budget_planned ? $this->stage_amount : $this->stage->stage_amount,
+    ]);
+  }
+  /**
    * Get the validation rules that apply to the request.
    *
    * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
@@ -25,7 +36,8 @@ class StageUpdateRequest extends FormRequest
     return [
       'name' => 'required|string|max:255|unique:contract_stages,name,' . $this->stage->id . ',id,contract_id,' . $this->contract->id,
       'stage_amount' => [
-        'required',
+        'nullable',
+        Rule::requiredIf($this->stage->is_budget_planned),
         'numeric',
         'gte:' . $this->stage->stage_amount - $this->stage->remaining_amount, // gte already distributed to phases.
         'lte:' . $this->contract->remaining_cost($this->stage->stage_amount)

@@ -29,8 +29,18 @@ class PhaseUpdateRequest extends FormRequest
 
     return [
       'name' => 'required|string|max:255|unique:contract_phases,name,' . $this->phase->id . ',id,stage_id,' . $this->phase->stage_id,
-      'estimated_cost' => ['required', 'numeric', 'gt:0', 'max:' . $this->stage->remaining_amount - $tax_amount + $this->phase->estimated_cost],
-      'total_cost' => ['required', 'numeric', 'gt:0', 'max:' . $this->phase->stage->remaining_amount + $this->phase->total_cost],
+      'estimated_cost' => [
+        'required',
+        'numeric',
+        ($this->phase->stage->is_budget_planned ? 'gt:0' : 'gte:0'),
+        'max:' . ($this->phase->stage->is_budget_planned ? ($this->phase->stage->remaining_amount - $tax_amount + $this->phase->estimated_cost) : ($this->contract->remaining_amount - $tax_amount + $this->phase->estimated_cost))
+      ],
+      'total_cost' => [
+        'required',
+        'numeric',
+        ($this->phase->stage->is_budget_planned ? 'gt:0' : 'gte:0'),
+        'max:' . ($this->phase->stage->is_budget_planned ? ($this->phase->stage->remaining_amount + $this->phase->total_cost) : ($this->contract->remaining_amount + $this->phase->total_cost))
+      ],
       'phase_taxes' => 'nullable|array',
       'phase_taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
       'description' => 'nullable|string|max:2000',

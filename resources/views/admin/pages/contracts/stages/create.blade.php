@@ -8,7 +8,16 @@
       {{ Form::label('name', __('Name'), ['class' => 'col-form-label']) }}
       {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
   </div>
+  {{-- is budget planned --}}
   <div class="form-group col-6">
+    {{ Form::label('is_budget_planned', __('Is Budget Planned'), ['class' => 'col-form-label']) }}
+    {!! Form::select('is_budget_planned', ['1' => 'Yes', '0' => 'No'], null, [
+      'class' => 'form-control globalOfSelect2',
+      'data-placeholder' => __('Budget Type'),
+      'disabled' => $stage->id ? true : false,
+    ]) !!}
+  </div>
+  <div class="form-group col-6 {{ (!$stage->id ? '' : ($stage->is_budget_planned ?: 'd-none'))}}">
     {{ Form::label('stage_amount', __('Stage Amount'), ['class' => 'col-form-label']) }}
     <div class="dropdown open d-inline">
       <span data-bs-toggle="dropdown" aria-haspopup="true">
@@ -123,6 +132,15 @@
       $('[name="stage_amount"]').val(estimatedCost);
     }else{
       $('[name="stage_amount"]').val('');
+    }
+  })
+
+  // hide stage amount if budget is not planned
+  $(document).on('change', '[name="is_budget_planned"]', function(){
+    if($(this).val() == 0){
+      $('[name="stage_amount"]').closest('.form-group').addClass('d-none');
+    }else{
+      $('[name="stage_amount"]').closest('.form-group').removeClass('d-none');
     }
   })
 </script>

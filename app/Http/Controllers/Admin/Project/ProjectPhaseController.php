@@ -45,28 +45,28 @@ class ProjectPhaseController extends Controller
     $stage = ContractStage::find($stage) ?? 'stage';
     $contract->load('project');
     $project = $contract->project ?? 'project';
-    // stage is instance of ContractStage then get stage remaining amount, else get contract remaining amount
-    $remaining_amount = $stage->remaining_amount;
-    // abort_if(!$project->isMine(), 403);
-
+    $max_amount = $stage->is_budget_planned ? $stage->remaining_amount : $contract->remaining_amount;
     $phase = new ContractPhase();
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'stage', 'remaining_amount', 'tax_rates'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
   }
 
   public function store($project, Contract $contract, ContractStage $stage, PhaseStoreRequest $request)
   {
     $contract->load('project');
-    // $stage = ContractStage::find($stage) ?? 'stage';
     $project = $contract->project ?? 'project';
-    // abort_if(!$project->isMine(), 403);
 
     $phase = $contract->phases()->create(
       ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost'])
     );
 
     $this->storeTaxes($phase, $request->phase_taxes);
+
+    // if budget is not planned, then update stage amount
+    if(!$stage->is_budget_planned){
+      $stage->update(['stage_amount' => $stage->stage_amount + $phase->total_cost]);
+    }
 
     $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
 
@@ -98,13 +98,12 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
 
-    $remaining_amount = $stage->remaining_amount + $phase->total_cost;
-
+    $max_amount = ($stage->is_budget_planned ? $stage->remaining_amount : $contract->remaining_amount) + $phase->total_cost;
     $contract->load('project');
     $project = $contract->project ?? 'project';
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage', 'tax_rates', 'remaining_amount'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
   }
 
   public function update($project, PhaseUpdateRequest $request, Contract $contract, $stage, ContractPhase $phase)
@@ -117,9 +116,16 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not update this phase because it is in paid invoice');
     }
 
+    $phaseOldTotal = $phase->total_cost;
+
     $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost']));
 
     $this->storeTaxes($phase, $request->phase_taxes);
+
+    // if budget is not planned, then update stage amount
+    if(!$phase->stage->is_budget_planned){
+      $phase->stage->update(['stage_amount' => $phase->stage->stage_amount - $phaseOldTotal + $phase->total_cost]);
+    }
 
     // if added in invoice then update invoice item and tax amount
     $phase->load('addedAsInvoiceItem.invoice');
@@ -163,6 +169,11 @@ class ProjectPhaseController extends Controller
       $item->taxes()->detach();
       $item->delete();
     });
+
+    // if budget is not planned, then update stage amount
+    if(!$phase->stage->is_budget_planned){
+      $phase->stage->update(['stage_amount' => $phase->stage->stage_amount - $phase->total_cost]);
+    }
 
     $phase->taxes()->detach();
 
