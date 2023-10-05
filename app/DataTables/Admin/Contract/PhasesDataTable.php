@@ -23,7 +23,8 @@ class PhasesDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
     ->editColumn('action', function($phase){
-      return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $this->stage, 'contract_id' => $this->contract_id])->render();
+      $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial paid']));
+      return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $this->stage, 'contract_id' => $this->contract_id, 'is_editable' => $is_editable])->render();
     })
     ->editColumn('invoice_id', function($phase){
       $invoiceItem = $phase->addedAsInvoiceItem->first();
@@ -75,18 +76,13 @@ class PhasesDataTable extends DataTable
   public function query(ContractPhase $model): QueryBuilder
   {
       return $model
-          ->leftjoin('invoice_items', function($join) {
-              $join->on('contract_phases.id', '=', 'invoice_items.invoiceable_id')
-                   ->where('invoice_items.invoiceable_type', ContractPhase::class);
-          })
           ->when($this->stage instanceof ContractStage, function($q){
               $q->where('stage_id', $this->stage->id);
           })
-          ->with('addedAsInvoiceItem')
           ->when($this->contract_id, function($q){
-              $q->where('contract_id', $this->contract_id);
+            $q->where('contract_id', $this->contract_id);
           })
-          ->select(['contract_phases.*', 'invoice_items.invoice_id as invoice_column_id'])
+          ->with('addedAsInvoiceItem.invoice')
           ->newQuery();
   }
 

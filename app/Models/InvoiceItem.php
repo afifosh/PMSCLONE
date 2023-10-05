@@ -46,10 +46,10 @@ class InvoiceItem extends Model
     $this->attributes['total_tax_amount'] = round($value * 1000);
   }
 
-  // public function invoice()
-  // {
-  //   return $this->belongsTo(Invoice::class);
-  // }
+  public function invoice()
+  {
+    return $this->belongsTo(Invoice::class);
+  }
 
   public function invoiceable()
   {

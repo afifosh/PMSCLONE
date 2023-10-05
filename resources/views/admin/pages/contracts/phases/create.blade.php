@@ -22,19 +22,19 @@
       {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
   </div>
   <div class="form-group col-6">
-    {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
+    {{ Form::label('total_cost', __('Phase Cost'), ['class' => 'col-form-label']) }}
     <div class="dropdown open d-inline">
       <span data-bs-toggle="dropdown" aria-haspopup="true">
           <i class="fas fa-calculator"></i>
       </span>
       <div class="dropdown-menu p-3">
         <div class="mb-3" data-content="percent-cal">
-          <label for="percent-value" class="form-label">Percentage (Balance: {{$remaining_amount}})</label>
-          <input type="number" name="percent-value" id="percent-value" data-balance="{{$remaining_amount}}" class="form-control" placeholder="10%">
+          <label for="percent-value" class="form-label">Percentage (Total: {{$stage->stage_amount}})</label>
+          <input type="number" name="percent-value" id="percent-value" data-balance="{{$stage->stage_amount}}" class="form-control" placeholder="10%">
         </div>
       </div>
     </div>
-    {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
+    {!! Form::number('total_cost', null, ['class' => 'form-control', 'placeholder' => __('Phase Cost')]) !!}
   </div>
   {{-- taxes --}}
   <div class="">
@@ -183,9 +183,9 @@
     const balance = $(this).data('balance');
     if(percent && balance){
       const estimatedCost = (balance * percent) / 100;
-      $('[name="estimated_cost"]').val(estimatedCost);
+      $('[name="total_cost"]').val(estimatedCost);
     }else{
-      $('[name="estimated_cost"]').val('');
+      $('[name="total_cost"]').val('');
     }
   })
 </script>

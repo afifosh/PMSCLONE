@@ -62,7 +62,9 @@ class InvoiceController extends Controller
     $data['tax_rates'] = Tax::get(); // both retention and taxes, will be filtered in view
     $data['pendingDocs'] = $invoice->contract->pendingDocs()->get();
 
-    if($invoice->type != 'Regular'){
+    $data['is_editable'] = $invoice->isEditable();
+
+    if ($invoice->type != 'Regular') {
       return view('admin.pages.invoices.edit-downpayment', $data);
     }
 
@@ -71,6 +73,10 @@ class InvoiceController extends Controller
 
   public function update(InvoiceStoreRequest $request, Invoice $invoice)
   {
+    if(!$invoice->isEditable()){
+      return $this->sendRes('', ['event' => 'redirect', 'url' => route('admin.invoices.index')]);
+    }
+
     if ($request->update_tax_type) {
       $invoice->update($request->validated());
       $invoice->taxes()->detach();
@@ -119,7 +125,7 @@ class InvoiceController extends Controller
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Retention updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
-    }elseif($request->type == 'downpayment'){
+    } elseif ($request->type == 'downpayment') {
       $invoice->update($request->validated() + ['total' => $request->subtotal]);
 
       return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
@@ -132,6 +138,10 @@ class InvoiceController extends Controller
 
   public function destroy(Invoice $invoice)
   {
+    if(!$invoice->isEditable()){
+      return $this->sendError('Invoice is not editable');
+    }
+
     $invoice->delete();
 
     return $this->sendRes('Invoice deleted successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table']);
@@ -139,14 +149,17 @@ class InvoiceController extends Controller
 
   public function sortItems(Invoice $invoice, Request $request)
   {
+    if(!$invoice->isEditable()){
+      return $this->sendError('Invoice is not editable');
+    }
+
     $request->validate([
       'items' => 'required|array',
       'items.*' => 'required|integer|exists:invoice_items,id,invoice_id,' . $invoice->id,
     ]);
 
-    foreach($request->items as $order => $item_id){
+    foreach ($request->items as $order => $item_id) {
       $invoice->items()->where('id', $item_id)->update(['order' => $order]);
     }
-
   }
 }

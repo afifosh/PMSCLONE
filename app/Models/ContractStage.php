@@ -96,12 +96,10 @@ class ContractStage extends Model
   {
       // Get total phases amount in the same format as it's stored in the database (multiplied by 1000)
       $totalPhasesAmount = $this->phases->sum(function($phase) {
-          return $phase->getOriginal('estimated_cost');
+          return $phase->getOriginal('total_cost');
       });
       $totalPhasesAmount = round($totalPhasesAmount, 0);
       // Return the calculated remaining amount divided by 1000 to match your getter's format
       return ($this->getOriginal('stage_amount') - $totalPhasesAmount);
   }
-  
-  
 }

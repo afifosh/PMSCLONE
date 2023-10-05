@@ -62,18 +62,10 @@ class ProjectPhaseController extends Controller
     // abort_if(!$project->isMine(), 403);
 
     $phase = $contract->phases()->create(
-      [
-        'estimated_cost' => $request->estimated_cost,
-        'stage_id' => $stage->id ?? null
-      ]
-        + $request->only(['name', 'description', 'status', 'start_date', 'due_date'])
+      ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'total_cost'])
     );
 
     $this->storeTaxes($phase, $request->phase_taxes);
-
-    $phase->updateTaxAmount();
-
-    $stage->update(['remaining_amount' => $stage->remaining_amount - $phase->estimated_cost]);
 
     $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
 
@@ -93,40 +85,70 @@ class ProjectPhaseController extends Controller
     }
 
     $phase->taxes()->sync($sync_data);
+
+    $phase->updateTaxAmount();
   }
 
   public function edit($project, Contract $contract, ContractStage $stage, ContractPhase $phase)
   {
-    // $stage = ContractStage::find($stage) ?? 'stage';
+    $phase->load(['addedAsInvoiceItem.invoice']);
+
+    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial paid'])) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     $contract->load('project');
     $project = $contract->project ?? 'project';
-    // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
-    $remaining_amount = $stage instanceof ContractStage ? $stage->stage_amount : $contract->value;
+    $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage', 'remaining_amount'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage', 'tax_rates'))->render()]);
   }
 
   public function update($project, Request $request, Contract $contract, $stage, ContractPhase $phase)
   {
     $contract->load('project');
     $project = $contract->project ?? 'project';
-    $phase->load('stage');
-    // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
+    $phase->load(['addedAsInvoiceItem.invoice', 'stage']);
+
+    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial paid'])) {
+      return $this->sendError('You can not update this phase because it is in paid invoice');
+    }
 
     $request->validate([
       'name' => 'required|string|max:255|unique:contract_phases,name,' . $phase->id . ',id,stage_id,' . $phase->stage_id,
-      'estimated_cost' => ['required', 'numeric', 'gt:0', 'max:' . $phase->stage->remaining_amount + $phase->estimated_cost],
+      'total_cost' => ['required', 'numeric', 'gt:0', 'max:' . $phase->stage->remaining_amount + $phase->total_cost],
+      'phase_taxes' => 'nullable|array',
+      'phase_taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
       'description' => 'nullable|string|max:2000',
-      'start_date' => 'required|date'. (request()->due_date ? '|before_or_equal:due_date' : '' ).'|after_or_equal:' . $phase->stage->start_date,
+      'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $phase->stage->start_date,
       'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $phase->stage->due_date,
     ], [
       'due_date.before_or_equal' => 'The due date must be a date before or equal to state due date.'
     ]);
 
-    $costDiff = $phase->estimated_cost - $request->estimated_cost;
+    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'total_cost']));
 
-    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost']));
-    $phase->stage->update(['remaining_amount' => $phase->stage->remaining_amount + $costDiff]);
+    $this->storeTaxes($phase, $request->phase_taxes);
+
+    // if added in invoice then update invoice item and tax amount
+    $phase->load('addedAsInvoiceItem.invoice');
+
+    if ($phase->addedAsInvoiceItem->count()) {
+      $phase->addedAsInvoiceItem->each(function ($item) use ($phase) {
+        $item->update(['amount' => $phase->estimated_cost]);
+
+        $item->taxes()->detach();
+
+        foreach($phase->taxes as $tax){
+          $item->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $item->invoice_id]);
+        }
+
+        $item->updateTaxAmount();
+
+        $item->invoice->updateTaxAmount();
+      });
+    }
+
 
     $message = auth()->user()->name . ' updated phase: ' . $phase->name;
 
@@ -140,16 +162,24 @@ class ProjectPhaseController extends Controller
   {
     $contract->load('project');
     $project = $contract->project ?? 'project';
-    $phase->load('stage');
-    // abort_if(!$project->isMine() || $phase->project_id != $project->id, 403);
 
-    $phase->stage->update(['remaining_amount' => $phase->stage->remaining_amount + $phase->estimated_cost]);
+    $phase->load('addedAsInvoiceItem.invoice');
+    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial paid'])) {
+      return $this->sendError('You can not delete this phase because it is in paid invoice');
+    }
+
+    $phase->addedAsInvoiceItem->each(function ($item) {
+      $item->taxes()->detach();
+      $item->delete();
+    });
+
+    $phase->taxes()->detach();
 
     $phase->delete();
 
     $message = auth()->user()->name . ' deleted phase: ' . $phase->name;
 
-    if ($contract->project)
+    if (@$contract->project->id)
       broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
 
     return $this->sendRes(__('Phase Deleted Successfully'), ['event' => 'table_reload', 'table_id' => 'milstones-table', 'close' => 'globalModal']);

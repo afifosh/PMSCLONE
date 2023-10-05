@@ -23,14 +23,9 @@ class PhaseStoreRequest extends FormRequest
    */
   public function rules(): array
   {
-    $taxes = Tax::whereIn('id', filterInputIds($this->phase_taxes ?? []))->where('is_retention', false)->where('status', 'Active')->get();
-    $fixed_tax = $taxes->where('type', 'Fixed')->sum('amount');
-    $percent_tax = $taxes->where('type', 'Percent')->sum('amount');
-    $tax_amount = $fixed_tax + ($percent_tax * $this->estimated_cost / 100);
-
     return [
       'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,stage_id,' . $this->stage->id,
-      'estimated_cost' => ['required', 'numeric', 'gt:0' , 'max:' . $this->stage->remaining_amount - $tax_amount],
+      'total_cost' => ['required', 'numeric', 'gt:0' , 'max:' . $this->stage->remaining_amount],
       'phase_taxes' => 'nullable|array',
       'phase_taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
       'description' => 'nullable|string|max:2000',

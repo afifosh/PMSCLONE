@@ -116,6 +116,39 @@
     });
   }
 
+  $(document).on('click', '.select-items-btn', function(){
+    $('[name="selected_phases[]"]').toggleClass('d-none');
+  })
+
+  $(document).on('click change', '[name="selected_phases[]"]', function(){
+    if($('[name="selected_phases[]"]:checked').length > 0){
+      $('.select-items-btn').addClass('d-none');
+      $('.delete-items-btn').removeClass('d-none');
+    }else{
+      $('.delete-items-btn').addClass('d-none');
+      $('.select-items-btn').removeClass('d-none');
+    }
+  })
+
+  $(document).on('click', '.delete-items-btn', function(){
+    var ids = [];
+    $('[name="selected_phases[]"]:checked').each(function(){
+      ids.push($(this).val());
+    })
+    $.ajax({
+      url: route('admin.invoices.invoice-items.destroy', { invoice: {{$invoice->id}} , invoice_item: ids}),
+      type: "DELETE",
+      data: {
+        ids: ids
+      },
+      success: function(data) {
+        $('.delete-items-btn').addClass('d-none');
+        $('.select-items-btn').removeClass('d-none');
+        reloadPhasesList();
+      }
+    });
+  })
+
   $(document).ready(function() {
     initDropzone();
     initSortable();
@@ -304,13 +337,13 @@
                 <tr>
                   <td>Invoice Date</td>
                   <td>
-                    {!! Form::date('invoice_date', $invoice->invoice_date, ['class' => 'form-control flatpickr', 'placeholder' => 'YYYY-MM-DD']) !!}
+                    {!! Form::date('invoice_date', $invoice->invoice_date, ['class' => 'form-control flatpickr', 'placeholder' => 'YYYY-MM-DD', 'disabled' => !$is_editable]) !!}
                   </td>
                 </tr>
                 <tr>
                   <td>Due Date </td>
                   <td>
-                    {!! Form::date('due_date', $invoice->due_date, ['class' => 'form-control flatpickr', 'placeholder' => 'YYYY-MM-DD']) !!}
+                    {!! Form::date('due_date', $invoice->due_date, ['class' => 'form-control flatpickr', 'placeholder' => 'YYYY-MM-DD', 'disabled' => !$is_editable]) !!}
                   </td>
                 </tr>
               </tbody>
@@ -331,10 +364,14 @@
           <div class="col-12">
             <div class="table-responsive m-t-40 invoice-table-wrapper editing clear-both">
                 <table class="table table-hover invoice-table editing">
+                <button type="button" class="btn btn-primary btn-sm float-end select-items-btn">Select Items</button>
+                <button type="button" class="btn btn-primary btn-sm float-end d-none delete-items-btn">Delete Selected</button>
                     <thead>
                         <tr>
                             <!--action-->
-                            <th class="text-left x-action bill_col_action">Action</th>
+                            @if ($is_editable)
+                              <th class="text-left x-action bill_col_action">Action</th>
+                            @endif
                             <!--description-->
                             <th class="text-left x-description bill_col_description">Item</th>
                             <th class="text-left x-description bill_col_description">Price</th>
@@ -355,12 +392,14 @@
                 </table>
             </div>
         </div>
-          <div class="row pb-4">
-            <div class="col-12 mt-4">
-              <button type="button" class="btn btn-primary" data-title="{{__('Add Item')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.custom-invoice-items.create',[$invoice])}}">Add Item</button>
-              <button type="button" class="btn btn-primary" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
+          @if ($is_editable)
+            <div class="row pb-4">
+              <div class="col-12 mt-4">
+                <button type="button" class="btn btn-primary" data-title="{{__('Add Item')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.custom-invoice-items.create',[$invoice])}}">Add Item</button>
+                <button type="button" class="btn btn-primary" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
+              </div>
             </div>
-          </div>
+          @endif
         </div>
 
         <hr class="my-3 mx-n4" />
@@ -375,75 +414,77 @@
           </div>
         </div>
 
-        <div class="row p-sm-2 pe-4">
-          <div class="col-12 d-flex justify-content-end">
-            <section class="center">
-              <button id="invoice-retention" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Retention</button>
-            </section>
-            <section class="center">
-              <button id="invoice-adjustment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Adjustment</button>
-            </section>
-            <section class="center">
-              <button id="invoice-discount" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Discount</button>
-            </section>
-            @if ($invoice->is_summary_tax)
+        @if($is_editable)
+          <div class="row p-sm-2 pe-4">
+            <div class="col-12 d-flex justify-content-end">
               <section class="center">
-                <div hidden>
-                    <div data-name="popover-tax-rates">
-                      <div class="d-flex justify-content-between">
-                        <b>Tax Rates</b>
-                        <button type="button" class="btn-close" onclick="$('#tax-rates').popover('hide');" aria-label="Close"></button>
-                      </div>
-                      <hr class="m-0">
-                      <div class="mt-2">
-                        @forelse ($tax_rates->where('is_retention', false) as $tax)
-                        <div class="form-check">
-                          <input class="form-check-input" name="invoice_taxes[]" type="checkbox" value="{{$tax->id}}" id="tax-{{$tax->id}}">
-                          <label class="form-check-label" for="tax-{{$tax->id}}">
-                            {{$tax->name}} (
-                              @if($tax->type != 'Percent')
-                                @money($tax->amount, $invoice->contract->currency, true)
-                              @else
-                                {{$tax->amount}}%
-                              @endif
-                            )
-                          </label>
-                        </div>
-                        @empty
-                        @endforelse
-                      </div>
-                      <div class="d-flex justify-content-end mt-2">
-                        <button class="btn btn-primary btn-sm" onclick="updateSummaryTax()">Update</button>
-                      </div>
-                    </div>
-                </div>
-                <button id="tax-rates" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Tax Rates</button>
+                <button id="invoice-retention" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Retention</button>
               </section>
-            @endif
-            <div class="dropdown dropup">
-              <button class="btn btn-outline-primary dropdown-toggle rounded-pill btn-sm" type="button" id="tax-type" data-bs-toggle="dropdown" aria-expanded="false">
-                Tax Type
-              </button>
-              <div>
-                <div class="dropdown-menu p-2" aria-labelledby="tax-type">
-                  <div class="d-flex justify-content-between">
-                    <b>Tax Type</b>
+              <section class="center">
+                <button id="invoice-adjustment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Adjustment</button>
+              </section>
+              <section class="center">
+                <button id="invoice-discount" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Discount</button>
+              </section>
+              @if ($invoice->is_summary_tax)
+                <section class="center">
+                  <div hidden>
+                      <div data-name="popover-tax-rates">
+                        <div class="d-flex justify-content-between">
+                          <b>Tax Rates</b>
+                          <button type="button" class="btn-close" onclick="$('#tax-rates').popover('hide');" aria-label="Close"></button>
+                        </div>
+                        <hr class="m-0">
+                        <div class="mt-2">
+                          @forelse ($tax_rates->where('is_retention', false) as $tax)
+                          <div class="form-check">
+                            <input class="form-check-input" name="invoice_taxes[]" type="checkbox" value="{{$tax->id}}" id="tax-{{$tax->id}}">
+                            <label class="form-check-label" for="tax-{{$tax->id}}">
+                              {{$tax->name}} (
+                                @if($tax->type != 'Percent')
+                                  @money($tax->amount, $invoice->contract->currency, true)
+                                @else
+                                  {{$tax->amount}}%
+                                @endif
+                              )
+                            </label>
+                          </div>
+                          @empty
+                          @endforelse
+                        </div>
+                        <div class="d-flex justify-content-end mt-2">
+                          <button class="btn btn-primary btn-sm" onclick="updateSummaryTax()">Update</button>
+                        </div>
+                      </div>
                   </div>
-                  <hr class="m-0">
-                  <div class="my-3 m-2">
-                    <select class="form-select form-select-sm" name="is_summary_tax_mock">
-                      <option @selected($invoice->is_summary_tax) value="1">Summary</option>
-                      <option @selected(!$invoice->is_summary_tax) value="0">Inline</option>
-                    </select>
-                  </div>
-                  <div class="d-flex justify-content-end mt-2">
-                    <button class="btn btn-primary btn-sm" type="button" onclick="update_tax_type()">Update</button>
+                  <button id="tax-rates" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Tax Rates</button>
+                </section>
+              @endif
+              <div class="dropdown dropup">
+                <button class="btn btn-outline-primary dropdown-toggle rounded-pill btn-sm" type="button" id="tax-type" data-bs-toggle="dropdown" aria-expanded="false">
+                  Tax Type
+                </button>
+                <div>
+                  <div class="dropdown-menu p-2" aria-labelledby="tax-type">
+                    <div class="d-flex justify-content-between">
+                      <b>Tax Type</b>
+                    </div>
+                    <hr class="m-0">
+                    <div class="my-3 m-2">
+                      <select class="form-select form-select-sm" name="is_summary_tax_mock">
+                        <option @selected($invoice->is_summary_tax) value="1">Summary</option>
+                        <option @selected(!$invoice->is_summary_tax) value="0">Inline</option>
+                      </select>
+                    </div>
+                    <div class="d-flex justify-content-end mt-2">
+                      <button class="btn btn-primary btn-sm" type="button" onclick="update_tax_type()">Update</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        @endif
 
         <hr class="my-3 mx-n4" />
         {{-- <div class="row px-0 px-sm-4">
@@ -461,16 +502,18 @@
               </span>
               @empty
               @endforelse
-              <span id="file-upload" onclick="$('.dropzone').toggleClass('d-none');" class="btn btn-primary mb-1 btn-sm"><i class="fa-solid fa-circle-plus me-1"></i> {{__('Add Attachments')}}
-              </span>
-              <div class="dropzone d-none needsclick" data-upload-url="{{ route('admin.invoices.attachments.store', [$invoice])}}">
-                <div class="dz-message needsclick">
-                  <small class="h6">Drop the file here or click to upload </small>
+              @if($is_editable)
+                <span id="file-upload" onclick="$('.dropzone').toggleClass('d-none');" class="btn btn-primary mb-1 btn-sm"><i class="fa-solid fa-circle-plus me-1"></i> {{__('Add Attachments')}}
+                </span>
+                <div class="dropzone d-none needsclick" data-upload-url="{{ route('admin.invoices.attachments.store', [$invoice])}}">
+                  <div class="dz-message needsclick">
+                    <small class="h6">Drop the file here or click to upload </small>
+                  </div>
+                  <div class="fallback">
+                    <input name="file" type="file" />
+                  </div>
                 </div>
-                <div class="fallback">
-                  <input name="file" type="file" />
-                </div>
-              </div>
+              @endif
             </div>
           </div>
         </div>
@@ -479,7 +522,7 @@
           <div class="col-12">
             <div class="mb-3">
               <label for="refrence_id" class="form-label fw-semibold">{{__('Refrence ID')}}</label>
-              <input type="text" name="refrence_id" id="refrence_id" value="{{$invoice->refrence_id}}" class="form-control" placeholder="{{__('Refrence ID')}}">
+              <input type="text" name="refrence_id" {{$is_editable ?: 'disabled'}} id="refrence_id" value="{{$invoice->refrence_id}}" class="form-control" placeholder="{{__('Refrence ID')}}">
             </div>
           </div>
         </div>
@@ -488,7 +531,7 @@
           <div class="col-12">
             <div class="mb-3">
               <label for="terms" class="form-label fw-semibold">Terms:</label>
-              <textarea name="terms" class="form-control" rows="2" id="terms">{{$invoice->terms}}</textarea>
+              <textarea name="terms" class="form-control" {{$is_editable ?: 'disabled'}} rows="2" id="terms">{{$invoice->terms}}</textarea>
             </div>
           </div>
         </div>
@@ -496,7 +539,7 @@
           <div class="col-12">
             <div class="mb-3">
               <label for="note" class="form-label fw-semibold">Note:</label>
-              <textarea name="note" class="form-control" rows="2" id="note">{{$invoice->note}}</textarea>
+              <textarea name="note" class="form-control" {{$is_editable ?: 'disabled'}} rows="2" id="note">{{$invoice->note}}</textarea>
             </div>
           </div>
         </div>

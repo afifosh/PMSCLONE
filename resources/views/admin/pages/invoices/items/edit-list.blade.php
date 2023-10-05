@@ -1,10 +1,15 @@
 @forelse ($invoice->items as $item)
 <tr data-id="{{$item->id}}">
-  <!--action-->
-  <td class="cursor-pointer">
-    <span class="bi-drag pt-1 cursor-grab"><i class="ti ti-menu-2"></i></span>
-    <span data-toggle="ajax-delete" data-href={{route('admin.invoices.invoice-items.destroy', [$invoice,'invoice_item' => $item->id])}}><i class="ti ti-trash"></i> </span>
-  </td>
+  @if ($is_editable)
+    <!--action-->
+    <td class="cursor-pointer">
+      {!! Form::checkbox('selected_phases[]', $item->id, null, ['class' => 'form-check-input mt-1 d-none']) !!}
+
+      <span class="bi-drag pt-1 cursor-grab"><i class="ti ti-menu-2"></i></span>
+      {{-- <span data-toggle="ajax-delete" data-href={{route('admin.invoices.invoice-items.destroy', [$invoice,'invoice_item' => $item->id])}}><i class="ti ti-trash"></i> </span> --}}
+    </td>
+  @endif
+
   <!--description-->
   <td class="">{{$item->invoiceable->name ?? runtimeInvIdFormat($item->invoiceable_id)}}</td>
   <td>
@@ -20,7 +25,7 @@
   @if (!$invoice->is_summary_tax)
     <td class="text-left" style="max-width: 170px;">
       <div class="mb-3">
-        <select class="form-select invoice_taxes select2" data-item-id="{{$item->id}}" name="invoice_taxes[]" multiple data-placeholder="{{__('Select Tax')}}">
+        <select {{$is_editable ?: 'disabled'}} class="form-select invoice_taxes select2" data-item-id="{{$item->id}}" name="invoice_taxes[]" multiple data-placeholder="{{__('Select Tax')}}">
           @forelse ($tax_rates->where('is_retention', false) as $tax)
             <option @selected($item->taxes->contains($tax)) value="{{$tax->id}}">{{$tax->name}} (
               @if($tax->type != 'Percent')

@@ -240,4 +240,8 @@ class Invoice extends Model
     // have invoices table and invoice_items table. Invoice items table is polymorphic many to many. so checking is this phase class is added as invoice item
     return $this->morphMany(InvoiceItem::class, 'invoiceable');
   }
+
+  public function isEditable(){
+    return !in_array($this->status, ['Paid', 'Partial paid']);
+  }
 }
