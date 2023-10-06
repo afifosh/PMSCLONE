@@ -17,11 +17,13 @@ class ContractPhaseFactory extends Factory
   public function definition(): array
   {
     return [
-      'name' => $this->faker->sentence(),
+      'name' => $this->faker->word,
       'description' => $this->faker->sentence(),
       'estimated_cost' => 0,
+      'tax_amount' => 0,
+      'total_cost' => 0,
       'start_date' => now(),
-      'due_date' => now(),
+      'due_date' => now()
     ];
   }
 }
