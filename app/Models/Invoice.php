@@ -56,7 +56,7 @@ class Invoice extends Model
     'Draft',
     'Sent',
     'Paid',
-    'Partial paid',
+    'Partial Paid',
     'Cancelled'
   ];
 
@@ -247,7 +247,7 @@ class Invoice extends Model
   }
 
   public function isEditable(){
-    return !in_array($this->status, ['Paid', 'Partial paid']);
+    return !in_array($this->status, ['Paid', 'Partial Paid']);
   }
 
   public function releaseRetention(): void
@@ -270,8 +270,37 @@ class Invoice extends Model
         $this->update([
           'paid_amount' => $this->paid_amount + $this->retention_amount,
           'retention_released_at' => now(),
-          'status' => $this->paid_amount + $this->retention_amount >= $this->total ? 'Paid' : 'Partial paid',
+          'status' => $this->paid_amount + $this->retention_amount >= $this->total ? 'Paid' : 'Partial Paid',
         ]);
+      });
+    } catch (\Exception $e) {
+      throw $e;
+    }
+  }
+
+  public function mergeInvoices($invoices, $deleteMerged = true): void
+  {
+    try {
+      DB::transaction(function () use ($invoices, $deleteMerged) {
+        $invoices->each(function ($invoice) use ($deleteMerged) {
+
+          $invoice->items->each(function ($item) {
+            // if the invoice to be merged is using summary tax then delete the taxes of the items
+            if ($this->is_summary_tax) {
+              $item->taxes()->delete();
+            }
+            $item->update(['invoice_id' => $this->id]);
+          });
+
+          if($deleteMerged)
+            $invoice->delete();
+          else{
+            $invoice->update(['status' => 'Cancelled']);
+            $invoice->updateTaxAmount();
+          }
+        });
+
+        $this->updateTaxAmount();
       });
     } catch (\Exception $e) {
       throw $e;

@@ -63,6 +63,7 @@ use App\Http\Controllers\Admin\Invoice\CustomInvoiceItemController;
 use App\Http\Controllers\Admin\Invoice\InvoiceController;
 use App\Http\Controllers\Admin\Invoice\InvoiceItemController;
 use App\Http\Controllers\Admin\Invoice\InvoiceTaxController;
+use App\Http\Controllers\Admin\Invoice\MergeInvoiceController;
 use App\Http\Controllers\Admin\Project\GanttChartController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
@@ -303,6 +304,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
     Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');
+    Route::resource('invoices.merge-invoices', MergeInvoiceController::class)->only(['create', 'store']);
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

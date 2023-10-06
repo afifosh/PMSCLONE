@@ -133,7 +133,7 @@ class InvoiceController extends Controller
       return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
     }
 
-    $invoice->update(['status' => 'Sent'] + $request->validated());
+    $invoice->update($request->validated());
 
     return $this->sendRes('Invoice Updated Successfully', ['event' => 'redirect', 'url' => route('admin.invoices.index')]);
   }

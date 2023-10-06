@@ -23,7 +23,7 @@ class PhasesDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
     ->editColumn('action', function($phase){
-      $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial paid']));
+      $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid']));
       return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $this->stage, 'contract_id' => $this->contract_id, 'is_editable' => $is_editable])->render();
     })
     ->editColumn('invoice_id', function($phase){

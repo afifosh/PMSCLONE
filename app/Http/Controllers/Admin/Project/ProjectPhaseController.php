@@ -94,7 +94,7 @@ class ProjectPhaseController extends Controller
   {
     $phase->load(['addedAsInvoiceItem.invoice']);
 
-    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial paid'])) {
+    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
 
@@ -112,7 +112,7 @@ class ProjectPhaseController extends Controller
     $project = $contract->project ?? 'project';
     $phase->load(['addedAsInvoiceItem.invoice', 'stage']);
 
-    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial paid'])) {
+    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
       return $this->sendError('You can not update this phase because it is in paid invoice');
     }
 
@@ -161,7 +161,7 @@ class ProjectPhaseController extends Controller
     $project = $contract->project ?? 'project';
 
     $phase->load('addedAsInvoiceItem.invoice');
-    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial paid'])) {
+    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
       return $this->sendError('You can not delete this phase because it is in paid invoice');
     }
 

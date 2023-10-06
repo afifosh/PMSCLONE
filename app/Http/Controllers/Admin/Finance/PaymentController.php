@@ -53,7 +53,7 @@ class PaymentController extends Controller
 
     $req->invoice->update([
       'paid_amount' => $req->invoice->paid_amount + $req->amount,
-      'status' => $req->invoice->paid_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial paid',
+      'status' => $req->invoice->paid_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial Paid',
     ]);
 
     // release retention if requested
@@ -83,7 +83,7 @@ class PaymentController extends Controller
     $invoice = $payment->invoice;
     $invoice->update([
       'paid_amount' => $invoice->paid_amount - $payment->amount + $request->amount,
-      'status' => $invoice->paid_amount - $payment->amount + $request->amount >= $invoice->total ? 'Paid' : 'Partial paid',
+      'status' => $invoice->paid_amount - $payment->amount + $request->amount >= $invoice->total ? 'Paid' : 'Partial Paid',
     ]);
 
     $payment->update($request->validated());
@@ -97,7 +97,7 @@ class PaymentController extends Controller
 
     $invoice->update([
       'paid_amount' => $invoice->paid_amount - $payment->amount,
-      'status' => $invoice->paid_amount - $payment->amount >= $invoice->total ? 'Paid' : 'Partial paid',
+      'status' => $invoice->paid_amount - $payment->amount >= $invoice->total ? 'Paid' : 'Partial Paid',
     ]);
 
     $payment->delete();
