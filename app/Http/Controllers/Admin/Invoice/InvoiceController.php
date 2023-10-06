@@ -52,7 +52,9 @@ class InvoiceController extends Controller
 
   public function show(Invoice $invoice)
   {
-    //
+    if(request()->json){
+      return response()->json($invoice);
+    }
   }
 
   public function edit(Invoice $invoice)
@@ -108,10 +110,10 @@ class InvoiceController extends Controller
         $data['retention_amount'] = 0;
         $data['retention_percentage'] = 0;
       } elseif ($retenion->type == 'Percent') {
-        $data['retention_amount'] = - (($invoice->total) * $retenion->amount) / 100;
+        $data['retention_amount'] = (($invoice->total) * $retenion->amount) / 100;
         $data['retention_percentage'] = $retenion->amount;
       } else {
-        $data['retention_amount'] = -$retenion->amount;
+        $data['retention_amount'] = $retenion->amount;
         $data['retention_percentage'] = 0;
       }
       // if($request->retention_type == 'Percentage'){
@@ -161,5 +163,12 @@ class InvoiceController extends Controller
     foreach ($request->items as $order => $item_id) {
       $invoice->items()->where('id', $item_id)->update(['order' => $order]);
     }
+  }
+
+  public function releaseRetention(Invoice $invoice)
+  {
+    $invoice->releaseRetention();
+
+    return $this->sendRes('Retention released successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table']);
   }
 }

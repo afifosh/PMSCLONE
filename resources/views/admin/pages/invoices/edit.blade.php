@@ -405,9 +405,9 @@
         <hr class="my-3 mx-n4" />
 
         <div class="row p-0 p-sm-4">
-          <div class="col-md-6 mb-md-0 mb-3">
+          <div class="col-md-8 mb-md-0 mb-3">
           </div>
-          <div class="col-md-6 d-flex justify-content-end">
+          <div class="col-md-4">
             <div class="invoice-calculations">
               @include('admin.pages.invoices.items.summary')
             </div>

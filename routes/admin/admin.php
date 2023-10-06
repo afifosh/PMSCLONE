@@ -165,6 +165,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
     Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');
     Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');
+    Route::post('contracts/{contract}/release-retentions', [ContractController::class, 'releaseRetention'])->name('contracts.release-retentions');
     Route::resource('contracts', ContractController::class);
     Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
     Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
@@ -296,6 +297,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     // });
     Route::get('invoices/{invoice}/payments', [PaymentController::class, 'index'])->name('invoices.payments.index');
     Route::put('invoices/{invoice}/invoice-tems/sort', [InvoiceController::class, 'sortItems'])->name('invoices.invoice-items.sort');
+    Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
     Route::resource('invoices', InvoiceController::class);
     Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'destroy']);
     Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store']);

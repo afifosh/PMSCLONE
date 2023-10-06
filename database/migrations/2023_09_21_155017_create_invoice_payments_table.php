@@ -18,6 +18,7 @@ return new class extends Migration
       $table->date('payment_date');
       $table->bigInteger('amount')->default(0);
       $table->text('note')->nullable();
+      $table->integer('type')->default(0)->comment('0: invoice payment, 1: retention payment');
       $table->timestamps();
     });
   }

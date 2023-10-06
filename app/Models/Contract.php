@@ -352,4 +352,11 @@ class Contract extends Model
           });
       });
   }
+
+  public function releaseInvoicesRetentions()
+  {
+    $this->invoices->each(function ($invoice) {
+      $invoice->releaseRetention();
+    });
+  }
 }

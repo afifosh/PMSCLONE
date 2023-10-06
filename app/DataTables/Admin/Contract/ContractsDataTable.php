@@ -92,7 +92,9 @@ public function query(Contract $model): QueryBuilder
             DB::raw('SUM(invoices.paid_amount)/100 as paid_amount'),
             DB::raw('sum(invoices.total - invoices.paid_amount)/100 as due_amount'),
             DB::raw('sum(invoices.total_tax)/100 as total_tax'),
-            DB::raw('(sum(invoices.paid_amount)/sum(contracts.value))*100 as paid_percent')
+            DB::raw('(sum(invoices.paid_amount)/sum(contracts.value))*100 as paid_percent'),
+            // contract invoice count whose retention_released_at is null as pending_retentions_count
+            DB::raw('count(CASE WHEN invoices.retention_amount IS NOT NULL AND invoices.retention_released_at IS NULL THEN 1 ELSE NULL END) as pending_retentions_count')
         ])
         ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
         ->groupBy([

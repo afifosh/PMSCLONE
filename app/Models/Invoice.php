@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Mediable;
 
 class Invoice extends Model
@@ -39,7 +40,8 @@ class Invoice extends Model
     'retention_amount',
     'status',
     'type',
-    'refrence_id'
+    'refrence_id',
+    'retention_released_at',
   ];
 
   protected $casts = [
@@ -168,6 +170,10 @@ class Invoice extends Model
 
   public function getRetentionAmountAttribute($value)
   {
+    if($this->retention_released_at){
+      return 0;
+    }
+
     return $value / 1000;
   }
 
@@ -189,13 +195,12 @@ class Invoice extends Model
     if (!$subtotal) {
       $this->update(['discount_amount' => 0]);
     }
-    // dd($subtotal, $this->discount_amount, $this->total_tax, $this->retention_amount, $this->adjustment_amount);
+
     $this->update([
       'subtotal' => $subtotal,
       'total' => $subtotal
         + $this->discount_amount // it is negative value
         + $this->total_tax // add total tax. It is calculated in updateTaxAmount() method
-        + $this->retention_amount // retention amount is already negative. retention is basically deduction after applying discount, taxes and adjustments from the total. Which will be paid later on.
         + $this->adjustment_amount // adjustment amount can be negative or positive depending on the user input
     ]);
   }
@@ -243,5 +248,33 @@ class Invoice extends Model
 
   public function isEditable(){
     return !in_array($this->status, ['Paid', 'Partial paid']);
+  }
+
+  public function releaseRetention(): void
+  {
+    try {
+
+      if (!$this->retention_amount || $this->retention_released_at) {
+        return;
+      }
+
+      DB::transaction(function () {
+        $this->payments()->create([
+          'transaction_id' => 'RTN-' . $this->id . '-' . round($this->retention_amount),
+          'payment_date' => now(),
+          'amount' => $this->retention_amount,
+          'note' => 'Retention released',
+          'type' => 1
+        ]);
+
+        $this->update([
+          'paid_amount' => $this->paid_amount + $this->retention_amount,
+          'retention_released_at' => now(),
+          'status' => $this->paid_amount + $this->retention_amount >= $this->total ? 'Paid' : 'Partial paid',
+        ]);
+      });
+    } catch (\Exception $e) {
+      throw $e;
+    }
   }
 }

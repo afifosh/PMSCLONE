@@ -22,12 +22,6 @@ class InvoiceItemsStoreReqeust extends FormRequest
    */
   public function rules(): array
   {
-    if (request()->type == 'retentions')
-      return [
-        'retentions' => 'required|array',
-        'retentions.*' => 'nullable|exists:invoices,id|'. Rule::notIn([request()->invoice->id]),
-      ];
-
     return [
       'phases' => 'required|array',
       'phases.*' => 'nullable|exists:contract_phases,id',

@@ -16,6 +16,7 @@ class InvoicePayment extends Model
     'payment_date',
     'amount',
     'note',
+    'type'
   ];
 
   protected $casts = [

@@ -461,4 +461,12 @@ class ContractController extends Controller
 
     return $this->sendRes(__('Contract deleted successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table']);
   }
+
+  public function releaseRetention(Contract $contract)
+  {
+    $contract->load('invoices');
+    $contract->releaseInvoicesRetentions();
+
+    return $this->sendRes(__('Retentions Released successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table']);
+  }
 }
