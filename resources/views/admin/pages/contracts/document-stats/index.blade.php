@@ -71,6 +71,23 @@ $configData = Helper::appClasses();
                   'data-url' => route('resource-select', ['groupedCompany', 'hasinv'])
                 ]) !!}
               </div>
+              <div class="col">
+                {!! Form::label('filter_contract', 'Contract') !!}
+                {!! Form::select('filter_contract', [], [], [
+                  'class' => 'form-select select2Remote',
+                  'data-placeholder' => 'All',
+                  'data-allow-clear' => 'true',
+                  'data-url' => route('resource-select', ['Contract', 'hasinv'])
+                ]) !!}
+              </div>
+              <div class="col">
+                {!! Form::label('filter_status', 'Status') !!}
+                {!! Form::select('filter_status', $invoice_statuses, null, ['class' => 'form-select select2', 'data-allow-clear' => 'true', 'data-placeholder' => __('All')]) !!}
+              </div>
+              <div class="col">
+                {!! Form::label('filter_type', 'Type') !!}
+                {!! Form::select('filter_type', $invoice_types, '', ['class' => 'form-select select2', 'data-allow-clear' => 'true', 'data-placeholder' => __('All')]) !!}
+              </div>
             @endif
           </div>
         </form>

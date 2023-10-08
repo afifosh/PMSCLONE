@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\ContractDoc;
 
+use App\Models\Invoice;
 use App\Models\KycDocument;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -40,6 +41,7 @@ class DocControllStoreRequest extends FormRequest
       'fields.*.is_required' => ['required', 'boolean'],
       'fields.*.label' => ['required', 'string'],
       'fields.*.type' => ['required', 'string', Rule::in(KycDocument::TYPES)],
+      'invoice_type' => ['nullable', 'sometimes', Rule::in(Invoice::TYPES)],
     ];
 
     if($this->route()->getName() == 'admin.invoice-doc-controls.store'){

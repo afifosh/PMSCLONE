@@ -319,6 +319,11 @@ class Invoice extends Model
   {
     return KycDocument::where('status', 1) // active
       ->where('workflow', 'Invoice Required Docs') // workflow
+      ->where(function ($q){ // filter by invoice type')
+        $q->where('invoice_type', 'Both')
+          ->orWhere('invoice_type', $this->type)
+          ->orWhereNull('invoice_type');
+      })
       ->whereIn('client_type', array_merge(['Both'], ($this->contract->assignable instanceof Company ?  [$this->contract->assignable->type] : []))) // filter by client type
       ->where(function ($q){ // filter by contract
         $q->whereHas('contracts', function ($q) {

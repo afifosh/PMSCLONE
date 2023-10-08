@@ -25,7 +25,7 @@ class DocumentStatsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('contracts.id', function ($contract) {
-        return view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
+        return '<a href="'. route('admin.contracts.show', [$contract]) .'">'. runtimeInvIdFormat($contract->id) . '</a>';
       })
       ->editColumn('invoices.id', function ($invoice) {
         return '<a href="'. route('admin.invoices.edit', [$invoice]) .'">'. runtimeInvIdFormat($invoice->id) . '</a>';
@@ -109,6 +109,7 @@ class DocumentStatsDataTable extends DataTable
     if($this->model instanceof Contract) {
       array_unshift($columns, Column::make('contracts.id')->title('Contract'));
     }else if($this->model instanceof Invoice) {
+      array_unshift($columns, Column::make('type')->title('Type'));
       array_unshift($columns, Column::make('invoices.id')->title('Invoice'));
     }
 

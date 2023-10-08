@@ -24,7 +24,8 @@ class KycDocument extends Model
     'is_expiry_date_required',
     'fields',
     'workflow',
-    'client_type'
+    'client_type',
+    'invoice_type'
   ];
 
   public const TYPES = ['date', 'email', 'file', 'number', 'tel', 'text', 'textarea'];

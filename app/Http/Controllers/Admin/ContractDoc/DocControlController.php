@@ -7,6 +7,7 @@ use App\DataTables\Admin\ContractDoc\DocControlsDataTable;
 use App\Http\Requests\Admin\ContractDoc\DocControllStoreRequest;
 use App\Models\ContractCategory;
 use App\Models\ContractType;
+use App\Models\Invoice;
 use App\Models\KycDocument;
 
 class DocControlController extends Controller
@@ -28,6 +29,7 @@ class DocControlController extends Controller
     $data['title'] = 'Contract Required Docs';
     if (request()->route()->getName() == 'admin.invoice-doc-controls.create') {
       $data['title'] = 'Invoice Required Docs';
+      $data['invoice_types'] = Invoice::TYPES;
     }
     $data['types'] = KycDocument::TYPES;
     $data['kyc_document'] = new KycDocument();
@@ -70,6 +72,7 @@ class DocControlController extends Controller
     if (request()->route()->getName() == 'admin.invoice-doc-controls.edit') {
       $data['title'] = 'Invoice Required Docs';
       $data['contracts'] = $contractDocControl->contracts->pluck('subject', 'id');
+      $data['invoice_types'] = Invoice::TYPES;
     }
     $data['types'] = KycDocument::TYPES;
     $data['kyc_document'] = $contractDocControl->load(['contractTypes', 'contractCategories']);
