@@ -7,7 +7,7 @@
 
 
   {!! Form::hidden('document_id', $document->id) !!}
-  <div class="row g-3">
+  <div class="row g-3 mb-2">
     @foreach ($document->fields as $index => $field)
       @forelse (@$doc['fields'] ?? [] as $submited_field)
         @php
@@ -51,7 +51,7 @@
       </div>
     @endif
       <div class="col-12 d-flex justify-content-end">
-        <button type="button" class="btn btn-primary" data-form="ajax-form"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
+        <button type="button" class="btn btn-primary" data-form="ajax-form"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Save</span></button>
       </div>
   </div>
 {!! Form::close() !!}
