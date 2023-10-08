@@ -47,14 +47,32 @@ class Transaction extends Model
     'updated_at' => 'datetime: h:i A d M, Y',
   ];
 
+  public function getAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+  public function setAmountAttribute($value)
+  {
+    return $this->attributes['amount'] = round($value * 1000);
+  }
+
+  public function getRemainingBalanceAttribute($value)
+  {
+    return $value / 1000;
+  }
+  public function setRemainingBalanceAttribute($value)
+  {
+    return $this->attributes['remaining_balance'] = round($value * 1000);
+  }
+
   public function printableAmount()
   {
-    return Money::{$this->accountBalance->currency}($this->amount, false)->format();
+    return Money::{$this->accountBalance->currency}($this->amount, true)->format();
   }
 
   public function printableBalance()
   {
-    return Money::{$this->accountBalance->currency}($this->remaining_balance, false)->format();
+    return Money::{$this->accountBalance->currency}($this->remaining_balance, true)->format();
   }
 
   public function getAmount(): Money

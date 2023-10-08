@@ -33,7 +33,8 @@ class FinancialYearsDataTable extends DataTable
         return view('admin.pages.finances.financial-years.action', compact('financialYear'));
       })
       ->addColumn('balance', function($financialYear){
-        return Money::{$financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($financialYear->defaultCurrencyAccount[0]->balance, false)->format();
+        return Money($financialYear->defaultCurrencyAccount[0]->balance, $financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency'), true);
+        return Money::{$financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($financialYear->defaultCurrencyAccount[0]->balance, true)->format();
       });
   }
 

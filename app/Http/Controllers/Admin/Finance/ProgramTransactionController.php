@@ -50,7 +50,7 @@ class ProgramTransactionController extends Controller
       'account_id' => 'required|exists:account_balances,id',
     ]);
 
-    $amount = Money::{$programAccount->currency ?? config('money.defaults.currency')}($request->amount * 1000, false)->getAmount();
+    $amount = Money::{$programAccount->currency ?? config('money.defaults.currency')}($request->amount, false)->getAmount();
 
     if ($request->type == 'deposit') {
       $this->transactionProcessor->create(

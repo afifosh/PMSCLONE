@@ -24,12 +24,6 @@ class ProgramTransactionsDataTable extends DataTable
     ->editColumn('id', function($transaction){
       return runtimeTransIdFormat($transaction->id);
     })
-    ->editColumn('amount', function($transaction){
-      return Money::{$this->programAccount->currency ?? config('money.defaults.currency')}($transaction->amount, false)->format();
-    })
-    ->editColumn('remaining_balance', function($transaction){
-      return Money::{$this->programAccount->currency ?? config('money.defaults.currency')}($transaction->remaining_balance, false)->format();
-    })
     ->editColumn('action', function($transaction){
       return view('admin.pages.finances.financial-years.transactions.action', compact('transaction'));
     })

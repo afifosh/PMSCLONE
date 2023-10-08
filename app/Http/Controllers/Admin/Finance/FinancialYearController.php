@@ -72,7 +72,7 @@ class FinancialYearController extends Controller
     $account = $this->accountant->createAccount($financialYear, ['currency' => $request->currency, 'name' => $request->label, 'account_number' => $account_number]);
 
     $this->transactionProcessor->create($account, new TransactionDto(
-      $financialYear->getRawOriginal('initial_balance'),
+      $financialYear->initial_balance,
       'Credit',
       'Initial Balance',
     ));

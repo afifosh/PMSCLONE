@@ -34,7 +34,7 @@ class FinancialYear extends Model implements AccountBalanceHolderInterface
       return null;
     }
 
-    return Money::{$this->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($value, false)->format();
+    return $value / 1000;
   }
 
   public function setInitialBalanceAttribute($value)
