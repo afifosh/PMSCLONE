@@ -130,7 +130,7 @@
     },
     {
       "name": "Finances",
-      "slug": ["admin.finances.", "admin.invoices."],
+      "slug": ["admin.finances.", "admin.invoices.", "admin.invoice-doc-controls."],
       "icon": "menu-icon tf-icons ti ti-settings",
       "submenu": [
         {
@@ -162,6 +162,16 @@
           "url": "/admin/finances/payments",
           "name": "Payments",
           "slug": "admin.finances.payments.index"
+        },
+        {
+          "url": "/admin/invoice-doc-controls",
+          "name": "Document Controls",
+          "slug": "admin.invoice-doc-controls.index"
+        },
+        {
+          "url": "/admin/invoices/document-stats",
+          "name": "Contract Doc Stats",
+          "slug": "admin.invoices.document-stats.index"
         }
       ]
     },

@@ -37,7 +37,8 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-@include('admin.pages.contracts.header', ['tab' => 'uploaded-documents'])
+@includeWhen(isset($contract) ,'admin.pages.contracts.header', ['tab' => 'uploaded-documents'])
+@includeWhen(isset($invoice) ,'admin.pages.invoices.header-top', ['tab' => 'uploaded-documents'])
   <div class="mt-3  col-12">
     {{-- Stats Start --}}
     <div class="card h-100">

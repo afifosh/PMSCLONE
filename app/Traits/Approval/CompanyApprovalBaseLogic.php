@@ -24,8 +24,14 @@ trait CompanyApprovalBaseLogic
 
   protected function requiresApprovalWhen(array $modifications): bool
   {
-    if($this->doc_requestable_type == 'App\Models\Contract' || @$modifications['doc_requestable_type'] ==  'App\Models\Contract')
-    return false;
+    $modelsToIgnore = [
+      'App\Models\Contract',
+      'App\Models\Invoice',
+    ];
+
+    if(in_array($this->doc_requestable_type, $modelsToIgnore) || in_array(@$modifications['doc_requestable_type'], $modelsToIgnore)) {
+      return false;
+    }
     // Handle some logic that determines if this change requires approval
     //
     // Return true if the model requires approval, return false if it

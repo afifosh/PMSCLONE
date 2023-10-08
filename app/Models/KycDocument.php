@@ -58,6 +58,11 @@ class KycDocument extends Model
     return $this->belongsToMany(ContractCategory::class, KycDocumentContractCategory::class);
   }
 
+  public function contracts(): BelongsToMany
+  {
+    return $this->belongsToMany(Contract::class, KycDocContract::class, 'kyc_doc_id', 'contract_id');
+  }
+
   public function uploadedDocs(): HasMany
   {
     return $this->hasMany(UploadedKycDoc::class, 'kyc_doc_id');

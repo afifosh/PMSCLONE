@@ -65,6 +65,9 @@ class Invoice extends Model
     'Down Payment'
   ];
 
+  /*
+  * @constant FILES_PATH The path prefix to store uploaded Docs.
+  */
   const FILES_PATH = 'invoices';
 
   public function company()
@@ -305,5 +308,49 @@ class Invoice extends Model
     } catch (\Exception $e) {
       throw $e;
     }
+  }
+
+  public function uploadedDocs()
+  {
+    return $this->morphMany(UploadedKycDoc::class, 'doc_requestable');
+  }
+
+  public function requestedDocs()
+  {
+    return KycDocument::where('status', 1) // active
+      ->where('workflow', 'Invoice Required Docs') // workflow
+      ->whereIn('client_type', array_merge(['Both'], ($this->contract->assignable instanceof Company ?  [$this->contract->assignable->type] : []))) // filter by client type
+      ->where(function ($q){ // filter by contract
+        $q->whereHas('contracts', function ($q) {
+          $q->where('contracts.id', $this->contract_id);
+        })->orHas('contracts', '=', 0);
+      })
+      ->where(function ($q) { // filter by contract type
+        $q->when($this->contract->type_id, function ($q) {
+          $q->whereHas('contractTypes', function ($q) {
+            $q->where('contract_types.id', $this->contract->type_id);
+          })->orHas('contractTypes', '=', 0);
+        });
+      })
+      ->where(function ($q) { // filter by contract category
+        $q->when($this->contract->category_id, function ($q) {
+          $q->whereHas('contractCategories', function ($q) {
+            $q->where('contract_categories.id', $this->contract->category_id);
+          })->orHas('contractCategories', '=', 0);
+        });
+      });
+  }
+
+  public function pendingDocs()
+  {
+    return $this->requestedDocs()
+      ->whereDoesntHave('uploadedDocs', function ($q) { // filter by uploaded docs
+        $q->where('doc_requestable_id', $this->id)
+          ->where('doc_requestable_type', $this::class)
+          ->where(function ($q) {
+            $q->whereNull('expiry_date')
+              ->orWhere('expiry_date', '>=', today());
+          });
+      });
   }
 }

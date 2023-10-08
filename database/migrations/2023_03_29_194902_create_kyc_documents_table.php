@@ -15,7 +15,7 @@ return new class extends Migration
   {
     Schema::create('kyc_documents', function (Blueprint $table) {
       $table->id();
-      $table->enum('workflow', ['Company Kyc', 'Contract Required Docs'])->default('Company Kyc');
+      $table->enum('workflow', ['Company Kyc', 'Contract Required Docs', 'Invoice Required Docs'])->default('Company Kyc');
       $table->enum('client_type', ['Person', 'Company', 'Both'])->default('Both');
       $table->string('title');
       $table->string('required_from');

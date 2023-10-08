@@ -61,6 +61,12 @@ class Contract extends Model
     'updated_at' => 'datetime:d M, Y',
   ];
 
+
+  /*
+  * @constant FILES_PATH The path prefix to store uploaded Docs.
+  */
+  public const FILES_PATH = 'contracts';
+
   public function getValueAttribute($value)
   {
     return $value / 1000;

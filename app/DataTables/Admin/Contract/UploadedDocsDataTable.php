@@ -2,7 +2,6 @@
 
 namespace App\DataTables\Admin\Contract;
 
-use App\Models\Contract;
 use App\Models\UploadedKycDoc;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -13,9 +12,10 @@ use Yajra\DataTables\Services\DataTable;
 class UploadedDocsDataTable extends DataTable
 {
   /*
-  * @var Contract $contract
+  * @var App\Models\Contract | App\Models\Invoice $model
   */
-  public $contract;
+  public $model;
+
   /**
    * Build the DataTable class.
    *
@@ -25,7 +25,7 @@ class UploadedDocsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->addColumn('action', function ($doc) {
-        return view('admin.pages.contracts.uploaded-docs.action', ['doc' => $doc, 'contract' => $this->contract]);
+        return view('admin.pages.contracts.uploaded-docs.action', ['doc' => $doc, 'contract' => $this->model]);
       })
       ->editColumn('status', function ($doc) {
         return '<span class="badge bg-label-' . ($doc->status == 'Active' ? 'success' : 'danger') . '">' . $doc->status . '</span>';
@@ -44,7 +44,7 @@ class UploadedDocsDataTable extends DataTable
    */
   public function query(UploadedKycDoc $model): QueryBuilder
   {
-    $uniqueId = UploadedKycDoc::where('doc_requestable_type', Contract::class)->where('doc_requestable_id', $this->contract->id)
+    $uniqueId = UploadedKycDoc::where('doc_requestable_type', $this->model::class)->where('doc_requestable_id', $this->model->id)
       ->selectRaw('MAX(id) as id')
       ->groupBy('kyc_doc_id')
       ->pluck('id')->toArray();

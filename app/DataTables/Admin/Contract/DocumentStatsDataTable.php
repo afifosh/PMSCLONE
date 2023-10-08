@@ -3,6 +3,7 @@
 namespace App\DataTables\Admin\Contract;
 
 use App\Models\Contract;
+use App\Models\Invoice;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -11,6 +12,10 @@ use Yajra\DataTables\Services\DataTable;
 
 class DocumentStatsDataTable extends DataTable
 {
+  /*
+  * @var App\Models\Contract | App\Models\Invoice $model
+  */
+  public $model;
   /**
    * Build the DataTable class.
    *
@@ -22,28 +27,44 @@ class DocumentStatsDataTable extends DataTable
       ->editColumn('contracts.id', function ($contract) {
         return view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
       })
+      ->editColumn('invoices.id', function ($invoice) {
+        return '<a href="'. route('admin.invoices.edit', [$invoice]) .'">'. runtimeInvIdFormat($invoice->id) . '</a>';
+      })
       ->addColumn('requested_docs_count', function ($contract) {
         return $contract->requestedDocs()->count();
       })
       ->addColumn('pending_docs_count', function ($contract) {
         return $contract->pendingDocs()->count();
       })
-      ->setRowId('id');
+      ->setRowId('id')
+      ->rawColumns(['contracts.id', 'invoices.id']);
   }
 
   /**
    * Get the query source of dataTable.
    */
-  public function query(Contract $model): QueryBuilder
+  public function query(Contract $contract): QueryBuilder
   {
-    $q = $model->withCount([
-      'uploadedDocs as active_docs_count' => function ($q) {
-        $q->where('expiry_date', '>', today());
-      },
-      'uploadedDocs as expired_docs_count' => function ($q) {
-        $q->where('expiry_date', '<=', today());
-      }
-    ])->applyRequestFilters()->newQuery();
+    $model = $this->model;
+    if($model instanceof Contract) {
+      $q = $model->withCount([
+        'uploadedDocs as active_docs_count' => function ($q) {
+          $q->where('expiry_date', '>', today());
+        },
+        'uploadedDocs as expired_docs_count' => function ($q) {
+          $q->where('expiry_date', '<=', today());
+        }
+      ])->applyRequestFilters()->newQuery();
+    }else if($model instanceof Invoice) {
+      $q = $model->withCount([
+        'uploadedDocs as active_docs_count' => function ($q) {
+          $q->where('expiry_date', '>', today());
+        },
+        'uploadedDocs as expired_docs_count' => function ($q) {
+          $q->where('expiry_date', '<=', today());
+        }
+      ])->applyRequestFilters()->newQuery();
+    }
 
     return $q;
   }
@@ -77,14 +98,21 @@ class DocumentStatsDataTable extends DataTable
    */
   public function getColumns(): array
   {
-    return [
-      Column::make('contracts.id')->title('Contract'),
+    $columns = [
       Column::make('status'),
       Column::make('requested_docs_count')->title('Requested Docs'),
       Column::make('pending_docs_count')->title('Pending Docs'),
       Column::make('active_docs_count')->title('Active Docs'),
       Column::make('expired_docs_count')->title('Expired Docs'),
     ];
+
+    if($this->model instanceof Contract) {
+      array_unshift($columns, Column::make('contracts.id')->title('Contract'));
+    }else if($this->model instanceof Invoice) {
+      array_unshift($columns, Column::make('invoices.id')->title('Invoice'));
+    }
+
+    return $columns;
   }
 
   /**

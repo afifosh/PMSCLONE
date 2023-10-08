@@ -1,5 +1,10 @@
 
-  {!! Form::open(['route' => ['admin.contracts.pending-documents.store', ['contract' => $contract]], 'files' => true]) !!}
+  @if (isset($contract))
+    {!! Form::open(['route' => ['admin.contracts.pending-documents.store', ['contract' => $contract]], 'files' => true]) !!}
+  @else
+    {!! Form::open(['route' => ['admin.invoices.pending-documents.store', ['invoice' => $invoice]], 'files' => true]) !!}
+  @endif
+
 
   {!! Form::hidden('document_id', $document->id) !!}
   <div class="row g-3">
@@ -20,7 +25,7 @@
       @elseif($field['type'] == 'file')
       <div class="col-12 py-3">
         <label for="fields_{{ $loop->index }}" class="required">{{ $field['label'] }}</label>
-        <div class="dropzone needsclick" data-upload-url="{{ route('admin.contracts.upload-requested-doc', [$contract])}}" data-response="#{{'fields_'.$field['id']}}" data-file-path="{{@$field['value'] ? getAssetUrl(@$field['value']) : ''}}">
+        <div class="dropzone needsclick" data-upload-url="{{ (isset($contract) ? route('admin.contracts.upload-requested-doc', [$contract]) : route('admin.invoices.upload-requested-doc', [$invoice]) )}}" data-response="#{{'fields_'.$field['id']}}" data-file-path="{{@$field['value'] ? getAssetUrl(@$field['value']) : ''}}">
           <div class="dz-message needsclick">
             <small class="h6"> Drag and Drop the {{$field['label']}} here or click to upload </small>
           </div>

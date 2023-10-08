@@ -4,13 +4,11 @@ namespace App\Http\Controllers\Admin\Contract;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contract\DocumentUploadRequest;
-use App\Http\Requests\Admin\KycDocumentUpdateRequest;
-use App\Models\Company;
 use App\Models\Contract;
+use App\Models\Invoice;
 use App\Models\KycDocument;
 use App\Models\UploadedKycDoc;
 use App\Repositories\FileUploadRepository;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Pion\Laravel\ChunkUpload\Exceptions\UploadMissingFileException;
@@ -19,10 +17,16 @@ use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 
 class ContractDocumentController extends Controller
 {
-  public function index(Contract $contract, Request $request)
+  public function index($modal, Request $request)
   {
-    $data['contract'] = $contract;
-    $data['requestable_documents'] = $data['documents'] = $contract->pendingDocs()->get();
+    if ($request->route()->getName() == 'admin.contracts.pending-documents.index') {
+      $data['contract'] = $contract = Contract::findOrFail($modal);
+      $data['contract'] = $contract;
+      $data['requestable_documents'] = $data['documents'] = $contract->pendingDocs()->get();
+    } else {
+      $data['invoice'] = $invoice = Invoice::findOrFail($modal);
+      $data['requestable_documents'] = $data['documents'] = $invoice->pendingDocs()->get();
+    }
 
     request()->document_id = request()->document_id ?? $data['requestable_documents'][0]->id ?? 0;
     if ($request->fields_only) {
@@ -35,15 +39,21 @@ class ContractDocumentController extends Controller
     }
   }
 
-  public function store(DocumentUploadRequest $request, Contract $contract)
+  public function store(DocumentUploadRequest $request, $modal)
   {
-    $document = $contract->pendingDocs()->findOrFail($request->document_id);
+    if ($request->route()->getName() == 'admin.contracts.pending-documents.store') {
+      $modelInstance = Contract::findOrFail($modal);
+    } else {
+      $modelInstance = Invoice::findOrFail($modal);
+    }
+
+    $document = $modelInstance->pendingDocs()->findOrFail($request->document_id);
     $final_fields = [];
     $data = [];
     foreach ($document->fields as $field) {
       if ($field['type'] == 'file') {
-        $path = UploadedKycDoc::FILE_PATH . '/contracts/' . $contract->id;
-        Storage::move(KycDocument::TEMP_PATH . '/contracts/' . $contract->id . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
+        $path = UploadedKycDoc::FILE_PATH . '/' . $modelInstance::FILES_PATH . '/' . $modal;
+        Storage::move(KycDocument::TEMP_PATH . '/'. $modelInstance::FILES_PATH .'/' . $modal . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
         $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
       } else {
         $field['value'] = $request->{'fields.' . $field['id']};
@@ -53,7 +63,7 @@ class ContractDocumentController extends Controller
     if ($document->is_expirable) {
       $data['expiry_date'] = $request->expiry_date;
     }
-    $contract->uploadedDocs()->create(
+    $modelInstance->uploadedDocs()->create(
       [
         'uploader_id' => auth()->id(),
         'uploader_type' => get_class(auth()->user())
@@ -68,7 +78,7 @@ class ContractDocumentController extends Controller
     return $this->sendRes('Added Successfully', ['event' => 'page_reload']);
   }
 
-  public function uploadDocument(Contract $contract, Request $request, FileUploadRepository $file_repo)
+  public function uploadDocument($modal, Request $request, FileUploadRepository $file_repo)
   {
     $request->validate([
       'file' => 'required|mimetypes:text/plain,application/*,image/*,video/*,audio/*'
@@ -86,7 +96,7 @@ class ContractDocumentController extends Controller
     if ($save->isFinished()) {
       // save the file and return any response you need, current example uses `move` function. If you are
       // not using move, you need to manually delete the file by unlink($save->getFile()->getPathname())
-      return $this->saveFile($save->getFile(), $file_repo, $contract);
+      return $this->saveFile($save->getFile(), $file_repo, $modal);
     }
 
     // we are in chunk mode, lets send the current progress
@@ -99,9 +109,14 @@ class ContractDocumentController extends Controller
     ]);
   }
 
-  public function saveFile($file, FileUploadRepository $file_repo, Contract $contract)
+  public function saveFile($file, FileUploadRepository $file_repo, $modal)
   {
-    $path = KycDocument::TEMP_PATH . DIRECTORY_SEPARATOR . 'contracts/' . $contract->id;
+    if(request()->route()->getName() == 'admin.contracts.upload-requested-doc')
+      $prefix = 'contracts';
+    else
+      $prefix = 'invoices';
+
+    $path = KycDocument::TEMP_PATH . DIRECTORY_SEPARATOR . $prefix . '/' . $modal;
     $file_path = $file_repo->addAttachment($file, $path);
 
     return $this->sendRes('Uploaded Successfully', ['file_path' => $file_path]);

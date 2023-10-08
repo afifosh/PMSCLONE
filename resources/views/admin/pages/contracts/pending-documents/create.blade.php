@@ -52,7 +52,8 @@
 @endsection
 
 @section('content')
-@include('admin.pages.contracts.header', ['tab' => 'pending-documents'])
+@includeWhen(isset($contract),'admin.pages.contracts.header', ['tab' => 'pending-documents'])
+@includeWhen(isset($invoice) ,'admin.pages.invoices.header-top', ['tab' => 'pending-documents'])
 <div class="card mt-3">
   <div class="card-header">
     <h4 class="card-title">Pending Documents</h4>
@@ -63,7 +64,12 @@
         <div class="bs-stepper wizard-vertical vertical mt-2">
           <div class="bs-stepper-header">
             @forelse ($documents as $document)
-              <div class="step step-index-{{$loop->index}}" data-target="#kyc-docs-{{$document['id']}}" data-href="{{route('admin.contracts.pending-documents.index', ['contract' => $contract->id ,'document_id' => $document->id, 'fields_only' => true])}}">
+              <div class="step step-index-{{$loop->index}}" data-target="#kyc-docs-{{$document['id']}}" data-href="
+                {{ (isset($contract)
+                  ? route('admin.contracts.pending-documents.index', ['contract' => $contract->id ,'document_id' => $document->id, 'fields_only' => true])
+                  : route('admin.invoices.pending-documents.index', ['invoice' => $invoice->id ,'document_id' => $document->id, 'fields_only' => true])
+                )}}
+                ">
                 <button type="button" class="step-trigger">
                   <span class="bs-stepper-circle" style="background-color: #FF9F43 !important">{{$loop->iteration}}</span>
                   <span class="bs-stepper-label">
@@ -89,7 +95,7 @@
       @else
         <div class="alert alert-info">
           <h4 class="alert-heading">All Done</h4>
-          <p class="mb-0">There are no pending documents for this contract.</p>
+          <p class="mb-0">There are no pending documents for now.</p>
         </div>
       @endif
     </div>

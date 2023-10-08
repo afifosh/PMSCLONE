@@ -4,13 +4,21 @@
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Contract Doc Controls')
+@section('title', $title)
 
 @section('content')
   @if ($kyc_document->id)
-    {!! Form::model($kyc_document, ['route' => ['admin.contract-doc-controls.update', $kyc_document], 'method' => 'PUT', 'class' => 'repeater']) !!}
+    @if(request()->route()->getName() == 'admin.contract-doc-controls.edit')
+      {!! Form::model($kyc_document, ['route' => ['admin.contract-doc-controls.update', $kyc_document], 'method' => 'PUT', 'class' => 'repeater']) !!}
+    @else
+      {!! Form::model($kyc_document, ['route' => ['admin.invoice-doc-controls.update', $kyc_document], 'method' => 'PUT', 'class' => 'repeater']) !!}
+    @endif
   @else
-    {!! Form::open(['route' => 'admin.contract-doc-controls.store', 'method' => 'POST', 'class' => 'repeater']) !!}
+    @if(request()->route()->getName() == 'admin.contract-doc-controls.create')
+      {!! Form::open(['route' => 'admin.contract-doc-controls.store', 'method' => 'POST', 'class' => 'repeater']) !!}
+    @else
+      {!! Form::open(['route' => 'admin.invoice-doc-controls.store', 'method' => 'POST', 'class' => 'repeater']) !!}
+    @endif
   @endif
         @csrf
         <div class="row">
@@ -27,14 +35,29 @@
                         </div>
                         {{-- types --}}
                         <div class="form-group">
-                          {{ Form::label('contract_type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
+                          {{ Form::label('contract_type_ids', __('Contract Type'), ['class' => 'col-form-label']) }}
                           {!! Form::select('contract_type_ids[]', $contract_types, $kyc_document->contractTypes->pluck('id')->toArray(), ['class' => 'form-select select2', 'multiple', 'data-placeholder' => __('Select Type')]) !!}
                         </div>
                         {{-- categories --}}
                         <div class="form-group">
-                          {{ Form::label('contract_category_id', __('Contract Category'), ['class' => 'col-form-label']) }}
+                          {{ Form::label('contract_category_ids', __('Contract Category'), ['class' => 'col-form-label']) }}
                           {!! Form::select('contract_category_ids[]', $contract_categories, $kyc_document->contractCategories->pluck('id')->toArray(), ['class' => 'form-select select2', 'multiple', 'data-placeholder' => __('Select Category')]) !!}
                         </div>
+
+                        @if(request()->route()->getName() == 'admin.invoice-doc-controls.create' || request()->route()->getName() == 'admin.invoice-doc-controls.edit' )
+                         {{-- Contract --}}
+                          <div class="form-group">
+                            {{ Form::label('contract_ids', __('Contract'), ['class' => 'col-form-label']) }}
+                            {!! Form::select('contract_ids[]', $contracts ?? [], $kyc_document->contracts->pluck('id')->toArray(), [
+                              'class' => 'form-select select2Remote',
+                              'multiple',
+                              'data-placeholder' => __('Select Contract'),
+                              'data-allow-clear' => 'true',
+                              'data-url' => route('resource-select', ['Contract'])
+                            ]) !!}
+                          </div>
+                        @endif
+
                         <div class="form-group mb-2">
                             <label for="status" class="required">{{ __('Status:') }}</label>
                             {!! Form::select('status', ['1' => 'Active', '0' => 'Inactive'], null, ['class' => 'form-control select2']) !!}

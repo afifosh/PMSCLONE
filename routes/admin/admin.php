@@ -52,6 +52,7 @@ use App\Http\Controllers\Admin\Contract\ContractStageController;
 use App\Http\Controllers\Admin\Contract\DocumentStatController;
 use App\Http\Controllers\Admin\Contract\UploadedDocumentController;
 use App\Http\Controllers\Admin\ContractDoc\DocControlController;
+use App\Http\Controllers\Admin\DocControl\InvoiceDocController;
 use App\Http\Controllers\Admin\Finance\ProgramTransactionController;
 use App\Http\Controllers\Admin\Finance\FinancialYearController;
 use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
@@ -296,15 +297,20 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     // Route::prefix('invoices')->name('invoices.')->group(function(){
 
     // });
+    Route::get('invoices/document-stats', [DocumentStatController::class, 'index'])->name('invoices.document-stats.index');
     Route::get('invoices/{invoice}/payments', [PaymentController::class, 'index'])->name('invoices.payments.index');
     Route::put('invoices/{invoice}/invoice-tems/sort', [InvoiceController::class, 'sortItems'])->name('invoices.invoice-items.sort');
     Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
+    Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
     Route::resource('invoices', InvoiceController::class);
     Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'destroy']);
     Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
     Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');
     Route::resource('invoices.merge-invoices', MergeInvoiceController::class)->only(['create', 'store']);
+    Route::resource('invoice-doc-controls', DocControlController::class);
+    Route::resource('invoices.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
+    Route::resource('invoices.uploaded-documents', UploadedDocumentController::class);
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Contract Documents')
+@section('title', 'Documents Stats')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -32,34 +32,46 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header">
         <div class="d-flex justify-content-between mb-0">
-          <h5 class="card-title mb-0">{{__('Contract Document Stats')}}</h5>
+          <h5 class="card-title mb-0">{{__('Documents Stats')}}</h5>
         </div>
       </div>
       <h5 class="card-header mt-0 pt-0">Search Filter</h5>
       @if (!isset($contract) && !isset($company))
         <form class="js-datatable-filter-form">
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
-            <div class="col">
-              {!! Form::label('companies', 'Client') !!}
-              {!! Form::select('companies', [], [], [
-                'class' => 'form-select select2Remote',
-                'data-placeholder' => 'All',
-                'data-allow-clear' => 'true',
-                'data-url' => route('resource-select', ['groupedCompany', 'hasContracts'])
-              ]) !!}
-            </div>
-            <div class="col">
-              {!! Form::label('contract_category', 'Contract Category') !!}
-              {!! Form::select('contract_category', $contract_categories, '', ['class' => 'form-select select2']) !!}
-            </div>
-            <div class="col">
-              {!! Form::label('contract_type', 'Contract Type') !!}
-              {!! Form::select('contract_type', $contract_types, '', ['class' => 'form-select select2']) !!}
-            </div>
-            <div class="col">
-              {!! Form::label('filter_status', 'Contract Status') !!}
-              {!! Form::select('filter_status', $contract_statuses, '', ['class' => 'form-select select2']) !!}
-            </div>
+            @if(request()->route()->getName() == 'admin.contracts.document-stats.index')
+              <div class="col">
+                {!! Form::label('companies', 'Client') !!}
+                {!! Form::select('companies', [], [], [
+                  'class' => 'form-select select2Remote',
+                  'data-placeholder' => 'All',
+                  'data-allow-clear' => 'true',
+                  'data-url' => route('resource-select', ['groupedCompany', 'hasContracts'])
+                ]) !!}
+              </div>
+              <div class="col">
+                {!! Form::label('contract_category', 'Contract Category') !!}
+                {!! Form::select('contract_category', $contract_categories, '', ['class' => 'form-select select2']) !!}
+              </div>
+              <div class="col">
+                {!! Form::label('contract_type', 'Contract Type') !!}
+                {!! Form::select('contract_type', $contract_types, '', ['class' => 'form-select select2']) !!}
+              </div>
+              <div class="col">
+                {!! Form::label('filter_status', 'Contract Status') !!}
+                {!! Form::select('filter_status', $contract_statuses, '', ['class' => 'form-select select2']) !!}
+              </div>
+            @else
+              <div class="col">
+                {!! Form::label('filter_company', 'Client') !!}
+                {!! Form::select('filter_company', [], [], [
+                  'class' => 'form-select select2Remote',
+                  'data-placeholder' => 'All',
+                  'data-allow-clear' => 'true',
+                  'data-url' => route('resource-select', ['groupedCompany', 'hasinv'])
+                ]) !!}
+              </div>
+            @endif
           </div>
         </form>
       @endif

@@ -269,6 +269,7 @@
 @endsection
 
 @section('content')
+@includeWhen(isset($invoice) ,'admin.pages.invoices.header-top', ['tab' => 'invoice'])
 {{-- Alert Contract expired --}}
 @if(count($pendingDocs) > 0)
   <div class="col-12 mb-4">

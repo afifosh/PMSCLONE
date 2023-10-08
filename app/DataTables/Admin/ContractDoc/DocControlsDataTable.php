@@ -11,6 +11,10 @@ use Yajra\DataTables\Services\DataTable;
 
 class DocControlsDataTable extends DataTable
 {
+  /*
+  * @var $workflow string: Contract Required Docs | Invoice Required Docs
+  */
+  public $workflow = 'Contract Required Docs';
   /**
    * Build DataTable class.
    *
@@ -24,7 +28,11 @@ class DocControlsDataTable extends DataTable
         return $kyc_document->status ? '<span class="badge bg-label-success">Active</span>' : '<span class="badge bg-label-danger">Inactive</span>';
       })
       ->addColumn('action', function ($kyc_document) {
-        return view('admin.pages.contract-doc-controls.action', compact('kyc_document'));
+        if($this->workflow == 'Contract Required Docs')
+          $route = route('admin.contract-doc-controls.edit', $kyc_document->id);
+        else
+          $route = route('admin.invoice-doc-controls.edit', $kyc_document->id);
+        return view('admin.pages.contract-doc-controls.action', compact('route'));
       })
       ->rawColumns(['status', 'action']);
   }
@@ -37,7 +45,7 @@ class DocControlsDataTable extends DataTable
    */
   public function query(KycDocument $model): QueryBuilder
   {
-    return $model->where('workflow', 'Contract Required Docs')->with('contractTypes', 'contractCategories')->newQuery();
+    return $model->where('workflow', $this->workflow)->with('contractTypes', 'contractCategories')->newQuery();
   }
 
   /**
@@ -54,7 +62,9 @@ class DocControlsDataTable extends DataTable
         'className' =>  'btn btn-primary mx-3',
         'action' => 'function(e, dt, node, config){
             e.preventDefault();
-            window.location.href = "' . route('admin.contract-doc-controls.create') . '";
+            window.location.href = "' . ($this->workflow == 'Contract Required Docs'
+          ? route('admin.contract-doc-controls.create')
+          : route('admin.invoice-doc-controls.create')) . '";
           }'
       ];
 

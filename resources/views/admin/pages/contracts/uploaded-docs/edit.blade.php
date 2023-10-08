@@ -1,5 +1,8 @@
-
-{!! Form::open(['route' => ['admin.contracts.uploaded-documents.update', ['contract' => $contract, $uploaded_doc]], 'method' => 'PUT', 'files' => true]) !!}
+@if($modelInstance instanceof \App\Models\Contract)
+  {!! Form::open(['route' => ['admin.contracts.uploaded-documents.update', ['contract' => $modelInstance->id, $uploaded_doc]], 'method' => 'PUT', 'files' => true]) !!}
+@else
+  {!! Form::open(['route' => ['admin.invoices.uploaded-documents.update', ['invoice' => $modelInstance->id, $uploaded_doc]], 'method' => 'PUT', 'files' => true]) !!}
+@endif
 
 {{-- Requested Doc Id --}}
 {!! Form::hidden('document_id', $document->id) !!}
@@ -23,7 +26,7 @@
     @elseif($field['type'] == 'file')
     <div class="col-12 py-3">
       <label for="fields_{{ $loop->index }}" class="required">{{ $field['label'] }}</label>
-      <div class="dropzone needsclick" data-upload-url="{{ route('admin.contracts.upload-requested-doc', [$contract])}}" data-response="#{{'fields_'.$field['id']}}" data-file-path="{{@$field['value'] ? getAssetUrl(@$field['value']) : ''}}">
+      <div class="dropzone needsclick" data-upload-url="{{ ($modelInstance instanceof \App\Models\Contract ? route('admin.contracts.upload-requested-doc', [$modelInstance->id]) : route('admin.invoices.upload-requested-doc', [$modelInstance->id]))}}" data-response="#{{'fields_'.$field['id']}}" data-file-path="{{@$field['value'] ? getAssetUrl(@$field['value']) : ''}}">
         <div class="dz-message needsclick">
           <small class="h6"> Drag and Drop the {{$field['label']}} here or click to upload </small>
         </div>

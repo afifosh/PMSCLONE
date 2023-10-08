@@ -23,7 +23,7 @@ class DocControllStoreRequest extends FormRequest
    */
   public function rules(): array
   {
-    return [
+    $rules = [
       'title' => ['required', 'string'],
       'client_type' => ['required', 'in:Person,Company,Both'],
       'contract_type_ids' => ['nullable', 'array'],
@@ -41,6 +41,13 @@ class DocControllStoreRequest extends FormRequest
       'fields.*.label' => ['required', 'string'],
       'fields.*.type' => ['required', 'string', Rule::in(KycDocument::TYPES)],
     ];
+
+    if($this->route()->getName() == 'admin.invoice-doc-controls.store'){
+      $rules['contract_ids'] = ['nullable', 'array'];
+      $rules['contract_ids.*'] = ['nullable', 'exists:contracts,id'];
+    }
+
+    return $rules;
   }
 
   public function messages()
