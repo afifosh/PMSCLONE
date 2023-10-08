@@ -61,9 +61,10 @@
   <div class="card-body">
     <div class="col-12 mb-4">
       @if (count($documents))
-        <div class="bs-stepper wizard-vertical vertical mt-2">
-          <div class="bs-stepper-header">
-            @forelse ($documents as $document)
+        <div class="bs-stepper wizard-vertical horizontal mt-2 shadow-none">
+          @forelse ($documents as $document)
+            <!-- HEADER -->
+            <div class="bs-stepper-header">
               <div class="step step-index-{{$loop->index}}" data-target="#kyc-docs-{{$document['id']}}" data-href="
                 {{ (isset($contract)
                   ? route('admin.contracts.pending-documents.index', ['contract' => $contract->id ,'document_id' => $document->id, 'fields_only' => true])
@@ -72,25 +73,28 @@
                 ">
                 <button type="button" class="step-trigger">
                   <span class="bs-stepper-circle" style="background-color: #FF9F43 !important">{{$loop->iteration}}</span>
-                  <span class="bs-stepper-label">
+                  <span class="bs-stepper-label mw-100">
                     <span class="bs-stepper-title">{{$document->title}}</span>
                     <span class="bs-stepper-subtitle">{{$document->description}}</span>
                   </span>
                 </button>
               </div>
-            @empty
-            @endforelse
-          </div>
-          <div class="bs-stepper-content">
-            @forelse ($documents as $document)
-              <div id="kyc-docs-{{$document['id']}}" class="content">
+            </div>
+            
+            <!-- CONTENT -->
+            {{-- <div class="bs-stepper-content"> --}}
+              <div id="kyc-docs-{{$document['id']}}" class="content m-4">
                 @if ($document->id == request()->document_id)
                   @include('admin.pages.contracts.pending-documents.fields');
                 @endif
               </div>
-            @empty
-            @endforelse
-          </div>
+            {{-- </div> --}}
+          @empty
+            <div class="alert alert-info">
+              <h4 class="alert-heading">All Done</h4>
+              <p class="mb-0">There are no pending documents for now.</p>
+            </div>
+          @endforelse
         </div>
       @else
         <div class="alert alert-info">
@@ -101,5 +105,6 @@
     </div>
   </div>
 </div>
+
 @endsection
 
