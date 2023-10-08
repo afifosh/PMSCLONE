@@ -36,6 +36,15 @@ class AccountBalance extends Model
       'updated_at' => 'datetime:d M, Y',
     ];
 
+    public function getBalanceAttribute($value)
+    {
+      return $value / 1000;
+    }
+    public function setBalanceAttribute($value)
+    {
+      return $this->attributes['balance'] = round($value * 1000);
+    }
+
     public function setAccountNumberAttribute($value)
     {
       $value = $value ? $value : $this->createUniqueAccountNumber();
@@ -60,7 +69,7 @@ class AccountBalance extends Model
 
     public function printableBalance()
     {
-      return Money::{$this->currency}($this->balance, false)->format();
+      return Money::{$this->currency}($this->balance, true)->format();
     }
 
     public function printableAccountNumber()

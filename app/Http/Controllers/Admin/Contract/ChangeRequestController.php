@@ -97,7 +97,7 @@ class ChangeRequestController extends Controller
       $this->transactionProcessor->create(
         AccountBalance::find($contract->account_balance_id),
         new TransactionDto(
-          -($changeRequest->new_value - $contract->value) * 1000, // * 1000 to convert to cents and upto 3 decimal places
+          -($changeRequest->new_value - $contract->value),
           $changeRequest->new_value > $contract->value ? 'Debit' : 'Credit',
           'Contract Commitment - Updated',
           '',

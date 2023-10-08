@@ -50,7 +50,7 @@ class ProgramAccountsDataTable extends DataTable
       })->escapeColumns([])
 
     ->editColumn('balance', function($account){
-      return Money::{$account->currency ?? config('money.defaults.currency')}($account->balance, false)->format();
+      return Money::{$account->currency ?? config('money.defaults.currency')}($account->balance, true)->format();
     })
     ->editColumn('action', function($programAccount){
       return view('admin.pages.finances.program-accounts.actions', compact('programAccount'));
