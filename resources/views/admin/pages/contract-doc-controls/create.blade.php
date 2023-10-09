@@ -56,6 +56,11 @@
                               'data-url' => route('resource-select', ['Contract'])
                             ]) !!}
                           </div>
+                          {{-- Invoice Type --}}
+                          <div class="form-group">
+                            {{ Form::label('invoice_type', __('Invoice type'), ['class' => 'col-form-label']) }}
+                            {!! Form::select('invoice_type', (['' => 'Both'] + array_combine($invoice_types, $invoice_types)), $kyc_document->invoice_type , ['class' => 'form-select select2', 'data-placeholder' => __('Both'), 'data-allow-clear' => 'true']) !!}
+                          </div>
                         @endif
 
                         <div class="form-group mb-2">

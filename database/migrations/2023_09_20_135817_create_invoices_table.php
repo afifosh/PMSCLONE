@@ -40,7 +40,7 @@ return new class extends Migration
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
       $table->timestamp('retention_released_at')->nullable();
-      $table->enum('status', Invoice::STATUSES)->default('draft');
+      $table->enum('status', Invoice::STATUSES)->default('Draft');
       $table->timestamps();
     });
   }

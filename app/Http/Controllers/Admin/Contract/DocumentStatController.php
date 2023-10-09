@@ -21,7 +21,8 @@ class DocumentStatController extends Controller
       $data['contract_types'] = ContractType::pluck('name', 'id')->prepend('All', '');
     }else{
       $dataTable->model = resolve(Invoice::class);
-      $data = [];
+      $data['invoice_types'] = ['' => __('All')] + array_combine(Invoice::TYPES, Invoice::TYPES);
+      $data['invoice_statuses'] = ['' => __('All')] + array_combine(Invoice::STATUSES, Invoice::STATUSES);
     }
 
     return $dataTable->render('admin.pages.contracts.document-stats.index', $data);
