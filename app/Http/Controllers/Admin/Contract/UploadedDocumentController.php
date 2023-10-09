@@ -16,7 +16,7 @@ class UploadedDocumentController extends Controller
 {
   public function index($model, UploadedDocsDataTable $dataTable)
   {
-    if (request()->route()->getName() == 'admin.contracts.uploaded-docs.index') {
+    if (request()->route()->getName() == 'admin.contracts.uploaded-documents.index') {
       $dataTable->model = $data['contract'] =  Contract::findOrFail($model);
     } else {
       $dataTable->model = $data['invoice'] = Invoice::findOrFail($model);
@@ -37,7 +37,7 @@ class UploadedDocumentController extends Controller
 
   public function edit($model, UploadedKycDoc $uploadedDocument)
   {
-    if (request()->route()->getName() == 'admin.contracts.uploaded-docs.edit') {
+    if (request()->route()->getName() == 'admin.contracts.uploaded-documents.edit') {
       $data['modelInstance'] = Contract::findOrFail($model);
     } else {
       $data['modelInstance'] = Invoice::findOrFail($model);
@@ -52,7 +52,7 @@ class UploadedDocumentController extends Controller
 
   public function update(DocumentUploadRequest $request, $model, UploadedKycDoc $uploadedDocument)
   {
-    if (request()->route()->getName() == 'admin.contracts.uploaded-docs.update') {
+    if (request()->route()->getName() == 'admin.contracts.uploaded-documents.update') {
       $modelInstance = Contract::findOrFail($model);
     } else {
       $modelInstance = Invoice::findOrFail($model);
