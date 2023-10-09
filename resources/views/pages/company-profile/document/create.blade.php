@@ -18,7 +18,7 @@
   <hr class="my-3">
 @endif
 <div class="col-12 mb-4">
-  <div class="bs-stepper wizard-vertical vertical mt-2">
+  <div class="bs-stepper wizard-vertical vertical mt-2 shadow-none">
     <div class="bs-stepper-header">
       @forelse ($documents as $document)
         @php
