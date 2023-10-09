@@ -85,7 +85,7 @@
             {{-- <div class="bs-stepper-content"> --}}
               <div id="kyc-docs-{{$document['id']}}" class="content m-4">
                 @if ($document->id == request()->document_id)
-                  @include('admin.pages.contracts.pending-documents.fields');
+                  @include('admin.pages.contracts.pending-documents.fields')
                 @endif
               </div>
             {{-- </div> --}}
