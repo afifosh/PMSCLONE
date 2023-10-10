@@ -18,10 +18,10 @@ class ChangeRequestController extends Controller
   public function index(Contract $contract, ChangeRequestsDataTable $dataTable)
   {
     $data['contract'] = $contract;
-    if($contract)
-    $dataTable->contract = $contract;
+    if ($contract)
+      $dataTable->contract = $contract;
 
-    if(!$contract->id){
+    if (!$contract->id) {
       $data['contracts'] = Contract::has('changeRequests')->pluck('subject', 'id')->prepend('All', '0');
     }
 
@@ -33,7 +33,7 @@ class ChangeRequestController extends Controller
   {
     $contract = Contract::where('id', $contract)->firstOrNew();
     $change_order = new ContractChangeRequest();
-    $currency = config('money.currencies.'.($contract->currency ?? config('money.defaults.currency')));
+    $currency = config('money.currencies.' . ($contract->currency ?? config('money.defaults.currency')));
 
     $currency = [$contract->currency ?? config('money.defaults.currency') => $currency['name']];
 
@@ -42,9 +42,17 @@ class ChangeRequestController extends Controller
 
   public function store(ChangeRequestStoreRequest $request, Contract $contract)
   {
-    if($request->value_action != 'unchanged'){
+    if ($request->action_type == 'pause-contract') {
+      return $this->pauseContract($request, $contract);
+    } else if ($request->action_type == 'terminate-contract') {
+      return $this->terminateContract($request, $contract);
+    } else if ($request->action_type == 'resume-contract') {
+      return $this->resumeContract($request, $contract);
+    }
+
+    if ($request->value_action != 'unchanged') {
       $new_value = (int) $contract->value + ($request->value_action == 'inc' ? $request->value_change : -$request->value_change);
-    }else{
+    } else {
       $new_value = (int) $contract->value;
     }
 
@@ -65,6 +73,75 @@ class ChangeRequestController extends Controller
     return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
   }
 
+  public function pauseContract(ChangeRequestStoreRequest $request, Contract $contract)
+  {
+    if ($request->pause_until == 'manual') {
+      $data = [
+        'pause_until' => 'manual',
+        'description' => 'Pause Contract Until Manual Resume'
+      ];
+    } else if ($request->pause_until == 'custom_date') {
+      $data = [
+        'pause_until' => $request->custom_date_value,
+        'description' => 'Pause Contract Until ' . $request->custom_date_value
+      ];
+    } else if ($request->pause_until == 'custom_unit') {
+      $data = [
+        'pause_until' => now()->{'add' . $request->custom_unit}($request->pause_for),
+        'description' => 'Pause Contract For ' . $request->pause_for . ' ' . $request->custom_unit
+      ];
+    }
+
+    $data['pause_date'] = now();
+    $data['action'] = 'Pause Contract';
+
+    $contract->changeRequests()->create([
+      'sender_type' => 'App\Models\Admin',
+      'sender_id' => auth()->id(),
+      'reason' => $request->reason,
+      'description' => $request->description,
+      'data' => $data
+    ]);
+
+    return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
+  }
+  public function resumeContract(ChangeRequestStoreRequest $request, Contract $contract)
+  {
+    $data = [
+      'resume_date' => $request->resume_date == 'now' ? now() : $request->custom_resume_date,
+      'description' => $request->resume_date == 'now' ? 'Resume Contract' : 'Schedule Contract To Resume',
+      'action' => 'Resume'
+    ];
+
+    $contract->changeRequests()->create([
+      'sender_type' => 'App\Models\Admin',
+      'sender_id' => auth()->id(),
+      'reason' => $request->reason,
+      'description' => $request->description,
+      'data' => $data
+    ]);
+
+    return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
+  }
+  public function terminateContract(ChangeRequestStoreRequest $request, Contract $contract)
+  {
+    $data = [
+      'termination_date' => $request->terminate_date == 'now' ? now() : $request->custom_date,
+      'description' => $request->terminate_date == 'now' ? 'Terminate Contract' : 'Schedule Contract For Termination',
+      'action' => 'Termination'
+    ];
+
+    $contract->changeRequests()->create([
+      'sender_type' => 'App\Models\Admin',
+      'sender_id' => auth()->id(),
+      'reason' => $request->reason,
+      'description' => $request->description,
+      'data' => $data
+    ]);
+
+    return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
+  }
+
   public function approve(Contract $contract, ContractChangeRequest $changeRequest)
   {
     abort_if($changeRequest->status != 'Pending', 403, 'You can not reject this change request');
@@ -72,7 +149,7 @@ class ChangeRequestController extends Controller
     /*
     * update the account balance of the contract and remaining amount
     */
-    if($contract->value != $changeRequest->new_value){
+    if ($contract->value != $changeRequest->new_value) {
       $this->updateAccountBalance($contract, $changeRequest);
     }
 
@@ -93,11 +170,11 @@ class ChangeRequestController extends Controller
 
   protected function updateAccountBalance(Contract $contract, $changeRequest)
   {
-    if($contract->value != $changeRequest->new_value){
+    if ($contract->value != $changeRequest->new_value) {
       $this->transactionProcessor->create(
         AccountBalance::find($contract->account_balance_id),
         new TransactionDto(
-          -($changeRequest->new_value - $contract->value),
+          - ($changeRequest->new_value - $contract->value),
           $changeRequest->new_value > $contract->value ? 'Debit' : 'Credit',
           'Contract Commitment - Updated',
           '',
@@ -106,7 +183,6 @@ class ChangeRequestController extends Controller
         )
       );
     }
-
   }
 
   public function reject(Contract $contract, ContractChangeRequest $changeRequest)

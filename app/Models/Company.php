@@ -356,7 +356,7 @@ class Company extends BaseModel
     ->when(request()->get('q'), function ($q) {
       $q->where('name', 'like', '%' . request()->get('q') . '%');
     })
-    ->when(request()->has('contracts'), function ($q) {
+    ->when(request()->has('contracts') || request()->has('hasContract'), function ($q) {
       $q->has('contracts');
     })
     ->when(request()->has('hasinv'), function ($q) {

@@ -15,7 +15,7 @@ class CreateAccountBalanceSetupTables extends Migration
     {
         Schema::create('account_balances', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('account_number', 16)->unique();
+            $table->string('account_number', 16);
             $table->string('name', 255)->nullable();
             $table->char('currency', 3);
             $table->bigInteger('balance')->default(0);

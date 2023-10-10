@@ -50,9 +50,9 @@
       {{ Form::label('company_id', __('Client'), ['class' => 'col-form-label']) }}
       {!! Form::select('company_id', $clients ?? [], @$invoice->bill_clientid, [
         'id' => 'client_id-select',
-        'class' => 'form-select globalOfSelect2UserRemote dependent-select required',
+        'class' => 'form-select globalOfSelect2Remote dependent-select required',
         'data-placeholder' => 'Select Client',
-        'data-url' => route('resource-select-user', ['Company'])
+        'data-url' => route('resource-select', ['groupedCompany', 'hasContract'])
         ]) !!}
     </div>
     {{-- Contract --}}

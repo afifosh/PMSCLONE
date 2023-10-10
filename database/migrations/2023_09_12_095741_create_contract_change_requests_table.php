@@ -27,6 +27,8 @@ return new class extends Migration
       $table->string('new_currency')->nullable();
       $table->datetime('old_end_date')->nullable();
       $table->datetime('new_end_date')->nullable();
+      $table->enum('type', ['Terms', 'Lifecycle'])->default('Terms');
+      $table->json('data')->nullable();
       $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
       $table->timestamps();
     });

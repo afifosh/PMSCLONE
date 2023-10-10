@@ -4,102 +4,245 @@
     {!! Form::model($change_order, ['route' => ['admin.contracts.change-requests.store',  ['contract' => $contract->id ?? 'contract']], 'method' => 'POST', 'id' => 'create-change-request-form']) !!}
 @endif
 
-<div class="form-check">
-<div class="row">
+<div id="crc-sec" class="row">
   @if(!$contract->id)
-
-  <div class="mb-3">
-    {!! Form::label('contract_id', __('Select Contract'), ['class' => 'col-form-label']) !!}
-    {!! Form::select('contract_id', [], $contract->id ?? null, [
-      'data-placeholder' => 'Select Contract',
-      'class' => 'form-select globalOfSelect2Remote',
-      'data-url' => route('resource-select', ['Contract']),
-      'id' => 'contract_id'
-    ])!!}
-  </div>
+    <div class="mb-3">
+      {!! Form::label('contract_id', __('Select Contract'), ['class' => 'col-form-label']) !!}
+      {!! Form::select('contract_id', [], $contract->id ?? null, [
+        'data-placeholder' => 'Select Contract',
+        'class' => 'form-select globalOfSelect2Remote',
+        'data-url' => route('resource-select', ['Contract']),
+        'id' => 'contract_id'
+      ])!!}
+    </div>
   @endif
-  <div class="form-group col">
-    <label for="current_amount" class='col-form-label'>Current Value</label>
-    {!! Form::text('current_amount', $contract->printable_value ?? null, ['class' => 'form-control', 'disabled','placeholder' => __('value'), 'data-value' => $contract->value ?? null]) !!}
-  </div>
-  <div class="form-group col-6 d-none n-value">
-      <label for="new_value" class='col-form-label'>New Value</label>
-      {!! Form::text('new_value', null, ['class' => 'form-control', 'disabled','placeholder' => __('Value')]) !!}
-  </div>
-  <div class="d-flex mt-2">
-    <div class="form-check me-2">
-      <input class="form-check-input" type="radio" name="value_action" value="unchanged" id="unch-val-rd" checked>
-      <label class="form-check-label" for="unch-val-rd">
-        No Change
+  <div class="d-flex">
+    <div class="form-check me-3">
+      <input class="form-check-input" type="radio" name="action_type" value="update-terms" checked id="update-terms-rad">
+      <label class="form-check-label" for="update-terms-rad">
+        Update Terms
       </label>
     </div>
-    <div class="form-check me-2">
-      <input class="form-check-input" type="radio" name="value_action" value="inc" id="inc-val-rd">
-      <label class="form-check-label" for="inc-val-rd">
-        Increase Value
+    <div class="form-check me-3">
+      <input class="form-check-input" type="radio" name="action_type" value="pause-contract" id="pause-contract">
+      <label class="form-check-label" for="pause-contract">
+        Pause Contract
       </label>
     </div>
-    <div class="form-check me-2">
-      <input class="form-check-input" type="radio" name="value_action" value="dec" id="dec-val-rd">
-      <label class="form-check-label" for="dec-val-rd">
-        Decrease Value
+    <div class="form-check me-3">
+      <input class="form-check-input" type="radio" name="action_type" value="resume-contract" id="resume-contract">
+      <label class="form-check-label" for="resume-contract">
+        Resume Contract
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="action_type" value="terminate-contract" id="terminate-contract">
+      <label class="form-check-label" for="terminate-contract">
+        Terminate Contract
       </label>
     </div>
   </div>
-  <div class="form-group col-12 val-calc d-none">
-    <label for="value" class='col-form-label'>Value Change</label>
-    <div class="d-flex">
-      <div>
-        {!! Form::number('value_change', null, ['class' => 'form-control value_change', 'placeholder' => __('Value')]) !!}
-      </div>
-      {!! Form::select('currency', $currency ?? [], $contract->currency ?? null, [
-        'data-placeholder' => 'Select Currency',
-        'class' => 'form-select globalOfSelect2Remote value_change_currency',
-        'data-url' => route('resource-select', ['Currency'])
-        ])!!}
+  <div id="pause-contract-section" class="d-none ac-sec">
+    <div class="card mt-2">
+      <h5 class="card-header">Pause Contract</h5>
+        <div class="card-body">
+          <div class="row ms-3">
+            <div class="row">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pause_until" value="manual" id="pause-manual" checked>
+                <label class="form-check-label" for="pause-manual">
+                  Pause Until I Resume
+                </label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pause_until" value="custom_date" id="pause-custom">
+                <label class="form-check-label" for="pause-custom">
+                  Pause Until a specific date
+                </label>
+              </div>
+              <div class="col-5 d-none pause-durantion">
+                <div class="mb-3">
+                  <input type="date" id="custom-date-value" name="custom_date_value" class="form-control flatpickr" data-flatpickr='{"minDate": "today"}' placeholder="Select Date">
+                </div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pause_until" value="custom_date_from" id="pause-custom-from">
+                <label class="form-check-label" for="pause-custom-from">
+                  Pause from a date, until I resume
+                </label>
+              </div>
+              <div class="col-5 d-none pause-durantion">
+                <div class="mb-3">
+                  <input type="date" id="custom-from-date-value" name="custom_from_date_value" class="form-control flatpickr" placeholder="Select Date">
+                </div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="pause_until" value="custom_unit" id="pause-days">
+                <label class="form-check-label" for="pause-days">
+                  Pause For
+                </label>
+              </div>
+              <div class="col-5 d-none pause-durantion">
+                <div class="mb-3 d-flex">
+                  <span class="w-50">
+                    <input type="number" id="unit-value" name="pause_for"class="form-control cusom_resum_parm">
+                  </span>
+                  <span class="w-50">
+                    {!! Form::select('custom_unit', ['Days' => 'Days', 'Weeks' => 'Weeks', 'Months'=> 'Months'], null, ['class' => 'form-select select2 cusom_resum_parm']) !!}
+                  </span>
+                </div>
+                <div class="col">
+                  <div class="mb-3">
+                    <label for="" class="form-label">Will Resume On: </label>
+                    <input type="date" name="calculated_resumed_date" id="calculated_resumed_date" readonly class="form-control">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
   </div>
-
-    <hr class="mt-2">
-    <div class="form-group col">
-      {{ Form::label('c_end_date', __('Current End Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('c_end_date', $contract->end_date, ['class' => 'form-control', 'disabled','placeholder' => __('End Date')]) !!}
-    </div>
-    {{-- due date --}}
-    <div class="form-group col-6 new-end-date d-none">
-      {{ Form::label('new_end_date', __('New End Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('new_end_date', null, ['class' => 'form-control flatpickr', 'placeholder' => __('End Date')]) !!}
-    </div>
-    <div class="d-flex mt-2">
-      <div class="form-check me-2">
-        <input class="form-check-input" type="radio" name="timeline_action" value="unchanged" id="unch-timeline-rd" checked>
-        <label class="form-check-label" for="unch-timeline-rd">
-          No Change
-        </label>
+  <div id="update-terms-sectoin" class="ac-sec">
+    <div class="card mt-2">
+      <h5 class="card-header p-3">Update Terms</h5>
+      <div class="card-body row">
+        <div class="form-group col">
+          <label for="current_amount" class='col-form-label'>Current Value</label>
+          {!! Form::text('current_amount', $contract->printable_value ?? null, ['class' => 'form-control', 'disabled','placeholder' => __('value'), 'data-value' => $contract->value ?? null]) !!}
+        </div>
+        <div class="form-group col-6 d-none n-value">
+            <label for="new_value" class='col-form-label'>New Value</label>
+            {!! Form::text('new_value', null, ['class' => 'form-control', 'disabled','placeholder' => __('Value')]) !!}
+        </div>
+        <div class="d-flex mt-2">
+          <div class="form-check me-2">
+            <input class="form-check-input" type="radio" name="value_action" value="unchanged" id="unch-val-rd" checked>
+            <label class="form-check-label" for="unch-val-rd">
+              No Change
+            </label>
+          </div>
+          <div class="form-check me-2">
+            <input class="form-check-input" type="radio" name="value_action" value="inc" id="inc-val-rd">
+            <label class="form-check-label" for="inc-val-rd">
+              Increase Value
+            </label>
+          </div>
+          <div class="form-check me-2">
+            <input class="form-check-input" type="radio" name="value_action" value="dec" id="dec-val-rd">
+            <label class="form-check-label" for="dec-val-rd">
+              Decrease Value
+            </label>
+          </div>
+        </div>
+        <div class="form-group col-12 val-calc d-none">
+          <label for="value" class='col-form-label'>Value Change</label>
+          <div class="d-flex">
+            <div>
+              {!! Form::number('value_change', null, ['class' => 'form-control value_change', 'placeholder' => __('Value')]) !!}
+            </div>
+            {!! Form::select('currency', $currency ?? [], $contract->currency ?? null, [
+              'data-placeholder' => 'Select Currency',
+              'class' => 'form-select globalOfSelect2Remote value_change_currency',
+              'data-url' => route('resource-select', ['Currency'])
+              ])!!}
+          </div>
+        </div>
+        <hr class="mt-2">
+        <div class="form-group col">
+          {{ Form::label('c_end_date', __('Current End Date'), ['class' => 'col-form-label']) }}
+          {!! Form::date('c_end_date', $contract->end_date, ['class' => 'form-control', 'disabled','placeholder' => __('End Date')]) !!}
+        </div>
+        {{-- due date --}}
+        <div class="form-group col-6 new-end-date d-none">
+          {{ Form::label('new_end_date', __('New End Date'), ['class' => 'col-form-label']) }}
+          {!! Form::date('new_end_date', null, ['class' => 'form-control flatpickr', 'placeholder' => __('End Date')]) !!}
+        </div>
+        <div class="d-flex mt-2">
+          <div class="form-check me-2">
+            <input class="form-check-input" type="radio" name="timeline_action" value="unchanged" id="unch-timeline-rd" checked>
+            <label class="form-check-label" for="unch-timeline-rd">
+              No Change
+            </label>
+          </div>
+          <div class="form-check me-2">
+            <input class="form-check-input" type="radio" name="timeline_action" value="inc" id="inc-timeline-rd">
+            <label class="form-check-label" for="inc-timeline-rd">
+              Extend
+            </label>
+          </div>
+          <div class="form-check me-2">
+            <input class="form-check-input" type="radio" name="timeline_action" value="dec" id="dec-timeline-rd">
+            <label class="form-check-label" for="dec-timeline-rd">
+              Shorten
+            </label>
+          </div>
+        </div>
+        <div class="form-group col-12 timeline-calc d-none">
+          <label for="value" class='col-form-label'>Value Change</label>
+          <div class="d-flex">
+            {!! Form::number('timeline_change', null, ['class' => 'form-control timeline_change', 'placeholder' => __('Value')]) !!}
+            {!! Form::select('timeline_unit', ['Day' => 'Day(s)', 'Month' => 'Month(s)', 'Year' => 'Year(s)'], null, [
+              'data-start-date' => $contract->start_date,
+              'class' => 'form-select globalOfSelect2 timeline_change_unit'
+              ])!!}
+          </div>
+        </div>
       </div>
-      <div class="form-check me-2">
-        <input class="form-check-input" type="radio" name="timeline_action" value="inc" id="inc-timeline-rd">
-        <label class="form-check-label" for="inc-timeline-rd">
-          Extend
-        </label>
-      </div>
-      <div class="form-check me-2">
-        <input class="form-check-input" type="radio" name="timeline_action" value="dec" id="dec-timeline-rd">
-        <label class="form-check-label" for="dec-timeline-rd">
-          Shorten
-        </label>
+    </div>
+  </div>
+  <div id="contract-terminate-section" class="d-none ac-sec">
+    <div class="card mt-2">
+      <h5 class="card-header p-3">Terminate Contract</h5>
+      <div class="card-body">
+        <div class="row ms-3">
+          <div class="row">
+            <div class="form-check mb-4">
+              <input class="form-check-input" type="radio" name="terminate_date" value="now" id="terminate-now" checked>
+              <label class="form-check-label" for="terminate-now">
+                Terminate Immediately
+              </label>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="radio" name="terminate_date" value="custom" id="terminate-date">
+              <label class="form-check-label" for="terminate-date">
+                Terminate on a specific date
+              </label>
+            </div>
+            <div class="mb-3 col-6 d-none">
+              <input type="date" name="custom_date" id="custom-termination-date" class="form-control flatpickr" placeholder="Termination Date" data-flatpickr='{"minDate" : "today"}'>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="form-group col-12 timeline-calc d-none">
-      <label for="value" class='col-form-label'>Value Change</label>
-      <div class="d-flex">
-        {!! Form::number('timeline_change', null, ['class' => 'form-control timeline_change', 'placeholder' => __('Value')]) !!}
-        {!! Form::select('timeline_unit', ['Day' => 'Day(s)', 'Month' => 'Month(s)', 'Year' => 'Year(s)'], null, [
-          'data-start-date' => $contract->start_date,
-          'class' => 'form-select globalOfSelect2 timeline_change_unit'
-          ])!!}
+  </div>
+  <div id="contract-resume-section" class="d-none ac-sec">
+    <div class="card mt-2">
+      <h5 class="card-header p-3">Resume Contract</h5>
+      <div class="card-body">
+        <div class="row ms-3">
+          <div class="row">
+            <div class="form-check mb-4">
+              <input class="form-check-input" type="radio" name="resume_date" value="now" id="resume-now" checked>
+              <label class="form-check-label" for="resume-now">
+                Resume Immediately
+              </label>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="radio" name="resume_date" value="custom" id="resume-date">
+              <label class="form-check-label" for="resume-date">
+                Resume on a specific date
+              </label>
+            </div>
+            <div class="mb-3 col-6 d-none">
+              <input type="date" name="custom_resume_date" id="custom-resume-date" class="form-control flatpickr" placeholder="Resume Date">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
   <div class="form-group col-12">
     <label for="reason" class='col-form-label'>Reason</label>
@@ -251,4 +394,85 @@
       });
     }
   })
+
+  // show appropriate section on radio change
+  $(document).on('change', 'input[type=radio][name="action_type"]', function(){
+    let val = $(this).val();
+    $('.ac-sec').addClass('d-none');
+    if(val == 'pause-contract'){
+      $('#pause-contract-section').removeClass('d-none');
+    }else if(val == 'update-terms'){
+      $('#update-terms-sectoin').removeClass('d-none');
+    } else if(val == 'resume-contract'){
+      $('#contract-resume-section').removeClass('d-none');
+    } else if(val == 'terminate-contract'){
+      $('#contract-terminate-section').removeClass('d-none');
+    }
+  });
+
+  // pause Form js
+  $(document).on('change', 'input[name="pause_until"]', function() {
+      if ($(this).val() == 'custom_date') {
+        $('#custom-date-value').parents('.pause-durantion').removeClass('d-none');
+      } else {
+        $('#custom-date-value').parents('.pause-durantion').addClass('d-none');
+      }
+
+      if ($(this).val() == 'custom_date_from') {
+        $('#custom-from-date-value').parents('.pause-durantion').removeClass('d-none');
+      } else {
+        $('#custom-from-date-value').parents('.pause-durantion').addClass('d-none');
+      }
+
+      if ($(this).val() == 'custom_unit') {
+        $('#unit-value').parents('.pause-durantion').removeClass('d-none');
+      } else {
+        $('#unit-value').parents('.pause-durantion').addClass('d-none');
+      }
+  });
+  // end pause Form js
+
+  // termination form js
+  $(document).on('change', 'input[name="terminate_date"]', function() {
+    if ($(this).val() == 'custom') {
+      $('#custom-termination-date').parent().removeClass('d-none');
+    } else {
+      $('#custom-termination-date').parent().addClass('d-none');
+    }
+  });
+  // end termination form js
+
+  // resume form js
+  $(document).on('change', 'input[name="resume_date"]', function() {
+    if ($(this).val() == 'custom') {
+      $('#custom-resume-date').parent().removeClass('d-none');
+    } else {
+      $('#custom-resume-date').parent().addClass('d-none');
+    }
+  });
+  // end resume form js
+
+  // Resume form js
+  $(document).on('change', '.cusom_resum_parm', function(){
+      var unit = $('select[name="custom_unit"]').val();
+      var value = $('input[name="pause_for"]').val();
+      var date = new Date();
+      if(unit == 'Days'){
+          date.setDate(date.getDate() + parseInt(value));
+      }else if(unit == 'Weeks'){
+          date.setDate(date.getDate() + (parseInt(value) * 7));
+      }else if(unit == 'Months'){
+          date.setMonth(date.getMonth() + parseInt(value));
+      }
+      $('#calculated_resumed_date').val(date.toISOString().slice(0,10));
+  });
+  $(document).on('change', '#resume_now', function(){
+      if($(this).is(':checked')){
+          $('.resume_now_submit').removeClass('disabled');
+      }else{
+          $('.resume_now_submit').addClass('disabled');
+      }
+  });
+  // end Resume form js
+
 </script>

@@ -29,10 +29,7 @@ class ContractController extends Controller
   public function index(ContractsDataTable $dataTable)
   {
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
-    $data['projects'] = Project::mine()->whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
-    $data['companies'] = Company::has('contracts')->orderBy('type')->get(['id', 'name', 'type']);;
-    $data['programs'] = Program::has('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
     $data['contracts'] = Contract::selectRaw('count(*) as total')

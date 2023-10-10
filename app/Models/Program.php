@@ -45,7 +45,9 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
 
     public function scopeApplyRequestFilters($query)
     {
-      //
+      $query->when(request()->has('hasContract'), function ($q){
+        $q->has('contracts');
+      });
     }
 
 

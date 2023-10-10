@@ -22,7 +22,7 @@
   }
   .bs-stepper .step.crossed .step-trigger .bs-stepper-circle {
     background-color: inherit !important;
-    color: #474747 !important;
+    color: white !important;
   }
 </style>
 @endsection
@@ -72,7 +72,7 @@
                 )}}
                 ">
                 <button type="button" class="step-trigger">
-                  <span class="bs-stepper-circle" style="background-color: #FF9F43 !important">{{$loop->iteration}}</span>
+                  <span class="bs-stepper-circle" style="background-color: #FF9F43 !important; color:white !important;">{{$loop->iteration}}</span>
                   <span class="bs-stepper-label mw-100">
                     <span class="bs-stepper-title">{{$document->title}}</span>
                     <span class="bs-stepper-subtitle">{{$document->description}}</span>
@@ -80,7 +80,7 @@
                 </button>
               </div>
             </div>
-            
+
             <!-- CONTENT -->
             {{-- <div class="bs-stepper-content"> --}}
               <div id="kyc-docs-{{$document['id']}}" class="content m-4">

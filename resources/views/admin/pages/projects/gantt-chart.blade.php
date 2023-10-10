@@ -676,7 +676,7 @@ gantt.$task_data.style.cursor = 'grab';
                 'class' => 'form-select select2Remote gantt_filter',
                 'data-placeholder' => 'All',
                 'data-allow-clear' => 'true',
-                'data-url' => route('resource-select', ['groupedCompany', 'hasContracts'])
+                'data-url' => route('resource-select', ['groupedCompany', 'hasContract'])
               ]) !!}
             </div>
           @endif

@@ -75,7 +75,9 @@ class Project extends Model
 
   public function scopeApplyRequestFilters($query)
   {
-    //
+    $query->when(request()->has('hasContract'), function ($q){
+      $q->has('contracts');
+    });
   }
 
   public function program()

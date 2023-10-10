@@ -162,19 +162,29 @@ $configData = Helper::appClasses();
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
             <div class="col">
               {!! Form::label('projects', 'Projects') !!}
-              {!! Form::select('projects', $projects, null, ['class' => 'form-select select2', 'data-placeholder' => 'Projects']) !!}
+              {!! Form::select('projects', [], [], [
+                'class' => 'form-select select2Remote',
+                'data-placeholder' => __('All'),
+                'data-allow-clear' => 'true',
+                'data-url' => route('resource-select', ['Project', 'hasContract'])
+              ]) !!}
             </div>
             <div class="col">
               {!! Form::label('programs', 'Programs') !!}
-              {!! Form::select('programs', $programs, null, ['class' => 'form-select select2', 'data-placeholder' => 'Programs']) !!}
+              {!! Form::select('programs', [], [], [
+                'class' => 'form-select select2Remote',
+                'data-placeholder' => __('All'),
+                'data-allow-clear' => 'true',
+                'data-url' => route('resource-select', ['Program', 'hasContract'])
+              ]) !!}
             </div>
             <div class="col">
               {!! Form::label('project Status', 'Contract Status') !!}
-              {!! Form::select('filter_status', [0 => 'All'] + $contract_statuses, null, ['class' => 'form-select select2', 'data-placeholder' => 'Status']) !!}
+              {!! Form::select('filter_status', $contract_statuses, null, ['class' => 'form-select select2', 'data-placeholder' => 'All', 'data-allow-clear' => 'true']) !!}
             </div>
             <div class="col">
               {!! Form::label('contract_type', 'Contract Type') !!}
-              {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select select2', 'data-placeholder' => 'Type']) !!}
+              {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select select2', 'data-placeholder' => 'All', 'data-allow-clear' => 'true']) !!}
             </div>
             <div class="col">
               {!! Form::label('companies', 'Client') !!}
@@ -182,7 +192,7 @@ $configData = Helper::appClasses();
                 'class' => 'form-select select2Remote',
                 'data-placeholder' => 'All Clients',
                 'data-allow-clear' => 'true',
-                'data-url' => route('resource-select', ['groupedCompany', 'hascontracts']),
+                'data-url' => route('resource-select', ['groupedCompany', 'hasContract']),
                 ]) !!}
             </div>
           </div>

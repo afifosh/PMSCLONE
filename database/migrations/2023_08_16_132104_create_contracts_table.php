@@ -20,7 +20,7 @@ return new class extends Migration
       $table->foreignId('account_balance_id')->nullable()->constrained('account_balances')->onDelete('cascade')->cascadeOnUpdate();
       $table->nullableMorphs('assignable');
       $table->boolean('visible_to_client')->default(false);
-      $table->string('refrence_id', 100)->unique()->nullable();
+      $table->string('refrence_id', 100)->nullable();
       $table->string('subject');
       $table->string('currency', 5)->default('SAR');
       $table->unsignedBigInteger('value')->default(0);
