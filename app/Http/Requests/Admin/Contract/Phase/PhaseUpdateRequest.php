@@ -33,7 +33,7 @@ class PhaseUpdateRequest extends FormRequest
         'required',
         'numeric',
         ($this->phase->stage->is_budget_planned ? 'gt:0' : 'gte:0'),
-        'max:' . ($this->phase->stage->is_budget_planned ? ($this->phase->stage->remaining_amount - $tax_amount + $this->phase->estimated_cost) : ($this->contract->remaining_amount - $tax_amount + $this->phase->estimated_cost))
+        'max:' . ($this->phase->stage->is_budget_planned ? ($this->phase->stage->remaining_amount - $tax_amount + $this->phase->total_cost) : ($this->contract->remaining_amount - $tax_amount + $this->phase->total_cost))
       ],
       'total_cost' => [
         'required',
