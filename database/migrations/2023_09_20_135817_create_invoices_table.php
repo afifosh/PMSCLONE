@@ -42,6 +42,7 @@ return new class extends Migration
       $table->timestamp('retention_released_at')->nullable();
       $table->boolean('is_auto_generated')->default(false);
       $table->enum('status', Invoice::STATUSES)->default('Draft');
+      $table->timestamp('deleted_at')->nullable();
       $table->timestamps();
     });
   }

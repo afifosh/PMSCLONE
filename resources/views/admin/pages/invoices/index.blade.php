@@ -46,7 +46,12 @@ $configData = Helper::appClasses();
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
             <div class="col">
               {!! Form::label('filter_contract', 'Contract') !!}
-              {!! Form::select('filter_contract', $contracts, '', ['class' => 'form-select select2']) !!}
+              {!! Form::select('filter_contract', [], [], [
+                'class' => 'form-select select2Remote',
+                'data-placeholder' => 'All',
+                'data-allow-clear' => 'true',
+                'data-url' => route('resource-select', ['Contract', 'hasinv'])
+              ]) !!}
             </div>
             <div class="col">
               {!! Form::label('filter_company', 'Client') !!}
@@ -59,12 +64,38 @@ $configData = Helper::appClasses();
             </div>
             <div class="col">
               {!! Form::label('filter_status', 'Status') !!}
-              {!! Form::select('filter_status', $invoice_statuses, '', ['class' => 'form-select select2']) !!}
+              {!! Form::select('filter_status', $invoice_statuses, '', ['class' => 'form-select select2', 'data-placeholder' => 'All', 'data-allow-clear' => 'true']) !!}
             </div>
             <div class="col">
               {!! Form::label('filter_type', 'Type') !!}
-              {!! Form::select('filter_type', $invoice_types, '', ['class' => 'form-select select2']) !!}
+              {!! Form::select('filter_type', $invoice_types, '', ['class' => 'form-select select2', 'data-placeholder' => 'All', 'data-allow-clear' => 'true']) !!}
             </div>
+            <div class="col">
+              {!! Form::label('filter_due_date', 'Due Date') !!}
+              {!! Form::select('filter_due_date', [
+                '' => 'All',
+                'Overdue' => ['over_due' => 'Overdue'],
+                'Month' => [
+                  'this_month' => 'This Month',
+                  'prev_month' => 'Previous Month',
+                  'next_month' => 'Next Month',
+                ],
+                'Quarter' => [
+                  'this_quarter' => 'This Quarter',
+                  'prev_quarter' => 'Previous Quarter',
+                  'next_quarter' => 'Next Quarter',
+                ],
+                ], '',
+                [
+                  'class' => 'form-select select2',
+                  'data-placeholder' => 'All',
+                  'data-allow-clear' => 'true'
+                ]
+              ) !!}
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
+
           </div>
         </form>
       @endif

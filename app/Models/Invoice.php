@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Mediable;
 
 class Invoice extends Model
 {
-  use HasFactory, Mediable;
+  use HasFactory, Mediable, SoftDeletes;
 
   protected $fillable = [
     'company_id',
@@ -174,7 +175,7 @@ class Invoice extends Model
 
   public function getRetentionAmountAttribute($value)
   {
-    if($this->retention_released_at){
+    if ($this->retention_released_at) {
       return 0;
     }
 
@@ -239,8 +240,22 @@ class Invoice extends Model
       $q->where('status', request()->filter_status);
     })->when(request()->filter_type, function ($q) {
       $q->where('type', request()->filter_type);
-    })->when(request()->has('haspayments'), function($q){
+    })->when(request()->has('haspayments'), function ($q) {
       $q->has('payments');
+    })->when(request()->filter_due_date == 'this_month', function ($q) {
+      $q->whereBetween('due_date', [today()->startOfMonth(), today()->endOfMonth()]);
+    })->when(request()->filter_due_date == 'next_month', function ($q) {
+      $q->whereBetween('due_date', [today()->addMonth()->startOfMonth(), today()->addMonth()->endOfMonth()]);
+    })->when(request()->filter_due_date == 'prev_month', function ($q) {
+      $q->whereBetween('due_date', [today()->subMonth()->startOfMonth(), today()->subMonth()->endOfMonth()]);
+    })->when(request()->filter_due_date == 'over_due', function ($q) {
+      $q->where('due_date', '<', today())->where('status', '!=', 'Paid');
+    })->when(request()->filter_due_date == 'this_quarter', function ($q) {
+      $q->whereBetween('due_date', [today()->startOfQuarter(), today()->endOfQuarter()]);
+    })->when(request()->filter_due_date == 'prev_quarter', function ($q) {
+      $q->whereBetween('due_date', [today()->subQuarter()->startOfQuarter(), today()->subQuarter()->endOfQuarter()]);
+    })->when(request()->filter_due_date == 'next_quarter', function ($q) {
+      $q->whereBetween('due_date', [today()->addQuarter()->startOfQuarter(), today()->addQuarter()->endOfQuarter()]);
     });
   }
 
@@ -250,7 +265,8 @@ class Invoice extends Model
     return $this->morphMany(InvoiceItem::class, 'invoiceable');
   }
 
-  public function isEditable(){
+  public function isEditable()
+  {
     return !in_array($this->status, ['Paid', 'Partial Paid']);
   }
 
@@ -296,14 +312,14 @@ class Invoice extends Model
 
             $item->update(['invoice_id' => $this->id]);
 
-            if(!$this->is_summary_tax){
+            if (!$this->is_summary_tax) {
               $item->taxes()->update(['invoice_id' => $this->id]);
             }
           });
 
-          if($deleteMerged)
+          if ($deleteMerged)
             $invoice->delete();
-          else{
+          else {
             $invoice->update(['status' => 'Cancelled']);
             $invoice->updateTaxAmount();
           }
@@ -325,13 +341,13 @@ class Invoice extends Model
   {
     return KycDocument::where('status', 1) // active
       ->where('workflow', 'Invoice Required Docs') // workflow
-      ->where(function ($q){ // filter by invoice type')
+      ->where(function ($q) { // filter by invoice type')
         $q->where('invoice_type', 'Both')
           ->orWhere('invoice_type', $this->type)
           ->orWhereNull('invoice_type');
       })
       ->whereIn('client_type', array_merge(['Both'], ($this->contract->assignable instanceof Company ?  [$this->contract->assignable->type] : []))) // filter by client type
-      ->where(function ($q){ // filter by contract
+      ->where(function ($q) { // filter by contract
         $q->whereHas('contracts', function ($q) {
           $q->where('contracts.id', $this->contract_id);
         })->orHas('contracts', '=', 0);

@@ -1,7 +1,7 @@
 @if ($invoicePayment->id)
-    {!! Form::model($invoicePayment, ['route' => ['admin.finances.payments.update', $invoicePayment->id], 'method' => 'PUT']) !!}
+    {!! Form::model($invoicePayment, ['route' => ['admin.finances.payments.update', $invoicePayment->id, 'event' => isset($event) ? $event : ''], 'method' => 'PUT']) !!}
 @else
-    {!! Form::model($invoicePayment, ['route' => ['admin.finances.payments.store'], 'method' => 'POST']) !!}
+    {!! Form::model($invoicePayment, ['route' => ['admin.finances.payments.store', 'event' => isset($event) ? $event : ''], 'method' => 'POST']) !!}
 @endif
 
 <div class="row add-payment-form">
@@ -12,7 +12,8 @@
         'data-placeholder' => __('Select Client'),
         'class' => 'form-select globalOfSelect2Remote dependent-select',
         'data-url' => route('resource-select', ['groupedCompany', 'hasinv']),
-        'id' => 'payment-company-id'
+        'id' => 'payment-company-id',
+        'disabled' => isset($selected_invoice)
         ])!!}
     </div>
 
@@ -24,7 +25,8 @@
         'class' => 'form-select globalOfSelect2Remote dependent-select',
         'data-url' => route('resource-select', ['Contract', 'dependent' => 'company_id']),
         'data-dependent_id' => 'payment-company-id',
-        'id' => 'payment-contract-id'
+        'id' => 'payment-contract-id',
+        'disabled' => isset($selected_invoice)
         ])!!}
     </div>
     {{-- invoice --}}
@@ -37,6 +39,7 @@
         'class' => 'form-select globalOfSelect2Remote',
         'data-url' => route('resource-select', ['Invoice', 'dependent' => 'contract_id']),
         'data-dependent_id' => 'payment-contract-id',
+        'disabled' => isset($selected_invoice)
         ])!!}
     </div>
     {{-- Unpaid Amount --}}

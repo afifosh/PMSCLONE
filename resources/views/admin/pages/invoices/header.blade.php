@@ -12,7 +12,7 @@
           <div class="d-flex align-items-center">
             <div class="badge rounded-pill bg-label-info me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
             <div class="card-info">
-              <h5 class="mb-0">@cMoney($summary['total'] ?? 0, null, true)</h5>
+              <h5 class="mb-0">@cMoney($summary['total_amount'] ?? 0, null, true)</h5>
               <small>{{__('Total Amount')}}</small>
             </div>
           </div>
@@ -39,8 +39,66 @@
           <div class="d-flex align-items-center">
             <div class="badge rounded-pill bg-label-danger me-3 p-2"><i class="ti ti-shopping-cart ti-sm"></i></div>
             <div class="card-info">
-              <h5 class="mb-0">{{$overdue}}</h5>
-              <small>{{__('Over Due Invoices')}}</small>
+              <h5 class="mb-0">{{$trashed_count}}</h5>
+              <small>{{__('Trash')}}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mt-3  col-12">
+  <div class="card h-100">
+    <div class="card-header">
+      <div class="d-flex justify-content-between mb-3">
+        <h5 class="card-title mb-0">{{__('Invoices Payment Stats')}}</h5>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row gy-3 d-md-flex justify-content-between">
+        <div class="col-md-2 col-6">
+          <div class="d-flex align-items-center">
+            <div class="badge rounded-pill bg-label-info me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+            <div class="card-info">
+              <h5 class="mb-0">{{ $summary['total_invoices'] }}</h5>
+              <small>{{__('Total Invoices')}}</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="d-flex align-items-center">
+            <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+            <div class="card-info">
+              <h5 class="mb-0">{{ $summary['paid'] }}</h5>
+              <small>{{__('Paid Invoices')}}</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="d-flex align-items-center">
+            <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-currency-dollar ti-sm"></i></div>
+            <div class="card-info">
+              <h5 class="mb-0">{{ $summary['unpaid'] }}</h5>
+              <small>{{__('Unpaid Invoices')}}</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="d-flex align-items-center">
+            <div class="badge rounded-pill bg-label-danger me-3 p-2"><i class="ti ti-shopping-cart ti-sm"></i></div>
+            <div class="card-info">
+              <h5 class="mb-0">{{ $summary['partially_paid'] }}</h5>
+              <small>{{__('Partially Paid Invoices')}}</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="d-flex align-items-center">
+            <div class="badge rounded-pill bg-label-danger me-3 p-2"><i class="ti ti-shopping-cart ti-sm"></i></div>
+            <div class="card-info">
+              <h5 class="mb-0">{{ $summary['overdue'] }}</h5>
+              <small>{{__('Overdue Invoices')}}</small>
             </div>
           </div>
         </div>

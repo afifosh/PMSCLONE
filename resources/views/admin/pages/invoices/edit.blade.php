@@ -580,7 +580,7 @@
         <button class="btn btn-primary d-grid w-100 mt-2" type="button" data-toggle="ajax-modal" data-title="{{__('Merge Invoices')}}" data-href="{{route('admin.invoices.merge-invoices.create', [$invoice])}}">
           <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Merge Invoice</span>
         </button>
-        <button class="btn btn-primary d-grid mt-2 w-100" data-bs-toggle="offcanvas" type="button" data-bs-target="#addPaymentOffcanvas">
+        <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id])}}">
           <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
         </button>
       </div>

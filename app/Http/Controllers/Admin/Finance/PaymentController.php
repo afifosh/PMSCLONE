@@ -43,6 +43,16 @@ class PaymentController extends Controller
   {
     $data['invoicePayment'] = new InvoicePayment();
     $data['retentions'] = Tax::where('is_retention', 1)->where('status', 1)->get();
+    if($request->invoice){
+      $data['invoice'] = Invoice::with(['contract.assignable'])->findOrFail($request->invoice);
+      $data['companies'] = [$data['invoice']->contract->assignable_id => $data['invoice']->contract->assignable->name];
+      $data['contracts'] = [$data['invoice']->contract_id => $data['invoice']->contract->subject];
+      $data['invoiceId'] = [
+        $request->invoice => runtimeInvIdFormat($request->invoice) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount
+      ];
+      $data['selected_invoice'] = $request->invoice;
+      $data['event'] = 'page_reload';
+    }
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.create', $data)->render()]);
   }
@@ -64,7 +74,9 @@ class PaymentController extends Controller
       $req->invoice->contract->releaseInvoicesRetentions();
     }
 
-    return $this->sendRes('Payment created successfully.', ['event' => 'table_reload', 'table_id' => 'payments-table', 'close' => 'globalModal']);
+    $event = $req->event ? $req->event : 'table_reload';
+
+    return $this->sendRes('Payment created successfully.', ['event' => $event, 'table_id' => 'payments-table', 'close' => 'globalModal']);
   }
 
   public function edit(InvoicePayment $payment)

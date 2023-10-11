@@ -24,10 +24,17 @@ class InvoiceController extends Controller
       $dataTable->filterBy = Company::findOrFail(request()->route('company'));
       $data['company'] = $dataTable->filterBy;
     } else {
-      $data['summary'] = Invoice::selectRaw('SUM(total) as total, SUM(paid_amount) as paid_amount, SUM(total - paid_amount)/100 as due_amount')->first();
-      $data['overdue'] = Invoice::where('due_date', '<', now())->where('status', '!=', 'Paid')->count();
-      $data['contracts'] = Contract::has('invoices')->pluck('subject', 'id')->prepend('All', '');
-      $data['companies'] = Company::has('contracts.invoices')->get(['name', 'id', 'type'])->prepend('All', '');
+      $data['summary'] = Invoice::selectRaw('
+        SUM(total) / 1000 as total_amount,
+        SUM(paid_amount) as paid_amount,
+        SUM(total - paid_amount) / 1000 as due_amount,
+        COUNT(*) as total_invoices,
+        SUM(IF(status = "Paid", 1, 0)) as paid,
+        SUM(IF((status = "Unpaid" OR status = "Draft" OR status = "Sent") AND (due_date > NOW()), 1, 0)) as unpaid,
+        SUM(IF(status = "Partially Paid", 1, 0)) as partially_paid,
+        SUM(IF(due_date < NOW() AND status != "Paid", 1, 0)) as overdue
+      ')->first();
+      $data['trashed_count'] = Invoice::onlyTrashed()->count();
       $data['invoice_types'] = ['' => __('All')] + array_combine(Invoice::TYPES, Invoice::TYPES);
       $data['invoice_statuses'] = ['' => __('All')] + array_combine(Invoice::STATUSES, Invoice::STATUSES);
     }
@@ -52,7 +59,7 @@ class InvoiceController extends Controller
 
   public function show(Invoice $invoice)
   {
-    if(request()->json){
+    if (request()->json) {
       return response()->json($invoice);
     }
   }
@@ -75,7 +82,7 @@ class InvoiceController extends Controller
 
   public function update(InvoiceStoreRequest $request, Invoice $invoice)
   {
-    if(!$invoice->isEditable()){
+    if (!$invoice->isEditable()) {
       return $this->sendRes('', ['event' => 'redirect', 'url' => route('admin.invoices.index')]);
     }
 
@@ -140,7 +147,7 @@ class InvoiceController extends Controller
 
   public function destroy(Invoice $invoice)
   {
-    if(!$invoice->isEditable()){
+    if (!$invoice->isEditable()) {
       return $this->sendError('Invoice is not editable');
     }
 
@@ -151,7 +158,7 @@ class InvoiceController extends Controller
 
   public function sortItems(Invoice $invoice, Request $request)
   {
-    if(!$invoice->isEditable()){
+    if (!$invoice->isEditable()) {
       return $this->sendError('Invoice is not editable');
     }
 
