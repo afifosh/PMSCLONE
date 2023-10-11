@@ -39,8 +39,8 @@ class StageUpdateRequest extends FormRequest
         'nullable',
         Rule::requiredIf($this->stage->is_budget_planned),
         'numeric',
-        'gte:' . $this->stage->stage_amount - $this->stage->remaining_amount, // gte already distributed to phases.
-        'lte:' . $this->contract->remaining_cost($this->stage->stage_amount)
+       // 'gte:' . $this->stage->stage_amount - $this->stage->remaining_amount, // gte already distributed to phases.
+       // 'lte:' . $this->contract->remaining_cost($this->stage->stage_amount)
       ],
       'description' => 'nullable|string|max:2000',
       'start_date' => [

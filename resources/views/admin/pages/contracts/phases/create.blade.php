@@ -188,9 +188,9 @@
     const balance = $(this).data('balance');
     if(percent && balance){
       const estimatedCost = (balance * percent) / 100;
-      $('[name="estimated_cost"]').val(estimatedCost);
+      $('[name="estimated_cost"]').val(estimatedCost).trigger('change');
     }else{
-      $('[name="estimated_cost"]').val('');
+      $('[name="estimated_cost"]').val('').trigger('change');
     }
   })
 
@@ -237,9 +237,9 @@
     const balance = $($this).data('max');
     if(totalCost && balance){
       // show validation error if total cost is greater than balance
-      if(totalCost > balance){
-        $($this).after('<div class="text-danger validation-error">The total cost must not be greater than '+balance+'.</div>');
-      }
+      // if(totalCost > balance){
+      //   $($this).after('<div class="text-danger validation-error">The total cost must not be greater than '+balance+'.</div>');
+      // }
     }
   }
 </script>

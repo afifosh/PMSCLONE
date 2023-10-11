@@ -38,13 +38,13 @@ class PhaseStoreRequest extends FormRequest
         'required',
         'numeric',
         ($this->stage->is_budget_planned ? 'gt:0' : 'gte:0'),
-        'max:' . ($this->stage->is_budget_planned ? ($this->stage->remaining_amount - $tax_amount) : ($this->contract->remaining_amount - $tax_amount))
+        //'max:' . ($this->stage->is_budget_planned ? ($this->stage->remaining_amount - $tax_amount) : ($this->contract->remaining_amount - $tax_amount))
       ],
       'total_cost' => [
         'required',
         'numeric',
         ($this->stage->is_budget_planned ? 'gt:0' : 'gte:0'),
-        'max:' . ($this->stage->is_budget_planned ? ($this->stage->remaining_amount) : ($this->contract->remaining_amount))
+        //'max:' . ($this->stage->is_budget_planned ? ($this->stage->remaining_amount) : ($this->contract->remaining_amount))
       ],
       'phase_taxes' => 'nullable|array',
       'phase_taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
