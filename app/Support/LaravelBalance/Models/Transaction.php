@@ -53,7 +53,7 @@ class Transaction extends Model
   }
   public function setAmountAttribute($value)
   {
-    return $this->attributes['amount'] = round($value * 1000);
+    return $this->attributes['amount'] = moneyToInt($value);
   }
 
   public function getRemainingBalanceAttribute($value)
@@ -62,7 +62,7 @@ class Transaction extends Model
   }
   public function setRemainingBalanceAttribute($value)
   {
-    return $this->attributes['remaining_balance'] = round($value * 1000);
+    return $this->attributes['remaining_balance'] = moneyToInt($value);
   }
 
   public function printableAmount()

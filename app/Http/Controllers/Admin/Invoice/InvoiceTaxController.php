@@ -21,7 +21,7 @@ class InvoiceTaxController extends Controller
 
     $sync_data = [];
     foreach ($rates as $rate) {
-      $sync_data[$rate->id] = ['amount' => $rate->amount * 1000, 'type' => $rate->type, 'invoice_item_id' => $request->item_id, 'invoice_id' => $invoice->id];
+      $sync_data[$rate->id] = ['amount' => $rate->getRawOriginal('amount'), 'type' => $rate->type, 'invoice_item_id' => $request->item_id, 'invoice_id' => $invoice->id];
     }
 
     if ($request->item_id) {

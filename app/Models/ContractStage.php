@@ -69,7 +69,7 @@ class ContractStage extends Model
 
   public function setStageAmountAttribute($value)
   {
-    $this->attributes['stage_amount'] = round($value * 1000);
+    $this->attributes['stage_amount'] = moneyToInt($value);;
   }
 
   public function getRemainingAmountAttribute()

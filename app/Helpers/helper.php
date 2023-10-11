@@ -200,3 +200,8 @@ function runtimeInvIdFormat($invoice_id = '') {
       return '---';
   }
 }
+
+function moneyToInt($amount)
+{
+  return round($amount * 1000, 0, PHP_ROUND_HALF_DOWN);
+}

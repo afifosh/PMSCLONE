@@ -58,7 +58,7 @@ class ContractChangeRequest extends Model
 
   public function setOldValueAttribute($value)
   {
-    return $this->attributes['old_value'] = Money::{$this->old_currency ?? config('money.defaults.currency')}($value)->getAmount() * 1000;
+    return $this->attributes['old_value'] = moneyToInt($value);
   }
 
   public function getNewValueAttribute($value)
@@ -68,7 +68,7 @@ class ContractChangeRequest extends Model
 
   public function setNewValueAttribute($value)
   {
-    return $this->attributes['new_value'] = Money::{$this->new_currency ?? config('money.defaults.currency')}($value)->getAmount() * 1000;
+    return $this->attributes['new_value'] = moneyToInt($value);
   }
 
   public function pritableOldValue()

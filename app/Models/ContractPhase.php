@@ -56,7 +56,7 @@ class ContractPhase extends Model
 
   public function setEstimatedCostAttribute($value)
   {
-    $this->attributes['estimated_cost'] = round($value * 1000);
+    $this->attributes['estimated_cost'] = moneyToInt($value);
   }
 
   public function getTaxAmountAttribute($value)
@@ -66,7 +66,7 @@ class ContractPhase extends Model
 
   public function setTaxAmountAttribute($value)
   {
-    $this->attributes['tax_amount'] = round($value * 1000);
+    $this->attributes['tax_amount'] = moneyToInt($value);
   }
 
   public function getTotalCostAttribute($value)
@@ -76,7 +76,7 @@ class ContractPhase extends Model
 
   public function setTotalCostAttribute($value)
   {
-    $this->attributes['total_cost'] = round($value * 1000);
+    $this->attributes['total_cost'] = moneyToInt($value);
   }
 
   public function getStatusAttribute()

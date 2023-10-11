@@ -33,6 +33,6 @@ class PhaseTax extends Model
 
   public function setAmountAttribute($value)
   {
-    $this->attributes['amount'] = $value * 1000;
+    $this->attributes['amount'] = moneyToInt($value);
   }
 }

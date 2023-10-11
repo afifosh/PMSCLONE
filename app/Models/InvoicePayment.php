@@ -37,7 +37,7 @@ class InvoicePayment extends Model
 
   public function setAmountAttribute($value)
   {
-    $this->attributes['amount'] = round($value * 1000);
+    $this->attributes['amount'] = moneyToInt($value);
   }
 
   public function contract()

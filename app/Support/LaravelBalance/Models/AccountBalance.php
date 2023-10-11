@@ -42,7 +42,7 @@ class AccountBalance extends Model
     }
     public function setBalanceAttribute($value)
     {
-      return $this->attributes['balance'] = round($value * 1000);
+      return $this->attributes['balance'] = moneyToInt($value);
     }
 
     public function setAccountNumberAttribute($value)

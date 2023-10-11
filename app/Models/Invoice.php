@@ -119,7 +119,7 @@ class Invoice extends Model
 
   public function setSubtotalAttribute($value)
   {
-    $this->attributes['subtotal'] = round($value * 1000);
+    $this->attributes['subtotal'] = moneyToInt($value);
   }
 
   public function getTotalAttribute($value)
@@ -129,7 +129,7 @@ class Invoice extends Model
 
   public function setTotalAttribute($value)
   {
-    $this->attributes['total'] = round($value * 1000);
+    $this->attributes['total'] = moneyToInt($value);
   }
 
   public function getPaidAmountAttribute($value)
@@ -139,7 +139,7 @@ class Invoice extends Model
 
   public function setPaidAmountAttribute($value)
   {
-    $this->attributes['paid_amount'] = round($value * 1000);
+    $this->attributes['paid_amount'] = moneyToInt($value);
   }
 
   public function getTotalTaxAttribute($value)
@@ -149,7 +149,7 @@ class Invoice extends Model
 
   public function setTotalTaxAttribute($value)
   {
-    $this->attributes['total_tax'] = round($value * 1000);
+    $this->attributes['total_tax'] = moneyToInt($value);
   }
 
   public function getDiscountAmountAttribute($value)
@@ -159,7 +159,7 @@ class Invoice extends Model
 
   public function setDiscountAmountAttribute($value)
   {
-    $this->attributes['discount_amount'] = round($value * 1000);
+    $this->attributes['discount_amount'] = moneyToInt($value);
   }
 
   public function getAdjustmentAmountAttribute($value)
@@ -169,7 +169,7 @@ class Invoice extends Model
 
   public function setAdjustmentAmountAttribute($value)
   {
-    $this->attributes['adjustment_amount'] = round($value * 1000);
+    $this->attributes['adjustment_amount'] = moneyToInt($value);
   }
 
   public function getRetentionAmountAttribute($value)
@@ -183,7 +183,7 @@ class Invoice extends Model
 
   public function setRetentionAmountAttribute($value)
   {
-    $this->attributes['retention_amount'] = round($value * 1000);
+    $this->attributes['retention_amount'] = moneyToInt($value);
   }
 
   public function updateItemsTaxType(): void
@@ -379,7 +379,7 @@ class Invoice extends Model
       $data = [];
       foreach ($phase_ids as $phase) {
         $data[$phase] = [
-          'amount' => $pivot_amounts->where('id', $phase)->first()->estimated_cost * 1000
+          'amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('estimated_cost')
         ]; // convert to cents manually, setter is not working for pivot table
       }
 

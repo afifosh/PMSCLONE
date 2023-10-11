@@ -33,7 +33,7 @@ class InvoiceItem extends Model
 
   public function setAmountAttribute($value)
   {
-    $this->attributes['amount'] = round($value * 1000);
+    $this->attributes['amount'] = moneyToInt($value);
   }
 
   public function getTotalTaxAmountAttribute($value)
@@ -43,7 +43,7 @@ class InvoiceItem extends Model
 
   public function setTotalTaxAmountAttribute($value)
   {
-    $this->attributes['total_tax_amount'] = round($value * 1000);
+    $this->attributes['total_tax_amount'] = moneyToInt($value);
   }
 
   public function invoice()

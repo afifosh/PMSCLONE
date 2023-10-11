@@ -74,7 +74,7 @@ class Contract extends Model
 
   public function setValueAttribute($value)
   {
-    return $this->attributes['value'] = Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount() * 1000;
+    return $this->attributes['value'] = moneyToInt($value);
   }
 
   public function getRemainingAmountAttribute()

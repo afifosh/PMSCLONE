@@ -28,7 +28,7 @@ class CustomInvoiceItem extends Model
 
   public function setPriceAttribute($value)
   {
-    $this->attributes['price'] = round($value * 1000);
+    $this->attributes['price'] = moneyToInt($value);
   }
 
   public function getTotalAttribute($value)
@@ -39,7 +39,7 @@ class CustomInvoiceItem extends Model
 
   public function setTotalAttribute($value)
   {
-    $this->attributes['total'] = round($value * 1000);
+    $this->attributes['total'] = moneyToInt($value);
   }
 
   public function invoice()
