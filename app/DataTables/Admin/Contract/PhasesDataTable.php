@@ -22,31 +22,33 @@ class PhasesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-    ->editColumn('action', function($phase){
-      $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid']));
-      return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $this->stage, 'contract_id' => $this->contract_id, 'is_editable' => $is_editable])->render();
-    })
-    ->editColumn('invoice_id', function($phase){
-      $invoiceItem = $phase->addedAsInvoiceItem->first();
-      return $invoiceItem
+      ->editColumn('checkbox', function ($phase) {
+        return '<input class="form-check-input phase-check" name="selected_phases[]" type="checkbox" value="' . $phase->id . '">';
+      })
+      ->editColumn('action', function ($phase) {
+        $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid']));
+        return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $this->stage, 'contract_id' => $this->contract_id, 'is_editable' => $is_editable])->render();
+      })
+      ->editColumn('invoice_id', function ($phase) {
+        $invoiceItem = $phase->addedAsInvoiceItem->first();
+        return $invoiceItem
           ? '<a href="' . route('admin.invoices.edit', $invoiceItem->invoice_id) . '">' . runtimeInvIdFormat($invoiceItem->invoice_id) . '</a>'
           : 'N/A';
-    })
-    ->editColumn('estimated_cost', function($phase){
-      return Money($phase->estimated_cost, $phase->contract->currency, true);
-    })
-    ->editColumn('tax_amount', function($phase){
-      return Money($phase->tax_amount, $phase->contract->currency, true);
-    })
-    ->editColumn('total_cost', function($phase){
-      return Money($phase->total_cost, $phase->contract->currency, true);
-    })->rawColumns(['invoice_id','action'])
-    ->setRowAttr([
-      'data-id' => function($phase){
-        return $phase->id;
-      }
-    ]);
-
+      })
+      ->editColumn('estimated_cost', function ($phase) {
+        return Money($phase->estimated_cost, $phase->contract->currency, true);
+      })
+      ->editColumn('tax_amount', function ($phase) {
+        return Money($phase->tax_amount, $phase->contract->currency, true);
+      })
+      ->editColumn('total_cost', function ($phase) {
+        return Money($phase->total_cost, $phase->contract->currency, true);
+      })->rawColumns(['invoice_id', 'action', 'checkbox'])
+      ->setRowAttr([
+        'data-id' => function ($phase) {
+          return $phase->id;
+        }
+      ]);
   }
 
   /**
@@ -54,15 +56,15 @@ class PhasesDataTable extends DataTable
    */
   public function query(ContractPhase $model): QueryBuilder
   {
-      return $model
-          ->when($this->stage instanceof ContractStage, function($q){
-              $q->where('stage_id', $this->stage->id);
-          })
-          ->when($this->contract_id, function($q){
-            $q->where('contract_id', $this->contract_id);
-          })
-          ->with('addedAsInvoiceItem.invoice')
-          ->newQuery();
+    return $model
+      ->when($this->stage instanceof ContractStage, function ($q) {
+        $q->where('stage_id', $this->stage->id);
+      })
+      ->when($this->contract_id, function ($q) {
+        $q->where('contract_id', $this->contract_id);
+      })
+      ->with('addedAsInvoiceItem.invoice')
+      ->newQuery();
   }
 
 
@@ -73,15 +75,29 @@ class PhasesDataTable extends DataTable
   {
     $buttons = [];
     // if ($this->contract->getRawOriginal('status') == 'Active')
-      $buttons[] = [
-        'text' => '<span>Add Phase</span>',
-        'className' =>  'btn btn-primary mx-3',
-        'attr' => [
-          'data-toggle' => "ajax-modal",
-          'data-title' => 'Add Phase',
-          'data-href' => route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $this->contract_id, $this->stage->id ?? 'stage'])
-        ]
-      ];
+    $buttons[] = [
+      'text' => '<span>Select Phases</span>',
+      'className' =>  'btn btn-primary mx-3 select-phases-btn',
+      'attr' => [
+        'onclick' => 'toggleCheckboxes()',
+      ]
+    ];
+    $buttons[] = [
+      'text' => '<span>Create Invoices</span>',
+      'className' =>  'btn btn-primary mx-3 create-inv-btn d-none',
+      'attr' => [
+        'onclick' => 'createInvoices()',
+      ]
+    ];
+    $buttons[] = [
+      'text' => '<span>Add Phase</span>',
+      'className' =>  'btn btn-primary',
+      'attr' => [
+        'data-toggle' => "ajax-modal",
+        'data-title' => 'Add Phase',
+        'data-href' => route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $this->contract_id, $this->stage->id ?? 'stage'])
+      ]
+    ];
 
     return $this->builder()
       ->setTableId('phases-table')
@@ -111,6 +127,7 @@ class PhasesDataTable extends DataTable
   {
     return [
       Column::make('order')->visible(false),
+      Column::make('checkbox')->title('<input class="form-check-input phase-check-all" type="checkbox">')->orderable(false)->searchable(false)->printable(false)->exportable(false)->visible(false)->width(1),
       Column::make('name'),
       Column::make('start_date'),
       Column::make('due_date')->title('End Date'),

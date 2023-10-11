@@ -192,6 +192,7 @@
     });
   }
   function initDragola(){
+    return true;
     const drake = dragula({
       isContainer: function (el) {
         return el.classList.contains('subtasks') || el.classList.contains('todo-task-list');

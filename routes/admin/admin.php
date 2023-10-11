@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Company\KycDocumentController;
 use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CompanyRoleController;
+use App\Http\Controllers\Admin\Contract\BulkInvoiceController;
 use App\Http\Controllers\Admin\Contract\ChangeRequestController;
 use App\Http\Controllers\Admin\Contract\ContractCategoryController;
 use App\Http\Controllers\Admin\Contract\ContractController;
@@ -189,6 +190,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('contracts.stages', ContractStageController::class);
     Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
     Route::resource('contracts.uploaded-documents', UploadedDocumentController::class);
+    Route::resource('contracts.bulk-invoices', BulkInvoiceController::class)->only(['store']);
     Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
     Route::resource('contract-doc-controls', DocControlController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');

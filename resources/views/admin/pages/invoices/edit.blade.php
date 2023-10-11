@@ -118,6 +118,16 @@
 
   $(document).on('click', '.select-items-btn', function(){
     $('[name="selected_phases[]"]').toggleClass('d-none');
+    $('.select-all-items').toggleClass('d-none');
+  })
+
+  $(document).on('change', '.select-all-items', function(){
+    if($(this).is(':checked')){
+      $('[name="selected_phases[]"]').prop('checked', true).trigger('change');
+    }else{
+      $('[name="selected_phases[]"]').prop('checked', false).trigger('change');
+    }
+
   })
 
   $(document).on('click change', '[name="selected_phases[]"]', function(){
@@ -127,6 +137,13 @@
     }else{
       $('.delete-items-btn').addClass('d-none');
       $('.select-items-btn').removeClass('d-none');
+    }
+
+    // if all items are selected then check select all checkbox
+    if($('[name="selected_phases[]"]').length == $('[name="selected_phases[]"]:checked').length){
+      $('.select-all-items').prop('checked', true);
+    }else{
+      $('.select-all-items').prop('checked', false);
     }
   })
 
@@ -375,7 +392,7 @@
                         <tr>
                             <!--action-->
                             @if ($is_editable)
-                              <th class="text-left x-action bill_col_action">Action</th>
+                              <th class="text-left x-action bill_col_action"><input type="checkbox" class="form-check-input select-all-items d-none"> Action</th>
                             @endif
                             <!--description-->
                             <th class="text-left x-description bill_col_description">Item</th>

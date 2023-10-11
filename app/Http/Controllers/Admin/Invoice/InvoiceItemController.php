@@ -53,33 +53,7 @@ class InvoiceItemController extends Controller
 
     $phases = filterInputIds($request->phases);
 
-    $pivot_amounts = ContractPhase::whereIn('id', $phases)
-      ->where('contract_id', $invoice->contract_id)
-      ->has('addedAsInvoiceItem', 0)
-      ->with('taxes')
-      ->get();
-
-    // formate data for pivot table
-    $data = [];
-    foreach ($phases as $phase) {
-      $data[$phase] = [
-        'amount' => $pivot_amounts->where('id', $phase)->first()->estimated_cost * 1000
-      ]; // convert to cents manually, setter is not working for pivot table
-    }
-
-    $invoice->phases()->syncWithoutDetaching($data);
-
-    foreach($pivot_amounts as $phase){
-      $invPhase = $invoice->items()->where('invoiceable_id', $phase->id)->first();
-
-      foreach($phase->taxes as $tax){
-        $invPhase->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $invoice->id]);
-      }
-
-      $invPhase->updateTaxAmount();
-    }
-
-    $invoice->updateTaxAmount();
+    $invoice->attachPhasesWithTax($phases);
 
     return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }

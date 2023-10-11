@@ -42,6 +42,7 @@ class Invoice extends Model
     'type',
     'refrence_id',
     'retention_released_at',
+    'is_auto_generated'
   ];
 
   protected $casts = [
@@ -292,7 +293,12 @@ class Invoice extends Model
             if ($this->is_summary_tax) {
               $item->taxes()->delete();
             }
+
             $item->update(['invoice_id' => $this->id]);
+
+            if(!$this->is_summary_tax){
+              $item->taxes()->update(['invoice_id' => $this->id]);
+            }
           });
 
           if($deleteMerged)
@@ -357,5 +363,45 @@ class Invoice extends Model
               ->orWhere('expiry_date', '>=', today());
           });
       });
+  }
+
+  public function attachPhasesWithTax(array $phase_ids): bool
+  {
+    DB::beginTransaction();
+    try {
+      $pivot_amounts = ContractPhase::whereIn('id', $phase_ids)
+        ->where('contract_id', $this->contract_id)
+        ->has('addedAsInvoiceItem', 0)
+        ->with('taxes')
+        ->get();
+
+      // formate data for pivot table
+      $data = [];
+      foreach ($phase_ids as $phase) {
+        $data[$phase] = [
+          'amount' => $pivot_amounts->where('id', $phase)->first()->estimated_cost * 1000
+        ]; // convert to cents manually, setter is not working for pivot table
+      }
+
+      $this->phases()->syncWithoutDetaching($data);
+
+      foreach ($pivot_amounts as $phase) {
+        $invPhase = $this->items()->where('invoiceable_id', $phase->id)->first();
+
+        foreach ($phase->taxes as $tax) {
+          $invPhase->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $this->id]);
+        }
+
+        $invPhase->updateTaxAmount();
+      }
+
+      $this->updateTaxAmount();
+
+      DB::commit();
+      return true;
+    } catch (\Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
   }
 }
