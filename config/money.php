@@ -1337,7 +1337,7 @@ return [
         'SAR' => [
             'name'                => 'Saudi Riyal',
             'code'                => 682,
-            'precision'           => 3,
+            'precision'           => 2,
             'subunit'             => 100,
             'symbol'              => 'SAR', //'ر.س',
             'symbol_first'        => true, // false to make on left

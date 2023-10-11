@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
-use Akaunting\Money\Money;
 use Yajra\DataTables\Services\DataTable;
+use Akaunting\Money\Money;
 
 class FinancialYearsDataTable extends DataTable
 {

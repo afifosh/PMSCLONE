@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Invoice;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class MergeInvoiceController extends Controller
 {
@@ -28,11 +29,14 @@ class MergeInvoiceController extends Controller
   {
     $request->validate([
       'invoice_ids' => 'required|array',
-      'invoice_ids.*' => 'required|exists:invoices,id',
+      'invoice_ids.*' => 'nullable|exists:invoices,id',
     ],[
-      'invoice_ids.*.required' => __('Required'),
+      'invoice_ids.*.required' => __(''),
       'invoice_ids.*.exists' => __('One of the selected invoices is invalid'),
     ]);
+
+    $invoice_ids = filterInputIds($request->invoice_ids);
+    if(count($invoice_ids) < 1) throw ValidationException::withMessages(['invoice_ids' => __('')]);
 
     $invoices = Invoice::where('contract_id', $invoice->contract_id)
       ->where('id', '!=', $invoice->id)
