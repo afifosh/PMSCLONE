@@ -26,9 +26,12 @@ class ContractChangeRequest extends Model
     'new_end_date',
     'status',
     'reviewed_at',
+    'type',
+    'data'
   ];
 
   protected $casts = [
+    'data' => 'array',
     'old_end_date' => 'datetime:d M, Y',
     'new_end_date' => 'datetime:d M, Y',
     'reviewed_at' => 'datetime:d M, Y',

@@ -34,6 +34,12 @@ class ChangeRequestsDataTable extends DataTable
         return $change_order->sender->full_name;
       }
     })
+    ->addColumn('changes', function($changeRequest) {
+      return view('admin.pages.contracts.change-requests.changes-column', compact('changeRequest'));
+    })
+    ->addColumn('change_type', function($changeRequest) {
+      return view('admin.pages.contracts.change-requests.change-type-column', compact('changeRequest'));
+    })
     ->editColumn('old_value', function($change_order) {
       return $change_order->pritableOldValue();
     })
@@ -98,11 +104,9 @@ class ChangeRequestsDataTable extends DataTable
   {
     $columns = [
       Column::make('sender'),
-      Column::make('old_value')->title('Old Amount'),
-      Column::make('new_value')->title('New Amount'),
-      Column::make('old_end_date')->title('Old End Date'),
-      Column::make('new_end_date')->title('New End Date'),
-      Column::make('created_at')->title('Ordered At'),
+      Column::make('change_type')->title('Change type'),
+      Column::make('changes')->title('Changes'),
+      Column::make('created_at')->title('Requested At'),
       Column::make('status')->title('Status'),
     ];
 

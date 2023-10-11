@@ -75,6 +75,7 @@ class ChangeRequestController extends Controller
 
   public function pauseContract(ChangeRequestStoreRequest $request, Contract $contract)
   {
+    $data['pause_date'] = now();
     if ($request->pause_until == 'manual') {
       $data = [
         'pause_until' => 'manual',
@@ -83,22 +84,28 @@ class ChangeRequestController extends Controller
     } else if ($request->pause_until == 'custom_date') {
       $data = [
         'pause_until' => $request->custom_date_value,
-        'description' => 'Pause Contract Until ' . $request->custom_date_value
+        'description' => 'Pause Contract Until ' . date('d M, Y', strtotime($request->custom_date_value))
       ];
     } else if ($request->pause_until == 'custom_unit') {
       $data = [
         'pause_until' => now()->{'add' . $request->custom_unit}($request->pause_for),
-        'description' => 'Pause Contract For ' . $request->pause_for . ' ' . $request->custom_unit
+        'description' => 'Pause Contract Until ' . now()->{'add' . $request->custom_unit}($request->pause_for)->format('d M, Y')
+      ];
+    } else if($request->pause_until == 'custom_date_from') {
+      $data = [
+        'pause_until' => 'manual',
+        'pause_date' => $request->custom_from_date_value,
+        'description' => 'Pause Contract From ' . date('d M, Y', strtotime($request->custom_from_date_value)) . ' Until Manual Resume'
       ];
     }
 
-    $data['pause_date'] = now();
     $data['action'] = 'Pause Contract';
 
     $contract->changeRequests()->create([
       'sender_type' => 'App\Models\Admin',
       'sender_id' => auth()->id(),
       'reason' => $request->reason,
+      'type' => 'Lifecycle',
       'description' => $request->description,
       'data' => $data
     ]);
@@ -118,6 +125,7 @@ class ChangeRequestController extends Controller
       'sender_id' => auth()->id(),
       'reason' => $request->reason,
       'description' => $request->description,
+      'type' => 'Lifecycle',
       'data' => $data
     ]);
 
@@ -135,6 +143,7 @@ class ChangeRequestController extends Controller
       'sender_type' => 'App\Models\Admin',
       'sender_id' => auth()->id(),
       'reason' => $request->reason,
+      'type' => 'Lifecycle',
       'description' => $request->description,
       'data' => $data
     ]);
