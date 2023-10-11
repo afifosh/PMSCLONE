@@ -75,7 +75,7 @@ class ChangeRequestController extends Controller
 
   public function pauseContract(ChangeRequestStoreRequest $request, Contract $contract)
   {
-    $data['pause_date'] = now();
+    $pause_date = now();
     if ($request->pause_until == 'manual') {
       $data = [
         'pause_until' => 'manual',
@@ -94,12 +94,13 @@ class ChangeRequestController extends Controller
     } else if($request->pause_until == 'custom_date_from') {
       $data = [
         'pause_until' => 'manual',
-        'pause_date' => $request->custom_from_date_value,
         'description' => 'Pause Contract From ' . date('d M, Y', strtotime($request->custom_from_date_value)) . ' Until Manual Resume'
       ];
+      $pause_date = $request->custom_from_date_value;
     }
 
     $data['action'] = 'Pause Contract';
+    $data['pause_date'] = $pause_date;
 
     $contract->changeRequests()->create([
       'sender_type' => 'App\Models\Admin',
