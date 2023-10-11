@@ -8,7 +8,7 @@ use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 use App\Support\LaravelBalance\Models\Transaction;
-use Akaunting\Money\Money;
+use App\Support\Money;
 
 class FinancialYearTransactionsDataTable extends DataTable
 {

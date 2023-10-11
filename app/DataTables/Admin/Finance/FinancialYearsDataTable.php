@@ -8,7 +8,6 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
-use Akaunting\Money\Money;
 
 class FinancialYearsDataTable extends DataTable
 {
@@ -33,8 +32,7 @@ class FinancialYearsDataTable extends DataTable
         return view('admin.pages.finances.financial-years.action', compact('financialYear'));
       })
       ->addColumn('balance', function($financialYear){
-        return Money($financialYear->defaultCurrencyAccount[0]->balance, $financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency'), true);
-        return Money::{$financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($financialYear->defaultCurrencyAccount[0]->balance, true)->format();
+        return cMoney($financialYear->defaultCurrencyAccount[0]->balance, $financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency'), true);
       });
   }
 

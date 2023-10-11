@@ -15,7 +15,7 @@
             <tr>
               <td>{!! Form::checkbox('invoice_ids[]', $inv->id, 0, ['class' => 'form-check-input phase-item']) !!}</td>
               <td>{{ runtimeInvIdFormat($inv->id) }}</td>
-              <td>@money($inv->total, $invoice->contract->currency, true)</td>
+              <td>@cMoney($inv->total, $invoice->contract->currency, true)</td>
               <td>{{ $inv->status }}</td>
             </tr>
           @empty

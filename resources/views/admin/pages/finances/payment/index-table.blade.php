@@ -10,7 +10,7 @@
               <tr>
                 <td>{{runtimeTransIdFormat($payment->id)}}</td>
                 <td>{{$payment->transaction_id}}</td>
-                <td>@money($payment->amount, $invoice->contract->currency, true)</td>
+                <td>@cMoney($payment->amount, $invoice->contract->currency, true)</td>
                 <td>{{$payment->created_at}}</td>
               </tr>
             @empty

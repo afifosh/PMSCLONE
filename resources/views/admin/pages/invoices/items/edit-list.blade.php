@@ -14,13 +14,13 @@
   <td class="">{{$item->invoiceable->name ?? runtimeInvIdFormat($item->invoiceable_id)}}</td>
   <td>
     @if ($item->invoiceable_type == 'App\Models\CustomInvoiceItem')
-      @money($item->invoiceable->price, $invoice->contract->currency, true)
+      @cMoney($item->invoiceable->price, $invoice->contract->currency, true)
     @else
-      @money($item->amount, $invoice->contract->currency, true)
+      @cMoney($item->amount, $invoice->contract->currency, true)
     @endif
   </td>
   <td>{{$item->invoiceable->quantity ?? 1}}</td>
-  <td class="">@money($item->amount, $invoice->contract->currency, true)</td>
+  <td class="">@cMoney($item->amount, $invoice->contract->currency, true)</td>
   <!--tax-->
   @if (!$invoice->is_summary_tax)
     <td class="text-left" style="max-width: 170px;">
@@ -29,7 +29,7 @@
           @forelse ($tax_rates->where('is_retention', false) as $tax)
             <option @selected($item->taxes->contains($tax)) value="{{$tax->id}}">{{$tax->name}} (
               @if($tax->type != 'Percent')
-                @money($tax->amount, $invoice->contract->currency, true)
+                @cMoney($tax->amount, $invoice->contract->currency, true)
               @else
                 {{$tax->amount}}%
               @endif
@@ -41,7 +41,7 @@
     </td>
   @endif
   <!--total-->
-  <td class="text-right x-total bill_col_total" id="bill_col_total">@money($item->amount + $item->total_tax_amount, $invoice->contract->currency, true)
+  <td class="text-right x-total bill_col_total" id="bill_col_total">@cMoney($item->amount + $item->total_tax_amount, $invoice->contract->currency, true)
   </td>
 </tr>
 @empty

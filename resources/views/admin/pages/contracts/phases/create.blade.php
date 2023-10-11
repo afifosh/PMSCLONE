@@ -43,7 +43,7 @@
       @forelse ($tax_rates->where('is_retention', false) as $tax)
         <option @selected($phase->taxes->contains($tax)) value="{{$tax->id}}" data-amount="{{$tax->amount}}" data-type={{$tax->type}}>{{$tax->name}} (
           @if($tax->type != 'Percent')
-            @money($tax->amount, $phase->contract->currency, true)
+            @cMoney($tax->amount, $phase->contract->currency, true)
           @else
             {{$tax->amount}}%
           @endif

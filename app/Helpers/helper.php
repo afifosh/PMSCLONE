@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\Money;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -169,39 +170,58 @@ function replaceStrVariables($template, $data)
   return str_replace(array_keys($data), array_values($data), $template);
 }
 
-function runtimeContractIdFormat($contract_id = '') {
+function runtimeContractIdFormat($contract_id = '')
+{
   if (is_numeric($contract_id)) {
-      return 'CNT-' . str_pad($contract_id, 8, '0', STR_PAD_LEFT);
+    return 'CNT-' . str_pad($contract_id, 8, '0', STR_PAD_LEFT);
   } else {
-      return '---';
+    return '---';
   }
 }
 
-function runtimeChangeReqIdFormat($change_req_id = '') {
+function runtimeChangeReqIdFormat($change_req_id = '')
+{
   if (is_numeric($change_req_id)) {
-      return 'CHRQ-' . str_pad($change_req_id, 4, '0', STR_PAD_LEFT);
+    return 'CHRQ-' . str_pad($change_req_id, 4, '0', STR_PAD_LEFT);
   } else {
-      return '---';
+    return '---';
   }
 }
 
-function runtimeTransIdFormat($transaction_id = '') {
+function runtimeTransIdFormat($transaction_id = '')
+{
   if (is_numeric($transaction_id)) {
-      return 'TRX-' . str_pad($transaction_id, 4, '0', STR_PAD_LEFT);
+    return 'TRX-' . str_pad($transaction_id, 4, '0', STR_PAD_LEFT);
   } else {
-      return '---';
+    return '---';
   }
 }
 
-function runtimeInvIdFormat($invoice_id = '') {
+function runtimeInvIdFormat($invoice_id = '')
+{
   if (is_numeric($invoice_id)) {
-      return 'INV-' . str_pad($invoice_id, 6, '0', STR_PAD_LEFT);
+    return 'INV-' . str_pad($invoice_id, 6, '0', STR_PAD_LEFT);
   } else {
-      return '---';
+    return '---';
   }
 }
 
 function moneyToInt($amount)
 {
-  return round($amount * 1000, 0, PHP_ROUND_HALF_DOWN);
+  return round($amount * 1000, 0, config('app.rounding_mode'));
+}
+
+function cMoney(mixed $amount, string $currency = null, bool $convert = null): Money
+{
+  if (is_null($currency)) {
+    /** @var string $currency */
+    $currency = config('money.defaults.currency');
+  }
+
+  if (is_null($convert)) {
+    /** @var bool $convert */
+    $convert = config('money.defaults.convert');
+  }
+
+  return new Money($amount, currency($currency), $convert);
 }

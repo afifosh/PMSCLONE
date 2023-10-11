@@ -2,7 +2,6 @@
 
 namespace App\DataTables\Admin\Finance;
 
-use Akaunting\Money\Money;
 use App\Support\LaravelBalance\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;

@@ -2,7 +2,6 @@
 
 namespace App\DataTables\Admin\Contract;
 
-use Akaunting\Money\View\Components\Money;
 use App\Models\ContractStage;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -28,7 +27,7 @@ class StagesDataTable extends DataTable
         return view('admin.pages.contracts.stages.value-column', compact('stage'));
       })
       // ->editColumn('total_amount', function ($stage) {
-      //   return Money($stage->stage_amount, $stage->contract->currency, true);
+      //   return cMoney($stage->stage_amount, $stage->contract->currency, true);
       // })
       ->addColumn('action', function($stage){
         return view('admin.pages.contracts.stages.actions', compact('stage'));

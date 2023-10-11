@@ -36,13 +36,13 @@ class PhasesDataTable extends DataTable
           : 'N/A';
       })
       ->editColumn('estimated_cost', function ($phase) {
-        return Money($phase->estimated_cost, $phase->contract->currency, true);
+        return cMoney($phase->estimated_cost, $phase->contract->currency, true);
       })
       ->editColumn('tax_amount', function ($phase) {
-        return Money($phase->tax_amount, $phase->contract->currency, true);
+        return cMoney($phase->tax_amount, $phase->contract->currency, true);
       })
       ->editColumn('total_cost', function ($phase) {
-        return Money($phase->total_cost, $phase->contract->currency, true);
+        return cMoney($phase->total_cost, $phase->contract->currency, true);
       })->rawColumns(['invoice_id', 'action', 'checkbox'])
       ->setRowAttr([
         'data-id' => function ($phase) {

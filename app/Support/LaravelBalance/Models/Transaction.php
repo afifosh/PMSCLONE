@@ -4,7 +4,7 @@ namespace App\Support\LaravelBalance\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
-use Akaunting\Money\Money;
+use App\Support\Money;
 
 class Transaction extends Model
 {

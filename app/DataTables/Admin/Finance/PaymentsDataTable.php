@@ -2,13 +2,10 @@
 
 namespace App\DataTables\Admin\Finance;
 
-use Akaunting\Money\Money;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
-use App\Models\Payment;
-use Google\Service\AIPlatformNotebooks\Runtime;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -34,7 +31,7 @@ class PaymentsDataTable extends DataTable
         return '<a href="' . route('admin.invoices.edit', $invoicePayment->invoice_id) . '">' . runtimeInvIdFormat($invoicePayment->invoice_id) . '</a>';
       })
       ->editColumn('amount', function ($invoicePayment) {
-        return Money($invoicePayment->amount, $invoicePayment->contract->currency, true);
+        return cMoney($invoicePayment->amount, $invoicePayment->contract->currency, true);
       })
       ->addColumn('action', function($invoicePayment){
         return view('admin.pages.finances.payment.action', compact('invoicePayment'));

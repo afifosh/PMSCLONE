@@ -11,7 +11,7 @@
  */
 
 use Akaunting\Money\Currency;
-use Akaunting\Money\Money;
+use App\Support\Money;
 use Illuminate\Support\Str;
 use Modules\Core\Facades\Innoclapps;
 

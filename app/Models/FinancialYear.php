@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Akaunting\Money\Money;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Support\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;

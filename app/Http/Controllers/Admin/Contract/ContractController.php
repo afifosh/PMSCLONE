@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin\Contract;
 
-use Akaunting\Money\Money;
 use App\DataTables\Admin\Contract\ContractsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ContractStoreRequest;

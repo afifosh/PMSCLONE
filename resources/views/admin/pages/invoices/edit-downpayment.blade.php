@@ -130,16 +130,16 @@
                     <tbody id="billing-items-container" class="billing-items-container-editing">
                       <tr class="downpayment-row">
                         <td class="text-left x-action edit-downpayment cursor-pointer"><i class="ti ti-edit"></i> </td>
-                        <td class="text-left x-rate bill_col_rate">@money($invoice->subtotal, $invoice->contract->currency, true)</td>
+                        <td class="text-left x-rate bill_col_rate">@cMoney($invoice->subtotal, $invoice->contract->currency, true)</td>
                         <td class="text-left x-rate bill_col_rate">{{$invoice->description}}</td>
-                        <td class="text-left x-rate bill_col_rate">@money($invoice->subtotal, $invoice->contract->currency, true)</td>
+                        <td class="text-left x-rate bill_col_rate">@cMoney($invoice->subtotal, $invoice->contract->currency, true)</td>
                       </tr>
                       {{-- For editing : convert to input --}}
                       <tr class="d-none downpayment-row-edit">
                         <td class="text-left x-action bill_col_action cursor-pointer" data-form-id="downpayment-form" data-form="ajax-form"><i class="ti ti-check"></i> </td>
                         <td class="text-left x-rate bill_col_rate"><input type="number" id="dp-subtotal" class="form-control" name="subtotal" value="{{$invoice->subtotal}}"></td>
                         <td class="text-left x-rate"><input type="text" class="form-control" id="dp-description" name="description" value="{{$invoice->description}}"></td>
-                        <td class="text-left x-rate bill_col_rate">@money($invoice->subtotal, $invoice->contract->currency, true)</td>
+                        <td class="text-left x-rate bill_col_rate">@cMoney($invoice->subtotal, $invoice->contract->currency, true)</td>
                         </form>
                       </tr>
                     </tbody>

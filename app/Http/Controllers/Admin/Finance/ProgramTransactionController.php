@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Finance;
 
-use Akaunting\Money\Money;
+use App\Support\Money;
 use App\DataTables\Admin\Finance\ProgramTransactionsDataTable;
 use App\Http\Controllers\Controller;
 use App\Support\LaravelBalance\Dto\TransactionDto;

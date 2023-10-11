@@ -29,5 +29,9 @@ class CustomBladeDirectiveServiceProvider extends ServiceProvider
         echo $check ? '<small class=\"text-warning\">This Field is Updated and required Approval</small>' : '';
         ?>";
     });
+
+    Blade::directive('cMoney', function (?string $expression) {
+      return "<?php echo cMoney($expression); ?>";
+    });
   }
 }

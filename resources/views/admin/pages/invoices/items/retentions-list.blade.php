@@ -15,7 +15,7 @@
         <tr class="">
           <th>{!! Form::checkbox('retentions[]', $invoice->id, 0, ['class' => 'form-check-input retention-item']) !!}</th>
           <td>{{runtimeInvIdFormat($invoice->id)}}</td>
-          <td>@money(-$invoice->retention_amount, $invoice->contract->currency, true)</td>
+          <td>@cMoney(-$invoice->retention_amount, $invoice->contract->currency, true)</td>
         </tr>
         @empty
         @endforelse --}}

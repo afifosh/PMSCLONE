@@ -464,7 +464,7 @@
                             <label class="form-check-label" for="tax-{{$tax->id}}">
                               {{$tax->name}} (
                                 @if($tax->type != 'Percent')
-                                  @money($tax->amount, $invoice->contract->currency, true)
+                                  @cMoney($tax->amount, $invoice->contract->currency, true)
                                 @else
                                   {{$tax->amount}}%
                                 @endif
@@ -662,7 +662,7 @@
               @forelse ($tax_rates->where('is_retention', true) as $ret)
                 <option value="{{$ret->id}}">{{$ret->name}} (
                   @if ($ret->type != 'Percent')
-                      @money($ret->amount, $invoice->contract->currency, true)
+                      @cMoney($ret->amount, $invoice->contract->currency, true)
                   @else
                       {{$ret->amount}}%
                   @endif
