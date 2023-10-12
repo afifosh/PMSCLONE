@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +44,8 @@ class Invoice extends Model
     'type',
     'refrence_id',
     'retention_released_at',
-    'is_auto_generated'
+    'is_auto_generated',
+    'downpayment_amount'
   ];
 
   protected $casts = [
@@ -187,6 +189,16 @@ class Invoice extends Model
     $this->attributes['retention_amount'] = moneyToInt($value);
   }
 
+  public function getDownpaymentAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setDownpaymentAmountAttribute($value)
+  {
+    $this->attributes['downpayment_amount'] = moneyToInt($value);
+  }
+
   public function updateItemsTaxType(): void
   {
     $this->items->each(function ($item) {
@@ -203,6 +215,7 @@ class Invoice extends Model
 
     $this->update([
       'subtotal' => $subtotal,
+      'downpayment_amount' => $this->downPayments()->sum('amount') / 1000,
       'total' => $subtotal
         + $this->discount_amount // it is negative value
         + $this->total_tax // add total tax. It is calculated in updateTaxAmount() method
@@ -419,5 +432,70 @@ class Invoice extends Model
       DB::rollBack();
       throw $e;
     }
+  }
+
+  /**
+   * Get the downpayment remaining amount which is not deducted (not setteled in any other invoice) from this invoice.
+   */
+
+  public function downpaymentAmountRemaining()
+  {
+    if($this->type == 'Regular'){
+      return 0;
+    }
+
+    return $this->total - $this->pivotSetteledDownpaymentInvoices()->sum('amount') / 1000;
+  }
+
+  /**
+   * Get pivot table invoices which are using this invoice' amount as downpayment.
+   */
+
+  public function pivotSetteledDownpaymentInvoices(): HasMany
+  {
+    return $this->hasMany(InvoiceDownpayment::class, 'downpayment_id', 'id');
+  }
+
+  /**
+   * Get pivot table invoices .
+   */
+
+   public function pivotDownpaymentInvoices(): HasMany
+   {
+     return $this->hasMany(InvoiceDownpayment::class, 'invoice_id', 'id');
+   }
+
+  /**
+   * Get the downpayments being deducted from this invoice.
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+   */
+  public function downPayments(): BelongsToMany
+  {
+    return $this->belongsToMany(Invoice::class, 'invoice_downpayments', 'invoice_id', 'downpayment_id')->withPivot('is_percentage', 'amount', 'percentage');
+  }
+
+  /**
+   * Get the invoices being paid by this downpayment.
+   */
+  public function downPaymentOf(): BelongsToMany
+  {
+    return $this->belongsToMany(Invoice::class, 'invoice_downpayments', 'downpayment_id', 'invoice_id')->withPivot('is_percentage', 'amount', 'percentage');
+  }
+
+  /**
+   * Get the downpayment invoices which can be deducted from this invoice.
+   */
+  public function deductableDownpayments(): HasMany
+  {
+    return $this->hasMany(Invoice::class, 'contract_id', 'contract_id')->where('type', 'Down Payment')->where('status', 'Paid');
+  }
+
+  /**
+   * Get the amount which can be paid against this invoice.
+   */
+  public function payableAmount()
+  {
+    return $this->total - $this->paid_amount - $this->retention_amount - $this->downpayment_amount;
   }
 }

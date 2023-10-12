@@ -284,7 +284,8 @@ class Contract extends Model
 
   public function getPrintableValueAttribute()
   {
-    return Money::{$this->currency ?? config('money.defaults.currency')}($this->value, true)->format();
+    return cMoney($this->value, $this->currency, false);
+    // return Money::{$this->currency ?? config('money.defaults.currency')}($this->value, true)->format();
   }
 
   public function program(): BelongsTo

@@ -30,13 +30,16 @@ class PaymentsDataTable extends DataTable
       ->editColumn('invoice_id', function ($invoicePayment) {
         return '<a href="' . route('admin.invoices.edit', $invoicePayment->invoice_id) . '">' . runtimeInvIdFormat($invoicePayment->invoice_id) . '</a>';
       })
+      ->editColumn('contract.id', function ($invoicePayment) {
+        return '<a href="' . route('admin.contracts.show', $invoicePayment->contract->id) . '">' . runtimeContractIdFormat($invoicePayment->contract->id) . '</a>';
+      })
       ->editColumn('amount', function ($invoicePayment) {
         return cMoney($invoicePayment->amount, $invoicePayment->contract->currency, true);
       })
       ->addColumn('action', function($invoicePayment){
         return view('admin.pages.finances.payment.action', compact('invoicePayment'));
       })
-      ->rawColumns(['invoice_id']);
+      ->rawColumns(['invoice_id', 'contract.id']);
   }
 
   /**
@@ -105,6 +108,7 @@ class PaymentsDataTable extends DataTable
   {
     return [
       Column::make('id'),
+      Column::make('contract.id'),
       Column::make('invoice_id'),
       Column::make('transaction_id'),
       Column::make('amount'),

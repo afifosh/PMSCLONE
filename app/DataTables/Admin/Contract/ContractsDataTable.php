@@ -15,6 +15,7 @@ use Yajra\DataTables\Services\DataTable;
 class ContractsDataTable extends DataTable
 {
   public $projectId = null;
+  public $company = null;
 
   /**
    * Build the DataTable class.
@@ -116,6 +117,9 @@ public function query(Contract $model): QueryBuilder
     // If a projectId is provided, filter by it
     if ($this->projectId) {
         $query->where('project_id', $this->projectId);
+    }
+    if($this->company){
+      $query->where('assignable_id', $this->company->id)->where('assignable_type', Company::class);
     }
 
     // Apply any additional filters if necessary

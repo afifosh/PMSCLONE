@@ -40,6 +40,45 @@ $configData = Helper::appClasses();
 
   <div class="mt-3  col-12">
     <div class="card">
+      @if(isset($company) && !isset($contract))
+        <h5 class="card-header">Search Filter</h5>
+        <form class="js-datatable-filter-form">
+          <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
+            <div class="col-4">
+              {!! Form::label('filter_contract', 'Contract') !!}
+              {!! Form::select('filter_contract', [], [], [
+                'class' => 'form-select select2Remote',
+                'data-placeholder' => 'All',
+                'data-allow-clear' => 'true',
+                'data-url' => route('resource-select', ['Contract', 'hasinv', 'companies' => $company->id])
+              ]) !!}
+            </div>
+            <div class="col-4">
+              {!! Form::label('filter_due_date', 'Due Date') !!}
+              {!! Form::select('filter_due_date', [
+                '' => 'All',
+                'Overdue' => ['over_due' => 'Overdue'],
+                'Month' => [
+                  'this_month' => 'This Month',
+                  'prev_month' => 'Previous Month',
+                  'next_month' => 'Next Month',
+                ],
+                'Quarter' => [
+                  'this_quarter' => 'This Quarter',
+                  'prev_quarter' => 'Previous Quarter',
+                  'next_quarter' => 'Next Quarter',
+                ],
+                ], '',
+                [
+                  'class' => 'form-select select2',
+                  'data-placeholder' => 'All',
+                  'data-allow-clear' => 'true'
+                ]
+              ) !!}
+            </div>
+          </div>
+        </form>
+      @endif
       @if (!isset($contract) && !isset($company))
         <h5 class="card-header">Search Filter</h5>
         <form class="js-datatable-filter-form">

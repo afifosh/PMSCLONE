@@ -6,7 +6,7 @@
   <td class="x-balance-due-lang">Balance Due : </td>
   <td class="x-balance-due">
     <span class="x-due-amount-label">
-        <label class="label label-rounded label-danger text-white badge bg-label-primary">@cMoney($invoice->total - $invoice->paid_amount, $invoice->contract->currency, true)</label>
+        <label class="label label-rounded label-danger text-white badge bg-label-primary">@cMoney($invoice->payableAmount(), $invoice->contract->currency, true)</label>
     </span>
   </td>
 </tr>

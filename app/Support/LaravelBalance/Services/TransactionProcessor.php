@@ -37,7 +37,7 @@ class TransactionProcessor
         // Change account balance value.
         $balance = $accountBalance->getBalance();
         $balance = $balance->add($transaction->getAmount());
-        $accountBalance->updateBalance($balance);
+        $accountBalance->updateBalance(cMoney($balance->getAmount(), $balance->getCurrency()->getSymbol()));
         $transaction->remaining_balance = $balance->getAmount();
 
         // Save models.

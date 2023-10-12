@@ -30,10 +30,11 @@ class PaymentController extends Controller
       $data['invoice'] = Invoice::with('payments')->findOrFail(request()->route('invoice'));
       return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.index-table', $data)->render()]);
     } else {
-      $data['companies'] = Company::has('contracts.invoices.payments')->get(['name', 'id', 'type'])->prepend('All', '');
-      $data['invoice_types'] = ['' => 'All', 'Regular' => 'Regular', 'Down payment' => 'Down payment'];
+      $data['companies'] = Company::has('contracts.invoices.payments')->get(['name', 'id', 'type'])->prepend('All', '');  
       $data['contract_categories'] = ContractCategory::pluck('name', 'id')->prepend('All', '');
     }
+
+    $data['invoice_types'] = ['' => 'All', 'Regular' => 'Regular', 'Down payment' => 'Down payment'];
 
     return $dataTable->render('admin.pages.finances.payment.index', $data);
     // return view('admin.pages.finances.payment.index');
@@ -48,7 +49,7 @@ class PaymentController extends Controller
       $data['companies'] = [$data['invoice']->contract->assignable_id => $data['invoice']->contract->assignable->name];
       $data['contracts'] = [$data['invoice']->contract_id => $data['invoice']->contract->subject];
       $data['invoiceId'] = [
-        $request->invoice => runtimeInvIdFormat($request->invoice) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount
+        $request->invoice => runtimeInvIdFormat($request->invoice) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount - $data['invoice']->downpayment_amount
       ];
       $data['selected_invoice'] = $request->invoice;
       $data['event'] = 'page_reload';
@@ -84,7 +85,7 @@ class PaymentController extends Controller
     $data['invoicePayment'] = $payment;
     $data['invoice'] = $payment->invoice;
     $data['invoiceId'] = [
-      $payment->invoice_id => runtimeInvIdFormat($payment->invoice_id) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount
+      $payment->invoice_id => runtimeInvIdFormat($payment->invoice_id) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount - $data['invoice']->downpayment_amount
     ];
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.create', $data)->render()]);

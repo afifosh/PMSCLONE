@@ -57,7 +57,7 @@
     {{-- payable amoun --}}
     <div class="form-group col-6 payable-amount ">
         {{ Form::label('payable_amount', __('Payable Amount'), ['class' => 'col-form-label']) }}
-        {!! Form::number('payable_amount', isset($invoice) ? ($invoice->total - $invoice->paid_amount - $invoice->retention_amount + $invoicePayment->amount) : null, ['class' => 'form-control', 'placeholder' => __('0.0'), 'disabled']) !!}
+        {!! Form::number('payable_amount', isset($invoice) ? ($invoice->payableAmount() + $invoicePayment->amount) : null, ['class' => 'form-control', 'placeholder' => __('0.0'), 'disabled']) !!}
     </div>
 
 
@@ -130,7 +130,7 @@
         dataType: 'JSON',
         success: function(data) {
           const unpaidAmount = (data.total - data.paid_amount).toFixed(3)
-          const payableAmount = (data.total - data.paid_amount - data.retention_amount).toFixed(3) < 0 ? 0 : (data.total - data.paid_amount - data.retention_amount).toFixed(3)
+          const payableAmount = (data.total - data.paid_amount - data.retention_amount - data.downpayment_amount).toFixed(3) < 0 ? 0 : (data.total - data.paid_amount - data.retention_amount - data.downpayment_amount).toFixed(3)
           $('.add-payment-form [name="unpaid_amount"]').val(unpaidAmount)
           $('.add-payment-form [name="retention_amount"]').val(data.retention_amount)
           $('.add-payment-form [name="payable_amount"]').val(payableAmount)

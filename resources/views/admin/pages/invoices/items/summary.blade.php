@@ -42,23 +42,38 @@
   <span class="fw-semibold">@cMoney($invoice->total, $invoice->contract->currency, true)</span>
 </div>
 
+@if($invoice->downpayment_amount != 0)
+<hr>
+  @forelse ($invoice->downPayments as $dp)
+    <div class="d-flex justify-content-between">
+      <span class="me-2">DP-{{runtimeInvIdFormat($dp->id) }}
+        @if ($dp->pivot->is_percentage)
+          ({{$dp->pivot->percentage / 1000}}%)
+        @endif
+      :</span>
+      <span class="fw-semibold">@cMoney(-$dp->pivot->amount / 1000, $invoice->contract->currency, true)</span>
+    </div>
+  @empty
+  @endforelse
+@endif
+
 @if($invoice->retention_name != null)
   <hr />
   <div class="d-flex justify-content-between mb-2">
     <span class="me-2">Retention ({{$invoice->retention_name}} @if ($invoice->retention_percentage){{$invoice->retention_percentage}}%@endif):</span>
-    <span class="fw-semibold">@cMoney($invoice->retention_amount, $invoice->contract->currency, true)</span>
+    <span class="fw-semibold">@cMoney(-$invoice->retention_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif
 @if ($invoice->paid_amount)
   <hr />
   <div class="d-flex justify-content-between">
     <span class="w-px-100">Paid:</span>
-    <span class="fw-semibold">@cMoney($invoice->paid_amount, $invoice->contract->currency, true)</span>
+    <span class="fw-semibold">@cMoney(-$invoice->paid_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif
 
 <hr />
 <div class="d-flex justify-content-between">
   <span class="w-px-100">Payable:</span>
-  <span class="fw-semibold">@cMoney($invoice->total - $invoice->paid_amount - $invoice->retention_amount, $invoice->contract->currency, true)</span>
+  <span class="fw-semibold">@cMoney($invoice->payableAmount(), $invoice->contract->currency, true)</span>
 </div>

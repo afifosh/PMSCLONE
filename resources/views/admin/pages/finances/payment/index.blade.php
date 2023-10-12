@@ -37,6 +37,26 @@ $configData = Helper::appClasses();
 @includeWhen(isset($company),'admin.pages.company.header', ['tab' => 'payments'])
   <div class="mt-3  col-12">
     <div class="card">
+      @if (!isset($contract) && isset($company))
+        <h5 class="card-header">Search Filter</h5>
+        <form class="js-datatable-filter-form">
+          <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
+            <div class="col-4">
+              {!! Form::label('filter_contract', 'Contract') !!}
+              {!! Form::select('filter_contract', [], '', [
+                'class' => 'form-select select2Remote',
+                'data-url' => route('resource-select', ['Contract', 'haspayments', 'companies' => $company->id]),
+                'data-placeholder' => __('All Contracts'),
+                'data-allow-clear' => 'true',
+              ]) !!}
+            </div>
+            <div class="col-4">
+              {!! Form::label('filter_invoice_type', 'Invoice Type') !!}
+              {!! Form::select('filter_invoice_type', $invoice_types, '', ['class' => 'form-select select2']) !!}
+            </div>
+          </div>
+        </form>
+      @endif
       @if (!isset($contract) && !isset($company))
         <h5 class="card-header">Search Filter</h5>
         <form class="js-datatable-filter-form">

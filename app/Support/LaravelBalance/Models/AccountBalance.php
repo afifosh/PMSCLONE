@@ -100,7 +100,7 @@ class AccountBalance extends Model
      */
     public function getBalance(): Money
     {
-        return new Money($this->balance ? $this->balance : 0, $this->getCurrency());
+        return cMoney($this->balance ? $this->balance : 0, $this->getCurrencySymbol());
     }
 
     /**
@@ -109,6 +109,11 @@ class AccountBalance extends Model
     public function getCurrency(): Currency
     {
         return new Currency($this->currency);
+    }
+
+    public function getCurrencySymbol()
+    {
+      return $this->currency;
     }
 
     /**

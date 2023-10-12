@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Invoice;
 
+use App\DataTables\Admin\Invoice\DownpaymentInvoicesDataTable;
 use App\DataTables\Admin\Invoice\InvoicesDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\InvoiceStoreRequest;
@@ -66,7 +67,7 @@ class InvoiceController extends Controller
 
   public function edit(Invoice $invoice)
   {
-    $invoice->load('items.invoiceable', 'items.taxes', 'contract');
+    $invoice->load('items.invoiceable', 'items.taxes', 'contract', 'deductableDownpayments');
     $data['invoice'] = $invoice;
     $data['tax_rates'] = Tax::get(); // both retention and taxes, will be filtered in view
     $data['pendingDocs'] = $invoice->contract->pendingDocs()->get();
@@ -74,7 +75,11 @@ class InvoiceController extends Controller
     $data['is_editable'] = $invoice->isEditable();
 
     if ($invoice->type != 'Regular') {
-      return view('admin.pages.invoices.edit-downpayment', $data);
+      $dataTable = app(DownpaymentInvoicesDataTable::class);
+      $dataTable->downpaymentInvoice = $invoice;
+
+      return $dataTable->render('admin.pages.invoices.edit-downpayment', $data);
+      // view('admin.pages.invoices.edit-downpayment', $data)
     }
 
     return view('admin.pages.invoices.edit', $data);

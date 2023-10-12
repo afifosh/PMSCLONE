@@ -62,6 +62,7 @@ use App\Http\Controllers\Admin\Finance\ProgramAccountController;
 use App\Http\Controllers\Admin\Finance\TaxController;
 use App\Http\Controllers\Admin\Invoice\AttachmentController;
 use App\Http\Controllers\Admin\Invoice\CustomInvoiceItemController;
+use App\Http\Controllers\Admin\Invoice\DownpaymentController;
 use App\Http\Controllers\Admin\Invoice\InvoiceController;
 use App\Http\Controllers\Admin\Invoice\InvoiceItemController;
 use App\Http\Controllers\Admin\Invoice\InvoiceTaxController;
@@ -140,6 +141,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('companies/{company}/invoices', [InvoiceController::class, 'index'])->name('companies.invoices.index');
     Route::get('companies/{company}/payments', [PaymentController::class, 'index'])->name('companies.payments.index');
     Route::resource('companies', CompanyController::class);
+    Route::resource('companies.contracts', ContractController::class);
     Route::resource('companies.contacts', UserController::class);
     Route::resource('companies.contact-persons', ContactPersonController::class);
     Route::match(['get', 'post'], 'company-invitations/{company_invitation}/revoke', [InvitationController::class, 'revokeInvitation'])->name('company-invitations.revoke');
@@ -308,6 +310,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'destroy']);
     Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
+    Route::resource('invoices.downpayments', DownpaymentController::class)->only(['store']);
     Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');
     Route::resource('invoices.merge-invoices', MergeInvoiceController::class)->only(['create', 'store']);
     Route::resource('invoice-doc-controls', DocControlController::class);

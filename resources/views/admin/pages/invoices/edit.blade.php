@@ -166,6 +166,24 @@
     });
   })
 
+  $(document).on('change', '[name="downpayment_type"]', function(){
+    if($(this).val() != 'Fixed'){
+      $('[name="downpayment_amount"]').parent().removeClass('d-none');
+    }else{
+      $('[name="downpayment_amount"]').parent().addClass('d-none');
+    }
+  })
+
+  $(document).on('keyup', '[name="downpayment_value"]', function(){
+    if($('input[name="downpayment_type"]:checked').val() != 'Fixed'){
+      // get data-amount attr from selected option
+      var subtotal = $('[name="downpayment_id"]').find(':selected').data('amount');
+      var value = $(this).val();
+      var amount = parseFloat(subtotal) * parseFloat(value) / 100;
+      $('[name="downpayment_amount"]').val(amount);
+    }
+  })
+
   $(document).ready(function() {
     initDropzone();
     initSortable();
@@ -203,6 +221,15 @@
           placement: 'top'
       }
       var elm = document.getElementById('invoice-retention')
+      var popover = new bootstrap.Popover(elm, options)
+
+      // downpayment popover
+      var options = {
+          html: true,
+          content: $('[data-name="popover-invoice-downpayment"]'),
+          placement: 'top'
+      }
+      var elm = document.getElementById('invoice-downpayment')
       var popover = new bootstrap.Popover(elm, options)
   })
 
@@ -439,6 +466,9 @@
         @if($is_editable)
           <div class="row p-sm-2 pe-4">
             <div class="col-12 d-flex justify-content-end">
+              <section class="center">
+                <button id="invoice-downpayment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-{{count($invoice->deductableDownpayments) == 0 ? 'muted disabled' : 'primary'}} rounded-pill" data-bs-toggle="popover">Downpayment</button>
+              </section>
               <section class="center">
                 <button id="invoice-retention" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Retention</button>
               </section>
@@ -686,5 +716,46 @@
       </form>
     </div>
   </div>
+  {{-- end retention popover --}}
+  {{-- downpayment Popover --}}
+  <div hidden>
+    <div data-name="popover-invoice-downpayment">
+      <form method="POST" action="{{route('admin.invoices.downpayments.store', [$invoice])}}">
+        <div class="d-flex justify-content-between">
+          <b>Downpayment</b>
+          <button type="button" class="btn-close" onclick="$('#invoice-downpayment').popover('hide');" aria-label="Close"></button>
+        </div>
+        <hr class="m-0">
+        <div>
+          <div class="form-group">
+            {{ Form::label('downpayment_id', __(' Downpayment'), ['class' => 'col-form-label']) }}
+            <select name="downpayment_id" id="downpayment_id" class="form-select select2">
+              <option value="">{{__('Select Downpayment')}}</option>
+              @forelse ($invoice->deductableDownpayments as $dp)
+                <option data-amount="{{$dp->total}}" value="{{$dp->id}}">{{runtimeInvIdFormat($dp->id)}} ( Total: @cMoney($dp->total, $invoice->contract->currency, true) )</option>
+              @empty
+              @endforelse
+            </select>
+          </div>
+          <div class="form-group">
+            {{ Form::label('downpayment_type', __('Amount Type'), ['class' => 'col-form-label']) }}
+            {!! Form::select('downpayment_type', ['Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select select2']) !!}
+          </div>
+          <div class="form-group">
+            {{ Form::label('downpayment_value', __('Retention Value'), ['class' => 'col-form-label']) }}
+            {!! Form::number('downpayment_value', null, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
+          </div>
+          <div class="form-group d-none">
+            {{ Form::label('downpayment_amount', __('Actual Amount'), ['class' => 'col-form-label']) }}
+            {!! Form::number('downpayment_amount', null, ['class' => 'form-control', 'placeholder' => __('0.00'), 'disabled']) !!}
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <button class="btn btn-primary btn-sm" data-form="ajax-form">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {{-- end downpayment popover --}}
 </div>
 @endsection

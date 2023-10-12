@@ -5,6 +5,8 @@
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 @endsection
 
 @section('page-style')
@@ -14,6 +16,7 @@
 @section('vendor-script')
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
 @endsection
 
 @section('page-script')
@@ -101,8 +104,8 @@
           </div>
           <div>
             <table>
-                <tbody id="balance-summary" class="d-none">
-                  {{-- @include('admin.pages.invoices.balance-summary') --}}
+                <tbody id="balance-summary">
+                  @include('admin.pages.invoices.balance-summary-downpayment')
                 </tbody>
             </table>
           </div>
@@ -193,17 +196,30 @@
         <button class="btn btn-primary d-grid w-100" type="button" data-form="ajax-form">
           <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Save Invoice</span>
         </button>
-        <button class="btn btn-primary d-grid mt-2 w-100" data-bs-toggle="offcanvas" type="button" data-bs-target="#addPaymentOffcanvas">
+        <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id])}}">
           <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
         </button>
       </div>
     </div>
   </div>
 </form>
+<div class="mt-3 col-lg-9 col-12">
+  <div class="card">
+    <h5 class="card-header">Invoices using this downpayment</h5>
+    <div class="card-body">
+      {{$dataTable->table()}}
+    </div>
+  </div>
+</div>
 <form id="downpayment-form" action="{{route('admin.invoices.update', [$invoice, 'type' => 'downpayment'])}}">
   @method('PUT')
-  <input type="hidded" id="dp-form-subtotal" name="subtotal" value="{{$invoice->subtotal}}">
-  <input type="hidded" id="dp-form-description" name="description" value="{{$invoice->description}}">
+  <input type="hidden" id="dp-form-subtotal" name="subtotal" value="{{$invoice->subtotal}}">
+  <input type="hidden" id="dp-form-description" name="description" value="{{$invoice->description}}">
 </form>
 </div>
 @endsection
+
+@push('scripts')
+    {{$dataTable->scripts()}}
+    <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+@endpush

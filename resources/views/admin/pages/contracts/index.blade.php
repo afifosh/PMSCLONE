@@ -35,7 +35,8 @@ $configData = Helper::appClasses();
 
 @section('content')
 @includeWhen(isset($project), 'admin.pages.projects.navbar', ['tab' => 'contracts'])
-@if (!isset($project))
+@includeWhen(isset($company), 'admin.pages.company.header', ['tab' => 'contracts'])
+@if (!isset($project) && !isset($company))
   <div class="mt-3  col-12">
     {{-- Stats Start --}}
     <div class="card h-100">
@@ -156,8 +157,8 @@ $configData = Helper::appClasses();
     {{-- Stats End --}}
 @endif
     <div class="card mt-3">
-      <h5 class="card-header">Search Filter</h5>
-      @if (!isset($project))
+      @if (!isset($project) && !isset($company))
+        <h5 class="card-header">Search Filter</h5>
         <form class="js-datatable-filter-form">
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
             <div class="col">

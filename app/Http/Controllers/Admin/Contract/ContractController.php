@@ -27,6 +27,10 @@ class ContractController extends Controller
    */
   public function index(ContractsDataTable $dataTable)
   {
+    $data['company'] = Company::find(request()->route('company'));
+    if($data['company']){
+      $dataTable->company = $data['company'];
+    }else{
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
@@ -44,6 +48,7 @@ class ContractController extends Controller
       ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
       ->withTrashed()
       ->first();
+    }
 
     return $dataTable->render('admin.pages.contracts.index', $data);
     // view('admin.pages.contracts.index');
