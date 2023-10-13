@@ -11,10 +11,10 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('kyc_document_contract_categories', function (Blueprint $table) {
+    Schema::create('kyc_doc_conditions', function (Blueprint $table) {
       $table->id();
+      $table->morphs('conditionable');
       $table->foreignId('kyc_document_id')->constrained('kyc_documents')->onDelete('cascade')->cascadeOnUpdate();
-      $table->foreignId('contract_category_id')->constrained('contract_categories')->onDelete('cascade')->cascadeOnUpdate();
       $table->timestamps();
     });
   }
@@ -24,6 +24,6 @@ return new class extends Migration
    */
   public function down(): void
   {
-    Schema::dropIfExists('kyc_document_contract_categories');
+    Schema::dropIfExists('kyc_doc_conditions');
   }
 };

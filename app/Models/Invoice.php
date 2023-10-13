@@ -199,6 +199,10 @@ class Invoice extends Model
     $this->attributes['downpayment_amount'] = moneyToInt($value);
   }
 
+  public function getDownpaymentAmountRemainingAttribute(){
+    return $this->downpaymentAmountRemaining();
+  }
+
   public function updateItemsTaxType(): void
   {
     $this->items->each(function ($item) {

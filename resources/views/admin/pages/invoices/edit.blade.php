@@ -333,6 +333,21 @@
     </div>
   </div>
 @endif
+@forelse ($invoice->deductableDownpayments as $dp)
+@if ($dp->downpayment_amount_remaining > 0)
+  <div class="col-12 mb-4">
+    <div role="alert" class="alert alert-warning alert-dismissible">
+      <h5 class="alert-heading mb-2"> <span class="alert-icon text-warning me-2">
+        <i class="ti ti-bell ti-xs"></i>
+      </span> {{__('Down payment Invoice Available')}}</h5>
+      <p class="mb-2"><strong>You have down payment invoice with unsetteled balance: @cMoney($dp->downpayment_amount_remaining, $invoice->contract->currency, true)</strong></p>
+      <p class="mb-0 d-flex justify-content-end"><a class="btn btn-outline-warning" href="{{route('admin.invoices.edit', [$dp->id])}}">View</a></p>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+@endif
+@empty
+@endforelse
 <form action="{{route('admin.invoices.update', [$invoice])}}" method="POST">
   @method('PUT')
   @csrf
@@ -467,7 +482,7 @@
           <div class="row p-sm-2 pe-4">
             <div class="col-12 d-flex justify-content-end">
               <section class="center">
-                <button id="invoice-downpayment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-{{count($invoice->deductableDownpayments) == 0 ? 'muted disabled' : 'primary'}} rounded-pill" data-bs-toggle="popover">Downpayment</button>
+                <button id="invoice-downpayment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-{{count($invoice->deductableDownpayments) == 0 ? 'muted disabled' : 'primary'}} rounded-pill" data-bs-toggle="popover">Down payment</button>
               </section>
               <section class="center">
                 <button id="invoice-retention" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Retention</button>
@@ -722,7 +737,7 @@
     <div data-name="popover-invoice-downpayment">
       <form method="POST" action="{{route('admin.invoices.downpayments.store', [$invoice])}}">
         <div class="d-flex justify-content-between">
-          <b>Downpayment</b>
+          <b>Down payment</b>
           <button type="button" class="btn-close" onclick="$('#invoice-downpayment').popover('hide');" aria-label="Close"></button>
         </div>
         <hr class="m-0">
@@ -730,7 +745,7 @@
           <div class="form-group">
             {{ Form::label('downpayment_id', __(' Downpayment'), ['class' => 'col-form-label']) }}
             <select name="downpayment_id" id="downpayment_id" class="form-select select2">
-              <option value="">{{__('Select Downpayment')}}</option>
+              <option value="">{{__('Select Down payment')}}</option>
               @forelse ($invoice->deductableDownpayments as $dp)
                 <option data-amount="{{$dp->total}}" value="{{$dp->id}}">{{runtimeInvIdFormat($dp->id)}} ( Total: @cMoney($dp->total, $invoice->contract->currency, true) )</option>
               @empty

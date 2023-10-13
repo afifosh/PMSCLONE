@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class KycDocument extends Model
@@ -28,8 +27,14 @@ class KycDocument extends Model
     'invoice_type'
   ];
 
+  /**
+   * input fields types which are allowed to be added in a document form
+   */
   public const TYPES = ['date', 'email', 'file', 'number', 'tel', 'text', 'textarea'];
 
+  /**
+   * validation rules for each input field type
+   */
   public const VALIDATIONS = [
     'date' => ['date'],
     'email' => ['email', 'max:255'],
@@ -49,21 +54,49 @@ class KycDocument extends Model
     'updated_at' => 'datetime:d M, Y',
   ];
 
-  public function contractTypes(): BelongsToMany
+
+  /**
+   * The contract types from which this document is required.
+   * null means all contract types
+   * polymorphic, inverse many-to-many relationship
+   *
+   * @return MorphedByMany
+   */
+  public function contractTypes()
   {
-    return $this->belongsToMany(ContractType::class, KycDocumentContractType::class);
+    return $this->morphedByMany(ContractType::class, 'conditionable', 'kyc_doc_conditions');
   }
 
-  public function contractCategories(): BelongsToMany
+  /**
+   * The contract categories from which this document is required.
+   * null means all contract categories
+   * polymorphic, inverse many-to-many relationship
+   *
+   * @return MorphedByMany
+   */
+  public function contractCategories()
   {
-    return $this->belongsToMany(ContractCategory::class, KycDocumentContractCategory::class);
+    return $this->morphedByMany(ContractCategory::class, 'conditionable', 'kyc_doc_conditions');
   }
 
-  public function contracts(): BelongsToMany
+  /**
+   * The contracts from which this document is required.
+   * null means all contracts
+   * polymorphic, inverse many-to-many relationship
+   *
+   * @return MorphedByMany
+   */
+  public function contracts()
   {
-    return $this->belongsToMany(Contract::class, KycDocContract::class, 'kyc_doc_id', 'contract_id');
+    return $this->morphedByMany(Contract::class, 'conditionable', 'kyc_doc_conditions');
   }
 
+  /**
+   * Uploaded Documents against this required document
+   * one-to-many relationship
+   *
+   * @return HasMany
+   */
   public function uploadedDocs(): HasMany
   {
     return $this->hasMany(UploadedKycDoc::class, 'kyc_doc_id');

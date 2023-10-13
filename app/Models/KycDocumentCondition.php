@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class KycDocumentContractType extends Model
+class KycDocumentCondition extends Model
 {
   use HasFactory;
 
   protected $fillable = [
     'kyc_document_id',
-    'contract_type_id'
+    'conditionable_id',
+    'conditionable_type'
   ];
 
   public function kycDocument()
@@ -19,8 +20,8 @@ class KycDocumentContractType extends Model
     return $this->belongsTo(KycDocument::class);
   }
 
-  public function contractType()
+  public function conditionable()
   {
-    return $this->belongsTo(ContractType::class);
+    return $this->morphTo();
   }
 }
