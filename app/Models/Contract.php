@@ -346,6 +346,22 @@ class Contract extends Model
             $q->where('contract_categories.id', $this->category_id);
           })->orHas('contractCategories', '=', 0);
         });
+      })
+      ->where(function ($q) { // required_at && required_at_type
+        $q->whereNull('required_at') // if required_at is null then at any time this is required
+          // if required_at is not null then check the required_at_type
+          ->orWhere(function ($q) {
+            $q->where('required_at', '>=', today())
+              ->where('required_at_type', 'Before');
+          })
+          ->orWhere(function ($q) {
+            $q->where('required_at', '<=', today())
+              ->where('required_at_type', 'After');
+          })
+          ->orWhere(function ($q) {
+            $q->where('required_at', today())
+              ->where('required_at_type', 'On');
+          });
       });
   }
 

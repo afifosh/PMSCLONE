@@ -45,7 +45,8 @@ class Invoice extends Model
     'refrence_id',
     'retention_released_at',
     'is_auto_generated',
-    'downpayment_amount'
+    'downpayment_amount',
+    'downpayment_before_tax'
   ];
 
   protected $casts = [
@@ -199,7 +200,18 @@ class Invoice extends Model
     $this->attributes['downpayment_amount'] = moneyToInt($value);
   }
 
-  public function getDownpaymentAmountRemainingAttribute(){
+  public function getDownpaymentBeforeTaxAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setDownpaymentBeforeTaxAttribute($value)
+  {
+    $this->attributes['downpayment_before_tax'] = moneyToInt($value);
+  }
+
+  public function getDownpaymentAmountRemainingAttribute()
+  {
     return $this->downpaymentAmountRemaining();
   }
 
@@ -217,11 +229,15 @@ class Invoice extends Model
       $this->update(['discount_amount' => 0]);
     }
 
+    $downpayment_before_tax = $this->downPayments()->wherePivot('is_after_tax', 0)->sum('amount') / 1000;
+
     $this->update([
       'subtotal' => $subtotal,
-      'downpayment_amount' => $this->downPayments()->sum('amount') / 1000,
+      'downpayment_amount' => $this->downPayments()->wherePivot('is_after_tax', 1)->sum('amount') / 1000,
+      'downpayment_before_tax' => $downpayment_before_tax,
       'total' => $subtotal
         + $this->discount_amount // it is negative value
+        - $downpayment_before_tax // downpayment before tax is negative value
         + $this->total_tax // add total tax. It is calculated in updateTaxAmount() method
         + $this->adjustment_amount // adjustment amount can be negative or positive depending on the user input
     ]);
@@ -233,7 +249,7 @@ class Invoice extends Model
     if ($this->is_summary_tax) {
       $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
       $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
-      $this->update(['total_tax' => $fixed_tax + (($this->subtotal + $this->discount_amount) * $percent_tax / 100)]);
+      $this->update(['total_tax' => $fixed_tax + (($this->subtotal + $this->discount_amount - $this->downpayment_before_tax) * $percent_tax / 100)]);
     } else {
       $fixed_tax = $this->items()->sum('invoice_items.total_tax_amount') / 1000;
       $this->update(['total_tax' => $fixed_tax]);
@@ -382,6 +398,22 @@ class Invoice extends Model
             $q->where('contract_categories.id', $this->contract->category_id);
           })->orHas('contractCategories', '=', 0);
         });
+      })
+      ->where(function ($q) { // required_at && required_at_type
+        $q->whereNull('required_at') // if required_at is null then at any time this is required
+          // if required_at is not null then check the required_at_type
+          ->orWhere(function ($q) {
+            $q->where('required_at', '>=', today())
+              ->where('required_at_type', 'Before');
+          })
+          ->orWhere(function ($q) {
+            $q->where('required_at', '<=', today())
+              ->where('required_at_type', 'After');
+          })
+          ->orWhere(function ($q) {
+            $q->where('required_at', today())
+              ->where('required_at_type', 'On');
+          });
       });
   }
 
@@ -444,7 +476,7 @@ class Invoice extends Model
 
   public function downpaymentAmountRemaining()
   {
-    if($this->type == 'Regular'){
+    if ($this->type == 'Regular') {
       return 0;
     }
 
@@ -464,10 +496,10 @@ class Invoice extends Model
    * Get pivot table invoices .
    */
 
-   public function pivotDownpaymentInvoices(): HasMany
-   {
-     return $this->hasMany(InvoiceDownpayment::class, 'invoice_id', 'id');
-   }
+  public function pivotDownpaymentInvoices(): HasMany
+  {
+    return $this->hasMany(InvoiceDownpayment::class, 'invoice_id', 'id');
+  }
 
   /**
    * Get the downpayments being deducted from this invoice.
@@ -476,7 +508,7 @@ class Invoice extends Model
    */
   public function downPayments(): BelongsToMany
   {
-    return $this->belongsToMany(Invoice::class, 'invoice_downpayments', 'invoice_id', 'downpayment_id')->withPivot('is_percentage', 'amount', 'percentage');
+    return $this->belongsToMany(Invoice::class, 'invoice_downpayments', 'invoice_id', 'downpayment_id')->withPivot('is_percentage', 'amount', 'percentage', 'is_after_tax');
   }
 
   /**
@@ -484,7 +516,7 @@ class Invoice extends Model
    */
   public function downPaymentOf(): BelongsToMany
   {
-    return $this->belongsToMany(Invoice::class, 'invoice_downpayments', 'downpayment_id', 'invoice_id')->withPivot('is_percentage', 'amount', 'percentage');
+    return $this->belongsToMany(Invoice::class, 'invoice_downpayments', 'downpayment_id', 'invoice_id')->withPivot('is_percentage', 'amount', 'percentage', 'is_after_tax');
   }
 
   /**

@@ -18,6 +18,7 @@ return new class extends Migration
       $table->boolean('is_percentage')->default(false);
       $table->unsignedBigInteger('amount')->default(0);
       $table->unsignedInteger('percentage')->default(0);
+      $table->boolean('is_after_tax')->default(true);
       $table->timestamps();
     });
   }

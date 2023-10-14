@@ -15,6 +15,7 @@ class DownpaymentController extends Controller
       'downpayment_id' => 'required|exists:invoices,id',
       'downpayment_type' => 'required|in:Fixed,Percentage',
       'downpayment_value' => 'required|numeric|gte:0',
+      'deduction_type' => 'required|in:before_tax,after_tax'
     ]);
 
     $downpayment = Invoice::find($request->downpayment_id);
@@ -36,6 +37,7 @@ class DownpaymentController extends Controller
         'is_percentage' => $request->downpayment_type == 'Percentage',
         'percentage' => $request->downpayment_type == 'Percentage' ? moneyToInt($request->downpayment_value) : 0,
         'amount' => $amount,
+        'is_after_tax' => $request->deduction_type == 'after_tax'
       ]]);
     }
 

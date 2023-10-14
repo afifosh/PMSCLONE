@@ -28,6 +28,8 @@ return new class extends Migration
       $table->string('expiry_date_title')->nullable();
       $table->boolean('is_expiry_date_required')->default(false);
       $table->json('fields')->nullable();
+      $table->timestamp('required_at')->nullable();
+      $table->enum('required_at_type', ['Before', 'After', 'On'])->default('Before');
       $table->timestamps();
     });
   }

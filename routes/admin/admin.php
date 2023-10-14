@@ -67,6 +67,7 @@ use App\Http\Controllers\Admin\Invoice\InvoiceController;
 use App\Http\Controllers\Admin\Invoice\InvoiceItemController;
 use App\Http\Controllers\Admin\Invoice\InvoiceTaxController;
 use App\Http\Controllers\Admin\Invoice\MergeInvoiceController;
+use App\Http\Controllers\Admin\Invoice\StatisticController;
 use App\Http\Controllers\Admin\Project\GanttChartController;
 use App\Http\Controllers\Admin\Project\ImportTemplateController;
 use App\Http\Controllers\Admin\Project\ProjectCategoryController;
@@ -303,6 +304,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     // });
     Route::get('invoices/document-stats', [DocumentStatController::class, 'index'])->name('invoices.document-stats.index');
     Route::get('invoices/{invoice}/payments', [PaymentController::class, 'index'])->name('invoices.payments.index');
+    Route::get('invoices-statistics', StatisticController::class)->name('invoices.statistics');
     Route::put('invoices/{invoice}/invoice-tems/sort', [InvoiceController::class, 'sortItems'])->name('invoices.invoice-items.sort');
     Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
     Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');

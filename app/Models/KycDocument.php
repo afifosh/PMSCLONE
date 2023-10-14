@@ -24,7 +24,9 @@ class KycDocument extends Model
     'fields',
     'workflow',
     'client_type',
-    'invoice_type'
+    'invoice_type',
+    'required_at',
+    'required_at_type' // Before, After, On
   ];
 
   /**
@@ -50,6 +52,7 @@ class KycDocument extends Model
     'is_mendatory' => 'boolean',
     'is_expiry_date_required' => 'boolean',
     'fields' => 'array',
+    'required_at' => 'datetime: d M, Y',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];

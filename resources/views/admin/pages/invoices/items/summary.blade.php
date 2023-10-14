@@ -9,6 +9,23 @@
     <span class="fw-semibold">@cMoney($invoice->discount_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif
+@if($invoice->downpayment_amount != 0 && $invoice->downPayments()->wherePivot('is_after_tax', 0)->count() > 0)
+<hr>
+  @forelse ($invoice->downPayments as $dp)
+    @if ($dp->pivot->is_after_tax)
+      @continue
+    @endif
+    <div class="d-flex justify-content-between">
+      <span class="me-2">DP-{{runtimeInvIdFormat($dp->id) }}
+        @if ($dp->pivot->is_percentage)
+          ({{$dp->pivot->percentage / 1000}}%)
+        @endif
+      :</span>
+      <span class="fw-semibold">@cMoney(-$dp->pivot->amount / 1000, $invoice->contract->currency, true)</span>
+    </div>
+  @empty
+  @endforelse
+@endif
 
 <hr>
 @forelse ($invoice->taxes as $tax)
@@ -19,7 +36,7 @@
     @if($tax->pivot->type != 'Percent')
       @cMoney($tax->pivot->amount, $invoice->contract->currency, true)
     @else
-      {{$tax->pivot->amount}}%
+      {{$tax->pivot->amount / 1000}}%
     @endif
   </span>
 </div>
@@ -42,9 +59,12 @@
   <span class="fw-semibold">@cMoney($invoice->total, $invoice->contract->currency, true)</span>
 </div>
 
-@if($invoice->downpayment_amount != 0)
+@if($invoice->downpayment_amount != 0 && $invoice->downPayments()->wherePivot('is_after_tax', 1)->count() > 0)
 <hr>
   @forelse ($invoice->downPayments as $dp)
+    @if ($dp->pivot->is_after_tax == 0)
+      @continue
+    @endif
     <div class="d-flex justify-content-between">
       <span class="me-2">DP-{{runtimeInvIdFormat($dp->id) }}
         @if ($dp->pivot->is_percentage)

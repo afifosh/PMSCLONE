@@ -15,6 +15,7 @@ class InvoiceDownpayment extends Model
     'is_percentage',
     'amount',
     'percentage',
+    'is_after_tax'
   ];
 
   public function invoice()

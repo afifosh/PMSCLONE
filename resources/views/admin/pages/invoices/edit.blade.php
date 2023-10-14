@@ -753,6 +753,10 @@
             </select>
           </div>
           <div class="form-group">
+            {{ Form::label('deduction_type', __('Deduction Type'), ['class' => 'col-form-label']) }}
+            {!! Form::select('deduction_type', ['after_tax' => 'After Tax', 'before_tax' => 'Before Tax'], null, ['class' => 'form-select select2']) !!}
+          </div>
+          <div class="form-group">
             {{ Form::label('downpayment_type', __('Amount Type'), ['class' => 'col-form-label']) }}
             {!! Form::select('downpayment_type', ['Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select select2']) !!}
           </div>

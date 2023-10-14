@@ -24,8 +24,10 @@ return new class extends Migration
       $table->boolean('is_summary_tax')->default(false);
       $table->nullableMorphs('creator');
       $table->bigInteger('subtotal')->default(0);
+      $table->unsignedBigInteger('downpayment_before_tax')->default(0);
       $table->bigInteger('total_tax')->default(0);
       $table->bigInteger('total')->default(0);
+      $table->unsignedBigInteger('downpayment_amount')->default(0);
       $table->bigInteger('paid_amount')->default(0);
       $table->string('description')->nullable();
       $table->text('note')->nullable();
@@ -40,7 +42,6 @@ return new class extends Migration
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
       $table->timestamp('retention_released_at')->nullable();
-      $table->unsignedBigInteger('downpayment_amount')->default(0);
       $table->boolean('is_auto_generated')->default(false);
       $table->enum('status', Invoice::STATUSES)->default('Draft');
       $table->timestamp('deleted_at')->nullable();

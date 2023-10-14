@@ -42,6 +42,8 @@ class DocControllStoreRequest extends FormRequest
       'fields.*.label' => ['required', 'string'],
       'fields.*.type' => ['required', 'string', Rule::in(KycDocument::TYPES)],
       'invoice_type' => ['nullable', 'sometimes', Rule::in(Invoice::TYPES)],
+      'required_at' => ['nullable', 'date'],
+      'required_at_type' => ['string', Rule::in(['Before', 'After', 'On'])],
     ];
 
     if($this->route()->getName() == 'admin.invoice-doc-controls.store'){

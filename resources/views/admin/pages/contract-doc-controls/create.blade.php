@@ -64,6 +64,14 @@
                         @endif
 
                         <div class="form-group mb-2">
+                          <label for="required_at" >{{ __('Required At:') }}</label>
+                          {!! Form::text('required_at',null, ['class' => 'form-control flatpickr']) !!}
+                        </div>
+                        <div class="form-group mb-2">
+                          <label for="required_at_type" class="required">{{ __('Required At Type:') }}</label>
+                          {!! Form::select('required_at_type', ['Before' => 'Before', 'After' => 'After', 'On' => 'On'], null, ['class' => 'form-control select2']) !!}
+                        </div>
+                        <div class="form-group mb-2">
                             <label for="status" class="required">{{ __('Status:') }}</label>
                             {!! Form::select('status', ['1' => 'Active', '0' => 'Inactive'], null, ['class' => 'form-control select2']) !!}
                         </div>
@@ -160,16 +168,19 @@
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
 @endsection
 
 @section('vendor-script')
     <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/jquery-repeater/jquery-repeater.js') }}"></script>
 @endsection
 
 @section('page-script')
     <script src="{{ asset('assets/js/scripts/repeater.js') }}"></script>
     <script src="{{ asset('assets/js/custom/select2.js') }}"></script>
+    <script src="{{ asset('assets/js/custom/flatpickr.js') }}"></script>
     <script>
       $(document).on('click', '[name="is_expirable"]', function() {
         $('#expirable_c').toggle();

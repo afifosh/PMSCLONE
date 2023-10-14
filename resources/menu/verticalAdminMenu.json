@@ -159,6 +159,11 @@
           "slug": "admin.invoices.index"
         },
         {
+          "url": "/admin/invoices-statistics",
+          "name": "Invoices Stats",
+          "slug": "admin.invoices.statistics"
+        },
+        {
           "url": "/admin/finances/payments",
           "name": "Payments",
           "slug": "admin.finances.payments.index"
