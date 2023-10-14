@@ -9,7 +9,7 @@
     <span class="fw-semibold">@cMoney($invoice->discount_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif
-@if($invoice->downpayment_amount != 0 && $invoice->downPayments()->wherePivot('is_after_tax', 0)->count() > 0)
+@if($invoice->downPayments()->wherePivot('is_after_tax', 0)->count() > 0)
 <hr>
   @forelse ($invoice->downPayments as $dp)
     @if ($dp->pivot->is_after_tax)
