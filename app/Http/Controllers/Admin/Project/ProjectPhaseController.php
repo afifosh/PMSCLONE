@@ -45,7 +45,7 @@ class ProjectPhaseController extends Controller
     $stage = ContractStage::find($stage) ?? 'stage';
     $contract->load('project');
     $project = $contract->project ?? 'project';
-    $max_amount = $stage->is_budget_planned ? $stage->remaining_amount : $contract->remaining_amount;
+    $max_amount = $contract->remaining_amount;
     $phase = new ContractPhase();
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
@@ -62,11 +62,6 @@ class ProjectPhaseController extends Controller
     );
 
     $this->storeTaxes($phase, $request->phase_taxes);
-
-    // if budget is not planned, then update stage amount
-    if(!$stage->is_budget_planned){
-      $stage->update(['stage_amount' => $stage->stage_amount + $phase->total_cost]);
-    }
 
     $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
 
@@ -98,7 +93,7 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
 
-    $max_amount = ($stage->is_budget_planned ? $stage->remaining_amount : $contract->remaining_amount) + $phase->total_cost;
+    $max_amount = $contract->remaining_amount + $phase->total_cost;
     $contract->load('project');
     $project = $contract->project ?? 'project';
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
@@ -116,16 +111,9 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not update this phase because it is in paid invoice');
     }
 
-    $phaseOldTotal = $phase->total_cost;
-
     $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost']));
 
     $this->storeTaxes($phase, $request->phase_taxes);
-
-    // if budget is not planned, then update stage amount
-    if(!$phase->stage->is_budget_planned){
-      $phase->stage->update(['stage_amount' => $phase->stage->stage_amount - $phaseOldTotal + $phase->total_cost]);
-    }
 
     // if added in invoice then update invoice item and tax amount
     $phase->load('addedAsInvoiceItem.invoice');
@@ -169,11 +157,6 @@ class ProjectPhaseController extends Controller
       $item->taxes()->detach();
       $item->delete();
     });
-
-    // if budget is not planned, then update stage amount
-    if(!$phase->stage->is_budget_planned){
-      $phase->stage->update(['stage_amount' => $phase->stage->stage_amount - $phase->total_cost]);
-    }
 
     $phase->taxes()->detach();
 

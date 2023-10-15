@@ -4,74 +4,11 @@
     {!! Form::model($stage, ['route' => ['admin.contracts.stages.store',  ['project' => $project, 'contract' => $contract]], 'method' => 'POST']) !!}
 @endif
 <div class="row">
-  <div class="form-group col-6">
+  <div class="form-group col-12">
       {{ Form::label('name', __('Name'), ['class' => 'col-form-label']) }}
       {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
   </div>
-  {{-- is budget planned --}}
-  <div class="form-group col-6">
-    {{ Form::label('is_budget_planned', __('Is Budget Planned'), ['class' => 'col-form-label']) }}
-    {!! Form::select('is_budget_planned', ['1' => 'Yes', '0' => 'No'], null, [
-      'class' => 'form-control globalOfSelect2',
-      'data-placeholder' => __('Budget Type'),
-      'disabled' => $stage->id ? true : false,
-    ]) !!}
-  </div>
-  <div class="form-group col-6 {{ (!$stage->id ? '' : ($stage->is_budget_planned ?: 'd-none'))}}">
-    {{ Form::label('stage_amount', __('Stage Amount'), ['class' => 'col-form-label']) }}
-    <div class="dropdown open d-inline">
-      <span data-bs-toggle="dropdown" aria-haspopup="true">
-          <i class="fas fa-calculator"></i>
-      </span>
-      <div class="dropdown-menu p-3">
-        <div class="mb-3" data-content="percent-cal">
-          <label for="percent-value" class="form-label">Percentage (Total: {{$contract->value}})</label>
-          <input type="number" name="percent-value" id="percent-value" data-balance="{{$contract->value}}" class="form-control" placeholder="10%">
-        </div>
-      </div>
-    </div>
-    {!! Form::number('stage_amount', null, ['class' => 'form-control', 'placeholder' => __('Stage Amount')]) !!}
-  </div>
-  {{-- start date --}}
-  <div class="form-group col-6">
-    {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('start_date', $stage->start_date, ['class' => 'form-control flatpickr', 'id' => 'start_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Start Date')]) !!}
-  </div>
-  {{-- due date --}}
-  <div class="form-group col-6">
-    {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('due_date', $stage->due_date, ['class' => 'form-control flatpickr', 'id' => 'stage_end_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'.$contract->start_date.'", "maxDate":"'.$contract->end_date.'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Due Date')]) !!}
-  </div>
-  <div class="col-12 mt-2">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="cal-stage-end-date">
-      <label class="form-check-label" for="cal-stage-end-date">
-        Calculate End Date
-      </label>
-    </div>
-  </div>
-  <div class="d-none" id="end-date-cal-form">
-    <hr>
-    <div class="mb-3">
-      <label for="" class="form-label">After From Start Date</label>
-      <div class="d-flex">
-        <div class="d-flex w-100">
-          <input id="stage-add-count" type="number"  class="form-control cal-stage-end-date">
-          {!! Form::select('null', ['Days' => 'Day(s)', 'Weeks' => 'Week(s)', 'Months' => 'Month(s)', 'Years' => 'Year(s)'], null, ['class' => 'stage-add-unit cal-stage-end-date input-group-text form-select globalOfSelect2']) !!}
-        </div>
-      </div>
-    </div>
-    <hr>
-  </div>
-
 </div>
-<div class="col-md-12 mt-3">
-  <div class="mb-3">
-    {!! Form::label('description', 'Description', ['class' => 'col-form-label']) !!}
-    {!! Form::textarea('description', null, ['class' => 'form-control', 'rows' => 5]) !!}
-  </div>
-</div>
-
 <div class="mt-3">
     <div class="btn-flt float-end">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
@@ -79,68 +16,3 @@
     </div>
 </div>
 {!! Form::close() !!}
-</div>
-
-<script>
-  $(document).on('change', '#cal-stage-end-date', function() {
-    if ($(this).is(':checked')) {
-      $('#end-date-cal-form').removeClass('d-none');
-      calStageEndDate();
-    } else {
-      $('#end_date').val('');
-      $('#end-date-cal-form').addClass('d-none');
-      initFlatPickr();
-    }
-  });
-
-  $(document).on('change', '[name="start_date"]', function(){
-    calStageEndDate();
-  })
-
-  $(document).on('change keyup', '.cal-stage-end-date', function() {
-    calStageEndDate();
-  });
-
-  function calStageEndDate()
-  {
-    const count = $('#stage-add-count').val();
-    const unit = $('.stage-add-unit').val();
-    const startDate = $('#start_date').val();
-    if(!startDate) return;
-    if (count && unit) {
-      let endDate = new Date(startDate);
-      if(unit == 'Days') {
-        endDate.setDate(endDate.getDate() + parseInt(count));
-      } else if(unit == 'Weeks') {
-        endDate.setDate(endDate.getDate() + (parseInt(count) * 7));
-      } else if(unit == 'Months') {
-        endDate.setMonth(endDate.getMonth() + parseInt(count));
-      } else if(unit == 'Years') {
-        endDate.setFullYear(endDate.getFullYear() + parseInt(count));
-      }
-      $('#stage_end_date').val(endDate.toISOString().slice(0, 10));
-    }else{
-      // $('#stage_end_date').val('');
-    }
-    initFlatPickr();
-  }
-  $('#percent-value').on('change keyup', function(){
-    const percent = $(this).val();
-    const balance = $(this).data('balance');
-    if(percent && balance){
-      const estimatedCost = (balance * percent) / 100;
-      $('[name="stage_amount"]').val(estimatedCost);
-    }else{
-      $('[name="stage_amount"]').val('');
-    }
-  })
-
-  // hide stage amount if budget is not planned
-  $(document).on('change', '[name="is_budget_planned"]', function(){
-    if($(this).val() == 0){
-      $('[name="stage_amount"]').closest('.form-group').addClass('d-none');
-    }else{
-      $('[name="stage_amount"]').closest('.form-group').removeClass('d-none');
-    }
-  })
-</script>

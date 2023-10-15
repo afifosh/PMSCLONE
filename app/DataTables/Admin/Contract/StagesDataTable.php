@@ -23,12 +23,15 @@ class StagesDataTable extends DataTable
       ->editColumn('name', function ($stage) {
         return '<a href="' . route('admin.contracts.stages.phases.index', [$this->contract, $stage]) . '">' . $stage->name . '</a>';
       })
-      ->addColumn('total_amount', function ($stage) {
-        return view('admin.pages.contracts.stages.value-column', compact('stage'));
+      ->editColumn('start_date', function($stage){
+        return $stage->start_date ? $stage->start_date->format('d M, Y') : '-';
       })
-      // ->editColumn('total_amount', function ($stage) {
-      //   return cMoney($stage->stage_amount, $stage->contract->currency, true);
-      // })
+      ->editColumn('due_date', function($stage){
+        return $stage->due_date ? $stage->due_date->format('d M, Y') : '-';
+      })
+      ->addColumn('total_amount', function ($stage) {
+        return cMoney($stage->stage_amount ?? 0, $stage->contract->currency, true);
+      })
       ->addColumn('action', function($stage){
         return view('admin.pages.contracts.stages.actions', compact('stage'));
       })

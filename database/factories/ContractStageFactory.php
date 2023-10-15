@@ -18,11 +18,6 @@ class ContractStageFactory extends Factory
   {
     return [
       'name' => $this->faker->word,
-      'start_date' => '', // will be overwritten from seeder
-      'due_date' => '', // will be overwritten from seeder
-      'stage_amount' => '', // will be overwritten from seeder
-      'description' => $this->faker->sentence,
-      'is_budget_planned' => 1,
     ];
   }
 }

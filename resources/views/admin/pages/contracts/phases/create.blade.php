@@ -29,8 +29,8 @@
       </span>
       <div class="dropdown-menu p-3">
         <div class="mb-3" data-content="percent-cal">
-          <label for="percent-value" class="form-label">Percentage (Total: {{$stage->stage_amount}})</label>
-          <input type="number" name="percent-value" id="percent-value" data-balance="{{$stage->stage_amount}}" class="form-control" placeholder="10%">
+          <label for="percent-value" class="form-label">Percentage (Total: {{$contract->value}})</label>
+          <input type="number" name="percent-value" id="percent-value" data-balance="{{$contract->value}}" class="form-control" placeholder="10%">
         </div>
       </div>
     </div>
@@ -60,12 +60,12 @@
   {{-- start date --}}
   <div class="form-group col-6">
     {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('start_date', $phase->start_date, ['class' => 'form-control flatpickr', 'id' => 'start_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'. (isset($stage->start_date) ? $stage->start_date : $contract->start_date) .'", "maxDate":"'. (isset($stage->due_date) ? $stage->due_date : $contract->end_date ).'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Start Date')]) !!}
+    {!! Form::date('start_date', $phase->start_date, ['class' => 'form-control flatpickr', 'id' => 'start_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'. $contract->start_date .'", "maxDate":"'. $contract->end_date .'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Start Date')]) !!}
   </div>
   {{-- due date --}}
   <div class="form-group col-6">
     {{ Form::label('due_date', __('Due Date'), ['class' => 'col-form-label']) }}
-    {!! Form::date('due_date', $phase->due_date, ['class' => 'form-control flatpickr', 'id' => 'phase_end_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'. (isset($stage->start_date) ? $stage->start_date : $contract->start_date) .'", "maxDate":"'. (isset($stage->due_date) ? $stage->due_date : $contract->end_date ).'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Due Date')]) !!}
+    {!! Form::date('due_date', $phase->due_date, ['class' => 'form-control flatpickr', 'id' => 'phase_end_date', 'data-flatpickr' => '{"altFormat": "F j, Y", "minDate":"'. $contract->start_date .'", "maxDate":"'. $contract->end_date .'", "dateFormat": "Y-m-d"}', 'placeholder' => __('Due Date')]) !!}
   </div>
   <div class="col-12 mt-2">
     <div class="form-check">

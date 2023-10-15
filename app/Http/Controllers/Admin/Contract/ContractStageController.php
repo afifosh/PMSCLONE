@@ -39,14 +39,13 @@ class ContractStageController extends Controller
 
   public function store(Contract $contract, StageStoreRequest $request)
   {
-    $contract->load('project', 'stages');
+    $contract->load('project');
     $project = $contract->project ?? 'project';
     // abort_if(!$project->isMine(), 403);
 
-    $stage = $contract->stages()->create($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'stage_amount', 'is_budget_planned']));
+    $stage = $contract->stages()->create($request->only(['name']));
 
     $message = auth()->user()->name . ' created a new stage: ' . $stage->name;
-
     if ($contract->project)
       broadcast(new ProjectPhaseUpdated($project, 'stage-list', $message))->toOthers();
 
@@ -68,7 +67,7 @@ class ContractStageController extends Controller
     $project = $contract->project ?? 'project';
     $stage->load('phases');
 
-    $stage->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'stage_amount']));
+    $stage->update($request->only(['name']));
 
     $message = auth()->user()->name . ' updated stage: ' . $stage->name;
 

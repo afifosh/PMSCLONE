@@ -44,8 +44,8 @@ class PhaseUpdateRequest extends FormRequest
       'phase_taxes' => 'nullable|array',
       'phase_taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
       'description' => 'nullable|string|max:2000',
-      'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $this->phase->stage->start_date,
-      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->phase->stage->due_date,
+      'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $this->contract->start_date,
+      'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->contract->end_date,
     ];
   }
 

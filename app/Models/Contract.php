@@ -79,7 +79,7 @@ class Contract extends Model
 
   public function getRemainingAmountAttribute()
   {
-    return $this->value - $this->stages->sum('stage_amount');
+    return $this->value - $this->phases->sum('total_cost');
   }
 
   public function getStatusAttribute()
@@ -216,16 +216,6 @@ class Contract extends Model
     return $this->hasMany(ContractPhase::class);
   }
 
-  public function initialStage(): HasOne
-  {
-    return $this->hasOne(ContractStage::class)->where('stage_type', 'Initial Stage');
-  }
-
-  public function initialStageMilstones(): HasManyThrough
-  {
-    return $this->hasManyThrough(ContractPhase::class, ContractStage::class, 'contract_id', 'stage_id')->where('stage_type', 'Initial Stage');
-  }
-
   public function stages(): HasMany
   {
     return $this->hasMany(ContractStage::class);
@@ -267,25 +257,9 @@ class Contract extends Model
     elseif ($status == 'Paused') return 'warning';
   }
 
-  public function remaining_cost($stage_cost = 0)
-  {
-    return $this->remaining_amount + $stage_cost;
-  }
-
-  public function formatPhaseValue($value)
-  {
-    return Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount();
-  }
-
-  public function formatStageValue($value)
-  {
-    return Money::{$this->currency ?? config('money.defaults.currency')}($value)->getAmount();
-  }
-
   public function getPrintableValueAttribute()
   {
-    return cMoney($this->value, $this->currency, false);
-    // return Money::{$this->currency ?? config('money.defaults.currency')}($this->value, true)->format();
+    return cMoney($this->value, $this->currency, true);
   }
 
   public function program(): BelongsTo

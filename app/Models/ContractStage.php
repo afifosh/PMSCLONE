@@ -10,23 +10,15 @@ class ContractStage extends Model
   use HasFactory;
 
   protected $fillable = [
-    'name',
-    'type',
-    'start_date',
-    'due_date',
-    'stage_amount',
-    'description',
-    'is_budget_planned'
+    'name'
   ];
 
   protected $casts = [
-    'start_date' => 'datetime:d M, Y',
-    'due_date' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];
 
-  protected $appends = ['status'];
+  protected $appends = ['status', 'stage_amount', 'start_date', 'due_date'];
 
   public function getStatusAttribute()
   {
@@ -34,10 +26,6 @@ class ContractStage extends Model
     // elseif($this->start_date->isFuture()) return 'Not started';
     // elseif(now() > $this->due_date->subMonth()) return 'About To Expire';
     // elseif(now() >= $this->start_date) return 'Active';
-    $value = $this->getRawOriginal('status');
-
-    if ($value == 'Terminated' || $value == 'Paused' || $value == 'Draft') return $value;
-
     if ($this->due_date === null && $this->start_date === null)
       return '';
 
@@ -62,19 +50,19 @@ class ContractStage extends Model
     }
   }
 
-  public function getStageAmountAttribute($value)
+  public function getStageAmountAttribute()
   {
-    return $value / 1000;
+    return $this->phases->sum('estimated_cost');
   }
 
-  public function setStageAmountAttribute($value)
+  public function getStartDateAttribute()
   {
-    $this->attributes['stage_amount'] = moneyToInt($value);;
+    return $this->phases->min('start_date');
   }
 
-  public function getRemainingAmountAttribute()
+  public function getDueDateAttribute()
   {
-      return $this->calculateRemainingAmount();
+    return $this->phases->max('due_date');
   }
 
   public function contract()
@@ -85,16 +73,5 @@ class ContractStage extends Model
   public function phases()
   {
     return $this->hasMany(ContractPhase::class, 'stage_id');
-  }
-
-  public function calculateRemainingAmount()
-  {
-      // Get total phases amount in the same format as it's stored in the database (multiplied by 1000)
-      $totalPhasesAmount = $this->phases->sum(function($phase) {
-          return $phase->getOriginal('total_cost');
-      });
-      $totalPhasesAmount = round($totalPhasesAmount, 0);
-      // Return the calculated remaining amount divided by 1000 to match your getter's format
-      return ($this->getOriginal('stage_amount') - $totalPhasesAmount);
   }
 }
