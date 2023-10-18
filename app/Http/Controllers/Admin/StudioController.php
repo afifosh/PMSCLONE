@@ -43,7 +43,7 @@ class StudioController extends Controller
         $data['states'] = $studio->state_id ? State::where('id', $studio->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
         $data['cities'] = $studio->city_id ? City::where('id', $studio->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
     
-        return view('admin.pages.artist.show-profile', $data);
+        return view('admin.pages.studio.show-profile', $data);
     }
 
     public function edit(Studio $studio)

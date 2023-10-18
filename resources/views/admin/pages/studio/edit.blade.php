@@ -1,6 +1,6 @@
 @extends('admin/layouts/layoutMaster')
 
-@section('title', 'Artist Profile Details')
+@section('title', 'Studio Profile Details')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -72,19 +72,14 @@
   .iti { width: 100%; }
 </style>
 <h4 class="fw-bold py-3 mb-4">
-  <span class="text-muted fw-light">Account Settings /</span> Artist
+  <span class="text-muted fw-light">Account Settings /</span> Studio
 </h4>
 
 <div class="row">
   <div class="col-md-12">
   {{-- @include('admin.pages.account._partials.tabs') --}}
     <div class="card mb-4">
-      <h5 class="card-header">Artist Profile Details</h5>
-      {{-- {{    dd($studio); }} --}}
-      <!-- Account -->
-      {{-- <form action="{{ route('admin.studios.update', ['artist' => $studio->id]) }}" method="POST">
-      <form action="{{route('admin.studios.update')}}" method="POST" enctype="multipart/form-data"> --}}
-        {{-- <form method="POST" action="{{ route('admin.studios.update', $studio->id) }}">  --}}
+      <h5 class="card-header">Studio Profile Details</h5>
        {!! Form::model($studio, ['route' => ['admin.studios.update', $studio->id], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
       <div class="card-body">
         <div class="d-flex align-items-start align-items-sm-center gap-4">

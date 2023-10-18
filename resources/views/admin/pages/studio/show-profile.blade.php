@@ -23,7 +23,7 @@
 @endsection
 
 @section('content')
-@include('admin.pages.artist.header', ['tab' => 'profile'])
+@include('admin.pages.studio.header', ['tab' => 'profile'])
 <!-- User Profile Content -->
 <div class="row">
   <div class="col-xl-4 col-lg-5 col-md-5">

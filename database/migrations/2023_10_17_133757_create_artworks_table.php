@@ -17,6 +17,7 @@ return new class extends Migration
             $table->year('year');
             $table->string('medium');
             $table->string('dimension');
+            $table->text('description')->nullable(); // Add description column
             $table->string('featured_image')->nullable(); // Add featured_image column
             $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();            
             $table->timestamps();

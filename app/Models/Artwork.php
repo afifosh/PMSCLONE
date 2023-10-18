@@ -53,4 +53,8 @@ class Artwork extends Model
         return $this->belongsTo(Admin::class, 'added_by', 'id');
       }
 
+      public function medium()
+      {
+          return $this->belongsTo(Medium::class);
+      }      
 }
