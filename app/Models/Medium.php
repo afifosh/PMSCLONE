@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Medium extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = ['name'];
+  protected $table = 'mediums';
+
+  protected $fillable = ['name'];
 }

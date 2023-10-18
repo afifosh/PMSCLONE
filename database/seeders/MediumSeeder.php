@@ -12,8 +12,8 @@ class MediumSeeder extends Seeder
      */
     public function run()
     {
-        // Using Eloquent to delete all rows in the Artwork table
-        \App\Models\Medium::truncate();
+        // uncomment this line if table is not empty and you want to delete all the previous data
+        // Medium::query()->delete();
 
         // Define the number of studios you want to seed
         $studioCount = 10;
@@ -22,10 +22,10 @@ class MediumSeeder extends Seeder
         // Get the first admin's ID
         $admin  = Admin::first();
 
-      
+
         // Create 10 fake Artworks
         Medium::factory($studioCount)->create([
             'added_by' => $admin->id,
-        ]);     
+        ]);
     }
 }

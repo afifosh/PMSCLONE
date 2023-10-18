@@ -17,10 +17,16 @@ class CreateLocationsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('address');
+            $table->foreignId('country_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('city_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('state_id')->nullable()->constrained()->cascadeOnDelete();
             $table->decimal('latitude', 10, 7); // Adjust precision and scale as needed
             $table->decimal('longitude', 10, 7); // Adjust precision and scale as needed
             $table->integer('zoomLevel')->default(0);
             $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
+            $table->boolean('is_public')->default(true);
+            $table->nullableMorphs('owner');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();
         });
     }

@@ -560,4 +560,12 @@ class Company extends BaseModel
   {
     return $this->morphMany(Contract::class, 'assignable');
   }
+
+  /**
+   * Get all the location owned by this company. (Locations for placing artworks)
+   */
+  public function artworkLocations()
+  {
+    return $this->morphMany(Location::class, 'owner', 'owner_type', 'owner_id');
+  }
 }

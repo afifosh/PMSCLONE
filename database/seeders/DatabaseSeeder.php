@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Admin;
 use App\Models\Company;
+use App\Models\Medium;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -41,5 +42,8 @@ class DatabaseSeeder extends Seeder
         $this->call(ContractSeeder::class);
         $this->call(EmailTemplateSeeder::class);
         $this->call(AccountBalanceHolderSeeder::class);
+        $this->call(ArtworkSeeder::class);
+        $this->call(LocationSeeder::class);
+        $this->call(MediumSeeder::class);
     }
 }

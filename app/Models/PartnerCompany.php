@@ -35,4 +35,12 @@ class PartnerCompany extends BaseModel
     {
       return $this->hasMany(CompanyDepartment::class, 'company_id', 'id');
     }
+
+    /**
+   * Get all the location owned by this company. (Locations for placing artworks)
+   */
+  public function artworkLocations()
+  {
+    return $this->morphMany(Location::class, 'owner', 'owner_type', 'owner_id');
+  }
 }
