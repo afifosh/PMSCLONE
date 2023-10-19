@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->year('year');
-            $table->string('medium');
+            $table->foreignId('medium_id')->nullable()->constrained('mediums')->cascadeOnUpdate()->nullOnDelete();
             $table->string('dimension');
             $table->text('description')->nullable(); // Add description column
             $table->string('featured_image')->nullable(); // Add featured_image column
