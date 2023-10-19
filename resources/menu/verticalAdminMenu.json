@@ -54,24 +54,77 @@
       "slug": "admin.companies.index"
     },
     {
-      "url": "/admin/artists",
-      "name": "Artists",
-      "icon": "menu-icon fas fa-building",
-      "slug": "admin.artists.index"
-    },    
-    {
-      "url": "/admin/studios",
-      "name": "Studios",
-      "icon": "menu-icon fas fa-building",
-      "slug": "admin.studios.index"
-    },  
-    {
-      "url": "/admin/artworks",
       "name": "Artworks",
-      "icon": "menu-icon fas fa-building",
-      "slug": "admin.artworks.index"
-    },  
+      "slug": ["admin.artworks.index", "admin.artists.index", "admin.studios.index","admin.locations.index", "admin.mediums.index"],
+      "icon": "menu-icon tf-icons ti ti-color-swatch",
+      "submenu": [
+        {
+          "url": "/admin/artworks",
+          "name": "Artworks",
+          "icon": "menu-icon fas fa-building",
+          "slug": "admin.artworks.index"
+        },
+        {
+          "url": "/admin/artists",
+          "name": "Artists",
+          "icon": "menu-icon fas fa-building",
+          "slug": "admin.artists.index"
+        },    
+        {
+          "url": "/admin/studios",
+          "name": "Studios",
+          "icon": "menu-icon fas fa-building",
+          "slug": "admin.studios.index"
+        },          
+        {
+          "name": "Settings",
+          "slug": ["admin.locations.index", "admin.mediums.index"],
+          "submenu": [
+            {
+              "url": "/admin/locations",
+              "name": "Locations",
+              "icon": "menu-icon fas fa-building",
+              "slug": "admin.locations.index"
+            },
+            {
+              "url": "/admin/mediums",
+              "name": "Mediums",
+              "icon": "menu-icon fas fa-building",
+              "slug": "admin.mediums.index"
+            }
+          ]
+        }
+      ]
+    },
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     {
       "url": "/admin/programs",
       "name": "Programs",

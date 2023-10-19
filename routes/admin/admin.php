@@ -12,7 +12,6 @@ use App\Http\Controllers\Admin\Company\InvitationController;
 use App\Http\Controllers\Admin\Company\KycDocumentController;
 use App\Http\Controllers\Admin\Company\UserController;
 use App\Http\Controllers\Admin\CompanyController;
-use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\Admin\CompanyRoleController;
 use App\Http\Controllers\Admin\Contract\BulkInvoiceController;
 use App\Http\Controllers\Admin\Contract\ChangeRequestController;
@@ -92,6 +91,8 @@ use Modules\MailClient\Http\Controllers\OAuthEmailAccountController;
 use App\Http\Controllers\Admin\ArtworkController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\StudioController;
+use App\Http\Controllers\Admin\MediumController;
+use App\Http\Controllers\Admin\ArtistController;
 
 
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
@@ -164,6 +165,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('locations', LocationController::class);
     // Studio routes
     Route::resource('studios', StudioController::class);
+    // Medium routes
+    Route::resource('mediums', MediumController::class);
+
 
     Route::prefix('partner')->name('partner.')->group(function () {
       Route::resource('companies', PatnerCompanyController::class);
