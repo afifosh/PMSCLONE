@@ -33,5 +33,9 @@ class Medium extends Model
     return $this->belongsTo(Admin::class, 'added_by', 'id');
   }
 
+  public function scopeApplyRequestFilters($query)
+  { 
+    //
+  }
 
 }

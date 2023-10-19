@@ -30,7 +30,7 @@ class ArtworksDataTable extends DataTable
                 return view('admin.pages.artwork.action', compact('artwork'));
             }) 
             ->addColumn('medium', function (artwork $artwork) {
-              return $artwork->medium;
+              return $artwork->medium->name;
           })             
             ->filterColumn('added_by', function($query, $keyword){
                 return $query->whereHas('addedBy', function($q) use ($keyword){

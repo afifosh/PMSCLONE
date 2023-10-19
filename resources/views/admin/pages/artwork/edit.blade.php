@@ -37,15 +37,15 @@
     var input = document.querySelector("#phone");
     window.itiPhone = intlTelInput(input, {
       utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2/build/js/utils.js",
-      initialCountry: "auto",
+      initialmedium: "auto",
       geoIpLookup: function(success) {
-        fetch("https://api.country.is")
+        fetch("https://api.medium.is")
           .then(function(response) {
             if (!response.ok) return success("");
             return response.json();
           })
           .then(function(ipdata) {
-            success(ipdata.country);
+            success(ipdata.medium);
           });
         },
       });
@@ -58,7 +58,7 @@
     $('#phone').val(itiPhone.getNumber());
     if(isValid){
       $('#itiPhone').text('')
-      $('#itiPhoneCountry').val(itiPhone.getSelectedCountryData().iso2)
+      $('#itiPhonemedium').val(itiPhone.getSelectedmediumData().iso2)
     }else{
       $('#itiPhone').text('Invalid phone number')
       $('#itiPhone').css('color', 'red')
@@ -126,10 +126,13 @@
               @error('year')<div class="text-danger">{{ $message }}</div>@enderror
           </div>
           <div class="mb-3 col-md-12">
-              <label for="medium" class="form-label">Medium</label>
-              <input class="form-control" type="text" id="medium" name="medium" value="{{ old('medium') ?? $artwork->medium }}" />
-              @error('medium')<div class="text-danger">{{ $message }}</div>@enderror
-          </div>
+            {{ Form::label('medium_id', __('Medium'), ['class' => 'form-label']) }}
+            {!! Form::select('medium_id', $mediums, $artwork->medium_id, [
+            'class' => 'form-select globalOfSelect2Remote',
+            'data-url' => route('resource-select', ['Medium']),
+            'id' => 'user-mediums-id',
+            ]) !!}
+          </div>          
           <div class="mb-3 col-md-12">
               <label for="dimension" class="form-label">Dimension</label>
               <input class="form-control" type="text" id="dimension" name="dimension" value="{{ old('dimension') ?? $artwork->dimension }}" />

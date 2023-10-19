@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\DataTables\Admin\ArtworksDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Artwork;
+use App\Models\Medium;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -29,10 +30,8 @@ class ArtworkController extends Controller
 
   public function create()
   {
-    $data['Artwork'] = new Artwork();
-    $data['countries'] = ['' => 'Select Country'];
-    $data['states'] = ['' => 'Select State'];
-    $data['cities'] = ['' => 'Select City'];
+    $data['artwork'] = new Artwork();
+    $data['$mediums'] = ['' => 'Select Medium'];
     return $this->sendRes('success', ['view_data' => view('admin.pages.artwork.edit', $data)->render(), 'JsMethods' => ['initIntlTel']]);
   }
 
@@ -54,6 +53,7 @@ class ArtworkController extends Controller
   public function show(Artwork $artwork)
   {
     $data['artwork'] = $artwork;
+    $data['mediums'] = $artwork->medium_id ? Medium::where('id', $artwork->medium_id)->pluck('name', 'id')->prepend('Select Medium', '') : ['' => 'Select Medium'];
 
     return view('admin.pages.artwork.show-profile', $data);
   }
@@ -62,6 +62,7 @@ class ArtworkController extends Controller
   public function edit(Artwork $artwork)
   {
     $data['artwork'] = $artwork;
+    $data['mediums'] = $artwork->medium_id ? Medium::where('id', $artwork->medium_id)->pluck('name', 'id')->prepend('Select Medium', '') : ['' => 'Select Medium'];
 
     return view('admin.pages.artwork.edit', $data);
   }
@@ -86,7 +87,7 @@ class ArtworkController extends Controller
     $artwork->update($att);
 
     $data['artwork'] = $artwork;
-
+    $data['mediums'] = $artwork->medium_id ? Medium::where('id', $artwork->medium_id)->pluck('name', 'id')->prepend('Select Medium', '') : ['' => 'Select Medium'];
         return $this->sendRes('Updated Successfully', [
           'view_data' => view('admin.pages.artwork.edit', $data)->render(),
           'JsMethods' => ['initIntlTel'],

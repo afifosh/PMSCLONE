@@ -12,11 +12,12 @@ class ArtworkFactory extends Factory
     public function definition()
     {
         return [
-            'year' => $this->faker->year,
-            'medium' => $this->faker->word,
-            'dimension' => $this->faker->sentence,
             'title' => $this->faker->sentence,
-            'featured_image' => null, // You can generate fake image URLs here if needed.
+            'year' => $this->faker->year,
+            'medium_id' => null, // Define how you want to generate the 'medium_id' attribute.
+            'dimension' => $this->faker->sentence,
+            'description' => $this->faker->text, // Add description column
+            'featured_image' => null, // Define how you want to generate the 'featured_image' attribute.
             'added_by' => null, // Define how you want to generate the 'added_by' attribute.
         ];
     }

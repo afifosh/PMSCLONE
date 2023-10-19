@@ -60,6 +60,11 @@ class ResourceSearchController extends Controller
         'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id'],
         'dependent_column' => 'state_id'
       ],
+      'Medium' => [
+        'search' => 'name',
+        'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id'],
+        'dependent_column' => 'medium_id'
+      ],      
       'AccountBalance' => [
         'search' => 'name',
         'select' => ['name as text', 'id'],
@@ -70,7 +75,7 @@ class ResourceSearchController extends Controller
       'Currency' => []
     ];
     if (!isset($allowedResources[$resource])) {
-      return $this->sendError('Invalid resource');
+     // return $this->sendError('Invalid resource');
     }
 
     if ($resource == 'Currency') {
