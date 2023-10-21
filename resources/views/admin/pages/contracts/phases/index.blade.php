@@ -112,8 +112,8 @@ function toggleCheckboxes(){
 @endsection
 
 @section('content')
-@includeWhen($page == 'Project', 'admin.pages.projects.navbar', ['tab' => $stage == 'stage' ? 'phases' : 'null'])
-@includeWhen($page == 'Contract', 'admin.pages.contracts.header', ['tab' => $stage == 'stage' ? 'phases' : 'null'])
+@includeWhen($page == 'Project', 'admin.pages.projects.navbar', ['tab' => 'phases'])
+@includeWhen($page == 'Contract', 'admin.pages.contracts.header', ['tab' => 'phases'])
 {{-- <div class="app-email mt-3 card">
   <div class="row g-0">
     <!-- Task Sidebar -->

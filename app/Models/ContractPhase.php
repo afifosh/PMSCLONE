@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ContractPhase extends Model
+class ContractPhase extends BaseModel
 {
   use HasFactory;
 
@@ -111,6 +111,11 @@ class ContractPhase extends Model
     }
   }
 
+  public function scopeApplyRequestFilters($q)
+  {
+    //
+  }
+
   public function contract(): BelongsTo
   {
     return $this->belongsTo(Contract::class);
@@ -125,6 +130,20 @@ class ContractPhase extends Model
   {
     // have invoices table and invoice_items table. Invoice items table is polymorphic many to many. so checking is this phase class is added as invoice item
     return $this->morphMany(InvoiceItem::class, 'invoiceable');
+  }
+
+  public function invoices(): BelongsToMany
+  {
+    return $this->belongsToMany(Invoice::class, 'invoice_items', 'invoiceable_id', 'invoice_id')->where('invoiceable_type', ContractPhase::class);
+  }
+
+  /**
+   * The remaining amount to be invoiced
+   */
+  public function getRemainingAmount()
+  {
+    $total = $this->invoices()->sum('total') / 1000;
+    return $this->total_cost - $total;
   }
 
   public function taxes(): BelongsToMany

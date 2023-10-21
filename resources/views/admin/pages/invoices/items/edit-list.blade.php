@@ -1,4 +1,5 @@
 @forelse ($invoice->items as $item)
+@continue($invoice->type == 'Partial Invoice' && $item->invoiceable_type == 'App\Models\ContractPhase')
 <tr data-id="{{$item->id}}">
   @if ($is_editable)
     <!--action-->

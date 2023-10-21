@@ -15,13 +15,18 @@
           <!--begin::Wrapper-->
           <div class="flex-grow-1">
               <!--begin::Head-->
-              <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+              <div class="d-flex justify-content-between flex-wrap mb-2">
                   <!--begin::Details-->
-                  <div class="d-flex flex-column">
+                  <div class="d-flex flex-column w-100">
                       <!--begin::Status-->
-                      <div class="d-flex align-items-center mb-1">
-                          <a href="#" class="text-gray-800 text-hover-primary fs-2 fw-bold me-3">{{$contract->subject}}</a>
-                          <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
+                      <div class="row">
+                        <div class="d-flex justify-content-between">
+                          <div class="d-flex align-items-center mb-1">
+                            <a href="#" class="text-gray-800 text-hover-primary fs-2 fw-bold me-3">{{$contract->subject}}</a>
+                            <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
+                          </div>
+                          <span id="contract-viewing-users"></span>
+                        </div>
                       </div>
                       <!--end::Status-->
 
@@ -114,7 +119,22 @@
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'uploaded-documents' ? 'active' : ''}}" href="{{route('admin.contracts.uploaded-documents.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Uploaded Documents</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'pending-documents' ? 'active' : ''}}" href="{{route('admin.contracts.pending-documents.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Pending Documents</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'settings' ? 'active' : ''}}" href="{{route('admin.contracts.settings.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Settings</a></li>
+      <li class="nav-item"><a class="nav-link py-3 {{$tab == 'logs' ? 'active' : ''}}" href="{{route('admin.contracts.logs.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Logs</a></li>
       </ul>
       <!--end::Nav-->
   </div>
 </div>
+@push('scripts')
+<script>
+  /***
+   * Variables used in this file
+   **/
+  const activeContractId = "{{$contract->id}}";
+  const activeContractTab = "{{$tab}}";
+  var contractViewingUsers = [];
+  var stageEditingUsers = [];
+  var phaseEditingUsers = [];
+  var disablePhaseWhisper = false;
+</script>
+<script src="{{asset('assets/js/custom/contracts-realtime-updates.js')}}"></script>
+@endpush

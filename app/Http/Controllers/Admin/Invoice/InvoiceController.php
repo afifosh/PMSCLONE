@@ -55,6 +55,11 @@ class InvoiceController extends Controller
   {
     $invoice = Invoice::create($request->validated() + ['total' => $request->subtotal]);
 
+    if($request->type == 'Partial Invoice'){
+      $invoice->attachPhasesWithTax([$request->phase_id]);
+      $invoice->update(['is_payable' => false]);
+    }
+
     return $this->sendRes('Invoice Added Successfully', ['event' => 'redirect', 'url' => route('admin.invoices.edit', $invoice)]);
   }
 
@@ -74,7 +79,7 @@ class InvoiceController extends Controller
 
     $data['is_editable'] = $invoice->isEditable();
 
-    if ($invoice->type != 'Regular') {
+    if ($invoice->type == 'Downpayment') {
       $dataTable = app(DownpaymentInvoicesDataTable::class);
       $dataTable->downpaymentInvoice = $invoice;
 

@@ -74,7 +74,7 @@ class InvoiceStoreRequest extends FormRequest
       ];
 
     return [
-      'type' => 'required|in:Regular,Down Payment',
+      'type' => 'required|in:Regular,Down Payment,Partial Invoice',
       'subtotal' => 'nullable|required_if:type,Down Payment|numeric'.(request()->type == 'Down Payment' ? '|gt:0' : ''),
       'description' => 'nullable|required_if:type,Down Payment|string|max:255',
       'company_id' => 'required|exists:companies,id',
@@ -83,7 +83,8 @@ class InvoiceStoreRequest extends FormRequest
       'due_date' => 'required|date',
       'note' => 'nullable|string',
       'terms' => 'nullable|string',
-      'refrence_id' => 'nullable|string|max:255'
+      'refrence_id' => 'nullable|string|max:255',
+      'phase_id' => 'nullable|required_if:type,Partial Invoice|exists:contract_phases,id'
     ];
   }
 

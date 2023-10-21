@@ -422,14 +422,60 @@
           </div>
         </div>
 
+        <hr class="my-0" />
+
+        @if ($invoice->type == 'Partial Invoice')
+          <div class="source-item pt-4 px-0 px-sm-4">
+            <div class="col-12">
+              <div class="table-responsive m-t-40">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                        <th class="text-left x-description bill_col_description">Phase</th>
+                        <th class="text-left x-description bill_col_description">Total Cost</th>
+                        <th class="text-left x-rate bill_col_rate">Invoiceable Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @php
+                      $phase = $invoice->items->where('invoiceable_type', 'App\Models\ContractPhase')[0];
+                    @endphp
+                    <tr>
+                      <td class="">{{$phase->invoiceable->name ?? runtimeInvIdFormat($phase->invoiceable_id)}}</td>
+                      <!--total-->
+                      <td class="text-right">
+                          @cMoney($phase->amount + $phase->total_tax_amount, $invoice->contract->currency, true)
+                      </td>
+                      <!--total-->
+                      <!-- invoiceable amount -->
+                      <td class="text-right">
+                        @cMoney($phase->invoiceable->getRemainingAmount() + $invoice->total, $invoice->contract->currency, true)
+                      </td>
+                      <!-- invoiceable amount -->
+                    </tr>
+                    {{-- @include('admin.pages.invoices.items.edit-list') --}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        @endif
+
         <hr class="my-3 mx-n4" />
 
         <div class="source-item pt-4 px-0 px-sm-4">
           <div class="col-12">
             <div class="table-responsive m-t-40 invoice-table-wrapper editing clear-both">
                 <table class="table table-hover invoice-table editing">
-                <button type="button" class="btn btn-primary btn-sm float-end select-items-btn">Select Items</button>
-                <button type="button" class="btn btn-primary btn-sm float-end d-none delete-items-btn">Delete Selected</button>
+                <button type="button" class="btn btn-primary btn-sm float-end me-2 select-items-btn">Select Items</button>
+                <button type="button" class="btn btn-primary btn-sm float-end me-2 d-none delete-items-btn">Delete Selected</button>
+                @if ($is_editable)
+                  @if($invoice->type == 'Regular')
+                    <button type="button" class="btn btn-primary btn-sm float-end me-2" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
+                  @else
+                    <button type="button" class="btn btn-primary btn-sm float-end me-2" data-title="{{__('Add Item')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.custom-invoice-items.create',[$invoice])}}">Add Item</button>
+                  @endif
+                @endif
                     <thead>
                         <tr>
                             <!--action-->
@@ -455,15 +501,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-          @if ($is_editable)
-            <div class="row pb-4">
-              <div class="col-12 mt-4">
-                <button type="button" class="btn btn-primary" data-title="{{__('Add Item')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.custom-invoice-items.create',[$invoice])}}">Add Item</button>
-                <button type="button" class="btn btn-primary" data-title="{{__('Add Phases')}}" data-toggle='ajax-modal' data-href="{{route('admin.invoices.invoice-items.create',[$invoice])}}">Add Phases</button>
-              </div>
-            </div>
-          @endif
+          </div>
         </div>
 
         <hr class="my-3 mx-n4" />
