@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-class Contract extends Model
+class Contract extends BaseModel
 {
   use HasFactory, SoftDeletes, HasEnum;
 

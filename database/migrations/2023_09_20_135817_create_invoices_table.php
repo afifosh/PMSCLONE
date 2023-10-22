@@ -24,25 +24,44 @@ return new class extends Migration
       $table->boolean('is_summary_tax')->default(false);
       $table->nullableMorphs('creator');
       $table->bigInteger('subtotal')->default(0);
-      $table->unsignedBigInteger('downpayment_before_tax')->default(0);
       $table->bigInteger('total_tax')->default(0);
       $table->bigInteger('total')->default(0);
-      $table->unsignedBigInteger('downpayment_amount')->default(0);
       $table->bigInteger('paid_amount')->default(0);
       $table->string('description')->nullable();
       $table->text('note')->nullable();
       $table->text('terms')->nullable();
+      /**
+       * Downpayment
+       */
+      $table->unsignedBigInteger('downpayment_before_tax')->default(0);
+      $table->unsignedBigInteger('downpayment_amount')->default(0);
+      /**
+       * Discount
+       */
       $table->enum('discount_type', ['Fixed', 'Percentage'])->nullable();
+      $table->boolean('is_discount_before_tax')->default(true);
       $table->integer('discount_percentage')->default(0);
       $table->bigInteger('discount_amount')->default(0);
+      /**
+       * Adjustment
+       */
       $table->string('adjustment_description')->nullable();
       $table->bigInteger('adjustment_amount')->default(0);
+      $table->boolean('is_adjustment_before_tax')->default(false);
+      /**
+       * Retention
+       */
       $table->foreignId('retention_id')->nullable()->constrained('taxes')->nullOnDelete();
       $table->string('retention_name')->nullable();
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
       $table->timestamp('retention_released_at')->nullable();
+      $table->boolean('is_retention_before_tax')->default(false);
+      /**
+       * End Retention
+       */
       $table->boolean('is_auto_generated')->default(false);
+      $table->boolean('is_payable')->default(true); // if partial invoice total is more than phase total total, it will be false
       $table->enum('status', Invoice::STATUSES)->default('Draft');
       $table->timestamp('deleted_at')->nullable();
       $table->timestamps();

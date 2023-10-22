@@ -46,7 +46,8 @@ class Invoice extends Model
     'retention_released_at',
     'is_auto_generated',
     'downpayment_amount',
-    'downpayment_before_tax'
+    'downpayment_before_tax',
+    'is_payable'
   ];
 
   protected $casts = [
@@ -67,7 +68,8 @@ class Invoice extends Model
 
   const TYPES = [
     'Regular',
-    'Down Payment'
+    'Down Payment',
+    'Partial Invoice'
   ];
 
   /*
@@ -224,7 +226,11 @@ class Invoice extends Model
 
   public function updateSubtotal(): void
   {
-    $subtotal = $this->items()->sum('amount') / 1000;
+    if($this->type == 'Partial Invoice'){
+      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum('amount') / 1000;
+    }else if($this->type == 'Regular'){
+      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum('amount') / 1000;
+    }
     if (!$subtotal) {
       $this->update(['discount_amount' => 0]);
     }
@@ -436,7 +442,7 @@ class Invoice extends Model
     try {
       $pivot_amounts = ContractPhase::whereIn('id', $phase_ids)
         ->where('contract_id', $this->contract_id)
-        ->has('addedAsInvoiceItem', 0)
+        // ->has('addedAsInvoiceItem', 0)
         ->with('taxes')
         ->get();
 

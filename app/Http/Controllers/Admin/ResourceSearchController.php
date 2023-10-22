@@ -72,6 +72,11 @@ class ResourceSearchController extends Controller
           'program_id' => 'where has program',
         ]
       ],
+      'ContractPhase' => [
+        'search' => 'name',
+        'select' => ['name as text', 'id'],
+        'dependent_column' => 'contract_id'
+      ],
       'Currency' => []
     ];
     if (!isset($allowedResources[$resource])) {

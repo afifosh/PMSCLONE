@@ -20,7 +20,7 @@ class GanttChartController extends Controller
       ->applyRequestFilters()
       ->with([
         'stages' => function ($q) {
-          $q->select('contract_stages.id', 'contract_stages.name', 'start_date', 'due_date', 'contract_id');
+          $q->select('contract_stages.id', 'contract_stages.name', 'contract_id');
         },
         'stages.phases' => function ($q) {
           $q->select('contract_phases.id', 'contract_phases.name', 'start_date', 'due_date', 'contract_id', 'stage_id');

@@ -30,6 +30,21 @@
         </div>
         <div class="col-md mb-md-0 mb-3">
           <div class="form-check custom-option custom-option-icon {{$invoice->type == 'Down Payment' ? 'checked': ''}}">
+            <label class="form-check-label custom-option-content" for="customRadioDown-partial-payment">
+              <span class="custom-option-body">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                      <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                  </svg>
+                <span class="custom-option-title"> Partial Invoice </span>
+              </span>
+              {!! Form::radio('type', 'Partial Invoice', false, ['class' => 'form-check-input', 'id' => 'customRadioDown-partial-payment']) !!}
+            </label>
+          </div>
+        </div>
+        <div class="col-md mb-md-0 mb-3">
+          <div class="form-check custom-option custom-option-icon {{$invoice->type == 'Down Payment' ? 'checked': ''}}">
             <label class="form-check-label custom-option-content" for="customRadioDown Payment">
               <span class="custom-option-body">
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -63,6 +78,17 @@
         'data-url' => route('resource-select', ['Contract', 'dependent' => 'company_id']),
         'data-placeholder' => 'Select Contract',
         'data-dependent_id' => 'client_id-select',
+      ]) !!}
+    </div>
+    {{-- Phase --}}
+    <div class="form-group col-6 phase-for-partial d-none">
+      {{ Form::label('phase_id', __('Phase'), ['class' => 'col-form-label']) }}
+      {!! Form::select('phase_id', $phases ?? [], null, [
+        'class' => 'form-select globalOfSelect2Remote',
+        'data-url' => route('resource-select', ['ContractPhase', 'dependent' => 'contract_id']),
+        'data-placeholder' => 'Select Phase',
+        'data-dependent_id' => 'contract_id',
+        'data-allow-clear' => 'true'
       ]) !!}
     </div>
     {{-- invoice date --}}
@@ -117,6 +143,11 @@
       $('.downpayment-amount').removeClass('d-none');
     }else{
       $('.downpayment-amount').addClass('d-none');
+    }
+    if($(this).val() == 'Partial Invoice'){
+      $('.phase-for-partial').removeClass('d-none');
+    }else{
+      $('.phase-for-partial').addClass('d-none');
     }
   })
   $(document).on('change', '[name="contract_id"]', function(){

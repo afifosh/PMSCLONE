@@ -1,7 +1,11 @@
 @if ($phase->id)
-    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.update', ['project' => $project, 'contract' => $contract, 'phase' => $phase->id, 'stage' => $stage]], 'method' => 'PUT']) !!}
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.update', ['project' => 'project', 'contract' => $contract, 'phase' => $phase->id, 'stage' => $stage]],
+      'method' => 'PUT',
+      'id' => 'phase-update-form',
+      'data-phase-id' => $phase->id,
+    ]) !!}
 @else
-    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.store',  ['project' => $project, 'contract' => $contract, 'stage' => $stage]], 'method' => 'POST']) !!}
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.store',  ['project' => 'project', 'contract' => $contract, 'stage' => $stage]], 'method' => 'POST']) !!}
 @endif
 
 {{-- <div class="form-check">
@@ -69,7 +73,7 @@
   </div>
   <div class="col-12 mt-2">
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="cal-phase-end-date">
+      <input class="form-check-input" name="calc_end_date" type="checkbox" id="cal-phase-end-date">
       <label class="form-check-label" for="cal-phase-end-date">
         Calculate End Date
       </label>
@@ -82,7 +86,7 @@
       <div class="d-flex">
         <div class="d-flex w-100">
           <input id="cont-add-count" type="number"  class="form-control cal-phase-end-date">
-          {!! Form::select('null', ['Days' => 'Day(s)', 'Weeks' => 'Week(s)', 'Months' => 'Month(s)', 'Years' => 'Year(s)'], null, ['class' => 'cont-add-unit cal-phase-end-date input-group-text form-select globalOfSelect2']) !!}
+          {!! Form::select('cal_end_date_unit', ['Days' => 'Day(s)', 'Weeks' => 'Week(s)', 'Months' => 'Month(s)', 'Years' => 'Year(s)'], null, ['class' => 'cont-add-unit cal-phase-end-date input-group-text form-select globalOfSelect2']) !!}
         </div>
       </div>
     </div>
@@ -119,7 +123,9 @@
   </div>
 </div>
 
-<div class="mt-3">
+<div class="mt-3 d-flex justify-content-between">
+  <div class="phase-editing-users">
+  </div>
     <div class="btn-flt float-end">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
         <button type="submit" data-form="ajax-form" class="btn btn-primary">{{ __('Save') }}</button>

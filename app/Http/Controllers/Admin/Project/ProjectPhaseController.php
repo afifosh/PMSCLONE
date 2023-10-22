@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Project;
 
 use App\DataTables\Admin\Contract\PhasesDataTable;
-use App\Events\Admin\ProjectPhaseUpdated;
+use App\Events\Admin\Contract\ContractUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contract\Phase\PhaseStoreRequest;
 use App\Http\Requests\Admin\Contract\Phase\PhaseUpdateRequest;
@@ -43,30 +43,20 @@ class ProjectPhaseController extends Controller
   public function create($project, Contract $contract, $stage)
   {
     $stage = ContractStage::find($stage) ?? 'stage';
-    $contract->load('project');
-    $project = $contract->project ?? 'project';
     $max_amount = $contract->remaining_amount;
     $phase = new ContractPhase();
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('project', 'contract', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
   }
 
   public function store($project, Contract $contract, ContractStage $stage, PhaseStoreRequest $request)
   {
-    $contract->load('project');
-    $project = $contract->project ?? 'project';
-
     $phase = $contract->phases()->create(
       ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost'])
     );
-
     $this->storeTaxes($phase, $request->phase_taxes);
-
-    $message = auth()->user()->name . ' created a new phase: ' . $phase->name;
-
-    if ($contract->project)
-      broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
+    broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
     return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
   }
@@ -94,17 +84,13 @@ class ProjectPhaseController extends Controller
     }
 
     $max_amount = $contract->remaining_amount + $phase->total_cost;
-    $contract->load('project');
-    $project = $contract->project ?? 'project';
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'project', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
   }
 
   public function update($project, PhaseUpdateRequest $request, Contract $contract, $stage, ContractPhase $phase)
   {
-    $contract->load('project');
-    $project = $contract->project ?? 'project';
     $phase->load(['addedAsInvoiceItem.invoice', 'stage']);
 
     if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
@@ -134,20 +120,13 @@ class ProjectPhaseController extends Controller
       });
     }
 
-
-    $message = auth()->user()->name . ' updated phase: ' . $phase->name;
-
-    if ($contract->project)
-      broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
+    broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
     return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
   }
 
   public function destroy($project, Contract $contract, $stage, ContractPhase $phase)
   {
-    $contract->load('project');
-    $project = $contract->project ?? 'project';
-
     $phase->load('addedAsInvoiceItem.invoice');
     if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
       return $this->sendError('You can not delete this phase because it is in paid invoice');
@@ -162,19 +141,13 @@ class ProjectPhaseController extends Controller
 
     $phase->delete();
 
-    $message = auth()->user()->name . ' deleted phase: ' . $phase->name;
-
-    if (@$contract->project->id)
-      broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
+    broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
     return $this->sendRes(__('Phase Deleted Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
   }
 
   public function sortPhases($project, Contract $contract, Request $request)
   {
-    $contract->load('project');
-    $project = $contract->project ?? 'project';
-    // abort_if(!$project->isMine(), 403);
 
     $request->validate([
       'phases' => 'required|array',
@@ -184,11 +157,7 @@ class ProjectPhaseController extends Controller
     foreach ($request->phases as $order => $phase_id) {
       $contract->phases()->where('id', $phase_id)->update(['order' => $order]);
     }
-
-    $message = auth()->user()->name . ' sorted phase list';
-
-    if ($contract->project)
-      broadcast(new ProjectPhaseUpdated($project, 'phase-list', $message))->toOthers();
+    broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
     return $this->sendRes(__('Phases Sorted Successfully'), ['event' => 'functionCall', 'function' => 'refreshPhaseList']);
   }

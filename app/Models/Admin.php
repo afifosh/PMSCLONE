@@ -97,6 +97,16 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
   }
 
   /**
+     * Attributes to exclude from the Audit.
+     *
+     * @var array
+     */
+    protected $auditExclude = [
+      'is_online',
+      'last_seen',
+  ];
+
+  /**
      * Get the user time format
      */
     public function getLocalTimeFormat(): string

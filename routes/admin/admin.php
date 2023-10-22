@@ -51,6 +51,7 @@ use App\Http\Controllers\Admin\MediaViewController;
 use App\Http\Controllers\Admin\PersonalNote\PersonalNoteController;
 use App\Http\Controllers\Admin\Contract\ContractStageController;
 use App\Http\Controllers\Admin\Contract\DocumentStatController;
+use App\Http\Controllers\Admin\Contract\LogController;
 use App\Http\Controllers\Admin\Contract\UploadedDocumentController;
 use App\Http\Controllers\Admin\ContractDoc\DocControlController;
 use App\Http\Controllers\Admin\DocControl\InvoiceDocController;
@@ -192,6 +193,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');
     Route::post('contracts/{contract}/release-retentions', [ContractController::class, 'releaseRetention'])->name('contracts.release-retentions');
     Route::resource('contracts', ContractController::class);
+    Route::resource('contracts.logs', LogController::class)->only(['index']);
     Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
     Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
     Route::post('contracts/{contract}/change-requests/{change_request}/reject', [ChangeRequestController::class, 'reject'])->name('contracts.change-requests.reject');
