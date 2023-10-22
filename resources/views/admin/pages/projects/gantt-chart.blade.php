@@ -41,6 +41,7 @@
 <script src="{{asset('assets/vendor/libs/block-ui/block-ui.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="{{asset('assets/libs/dhtmlxgantt/dhtmlxgantt.js')}}"></script>
+<script src="https://export.dhtmlx.com/gantt/api.js"></script>
 @endsection
 
 @section('page-script')
@@ -543,7 +544,7 @@ gantt.templates.task_text = function(start, end, task){
 };
 	// gantt.message({text: "Scale the Gantt chart to make the whole project fit the screen", expire: -1});
 
-  gantt.plugins({tooltip: true, marker: true});
+  gantt.plugins({tooltip: true, marker: true, export_api: true});
 
   changeToday({checked: true});
 
@@ -707,10 +708,19 @@ gantt.$task_data.style.cursor = 'grab';
               <option value="hours">Hours</option>
             </select>
           </div>
-          <div class="col-md-7 d-flex justify-content-between pt-4">
+          <div class="col-md-8 d-flex justify-content-between pt-4">
             <button class='btn btn-primary zoom_toggle' onclick="toggleMode(this)">Zoom to Fit</button>
             <button class="btn btn-primary" onclick="zoom_in()">Zoom In</button>
             <button class="btn btn-primary" onclick="zoom_out()">Zoom Out</button>
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" onclick='gantt.exportToPDF()'>PDF</a></li>
+                <li><a class="dropdown-item" href="#" onclick='gantt.exportToPNG()'>PNG</a></li>
+              </ul>
+            </div>
             <label class="switch switch-lg">
               <input type="checkbox" class="switch-input config-input" onchange="changeCollapse(this)">
               <span class="switch-toggle-slider">
