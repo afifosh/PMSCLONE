@@ -635,6 +635,54 @@ document.addEventListener('mousemove', function(e) {
 });
 
 gantt.$task_data.style.cursor = 'grab';
+
+function export_gantt(type)
+{
+  let start_date = $('#export-start-date').val();
+  const parts = start_date.split('-');
+  start_date = `${parts[2]}-${parts[1]}-${parts[0]}`;
+  let end_date = $('#export-end-date').val();
+  const parts2 = end_date.split('-');
+  end_date = `${parts2[2]}-${parts2[1]}-${parts2[0]}`;
+  if(type == 'pdf'){
+    gantt.exportToPDF({start: start_date, end: end_date});
+  }
+  else if(type == 'png'){
+    gantt.exportToPNG({start: start_date, end: end_date});
+  }
+}
+
+function showExportModal()
+{
+  $('#globalModalTitle').html('Export Gantt Chart');
+  $('#globalModalBody').html(`
+  <div id="export-modal-body">
+  <div class="row">
+    <div class="col-6">
+      <div class="mb-3">
+        <label for="export-start-date" class="form-label">Start Date</label>
+        <input type="date" name="export-start-date" id="export-start-date" class="form-control flatpickr" placeholder="Start Date">
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="mb-3">
+        <label for="export-end-date" class="form-label">End Date</label>
+        <input type="date" name="export-end-date" id="export-end-date" class="form-control flatpickr" placeholder="End Date">
+      </div>
+    </div>
+  </div>
+  {{-- actions --}}
+  <div class="col-12">
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-primary me-1" onclick="export_gantt('pdf');">Export PDF</button>
+      <button class="btn btn-primary" onclick="export_gantt('png')">Export PNG</button>
+    </div>
+  </div>
+</div>
+  `);
+  initFlatPickr();
+  $('#globalModal').modal('show');
+}
 </script>
 @endsection
 
@@ -712,15 +760,16 @@ gantt.$task_data.style.cursor = 'grab';
             <button class='btn btn-primary zoom_toggle' onclick="toggleMode(this)">Zoom to Fit</button>
             <button class="btn btn-primary" onclick="zoom_in()">Zoom In</button>
             <button class="btn btn-primary" onclick="zoom_out()">Zoom Out</button>
-            <div class="btn-group">
+            <button class="btn btn-primary" onclick="showExportModal()">Export</button>
+            {{-- <div class="btn-group">
               <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 Export
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" onclick='gantt.exportToPDF()'>PDF</a></li>
+                <li><a class="dropdown-item" href="#" onclick='gantt.exportToPDF({start:"01-10-2023", end:"11-11-2023" })'>PDF</a></li>
                 <li><a class="dropdown-item" href="#" onclick='gantt.exportToPNG()'>PNG</a></li>
               </ul>
-            </div>
+            </div> --}}
             <label class="switch switch-lg">
               <input type="checkbox" class="switch-input config-input" onchange="changeCollapse(this)">
               <span class="switch-toggle-slider">
