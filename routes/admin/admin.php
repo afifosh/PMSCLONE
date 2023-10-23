@@ -181,6 +181,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
     Route::get('projects/gantt-chart', [GanttChartController::class, 'index'])->name('projects.gantt-chart.index');
     Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
+    // Route for listing invoices for a program
+    Route::get('programs/{program}/invoices', [ProgramController::class, 'invoices'])->name('programs.invoices');
+    // Route for listing contracts for a program
+    Route::get('programs/{program}/contracts', [ProgramController::class, 'contracts'])->name('programs.contracts');
+   
     Route::put('projects/{project}/contracts/{contract}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.contracts.sort-phases');
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
