@@ -36,7 +36,7 @@ $configData = Helper::appClasses();
 @section('content')
 @includeWhen(isset($project), 'admin.pages.projects.navbar', ['tab' => 'contracts'])
 @includeWhen(isset($company), 'admin.pages.company.header', ['tab' => 'contracts'])
-@includeWhen(isset($program), 'admin.pages.programs.index', ['tab' => 'contracts'])
+@includeWhen(isset($program), 'admin.pages.programs.program-nav', ['tab' => 'contracts'])
 @if (!isset($project) && !isset($company) && !isset($program))
   <div class="mt-3  col-12">
     {{-- Stats Start --}}

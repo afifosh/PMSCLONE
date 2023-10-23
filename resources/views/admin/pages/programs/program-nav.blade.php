@@ -38,7 +38,7 @@
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
       <li class="nav-item"><a class="nav-link {{$tab == 'profile' ? 'active' : ''}}" href="{{ route('admin.programs.show', $program)}}"><i class='ti-xs ti ti-user-check me-1'></i> Profile</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'contracts' ? 'active' : ''}}" href="{{ route('admin.programs.contracts.index', ['program' => $program->id])}}"><i class='ti-xs ti ti-users me-1'></i> Contracts</a></li>
-      <li class="nav-item"><a class="nav-link {{$tab == 'contracts' ? 'active' : ''}}" href="{{ route('admin.programs.invoices', ['program' => $program->id])}}"><i class='ti-xs ti ti-users me-1'></i> Invoices</a></li>
+      <li class="nav-item"><a class="nav-link {{$tab == 'invoices' ? 'active' : ''}}" href="{{ route('admin.programs.invoices', ['program' => $program->id])}}"><i class='ti-xs ti ti-users me-1'></i> Invoices</a></li>
       {{-- <li class="nav-item"><a class="nav-link {{$tab == 'rfps' ? 'active' : ''}}" href="{{ route('admin.programs.showDraftRFPs', ['program' => $program->id])}}"><i class='ti-xs ti ti-users me-1'></i> RFP Drafs</a></li> --}}
       <li class="nav-item"><a class="nav-link {{$tab == 'users' ? 'active' : ''}}" href="{{ route('admin.programs.users.index', ['program' => $program->id])}}"><i class='ti-xs ti ti-users me-1'></i> Users</a></li>
     </ul>
