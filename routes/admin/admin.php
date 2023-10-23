@@ -184,11 +184,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     // Route for listing invoices for a program
     Route::get('programs/{program}/invoices', [ProgramController::class, 'invoices'])->name('programs.invoices');
     // Route for listing contracts for a program
-    Route::get('programs/{program}/contracts', [ProgramController::class, 'contracts'])->name('programs.contracts');
-   
+    //Route::get('programs/{program}/contracts', [ProgramController::class, 'contracts'])->name('programs.contracts');
+
+
     Route::put('projects/{project}/contracts/{contract}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.contracts.sort-phases');
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
+    Route::resource('programs.contracts', ContractController::class);
+
 
     Route::get('contracts/document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
     Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');

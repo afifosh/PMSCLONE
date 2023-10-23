@@ -16,7 +16,8 @@ class ContractsDataTable extends DataTable
 {
   public $projectId = null;
   public $company = null;
-
+  public $program = null;
+  public $programId = null;
   /**
    * Build the DataTable class.
    *
@@ -121,6 +122,9 @@ public function query(Contract $model): QueryBuilder
     if($this->company){
       $query->where('assignable_id', $this->company->id)->where('assignable_type', Company::class);
     }
+    if ($this->program) {
+      $query->where('program_id', $this->program->id);
+  }
 
     // Apply any additional filters if necessary
     $query->applyRequestFilters();
@@ -183,6 +187,11 @@ public function query(Contract $model): QueryBuilder
       // Column::make('phases_count')->title('Phases')->searchable(false),
       Column::make('status'),
     ];
+  }
+
+  public function setProgram($programId)
+  {
+      $this->$programId = $programId;
   }
 
   /**

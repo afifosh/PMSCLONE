@@ -28,9 +28,13 @@ class ContractController extends Controller
   public function index(ContractsDataTable $dataTable)
   {
     $data['company'] = Company::find(request()->route('company'));
-    if($data['company']){
-      $dataTable->company = $data['company'];
-    }else{
+    $data['program'] = Program::find(request()->route('program'));
+
+    if ($data['company']) {
+        $dataTable->company = $data['company'];
+    } if ($data['program']) {
+      $dataTable->program = $data['program'];
+    } else {      
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
