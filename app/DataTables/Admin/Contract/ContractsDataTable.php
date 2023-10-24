@@ -33,7 +33,7 @@ class ContractsDataTable extends DataTable
       ->editColumn('subject', function ($contract) {
         return $contract->subject ? $contract->subject : '-';
       })
-      ->editColumn('program', function ($contract) {
+      ->editColumn('program.name', function ($contract) {
         return $contract->program_id ? $contract->program->name : '-';  // Assuming the program has a 'name' field
       })
       ->addColumn('action', function ($contract) {
@@ -104,6 +104,7 @@ public function query(Contract $model): QueryBuilder
             DB::raw('count(CASE WHEN invoices.retention_amount IS NOT NULL AND invoices.retention_released_at IS NULL THEN 1 ELSE NULL END) as pending_retentions_count')
         ])
         ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+        ->leftJoin('programs', 'contracts.program_id', '=', 'programs.id')
         ->groupBy([
             'contracts.id',
             'contracts.program_id',
@@ -190,7 +191,7 @@ public function query(Contract $model): QueryBuilder
     return [
       Column::make('contracts.id')->title('Contract'),
       Column::make('subject')->title('Subject'),
-      Column::make('program')->title('Program'),
+      Column::make('program.name')->name('programs.name')->title('Program'),
       Column::make('refrence_id')->title('Ref ID'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
