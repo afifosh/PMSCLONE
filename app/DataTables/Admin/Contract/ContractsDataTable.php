@@ -34,8 +34,10 @@ class ContractsDataTable extends DataTable
         return $contract->subject ? $contract->subject : '-';
       })
       ->editColumn('program.name', function ($contract) {
-        return $contract->program_id ? $contract->program->name : '-';  // Assuming the program has a 'name' field
-      })
+        return $contract->program_id 
+            ? '<a href="' . route('admin.programs.show', $contract->program->id) . '">' . $contract->program->name . '</a>'
+            : 'N/A';
+      })    
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
@@ -71,7 +73,7 @@ class ContractsDataTable extends DataTable
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
         });
       })
-      ->rawColumns(['id']);
+      ->rawColumns(['id', 'program.name']);
   }
 
 /**

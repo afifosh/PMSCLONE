@@ -38,15 +38,19 @@ class InvoicesDataTable extends DataTable
         return '<a href="' . route('admin.contracts.show', $invoice->contract->id) . '">' . $invoice->contract->subject . '</a>';
       })
       ->addColumn('program_name', function ($invoice) {
-        return $invoice->contract->program ? $invoice->contract->program->name : 'N/A';
-      })
+        return $invoice->contract->program 
+            ? '<a href="' . route('admin.programs.show', $invoice->contract->program->id) . '">' . $invoice->contract->program->name . '</a>'
+            : 'N/A';
+      })    
       ->editColumn('action', function ($invoice) {
         return view('admin.pages.invoices.action', ['invoice' => $invoice]);
       })
       ->addColumn('total', function ($invoice) {
         return view('admin.pages.invoices.total-column', ['invoice' => $invoice]);
       })
-      ->rawColumns(['company_id', 'id', 'contract_id']);
+      ->rawColumns(['company_id', 'id', 'contract_id', 'program_name']);
+
+
   }
 
   /**
