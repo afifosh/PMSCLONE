@@ -35,7 +35,10 @@ class InvoicesDataTable extends DataTable
         return view('admin._partials.sections.company-avatar', ['company' => $invoice->company])->render();
       })
       ->editColumn('contract_id', function ($invoice) {
-        return $invoice->contract->subject;
+        return '<a href="' . route('admin.contracts.show', $invoice->contract->id) . '">' . $invoice->contract->subject . '</a>';
+      })
+      ->addColumn('program_name', function ($invoice) {
+        return $invoice->contract->program ? $invoice->contract->program->name : 'N/A';
       })
       ->editColumn('action', function ($invoice) {
         return view('admin.pages.invoices.action', ['invoice' => $invoice]);
@@ -43,7 +46,7 @@ class InvoicesDataTable extends DataTable
       ->addColumn('total', function ($invoice) {
         return view('admin.pages.invoices.total-column', ['invoice' => $invoice]);
       })
-      ->rawColumns(['company_id', 'id']);
+      ->rawColumns(['company_id', 'id', 'contract_id']);
   }
 
   /**
@@ -51,7 +54,8 @@ class InvoicesDataTable extends DataTable
    */
   public function query(Invoice $model): QueryBuilder
   {
-    $query = $model->with(['company', 'contract']);
+    //$query = $model->with(['company', 'contract']);
+    $query = $model->with(['company', 'contract', 'contract.program']);
     // if filterBy is instance of Contract
     if ($this->filterBy instanceof Contract) {
       $query->where('contract_id', $this->filterBy->id);
@@ -115,6 +119,7 @@ class InvoicesDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('company_id')->title('Client'),
+      Column::make('program_name')->title('Program'), // Added this line
       Column::make('contract_id')->title('Contract'),
       Column::make('due_date'),
       Column::make('status'),
