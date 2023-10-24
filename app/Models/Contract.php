@@ -259,7 +259,7 @@ class Contract extends BaseModel
 
   public function getPrintableValueAttribute()
   {
-    return cMoney($this->value, $this->currency, true);
+    return Money($this->value, $this->currency, true);
   }
 
   public function program(): BelongsTo

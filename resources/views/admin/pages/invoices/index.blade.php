@@ -35,12 +35,13 @@ $configData = Helper::appClasses();
 
 @includeWhen(isset($contract),'admin.pages.contracts.header', ['tab' => 'invoices'])
 @includeWhen(isset($company),'admin.pages.company.header', ['tab' => 'invoices'])
+@includeWhen(isset($program),'admin.pages.programs.program-nav', ['tab' => 'invoices'])
 {{-- Include Default Header --}}
-@includeWhen(!isset($contract) && !isset($company), 'admin.pages.invoices.header')
+@includeWhen(!isset($contract) && !isset($company) && !isset($program), 'admin.pages.invoices.header')
 
   <div class="mt-3  col-12">
     <div class="card">
-      @if(isset($company) && !isset($contract))
+      @if(isset($company) && !isset($contract) && !isset($program))
         <h5 class="card-header">Search Filter</h5>
         <form class="js-datatable-filter-form">
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">
@@ -79,7 +80,7 @@ $configData = Helper::appClasses();
           </div>
         </form>
       @endif
-      @if (!isset($contract) && !isset($company))
+      @if (!isset($contract) && !isset($company) && !isset($program))
         <h5 class="card-header">Search Filter</h5>
         <form class="js-datatable-filter-form">
           <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 mx-3 gap-md-0">

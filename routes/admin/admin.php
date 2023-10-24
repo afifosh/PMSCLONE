@@ -191,6 +191,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs', ProgramController::class);
     Route::resource('programs.users', ProgramUserController::class);
     Route::resource('programs.contracts', ContractController::class);
+    Route::resource('programs.invoices', InvoiceController::class);
+    Route::resource('programs.payments', PaymentController::class);    
 
 
     Route::get('contracts/document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');

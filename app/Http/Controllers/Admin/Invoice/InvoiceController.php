@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\Invoice\InvoiceStoreRequest;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Invoice;
+use App\Models\Program;
 use App\Models\Tax;
 use Illuminate\Http\Request;
 
@@ -24,6 +25,9 @@ class InvoiceController extends Controller
     } elseif (request()->route()->getName() == 'admin.companies.invoices.index') {
       $dataTable->filterBy = Company::findOrFail(request()->route('company'));
       $data['company'] = $dataTable->filterBy;
+    } elseif (request()->route()->getName() == 'admin.programs.invoices.index') {  // Assuming this is the route name for program invoices
+      $dataTable->filterBy = Program::findOrFail(request()->route('program'));
+      $data['program'] = $dataTable->filterBy;
     } else {
       $data['summary'] = Invoice::selectRaw('
         SUM(total) / 1000 as total_amount,

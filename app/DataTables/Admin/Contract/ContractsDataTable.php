@@ -5,6 +5,7 @@ namespace App\DataTables\Admin\Contract;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
+use App\Models\Program;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
@@ -31,6 +32,9 @@ class ContractsDataTable extends DataTable
       })
       ->editColumn('subject', function ($contract) {
         return $contract->subject ? $contract->subject : '-';
+      })
+      ->editColumn('program', function ($contract) {
+        return $contract->program_id ? $contract->program->name : '-';  // Assuming the program has a 'name' field
       })
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
@@ -79,6 +83,7 @@ public function query(Contract $model): QueryBuilder
     $query = $model->newQuery()
         ->select([
             'contracts.id',
+            'contracts.program_id',
             'contracts.refrence_id',
             'contracts.subject', // Add this line for the subject column
             'contracts.project_id',
@@ -101,6 +106,7 @@ public function query(Contract $model): QueryBuilder
         ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
         ->groupBy([
             'contracts.id',
+            'contracts.program_id',
             'contracts.refrence_id',
             'contracts.subject', // Add this line for the subject column
             'contracts.project_id',
@@ -122,9 +128,17 @@ public function query(Contract $model): QueryBuilder
     if($this->company){
       $query->where('assignable_id', $this->company->id)->where('assignable_type', Company::class);
     }
+    // If a program is provided, filter by it and its children
     if ($this->program) {
-      $query->where('program_id', $this->program->id);
-  }
+      // Fetch IDs for all children of the given program
+      $childProgramIds = Program::where('parent_id', $this->program->id)->pluck('id')->toArray();
+
+      // Include the main program's ID
+      $programIds = array_merge([$this->program->id], $childProgramIds);
+
+      // Use these IDs to filter contracts
+      $query->whereIn('program_id', $programIds);
+    }
 
     // Apply any additional filters if necessary
     $query->applyRequestFilters();
@@ -176,6 +190,7 @@ public function query(Contract $model): QueryBuilder
     return [
       Column::make('contracts.id')->title('Contract'),
       Column::make('subject')->title('Subject'),
+      Column::make('program')->title('Program'),
       Column::make('refrence_id')->title('Ref ID'),
       Column::make('assigned_to')->title('Assigned To'),
       Column::make('type.name')->title('Type'),
