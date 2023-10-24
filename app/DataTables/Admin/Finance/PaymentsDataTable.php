@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
+use App\Models\Program;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -57,6 +58,16 @@ class PaymentsDataTable extends DataTable
       $query->whereHas('invoice', function ($q) {
         $q->where('company_id', $this->filterBy->id);
       });
+    } else if ($this->filterBy instanceof Program) {
+        // Fetch child program IDs
+        $childProgramIds = Program::where('parent_id', $this->filterBy->id)->pluck('id')->toArray();
+
+        // Include the main program's ID
+        $programIds = array_merge([$this->filterBy->id], $childProgramIds);
+
+        $query->whereHas('invoice', function ($query) use ($programIds) {
+            $query->whereIn('program_id', $programIds);
+        });
     } else if($this->filterBy instanceof Invoice){
       $query->where('invoice_id', $this->filterBy->id);
     }

@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ContractCategory;
 use App\Models\Invoice;
+use App\Models\Program;
 use App\Models\InvoicePayment;
 use App\Models\Tax;
 use Illuminate\Http\Request;
@@ -26,6 +27,9 @@ class PaymentController extends Controller
     } elseif (request()->route()->getName() == 'admin.contracts.payments.index') {
       $dataTable->filterBy = Contract::findOrFail(request()->route('contract'));
       $data['contract'] = $dataTable->filterBy;
+    } elseif (request()->route()->getName() == 'admin.programs.payments.index') {
+      $dataTable->filterBy = Program::findOrFail(request()->route('program'));
+      $data['program'] = $dataTable->filterBy;      
     } elseif (request()->route()->getName() == 'admin.invoices.payments.index' && request()->accepts == 'view_data') {
       $data['invoice'] = Invoice::with('payments')->findOrFail(request()->route('invoice'));
       return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.index-table', $data)->render()]);
