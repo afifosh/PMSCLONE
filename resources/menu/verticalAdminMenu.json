@@ -169,15 +169,10 @@
           "slug": "admin.change-requests.index"
         },
         {
-          "url": "/admin/contract-types",
-          "name": "Contract Types",
-          "slug": "admin.contract-types.index"
-        },
-        {
-          "url": "/admin/contract-categories",
-          "name": "Contract Categories",
-          "slug": "admin.contract-categories.index"
-        },
+          "url": "/admin/contracts/paymentsplan",
+          "name": "Payments Plan",
+          "slug": "admin.contracts.paymentsplan"
+        },        
         {
           "url": "/admin/projects/gantt-chart",
           "name": "Gantt Chart",
@@ -189,14 +184,30 @@
           "slug": "admin.contracts.document-stats.index"
         },
         {
-          "url": "/admin/contract-doc-controls",
-          "name": "Document Controls",
-          "slug": "admin.contract-doc-controls.index"
-        },
-        {
           "url": "/admin/contracts/statistics",
           "name": "Statistics",
           "slug": "admin.contracts.statistics"
+        },
+        {
+          "name": "Settings",
+          "slug": ["admin.contract-types.index", "admin.contract-categories.index,admin.contract-doc-controls.index"],
+          "submenu": [
+            {
+              "url": "/admin/contract-types",
+              "name": "Contract Types",
+              "slug": "admin.contract-types.index"
+            },
+            {
+              "url": "/admin/contract-categories",
+              "name": "Contract Categories",
+              "slug": "admin.contract-categories.index"
+            },
+            {
+              "url": "/admin/contract-doc-controls",
+              "name": "Document Controls",
+              "slug": "admin.contract-doc-controls.index"
+            }          
+          ]
         }
       ]
     },

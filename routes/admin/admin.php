@@ -194,11 +194,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs.invoices', InvoiceController::class);
     Route::resource('programs.payments', PaymentController::class);    
 
+    Route::prefix('contracts')->group(function () {
+      Route::get('paymentsplan',  [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
+      // You can add more routes specific to contracts here
+      Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
+      Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
+    });
 
-    Route::get('contracts/document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
+
     Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
-    Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
+    // Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
     Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');
     Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');
     Route::post('contracts/{contract}/release-retentions', [ContractController::class, 'releaseRetention'])->name('contracts.release-retentions');
