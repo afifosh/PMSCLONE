@@ -113,8 +113,81 @@ class ContractPhase extends BaseModel
 
   public function scopeApplyRequestFilters($q)
   {
-    //
+
+
+
+    return $q->when(request()->filter_status, function ($q) {
+      if (request()->filter_status == 'Draft') return $q->where('contracts.status', 'Draft');
+      else if (request()->filter_status == 'Not started') {
+        $q->where('start_date', '>', now());
+      } elseif (request()->filter_status == 'Expired') {
+        $q->where('contracts.status', 'Active')->where('end_date', '<', now());
+      } elseif (request()->filter_status == 'Terminated') {
+        $q->where('contracts.status', 'Terminated');
+      } elseif (request()->filter_status == 'Paused') {
+        $q->where('contracts.status', 'Paused');
+      } elseif (request()->filter_status == 'Active') {
+        $q->where('contracts.status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now()); //->where('end_date', '>=', now()->addWeeks(2));
+      } elseif (request()->filter_status == 'About To Expire') {
+        $q->where('contracts.status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addMonth());
+      }
+      })->when(request()->companies, function ($q) {
+        $q->where('contracts.assignable_type', Company::class)->where('contracts.assignable_id', request()->companies);
+      })->when(request()->search_q, function ($q) {
+      $q->where(function ($q) {
+        $q->where('contracts.subject', 'like', '%' . request()->search_q . '%')
+          ->orWhereHas('phases', function ($q) {
+            $q->where('name', 'like', '%' . request()->search_q . '%');
+          });
+      });
+    })->when(request()->contract_type, function ($q) {
+        $q->where('contracts.type_id', request()->contract_type);
+      })->when(request()->contracts, function ($q) {
+        $q->where('contracts.id', request()->contracts);        
+    })->when(request()->contract_category, function ($q) {
+        $q->where('contracts.category_id', request()->contract_category);
+    })->when(request()->projects, function ($q) {
+      $q->whereHas('project', function ($q) {
+        $q->where('id', request()->projects);
+      });
+    })->when(request()->programs, function ($q) {
+      $programs = request()->programs;
+
+    // Ensure that $programs is an array of integers
+    if (!is_array($programs)) {
+        $programs = [$programs]; // Wrap the integer in an array
+    }
+
+    // Cast each element in the $programs array to an integer
+    $programs = array_map('intval', $programs);
+          // Fetch IDs for all children of the given program
+          $childProgramIds = Program::where('parent_id', request()->programs)->pluck('id')->toArray();
+  
+          // Include the main program's ID
+      //    $programIds = array_merge(request()->programs, $childProgramIds);
+    //   $programs = request()->programs;
+
+    // // Cast each element in the $programs array to an integer
+    // $programs = array_map('intval', $programs);
+          // Use these IDs to filter contracts
+          $q->whereIn('contracts.program_id',   $programs);
+    })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function($q){
+      try {
+        $date = Carbon::parse(explode(' to ', request()->date_range)[0]);
+        $q->where('start_date', '>=', $date);
+      } catch (\Exception $e) {
+      }
+    })->when(request()->date_range && @explode(' to ', request()->date_range)[1], function($q){
+      try {
+        $date = Carbon::parse(explode(' to ', request()->date_range)[1]);
+        $q->where('end_date', '<=', $date);
+      } catch (\Exception $e) {
+      }
+    })->join('contract_stages as cs1', 'contract_phases.stage_id', '=', 'cs1.id')
+    ->join('contracts as c1', 'cs1.contract_id', '=', 'c1.id')
+    ->leftJoin('programs as p1', 'c1.program_id', '=', 'p1.id');
   }
+
 
   public function contract(): BelongsTo
   {
