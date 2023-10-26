@@ -10,6 +10,7 @@ use App\Http\Requests\Admin\ContractUpdateRequest;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
+use App\Models\ContractPhase;
 use App\Models\ContractCategory;
 use App\Models\ContractType;
 use App\Models\Program;
@@ -19,6 +20,7 @@ use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Traits\FinanceTrait;
 use Illuminate\Support\Facades\DB;
 use App\Models\Tax;
+use DataTables;
 
 class ContractController extends Controller
 {
@@ -477,37 +479,118 @@ class ContractController extends Controller
   }
 
   public function ContractPaymentsPlan(PaymentsPlanDataTable $dataTable)
-{
+  {
 
-  $data['company'] = Company::find(request()->route('company'));
-  $data['program'] = Program::find(request()->route('program'));
-// dd($data);
-  if ($data['company']) {
-      $dataTable->company = $data['company'];
-  } if ($data['program']) {
-    $dataTable->program = $data['program'];
-  } else {      
-  $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
-  $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
+    $data['company'] = Company::find(request()->route('company'));
+    $data['program'] = Program::find(request()->route('program'));
+  // dd($data);
+    if ($data['company']) {
+        $dataTable->company = $data['company'];
+    } if ($data['program']) {
+      $dataTable->program = $data['program'];
+    } else {      
+    $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
+    $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
-  // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
-  $data['contracts'] = Contract::selectRaw('count(*) as total')
-    // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-    ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-    ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
-    ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
-    ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
-    ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
-    ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
-    ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
-    ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
-    ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
-    ->withTrashed()
-    ->first();
+    // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
+    $data['contracts'] = Contract::selectRaw('count(*) as total')
+      // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
+      ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
+      ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
+      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
+      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
+      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
+      ->withTrashed()
+      ->first();
+    }
+
+    return $dataTable->render('admin.pages.contracts.paymentsplan.index', $data);
+
   }
 
-  return $dataTable->render('admin.pages.contracts.paymentsplan.index', $data);
+  public function ContractPaymentsPlanDetails($contract_id)
+{
+    // Filter phases based on the given contract ID
+    $query = ContractPhase::query()
+        ->join('contract_stages', 'contract_phases.stage_id', '=', 'contract_stages.id')
+        ->join('contracts', 'contract_stages.contract_id', '=', 'contracts.id')
+        ->where('contracts.id', $contract_id)
+        ->select([
+            'contract_phases.*',
+            'contracts.subject as contract_name',
+            'contract_stages.name as stage_name',
+        ])
+        ->with('addedAsInvoiceItem.invoice');
 
+    // DataTable logic
+    $dataTable = DataTables::of($query)
+        ->addColumn('stage_name', function ($phase) {
+           return $phase->stage_name; // Assuming phase name is in 'name' field of contract_phases table
+        })    
+        ->editColumn('invoice_id', function ($phase) {
+          $invoiceItem = $phase->addedAsInvoiceItem->first();
+          return $invoiceItem
+            ? '<a href="' . route('admin.invoices.edit', $invoiceItem->invoice_id) . '">' . runtimeInvIdFormat($invoiceItem->invoice_id) . '</a>'
+            : 'N/A';
+        })
+        ->addColumn('phase_name', function ($phase) {
+            return $phase->name; // Assuming phase name is in 'name' field of contract_phases table
+        })
+        ->addColumn('start_date', function ($phase) {
+            return $phase->start_date; // Similarly, for start_date
+        })
+        ->addColumn('due_date', function ($phase) {
+            return $phase->due_date; // Similarly, for due_date
+        })
+        ->addColumn('amount', function ($phase) {
+            return view('admin.pages.contracts.paymentsplan.value-column', compact('phase'));
+        })
+        ->editColumn('actions', function ($phase) use ($contract_id) {
+          $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid']));
+          $stage = $phase->stage;  // Assuming you have a 'stage' relationship on the phase model.
+          return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $stage, 'contract_id' => $contract_id, 'is_editable' => $is_editable])->render();
+      })
+        ->rawColumns(['actions']); // Indicate that actions column will have raw HTML
+
+        $outputData = $dataTable->make(true)->getData(true); // Get data as an associative array
+
+        // Add custom buttons to the data table's output
+        $outputData['buttons'] = [
+            [
+                'text' => 'Select Phases',
+                'className' => 'btn btn-primary mx-3 select-phases-btn',
+                'attr' => [
+                    'onclick' => 'toggleCheckboxes()',
+                ],
+            ],
+            [
+                'text' => 'Create Invoices',
+                'className' => 'btn btn-primary mx-3 create-inv-btn d-none',
+                'attr' => [
+                    'onclick' => 'createInvoices()',
+                ],
+            ],
+            [
+                'text' => 'Add Phase',
+                'className' => 'btn btn-primary',
+                'attr' => [
+                    'data-toggle' => "ajax-modal",
+                    'data-title' => 'Add Phase',
+                    'data-href' => route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $contract_id, $this->stage->id ?? 'stage']),
+                ],
+            ],
+        ];
+    
+        return response()->json($outputData); // Return a new JSON response with the modified data
+    
 }
+
+
+
+
 
 }

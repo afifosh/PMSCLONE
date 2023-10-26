@@ -199,6 +199,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
       // You can add more routes specific to contracts here
       Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
       Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
+
+      // Add the new route for paymentsplans with a specific contract id
+      Route::get('paymentsplan/{contract_id}/details', [ContractController::class, 'ContractPaymentsPlanDetails'])->name('contracts.paymentsplan.details');
     });
 
 

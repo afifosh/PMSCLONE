@@ -127,9 +127,9 @@ class ContractPhase extends BaseModel
       } elseif (request()->filter_status == 'Paused') {
         $q->where('contracts.status', 'Paused');
       } elseif (request()->filter_status == 'Active') {
-        $q->where('contracts.status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now()); //->where('end_date', '>=', now()->addWeeks(2));
+        $q->where('contracts.status', 'Active')->where('contracts.start_date', '<=', now())->where('contracts.end_date', '>=', now()); //->where('end_date', '>=', now()->addWeeks(2));
       } elseif (request()->filter_status == 'About To Expire') {
-        $q->where('contracts.status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addMonth());
+        $q->where('contracts.status', 'Active')->where('contracts.end_date', '>', now())->where('contracts.end_date', '<', now()->addMonth());
       }
       })->when(request()->companies, function ($q) {
         $q->where('contracts.assignable_type', Company::class)->where('contracts.assignable_id', request()->companies);

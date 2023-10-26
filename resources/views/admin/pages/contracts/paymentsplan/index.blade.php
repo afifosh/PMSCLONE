@@ -96,22 +96,81 @@ $configData = Helper::appClasses();
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script>
-      $(document).ready(function () {
-          $('.js-datatable-filter-form :input').on('change', function (e) {
-              console.log('Filter changed'); // Add this line for debugging
+ 
+ 
+ $(document).ready(function() {
+    var table = $('#paymentsplan-table').DataTable();
 
-              window.LaravelDataTables["paymentsplan-table"].draw();
-          });
+    function createChildTable(row, contractId) {
+        var childTableId = 'child-table-' + contractId;
+        var childTable = row.child('<table id="' + childTableId + '" class="display" width="100%"></table>').show();
+        
+        $.get("{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/details", function(response) {
 
-          $('#paymentsplan-table').on('preXhr.dt', function ( e, settings, data ) {
-            console.log('PreXHR event'); // Add this line for debugging
+          var buttonsConfig = response.buttons.map(function(button) {
+        return {
+            text: button.text,
+            className: button.className,
+            action: function(e, dt, node, config) {
+                // Check if the 'onclick' attribute exists and run the function
+                if(button.attr && button.attr.onclick) {
+                    eval(button.attr.onclick.replace('()', ''));
+                }
+            },
+            attr: button.attr // Add attributes from the attr key in the JSON
+        };
+    });
+
+            $('#' + childTableId).DataTable({
+              data: response.data,
+            columns: [
+              { data: 'stage_name', title: 'Stage Name' },
+              { data: 'name', title: 'Phase Name' },
+              { data: 'start_date', title: 'Start Date' },
+              { data: 'due_date', title: 'Due Date' },
+              { data: 'amount', title: 'Amount' },
+              { data: 'status', title: 'Status' },
+              {
+                  data: 'actions',
+                  title: 'Actions',
+                  orderable: false,
+                  searchable: false
+              }
+            ],
+            destroy: true,
+            buttons: buttonsConfig 
+            });
+        });
+    }
+
+    $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
+        var tr = $(this).closest('tr');
+        var row = table.row(tr);
+        var contractId = $(this).attr('contract-id');
+
+        if (row.child.isShown()) {
+            row.child.hide();
+            tr.removeClass('shown');
+            tr.css('background-color', '');  // Reset the background color
+        } else {
+            createChildTable(row, contractId);
+            tr.addClass('shown');
+            tr.css('background-color', '#f5f5f5');  // Set a light gray background color
+        }
+    });
+
+    $('.js-datatable-filter-form :input').on('change', function (e) {
+        console.log('Filter changed');
+        window.LaravelDataTables["paymentsplan-table"].draw();
+    });
+
+    $('#paymentsplan-table').on('preXhr.dt', function (e, settings, data) {
+        console.log('PreXHR event');
         $('.js-datatable-filter-form :input').each(function () {
             data[$(this).prop('name')] = $(this).val();
         });
+    });
+});
 
-          });
-      });
-
-      
-    </script>
+</script>
 @endpush
