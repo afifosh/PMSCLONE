@@ -34,7 +34,7 @@ class PaymentsPlanDataTable extends DataTable
             : 'N/A';
       })    
       ->addColumn('expand', function ($contract) {
-        return '<i class="ti ti-layout-sidebar-left-expand ti-fade-right-hover ti-md me-3 btn-expand" contract-id="' . $contract->id . '"></i>';
+        return '<i class="ti ti-layout-sidebar-left-expand ti-md me-3 btn-expand" contract-id="' . $contract->id . '"></i>';
       })    
       ->editColumn('subject', function ($contract) {
         return $contract->subject

@@ -95,82 +95,102 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
-    <script>
- 
- 
- $(document).ready(function() {
+ <script>
+$(document).ready(function() {
     var table = $('#paymentsplan-table').DataTable();
+    var expandedRow = null; // Variable to track the currently expanded row
 
     function createChildTable(row, contractId) {
-        var childTableId = 'child-table-' + contractId;
-        var childTable = row.child('<table id="' + childTableId + '" class="display" width="100%"></table>').show();
-        
-        $.get("{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/details", function(response) {
-
-          var buttonsConfig = response.buttons.map(function(button) {
-        return {
-            text: button.text,
-            className: button.className,
-            action: function(e, dt, node, config) {
-                // Check if the 'onclick' attribute exists and run the function
-                if(button.attr && button.attr.onclick) {
-                    eval(button.attr.onclick.replace('()', ''));
+        if (expandedRow) {
+            // Collapse all other rows in the table except the selected row
+            table.rows().every(function() {
+                var tr = this.node();
+                if (tr !== row.node()) {
+                    var otherRow = table.row(tr);
+                    otherRow.child.hide();
+                    $(tr).removeClass('shown');
+                    $(tr).css('background-color', ''); // Reset the background color
                 }
-            },
-            attr: button.attr // Add attributes from the attr key in the JSON
-        };
-    });
+            });
+        }
+
+        var childTableId = 'child-table-' + contractId;
+        var childTable = row.child('<table id="' + childTableId + '" class="display table dataTable" style="" width="100%"></table>').show();
+
+        $.get("{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/details", function(response) {
+            var buttonsConfig = response.buttons.map(function(button) {
+                return {
+                    text: button.text,
+                    className: button.className,
+                    action: function(e, dt, node, config) {
+                        // Check if the 'onclick' attribute exists and run the function
+                        if (button.attr && button.attr.onclick) {
+                            eval(button.attr.onclick.replace('()', ''));
+                        }
+                    },
+                    attr: button.attr // Add attributes from the attr key in the JSON
+                };
+            });
 
             $('#' + childTableId).DataTable({
-              data: response.data,
-            columns: [
-              { data: 'stage_name', title: 'Stage Name' },
-              { data: 'name', title: 'Phase Name' },
-              { data: 'start_date', title: 'Start Date' },
-              { data: 'due_date', title: 'Due Date' },
-              { data: 'amount', title: 'Amount' },
-              { data: 'status', title: 'Status' },
-              {
-                  data: 'actions',
-                  title: 'Actions',
-                  orderable: false,
-                  searchable: false
-              }
-            ],
-            destroy: true,
-            buttons: buttonsConfig 
+                data: response.data,
+                columns: [
+                    { data: 'stage_name', title: 'Stage Name' },
+                    { data: 'name', title: 'Phase Name' },
+                    { data: 'start_date', title: 'Start Date' },
+                    { data: 'due_date', title: 'Due Date' },
+                    { data: 'amount', title: 'Amount' },
+                    { data: 'status', title: 'Status' },
+                    {
+                        data: 'actions',
+                        title: 'Actions',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                destroy: true,
+                dom: 'Blfrtip',
+                buttons: buttonsConfig,
+                initComplete: function() {
+                    // Move the buttons container near the search bar
+                    $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
+                }
             });
         });
     }
 
     $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         var tr = $(this).closest('tr');
-        var row = table.row(tr);
+        var selectedRow = table.row(tr);
         var contractId = $(this).attr('contract-id');
 
-        if (row.child.isShown()) {
-            row.child.hide();
-            tr.removeClass('shown');
-            tr.css('background-color', '');  // Reset the background color
+        if (selectedRow.child.isShown()) {
+            // Collapse the selected row
+            selectedRow.child.hide();
+            $(tr).removeClass('shown');
+            $(tr).css('background-color', ''); // Reset the background color
+            expandedRow = null; // Reset the currently expanded row
         } else {
-            createChildTable(row, contractId);
-            tr.addClass('shown');
-            tr.css('background-color', '#f5f5f5');  // Set a light gray background color
+            // Expand the selected row
+            createChildTable(selectedRow, contractId);
+            $(tr).addClass('shown');
+            $(tr).css('background-color', '#f5f5f5'); // Set a light gray background color
+            expandedRow = selectedRow; // Set the currently expanded row
         }
     });
 
-    $('.js-datatable-filter-form :input').on('change', function (e) {
+    $('.js-datatable-filter-form :input').on('change', function(e) {
         console.log('Filter changed');
         window.LaravelDataTables["paymentsplan-table"].draw();
     });
 
-    $('#paymentsplan-table').on('preXhr.dt', function (e, settings, data) {
+    $('#paymentsplan-table').on('preXhr.dt', function(e, settings, data) {
         console.log('PreXHR event');
-        $('.js-datatable-filter-form :input').each(function () {
+        $('.js-datatable-filter-form :input').each(function() {
             data[$(this).prop('name')] = $(this).val();
         });
     });
 });
-
 </script>
+
 @endpush
