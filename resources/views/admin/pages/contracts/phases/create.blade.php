@@ -26,6 +26,14 @@
       {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
   </div>
   <div class="form-group col-6">
+    {{ Form::label('stage', __('Stage'), ['class' => 'col-form-label']) }}
+    @php
+    $selectedStageId = isset($stage->id) ? $stage->id : null;
+    @endphp
+    {!! Form::select('stage_id', $stages, $selectedStageId, ['class' => 'form-control select2', 'placeholder' => 'Select Stage']) !!}
+    
+  </div>
+  <div class="form-group col-6">
     {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
     <div class="dropdown open d-inline">
       <span data-bs-toggle="dropdown" aria-haspopup="true">
@@ -56,6 +64,11 @@
       @endforelse
     </select>
   </div>
+  <!-- New adjustment amount field -->
+  <div class="form-group col-6">
+    {{ Form::label('adjustment_amount', __('Adjustment Amount'), ['class' => 'col-form-label']) }}
+    {!! Form::number('adjustment_amount', null, ['class' => 'form-control', 'placeholder' => __('Adjustment Amount')]) !!}
+  </div>  
   {{-- total cost --}}
   <div class="form-group col-6">
     {{ Form::label('total_cost', __('Total Cost'), ['class' => 'col-form-label']) }}
@@ -210,6 +223,7 @@
   function calculateTotalCost()
   {
     const estimatedCost = $('[name="estimated_cost"]').val();
+    const adjustmentAmount = parseFloat($('[name="adjustment_amount"]').val());
     const taxes = $('[name="phase_taxes[]"]').val();
     let totalCost = parseFloat(estimatedCost);
     if(estimatedCost && taxes){
@@ -227,10 +241,18 @@
       totalCost += (totalCost * percentagTax) / 100;
       totalCost += fixedTax;
     }
+
+    // Incorporate the adjustment amount
+    totalCost += adjustmentAmount;
+
     totalCost = totalCost.toFixed(3);
     $('[name="total_cost"]').val(totalCost);
     validateTotalCost();
   }
+
+  $(document).on('change keyup', '[name="adjustment_amount"]', function(){
+    calculateTotalCost();
+  });
 
   $(document).on('change', '[name="total_cost"]', function(){
     validateTotalCost();

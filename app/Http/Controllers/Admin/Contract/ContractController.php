@@ -541,10 +541,10 @@ class ContractController extends Controller
             return $phase->name; // Assuming phase name is in 'name' field of contract_phases table
         })
         ->addColumn('start_date', function ($phase) {
-            return $phase->start_date; // Similarly, for start_date
+            return $phase->start_date->format('d M, Y'); // Similarly, for start_date
         })
         ->addColumn('due_date', function ($phase) {
-            return $phase->due_date; // Similarly, for due_date
+            return $phase->due_date->format('d M, Y'); // Similarly, for due_date
         })
         ->addColumn('amount', function ($phase) {
             return view('admin.pages.contracts.paymentsplan.value-column', compact('phase'));

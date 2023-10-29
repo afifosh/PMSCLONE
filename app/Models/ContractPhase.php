@@ -18,6 +18,7 @@ class ContractPhase extends BaseModel
     'name',
     'estimated_cost',
     'tax_amount',
+    'adjustment_amount',
     'total_cost',
     'start_date',
     'due_date',
@@ -58,6 +59,16 @@ class ContractPhase extends BaseModel
     $this->attributes['estimated_cost'] = moneyToInt($value);
   }
 
+  public function getAdjustmentAmountAttribute($value)
+  {
+      return $value / 1000;
+  }
+  
+  public function setAdjustmentAmountAttribute($value)
+  {
+      $this->attributes['adjustment_amount'] = moneyToInt($value);
+  }
+  
   public function getTaxAmountAttribute($value)
   {
     return $value / 1000;
@@ -226,11 +237,11 @@ class ContractPhase extends BaseModel
 
   public function updateTaxAmount(): void
   {
-    $fixed_tax = $this->taxes()->where('phase_taxes.type', 'Fixed')->sum('phase_taxes.amount');
-    $percent_tax = $this->taxes()->where('phase_taxes.type', 'Percent')->sum('phase_taxes.amount');
-    $tax_amount = $this->estimated_cost * ($percent_tax / (100 * 1000)) + $fixed_tax;
-    $total_cost = $this->estimated_cost + $tax_amount;
-
-    $this->update(['tax_amount' => $tax_amount, 'total_cost' => $total_cost]);
-  }
+      $fixed_tax = $this->taxes()->where('phase_taxes.type', 'Fixed')->sum('phase_taxes.amount');
+      $percent_tax = $this->taxes()->where('phase_taxes.type', 'Percent')->sum('phase_taxes.amount');
+      $tax_amount = $this->estimated_cost * ($percent_tax / (100 * 1000)) + $fixed_tax;
+      $total_cost = $this->estimated_cost + $tax_amount + $this->adjustment_amount; // Added the adjustment here
+  
+      $this->update(['tax_amount' => $tax_amount, 'total_cost' => $total_cost]);
+  }  
 }

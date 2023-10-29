@@ -46,6 +46,8 @@ class PhaseUpdateRequest extends FormRequest
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $this->contract->start_date,
       'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->contract->end_date,
+      'stage_id' => 'required|exists:contract_stages,id,contract_id,' . $this->contract->id, // Ensure the stage id belongs to the contract
+      'adjustment_amount' => 'nullable|numeric',
     ];
   }
 
@@ -53,7 +55,9 @@ class PhaseUpdateRequest extends FormRequest
   {
     return [
       'estimated_cost.max' => '',
-      'due_date.before_or_equal' => 'The due date must be a date before or equal to state due date.'
+      'due_date.before_or_equal' => 'The due date must be a date before or equal to state due date.',
+      'stage_id.exists' => 'Please select a valid stage for this contract.',
+      'stage_id.required' => 'The stage field is required. Please select a stage.',
     ];
   }
 }

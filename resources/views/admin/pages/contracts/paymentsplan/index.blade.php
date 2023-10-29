@@ -114,8 +114,56 @@ $(document).ready(function() {
             });
         }
 
-        var childTableId = 'child-table-' + contractId;
-        var childTable = row.child('<table id="' + childTableId + '" class="display table dataTable" style="" width="100%"></table>').show();
+        // var childTableId = 'child-table-' + contractId;
+        // var childTable = row.child('<table id="' + childTableId + '" class="display table dataTable" style="" width="100%"></table>').show();
+    // 1st Row - For the pills
+    var pills = `
+        <tr>
+            <td colspan="100%"> 
+                <ul class="nav nav-pills mt-3 mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-stages-${contractId}" aria-controls="child-stages-${contractId}" aria-selected="false">Stages</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#child-phases-${contractId}" aria-controls="child-phases-${contractId}" aria-selected="true">Phases</button>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        
+    `;
+
+    row.child(pills).show();
+
+    // 2nd Row - For the content
+    var content = `
+        <tr class="p-0">
+            <td class="p-0" colspan="100%">
+                <div class="tab-content">
+                    <div class="tab-pane fade" id="child-stages-${contractId}" role="tabpanel" aria-labelledby="child-stages-tab-${contractId}">
+                        <!-- Stages content here -->
+                    </div>
+                    <div class="tab-pane fade show active" id="child-phases-${contractId}" role="tabpanel" aria-labelledby="child-phases-tab-${contractId}">
+                        <!-- Phases content here -->
+                        <!-- This is where your child table (Datatable) will go -->
+                        <table id="child-table-${contractId}"></table>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    `;
+
+    // Insert the content row after the pills row
+   // $(row.node()).next().after(content);
+
+    var contentRow = $(content);
+contentRow.addClass("custom-content-row");
+contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
+$(row.node()).next().after(contentRow);
+    // Insert the content row after the pills row
+  //  $(row.node()).after(content);
+    var childTableId = "child-table-" + contractId;
+
 
         $.get("{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/details", function(response) {
             var buttonsConfig = response.buttons.map(function(button) {

@@ -46,14 +46,14 @@ class ProjectPhaseController extends Controller
     $max_amount = $contract->remaining_amount;
     $phase = new ContractPhase();
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
-
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
+    $stages = $contract->stages->pluck('name', 'id');
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
   }
 
   public function store($project, Contract $contract, ContractStage $stage, PhaseStoreRequest $request)
   {
     $phase = $contract->phases()->create(
-      ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost'])
+      ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'adjustment_amount','stage_id'])
     );
     $this->storeTaxes($phase, $request->phase_taxes);
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
@@ -82,11 +82,11 @@ class ProjectPhaseController extends Controller
     if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
-
+    $stages = $contract->stages->pluck('name', 'id');
     $max_amount = $contract->remaining_amount + $phase->total_cost;
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
-
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
+// dd($phase);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract','stages' ,'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
   }
 
   public function update($project, PhaseUpdateRequest $request, Contract $contract, $stage, ContractPhase $phase)
@@ -97,7 +97,7 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not update this phase because it is in paid invoice');
     }
 
-    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost']));
+    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'adjustment_amount','stage_id']));
 
     $this->storeTaxes($phase, $request->phase_taxes);
 
@@ -116,7 +116,7 @@ class ProjectPhaseController extends Controller
 
         $item->updateTaxAmount();
 
-        $item->invoice->updateTaxAmount();
+        $item->invoice->updateTaxAmount(); // ERROR HERE 
       });
     }
 
