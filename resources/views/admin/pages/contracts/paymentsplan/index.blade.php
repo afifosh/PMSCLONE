@@ -254,11 +254,14 @@ $(row.node()).next().after(contentRow);
     }
 
     
-    $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
-      var tr = $(this).closest('tr');
+    var expandedRow = null; // Variable to track the currently expanded row
+
+$('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
+    var tr = $(this).closest('tr');
     var selectedRow = table.row(tr);
     var contractId = $(this).attr('contract-id');
 
+    // If this row is already shown, hide it
     if (selectedRow.child.isShown()) {
         // Find any added child rows and remove them
         tr.nextAll('.child-row-added').remove();
@@ -267,9 +270,19 @@ $(row.node()).next().after(contentRow);
         $(tr).removeClass('shown');
         $(tr).css('background-color', '');
     } else {
+        // If another row is expanded, collapse it
+        if (expandedRow) {
+            expandedRow.child.hide();
+            $(expandedRow.node()).removeClass('shown');
+            $(expandedRow.node()).css('background-color', '');
+            $(expandedRow.node()).nextAll('.child-row-added').remove();
+        }
+
         createChildTable(selectedRow, contractId);
         $(tr).addClass('shown');
         $(tr).css('background-color', '#f5f5f5');
+        
+        expandedRow = selectedRow; // Update the reference to the currently expanded row
     }
 });
 
