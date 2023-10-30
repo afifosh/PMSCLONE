@@ -596,7 +596,7 @@ class ContractController extends Controller
   
       $dataTable = DataTables::of($query)
           ->editColumn('name', function ($stage) {
-              return '<a href="' . route('admin.contracts.stages.phases.index', [$stage->contract, $stage]) . '">' . $stage->name . '</a>';
+              return $stage->name;
           })
           ->editColumn('start_date', function($stage) {
               return $stage->start_date ? $stage->start_date->format('d M, Y') : '-';

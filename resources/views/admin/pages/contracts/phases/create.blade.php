@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-start align-items-center user-name">
+<div class="d-flex justify-content-start align-items-center user-name mb-4">
   <div class="avatar-wrapper">
     <div class="avatar me-2"><i class="ti ti-license mb-2 ti-xl"></i></div>
   </div>
@@ -8,8 +8,32 @@
     <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
   </div>
 </div>
-<hr class="my-4">
-
+<div class="row mb-4">
+    <div class="nav-align-top">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" onclick="reload_task_summary();">
+          <button type="button" class="nav-link {{request()->tab == null || request()->tab == 'summary' ? 'active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-controls="navs-top-summary" aria-selected="true">Summary</button>
+        </li>
+        <li class="nav-item" onclick="reload_logs_list();">
+          <button type="button" class="nav-link {{request()->tab == 'activities' ? 'active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-controls="navs-top-activities" aria-selected="false">Activities</button>
+        </li>
+        <li class="nav-item" onclick="reload_task_comments();">
+          <button type="button" class="nav-link {{request()->tab == 'comments' ? 'active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-controls="navs-top-comments" aria-selected="false">Comments</button>
+        </li>
+      </ul>
+      <div class="tab-content p-0">
+        <div class="tab-pane fade {{request()->tab == null || request()->tab == 'summary' ? 'show active' : ''}}" id="navs-top-summary" role="tabpanel">
+          {{-- @includeWhen(request()->tab == null || request()->tab == 'summary','admin.pages.projects.tasks.show-summary') --}}
+        </div>
+        <div class="tab-pane fade {{request()->tab == 'activities' ? 'show active' : ''}}" id="navs-top-activities" role="tabpanel">
+          {{-- @includeWhen(request()->tab == 'activities', 'admin.pages.projects.tasks.show-activities') --}}
+        </div>
+        <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments" role="tabpanel">
+          {{-- @includeWhen(request()->tab == 'comments', 'admin.pages.projects.tasks.show-comments') --}}
+        </div>
+      </div>
+    </div>
+</div>
 @if ($phase->id)
     {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.update', ['project' => 'project', 'contract' => $contract, 'phase' => $phase->id, 'stage' => $stage]],
       'method' => 'PUT',
