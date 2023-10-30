@@ -150,6 +150,8 @@ $(document).ready(function() {
                 <div class="tab-content">
                     <div class="tab-pane fade" id="child-stages-${contractId}" role="tabpanel" aria-labelledby="child-stages-tab-${contractId}">
                         <!-- Stages content here -->
+                        <!-- Stages content here -->
+                        <table id="stages-table-${contractId}"></table>
                     </div>
                     <div class="tab-pane fade show active" id="child-phases-${contractId}" role="tabpanel" aria-labelledby="child-phases-tab-${contractId}">
                         <!-- Phases content here -->
@@ -172,13 +174,37 @@ $(row.node()).next().after(contentRow);
   //  $(row.node()).after(content);
     var childTableId = "child-table-" + contractId;
 
+    // Stages DataTable
+    $('#stages-table-' + contractId).DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/stages",
+        columns: [
+            // Define your stages columns here. I'm making some assumptions. Adjust accordingly.
+            { data: "name", "name": "contract_stages.name", title: 'Stage Name' },
+            { data: 'phases_count', title: 'Phases' },
+            { data: 'start_date', title: 'Start Date' },
+            { data: 'due_date', title: 'Due Date' },
+            { data: 'total_amount', title: 'Amount' },
+            { data: 'status', title: 'Status' },
+            {
+                        data: 'actions',
+                        title: 'Actions',
+                        orderable: false,
+                        searchable: false
+                    }
+
+        ],
+        destroy: true
+        // Add more DataTable options if required
+    });
 
     $('#' + childTableId).DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/details",
+                ajax: "{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/phases",
                 columns: [
-                    { data: "stage_name", "name": "contract_stages.name", title: 'Stage Name' },
+                    { data: "stage_name", "name": "stage_name", title: 'Stage Name' },
                     { data: 'name', title: 'Phase Name' },
                     { data: 'start_date', title: 'Start Date' },
                     { data: 'due_date', title: 'Due Date' },
@@ -257,6 +283,24 @@ $(row.node()).next().after(contentRow);
         $('.js-datatable-filter-form :input').each(function() {
             data[$(this).prop('name')] = $(this).val();
         });
+    });
+
+        // Reload stages DataTable when "Stages" pill tab is clicked
+        $(document).on('click', '.nav-link[data-bs-target^="#child-stages-"]', function() {
+        // Extract the contractId from the target attribute of the clicked pill tab
+        var contractId = $(this).attr('data-bs-target').replace("#child-stages-", "");
+
+        // Get the corresponding stages DataTable and reload it
+        $('#stages-table-' + contractId).DataTable().ajax.reload();
+    });
+
+    // Reload phases DataTable when "Phases" pill tab is clicked
+    $(document).on('click', '.nav-link[data-bs-target^="#child-phases-"]', function() {
+        // Extract the contractId from the target attribute of the clicked pill tab
+        var contractId = $(this).attr('data-bs-target').replace("#child-phases-", "");
+
+        // Get the corresponding phases DataTable and reload it
+        $('#child-table-' + contractId).DataTable().ajax.reload();
     });
 });
 </script>

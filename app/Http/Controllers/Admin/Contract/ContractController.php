@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\ContractStoreRequest;
 use App\Http\Requests\Admin\ContractUpdateRequest;
 use App\Models\Client;
 use App\Models\Company;
+use App\Models\ContractStage;
 use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\ContractCategory;
@@ -512,24 +513,22 @@ class ContractController extends Controller
 
   }
 
-  public function ContractPaymentsPlanDetails($contract_id)
+  public function ContractPaymentsPlanPhases($contract_id)
   {
-      $query = ContractPhase::with([
-        'stage:id,name', // load only id and name for the stage
-        'addedAsInvoiceItem.invoice:id,status' // load only id and status for the invoice
-          ])
-          ->join('contract_stages', 'contract_phases.stage_id', '=', 'contract_stages.id')
-          ->join('contracts', 'contract_stages.contract_id', '=', 'contracts.id')
-          ->where('contracts.id', $contract_id)
-          ->select([
-              'contract_phases.*',
-              'contracts.subject as contract_name',
-              'contract_stages.name',
-          ]);
+    $query = ContractPhase::with(['stage:name,id']) // Load only the name of the related stage
+    ->whereHas('stage.contract', function ($query) use ($contract_id) {
+        $query->where('id', $contract_id);
+    })
+    ->select('contract_phases.*'); // Select all columns from contract_phases
+
+    $query = ContractPhase::whereHas('stage.contract', function ($query) use ($contract_id) {
+      $query->where('id', $contract_id);
+  })->select('contract_phases.*');
+
   
       $dataTable = DataTables::of($query)
           ->addColumn('stage_name', function ($phase) {
-              return $phase->stage->name;
+            return $phase->stage ? $phase->stage->name : 'N/A'; // Added a null check in case a phase doesn't have a related stage
           })
           ->editColumn('invoice_id', function ($phase) {
               $invoiceItem = $phase->addedAsInvoiceItem->first();
@@ -587,8 +586,41 @@ class ContractController extends Controller
           return response()->json($outputData); // Return a new JSON response with the modified data
   }
   
-
-
+  public function ContractPaymentsPlanStages($contract_id)
+  {
+      $query = ContractStage::where('contract_id', $contract_id)
+          ->withCount('phases')
+          ->with(['contract' => function ($q) {
+              $q->select(['contracts.id', 'currency']);
+          }]);
+  
+      $dataTable = DataTables::of($query)
+          ->editColumn('name', function ($stage) {
+              return '<a href="' . route('admin.contracts.stages.phases.index', [$stage->contract, $stage]) . '">' . $stage->name . '</a>';
+          })
+          ->editColumn('start_date', function($stage) {
+              return $stage->start_date ? $stage->start_date->format('d M, Y') : '-';
+          })
+          ->editColumn('due_date', function($stage) {
+              return $stage->due_date ? $stage->due_date->format('d M, Y') : '-';
+          })
+          ->addColumn('total_amount', function ($stage) {
+            return cMoney($stage->stage_amount ?? 0, $stage->contract->currency, true);
+          })
+          ->addColumn('actions', function($stage){
+            return view('admin.pages.contracts.stages.actions', compact('stage'));
+          })
+          ->filterColumn('total_amount', function ($query, $keyword) {
+              $query->whereRaw("stage_amount like ?", ["%{$keyword}%"]);
+          })
+          ->filterColumn('phases_count', function ($query, $keyword) {
+              $query->has('phases', $keyword);
+          })
+          ->rawColumns(['name', 'action']);
+  
+      return $dataTable->make(true);
+  }
+  
 
 
 }

@@ -201,7 +201,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
       Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
 
       // Add the new route for paymentsplans with a specific contract id
-      Route::get('paymentsplan/{contract_id}/details', [ContractController::class, 'ContractPaymentsPlanDetails'])->name('contracts.paymentsplan.details');
+      Route::get('paymentsplan/{contract_id}/phases', [ContractController::class, 'ContractPaymentsPlanPhases'])->name('contracts.paymentsplan.phases');
+      Route::get('paymentsplan/{contract_id}/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
       //Route::get('{contract_id}/paymentsplan', [ContractController::class, 'SpecificContractPaymentsPlan'])->name('contracts.specific.paymentsplan');
     });
 

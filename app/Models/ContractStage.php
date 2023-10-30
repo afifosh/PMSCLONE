@@ -74,4 +74,5 @@ class ContractStage extends BaseModel
   {
     return $this->hasMany(ContractPhase::class, 'stage_id');
   }
+  
 }
