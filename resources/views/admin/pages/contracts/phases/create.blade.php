@@ -1,3 +1,15 @@
+<div class="d-flex justify-content-start align-items-center user-name">
+  <div class="avatar-wrapper">
+    <div class="avatar me-2"><i class="ti ti-license mb-2 ti-xl"></i></div>
+  </div>
+  <div class="d-flex flex-column">
+    <span class="fw-medium mb-1">{{ $contract->subject }}</span>
+    <small class="text-muted mb-1">{{ $contract->program->name }}</small>
+    <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
+  </div>
+</div>
+<hr class="my-4">
+
 @if ($phase->id)
     {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.update', ['project' => 'project', 'contract' => $contract, 'phase' => $phase->id, 'stage' => $stage]],
       'method' => 'PUT',
@@ -223,7 +235,12 @@
   function calculateTotalCost()
   {
     const estimatedCost = $('[name="estimated_cost"]').val();
-    const adjustmentAmount = parseFloat($('[name="adjustment_amount"]').val());
+    const adjustmentInputValue = $('[name="adjustment_amount"]').val();
+    const adjustmentAmount = adjustmentInputValue ? parseFloat(adjustmentInputValue) : 0;
+
+    if (isNaN(adjustmentAmount)) {
+        adjustmentAmount = 0;
+    }
     const taxes = $('[name="phase_taxes[]"]').val();
     let totalCost = parseFloat(estimatedCost);
     if(estimatedCost && taxes){

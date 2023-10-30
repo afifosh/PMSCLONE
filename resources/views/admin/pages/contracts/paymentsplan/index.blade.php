@@ -101,6 +101,14 @@ $(document).ready(function() {
     var expandedRow = null; // Variable to track the currently expanded row
 
     function createChildTable(row, contractId) {
+
+        // Check if child table already exists, if so, destroy it
+        var existingChildTable = $('#child-table-' + contractId).DataTable();
+    if (existingChildTable) {
+        existingChildTable.destroy();
+    }
+
+
         if (expandedRow) {
             // Collapse all other rows in the table except the selected row
             table.rows().every(function() {
@@ -118,7 +126,7 @@ $(document).ready(function() {
         // var childTable = row.child('<table id="' + childTableId + '" class="display table dataTable" style="" width="100%"></table>').show();
     // 1st Row - For the pills
     var pills = `
-        <tr>
+        <tr class="child-row-added">
             <td colspan="100%"> 
                 <ul class="nav nav-pills mt-3 mb-3" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -137,7 +145,7 @@ $(document).ready(function() {
 
     // 2nd Row - For the content
     var content = `
-        <tr class="p-0">
+        <tr class="child-row-added p-0">
             <td class="p-0" colspan="100%">
                 <div class="tab-content">
                     <div class="tab-pane fade" id="child-stages-${contractId}" role="tabpanel" aria-labelledby="child-stages-tab-${contractId}">
@@ -165,25 +173,12 @@ $(row.node()).next().after(contentRow);
     var childTableId = "child-table-" + contractId;
 
 
-        $.get("{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/details", function(response) {
-            var buttonsConfig = response.buttons.map(function(button) {
-                return {
-                    text: button.text,
-                    className: button.className,
-                    action: function(e, dt, node, config) {
-                        // Check if the 'onclick' attribute exists and run the function
-                        if (button.attr && button.attr.onclick) {
-                            eval(button.attr.onclick.replace('()', ''));
-                        }
-                    },
-                    attr: button.attr // Add attributes from the attr key in the JSON
-                };
-            });
-
-            $('#' + childTableId).DataTable({
-                data: response.data,
+    $('#' + childTableId).DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/details",
                 columns: [
-                    { data: 'stage_name', title: 'Stage Name' },
+                    { data: "stage_name", "name": "contract_stages.name", title: 'Stage Name' },
                     { data: 'name', title: 'Phase Name' },
                     { data: 'start_date', title: 'Start Date' },
                     { data: 'due_date', title: 'Due Date' },
@@ -198,34 +193,59 @@ $(row.node()).next().after(contentRow);
                 ],
                 destroy: true,
                 dom: 'Blfrtip',
-                buttons: buttonsConfig,
+                buttons: [
+        {
+            text: 'Select Phases',
+            className: 'btn btn-primary mx-3 select-phases-btn',
+            action: function(e, dt, node, config) {
+                toggleCheckboxes();
+            }
+        },
+        {
+            text: 'Create Invoices',
+            className: 'btn btn-primary mx-3 create-inv-btn d-none',
+            action: function(e, dt, node, config) {
+                createInvoices();
+            }
+        },
+        {
+            text: 'Add Phase',
+            className: 'btn btn-primary',
+            action: function(e, dt, node, config) {
+              //  var href = route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $contract_id, $this->stage->id ?? 'stage']);
+                // Assuming you have an AJAX modal function to open up the modal. If not, replace with your method.
+             //   openAjaxModal('Add Phase', href);
+            }
+        }
+    ],
                 initComplete: function() {
                     // Move the buttons container near the search bar
-                    $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
+                   // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
                 }
             });
-        });
+
+
     }
 
+    
     $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
-        var tr = $(this).closest('tr');
-        var selectedRow = table.row(tr);
-        var contractId = $(this).attr('contract-id');
+      var tr = $(this).closest('tr');
+    var selectedRow = table.row(tr);
+    var contractId = $(this).attr('contract-id');
 
-        if (selectedRow.child.isShown()) {
-            // Collapse the selected row
-            selectedRow.child.hide();
-            $(tr).removeClass('shown');
-            $(tr).css('background-color', ''); // Reset the background color
-            expandedRow = null; // Reset the currently expanded row
-        } else {
-            // Expand the selected row
-            createChildTable(selectedRow, contractId);
-            $(tr).addClass('shown');
-            $(tr).css('background-color', '#f5f5f5'); // Set a light gray background color
-            expandedRow = selectedRow; // Set the currently expanded row
-        }
-    });
+    if (selectedRow.child.isShown()) {
+        // Find any added child rows and remove them
+        tr.nextAll('.child-row-added').remove();
+
+        selectedRow.child.hide();
+        $(tr).removeClass('shown');
+        $(tr).css('background-color', '');
+    } else {
+        createChildTable(selectedRow, contractId);
+        $(tr).addClass('shown');
+        $(tr).css('background-color', '#f5f5f5');
+    }
+});
 
     $('.js-datatable-filter-form :input').on('change', function(e) {
         console.log('Filter changed');

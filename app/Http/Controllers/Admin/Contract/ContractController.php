@@ -513,82 +513,80 @@ class ContractController extends Controller
   }
 
   public function ContractPaymentsPlanDetails($contract_id)
-{
-    // Filter phases based on the given contract ID
-    $query = ContractPhase::query()
-        ->join('contract_stages', 'contract_phases.stage_id', '=', 'contract_stages.id')
-        ->join('contracts', 'contract_stages.contract_id', '=', 'contracts.id')
-        ->where('contracts.id', $contract_id)
-        ->select([
-            'contract_phases.*',
-            'contracts.subject as contract_name',
-            'contract_stages.name as stage_name',
-        ])
-        ->with('addedAsInvoiceItem.invoice');
+  {
+      $query = ContractPhase::with([
+        'stage:id,name', // load only id and name for the stage
+        'addedAsInvoiceItem.invoice:id,status' // load only id and status for the invoice
+          ])
+          ->join('contract_stages', 'contract_phases.stage_id', '=', 'contract_stages.id')
+          ->join('contracts', 'contract_stages.contract_id', '=', 'contracts.id')
+          ->where('contracts.id', $contract_id)
+          ->select([
+              'contract_phases.*',
+              'contracts.subject as contract_name',
+              'contract_stages.name',
+          ]);
+  
+      $dataTable = DataTables::of($query)
+          ->addColumn('stage_name', function ($phase) {
+              return $phase->stage->name;
+          })
+          ->editColumn('invoice_id', function ($phase) {
+              $invoiceItem = $phase->addedAsInvoiceItem->first();
+              return $invoiceItem
+                  ? '<a href="' . route('admin.invoices.edit', $invoiceItem->invoice_id) . '">' . runtimeInvIdFormat($invoiceItem->invoice_id) . '</a>'
+                  : 'N/A';
+          })
+          ->addColumn('phase_name', function ($phase) {
+              return $phase->name;
+          })
+          ->addColumn('start_date', function ($phase) {
+              return $phase->start_date->format('d M, Y');
+          })
+          ->addColumn('due_date', function ($phase) {
+              return $phase->due_date->format('d M, Y');
+          })
+          ->addColumn('amount', function ($phase) {
+              return view('admin.pages.contracts.paymentsplan.value-column', compact('phase'));
+          })
+          ->editColumn('actions', function ($phase) use ($contract_id) {
+              $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid']));
+              return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $phase->stage, 'contract_id' => $contract_id, 'is_editable' => $is_editable])->render();
+          })
+          ->rawColumns(['actions', 'invoice_id', 'amount']);
+  
+          $outputData = $dataTable->make(true)->getData(true); // Get data as an associative array
 
-    // DataTable logic
-    $dataTable = DataTables::of($query)
-        ->addColumn('stage_name', function ($phase) {
-           return $phase->stage_name; // Assuming phase name is in 'name' field of contract_phases table
-        })    
-        ->editColumn('invoice_id', function ($phase) {
-          $invoiceItem = $phase->addedAsInvoiceItem->first();
-          return $invoiceItem
-            ? '<a href="' . route('admin.invoices.edit', $invoiceItem->invoice_id) . '">' . runtimeInvIdFormat($invoiceItem->invoice_id) . '</a>'
-            : 'N/A';
-        })
-        ->addColumn('phase_name', function ($phase) {
-            return $phase->name; // Assuming phase name is in 'name' field of contract_phases table
-        })
-        ->addColumn('start_date', function ($phase) {
-            return $phase->start_date->format('d M, Y'); // Similarly, for start_date
-        })
-        ->addColumn('due_date', function ($phase) {
-            return $phase->due_date->format('d M, Y'); // Similarly, for due_date
-        })
-        ->addColumn('amount', function ($phase) {
-            return view('admin.pages.contracts.paymentsplan.value-column', compact('phase'));
-        })
-        ->editColumn('actions', function ($phase) use ($contract_id) {
-          $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid']));
-          $stage = $phase->stage;  // Assuming you have a 'stage' relationship on the phase model.
-          return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $stage, 'contract_id' => $contract_id, 'is_editable' => $is_editable])->render();
-      })
-        ->rawColumns(['actions']); // Indicate that actions column will have raw HTML
-
-        $outputData = $dataTable->make(true)->getData(true); // Get data as an associative array
-
-        // Add custom buttons to the data table's output
-        $outputData['buttons'] = [
-            [
-                'text' => 'Select Phases',
-                'className' => 'btn btn-primary mx-3 select-phases-btn',
-                'attr' => [
-                    'onclick' => 'toggleCheckboxes()',
-                ],
-            ],
-            [
-                'text' => 'Create Invoices',
-                'className' => 'btn btn-primary mx-3 create-inv-btn d-none',
-                'attr' => [
-                    'onclick' => 'createInvoices()',
-                ],
-            ],
-            [
-                'text' => 'Add Phase',
-                'className' => 'btn btn-primary',
-                'attr' => [
-                    'data-toggle' => "ajax-modal",
-                    'data-title' => 'Add Phase',
-                    'data-href' => route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $contract_id, $this->stage->id ?? 'stage']),
-                ],
-            ],
-        ];
-    
-        return response()->json($outputData); // Return a new JSON response with the modified data
-    
-}
-
+          // Add custom buttons to the data table's output
+          $outputData['buttons'] = [
+              [
+                  'text' => 'Select Phases',
+                  'className' => 'btn btn-primary mx-3 select-phases-btn',
+                  'attr' => [
+                      'onclick' => 'toggleCheckboxes()',
+                  ],
+              ],
+              [
+                  'text' => 'Create Invoices',
+                  'className' => 'btn btn-primary mx-3 create-inv-btn d-none',
+                  'attr' => [
+                      'onclick' => 'createInvoices()',
+                  ],
+              ],
+              [
+                  'text' => 'Add Phase',
+                  'className' => 'btn btn-primary',
+                  'attr' => [
+                      'data-toggle' => "ajax-modal",
+                      'data-title' => 'Add Phase',
+                      'data-href' => route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $contract_id, $this->stage->id ?? 'stage']),
+                  ],
+              ],
+          ];
+      
+          return response()->json($outputData); // Return a new JSON response with the modified data
+  }
+  
 
 
 
