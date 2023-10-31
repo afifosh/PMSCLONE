@@ -79,7 +79,7 @@ class InvoiceController extends Controller
 
     $data['is_editable'] = $invoice->isEditable();
 
-    if ($invoice->type == 'Downpayment') {
+    if ($invoice->type == 'Down Payment') {
       $dataTable = app(DownpaymentInvoicesDataTable::class);
       $dataTable->downpaymentInvoice = $invoice;
 
@@ -105,41 +105,37 @@ class InvoiceController extends Controller
       return back()->with('success', 'Tax type updated successfully');
     } elseif ($request->update_discount) {
       if ($request->discount_type == 'Percentage') {
-        $data['discount_amount'] = - ($invoice->subtotal * $request->discount_value) / 100; //store negative value
+        $data['discount_amount'] = ($invoice->subtotal * $request->discount_value) / 100;
         $data['discount_percentage'] = $request->discount_value;
       } else {
-        $data['discount_amount'] = -$request->discount_value; //store negative value
+        $data['discount_amount'] = $request->discount_value;
         $data['discount_percentage'] = 0;
       }
+      $data['is_discount_before_tax'] = $request->discount_ded_type == 'Before Tax';
       $invoice->update($data + ['discount_type' => $request->discount_type]);
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Discount updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } elseif ($request->update_adjustment) {
-      $invoice->update($request->validated());
+      $invoice->update(['is_adjustment_before_tax' => $request->adjustment_type == 'Before Tax'] + $request->validated());
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Adjustment updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } elseif ($request->update_retention) {
-      // retention is basically deduction after applying discount, taxes and adjustments from the total. Which will be paid later on.
+      $invoice->updateRetention($request->retention_id, $request->retention_type == 'Before Tax');
       $retenion = Tax::where('is_retention', true)->find($request->retention_id);
+      $data['is_retention_before_tax'] = $request->retention_type == 'Before Tax';
       if (!$retenion) {
         $data['retention_amount'] = 0;
         $data['retention_percentage'] = 0;
       } elseif ($retenion->type == 'Percent') {
-        $data['retention_amount'] = (($invoice->total) * $retenion->amount) / 100;
+        $data['retention_amount'] = (($data['is_retention_before_tax'] ? $invoice->subtotal : $invoice->total) * $retenion->amount) / 100;
         $data['retention_percentage'] = $retenion->amount;
       } else {
         $data['retention_amount'] = $retenion->amount;
         $data['retention_percentage'] = 0;
       }
-      // if($request->retention_type == 'Percentage'){
-      //   $data['retention_amount'] = -($invoice->subtotal * $request->retention_value) / 100;
-      //   $data['retention_percentage'] = $request->retention_value;
-      // }else{
-      //   $data['retention_amount'] = -$request->retention_value;
-      //   $data['retention_percentage'] = 0;
-      // }
+
       $invoice->update($data + ['retention_id' => $request->retention_id, 'retention_name' => $retenion->name ?? null]);
       $invoice->reCalculateTotal();
 
@@ -155,15 +151,21 @@ class InvoiceController extends Controller
     return $this->sendRes('Invoice Updated Successfully', ['event' => 'redirect', 'url' => route('admin.invoices.index')]);
   }
 
-  public function destroy(Invoice $invoice)
+  public function destroy($invoice)
   {
-    if (!$invoice->isEditable()) {
-      return $this->sendError('Invoice is not editable');
+    if($invoice != 'bulk'){
+      $invoice = Invoice::findOrFail($invoice);
+      $invoice->payments()->delete();
+      $invoice->delete();
+    }else{
+      $invoices = Invoice::whereIn('id', request()->invoices)->get();
+      foreach($invoices as $invoice){
+        $invoice->payments()->delete();
+        $invoice->delete();
+      }
     }
 
-    $invoice->delete();
-
-    return $this->sendRes('Invoice deleted successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table']);
+    return $this->sendRes('Deleted successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table']);
   }
 
   public function sortItems(Invoice $invoice, Request $request)

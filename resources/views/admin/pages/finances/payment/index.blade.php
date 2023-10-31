@@ -117,5 +117,58 @@ $configData = Helper::appClasses();
               });
           });
       });
+
+      $(document).on('click', '.payment-check-all', function(){
+        if($(this).is(':checked')){
+          $('.payment-check').prop('checked', true).trigger('change');
+        }else{
+          $('.payment-check').prop('checked', false).trigger('change');
+        }
+      })
+
+      $(document).on('click change', '.payment-check', function(){
+        if($('.payment-check:checked').length == $('.payment-check').length){
+          $('.payment-check-all').prop('checked', true);
+        }else{
+          $('.payment-check-all').prop('checked', false);
+        }
+
+        // if atleast one is checked, show create-inv-btn
+        if($('.payment-check:checked').length > 0){
+          $('.select-payments-btn').addClass('d-none');
+          $('.delete-inv-btn').removeClass('d-none');
+        }else{
+          $('.delete-inv-btn').addClass('d-none');
+          $('.select-payments-btn').removeClass('d-none');
+        }
+      })
+
+      function destroyBulkPayments(){
+        var payments = [];
+        $('.payment-check:checked').each(function(){
+          payments.push($(this).val());
+        });
+        if(payments.length == 0){
+          return;
+        }
+        $.ajax({
+          url: route('admin.finances.payments.destroy', {'payment': 'bulk'}),
+          type: "DELETE",
+          data: {
+            payments: payments,
+          },
+          success: function(res){
+            $('.payment-check-all').prop('checked', false).trigger('change');
+            $('.payment-check').prop('checked', false).trigger('change');
+            toast_success(res.message)
+            toggleCheckboxes();
+          }
+        });
+      }
+
+      function toggleCheckboxes(){
+        $('#payments-table').DataTable().column(0).visible(!$('#payments-table').DataTable().column(0).visible());
+        $('#payments-table').DataTable().ajax.reload();
+      }
     </script>
 @endpush

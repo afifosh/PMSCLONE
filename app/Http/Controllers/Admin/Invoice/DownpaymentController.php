@@ -11,6 +11,12 @@ class DownpaymentController extends Controller
 {
   public function store(Invoice $invoice, Request $request)
   {
+    $amount_swaped = false;
+    if($request->downpayment_type == 'InvPerc'){
+      $amount_swaped = true;
+      $request->merge(['downpayment_type' => 'Fixed']);
+      $request->merge(['downpayment_value' => $request->downpayment_amount]);
+    }
     $request->validate([
       'downpayment_id' => 'required|exists:invoices,id',
       'downpayment_type' => 'required|in:Fixed,Percentage',
@@ -24,8 +30,12 @@ class DownpaymentController extends Controller
     $amount = $request->downpayment_type == 'Fixed' ? moneyToInt($request->downpayment_value) : (moneyToInt($request->downpayment_value * $downpayment->total) / 100);
 
     if($amount > moneyToInt($maxAmount)){
-      if($request->downpayment_type == 'Fixed')
-        throw ValidationException::withMessages(['downpayment_value' => 'Available amount is' . $maxAmount]);
+      if($request->downpayment_type == 'Fixed'){
+        if($amount_swaped)
+          throw ValidationException::withMessages(['downpayment_amount' => 'Available amount is' . $maxAmount]);
+        else
+          throw ValidationException::withMessages(['downpayment_value' => 'Available amount is' . $maxAmount]);
+      }
       else
         throw ValidationException::withMessages(['downpayment_amount' => 'Available amount is' . $maxAmount]);
     }

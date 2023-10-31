@@ -30,6 +30,9 @@ class PaymentsDataTable extends DataTable
       ->editColumn('invoice_id', function ($invoicePayment) {
         return '<a href="' . route('admin.invoices.edit', $invoicePayment->invoice_id) . '">' . runtimeInvIdFormat($invoicePayment->invoice_id) . '</a>';
       })
+      ->editColumn('checkbox', function ($payment) {
+        return '<input class="form-check-input payment-check" name="selected_payments[]" type="checkbox" value="' . $payment->id . '">';
+      })
       ->editColumn('contract.id', function ($invoicePayment) {
         return '<a href="' . route('admin.contracts.show', $invoicePayment->contract->id) . '">' . runtimeContractIdFormat($invoicePayment->contract->id) . '</a>';
       })
@@ -39,7 +42,7 @@ class PaymentsDataTable extends DataTable
       ->addColumn('action', function($invoicePayment){
         return view('admin.pages.finances.payment.action', compact('invoicePayment'));
       })
-      ->rawColumns(['invoice_id', 'contract.id']);
+      ->rawColumns(['invoice_id', 'contract.id', 'checkbox']);
   }
 
   /**
@@ -72,6 +75,21 @@ class PaymentsDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
+    $buttons[] = [
+      'text' => '<span>Select Payments</span>',
+      'className' =>  'btn btn-primary mx-3 select-payments-btn',
+      'attr' => [
+        'onclick' => 'toggleCheckboxes()',
+      ]
+    ];
+    $buttons[] = [
+      'text' => '<span>Delete Payments</span>',
+      'className' =>  'btn btn-primary mx-3 delete-inv-btn d-none',
+      'attr' => [
+        'data-toggle' => "confirm-action",
+        'data-success-action' => 'destroyBulkPayments',
+      ]
+    ];
     $buttons[] = [
       'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Payment</span>',
       'className' =>  'btn btn-primary mx-3',
@@ -107,6 +125,7 @@ class PaymentsDataTable extends DataTable
   public function getColumns(): array
   {
     return [
+      Column::make('checkbox')->title('<input class="form-check-input payment-check-all" type="checkbox">')->orderable(false)->searchable(false)->printable(false)->exportable(false)->visible(false)->width(1),
       Column::make('id'),
       Column::make('contract.id'),
       Column::make('invoice_id'),

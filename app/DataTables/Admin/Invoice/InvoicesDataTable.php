@@ -30,6 +30,9 @@ class InvoicesDataTable extends DataTable
       ->editColumn('id', function ($inv) {
         return '<a href="' . route('admin.invoices.edit', $inv->id) . '">' . runtimeInvIdFormat($inv->id) . '</a>';
       })
+      ->editColumn('checkbox', function ($inv) {
+        return '<input class="form-check-input invoice-check" name="selected_invoices[]" type="checkbox" value="' . $inv->id . '">';
+      })
       ->editColumn('company_id', function ($invoice) {
         return view('admin._partials.sections.company-avatar', ['company' => $invoice->company])->render();
       })
@@ -42,7 +45,7 @@ class InvoicesDataTable extends DataTable
       ->addColumn('total', function ($invoice) {
         return view('admin.pages.invoices.total-column', ['invoice' => $invoice]);
       })
-      ->rawColumns(['company_id', 'id']);
+      ->rawColumns(['company_id', 'id', 'checkbox']);
   }
 
   /**
@@ -67,6 +70,21 @@ class InvoicesDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
+    $buttons[] = [
+      'text' => '<span>Select Invoices</span>',
+      'className' =>  'btn btn-primary mx-3 select-invoices-btn',
+      'attr' => [
+        'onclick' => 'toggleCheckboxes()',
+      ]
+    ];
+    $buttons[] = [
+      'text' => '<span>Delete Invoices</span>',
+      'className' =>  'btn btn-primary mx-3 delete-inv-btn d-none',
+      'attr' => [
+        'data-toggle' => "confirm-action",
+        'data-success-action' => 'destroyBulkInvoices',
+      ]
+    ];
     $buttons[] = [
       'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Invoice</span>',
       'className' =>  'btn btn-primary mx-3',
@@ -102,6 +120,7 @@ class InvoicesDataTable extends DataTable
   public function getColumns(): array
   {
     return [
+      Column::make('checkbox')->title('<input class="form-check-input invoice-check-all" type="checkbox">')->orderable(false)->searchable(false)->printable(false)->exportable(false)->visible(false)->width(1),
       Column::make('id'),
       Column::make('company_id')->title('Client'),
       Column::make('contract_id')->title('Contract'),

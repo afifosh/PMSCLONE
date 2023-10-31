@@ -30,7 +30,7 @@ class PaymentController extends Controller
       $data['invoice'] = Invoice::with('payments')->findOrFail(request()->route('invoice'));
       return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.index-table', $data)->render()]);
     } else {
-      $data['companies'] = Company::has('contracts.invoices.payments')->get(['name', 'id', 'type'])->prepend('All', '');  
+      $data['companies'] = Company::has('contracts.invoices.payments')->get(['name', 'id', 'type'])->prepend('All', '');
       $data['contract_categories'] = ContractCategory::pluck('name', 'id')->prepend('All', '');
     }
 
@@ -104,17 +104,39 @@ class PaymentController extends Controller
     return $this->sendRes('Payment updated successfully.', ['event' => 'table_reload', 'table_id' => 'payments-table', 'close' => 'globalModal']);
   }
 
-  public function destroy(InvoicePayment $payment)
+  public function destroy($payment)
+  {
+    if($payment != 'bulk'){
+      $payment = InvoicePayment::with('invoice')->findOrFail($payment);
+      $this->deletePayment($payment);
+    }else{
+      $payments = InvoicePayment::whereIn('id', request()->payments)->with('invoice')->get();
+      foreach($payments as $payment){
+        $this->deletePayment($payment);
+      }
+    }
+
+    return $this->sendRes('Payment deleted successfully.', ['event' => 'table_reload', 'table_id' => 'payments-table']);
+  }
+
+  private function deletePayment($payment): void
   {
     $invoice = $payment->invoice;
 
+    $status = '';
+    if ($invoice->paid_amount - $payment->amount >= $invoice->payableAmount() + $invoice->paid_amount) {
+      $status = 'Paid';
+    } else if ($invoice->paid_amount - $payment->amount > 0) {
+      $status = 'Partial Paid';
+    } else {
+      $status = 'Draft';
+    }
+
     $invoice->update([
       'paid_amount' => $invoice->paid_amount - $payment->amount,
-      'status' => $invoice->paid_amount - $payment->amount >= $invoice->total ? 'Paid' : 'Partial Paid',
+      'status' =>  $status,
     ]);
 
     $payment->delete();
-
-    return $this->sendRes('Payment deleted successfully.', ['event' => 'table_reload', 'table_id' => 'payments-table']);
   }
 }
