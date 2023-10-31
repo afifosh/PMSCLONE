@@ -625,60 +625,68 @@ class ContractController extends Controller
   
   public function markPhaseAsComplete($contract_id, $phase_id)
   {
-      // Find the contract by its ID
-      $contract = Contract::findOrFail($contract_id);
-  
-      // Ensure the contract has a phase with the specified phase_id
-      $phase = $contract->phases()->where('id', $phase_id)->first();
-  
-      if (!$phase) {
-          // No such phase for this contract; you can handle the error as you like.
-          return redirect()->back()->withErrors(['error' => 'Invalid phase for this contract.']);
+      try {
+          // Find the contract by its ID
+          $contract = Contract::findOrFail($contract_id);
+      
+          // Ensure the contract has a phase with the specified phase_id
+          $phase = $contract->phases()->where('id', $phase_id)->first();
+      
+          if (!$phase) {
+              // No such phase for this contract; you can handle the error as you like.
+              return $this->sendError('Invalid phase for this contract.');
+          }
+      
+          // Check if the phase has already been reviewed by the current user
+          $existingReview = $phase->reviews()->where('user_id', Auth::id())->first();
+          if ($existingReview) {
+              // The phase has already been reviewed by the current user; handle this scenario as you prefer
+              return $this->sendError('You have already reviewed this phase.');
+          }
+      
+          // Mark the phase as reviewed
+          $review = new Review([
+              'user_id' => Auth::id(),
+              'reviewed_at' => now(),
+          ]);
+          $phase->reviews()->save($review);
+      
+          return $this->sendRes('Phase marked as reviewed!');
+      } catch (Throwable $e) {
+          return $this->sendError('Server Error');
       }
-  
-      // Check if the phase has already been reviewed by the current user
-      $existingReview = $phase->reviews()->where('user_id', Auth::id())->first();
-      if ($existingReview) {
-          // The phase has already been reviewed by the current user; handle this scenario as you prefer
-          return redirect()->back()->withErrors(['error' => 'You have already reviewed this phase.']);
-      }
-  
-      // Mark the phase as reviewed
-      $review = new Review([
-          'user_id' => Auth::id(),
-          'reviewed_at' => now(),
-      ]);
-      $phase->reviews()->save($review);
-  
-      return redirect()->back()->withSuccess('Phase marked as complete successfully!');
   }
-
+  
 
   public function markPhaseAsIncomplete($contract_id, $phase_id)
   {
-      // Find the contract by its ID
-      $contract = Contract::findOrFail($contract_id);
-  
-      // Ensure the contract has a phase with the specified phase_id
-      $phase = $contract->phases()->where('id', $phase_id)->first();
-  
-      if (!$phase) {
-          // No such phase for this contract; you can handle the error as you like.
-          return redirect()->back()->withErrors(['error' => 'Invalid phase for this contract.']);
-      }
-  
-      // Find the review for this phase by the current user
-      $review = $phase->reviews()->where('user_id', Auth::id())->first();
+      try {
+          // Find the contract by its ID
+          $contract = Contract::findOrFail($contract_id);
       
-      if (!$review) {
-          // The phase hasn't been reviewed by the current user; handle this scenario as you prefer
-          return redirect()->back()->withErrors(['error' => 'You have not reviewed this phase.']);
+          // Ensure the contract has a phase with the specified phase_id
+          $phase = $contract->phases()->where('id', $phase_id)->first();
+      
+          if (!$phase) {
+              // No such phase for this contract; you can handle the error as you like.
+              return $this->sendError('Invalid phase for this contract.');
+          }
+      
+          // Find the review for this phase by the current user
+          $review = $phase->reviews()->where('user_id', Auth::id())->first();
+          
+          if (!$review) {
+              // The phase hasn't been reviewed by the current user; handle this scenario as you prefer
+              return $this->sendError('You have not reviewed this phase.');
+          }
+      
+          // Delete the review to mark the phase as "incomplete"
+          $review->delete();
+      
+          return $this->sendRes('Phase marked as unreviewed!');
+      } catch (Throwable $e) {
+          return $this->sendError('Server Error');
       }
+  }
   
-      // Delete the review to mark the phase as "incomplete"
-      $review->delete();
-  
-      return redirect()->back()->withSuccess('Phase marked as incomplete successfully!');
-  }  
-
 }

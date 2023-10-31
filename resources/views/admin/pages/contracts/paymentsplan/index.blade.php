@@ -98,7 +98,6 @@ $configData = Helper::appClasses();
     <script>
         function togglePhaseCompleteness(buttonElement) {
             // Extract data attributes
-            alert("testt");
             const contractId = buttonElement.getAttribute('data-contract-id');
             const phaseId = buttonElement.getAttribute('data-phase-id');
             const isComplete = buttonElement.getAttribute('data-is-complete') === 'true';
@@ -120,16 +119,23 @@ $configData = Helper::appClasses();
             .then(data => {
                 if (data.success) {
                     // Toggle the button text and data attribute for next action
+                    // Toggle the button text and class for next action
                     const newText = isComplete ? 'MARK AS COMPLETE' : 'MARK AS INCOMPLETE';
+                    const newClass = isComplete ? 'btn-label-secondary' : 'btn-label-danger';
+
                     buttonElement.textContent = newText;
                     buttonElement.setAttribute('data-is-complete', !isComplete);
+                    buttonElement.classList.remove('btn-label-secondary', 'btn-label-danger');
+            buttonElement.classList.add(newClass);
+                    toast_success(data.message)
                 } else {
                     alert('Error toggling completion state.');
+                    toast_danger(data.message)
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                toast_danger(data.message)
             });
         }
         </script>
