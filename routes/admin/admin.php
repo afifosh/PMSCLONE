@@ -204,6 +204,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
       Route::get('paymentsplan/{contract_id}/phases', [ContractController::class, 'ContractPaymentsPlanPhases'])->name('contracts.paymentsplan.phases');
       Route::get('paymentsplan/{contract_id}/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
       //Route::get('{contract_id}/paymentsplan', [ContractController::class, 'SpecificContractPaymentsPlan'])->name('contracts.specific.paymentsplan');
+
+      // Route to mark a phase as complete
+      Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-complete', [ContractController::class, 'markPhaseAsComplete'])->name('contracts.phases.complete');
+      // Route to mark a phase as incomplete
+      Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-incomplete', [ContractController::class, 'markPhaseAsIncomplete'])->name('contracts.phases.incomplete');      
+
+
     });
 
 

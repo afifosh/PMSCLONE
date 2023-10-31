@@ -95,6 +95,45 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    <script>
+        function togglePhaseCompleteness(buttonElement) {
+            // Extract data attributes
+            alert("testt");
+            const contractId = buttonElement.getAttribute('data-contract-id');
+            const phaseId = buttonElement.getAttribute('data-phase-id');
+            const isComplete = buttonElement.getAttribute('data-is-complete') === 'true';
+        
+            // Use Blade to generate the base URL, then use JavaScript to dynamically append the rest
+            const baseURL = "{{ url('admin/contracts/paymentsplan/') }}";
+            const url = isComplete ? 
+                `${baseURL}/${contractId}/phases/${phaseId}/mark-incomplete` :
+                `${baseURL}/${contractId}/phases/${phaseId}/mark-complete`;
+        
+            fetch(url, {
+                method: 'POST', 
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Toggle the button text and data attribute for next action
+                    const newText = isComplete ? 'MARK AS COMPLETE' : 'MARK AS INCOMPLETE';
+                    buttonElement.textContent = newText;
+                    buttonElement.setAttribute('data-is-complete', !isComplete);
+                } else {
+                    alert('Error toggling completion state.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+        </script>
+        
  <script>
 $(document).ready(function() {
     var table = $('#paymentsplan-table').DataTable();
@@ -151,12 +190,12 @@ $(document).ready(function() {
                     <div class="tab-pane fade" id="child-stages-${contractId}" role="tabpanel" aria-labelledby="child-stages-tab-${contractId}">
                         <!-- Stages content here -->
                         <!-- Stages content here -->
-                        <table id="stages-table-${contractId}"></table>
+                        <table class="table"  id="stages-table-${contractId}"></table>
                     </div>
                     <div class="tab-pane fade show active" id="child-phases-${contractId}" role="tabpanel" aria-labelledby="child-phases-tab-${contractId}">
                         <!-- Phases content here -->
                         <!-- This is where your child table (Datatable) will go -->
-                        <table id="child-table-${contractId}"></table>
+                        <table class="table" id="child-table-${contractId}"></table>
                     </div>
                 </div>
             </td>

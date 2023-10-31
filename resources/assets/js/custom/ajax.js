@@ -697,7 +697,13 @@ $(document).on('click', '[data-toggle="ajax-modal"]', function () {
     type: 'get',
     url: url,
     success: function (response) {
-      $('#globalModalTitle').html(title);
+      // Check if modaltitle exists in the response and is not empty
+      var modalTitle = response.data.modaltitle;
+      if (modalTitle && modalTitle.trim() !== "") {
+          $('#globalModal .modal-header').html(modalTitle);
+      } else {
+          $('#globalModalTitle').html(title);
+      }
       $('#globalModalBody').html(response.data.view_data);
       initModalSelect2();
       if(typeof initFlatPickr != 'undefined'){

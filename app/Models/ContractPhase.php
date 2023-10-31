@@ -205,6 +205,11 @@ class ContractPhase extends BaseModel
     return $this->belongsTo(Contract::class);
   }
 
+  public function reviews()
+  {
+      return $this->morphMany(Review::class, 'reviewable');
+  }
+
   public function stage(): BelongsTo
   {
     return $this->belongsTo(ContractStage::class);

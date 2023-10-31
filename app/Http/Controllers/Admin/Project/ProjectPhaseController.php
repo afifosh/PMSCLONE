@@ -85,8 +85,29 @@ class ProjectPhaseController extends Controller
     $stages = $contract->stages->pluck('name', 'id');
     $max_amount = $contract->remaining_amount + $phase->total_cost;
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
-// dd($phase);
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract','stages' ,'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
+ 
+    $userHasMarkedComplete = $phase->reviews->contains('user_id', auth()->id());
+    $buttonLabel = $userHasMarkedComplete ? 'MARK AS INCOMPLETE' : 'MARK AS COMPLETE';
+    $buttonIcon = $userHasMarkedComplete ? 'ti-undo' : 'ti-bell';
+    $reviewStatus = $userHasMarkedComplete ? 'true' : 'false';   
+    $buttonLabelClass = $userHasMarkedComplete ? 'btn-label-danger' : 'btn-label-secondary';
+
+    $modalTitle = '
+    <h5 class="modal-title" id="globalModalTitle">Edit Phase</h5>
+    <div class="flex items-center justify-between border-b-1 w-full">
+        <button type="button" style="" 
+                class="me-4 btn btn-sm rounded-pill ' . $buttonLabelClass . ' waves-effect" 
+                data-phase-id="' . $phase->id . '" 
+                data-contract-id="' . $contract->id . '"
+                data-is-complete="' . $reviewStatus . '"
+                onclick="togglePhaseCompleteness(this)">
+            <span class="ti-xs ti ' . $buttonIcon . ' me-1"></span>' . $buttonLabel . '
+        </button>
+        <button type="button" data-bs-dismiss="modal" aria-label="Close" class="btn-close"></button>
+    </div>';
+
+
+    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract','stages' ,'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
   }
 
   public function update($project, PhaseUpdateRequest $request, Contract $contract, $stage, ContractPhase $phase)

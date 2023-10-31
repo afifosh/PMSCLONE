@@ -191,6 +191,11 @@ class Contract extends BaseModel
     });
   }
 
+  public function reviews()
+  {
+      return $this->morphMany(Review::class, 'reviewable');
+  }
+  
   public function category(): BelongsTo
   {
     return $this->belongsTo(ContractCategory::class);
