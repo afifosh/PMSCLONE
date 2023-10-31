@@ -175,9 +175,16 @@
   })
 
   $(document).on('keyup', '[name="downpayment_value"]', function(){
-    if($('input[name="downpayment_type"]:checked').val() != 'Fixed'){
+    console.log($('[name="downpayment_type"]').val());
+    if($('[name="downpayment_type"]').val() == 'Percentage'){
       // get data-amount attr from selected option
       var subtotal = $('[name="downpayment_id"]').find(':selected').data('amount');
+      var value = $(this).val();
+      var amount = parseFloat(subtotal) * parseFloat(value) / 100;
+      $('[name="downpayment_amount"]').val(amount);
+    }else if($('[name="downpayment_type"]').val() == 'InvPerc'){
+      // get data-amount attr from selected option
+      var subtotal = $('.invoice_total').data('amount');
       var value = $(this).val();
       var amount = parseFloat(subtotal) * parseFloat(value) / 100;
       $('[name="downpayment_amount"]').val(amount);
@@ -565,7 +572,7 @@
                   <button id="tax-rates" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Tax Rates</button>
                 </section>
               @endif
-              <div class="dropdown dropup">
+              <div class="dropdown dropup {{$invoice->type == 'Regular' ? 'd-none' : ''}}">
                 <button class="btn btn-outline-primary dropdown-toggle rounded-pill btn-sm" type="button" id="tax-type" data-bs-toggle="dropdown" aria-expanded="false">
                   Tax Type
                 </button>
@@ -687,7 +694,11 @@
         <hr class="m-0">
         <div>
           <div class="form-group">
-            {{ Form::label('discount_type', __('Discount Type'), ['class' => 'col-form-label']) }}
+            {{ Form::label('discount_ded_type', __('Discount Deduction Type'), ['class' => 'col-form-label']) }}
+            {!! Form::select('discount_ded_type', ['After Tax' => 'After Tax', 'Before Tax' => 'Before Tax'], null, ['class' => 'form-select']) !!}
+          </div>
+          <div class="form-group">
+            {{ Form::label('discount_type', __('Discount Value Type'), ['class' => 'col-form-label']) }}
             {!! Form::select('discount_type', ['0' => 'Select Type', 'Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select']) !!}
           </div>
           <div class="form-group">
@@ -715,6 +726,10 @@
           <div class="form-group">
             {{ Form::label('adjustment_description', __('Description'), ['class' => 'col-form-label']) }}
             {!! Form::text('adjustment_description', null, ['class' => 'form-control']) !!}
+          </div>
+          <div class="form-group">
+            {{ Form::label('adjustment_type', __('Adjustment Type'), ['class' => 'col-form-label']) }}
+            {!! Form::select('adjustment_type', ['After Tax' => 'After Tax', 'Before Tax' => 'Before Tax'], null, ['class' => 'form-select']) !!}
           </div>
           <div class="form-group">
             {{ Form::label('adjustment_amount', __('Adjustment Amount'), ['class' => 'col-form-label']) }}
@@ -754,11 +769,11 @@
               @endforelse
             </select>
           </div>
-          {{-- <div class="form-group">
-            {{ Form::label('retention_type', __('Retention Type'), ['class' => 'col-form-label']) }}
-            {!! Form::select('retention_type', ['0' => 'Select Type', 'Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select']) !!}
-          </div>
           <div class="form-group">
+            {{ Form::label('retention_type', __('Retention Type'), ['class' => 'col-form-label']) }}
+            {!! Form::select('retention_type', ['After Tax' => 'After Tax', 'Before Tax' => 'Before Tax'], null, ['class' => 'form-select']) !!}
+          </div>
+          {{-- <div class="form-group">
             {{ Form::label('retention_value', __('Retention Value'), ['class' => 'col-form-label']) }}
             {!! Form::number('retention_value', null, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
           </div> --}}
@@ -796,7 +811,7 @@
           </div>
           <div class="form-group">
             {{ Form::label('downpayment_type', __('Amount Type'), ['class' => 'col-form-label']) }}
-            {!! Form::select('downpayment_type', ['Fixed' => 'Fixed', 'Percentage' => 'Percentage'], null, ['class' => 'form-select select2']) !!}
+            {!! Form::select('downpayment_type', ['Fixed' => 'Fixed', 'Percentage' => 'Percentage', 'InvPerc' => 'Percentage of Invoice'], null, ['class' => 'form-select select2']) !!}
           </div>
           <div class="form-group">
             {{ Form::label('downpayment_value', __('Retention Value'), ['class' => 'col-form-label']) }}

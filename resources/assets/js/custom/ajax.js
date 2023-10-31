@@ -503,7 +503,7 @@ $(document).on('click', '[data-toggle="confirm-action"]', function () {
   var confirmationDesc = $(this).data('confirmation-desc') ? $(this).data('confirmation-desc') : "You won't be able to revert this!";
   var cBtn = $(this).data('confirm-btn') ? $(this).data('confirm-btn') : 'Yes';
   var method = $(this).data('method') ? $(this).data('method') : 'POST';
-
+  var action = $(this).data('success-action') ? $(this).data('success-action') : 'submit';
   // hide responsive modal in small screen
   if (dtrModal.length) {
     dtrModal.modal('hide');
@@ -522,6 +522,10 @@ $(document).on('click', '[data-toggle="confirm-action"]', function () {
     },
     buttonsStyling: false
   }).then(function (result) {
+    if (action != 'submit') {
+      eval(action + '()');
+      return;
+    }
     if (result.value) {
       // delete the data
       $.ajax({
