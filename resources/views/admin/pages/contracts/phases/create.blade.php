@@ -11,13 +11,13 @@
 <div class="row mb-4">
     <div class="nav-align-top">
       <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item" onclick="reload_task_summary();">
+        <li class="nav-item">
           <button type="button" class="nav-link {{request()->tab == null || request()->tab == 'summary' ? 'active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-controls="navs-top-summary" aria-selected="true">Summary</button>
         </li>
-        <li class="nav-item" onclick="reload_logs_list();">
+        <li class="nav-item">
           <button type="button" class="nav-link {{request()->tab == 'activities' ? 'active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-controls="navs-top-activities" aria-selected="false">Activities</button>
         </li>
-        <li class="nav-item" onclick="reload_task_comments();">
+        <li class="nav-item" >
           <button type="button" class="nav-link {{request()->tab == 'comments' ? 'active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-controls="navs-top-comments" aria-selected="false">Comments</button>
         </li>
       </ul>
@@ -30,6 +30,50 @@
         </div>
         <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments" role="tabpanel">
           {{-- @includeWhen(request()->tab == 'comments', 'admin.pages.projects.tasks.show-comments') --}}
+
+          @php
+          $contractAudits = \App\Models\Audit::where('auditable_id', $phase->id)
+                                ->where('auditable_type', get_class($phase))
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+                              
+                                @endphp
+<div class="card-body pb-0 mt-4">
+  <ul class="timeline mb-0">
+      @foreach($contractAudits as $audit)
+      <li class="timeline-item timeline-item-transparent">
+          <span class="timeline-point {{ $audit->event == 'created' ? 'timeline-point-success' : ($audit->event == 'updated' ? 'timeline-point-primary' : 'timeline-point-danger') }}"></span>
+          <div class="timeline-event">
+              <div class="timeline-header border-bottom mb-3">
+                  <h6 class="mb-0">{{ $audit->created_at->format('jS F Y') }}</h6>
+                  <span class="text-muted">{{ $audit->created_at->format('h:i A') }}</span>
+              </div>
+              <div class="d-flex justify-content-between flex-wrap mb-2">
+                  <div class="d-flex align-items-center">
+                      <p>{!! $audit->renderFieldAudit() !!}</p>
+                  </div>
+                  <div>
+                      {{-- <span class="text-muted">{{ $audit->created_at->format('h:i A') }}</span> --}}
+                  </div>
+              </div>
+              <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap pb-0 px-0">
+                <div class="d-flex align-items-center">
+                  <img src="{{ $audit->user->avatar  }}" class="rounded-circle me-3" alt="avatar" height="24" width="24">
+                  <div class="user-info">
+                    <p class="my-0">{{ $audit->user->name ?? 'Unknown' }}</p>
+                    
+                  </div>
+                </div>
+                
+              </div>
+          </div>
+      </li>
+      @endforeach
+  </ul>
+</div>
+
+
+    
         </div>
       </div>
     </div>
