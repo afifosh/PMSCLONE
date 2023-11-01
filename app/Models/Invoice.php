@@ -47,7 +47,10 @@ class Invoice extends Model
     'is_auto_generated',
     'downpayment_amount',
     'downpayment_before_tax',
-    'is_payable'
+    'is_payable',
+    'is_discount_before_tax',
+    'is_adjustment_before_tax',
+    'is_retention_before_tax'
   ];
 
   protected $casts = [
@@ -95,6 +98,22 @@ class Invoice extends Model
   public function items()
   {
     return $this->hasMany(InvoiceItem::class)->orderBy('order');
+  }
+
+  /**
+   * Item which are contract phases
+   */
+  public function phaseItems()
+  {
+    return $this->items()->where('invoiceable_type', ContractPhase::class);
+  }
+
+  /**
+   * Custom Invoice Items
+   */
+  public function customItems()
+  {
+    return $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->with('pivotTaxes');
   }
 
   public function phases()
@@ -226,9 +245,9 @@ class Invoice extends Model
 
   public function updateSubtotal(): void
   {
-    if($this->type == 'Partial Invoice'){
+    if ($this->type == 'Partial Invoice') {
       $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum('amount') / 1000;
-    }else if($this->type == 'Regular'){
+    } else if ($this->type == 'Regular') {
       $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum('amount') / 1000;
     }
     if (!$subtotal) {
@@ -237,28 +256,96 @@ class Invoice extends Model
 
     $downpayment_before_tax = $this->downPayments()->wherePivot('is_after_tax', 0)->sum('amount') / 1000;
 
+    $total = $subtotal
+    - $this->discount_amount
+    - $downpayment_before_tax
+    + $this->total_tax // add total tax. It is calculated in updateTaxAmount() method
+    + $this->adjustment_amount; // adjustment amount can be negative or positive depending on the user input
+
+    $retention_amount = $this->calRetentionAmount($total, $subtotal);
+
     $this->update([
       'subtotal' => $subtotal,
       'downpayment_amount' => $this->downPayments()->wherePivot('is_after_tax', 1)->sum('amount') / 1000,
       'downpayment_before_tax' => $downpayment_before_tax,
-      'total' => $subtotal
-        + $this->discount_amount // it is negative value
-        - $downpayment_before_tax // downpayment before tax is negative value
-        + $this->total_tax // add total tax. It is calculated in updateTaxAmount() method
-        + $this->adjustment_amount // adjustment amount can be negative or positive depending on the user input
+      'retention_amount' => $retention_amount,
+      'total' => $total
     ]);
   }
 
-  public function updateTaxAmount(): void
+  /**
+   * update tax for regular invoice
+   */
+  public function updateRegularInvoiceTax(): void
   {
-    $this->updateSubtotal();
     if ($this->is_summary_tax) {
       $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
       $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
-      $this->update(['total_tax' => $fixed_tax + (($this->subtotal + $this->discount_amount - $this->downpayment_before_tax) * $percent_tax / 100)]);
+      $this->update(['total_tax' => $fixed_tax + (($this->taxableSubtotal()) * $percent_tax / 100)]);
     } else {
-      $fixed_tax = $this->items()->sum('invoice_items.total_tax_amount') / 1000;
-      $this->update(['total_tax' => $fixed_tax]);
+      // $fixed_tax = $this->items()->sum('invoice_items.total_tax_amount') / 1000;
+      // $this->update(['total_tax' => $fixed_tax]);
+      $avg_tax_free_amount = $this->avgTaxFreeAmount();
+      $actual_tax = 0;
+
+      foreach ($this->items as $item) {
+        $item_tax = 0;
+        $item_taxable = $item->amount - $avg_tax_free_amount;
+        foreach ($item->pivotTaxes as $tax) {
+          if ($tax->type == 'Fixed') {
+            $item_tax += $tax->amount / 1000;
+          } else {
+            $item_tax += ($item_taxable * $tax->amount / 100);
+          }
+        }
+        $actual_tax += $item_tax;
+      }
+
+      $this->update(['total_tax' => $actual_tax]);
+    }
+  }
+
+  /**
+   * update tax for partial invoice
+   */
+  public function updatePartialInvoiceTax(): void
+  {
+    if ($this->is_summary_tax) {
+      $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
+      $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
+      $this->update(['total_tax' => $fixed_tax + (($this->taxableSubtotal()) * $percent_tax / 100)]);
+    } else {
+      $avg_tax_free_amount = $this->avgTaxFreeAmount();
+      $actual_tax = 0;
+
+      foreach ($this->customItems as $item) {
+        $item_tax = 0;
+        $item_taxable = $item->amount - $avg_tax_free_amount;
+        foreach ($item->pivotTaxes as $tax) {
+          if ($tax->type == 'Fixed') {
+            $item_tax += $tax->amount / 1000;
+          } else {
+            $item_tax += ($item_taxable * $tax->amount / 100);
+          }
+        }
+        $actual_tax += $item_tax;
+      }
+
+      $this->update(['total_tax' => $actual_tax]);
+    }
+  }
+
+  /**
+   * Recalculate Tax on invoice
+   */
+  public function updateTaxAmount(): void
+  {
+    $this->updateSubtotal();
+
+    if ($this->type == 'Regular') {
+      $this->updateRegularInvoiceTax();
+    } else if ($this->type == 'Partial Invoice') {
+      $this->updatePartialInvoiceTax();
     }
 
     $this->updateSubtotal();
@@ -267,6 +354,88 @@ class Invoice extends Model
   public function reCalculateTotal(): void
   {
     $this->updateTaxAmount(); // will update subtotal and total tax
+  }
+
+  public function updateRetention($retention_id, $is_retention_before_tax): void
+  {
+    $retenion = Tax::where('is_retention', true)->find($retention_id);
+    $data['is_retention_before_tax'] = $is_retention_before_tax;
+    if (!$retenion) {
+      $data['retention_amount'] = 0;
+      $data['retention_percentage'] = 0;
+    } elseif ($retenion->type == 'Percent') {
+      $data['retention_amount'] = (($data['is_retention_before_tax'] ? $this->subtotal : $this->total) * $retenion->amount) / 100;
+      $data['retention_percentage'] = $retenion->amount;
+    } else {
+      $data['retention_amount'] = $retenion->amount;
+      $data['retention_percentage'] = 0;
+    }
+
+    $this->update($data + ['retention_id' => $retention_id, 'retention_name' => $retenion->name ?? null]);
+
+    $this->reCalculateTotal();
+  }
+
+  /**
+   * Calculate retention amount
+   */
+  private function calRetentionAmount($total, $subtotal){
+    if($this->retention_percentage){
+      return (($this->is_retention_before_tax ? $subtotal : $total)  * $this->retention_percentage) / 100;
+    }
+
+    return $this->retention_amount;
+  }
+
+  public function reCalculateRetention(): void
+  {
+    if($this->retention_percentage){
+      $data['retention_amount'] = (($this->is_retention_before_tax ? $this->subtotal : $this->total)  * $this->retention_percentage) / 100;
+      $this->update($data);
+    }
+  }
+
+  /**
+   * Amount on which tax will not be applied.
+   * (We will not apply tax on discount, downpayment, adjustment and retention amounts which are before tax)
+   */
+  private function netTaxFreeAmount()
+  {
+    $subtractable = 0;
+
+    if ($this->is_discount_before_tax) {
+      $subtractable += $this->discount_amount;
+    }
+
+    if ($this->is_retention_before_tax) {
+      $subtractable += $this->retention_amount;
+    }
+
+    $subtractable += $this->downpayment_before_tax;
+    $adjustment = $this->is_adjustment_before_tax ? $this->adjustment_amount : 0;
+
+    return - ($adjustment - $subtractable);
+  }
+
+  /**
+   * Invoice Net subtotal  amount on which taxes will be applied.
+   * (We will not apply tax on discount, downpayment, adjustment and retention amounts which are before tax)
+   */
+  private function taxableSubtotal()
+  {
+    return $this->subtotal - $this->netTaxFreeAmount();
+  }
+
+  /**
+   * Tax free amount for each item. So that we can calculate inline tax for each item
+   */
+  private function avgTaxFreeAmount()
+  {
+    $count = ($this->type == 'Regular' ? $this->phaseItems()->count() : $this->customItems()->count());
+    if($count == 0)
+      return 0;
+
+    return $this->netTaxFreeAmount() / $count;
   }
 
   public function scopeApplyRequestFilters($q)

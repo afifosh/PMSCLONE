@@ -26,7 +26,7 @@
   @if (!$invoice->is_summary_tax)
     <td class="text-left" style="max-width: 170px;">
       <div class="mb-3">
-        <select {{$is_editable ?: 'disabled'}} class="form-select invoice_taxes select2" data-item-id="{{$item->id}}" name="invoice_taxes[]" multiple data-placeholder="{{__('Select Tax')}}">
+        <select {{$is_editable ? ($invoice->type != 'Partial Invoice' ? 'disabled' : '') : 'disabled'}} class="form-select invoice_taxes select2" data-item-id="{{$item->id}}" name="invoice_taxes[]" multiple data-placeholder="{{__('Select Tax')}}">
           @forelse ($tax_rates->where('is_retention', false) as $tax)
             <option @selected($item->taxes->contains($tax)) value="{{$tax->id}}">{{$tax->name}} (
               @if($tax->type != 'Percent')

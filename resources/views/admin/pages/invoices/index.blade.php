@@ -161,5 +161,58 @@ $configData = Helper::appClasses();
               });
           });
       });
+
+      $(document).on('click', '.invoice-check-all', function(){
+        if($(this).is(':checked')){
+          $('.invoice-check').prop('checked', true).trigger('change');
+        }else{
+          $('.invoice-check').prop('checked', false).trigger('change');
+        }
+      })
+
+      $(document).on('click change', '.invoice-check', function(){
+        if($('.invoice-check:checked').length == $('.invoice-check').length){
+          $('.invoice-check-all').prop('checked', true);
+        }else{
+          $('.invoice-check-all').prop('checked', false);
+        }
+
+        // if atleast one is checked, show create-inv-btn
+        if($('.invoice-check:checked').length > 0){
+          $('.select-invoices-btn').addClass('d-none');
+          $('.delete-inv-btn').removeClass('d-none');
+        }else{
+          $('.delete-inv-btn').addClass('d-none');
+          $('.select-invoices-btn').removeClass('d-none');
+        }
+      })
+
+      function destroyBulkInvoices(){
+        var invoices = [];
+        $('.invoice-check:checked').each(function(){
+          invoices.push($(this).val());
+        });
+        if(invoices.length == 0){
+          return;
+        }
+        $.ajax({
+          url: route('admin.invoices.destroy', {'invoice': 'bulk'}),
+          type: "DELETE",
+          data: {
+            invoices: invoices,
+          },
+          success: function(res){
+            $('.invoice-check-all').prop('checked', false).trigger('change');
+            $('.invoice-check').prop('checked', false).trigger('change');
+            toast_success(res.message)
+            toggleCheckboxes();
+          }
+        });
+      }
+
+      function toggleCheckboxes(){
+        $('#invoices-table').DataTable().column(0).visible(!$('#invoices-table').DataTable().column(0).visible());
+        $('#invoices-table').DataTable().ajax.reload();
+      }
     </script>
 @endpush

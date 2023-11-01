@@ -200,8 +200,8 @@ $notifications_count = \DB::table('notifications')->where('notifiable_type', 'Ap
                 <div class="dropdown-divider"></div>
               </li>
               @if (auth('admin')->check())
-              <li>
-                <a class="dropdown-item" href="{{ route('admin.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <li onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <a class="dropdown-item" href="javascript:void(0);" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                   <i class='ti ti-logout me-2'></i>
                   <span class="align-middle">Logout</span>
                 </a>

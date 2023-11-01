@@ -61,6 +61,15 @@ class InvoiceItem extends Model
     return $this->belongsToMany(Tax::class, 'invoice_taxes')->withPivot('amount', 'type');
   }
 
+  /**
+   * pivot table for storing taxes so that updating main tax table doesn't affect old invoices.
+   * Tax amount for invoices is calculated from this table.
+   */
+  public function pivotTaxes()
+  {
+    return $this->hasMany(InvoiceTax::class);
+  }
+
   public function updateTaxAmount(): void
   {
     $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
