@@ -13,6 +13,8 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/apex-charts/apex-charts.css')}}" />
+@livewireStyles
+<x-comments::styles />
 @endsection
 
 @section('page-style')
@@ -53,7 +55,7 @@ $configData = Helper::appClasses();
               'data-allow-clear' => 'true',
               'data-url' => route('resource-select', ['Contract', 'hasContract'])
             ]) !!}
-          </div>          
+          </div>
           <div class="col">
             {!! Form::label('programs', 'Programs') !!}
             {!! Form::select('programs', [], [], [
@@ -82,7 +84,7 @@ $configData = Helper::appClasses();
           </div>
         </div>
       </form>
-    
+
     <div class="card-body">
       {{$dataTable->table()}}
     </div>
@@ -95,21 +97,22 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+
     <script>
         function togglePhaseCompleteness(buttonElement) {
             // Extract data attributes
             const contractId = buttonElement.getAttribute('data-contract-id');
             const phaseId = buttonElement.getAttribute('data-phase-id');
             const isComplete = buttonElement.getAttribute('data-is-complete') === 'true';
-        
+
             // Use Blade to generate the base URL, then use JavaScript to dynamically append the rest
             const baseURL = "{{ url('admin/contracts/paymentsplan/') }}";
-            const url = isComplete ? 
+            const url = isComplete ?
                 `${baseURL}/${contractId}/phases/${phaseId}/mark-incomplete` :
                 `${baseURL}/${contractId}/phases/${phaseId}/mark-complete`;
-        
+
             fetch(url, {
-                method: 'POST', 
+                method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -139,7 +142,7 @@ $configData = Helper::appClasses();
             });
         }
         </script>
-        
+
  <script>
 $(document).ready(function() {
     var table = $('#paymentsplan-table').DataTable();
@@ -172,7 +175,7 @@ $(document).ready(function() {
     // 1st Row - For the pills
     var pills = `
         <tr class="child-row-added">
-            <td colspan="100%"> 
+            <td colspan="100%">
                 <ul class="nav nav-pills mt-3 mb-3" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-stages-${contractId}" aria-controls="child-stages-${contractId}" aria-selected="false">Stages</button>
@@ -183,7 +186,7 @@ $(document).ready(function() {
                 </ul>
             </td>
         </tr>
-        
+
     `;
 
     row.child(pills).show();
@@ -298,7 +301,7 @@ $(row.node()).next().after(contentRow);
 
     }
 
-    
+
     var expandedRow = null; // Variable to track the currently expanded row
 
 $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
@@ -326,7 +329,7 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         createChildTable(selectedRow, contractId);
         $(tr).addClass('shown');
         $(tr).css('background-color', '#f5f5f5');
-        
+
         expandedRow = selectedRow; // Update the reference to the currently expanded row
     }
 });
@@ -362,5 +365,7 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
     });
 });
 </script>
-
+@livewireScripts
+<x-comments::scripts />
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endpush

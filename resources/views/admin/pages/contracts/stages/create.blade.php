@@ -4,7 +4,7 @@
     </div>
     <div class="d-flex flex-column">
       <span class="fw-medium mb-1">{{ $contract->subject }}</span>
-      <small class="text-muted mb-1">{{ $contract->program->name }}</small>
+      <small class="text-muted mb-1">{{ $contract->program->name ?? 'N/A' }}</small>
       <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
     </div>
   </div>

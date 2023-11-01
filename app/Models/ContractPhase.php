@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Comments\Models\Concerns\HasComments;
 
 class ContractPhase extends BaseModel
 {
-  use HasFactory;
+  use HasFactory, HasComments;
 
   protected $fillable = [
     'contract_id',
@@ -61,14 +62,14 @@ class ContractPhase extends BaseModel
 
   public function getAdjustmentAmountAttribute($value)
   {
-      return $value / 1000;
+    return $value / 1000;
   }
-  
+
   public function setAdjustmentAmountAttribute($value)
   {
-      $this->attributes['adjustment_amount'] = moneyToInt($value);
+    $this->attributes['adjustment_amount'] = moneyToInt($value);
   }
-  
+
   public function getTaxAmountAttribute($value)
   {
     return $value / 1000;
@@ -142,9 +143,9 @@ class ContractPhase extends BaseModel
       } elseif (request()->filter_status == 'About To Expire') {
         $q->where('contracts.status', 'Active')->where('contracts.end_date', '>', now())->where('contracts.end_date', '<', now()->addMonth());
       }
-      })->when(request()->companies, function ($q) {
-        $q->where('contracts.assignable_type', Company::class)->where('contracts.assignable_id', request()->companies);
-      })->when(request()->search_q, function ($q) {
+    })->when(request()->companies, function ($q) {
+      $q->where('contracts.assignable_type', Company::class)->where('contracts.assignable_id', request()->companies);
+    })->when(request()->search_q, function ($q) {
       $q->where(function ($q) {
         $q->where('contracts.subject', 'like', '%' . request()->search_q . '%')
           ->orWhereHas('phases', function ($q) {
@@ -152,11 +153,11 @@ class ContractPhase extends BaseModel
           });
       });
     })->when(request()->contract_type, function ($q) {
-        $q->where('contracts.type_id', request()->contract_type);
-      })->when(request()->contracts, function ($q) {
-        $q->where('contracts.id', request()->contracts);        
+      $q->where('contracts.type_id', request()->contract_type);
+    })->when(request()->contracts, function ($q) {
+      $q->where('contracts.id', request()->contracts);
     })->when(request()->contract_category, function ($q) {
-        $q->where('contracts.category_id', request()->contract_category);
+      $q->where('contracts.category_id', request()->contract_category);
     })->when(request()->projects, function ($q) {
       $q->whereHas('project', function ($q) {
         $q->where('id', request()->projects);
@@ -164,39 +165,39 @@ class ContractPhase extends BaseModel
     })->when(request()->programs, function ($q) {
       $programs = request()->programs;
 
-    // Ensure that $programs is an array of integers
-    if (!is_array($programs)) {
+      // Ensure that $programs is an array of integers
+      if (!is_array($programs)) {
         $programs = [$programs]; // Wrap the integer in an array
-    }
+      }
 
-    // Cast each element in the $programs array to an integer
-    $programs = array_map('intval', $programs);
-          // Fetch IDs for all children of the given program
-          $childProgramIds = Program::where('parent_id', request()->programs)->pluck('id')->toArray();
-  
-          // Include the main program's ID
+      // Cast each element in the $programs array to an integer
+      $programs = array_map('intval', $programs);
+      // Fetch IDs for all children of the given program
+      $childProgramIds = Program::where('parent_id', request()->programs)->pluck('id')->toArray();
+
+      // Include the main program's ID
       //    $programIds = array_merge(request()->programs, $childProgramIds);
-    //   $programs = request()->programs;
+      //   $programs = request()->programs;
 
-    // // Cast each element in the $programs array to an integer
-    // $programs = array_map('intval', $programs);
-          // Use these IDs to filter contracts
-          $q->whereIn('contracts.program_id',   $programs);
-    })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function($q){
+      // // Cast each element in the $programs array to an integer
+      // $programs = array_map('intval', $programs);
+      // Use these IDs to filter contracts
+      $q->whereIn('contracts.program_id',   $programs);
+    })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function ($q) {
       try {
         $date = Carbon::parse(explode(' to ', request()->date_range)[0]);
         $q->where('start_date', '>=', $date);
       } catch (\Exception $e) {
       }
-    })->when(request()->date_range && @explode(' to ', request()->date_range)[1], function($q){
+    })->when(request()->date_range && @explode(' to ', request()->date_range)[1], function ($q) {
       try {
         $date = Carbon::parse(explode(' to ', request()->date_range)[1]);
         $q->where('end_date', '<=', $date);
       } catch (\Exception $e) {
       }
     })->join('contract_stages as cs1', 'contract_phases.stage_id', '=', 'cs1.id')
-    ->join('contracts as c1', 'cs1.contract_id', '=', 'c1.id')
-    ->leftJoin('programs as p1', 'c1.program_id', '=', 'p1.id');
+      ->join('contracts as c1', 'cs1.contract_id', '=', 'c1.id')
+      ->leftJoin('programs as p1', 'c1.program_id', '=', 'p1.id');
   }
 
 
@@ -207,7 +208,7 @@ class ContractPhase extends BaseModel
 
   public function reviews()
   {
-      return $this->morphMany(Review::class, 'reviewable');
+    return $this->morphMany(Review::class, 'reviewable');
   }
 
   public function stage(): BelongsTo
@@ -242,11 +243,29 @@ class ContractPhase extends BaseModel
 
   public function updateTaxAmount(): void
   {
-      $fixed_tax = $this->taxes()->where('phase_taxes.type', 'Fixed')->sum('phase_taxes.amount');
-      $percent_tax = $this->taxes()->where('phase_taxes.type', 'Percent')->sum('phase_taxes.amount');
-      $tax_amount = $this->estimated_cost * ($percent_tax / (100 * 1000)) + $fixed_tax;
-      $total_cost = $this->estimated_cost + $tax_amount + $this->adjustment_amount; // Added the adjustment here
-  
-      $this->update(['tax_amount' => $tax_amount, 'total_cost' => $total_cost]);
-  }  
+    $fixed_tax = $this->taxes()->where('phase_taxes.type', 'Fixed')->sum('phase_taxes.amount');
+    $percent_tax = $this->taxes()->where('phase_taxes.type', 'Percent')->sum('phase_taxes.amount');
+    $tax_amount = $this->estimated_cost * ($percent_tax / (100 * 1000)) + $fixed_tax;
+    $total_cost = $this->estimated_cost + $tax_amount + $this->adjustment_amount; // Added the adjustment here
+
+    $this->update(['tax_amount' => $tax_amount, 'total_cost' => $total_cost]);
+  }
+
+  /*
+ * This string will be used in notifications on what a new comment
+ * was made.
+ */
+  public function commentableName(): string
+  {
+    return 'Phase: ' . $this->name . ' Of contract: ' . $this->contract->subject;
+  }
+
+  /*
+* This URL will be used in notifications to let the user know
+* where the comment itself can be read.
+*/
+  public function commentUrl(): string
+  {
+    return '#';
+  }
 }

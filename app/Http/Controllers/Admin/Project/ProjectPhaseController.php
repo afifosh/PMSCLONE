@@ -53,7 +53,7 @@ class ProjectPhaseController extends Controller
   public function store($project, Contract $contract, ContractStage $stage, PhaseStoreRequest $request)
   {
     $phase = $contract->phases()->create(
-      ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'adjustment_amount','stage_id'])
+      ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'adjustment_amount', 'stage_id'])
     );
     $this->storeTaxes($phase, $request->phase_taxes);
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
@@ -75,9 +75,15 @@ class ProjectPhaseController extends Controller
     $phase->updateTaxAmount();
   }
 
-  public function edit($project, Contract $contract, ContractStage $stage, ContractPhase $phase)
+  public function edit($project, $contract, $stage, ContractPhase $phase)
   {
-    $phase->load(['addedAsInvoiceItem.invoice']);
+    if (request()->tab == 'activity') {
+      return $this->prepareActivityTab($phase);
+    }else if(request()->tab == 'comments'){
+      return $this->prepareCommentsTab($phase);
+    }
+    $phase->load(['addedAsInvoiceItem.invoice', 'contract']);
+    $contract = $phase->contract;
 
     if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
       return $this->sendError('You can not edit this phase because it is in paid invoice');
@@ -85,19 +91,19 @@ class ProjectPhaseController extends Controller
     $stages = $contract->stages->pluck('name', 'id');
     $max_amount = $contract->remaining_amount + $phase->total_cost;
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
- 
+
     $userHasMarkedComplete = $phase->reviews->contains('user_id', auth()->id());
     $buttonLabel = $userHasMarkedComplete ? 'MARK AS INCOMPLETE' : 'MARK AS COMPLETE';
     $buttonIcon = $userHasMarkedComplete ? 'ti-undo' : 'ti-bell';
-    $reviewStatus = $userHasMarkedComplete ? 'true' : 'false';   
+    $reviewStatus = $userHasMarkedComplete ? 'true' : 'false';
     $buttonLabelClass = $userHasMarkedComplete ? 'btn-label-danger' : 'btn-label-secondary';
 
     $modalTitle = '
     <h5 class="modal-title" id="globalModalTitle">Edit Phase</h5>
     <div class="flex items-center justify-between border-b-1 w-full">
-        <button type="button" style="" 
-                class="me-4 btn btn-sm rounded-pill ' . $buttonLabelClass . ' waves-effect" 
-                data-phase-id="' . $phase->id . '" 
+        <button type="button" style=""
+                class="me-4 btn btn-sm rounded-pill ' . $buttonLabelClass . ' waves-effect"
+                data-phase-id="' . $phase->id . '"
                 data-contract-id="' . $contract->id . '"
                 data-is-complete="' . $reviewStatus . '"
                 onclick="togglePhaseCompleteness(this)">
@@ -107,9 +113,23 @@ class ProjectPhaseController extends Controller
     </div>';
 
 
-    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract','stages' ,'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
+    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
   }
 
+  public function prepareActivityTab($phase)
+  {
+    $contractAudits = \App\Models\Audit::where('auditable_id', $phase->id)
+      ->where('auditable_type', get_class($phase))
+      ->orderBy('created_at', 'desc')
+      ->get();
+
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.tab-activity', compact('contractAudits'))->render()]);
+  }
+
+  public function prepareCommentsTab($phase)
+  {
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.tab-comments', compact('phase'))->render()]);
+  }
   public function update($project, PhaseUpdateRequest $request, Contract $contract, $stage, ContractPhase $phase)
   {
     $phase->load(['addedAsInvoiceItem.invoice', 'stage']);
@@ -118,7 +138,7 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not update this phase because it is in paid invoice');
     }
 
-    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'adjustment_amount','stage_id']));
+    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'adjustment_amount', 'stage_id']));
 
     $this->storeTaxes($phase, $request->phase_taxes);
 
@@ -131,13 +151,13 @@ class ProjectPhaseController extends Controller
 
         $item->taxes()->detach();
 
-        foreach($phase->taxes as $tax){
+        foreach ($phase->taxes as $tax) {
           $item->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $item->invoice_id]);
         }
 
         $item->updateTaxAmount();
 
-        $item->invoice->updateTaxAmount(); // ERROR HERE 
+        $item->invoice->updateTaxAmount(); // ERROR HERE
       });
     }
 
