@@ -42,4 +42,54 @@ class Audit extends ModelsAudit
           ->where('auditable_type', ContractStage::class);
       });
   }
+
+
+  public function renderCreatedMessage(): string
+  {
+      return 'created ' . $this->getModelClassName();
+  }
+
+  public function renderDeletedMessage(): string
+  {
+      return 'deleted ' . $this->getModelClassName();
+  }
+
+  private function beautifyFieldName(string $field): string
+  {
+      $words = explode('_', $field);
+      $capitalizedWords = array_map('ucfirst', $words);
+  
+      return implode(' ', $capitalizedWords);
+  }
+  
+  public function renderFieldAudit(): string
+  {
+      $auditData = $this->old_values;
+      
+      $messages = [];
+      foreach ($auditData as $field => $oldValue) {
+          $newValue = data_get($this->new_values, $field);
+  
+          // Beautify the field name
+          $beautifiedField = ucwords(str_replace('_', ' ', $field));
+          
+          // Check if the value was changed or set for the first time
+          if ($oldValue === null) {
+              $messages[] = 'Set <span class="mb-1 badge bg-label-secondary text-wrap text-start d-inline-block">' . $beautifiedField . '</span> to <span class="mb-1 badge bg-label-success text-wrap text-start d-inline-block">' . $newValue . '</span>';
+          } else if ($oldValue != $newValue) {
+              $messages[] = 'Changed <span class="mb-1 badge bg-label-secondary text-wrap text-start d-inline-block">' . $beautifiedField . '</span> from <span class="mb-1 badge bg-label-danger text-decoration-line-through text-wrap text-start d-inline-block">' . $oldValue . '</span> to <span class="mb-1 badge bg-label-success text-wrap text-start d-inline-block">' . $newValue . '</span>';
+          }
+      }
+  
+      return implode('<br>', $messages);
+  }
+  
+  
+  private function getModelClassName(): string
+  {
+      return class_basename($this->auditable_type);
+  }
+
+  // You can add other necessary functions...
+
 }
