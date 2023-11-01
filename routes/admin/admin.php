@@ -94,7 +94,7 @@ use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\StudioController;
 use App\Http\Controllers\Admin\MediumController;
 use App\Http\Controllers\Admin\ArtistController;
-
+use App\Http\Controllers\Admin\Contract\UploadedDoc\SignatureController;
 
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'adminVerified', 'mustBeActive', CheckForLockMode::class)->group(function () {
@@ -158,7 +158,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('company-invitations', InvitationController::class);
     // Route::resource('company-users', UserController::class);
 
-    // Artist routes    
+    // Artist routes
     Route::resource('artists', ArtistController::class);
     // Artwork routes
     Route::resource('artworks', ArtworkController::class);
@@ -192,7 +192,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs.users', ProgramUserController::class);
     Route::resource('programs.contracts', ContractController::class);
     Route::resource('programs.invoices', InvoiceController::class);
-    Route::resource('programs.payments', PaymentController::class);    
+    Route::resource('programs.payments', PaymentController::class);
+    Route::resource('doc-signatures', SignatureController::class);
 
     Route::prefix('contracts')->group(function () {
       Route::get('paymentsplan',  [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
@@ -208,7 +209,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
       // Route to mark a phase as complete
       Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-complete', [ContractController::class, 'markPhaseAsComplete'])->name('contracts.phases.complete');
       // Route to mark a phase as incomplete
-      Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-incomplete', [ContractController::class, 'markPhaseAsIncomplete'])->name('contracts.phases.incomplete');      
+      Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-incomplete', [ContractController::class, 'markPhaseAsIncomplete'])->name('contracts.phases.incomplete');
 
 
     });

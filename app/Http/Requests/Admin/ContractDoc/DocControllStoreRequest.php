@@ -17,6 +17,17 @@ class DocControllStoreRequest extends FormRequest
     return true;
   }
 
+  public function prepareForValidation()
+  {
+    $this->merge([
+      'signable' => $this->boolean('signable'),
+      'stampable' => $this->boolean('stampable'),
+      'signatures_required' =>  $this->signable ? $this->signatures_required ?? 0 : 0,
+      'stamps_required' => $this->stampable ? $this->stamps_required ?? 0 : 0,
+      'having_refrence_id' => $this->boolean('having_refrence_id'),
+    ]);
+  }
+
   /**
    * Get the validation rules that apply to the request.
    *
@@ -44,6 +55,11 @@ class DocControllStoreRequest extends FormRequest
       'invoice_type' => ['nullable', 'sometimes', Rule::in(Invoice::TYPES)],
       'required_at' => ['nullable', 'date'],
       'required_at_type' => ['string', Rule::in(['Before', 'After', 'On'])],
+      'signable' => ['required', 'boolean'],
+      'signatures_required' => ['nullable', 'integer', 'min:0'],
+      'stampable' => ['required', 'boolean'],
+      'stamps_required' => ['nullable', 'integer', 'min:0'],
+      'having_refrence_id' => ['required', 'boolean'],
     ];
 
     if($this->route()->getName() == 'admin.invoice-doc-controls.store'){

@@ -63,6 +63,10 @@ class ContractDocumentController extends Controller
     if ($document->is_expirable) {
       $data['expiry_date'] = $request->expiry_date;
     }
+
+    if ($document->having_refrence_id) {
+      $data['refrence_id'] = $request->refrence_id;
+    }
     $modelInstance->uploadedDocs()->create(
       [
         'uploader_id' => auth()->id(),

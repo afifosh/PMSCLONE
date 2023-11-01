@@ -38,14 +38,20 @@ class DocumentUploadRequest extends FormRequest
     if (!$document) {
       return $rules;
     }
+
     foreach ($document->fields as $i => $field) {
       $isRequired = ['nullable'];
       if ($field['is_required'])
         $isRequired = ['required'];
       $rules['fields.' . $field['id']] = array_merge($isRequired, $avail_rules[$field['type']]);
     }
+
     if ($document->is_expirable && $document->is_expiry_date_required) {
       $rules['expiry_date'] = ['required', 'date'];
+    }
+
+    if ($document->having_refrence_id) {
+      $rules['refrence_id'] = ['required', 'unique:uploaded_kyc_docs,refrence_id'];
     }
 
     return $rules;

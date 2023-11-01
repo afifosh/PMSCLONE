@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Contract;
 
+use App\DataTables\Admin\Company\UsersDataTable;
+use App\DataTables\Admin\Contract\DocSignaturesDataTable;
 use App\DataTables\Admin\Contract\UploadedDocsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contract\DocumentUploadRequest;
@@ -28,11 +30,36 @@ class UploadedDocumentController extends Controller
 
   public function show($model, UploadedKycDoc $uploadedDocument)
   {
-    $uploadedDocument->load('requestedDoc');
+    $uploadedDocument->load(['requestedDoc', 'versions' => function ($q) {
+      $q->select(['id', 'kyc_doc_id'])->orderBy('id', 'DESC');
+    }]);
+
     $data['document'] = $uploadedDocument->requestedDoc;
     $data['doc'] = $uploadedDocument;
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.uploaded-docs.show', $data)->render()]);
+    // if(request()->ajax())
+    //   return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.uploaded-docs.show', $data)->render()]);
+
+    if (request()->route()->getName() == 'admin.contracts.uploaded-documents.show') {
+      $data['contract'] =  Contract::findOrFail($model);
+    } else {
+      $data['invoice'] = Invoice::findOrFail($model);
+    }
+
+    $data['signaturesTable'] = new DocSignaturesDataTable();
+    $data['signaturesTable']->uploadedDoc = $uploadedDocument;
+
+    $data['stampsTable'] = new DocSignaturesDataTable();
+    $data['stampsTable']->uploadedDoc = $uploadedDocument;
+    $data['stampsTable']->is_signature = false;
+
+    if(request()->get('table') == 'stamps')
+      return $data['stampsTable']->render('admin.pages.contracts.uploaded-docs.show-signatures', $data);
+    if(request()->get('table') == 'signatures')
+      return $data['signaturesTable']->render('admin.pages.contracts.uploaded-docs.show-signatures', $data);
+
+
+    return view('admin.pages.contracts.uploaded-docs.show-doc', $data);
   }
 
   public function edit($model, UploadedKycDoc $uploadedDocument)

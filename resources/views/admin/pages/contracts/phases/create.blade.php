@@ -4,7 +4,7 @@
   </div>
   <div class="d-flex flex-column">
     <span class="fw-medium mb-1">{{ $contract->subject }}</span>
-    <small class="text-muted mb-1">{{ $contract->program->name }}</small>
+    <small class="text-muted mb-1">{{ $contract->program->name ?? 'N/A' }}</small>
     <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
   </div>
 </div>
@@ -67,7 +67,7 @@
     $selectedStageId = isset($stage->id) ? $stage->id : null;
     @endphp
     {!! Form::select('stage_id', $stages, $selectedStageId, ['class' => 'form-control select2', 'placeholder' => 'Select Stage']) !!}
-    
+
   </div>
   <div class="form-group col-6">
     {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
@@ -104,7 +104,7 @@
   <div class="form-group col-6">
     {{ Form::label('adjustment_amount', __('Adjustment Amount'), ['class' => 'col-form-label']) }}
     {!! Form::number('adjustment_amount', null, ['class' => 'form-control', 'placeholder' => __('Adjustment Amount')]) !!}
-  </div>  
+  </div>
   {{-- total cost --}}
   <div class="form-group col-6">
     {{ Form::label('total_cost', __('Total Cost'), ['class' => 'col-form-label']) }}

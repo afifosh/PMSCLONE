@@ -50,6 +50,12 @@
         <input type="date" name="expiry_date" value="{{@$doc['expiry_date'] ? date('Y-m-d', strtotime($doc['expiry_date'])) : ''}}" class="form-control flatpickr">
       </div>
     @endif
+    @if ($document->having_refrence_id)
+      <div class="form-group col-12 mt-2">
+        <label for="" class="required mb-2">{{__('Refrence Id :')}}</label>
+        <input type="text" name="refrence_id" value="{{@$doc['refrence_id']}}" class="form-control">
+      </div>
+    @endif
       <div class="col-12 d-flex justify-content-end">
         <button type="button" class="btn btn-primary" data-form="ajax-form"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Save</span></button>
       </div>

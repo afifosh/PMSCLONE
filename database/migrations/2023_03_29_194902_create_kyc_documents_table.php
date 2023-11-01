@@ -30,6 +30,9 @@ return new class extends Migration
       $table->json('fields')->nullable();
       $table->timestamp('required_at')->nullable();
       $table->enum('required_at_type', ['Before', 'After', 'On'])->default('Before');
+      $table->integer('signatures_required')->default(0);
+      $table->integer('stamps_required')->default(0);
+      $table->boolean('having_refrence_id')->default(false);
       $table->timestamps();
     });
   }

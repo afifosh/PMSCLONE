@@ -6,10 +6,11 @@ use App\Traits\Approval\CompanyApprovalBaseLogic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Comments\Models\Concerns\HasComments;
 
 class UploadedKycDoc extends Model
 {
-  use HasFactory, CompanyApprovalBaseLogic;
+  use HasFactory, CompanyApprovalBaseLogic, HasComments;
 
   protected $table = 'uploaded_kyc_docs';
 
@@ -20,6 +21,7 @@ class UploadedKycDoc extends Model
     'uploader_id',
     'uploader_type',
     'expiry_date',
+    'refrence_id'
   ];
 
   protected $casts = [
@@ -74,7 +76,41 @@ class UploadedKycDoc extends Model
   public function versions(): HasMany
   {
     return $this->hasMany($this::class, 'kyc_doc_id', 'kyc_doc_id')
-    ->whereColumn('uploaded_kyc_docs.doc_requestable_type', 'uploaded_kyc_docs.doc_requestable_type')
-    ->whereColumn('uploaded_kyc_docs.doc_requestable_id', 'uploaded_kyc_docs.doc_requestable_id');
+      ->whereColumn('uploaded_kyc_docs.doc_requestable_type', 'uploaded_kyc_docs.doc_requestable_type')
+      ->whereColumn('uploaded_kyc_docs.doc_requestable_id', 'uploaded_kyc_docs.doc_requestable_id');
+  }
+
+  /**
+   * Signatures for this document
+   */
+  public function signatures(): HasMany
+  {
+    return $this->hasMany(DocSignature::class)->where('is_signature', 1);
+  }
+
+  /**
+   * Stamps for this document
+   */
+  public function stamps(): HasMany
+  {
+    return $this->hasMany(DocSignature::class)->where('is_signature', 0);
+  }
+
+  /*
+ * This string will be used in notifications on what a new comment
+ * was made.
+ */
+  public function commentableName(): string
+  {
+    return 'Document: ' . $this->requestedDoc->title . ' Of ' . class_basename($this->doc_requestable_type);
+  }
+
+  /*
+* This URL will be used in notifications to let the user know
+* where the comment itself can be read.
+*/
+  public function commentUrl(): string
+  {
+    return '#';
   }
 }

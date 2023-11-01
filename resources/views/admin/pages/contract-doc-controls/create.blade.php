@@ -105,6 +105,57 @@
                           </div>
                         </div>
 
+                        {{-- signatures --}}
+                        <div class="col-12 my-2">
+                          <label class="switch">
+                            {{ Form::checkbox('signable', 1, $kyc_document->signatures_required > 0,['class' => 'switch-input'])}}
+                            <span class="switch-toggle-slider">
+                              <span class="switch-on"></span>
+                              <span class="switch-off"></span>
+                            </span>
+                            <span class="switch-label">Is signature required?</span>
+                          </label>
+                        </div>
+                        <div id="signable_c" style="{{$kyc_document->signatures_required > 0 ? '' : 'display:none'}}">
+                          <div class="form-group mb-2">
+                              <label class="required">{{ __('No. of Signatures:') }}</label>
+                              {!! Form::number('signatures_required', $kyc_document->signatures_required, ['class' => 'form-control', 'rows' => 2]) !!}
+                          </div>
+                        </div>
+                        {{-- end signatures --}}
+
+                        {{-- stamps --}}
+                        <div class="col-12 my-2">
+                          <label class="switch">
+                            {{ Form::checkbox('stampable', 1, $kyc_document->stamps_required > 0,['class' => 'switch-input'])}}
+                            <span class="switch-toggle-slider">
+                              <span class="switch-on"></span>
+                              <span class="switch-off"></span>
+                            </span>
+                            <span class="switch-label">Is stamp required?</span>
+                          </label>
+                        </div>
+                        <div id="stampable_c" style="{{$kyc_document->stamps_required > 0 ? '' : 'display:none'}}">
+                          <div class="form-group mb-2">
+                              <label class="required">{{ __('No. of Stamps:') }}</label>
+                              {!! Form::number('stamps_required', $kyc_document->stamps_required, ['class' => 'form-control', 'rows' => 2]) !!}
+                          </div>
+                        </div>
+                        {{-- end stamps --}}
+
+                        {{-- Having Refrence Id --}}
+                        <div class="col-12 my-2">
+                          <label class="switch">
+                            {{ Form::checkbox('having_refrence_id', 1, $kyc_document->having_refrence_id,['class' => 'switch-input'])}}
+                            <span class="switch-toggle-slider">
+                              <span class="switch-on"></span>
+                              <span class="switch-off"></span>
+                            </span>
+                            <span class="switch-label">Has refrence Id?</span>
+                          </label>
+                        </div>
+                        {{-- End Having Refrence Id --}}
+
                         <button class="btn btn-primary basicbtn float-right" data-form="ajax-form">
                             <i class="fas fa-save"></i>
                             {{ __('Save') }}
@@ -184,6 +235,12 @@
     <script>
       $(document).on('click', '[name="is_expirable"]', function() {
         $('#expirable_c').toggle();
+      });
+      $(document).on('click', '[name="signable"]', function() {
+        $('#signable_c').toggle();
+      });
+      $(document).on('click', '[name="stampable"]', function() {
+        $('#stampable_c').toggle();
       });
     </script>
 @endsection

@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin\Contract;
 
+use App\Models\Contract;
 use App\Models\UploadedKycDoc;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -33,10 +34,16 @@ class UploadedDocsDataTable extends DataTable
       ->addColumn('uploader', function ($doc) {
         return view('admin._partials.sections.user-info', ['user' => $doc->uploader]);
       })
+      ->editColumn('requested_doc.title', function ($doc) {
+        if($this->model instanceof Contract)
+          return '<a href="' . route('admin.contracts.uploaded-documents.show', [$this->model, $doc]) . '">' . htmlspecialchars($doc->requestedDoc->title, ENT_QUOTES, 'UTF-8') . '</a>';
+        else
+          return '<a href="' . route('admin.invoices.uploaded-documents.show', [$this->model, $doc]) . '">' . htmlspecialchars($doc->requestedDoc->title, ENT_QUOTES, 'UTF-8') . '</a>';
+      })
       ->orderColumn('status', function ($query, $order) {
         $query->orderBy('expiry_date', $order);
       })
-      ->rawColumns(['status']);
+      ->rawColumns(['status', 'requested_doc.title']);
   }
 
   /**

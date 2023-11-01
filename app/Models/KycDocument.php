@@ -26,7 +26,10 @@ class KycDocument extends Model
     'client_type',
     'invoice_type',
     'required_at',
-    'required_at_type' // Before, After, On
+    'required_at_type', // Before, After, On
+    'signatures_required',
+    'stamps_required',
+    'having_refrence_id'
   ];
 
   /**

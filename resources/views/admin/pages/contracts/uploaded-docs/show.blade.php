@@ -51,6 +51,6 @@
     </div>
   @endif
     <div class="col-12 d-flex justify-content-end">
-      <button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ __('Close') }}</button>
+      <button type="button" class="btn btn-primary {{isset($hide_close) ? 'd-none' : ''}}" data-bs-dismiss="modal">{{ __('Close') }}</button>
     </div>
 </div>
