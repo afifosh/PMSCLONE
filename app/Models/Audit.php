@@ -72,6 +72,16 @@ class Audit extends ModelsAudit
   
           // Beautify the field name
           $beautifiedField = ucwords(str_replace('_', ' ', $field));
+
+          // Checking for 'cost' or 'amount' in the field name (case-insensitive) and if the value is numeric and non-zero
+          if ((stripos($beautifiedField, 'Cost') !== false || stripos($beautifiedField, 'Amount') !== false)) {
+              if (is_numeric($newValue) && $newValue != 0) {
+                  $newValue /= 1000;
+              }
+              if (is_numeric($oldValue) && $oldValue != 0) {
+                  $oldValue /= 1000;
+              }
+          }          
           
           // Check if the value was changed or set for the first time
           if ($oldValue === null) {

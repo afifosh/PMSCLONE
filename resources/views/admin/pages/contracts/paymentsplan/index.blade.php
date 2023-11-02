@@ -150,6 +150,8 @@ $(document).ready(function() {
 
     function createChildTable(row, contractId) {
 
+
+    
         // Check if child table already exists, if so, destroy it
         var existingChildTable = $('#child-table-' + contractId).DataTable();
     if (existingChildTable) {
@@ -257,6 +259,7 @@ $(row.node()).next().after(contentRow);
                     { data: 'start_date', title: 'Start Date' },
                     { data: 'due_date', title: 'Due Date' },
                     { data: 'amount', title: 'Amount' },
+                    { data: "reviewed_by", "reviewed_by": "reviewed_by", title: 'Reviewed By' },
                     { data: 'status', title: 'Status' },
                     {
                         data: 'actions',
@@ -295,7 +298,10 @@ $(row.node()).next().after(contentRow);
                 initComplete: function() {
                     // Move the buttons container near the search bar
                    // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
-                }
+                }    ,drawCallback: function(settings) {
+                    $('[data-bs-toggle="tooltip"]').tooltip('dispose'); // Dispose of any existing tooltips to prevent potential issues
+        $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
+    }
             });
 
 
@@ -364,6 +370,12 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         $('#child-table-' + contractId).DataTable().ajax.reload();
     });
 });
+</script>
+<script>
+    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
 </script>
 @livewireScripts
 <x-comments::scripts />

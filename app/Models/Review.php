@@ -15,4 +15,10 @@ class Review extends Model
     {
         return $this->morphTo();
     }
+
+    // Adding this relationship
+    public function user() 
+    {
+        return $this->belongsTo(Admin::class);
+    }    
 }
