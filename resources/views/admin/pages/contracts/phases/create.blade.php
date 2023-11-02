@@ -63,6 +63,10 @@
     });
   }
 
+  $(document).ready(function () {
+        window.oURL = window.location.href;
+      });
+
   function reload_phase_activity(phase){
     var url = route('admin.projects.contracts.stages.phases.edit', {
       project: 'project',
