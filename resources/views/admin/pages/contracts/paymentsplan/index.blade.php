@@ -371,12 +371,6 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
     });
 });
 </script>
-<script>
-    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
 @livewireScripts
 <x-comments::scripts />
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

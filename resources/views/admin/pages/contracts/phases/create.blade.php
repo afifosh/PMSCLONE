@@ -17,6 +17,9 @@
         <li class="nav-item" onclick="reload_phase_activity({{$phase->id}})">
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-selected="false">Activities</button>
         </li>
+        <li class="nav-item" onclick="reload_phase_reviewers({{$phase->id}})">
+          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-reviewers" aria-selected="false">Reviewers</button>
+        </li>        
         <li class="nav-item" onclick="reload_phase_comments({{$phase->id}})">
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-selected="false">Comments</button>
         </li>
@@ -25,6 +28,9 @@
         <div class="tab-pane fade {{request()->tab == null || request()->tab == 'summary' ? 'show active' : ''}}" id="navs-top-summary" role="tabpanel">
           @include('admin.pages.contracts.phases.tab-summary')
         </div>
+        <div class="tab-pane fade {{request()->tab == null || request()->tab == 'reviewers' ? 'show active' : ''}}" id="navs-top-reviewers" role="tabpanel">
+          @include('admin.pages.contracts.phases.tab-reviewers')
+        </div>        
         <div class="tab-pane fade {{request()->tab == 'activities' ? 'show active' : ''}}" id="navs-top-activities" role="tabpanel">
         </div>
         <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments" role="tabpanel">
@@ -73,6 +79,24 @@
       }
     });
   }
+
+  function reload_phase_reviewers(phase){
+    var url = route('admin.projects.contracts.stages.phases.edit', {
+      project: 'project',
+      contract: 'contract',
+      stage: 'stage',
+      phase: phase,
+      tab: 'reviewers'
+    });
+    $.ajax({
+      url: url,
+      type: "GET",
+      success: function(data){
+        $('#navs-top-activities').html(data.data.view_data);
+      }
+    });
+  }
+
   $(document).on('change', '#cal-phase-end-date', function() {
     if ($(this).is(':checked')) {
       $('#end-date-cal-form').removeClass('d-none');
@@ -149,8 +173,10 @@
   {
     const estimatedCost = $('[name="estimated_cost"]').val();
     const adjustmentInputValue = $('[name="adjustment_amount"]').val();
-    const adjustmentAmount = adjustmentInputValue ? parseFloat(adjustmentInputValue) : 0;
+    let adjustmentAmount = $('[name="adjustment_amount"]').val();
+    adjustmentAmount = adjustmentInputValue ? parseFloat(adjustmentInputValue) : 0;
 
+    var totalTax = parseFloat(0);
     if (isNaN(adjustmentAmount)) {
         adjustmentAmount = 0;
     }
@@ -159,19 +185,27 @@
     if(estimatedCost && taxes){
       var percentagTax = 0;
       var fixedTax = 0;
+
       taxes.forEach(tax => {
         const taxAmount = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('amount');
         const taxType = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('type');
         if(taxType == 'Percent'){
           percentagTax += taxAmount;
+          console.log(percentagTax);
         }else{
           fixedTax += taxAmount;
         }
+        
       });
+
+      totalTax += (totalCost * percentagTax) / 100;
+      totalTax += fixedTax;   
+
       totalCost += (totalCost * percentagTax) / 100;
       totalCost += fixedTax;
+   
     }
-
+    $('[name="total_tax"]').val(totalTax.toFixed(3));
     // Incorporate the adjustment amount
     totalCost += adjustmentAmount;
 
