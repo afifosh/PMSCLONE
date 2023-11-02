@@ -69,13 +69,13 @@
           "name": "Artists",
           "icon": "menu-icon fas fa-building",
           "slug": "admin.artists.index"
-        },    
+        },
         {
           "url": "/admin/studios",
           "name": "Studios",
           "icon": "menu-icon fas fa-building",
           "slug": "admin.studios.index"
-        },          
+        },
         {
           "name": "Settings",
           "slug": ["admin.locations.index", "admin.mediums.index"],
@@ -124,7 +124,7 @@
 
 
 
-    
+
     {
       "url": "/admin/programs",
       "name": "Programs",
@@ -172,7 +172,7 @@
           "url": "/admin/contracts/paymentsplan",
           "name": "Payments Plan",
           "slug": "admin.contracts.paymentsplan"
-        },        
+        },
         {
           "url": "/admin/projects/gantt-chart",
           "name": "Gantt Chart",
@@ -206,7 +206,7 @@
               "url": "/admin/contract-doc-controls",
               "name": "Document Controls",
               "slug": "admin.contract-doc-controls.index"
-            }          
+            }
           ]
         }
       ]
@@ -214,7 +214,7 @@
     {
       "name": "Finances",
       "slug": ["admin.finances.", "admin.invoices.", "admin.invoice-doc-controls."],
-      "icon": "menu-icon tf-icons ti ti-settings",
+      "icon": "menu-icon tf-icons ti ti-coin",
       "submenu": [
         {
           "url": "/admin/finances/financial-years",
@@ -262,6 +262,12 @@
           "slug": "admin.invoices.document-stats.index"
         }
       ]
+    },
+    {
+      "url": "/admin/private-notes",
+      "name": "Notes",
+      "icon": "menu-icon tf-icons ti ti-notes",
+      "slug": "admin.private-notes.index"
     },
     {
       "url": "/admin/app/settings",
