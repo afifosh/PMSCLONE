@@ -20,7 +20,7 @@
     {!! Form::select('stage_id', $stages, $selectedStageId, ['class' => 'form-control select2', 'placeholder' => 'Select Stage']) !!}
 
   </div>
-  <div class="form-group col-6">
+  <div class="form-group col-12">
     {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
     <div class="dropdown open d-inline">
       <span data-bs-toggle="dropdown" aria-haspopup="true">
@@ -51,6 +51,11 @@
       @endforelse
     </select>
   </div>
+  {{-- total Tax Value --}}
+  <div class="form-group col-6">
+    {{ Form::label('total_tax', __('Tax Value'), ['class' => 'col-form-label']) }}
+    {!! Form::number('total_tax', null, ['class' => 'form-control', 'placeholder' => __('Tax Value'), 'disabled'])!!}
+  </div>  
   <!-- New adjustment amount field -->
   <div class="form-group col-6">
     {{ Form::label('adjustment_amount', __('Adjustment Amount'), ['class' => 'col-form-label']) }}

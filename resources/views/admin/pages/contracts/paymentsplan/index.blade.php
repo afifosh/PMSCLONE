@@ -97,20 +97,19 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
-
     <script>
-        function togglePhaseCompleteness(buttonElement) {
+        function togglePhaseReviewStatus(buttonElement) {
             // Extract data attributes
             const contractId = buttonElement.getAttribute('data-contract-id');
             const phaseId = buttonElement.getAttribute('data-phase-id');
-            const isComplete = buttonElement.getAttribute('data-is-complete') === 'true';
-
-            // Use Blade to generate the base URL, then use JavaScript to dynamically append the rest
-            const baseURL = "{{ url('admin/contracts/paymentsplan/') }}";
-            const url = isComplete ?
-                `${baseURL}/${contractId}/phases/${phaseId}/mark-incomplete` :
-                `${baseURL}/${contractId}/phases/${phaseId}/mark-complete`;
-
+            const isReviewed = buttonElement.getAttribute('data-is-reviewed') === 'true';
+    
+            // Using the route function to dynamically generate the URL
+            const url = route('admin.contracts.phases.toggle-review', {
+                contract_id: contractId,
+                phase_id: phaseId
+            });
+    
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -121,27 +120,31 @@ $configData = Helper::appClasses();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Toggle the button text and data attribute for next action
-                    // Toggle the button text and class for next action
-                    const newText = isComplete ? 'MARK AS COMPLETE' : 'MARK AS INCOMPLETE';
-                    const newClass = isComplete ? 'btn-label-secondary' : 'btn-label-danger';
+                    // Use the review status from the server response
+                    const isReviewedFromResponse = data.data.isReviewed;
 
+                    // Determine the button text and class based on the review status from the server response
+                    const newText = isReviewedFromResponse ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
+                    const newClass = isReviewedFromResponse ? 'btn-label-danger' : 'btn-label-secondary';
+
+                    // Update the button's text, data attribute, and class
                     buttonElement.textContent = newText;
-                    buttonElement.setAttribute('data-is-complete', !isComplete);
+                    buttonElement.setAttribute('data-is-reviewed', isReviewedFromResponse);
                     buttonElement.classList.remove('btn-label-secondary', 'btn-label-danger');
-            buttonElement.classList.add(newClass);
+                    buttonElement.classList.add(newClass);
                     toast_success(data.message)
                 } else {
-                    alert('Error toggling completion state.');
+                    alert('Error toggling review status.');
                     toast_danger(data.message)
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                toast_danger(data.message)
+                toast_danger('An unexpected error occurred.')
             });
         }
-        </script>
+    </script>
+
 
  <script>
 $(document).ready(function() {
@@ -150,6 +153,8 @@ $(document).ready(function() {
 
     function createChildTable(row, contractId) {
 
+
+    
         // Check if child table already exists, if so, destroy it
         var existingChildTable = $('#child-table-' + contractId).DataTable();
     if (existingChildTable) {
@@ -226,7 +231,7 @@ $(row.node()).next().after(contentRow);
     $('#stages-table-' + contractId).DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/stages",
+        ajax: route('admin.contracts.paymentsplan.stages', { contract_id: contractId }),
         columns: [
             // Define your stages columns here. I'm making some assumptions. Adjust accordingly.
             { data: "name", "name": "contract_stages.name", title: 'Stage Name' },
@@ -250,13 +255,14 @@ $(row.node()).next().after(contentRow);
     $('#' + childTableId).DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ url('admin/contracts/paymentsplan/') }}/" + contractId + "/phases",
+                ajax: route('admin.contracts.paymentsplan.phases', { contract_id: contractId }),
                 columns: [
                     { data: "stage_name", "name": "stage_name", title: 'Stage Name' },
                     { data: 'name', title: 'Phase Name' },
                     { data: 'start_date', title: 'Start Date' },
                     { data: 'due_date', title: 'Due Date' },
                     { data: 'amount', title: 'Amount' },
+                    { data: "reviewed_by", "reviewed_by": "reviewed_by", title: 'Reviewed By' },
                     { data: 'status', title: 'Status' },
                     {
                         data: 'actions',
@@ -295,7 +301,10 @@ $(row.node()).next().after(contentRow);
                 initComplete: function() {
                     // Move the buttons container near the search bar
                    // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
-                }
+                }    ,drawCallback: function(settings) {
+                    $('[data-bs-toggle="tooltip"]').tooltip('dispose'); // Dispose of any existing tooltips to prevent potential issues
+        $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
+    }
             });
 
 

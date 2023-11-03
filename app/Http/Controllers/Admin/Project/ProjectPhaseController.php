@@ -93,7 +93,7 @@ class ProjectPhaseController extends Controller
     $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
 
     $userHasMarkedComplete = $phase->reviews->contains('user_id', auth()->id());
-    $buttonLabel = $userHasMarkedComplete ? 'MARK AS INCOMPLETE' : 'MARK AS COMPLETE';
+    $buttonLabel = $userHasMarkedComplete ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
     $buttonIcon = $userHasMarkedComplete ? 'ti-undo' : 'ti-bell';
     $reviewStatus = $userHasMarkedComplete ? 'true' : 'false';
     $buttonLabelClass = $userHasMarkedComplete ? 'btn-label-danger' : 'btn-label-secondary';
@@ -105,8 +105,8 @@ class ProjectPhaseController extends Controller
                 class="me-4 btn btn-sm rounded-pill ' . $buttonLabelClass . ' waves-effect"
                 data-phase-id="' . $phase->id . '"
                 data-contract-id="' . $contract->id . '"
-                data-is-complete="' . $reviewStatus . '"
-                onclick="togglePhaseCompleteness(this)">
+                data-is-reviewed="' . $reviewStatus . '"
+                onclick="togglePhaseReviewStatus(this)">
             <span class="ti-xs ti ' . $buttonIcon . ' me-1"></span>' . $buttonLabel . '
         </button>
         <button type="button" data-bs-dismiss="modal" aria-label="Close" class="btn-close"></button>
@@ -163,7 +163,7 @@ class ProjectPhaseController extends Controller
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
-    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table']);
   }
 
   public function destroy($project, Contract $contract, $stage, ContractPhase $phase)

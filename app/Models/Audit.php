@@ -61,8 +61,59 @@ class Audit extends ModelsAudit
   
       return implode(' ', $capitalizedWords);
   }
-  
+
   public function renderFieldAudit(): string
+  {
+      $messages = [];
+  
+      // Beautify the field name
+      $beautifyFieldName = function($field) {
+          return ucwords(str_replace('_', ' ', $field));
+      };
+  
+      // Handle the audit log based on the event type
+      switch ($this->event) {
+          case 'created':
+              foreach ($this->new_values as $field => $newValue) {
+                  $beautifiedField = $beautifyFieldName($field);
+                  $messages[] = 'Set <span class="mb-1 badge bg-label-secondary text-wrap text-start d-inline-block">' . $beautifiedField . '</span> to <span class="mb-1 badge bg-label-success text-wrap text-start d-inline-block">' . $newValue . '</span>';
+              }
+              break;
+  
+          case 'updated':
+              foreach ($this->old_values as $field => $oldValue) {
+                  $newValue = data_get($this->new_values, $field);
+                  $beautifiedField = $beautifyFieldName($field);
+  
+                  // Check for 'cost' or 'amount' and adjust values
+                  if (stripos($beautifiedField, 'Cost') !== false || stripos($beautifiedField, 'Amount') !== false) {
+                      if (is_numeric($newValue) && $newValue != 0) {
+                          $newValue /= 1000;
+                      }
+                      if (is_numeric($oldValue) && $oldValue != 0) {
+                          $oldValue /= 1000;
+                      }
+                  }
+  
+                  if ($oldValue === null) {
+                      $messages[] = 'Set <span class="mb-1 badge bg-label-secondary text-wrap text-start d-inline-block">' . $beautifiedField . '</span> to <span class="mb-1 badge bg-label-success text-wrap text-start d-inline-block">' . $newValue . '</span>';
+                  } else if ($oldValue != $newValue) {
+                      $messages[] = 'Changed <span class="mb-1 badge bg-label-secondary text-wrap text-start d-inline-block">' . $beautifiedField . '</span> from <span class="mb-1 badge bg-label-danger text-decoration-line-through text-wrap text-start d-inline-block">' . $oldValue . '</span> to <span class="mb-1 badge bg-label-success text-wrap text-start d-inline-block">' . $newValue . '</span>';
+                  }
+              }
+              break;
+  
+          // Add cases for other potential event types here
+  
+          default:
+              // Handle or log unexpected event types if necessary
+              break;
+      }
+  
+      return implode('<br>', $messages);
+  }
+    
+  public function renderFieldAuditsss(): string
   {
       $auditData = $this->old_values;
       
@@ -72,6 +123,16 @@ class Audit extends ModelsAudit
   
           // Beautify the field name
           $beautifiedField = ucwords(str_replace('_', ' ', $field));
+
+          // Checking for 'cost' or 'amount' in the field name (case-insensitive) and if the value is numeric and non-zero
+          if ((stripos($beautifiedField, 'Cost') !== false || stripos($beautifiedField, 'Amount') !== false)) {
+              if (is_numeric($newValue) && $newValue != 0) {
+                  $newValue /= 1000;
+              }
+              if (is_numeric($oldValue) && $oldValue != 0) {
+                  $oldValue /= 1000;
+              }
+          }          
           
           // Check if the value was changed or set for the first time
           if ($oldValue === null) {

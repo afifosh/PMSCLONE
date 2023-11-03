@@ -195,24 +195,100 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('programs.payments', PaymentController::class);
     Route::resource('doc-signatures', SignatureController::class);
 
-    Route::prefix('contracts')->group(function () {
-      Route::get('paymentsplan',  [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
-      // You can add more routes specific to contracts here
-      Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
-      Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
+    // Route::prefix('contracts')->group(function () {
+    //   Route::get('paymentsplan',  [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
+    //   // You can add more routes specific to contracts here
+    //   Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
+    //   Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
 
-      // Add the new route for paymentsplans with a specific contract id
-      Route::get('paymentsplan/{contract_id}/phases', [ContractController::class, 'ContractPaymentsPlanPhases'])->name('contracts.paymentsplan.phases');
-      Route::get('paymentsplan/{contract_id}/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
-      //Route::get('{contract_id}/paymentsplan', [ContractController::class, 'SpecificContractPaymentsPlan'])->name('contracts.specific.paymentsplan');
+    //   // Add the new route for paymentsplans with a specific contract id
+    //   Route::get('paymentsplan/{contract_id}/phases', [ContractController::class, 'ContractPaymentsPlanPhases'])->name('contracts.paymentsplan.phases');
+    //   Route::get('paymentsplan/{contract_id}/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
+    //   //Route::get('{contract_id}/paymentsplan', [ContractController::class, 'SpecificContractPaymentsPlan'])->name('contracts.specific.paymentsplan');
 
-      // Route to mark a phase as complete
-      Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-complete', [ContractController::class, 'markPhaseAsComplete'])->name('contracts.phases.complete');
-      // Route to mark a phase as incomplete
-      Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-incomplete', [ContractController::class, 'markPhaseAsIncomplete'])->name('contracts.phases.incomplete');
+    //   // Route to mark a phase as complete
+    //   Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-complete', [ContractController::class, 'markPhaseAsComplete'])->name('contracts.phases.complete');
+    //   // Route to mark a phase as incomplete
+    //   Route::post('paymentsplan/{contract_id}/phases/{phase_id}/mark-incomplete', [ContractController::class, 'markPhaseAsIncomplete'])->name('contracts.phases.incomplete');
 
 
-    });
+    // });
+
+  //   Route::prefix('contracts')->group(function () {
+  //     // Your existing general contract routes here
+  //     Route::get('paymentsplan', [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
+  //     Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
+  //     Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
+      
+  //     // Grouped routes for payment plans with contract_id constraint
+  //     Route::prefix('paymentsplan/{contract_id}')->where(['contract_id' => '[0-9]+'])->group(function () {
+  //         // Route for a contract's payment plan details
+  //         Route::get('/', [ContractController::class, 'SpecificContractPaymentsPlan'])->name('contracts.specific.paymentsplan');
+          
+  //         // Route for phases of a specific contract's payment plan
+  //         Route::get('/phases', [ContractController::class, 'ContractPaymentsPlanPhases'])->name('contracts.paymentsplan.phases');
+  
+  //         // Route for stages of a specific contract's payment plan
+  //         Route::get('/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
+  
+  //         // Phase actions
+  //         Route::post('/phases/{phase_id}/mark-complete', [ContractController::class, 'markPhaseAsComplete'])->name('contracts.phases.complete')->where('phase_id', '[0-9]+');
+  //         Route::post('/phases/{phase_id}/mark-incomplete', [ContractController::class, 'markPhaseAsIncomplete'])->name('contracts.phases.incomplete')->where('phase_id', '[0-9]+');
+  
+  //         // Specific phase tab routes with phase_id constraint
+  //         Route::prefix('/phase/{phase_id}')->where(['phase_id' => '[0-9]+'])->group(function () {
+  //             Route::get('/reviewers', [PhaseController::class, 'reviewersTabContent'])->name('phases.reviewers');
+  //             Route::get('/comments', [PhaseController::class, 'commentsTabContent'])->name('phases.comments');
+  //             Route::get('/activity', [PhaseController::class, 'activityTabContent'])->name('phases.activity');
+  //             // ... add more routes for each tab as needed
+  //         });
+  //     });
+  // });
+
+  
+// Prefix for all contract-related routes
+Route::prefix('contracts')->group(function () {
+    
+  // General contract routes
+  Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
+  Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
+  Route::get('paymentsplan', [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
+  // Specific contract routes with contract_id constraint
+  Route::prefix('{contract_id}')->where(['contract_id' => '[0-9]+'])->group(function () {
+      
+      // Details of a specific contract
+      // Route::get('/', [ContractController::class, 'show'])->name('contracts.show');
+
+      // Payment plan and its sub-resources for a specific contract
+      Route::group(['prefix' => 'paymentsplan'], function () {
+          
+          // Route for a contract's payment plan details
+          Route::get('/', [ContractController::class, 'SpecificContractPaymentsPlan'])->name('contracts.specific.paymentsplan');
+
+          // Route for the phases of a contract's payment plan
+          Route::get('/phases', [ContractController::class, 'ContractPaymentsPlanPhases'])->name('contracts.paymentsplan.phases');
+
+          // Route for the stages of a contract's payment plan
+          Route::get('/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
+      });
+
+      // Routes for actions on phases
+      Route::prefix('phases/{phase_id}')->where(['phase_id' => '[0-9]+'])->group(function () {
+          // Route::post('/mark-complete', [ContractController::class, 'markPhaseAsComplete'])->name('contracts.phases.mark-complete');
+          // Route::post('/mark-incomplete', [ContractController::class, 'markPhaseAsIncomplete'])->name('contracts.phases.mark-incomplete');
+          // Single route to toggle the review status of a phase
+          Route::post('/toggle-review', [ContractController::class, 'togglePhaseReviewStatus'])->name('contracts.phases.toggle-review');
+
+          // Dynamic content loading for each phase tab
+          Route::get('/reviewers', [PhaseController::class, 'reviewersTabContent'])->name('phases.reviewers');
+          Route::get('/comments', [PhaseController::class, 'commentsTabContent'])->name('phases.comments');
+          Route::get('/activity', [PhaseController::class, 'activityTabContent'])->name('phases.activity');
+          // ... additional routes for each tab as needed
+      });
+  });
+  // ... other non-contract-specific routes
+});
+
 
 
     Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');

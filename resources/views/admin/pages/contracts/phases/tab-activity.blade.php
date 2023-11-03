@@ -2,7 +2,7 @@
   <ul class="timeline mb-0">
       @foreach($contractAudits as $audit)
       <li class="timeline-item timeline-item-transparent">
-          <span class="timeline-point {{ $audit->event == 'created' ? 'timeline-point-success' : ($audit->event == 'updated' ? 'timeline-point-primary' : 'timeline-point-danger') }}"></span>
+          <span class="timeline-point {{ $audit->event == 'created' ? 'timeline-point-success' : ($audit->event == 'updated' ? 'timeline-point-warning' : 'timeline-point-danger') }}"></span>
           <div class="timeline-event">
               <div class="timeline-header border-bottom mb-3">
                   <h6 class="mb-0">{{ $audit->created_at->format('jS F Y') }}</h6>
