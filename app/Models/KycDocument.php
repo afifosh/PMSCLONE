@@ -29,7 +29,8 @@ class KycDocument extends Model
     'required_at_type', // Before, After, On
     'signatures_required',
     'stamps_required',
-    'having_refrence_id'
+    'having_refrence_id',
+    'is_global'
   ];
 
   /**

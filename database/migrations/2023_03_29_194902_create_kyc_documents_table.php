@@ -33,6 +33,7 @@ return new class extends Migration
       $table->integer('signatures_required')->default(0);
       $table->integer('stamps_required')->default(0);
       $table->boolean('having_refrence_id')->default(false);
+      $table->boolean('is_global')->default(false)->comment('global will be shared between all invoices of same contract');
       $table->timestamps();
     });
   }

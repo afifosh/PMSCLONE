@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
+@livewireStyles
+<x-comments::styles />
 @endsection
 
 @section('page-style')
@@ -188,5 +190,11 @@ function toggleCheckboxes(){
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    <script>
+      window.oURL = window.location.href;
+    </script>
+    @livewireScripts
+    <x-comments::scripts />
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endpush
 

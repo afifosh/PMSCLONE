@@ -22,27 +22,29 @@ const tabActions = {
 /***
  *  Echo listen fo contract updates
  **/
-Echo.join(`contracts.${activeContractId}`)
-    .here((users) => {
-      for (let index = 0; index < users.length; index++) {
-        const user = users[index];
+if(activeContractId) {
+  Echo.join(`contracts.${activeContractId}`)
+      .here((users) => {
+        for (let index = 0; index < users.length; index++) {
+          const user = users[index];
+          contractViewingUsers[user.id] = user;
+        }
+        updateViewingUsers(contractViewingUsers);
+      })
+      .joining((user) => {
         contractViewingUsers[user.id] = user;
-      }
-      updateViewingUsers(contractViewingUsers);
-    })
-    .joining((user) => {
-      contractViewingUsers[user.id] = user;
-      updateViewingUsers(contractViewingUsers);
-    })
-    .leaving((user) => {
-      delete contractViewingUsers[user.id];
-      updateViewingUsers(contractViewingUsers);
-    })
-    .listen('.contract-updated', e => {
-      if(e.modifiedTab == activeContractTab){
-        tabActions[activeContractTab]();
-      }
-    });
+        updateViewingUsers(contractViewingUsers);
+      })
+      .leaving((user) => {
+        delete contractViewingUsers[user.id];
+        updateViewingUsers(contractViewingUsers);
+      })
+      .listen('.contract-updated', e => {
+        if(e.modifiedTab == activeContractTab){
+          tabActions[activeContractTab]();
+        }
+      });
+}
 
 /***
  * Update the users viewing contract
@@ -189,6 +191,7 @@ function whisperForPhaseEditing()
               name: $('#globalModal #phase-update-form [name="name"]').val(),
               estimated_cost: $('#globalModal #phase-update-form [name="estimated_cost"]').val(),
               'phase_taxes[]': $('#globalModal #phase-update-form [name="phase_taxes[]"]').val(),
+              adjustment_amount: $('#globalModal #phase-update-form [name="adjustment_amount"]').val(),
               total_cost: $('#globalModal #phase-update-form [name="total_cost"]').val(),
               start_date: $('#globalModal #phase-update-form [name="start_date"]').val(),
               due_date: $('#globalModal #phase-update-form [name="due_date"]').val(),

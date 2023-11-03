@@ -84,7 +84,8 @@ class UploadedDocumentController extends Controller
     } else {
       $modelInstance = Invoice::findOrFail($model);
     }
-    $document = $modelInstance->requestedDocs()->findOrFail($request->document_id);
+
+    $document = $uploadedDocument->kycDoc;
 
     if ($document) {
       $final_fields = [];

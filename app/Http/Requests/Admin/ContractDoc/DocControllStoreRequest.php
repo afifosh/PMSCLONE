@@ -25,6 +25,7 @@ class DocControllStoreRequest extends FormRequest
       'signatures_required' =>  $this->signable ? $this->signatures_required ?? 0 : 0,
       'stamps_required' => $this->stampable ? $this->stamps_required ?? 0 : 0,
       'having_refrence_id' => $this->boolean('having_refrence_id'),
+      'is_global' => $this->boolean('is_global') && ($this->route()->getName() == 'admin.invoice-doc-controls.store' || $this->route()->getName() == 'admin.invoice-doc-controls.update'),
     ]);
   }
 
@@ -62,9 +63,10 @@ class DocControllStoreRequest extends FormRequest
       'having_refrence_id' => ['required', 'boolean'],
     ];
 
-    if($this->route()->getName() == 'admin.invoice-doc-controls.store'){
+    if($this->route()->getName() == 'admin.invoice-doc-controls.store' || $this->route()->getName() == 'admin.invoice-doc-controls.update'){
       $rules['contract_ids'] = ['nullable', 'array'];
       $rules['contract_ids.*'] = ['nullable', 'exists:contracts,id'];
+      $rules['is_global'] = ['required', 'boolean'];
     }
 
     return $rules;

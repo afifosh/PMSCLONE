@@ -156,6 +156,21 @@
                         </div>
                         {{-- End Having Refrence Id --}}
 
+                        @if(request()->route()->getName() == 'admin.invoice-doc-controls.create' || request()->route()->getName() == 'admin.invoice-doc-controls.edit' )
+                          {{-- is Global --}}
+                          <div class="col-12 my-2">
+                            <label class="switch">
+                              {{ Form::checkbox('is_global', 1, $kyc_document->is_global,['class' => 'switch-input'])}}
+                              <span class="switch-toggle-slider">
+                                <span class="switch-on"></span>
+                                <span class="switch-off"></span>
+                              </span>
+                              <span class="switch-label">Is Global?</span>
+                            </label>
+                          </div>
+                          {{-- End is Global --}}
+                        @endif
+
                         <button class="btn btn-primary basicbtn float-right" data-form="ajax-form">
                             <i class="fas fa-save"></i>
                             {{ __('Save') }}

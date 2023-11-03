@@ -3,6 +3,7 @@
 namespace App\DataTables\Admin\Contract;
 
 use App\Models\Contract;
+use App\Models\Invoice;
 use App\Models\UploadedKycDoc;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -35,7 +36,7 @@ class UploadedDocsDataTable extends DataTable
         return view('admin._partials.sections.user-info', ['user' => $doc->uploader]);
       })
       ->editColumn('requested_doc.title', function ($doc) {
-        if($this->model instanceof Contract)
+        if ($this->model instanceof Contract)
           return '<a href="' . route('admin.contracts.uploaded-documents.show', [$this->model, $doc]) . '">' . htmlspecialchars($doc->requestedDoc->title, ENT_QUOTES, 'UTF-8') . '</a>';
         else
           return '<a href="' . route('admin.invoices.uploaded-documents.show', [$this->model, $doc]) . '">' . htmlspecialchars($doc->requestedDoc->title, ENT_QUOTES, 'UTF-8') . '</a>';
@@ -51,7 +52,22 @@ class UploadedDocsDataTable extends DataTable
    */
   public function query(UploadedKycDoc $model): QueryBuilder
   {
-    $uniqueId = UploadedKycDoc::where('doc_requestable_type', $this->model::class)->where('doc_requestable_id', $this->model->id)
+    $uniqueId = UploadedKycDoc::where(function ($q) {
+      $q->where('doc_requestable_type', $this->model::class)
+        ->where('doc_requestable_id', $this->model->id);
+    })
+      ->when($this->model::class == Invoice::class, function ($q) {
+        $q->orWhere(function ($q) {
+          $q->whereHas('kycDoc', function ($q) {
+            $q->where('is_global', true);
+          })
+            ->whereHasMorph('docRequestable', [$this->model::class], function ($q) {
+              $q->whereHas('contract', function ($q) {
+                $q->where('id', $this->model->contract_id);
+              });
+            });
+        });
+      })
       ->selectRaw('MAX(id) as id')
       ->groupBy('kyc_doc_id')
       ->pluck('id')->toArray();

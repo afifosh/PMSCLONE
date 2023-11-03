@@ -192,5 +192,39 @@ class KycDocumentSeeder extends Seeder
             }
         ]', true),
     ]);
+
+    KycDocument::create([
+      'workflow' => 'Invoice Required Docs',
+      'title' => 'Contract Agreement',
+      'required_from' => 0, // from other workflow not related to contract but required for consistency
+      'client_type' => 'Both',
+      'status' => 1,
+      'description' => 'Contract Agreement Info',
+      'is_expirable' => 1,
+      'is_mendatory' => 1,
+      'expiry_date_title' => 'Expiry Date',
+      'is_expiry_date_required' => 1,
+      'is_global' => 1,
+      'fields' => json_decode('[
+            {
+                "id": "in643a3774c50",
+                "type": "text",
+                "label": "Agreement Number",
+                "is_required": "1"
+            },
+            {
+                "id": "in643a3774c51",
+                "type": "date",
+                "label": "Agreement Date",
+                "is_required": "1"
+            },
+            {
+                "id": "in643a3774c52",
+                "type": "file",
+                "label": "Agreement Certificate",
+                "is_required": "1"
+            }
+        ]', true),
+    ]);
   }
 }

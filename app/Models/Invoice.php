@@ -257,10 +257,10 @@ class Invoice extends Model
     $downpayment_before_tax = $this->downPayments()->wherePivot('is_after_tax', 0)->sum('amount') / 1000;
 
     $total = $subtotal
-    - $this->discount_amount
-    - $downpayment_before_tax
-    + $this->total_tax // add total tax. It is calculated in updateTaxAmount() method
-    + $this->adjustment_amount; // adjustment amount can be negative or positive depending on the user input
+      - $this->discount_amount
+      - $downpayment_before_tax
+      + $this->total_tax // add total tax. It is calculated in updateTaxAmount() method
+      + $this->adjustment_amount; // adjustment amount can be negative or positive depending on the user input
 
     $retention_amount = $this->calRetentionAmount($total, $subtotal);
 
@@ -379,8 +379,9 @@ class Invoice extends Model
   /**
    * Calculate retention amount
    */
-  private function calRetentionAmount($total, $subtotal){
-    if($this->retention_percentage){
+  private function calRetentionAmount($total, $subtotal)
+  {
+    if ($this->retention_percentage) {
       return (($this->is_retention_before_tax ? $subtotal : $total)  * $this->retention_percentage) / 100;
     }
 
@@ -389,7 +390,7 @@ class Invoice extends Model
 
   public function reCalculateRetention(): void
   {
-    if($this->retention_percentage){
+    if ($this->retention_percentage) {
       $data['retention_amount'] = (($this->is_retention_before_tax ? $this->subtotal : $this->total)  * $this->retention_percentage) / 100;
       $this->update($data);
     }
@@ -432,7 +433,7 @@ class Invoice extends Model
   private function avgTaxFreeAmount()
   {
     $count = ($this->type == 'Regular' ? $this->phaseItems()->count() : $this->customItems()->count());
-    if($count == 0)
+    if ($count == 0)
       return 0;
 
     return $this->netTaxFreeAmount() / $count;
@@ -540,11 +541,32 @@ class Invoice extends Model
     }
   }
 
+  /**
+   * All the documents which are uploaded against this invoice (Both global and non global)
+   */
   public function uploadedDocs()
   {
-    return $this->morphMany(UploadedKycDoc::class, 'doc_requestable');
+    return $this->morphMany(UploadedKycDoc::class, 'doc_requestable')->where(function ($q) {
+      $q->whereHas('kycDoc', function ($q) {
+        $q->where('is_global', false);
+      });
+    })
+      // Global docs which are uploaded against this invoice
+      ->orWhere(function ($q) {
+        $q->whereHas('kycDoc', function ($q) {
+          $q->where('is_global', true);
+        })
+          ->whereHasMorph('docRequestable', [Invoice::class], function ($q) {
+            $q->whereHas('contract', function ($q) {
+              $q->where('id', $this->contract_id);
+            });
+          });
+      });
   }
 
+  /**
+   * All the documents which are requested to upload against this invoice (Both global and non global)
+   */
   public function requestedDocs()
   {
     return KycDocument::where('status', 1) // active
@@ -592,12 +614,26 @@ class Invoice extends Model
       });
   }
 
+  /**
+   * Documents which are requested to upload against this invoice but not uploaded yet or expired (Both global and non global)
+   */
   public function pendingDocs()
   {
     return $this->requestedDocs()
-      ->whereDoesntHave('uploadedDocs', function ($q) { // filter by uploaded docs
-        $q->where('doc_requestable_id', $this->id)
-          ->where('doc_requestable_type', $this::class)
+      ->whereDoesntHave('uploadedDocs', function ($q) { // filter out by uploaded docs
+        $q->where(function ($q) {
+          $q->where('doc_requestable_id', $this->id)
+            ->where('doc_requestable_type', $this::class)
+            // Exclude global docs which are uploaded in any other invoice of contract of this invoice
+            ->orWhere(function ($q) {
+              $q->whereHasMorph('docRequestable', [Invoice::class], function ($q) {
+                $q->where('contract_id', $this->contract_id);
+              })->whereHas('kycDoc', function ($q) {
+                $q->where('is_global', true);
+              });
+            });
+        })
+        // Exclude docs which are active and not expired
           ->where(function ($q) {
             $q->whereNull('expiry_date')
               ->orWhere('expiry_date', '>=', today());

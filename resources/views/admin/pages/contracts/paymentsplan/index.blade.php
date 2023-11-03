@@ -365,6 +365,22 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
     });
 });
 </script>
+
+{{-- Real Time Editing Scripts --}}
+<script>
+  /***
+   * Variables used in this file
+   **/
+  var activeContractId = "";
+  var activeContractTab = "";
+  var contractViewingUsers = [];
+  var stageEditingUsers = [];
+  var phaseEditingUsers = [];
+  var disablePhaseWhisper = false;
+  window.oURL = window.location.href;
+</script>
+<script src="{{asset('assets/js/custom/contracts-realtime-updates.js')}}"></script>
+{{-- End Real Time Editing Scripts --}}
 @livewireScripts
 <x-comments::scripts />
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

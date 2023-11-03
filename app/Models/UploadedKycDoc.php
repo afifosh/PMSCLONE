@@ -65,7 +65,7 @@ class UploadedKycDoc extends Model
 
   public function docRequestable()
   {
-    return $this->morphTo('doc_requestable', 'doc_requestable_id', 'doc_requestable_type');
+    return $this->morphTo('doc_requestable', 'doc_requestable_type', 'doc_requestable_id');
   }
 
   public function uploader()
