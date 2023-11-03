@@ -64,7 +64,7 @@ class ResourceSearchController extends Controller
         'search' => 'name',
         'select' => [DB::raw("CONCAT(UCASE(LEFT(name, 1)), LCASE(SUBSTRING(name, 2))) as text"), 'id'],
         'dependent_column' => 'medium_id'
-      ],      
+      ],
       'AccountBalance' => [
         'search' => 'name',
         'select' => ['name as text', 'id'],
@@ -74,8 +74,8 @@ class ResourceSearchController extends Controller
       ],
       'ContractPhase' => [
         'search' => 'name',
-        'select' => ['name as text', 'id'],
-        'dependent_column' => 'contract_id'
+        'select' => ['contract_phases.name as text', 'contract_phases.id'],
+        'dependent_column' => 'contract_phases.contract_id'
       ],
       'Currency' => []
     ];
