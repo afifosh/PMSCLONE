@@ -1,11 +1,11 @@
 @if ($phase->id)
-    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.update', ['project' => 'project', 'contract' => $contract, 'phase' => $phase->id, 'stage' => $stage]],
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.update', ['project' => 'project', 'contract' => $contract, 'phase' => $phase->id, 'stage' => $stage, 'tableId' => request()->tableId]],
       'method' => 'PUT',
       'id' => 'phase-update-form',
       'data-phase-id' => $phase->id,
     ]) !!}
 @else
-    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.store',  ['project' => 'project', 'contract' => $contract, 'stage' => $stage]], 'method' => 'POST']) !!}
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.store',  ['project' => 'project', 'contract' => $contract, 'stage' => $stage, 'tableId' => request()->tableId]], 'method' => 'POST']) !!}
 @endif
 <div class="row rr-single">
   <div class="form-group col-6">
@@ -17,7 +17,7 @@
     @php
     $selectedStageId = isset($stage->id) ? $stage->id : null;
     @endphp
-    {!! Form::select('stage_id', $stages, $selectedStageId, ['class' => 'form-control select2', 'placeholder' => 'Select Stage']) !!}
+    {!! Form::select('stage_id', $stages, $selectedStageId, ['class' => 'form-control globalOfSelect2', 'placeholder' => 'Select Stage']) !!}
 
   </div>
   <div class="form-group col-12">

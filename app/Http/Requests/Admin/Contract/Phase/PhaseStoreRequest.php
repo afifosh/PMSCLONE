@@ -46,7 +46,8 @@ class PhaseStoreRequest extends FormRequest
     $this->calculated_tax_amount = $fixed_tax + ($percent_tax * $this->estimated_cost / 100);
 
     $rules = [
-      'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,stage_id,' . $this->stage->id,
+      'stage_id' => 'required|exists:contract_stages,id,contract_id,' . $this->contract_id,
+      'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,stage_id,' . $this->stage_id,
       'estimated_cost' => [
         'required',
         'numeric',

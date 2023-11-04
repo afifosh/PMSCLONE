@@ -9,13 +9,13 @@
     </div>
   </div>
 @if ($stage->id)
-    {!! Form::model($stage, ['route' => ['admin.contracts.stages.update', ['contract' => $contract, 'stage' => $stage]],
+    {!! Form::model($stage, ['route' => ['admin.contracts.stages.update', ['contract' => $contract, 'stage' => $stage, 'tableId' => request()->tableId]],
         'method' => 'PUT',
         'id' => 'stage-update-form',
         'data-stage-id' => $stage->id,
     ]) !!}
 @else
-    {!! Form::model($stage, ['route' => ['admin.contracts.stages.store',  ['contract' => $contract]], 'method' => 'POST']) !!}
+    {!! Form::model($stage, ['route' => ['admin.contracts.stages.store',  ['contract' => $contract, 'tableId' => request()->tableId]], 'method' => 'POST']) !!}
 @endif
 <div class="row">
   <div class="form-group col-12">

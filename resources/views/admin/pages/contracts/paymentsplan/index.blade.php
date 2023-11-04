@@ -103,13 +103,13 @@ $configData = Helper::appClasses();
             const contractId = buttonElement.getAttribute('data-contract-id');
             const phaseId = buttonElement.getAttribute('data-phase-id');
             const isReviewed = buttonElement.getAttribute('data-is-reviewed') === 'true';
-    
+
             // Using the route function to dynamically generate the URL
             const url = route('admin.contracts.phases.toggle-review', {
                 contract_id: contractId,
                 phase_id: phaseId
             });
-    
+
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -154,7 +154,7 @@ $(document).ready(function() {
     function createChildTable(row, contractId) {
 
 
-    
+
         // Check if child table already exists, if so, destroy it
         var existingChildTable = $('#child-table-' + contractId).DataTable();
     if (existingChildTable) {
@@ -248,7 +248,19 @@ $(row.node()).next().after(contentRow);
                     }
 
         ],
-        destroy: true
+        buttons : [
+            {
+                text: 'Add Stage',
+                className: 'btn btn-primary',
+                attr: {
+                    'data-toggle': 'ajax-modal',
+                    'data-title': 'Add Stage',
+                    'data-href': route('admin.contracts.stages.create', { contract: contractId, tableId: ('stages-table-' + contractId)  })
+                }
+            }
+        ],
+        destroy: true,
+        dom: 'Blfrtip',
         // Add more DataTable options if required
     });
 
@@ -291,10 +303,10 @@ $(row.node()).next().after(contentRow);
         {
             text: 'Add Phase',
             className: 'btn btn-primary',
-            action: function(e, dt, node, config) {
-              //  var href = route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $contract_id, $this->stage->id ?? 'stage']);
-                // Assuming you have an AJAX modal function to open up the modal. If not, replace with your method.
-             //   openAjaxModal('Add Phase', href);
+            attr: {
+                'data-toggle': 'ajax-modal',
+                'data-title': 'Add Phase',
+                'data-href': route('admin.projects.contracts.stages.phases.create', {project: 'project', contract: contractId, stage: 'stage', tableId: childTableId })
             }
         }
     ],

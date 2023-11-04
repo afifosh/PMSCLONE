@@ -50,13 +50,13 @@ class ProjectPhaseController extends Controller
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
   }
 
-  public function store($project, Contract $contract, ContractStage $stage, PhaseStoreRequest $request)
+  public function store($project, Contract $contract, $stage, PhaseStoreRequest $request)
   {
 
     $data['total_cost'] = $request->estimated_cost + ($request->is_manual_tax ? $request->manual_tax_amount : $request->calculated_tax_amount);
     $data['manual_tax_amount'] = $request->manual_tax_amount;
     $data['tax_amount'] = $request->calculated_tax_amount;
-    $data['stage_id'] = $stage->id;
+    $data['stage_id'] = $request->stage_id;
 
     $phase = $contract->phases()->create(
       $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id'])
@@ -65,7 +65,7 @@ class ProjectPhaseController extends Controller
     $this->storeTaxes($phase, $request->taxes);
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
-    return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => request()->tableId ? request()->tableId : 'phases-table', 'close' => 'globalModal']);
   }
 
   protected function storeTaxes($phase, $taxes): void
@@ -170,7 +170,7 @@ class ProjectPhaseController extends Controller
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
-    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table']);
+    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload', 'table_id' => request()->tableId ? request()->tableId : 'phases-table']);
   }
 
   public function destroy($project, Contract $contract, $stage, ContractPhase $phase)

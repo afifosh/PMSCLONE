@@ -707,6 +707,7 @@ $(document).on('click', '[data-toggle="ajax-modal"]', function () {
           $('#globalModal .modal-header').html(modalTitle);
       } else {
           $('#globalModalTitle').html(title);
+          $('#globalModalTitle').siblings().remove();
       }
       $('#globalModalBody').html(response.data.view_data);
       initModalSelect2();
