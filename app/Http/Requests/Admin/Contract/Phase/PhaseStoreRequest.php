@@ -8,6 +8,16 @@ use Illuminate\Foundation\Http\FormRequest;
 class PhaseStoreRequest extends FormRequest
 {
   /**
+   * The tax rates for the phase. will be used in validation and controller as well
+   */
+  public $taxes = null;
+
+  /**
+   * calculated tax amount for the phase
+   */
+  public $calculated_tax_amount = 0;
+
+  /**
    * Determine if the user is authorized to make this request.
    */
   public function authorize(): bool
@@ -17,7 +27,10 @@ class PhaseStoreRequest extends FormRequest
 
   public function prepareForValidation()
   {
-    //
+    $this->merge([
+      'is_manual_tax' => $this->boolean('is_manual_tax'),
+      'manual_tax_amount' => $this->boolean('is_manual_tax') ? $this->manual_tax_amount : 0,
+    ]);
   }
 
   /**
@@ -27,18 +40,18 @@ class PhaseStoreRequest extends FormRequest
    */
   public function rules(): array
   {
-    $taxes = Tax::whereIn('id', filterInputIds($this->phase_taxes ?? []))->where('is_retention', false)->where('status', 'Active')->get();
-    $fixed_tax = $taxes->where('type', 'Fixed')->sum('amount');
-    $percent_tax = $taxes->where('type', 'Percent')->sum('amount');
-    $tax_amount = $fixed_tax + ($percent_tax * $this->estimated_cost / 100);
+    $this->taxes = Tax::whereIn('id', filterInputIds($this->phase_taxes ?? []))->where('is_retention', false)->where('status', 'Active')->get();
+    $fixed_tax = $this->taxes->where('type', 'Fixed')->sum('amount');
+    $percent_tax = $this->taxes->where('type', 'Percent')->sum('amount');
+    $this->calculated_tax_amount = $fixed_tax + ($percent_tax * $this->estimated_cost / 100);
 
-    return [
+    $rules = [
       'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,stage_id,' . $this->stage->id,
       'estimated_cost' => [
         'required',
         'numeric',
         'gt:0',
-        //'max:' .  ($this->contract->remaining_amount - $tax_amount))
+        //'max:' .  ($this->contract->remaining_amount - $this->calculated_tax_amount))
       ],
       'total_cost' => [
         'required',
@@ -51,7 +64,16 @@ class PhaseStoreRequest extends FormRequest
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $this->contract->start_date,
       'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->contract->end_date,
+      'is_manual_tax' => 'required|boolean',
+      'manual_tax_amount' => 'nullable|required_if:is_manual_tax,true|numeric',
     ];
+
+    if ($this->is_manual_tax && abs($this->manual_tax_amount - $this->calculated_tax_amount) > 1) {
+      // manual tax and tax_amount should not have difference more than 1
+        $rules['manual_tax_amount'] .= '|between:' . ($this->calculated_tax_amount - 1) . ',' . ($this->calculated_tax_amount + 1);
+    }
+
+    return $rules;
   }
 
   public function messages()

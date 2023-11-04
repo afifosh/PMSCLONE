@@ -16,6 +16,12 @@ class InvoiceItem extends Model
     'invoiceable_id',
     'amount',
     'total_tax_amount',
+    'manual_tax_amount',
+    'downpayment_id',
+    'is_downpayment_percentage',
+    'downpayment_amount',
+    'downpayment_percentage',
+    'manual_downpayment_amount',
     'description',
     'order'
   ];
@@ -44,6 +50,46 @@ class InvoiceItem extends Model
   public function setTotalTaxAmountAttribute($value)
   {
     $this->attributes['total_tax_amount'] = moneyToInt($value);
+  }
+
+  public function getManualTaxAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setManualTaxAmountAttribute($value)
+  {
+    $this->attributes['manual_tax_amount'] = moneyToInt($value);
+  }
+
+  public function getDownpaymentAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setDownpaymentAmountAttribute($value)
+  {
+    $this->attributes['downpayment_amount'] = moneyToInt($value);
+  }
+
+  public function getManualDownpaymentAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setManualDownpaymentAmountAttribute($value)
+  {
+    $this->attributes['manual_downpayment_amount'] = moneyToInt($value);
+  }
+
+  public function getDownpaymentPercentageAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setDownpaymentPercentageAttribute($value)
+  {
+    $this->attributes['downpayment_percentage'] = moneyToInt($value);
   }
 
   public function invoice()

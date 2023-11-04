@@ -19,7 +19,7 @@ class ContractPhase extends BaseModel
     'name',
     'estimated_cost',
     'tax_amount',
-    'adjustment_amount',
+    'manual_tax_amount',
     'total_cost',
     'start_date',
     'due_date',
@@ -60,14 +60,14 @@ class ContractPhase extends BaseModel
     $this->attributes['estimated_cost'] = moneyToInt($value);
   }
 
-  public function getAdjustmentAmountAttribute($value)
+  public function getManualTaxAmountAttribute($value)
   {
     return $value / 1000;
   }
 
-  public function setAdjustmentAmountAttribute($value)
+  public function setManualTaxAmountAttribute($value)
   {
-    $this->attributes['adjustment_amount'] = moneyToInt($value);
+    $this->attributes['manual_tax_amount'] = moneyToInt($value);
   }
 
   public function getTaxAmountAttribute($value)

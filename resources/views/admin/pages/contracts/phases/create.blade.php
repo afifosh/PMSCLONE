@@ -19,7 +19,7 @@
         </li>
         <li class="nav-item" onclick="reload_phase_reviewers({{$phase->id}})">
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-reviewers" aria-selected="false">Reviewers</button>
-        </li>        
+        </li>
         <li class="nav-item" onclick="reload_phase_comments({{$phase->id}})">
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-selected="false">Comments</button>
         </li>
@@ -30,7 +30,7 @@
         </div>
         <div class="tab-pane fade {{request()->tab == null || request()->tab == 'reviewers' ? 'show active' : ''}}" id="navs-top-reviewers" role="tabpanel">
           @include('admin.pages.contracts.phases.tab-reviewers')
-        </div>        
+        </div>
         <div class="tab-pane fade {{request()->tab == 'activities' ? 'show active' : ''}}" id="navs-top-activities" role="tabpanel">
         </div>
         <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments" role="tabpanel">
@@ -173,17 +173,20 @@
     calculateTotalCost();
   })
 
+  $(document).on('change keyup', '[name="manual_tax_amount"]', function(){
+    calculateTotalCost();
+  });
+
+  $(document).on('change', '[name="is_manual_tax"]', function(){
+    calculateTotalCost();
+  });
+
+
   function calculateTotalCost()
   {
     const estimatedCost = $('[name="estimated_cost"]').val();
-    const adjustmentInputValue = $('[name="adjustment_amount"]').val();
-    let adjustmentAmount = $('[name="adjustment_amount"]').val();
-    adjustmentAmount = adjustmentInputValue ? parseFloat(adjustmentInputValue) : 0;
 
     var totalTax = parseFloat(0);
-    if (isNaN(adjustmentAmount)) {
-        adjustmentAmount = 0;
-    }
     const taxes = $('[name="phase_taxes[]"]').val();
     let totalCost = parseFloat(estimatedCost);
     if(estimatedCost && taxes){
@@ -195,35 +198,41 @@
         const taxType = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('type');
         if(taxType == 'Percent'){
           percentagTax += taxAmount;
-          console.log(percentagTax);
         }else{
           fixedTax += taxAmount;
         }
-        
+
       });
 
       totalTax += (totalCost * percentagTax) / 100;
-      totalTax += fixedTax;   
+      totalTax += fixedTax;
 
       totalCost += (totalCost * percentagTax) / 100;
       totalCost += fixedTax;
-   
+
     }
     $('[name="total_tax"]').val(totalTax.toFixed(3));
-    // Incorporate the adjustment amount
-    totalCost += adjustmentAmount;
+
+    const manualTax = parseFloat($('[name="manual_tax_amount"]').val());
+    if($('[name="is_manual_tax"]').is(':checked') && manualTax){
+      totalCost = parseFloat(estimatedCost) + manualTax;
+    }
 
     totalCost = totalCost.toFixed(3);
     $('[name="total_cost"]').val(totalCost);
     validateTotalCost();
   }
 
-  $(document).on('change keyup', '[name="adjustment_amount"]', function(){
-    calculateTotalCost();
-  });
-
   $(document).on('change', '[name="total_cost"]', function(){
     validateTotalCost();
+  })
+
+  $(document).on('change', '[name="is_manual_tax"]', function (){
+    if($(this).is(':checked')){
+      $('[name="manual_tax_amount"]').parent().removeClass('d-none');
+    }else{
+      $('[name="manual_tax_amount"]').parent().addClass('d-none');
+    }
   })
 
   function validateTotalCost(){

@@ -52,10 +52,17 @@ class ProjectPhaseController extends Controller
 
   public function store($project, Contract $contract, ContractStage $stage, PhaseStoreRequest $request)
   {
+
+    $data['total_cost'] = $request->estimated_cost + ($request->is_manual_tax ? $request->manual_tax_amount : $request->calculated_tax_amount);
+    $data['manual_tax_amount'] = $request->manual_tax_amount;
+    $data['tax_amount'] = $request->calculated_tax_amount;
+    $data['stage_id'] = $stage->id;
+
     $phase = $contract->phases()->create(
-      ['stage_id' => $stage->id] + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'adjustment_amount', 'stage_id'])
+      $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id'])
     );
-    $this->storeTaxes($phase, $request->phase_taxes);
+
+    $this->storeTaxes($phase, $request->taxes);
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
     return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
@@ -63,16 +70,12 @@ class ProjectPhaseController extends Controller
 
   protected function storeTaxes($phase, $taxes): void
   {
-    $taxes = Tax::whereIn('id', filterInputIds($taxes))->where('is_retention', false)->where('status', 'Active')->get();
-
     $sync_data = [];
     foreach ($taxes as $rate) {
       $sync_data[$rate->id] = ['amount' => $rate->getRawOriginal('amount'), 'type' => $rate->type, 'contract_phase_id' => $phase->id];
     }
 
     $phase->taxes()->sync($sync_data);
-
-    $phase->updateTaxAmount();
   }
 
   public function edit($project, $contract, $stage, ContractPhase $phase)
@@ -138,9 +141,13 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not update this phase because it is in paid invoice');
     }
 
-    $phase->update($request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'adjustment_amount', 'stage_id']));
+    $data['total_cost'] = $request->estimated_cost + ($request->is_manual_tax ? $request->manual_tax_amount : $request->calculated_tax_amount);
+    $data['manual_tax_amount'] = $request->manual_tax_amount;
+    $data['tax_amount'] = $request->calculated_tax_amount;
 
-    $this->storeTaxes($phase, $request->phase_taxes);
+    $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
+
+    $this->storeTaxes($phase, $request->taxes);
 
     // if added in invoice then update invoice item and tax amount
     $phase->load('addedAsInvoiceItem.invoice');

@@ -54,12 +54,24 @@
   {{-- total Tax Value --}}
   <div class="form-group col-6">
     {{ Form::label('total_tax', __('Tax Value'), ['class' => 'col-form-label']) }}
-    {!! Form::number('total_tax', null, ['class' => 'form-control', 'placeholder' => __('Tax Value'), 'disabled'])!!}
-  </div>  
-  <!-- New adjustment amount field -->
-  <div class="form-group col-6">
-    {{ Form::label('adjustment_amount', __('Adjustment Amount'), ['class' => 'col-form-label']) }}
-    {!! Form::number('adjustment_amount', null, ['class' => 'form-control', 'placeholder' => __('Adjustment Amount')]) !!}
+    {!! Form::number('total_tax', $phase->tax_amount, ['class' => 'form-control', 'placeholder' => __('Tax Value'), 'disabled'])!!}
+  </div>
+  {{-- is Mantual Tax --}}
+  <div class="col-6 mt-1">
+    <label class="switch mt-4">
+      {{ Form::checkbox('is_manual_tax', 1, $phase->manual_tax_amount != 0,['class' => 'switch-input'])}}
+      <span class="switch-toggle-slider">
+        <span class="switch-on"></span>
+        <span class="switch-off"></span>
+      </span>
+      <span class="switch-label">Is Manual Tax?</span>
+    </label>
+  </div>
+  {{-- End is Mantual Tax --}}
+  <!-- Manual Tax field -->
+  <div class="form-group col-6 {{$phase->manual_tax_amount != 0 ? '' : 'd-none'}}">
+    {{ Form::label('manual_tax_amount', __('Manual Tax Amount'), ['class' => 'col-form-label']) }}
+    {!! Form::number('manual_tax_amount', null, ['class' => 'form-control', 'placeholder' => __('Manual Tax Amount')]) !!}
   </div>
   {{-- total cost --}}
   <div class="form-group col-6">

@@ -451,7 +451,7 @@
                       <td class="">{{$phase->invoiceable->name ?? runtimeInvIdFormat($phase->invoiceable_id)}}</td>
                       <!--total-->
                       <td class="text-right">
-                          @cMoney($phase->amount + $phase->total_tax_amount, $invoice->contract->currency, true)
+                          @cMoney($phase->invoiceable->total_cost, $invoice->contract->currency, true)
                       </td>
                       <!--total-->
                       <!-- invoiceable amount -->

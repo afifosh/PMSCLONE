@@ -17,6 +17,14 @@ return new class extends Migration
       $table->nullableMorphs('invoiceable');
       $table->unsignedBigInteger('amount')->default(0)->comment('Amount without tax');
       $table->unsignedBigInteger('total_tax_amount')->default(0);
+      $table->unsignedBigInteger('manual_tax_amount')->default(0);
+      // These fields are for inline downpayment.
+      $table->foreignId('downpayment_id')->nullable()->constrained('invoices')->cascadeOnDelete();
+      $table->boolean('is_downpayment_percentage')->default(false);
+      $table->unsignedInteger('downpayment_percentage')->default(0);
+      $table->unsignedBigInteger('downpayment_amount')->default(0);
+      $table->unsignedBigInteger('manual_downpayment_amount')->default(0);
+      // End of downpayment fields.
       $table->string('description')->nullable();
       $table->unsignedInteger('order')->default(0);
       $table->timestamps();
