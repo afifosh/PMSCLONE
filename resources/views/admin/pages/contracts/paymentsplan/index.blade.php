@@ -287,20 +287,6 @@ $(row.node()).next().after(contentRow);
                 dom: 'Blfrtip',
                 buttons: [
         {
-            text: 'Select Phases',
-            className: 'btn btn-primary mx-3 select-phases-btn',
-            action: function(e, dt, node, config) {
-                toggleCheckboxes();
-            }
-        },
-        {
-            text: 'Create Invoices',
-            className: 'btn btn-primary mx-3 create-inv-btn d-none',
-            action: function(e, dt, node, config) {
-                createInvoices();
-            }
-        },
-        {
             text: 'Add Phase',
             className: 'btn btn-primary',
             attr: {

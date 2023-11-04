@@ -14,15 +14,17 @@
         <li class="nav-item">
           <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-selected="true">Summary</button>
         </li>
-        <li class="nav-item" onclick="reload_phase_activity({{$phase->id}})">
-          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-selected="false">Activities</button>
-        </li>
-        <li class="nav-item" onclick="reload_phase_reviewers({{$phase->id}})">
-          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-reviewers" aria-selected="false">Reviewers</button>
-        </li>
-        <li class="nav-item" onclick="reload_phase_comments({{$phase->id}})">
-          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-selected="false">Comments</button>
-        </li>
+        @if($phase->id)
+          <li class="nav-item" onclick="reload_phase_activity({{$phase->id}})">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-selected="false">Activities</button>
+          </li>
+          <li class="nav-item" onclick="reload_phase_reviewers({{$phase->id}})">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-reviewers" aria-selected="false">Reviewers</button>
+          </li>
+          <li class="nav-item" onclick="reload_phase_comments({{$phase->id}})">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-selected="false">Comments</button>
+          </li>
+        @endif
       </ul>
       <div class="tab-content p-0">
         <div class="tab-pane fade {{request()->tab == null || request()->tab == 'summary' ? 'show active' : ''}}" id="navs-top-summary" role="tabpanel">

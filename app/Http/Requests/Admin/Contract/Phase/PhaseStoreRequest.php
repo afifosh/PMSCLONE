@@ -81,6 +81,8 @@ class PhaseStoreRequest extends FormRequest
   {
     return [
       'estimated_cost.max' => '',
+      'stage_id.exists' => 'Please select a valid stage for this contract.',
+      'stage_id.required' => 'The stage field is required. Please select a stage.',
     ];
   }
 }
