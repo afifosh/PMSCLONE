@@ -134,7 +134,9 @@
   var contractViewingUsers = [];
   var stageEditingUsers = [];
   var phaseEditingUsers = [];
+  var contractEditingUsers = [];  
   var disablePhaseWhisper = false;
+  var disableContractWhisper = false;
 </script>
 <script src="{{asset('assets/js/custom/contracts-realtime-updates.js')}}"></script>
 @endpush

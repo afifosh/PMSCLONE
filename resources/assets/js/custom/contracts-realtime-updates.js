@@ -236,3 +236,103 @@ function updatePhaseEditingUsers(users){
 /***************************************************************************
  ********************  End Echo for phase updates  ************************
  **************************************************************************/
+
+/**************************************************************************
+ * ********************  Echo for contract updates  ***********************
+ * ***********************************************************************/
+// Join the phase channel
+$('#globalModal').on('shown.bs.modal', function (e) {
+
+  if($('#globalModal #contract-update-form').length){
+    // Echo listen fo phase updates
+    Echo.join(`contracts.${$('#globalModal #contract-update-form').data('contract-id')}`)
+        .here((users) => {
+          for (let index = 0; index < users.length; index++) {
+            const user = users[index];
+            contractEditingUsers[user.id] = user;
+          }
+          updateContractEditingUsers(contractEditingUsers);
+        })
+        .joining((user) => {
+          contractEditingUsers[user.id] = user;
+          updateContractEditingUsers(contractEditingUsers);
+        })
+        .leaving((user) => {
+          delete contractEditingUsers[user.id];
+          updateContractEditingUsers(contractEditingUsers);
+        })
+        .error((error) => {
+            console.error(error);
+        });
+  }
+});
+
+/***
+ * Whisper contract editing
+ * */
+$('#globalModal').on('keyup change paste', '#contract-update-form input, #contract-update-form select, #contract-update-form textarea, #contract-update-form checkbox', function (e) {
+    if(disableContractWhisper){
+      return;
+    }
+    whisperForContractEditing();
+
+});
+
+ 
+function whisperForContractEditing()
+{
+  Echo.private(`contracts.${$('#globalModal #contract-update-form').data('contract-id')}`)
+        .whisper('editing-model', {
+            data: {
+              name: $('#globalModal #contract-update-form [name="subject"]').val(),
+              // estimated_cost: $('#globalModal #contract-update-form [name="estimated_cost"]').val(),
+              // 'phase_taxes[]': $('#globalModal #contract-update-form [name="phase_taxes[]"]').val(),
+              // adjustment_amount: $('#globalModal #contract-update-form [name="adjustment_amount"]').val(),
+              // total_cost: $('#globalModal #contract-update-form [name="total_cost"]').val(),
+              // start_date: $('#globalModal #contract-update-form [name="start_date"]').val(),
+              // due_date: $('#globalModal #contract-update-form [name="due_date"]').val(),
+              // calc_end_date: $('#globalModal #contract-update-form [name="calc_end_date"]').val(),
+              // cal_end_date_unit: $('#globalModal #contract-update-form [name="cal_end_date_unit"]').val(),
+              description: $('#globalModal #contract-update-form [name="description"]').val(),
+            },
+        
+        });
+}
+
+
+/***
+ * Listen For Whisper contract editing on modal open
+ * */
+$('#globalModal').on('shown.bs.modal', function (e) {
+  if($('#globalModal #contract-update-form').length){
+    Echo.private(`contracts.${$('#globalModal #contract-update-form').data('contract-id')}`)
+        .listenForWhisper('editing-model', (e) => {
+            disableContractWhisper = true;
+            $.each(e.data, function (name, value) {
+              $('#globalModal #contract-update-form [name="'+name+'"]').val(value);
+            });
+            // to updadte all select
+         //   $('#globalModal #contract-update-form [name="phase_taxes[]"]').trigger('change');
+            disableContractWhisper = false;
+        });
+  }
+});
+
+ // Leave the contract channel when modal is closed
+$('#globalModal').on('hidden.bs.modal', function (e) {
+  if($('#globalModal #contract-update-form').length){
+    Echo.leave(`contracts.${$('#globalModal #contract-update-form').data('contract-id')}`);
+  }
+});
+
+ /***
+ * Update the users Editing same contract
+ **/
+function updateContractEditingUsers(users){
+  $('.contract-editing-users').html(getUserAvatarGroup(users, 'sm'));
+  $('[data-popup="tooltip-custom"]').tooltip();
+}
+
+/***************************************************************************
+ ********************  End Echo for contract updates  **********************
+ **************************************************************************/

@@ -384,6 +384,8 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
   var stageEditingUsers = [];
   var phaseEditingUsers = [];
   var disablePhaseWhisper = false;
+  var contractEditingUsers = [];  
+  var disableContractWhisper = false;
   window.oURL = window.location.href;
 </script>
 <script src="{{asset('assets/js/custom/contracts-realtime-updates.js')}}"></script>

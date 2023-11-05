@@ -1,5 +1,9 @@
 @if ($contract->id)
-    {!! Form::model($contract, ['route' => ['admin.contracts.update', $contract->id], 'method' => 'PUT']) !!}
+    {!! Form::model($contract, ['route' => ['admin.contracts.update', $contract->id],
+      'method' => 'PUT',
+      'id' => 'contract-update-form',
+      'data-contract-id' => $contract->id,
+    ]) !!}
 @else
     {!! Form::model($contract, ['route' => ['admin.contracts.store'], 'method' => 'POST']) !!}
 @endif
@@ -161,6 +165,7 @@
 </div>
 <div class="mt-3 d-flex justify-content-between">
   <div class="contract-editing-users">
+    ss
   </div>  
   <div class="btn-flt float-end">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
