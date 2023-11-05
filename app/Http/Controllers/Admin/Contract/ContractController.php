@@ -471,11 +471,13 @@ class ContractController extends Controller
         // Your logic to get activities data
         // ...
 
-        // Prepare the data to be passed to the view
-        $data = ['contract' => $contract]; // Ensuring the data is passed as a key-value pair
-
+        $contractAudits = \App\Models\Audit::where('auditable_id', $contract->id)
+        ->where('auditable_type', get_class($contract))
+        ->orderBy('created_at', 'desc')
+        ->get();
+  
         // Render the 'reviewers' tab view to a string
-        $viewRendered = view('admin.pages.contracts.tabs.activities', $data)->render();
+        $viewRendered = view('admin.pages.contracts.tabs.activities', compact('contractAudits'))->render();
 
         // Return the rendered view within a response
         return $this->sendRes('success', ['view_data' => $viewRendered]);    
