@@ -22,7 +22,7 @@
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-reviewers" aria-selected="false">Reviewers</button>
         </li>
         <li class="nav-item" onclick="reload_contract_comments({{$contract->id}})">
-          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-selected="false">Comments</button>
+          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments-contracts" aria-selected="false">Comments</button>
         </li>
       @endif
     </ul>
@@ -36,7 +36,7 @@
       <div class="tab-pane fade {{request()->tab == 'activities' ? 'show active' : ''}}" id="navs-top-activities" role="tabpanel">
         @include('admin.pages.contracts.tabs.activities')
       </div>
-      <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments" role="tabpanel">
+      <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments-contracts" role="tabpanel">
         @include('admin.pages.contracts.tabs.comments')
       </div>
     </div>
