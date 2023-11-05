@@ -1,177 +1,111 @@
-@if ($contract->id)
-    {!! Form::model($contract, ['route' => ['admin.contracts.update', $contract->id], 'method' => 'PUT']) !!}
-@else
-    {!! Form::model($contract, ['route' => ['admin.contracts.store'], 'method' => 'POST']) !!}
-@endif
+<div class="d-flex justify-content-start align-items-center user-name mb-4">
+  <div class="avatar-wrapper">
+    <div class="avatar me-2"><i class="ti ti-license mb-2 ti-xl"></i></div>
+  </div>
+  <div class="d-flex flex-column">
+    <span class="fw-medium mb-1">{{ $contract->subject }}</span>
+    <small class="text-muted mb-1">{{ $contract->program->name ?? 'N/A' }}</small>
+    <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
+  </div>
+</div>
+<div class="row mb-4">
+  <div class="nav-align-top">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-selected="true">Summary</button>
+      </li>
+      @if($contract->id)
+        <li class="nav-item" onclick="reload_contract_activities({{$contract->id}})">
+          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-selected="false">Activities</button>
+        </li>
+        <li class="nav-item" onclick="reload_contract_reviewers({{$contract->id}})">
+          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-reviewers" aria-selected="false">Reviewers</button>
+        </li>
+        <li class="nav-item" onclick="reload_contract_comments({{$contract->id}})">
+          <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-selected="false">Comments</button>
+        </li>
+      @endif
+    </ul>
+    <div class="tab-content p-0">
+      <div class="tab-pane fade {{request()->tab == null || request()->tab == 'summary' ? 'show active' : ''}}" id="navs-top-summary" role="tabpanel">
+        @include('admin.pages.contracts.tabs.summary')
+      </div>
+      <div class="tab-pane fade {{request()->tab == 'reviewers' ? 'show active' : ''}}" id="navs-top-reviewers" role="tabpanel">
+        @include('admin.pages.contracts.tabs.reviewers')
+      </div>
+      <div class="tab-pane fade {{request()->tab == 'activities' ? 'show active' : ''}}" id="navs-top-activities" role="tabpanel">
+        @include('admin.pages.contracts.tabs.activities')
+      </div>
+      <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments" role="tabpanel">
+        @include('admin.pages.contracts.tabs.comments')
+      </div>
+    </div>
+  </div>
+</div>
 
-<div class="row">
-    {{-- Subject --}}
-    <div class="form-group col-6">
-        {{ Form::label('subject', __('Subject'), ['class' => 'col-form-label']) }}
-        {!! Form::text('subject', null, ['class' => 'form-control', 'placeholder' => __('Subject')]) !!}
-    </div>
-    {{-- project --}}
-    <div class="form-group col-6">
-      {{ Form::label('project_id', __('Project'), ['class' => 'col-form-label']) }}
-      {!! Form::select('project_id', $projects ?? [], $contract->project_id, [
-        'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['Project']),
-        'data-placeholder' => __('Select Project'),
-        'data-allow-clear' => 'true'
-        ])!!}
-    </div>
-    <div class="form-group col-6">
-      {{ Form::label('currency', __('Currency'), ['class' => 'col-form-label']) }}
-      {!! Form::select('currency', $currency ?? [], $contract->currency, [
-        'data-placeholder' => 'Select Currency',
-        'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['Currency']),
-        'data-allow-clear' => 'true'
-        ])!!}
-    </div>
-    {{-- value --}}
-    <div class="form-group col-6">
-      {{ Form::label('value', __('Contract Value'), ['class' => 'col-form-label']) }}
-      {!! Form::number('value', $contract->value + $contract->total_tax_amount, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
-    </div>
-    {{-- program --}}
-    <div class="form-group col-6">
-      {{ Form::label('program_id', __('Program'), ['class' => 'col-form-label']) }}
-      {!! Form::select('program_id', $programs ?? [], $contract->program_id, [
-      'class' => 'form-select globalOfSelect2Remote dependent-select',
-      'data-url' => route('resource-select', ['Program']),
-      'id' => 'contract-program-selected-id',
-      'data-placeholder' => __('Select Program'),
-      'data-allow-clear' => 'true'
-      ]) !!}
-    </div>
-    {{-- Account --}}
-    <div class="form-group col-6">
-      {{ Form::label('account_balance_id', __('Account'), ['class' => 'col-form-label']) }}
-      {!! Form::select('account_balance_id', $account_balanaces ?? [], $contract->account_balance_id, [
-      'class' => 'form-select globalOfSelect2Remote',
-      'data-url' => route('resource-select', ['AccountBalance', 'dependent' => 'programId']),
-      'data-dependent_id' => 'contract-program-selected-id',
-      'data-placeholder' => __('Select Account'),
-      'data-allow-clear' => 'true'
-      ]) !!}
-    </div>
-    {{-- customer --}}
-    <div class="form-group col-6">
-      {{ Form::label('company_id', __('Client'), ['class' => 'col-form-label']) }}
-      {!! Form::select('company_id', $companies ?? [], @$contract->assignable_type == 'App\Models\Company' && @$contract->assignable_id ? $contract->assignable_id : null, ['id' => 'contract-client-select',
-      'class' => 'form-select globalOfSelect2UserRemote',
-      'data-url' => route('resource-select-user', ['Company']),
-      'data-placeholder' => __('Select Client'),
-      'data-allow-clear' => 'true'
-      ]) !!}
-    </div>
-    {{-- types --}}
-    <div class="form-group col-6">
-      {{ Form::label('type_id', __('Contract Type'), ['class' => 'col-form-label']) }}
-      {!! Form::select('type_id', $types, $contract->type_id, [
-        'class' => 'form-select globalOfSelect2',
-        'data-placeholder' => __('Contract Type'),
-        'data-allow-clear' => 'true'
-      ]) !!}
-    </div>
-    {{-- categories --}}
-    <div class="form-group col-6">
-      {{ Form::label('category_id', __('Contract Category'), ['class' => 'col-form-label']) }}
-      {!! Form::select('category_id', $categories, $contract->category_id, [
-        'class' => 'form-select globalOfSelect2',
-        'data-placeholder' => __('Contract Category'),
-        'data-allow-clear' => 'true'
-      ]) !!}
-    </div>
-    <div class="form-group col-6">
-      {{ Form::label('refrence_id', __('Refrence Id'), ['class' => 'col-form-label']) }}
-      {!! Form::text('refrence_id', null, ['class' => 'form-control', 'required'=> 'true', 'placeholder' => __('Refrence Id')]) !!}
-    </div>
-    <div class="form-group col-6">
-      {{ Form::label('signature_date', __('Signature Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('signature_date', $contract->signature_date, ['class' => 'form-control flatpickr', 'required'=> 'true', 'placeholder' => __('Signature Date')]) !!}
-    </div>
-    {{-- invoicing method --}}
-    <div class="form-group col-6">
-      {{ Form::label('invoicing_method', __('Invoicing Method'), ['class' => 'col-form-label']) }}
-      {!! Form::select('invoicing_method', ['Recuring' => 'Recuring', 'Phase Based' => 'Phase Based'], $contract->invoicing_method, ['class' => 'form-select globalOfSelect2']) !!}
-    </div>
-    {{-- start date --}}
-    <div class="form-group col-6">
-      {{ Form::label('start_date', __('Start Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('start_date', $contract->start_date, [
-        'class' => 'form-control flatpickr',
-        'placeholder' => __('Start Date'),
-        'data-flatpickr' => '{"allowInput": true}'
-      ]) !!}
-    </div>
-    {{-- end date --}}
-    <div class="form-group col-6 end-date-sec {{!$contract->subject || $contract->end_date ? '' : 'd-none'}}">
-      {{ Form::label('end_date', __('End Date'), ['class' => 'col-form-label']) }}
-      {!! Form::date('end_date', $contract->end_date, ['class' => 'form-control flatpickr', 'placeholder' => __('End Date')]) !!}
-    </div>
-    {{-- dute date --}}
-    <div class="col-12 mt-2">
-      <div class="d-flex">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="cont-has-end-date" @checked(!$contract->subject || $contract->end_date)>
-          <label class="form-check-label me-2" for="cont-has-end-date">
-            Has End Date
-          </label>
-        </div>
-        <div class="form-check end-date-sec {{!$contract->subject || $contract->end_date ? '' : 'd-none'}}">
-          <input class="form-check-input" type="checkbox" id="cal-cont-end-date">
-          <label class="form-check-label" for="cal-cont-end-date">
-            Calculate End Date
-          </label>
-        </div>
-      </div>
-    </div>
-    <div class="d-none" id="end-date-cal-form">
-      <hr>
-      <div class="mb-3">
-        <label for="" class="form-label">After From Start Date</label>
-        <div class="d-flex">
-          <div class="d-flex w-100">
-            <input id="cont-add-count" type="number"  class="form-control cal-cont-end-date">
-            {!! Form::select('null', ['Days' => 'Day(s)', 'Weeks' => 'Week(s)', 'Months' => 'Month(s)', 'Years' => 'Year(s)'], null, ['class' => 'cont-add-unit cal-cont-end-date input-group-text form-select globalOfSelect2']) !!}
-          </div>
-        </div>
-      </div>
-      <hr>
-    </div>
-    <div class="form-group col-6">
-      <label class="switch d-flex flex-column">
-        {{ Form::label('visible_to_client', __('Visible to client'), ['class' => 'col-form-label']) }}
-        {{ Form::checkbox('visible_to_client', 1, $contract->visible_to_client,['class' => 'switch-input is-invalid'])}}
-        {{-- <input type="checkbox" class="switch-input is-invalid" checked /> --}}
-        <span class="switch-toggle-slider position-relative mt-2">
-          <span class="switch-on"></span>
-          <span class="switch-off"></span>
-        </span>
-        <span class="switch-label"></span>
-      </label>
-    </div>
-    {{-- description --}}
-    <div class="form-group col-12">
-      {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}
-      {!! Form::textarea('description', null, ['class' => 'form-control', 'rows' => 3, 'placeholder' => __('Description')]) !!}
-    </div>
-    {!! Form::hidden('isSavingDraft', null, ['id' => 'isSavingDraft']) !!}
-</div>
-<div class="mt-3">
-    <div class="btn-flt float-end">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-        @if (!$contract->status || $contract->status == 'Draft')
-          <button type="button" class="btn btn-dark" data-form="ajax-form" data-preAjaxAction="isSavingDraft" data-preAjaxParams="1">{{ __('Save Draft') }}</button>
-        @endif
-        <button type="submit" data-form="ajax-form" data-preAjaxAction="isSavingDraft" data-preAjaxParams="0" class="btn btn-primary">{{ __('Save') }}</button>
-    </div>
-</div>
-{!! Form::close() !!}
-</div>
 <script>
+
+function toggleContractReviewStatus(buttonElement) {
+            // Extract data attributes
+            const contractId = buttonElement.getAttribute('data-contract-id');
+            const isReviewed = buttonElement.getAttribute('data-is-reviewed') === 'true';
+
+            // Using the route function to dynamically generate the URL
+            const url = route('admin.contracts.toggle-review', {
+                contract_id: contractId,
+            });
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+         
+              
+                  if (data.data.event == 'table_reload') {
+                 
+                  if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
+                    $('#' + data.data.table_id)
+                      .DataTable()
+                      .ajax.reload();
+                  } 
+             
+                }
+                if(data.data.close == 'globalModal'){
+                  $('#globalModal').modal('hide');
+       
+          }else if(data.data.close == 'modal'){
+            current.closest('.modal').modal('hide');
+          }
+                    // Use the review status from the server response
+                    const isReviewedFromResponse = data.data.isReviewed;
+
+                    // Determine the button text and class based on the review status from the server response
+                    const newText = isReviewedFromResponse ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
+                    const newClass = isReviewedFromResponse ? 'btn-label-danger' : 'btn-label-secondary';
+
+                    // Update the button's text, data attribute, and class
+                    buttonElement.textContent = newText;
+                    buttonElement.setAttribute('data-is-reviewed', isReviewedFromResponse);
+                    buttonElement.classList.remove('btn-label-secondary', 'btn-label-danger');
+                    buttonElement.classList.add(newClass);
+                    toast_success(data.message)
+                } else {
+                    alert('Error toggling review status.');
+                    toast_danger(data.message)
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toast_danger('An unexpected error occurred.')
+            });
+        }
+
   function isSavingDraft(isDraft){
     $('#isSavingDraft').val(isDraft);
   }
@@ -248,4 +182,70 @@
     }
     initFlatPickr();
   }
+</script>
+
+<script>
+
+
+  $(document).ready(function () {
+        window.oURL = window.location.href;
+      });  
+  function reload_contract_summary(contract){
+    var url = route('admin.contracts.summary', {
+      contract_id: contract,
+    });
+    $.ajax({
+      url: url,
+      type: "GET",
+      success: function(data){
+        $('#navs-top-summary').html(data.data.view_data);
+      }
+    });
+  }
+
+  function reload_contract_comments(contract){
+    var url = route('admin.contracts.comments', {
+      contract_id: contract,
+    });
+    $.ajax({
+      url: url,
+      type: "GET",
+      success: function(data){
+        $('#navs-top-comments').html(data.data.view_data);
+          Livewire.rescan(document.getElementById('navs-top-comments'));
+          Alpine.initTree(document.getElementById('navs-top-comments'));
+        setTimeout(function () {
+          history.replaceState(null, null, oURL);
+        }, 1000);
+      }
+    });
+  }
+
+  
+  function reload_contract_activities(contract){
+    var url = route('admin.contracts.activities', {
+      contract_id: contract,
+    });
+    $.ajax({
+      url: url,
+      type: "GET",
+      success: function(data){
+        $('#navs-top-activities').html(data.data.view_data);
+      }
+    });
+  }
+
+  function reload_contract_reviewers(contract){
+    var url = route('admin.contracts.reviewers', {
+      contract_id: contract,
+    });
+    $.ajax({
+      url: url,
+      type: "GET",
+      success: function(data){
+        $('#navs-top-reviewers').html(data.data.view_data);
+      }
+    });
+  }
+
 </script>

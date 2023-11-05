@@ -15,10 +15,11 @@ use App\Support\Money;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Spatie\Comments\Models\Concerns\HasComments;
 
 class Contract extends BaseModel
 {
-  use HasFactory, SoftDeletes, HasEnum;
+  use HasFactory, SoftDeletes, HasEnum, HasComments;
 
   protected $fillable = [
     'category_id',
@@ -363,4 +364,22 @@ class Contract extends BaseModel
       $invoice->releaseRetention();
     });
   }
+
+    /*
+  * This string will be used in notifications on what a new comment
+  * was made.
+  */
+  public function commentableName(): string
+  {
+    return 'Phase: ' . $this->name . ' Of contract: ' . $this->contract->subject;
+  }
+
+  /*
+  * This URL will be used in notifications to let the user know
+  * where the comment itself can be read.
+  */
+  public function commentUrl(): string
+  {
+    return '#';
+  }  
 }

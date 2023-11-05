@@ -15,7 +15,7 @@ return new class extends Migration
       $table->id();
       $table->string('name');
       $table->enum('type', ['Percent', 'Fixed'])->default('Percent');
-      $table->unsignedBigInteger('amount')->default(0);
+      $table->BigInteger('amount')->default(0);
       $table->enum('status', ['Active', 'Inactive'])->default('Active');
       $table->boolean('is_retention')->default(false);
       $table->timestamps();

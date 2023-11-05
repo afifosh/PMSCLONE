@@ -41,6 +41,32 @@ class ContractsDataTable extends DataTable
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
+      ->addColumn('reviewed_by', function ($stage) {
+        $reviewers = $stage->reviews;
+    
+        $html = '<div class="d-flex align-items-center avatar-group my-3">';
+    
+        $maxDisplayed = 5;
+        for ($i = 0; $i < min($maxDisplayed, $reviewers->count()); $i++) {
+            $reviewer = $reviewers[$i];
+            $avatarUrl = $reviewer->user->avatar; // Assuming 'avatar' is the column name in the 'users' table
+            $userName = htmlspecialchars($reviewer->user->name); // Escape the name to ensure it's safe to display
+    
+            $html .= '<div class="avatar pull-up" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" aria-label="' . $userName . '" data-bs-original-title="' . $userName . '">
+                        <img src="' . $avatarUrl . '" alt="Avatar" class="rounded-circle">
+                      </div>';
+        }
+    
+        if ($reviewers->count() > $maxDisplayed) {
+            $moreCount = $reviewers->count() - $maxDisplayed;
+            $html .= '<div class="avatar pull-up">
+                        <span class="avatar-initial rounded-circle" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" data-bs-original-title="' . $moreCount . ' more reviewers">+' . $moreCount . '</span>
+                      </div>';
+        }
+    
+        $html .= '</div>';
+        return $html;
+      })
       ->addColumn('assigned_to', function ($project) {
         if ($project->assignable instanceof Company) {
           return view('admin._partials.sections.company-avatar', ['company' => $project->assignable]);
@@ -73,7 +99,7 @@ class ContractsDataTable extends DataTable
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
         });
       })
-      ->rawColumns(['id', 'program.name']);
+      ->rawColumns(['id', 'program.name','reviewed_by']);
   }
 
 /**
@@ -200,6 +226,7 @@ public function query(Contract $model): QueryBuilder
       Column::make('category.name')->title('Category'),
       Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
+      Column::make('reviewed_by')->title('Reviewed By'),
       Column::make('start_date'),
       Column::make('end_date'),
       // Column::make('phases_count')->title('Phases')->searchable(false),

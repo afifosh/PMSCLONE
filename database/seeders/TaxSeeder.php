@@ -42,6 +42,16 @@ class TaxSeeder extends Seeder
           'is_retention' => false,
       ]);
 
+ 
+       // 15% Tax
+       Tax::create([
+        'name' => '5% With Holding Tax',
+        'type' => 'Percent',
+        'amount' => -5,
+        'status' => 'Active',
+        'is_retention' => false,
+    ]);     
+ 
       // 5% Retention
       Tax::create([
         'name' => '5% Retention',

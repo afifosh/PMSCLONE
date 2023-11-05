@@ -255,7 +255,16 @@ Route::prefix('contracts')->group(function () {
   Route::get('paymentsplan', [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
   // Specific contract routes with contract_id constraint
   Route::prefix('{contract_id}')->where(['contract_id' => '[0-9]+'])->group(function () {
-      
+
+        // Display the form for editing contract details
+        // Process the action of marking a contract as reviewed
+        Route::post('/toggle-review', [ContractController::class, 'toggleContractReviewStatus'])->name('contracts.toggle-review');
+        // Dynamic content loading for each contract tab
+        Route::get('/summary', [ContractController::class, 'showSummary'])->name('contracts.summary');
+        Route::get('/reviewers', [ContractController::class, 'showReviewers'])->name('contracts.reviewers');
+        Route::get('/comments', [ContractController::class, 'showComments'])->name('contracts.comments');
+        Route::get('/activities', [ContractController::class, 'showActivities'])->name('contracts.activities');
+            
       // Details of a specific contract
       // Route::get('/', [ContractController::class, 'show'])->name('contracts.show');
 

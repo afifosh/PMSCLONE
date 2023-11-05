@@ -348,8 +348,138 @@ class ContractController extends Controller
     if ($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
 
+      $userHasMarkedComplete = $contract->reviews->contains('user_id', auth()->id());
+      $buttonLabel = $userHasMarkedComplete ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
+      $buttonIcon = $userHasMarkedComplete ? 'ti-undo' : 'ti-bell';
+      $reviewStatus = $userHasMarkedComplete ? 'true' : 'false';
+      $buttonLabelClass = $userHasMarkedComplete ? 'btn-label-danger' : 'btn-label-secondary';
+  
+      $modalTitle = '
+      <h5 class="modal-title" id="globalModalTitle">Edit Contract</h5>
+      <div class="flex items-center justify-between border-b-1 w-full">
+          <button type="button" style=""
+                  class="me-4 btn btn-sm rounded-pill ' . $buttonLabelClass . ' waves-effect"
+                  data-contract-id="' . $contract->id . '"
+                  data-is-reviewed="' . $reviewStatus . '"
+                  onclick="toggleContractReviewStatus(this)">
+              <span class="ti-xs ti ' . $buttonIcon . ' me-1"></span>' . $buttonLabel . '
+          </button>
+          <button type="button" data-bs-dismiss="modal" aria-label="Close" class="btn-close"></button>
+      </div>';
+  
+  
+    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.create', $data)->render()]);
+    
+
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
   }
+
+  /**
+   * Show the form for editing the specified resource.
+   */
+  public function summaryTabContent(Contract $contract)
+  {
+    $contract->load('project');
+    $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id');
+    $data['categories'] = ContractCategory::orderBy('id', 'desc')->pluck('name', 'id');
+    $data['projects'] = $contract->project_id ? Project::where('id', $contract->project_id)->pluck('name', 'id') : [];
+    $data['programs'] = $contract->program_id ? Program::where('id', $contract->program_id)->pluck('name', 'id') : [];
+    $data['companies'] = Company::where('id', $contract->assignable_id)->pluck('name', 'id');
+    $data['contract'] = $contract;
+    $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
+    $data['statuses'] = $contract->getPossibleStatuses();
+    $data['account_balanaces'] = $contract->account_balance_id ? AccountBalance::where('id', $contract->account_balance_id)->pluck('name', 'id') : [];
+    if ($contract->status == 'Terminated')
+      $data['termination_reason'] = $contract->getLatestTerminationReason();
+
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.tabs.summary', $data)->render()]);
+  }
+
+
+    /**
+     * Show the contracts summary.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showSummary(Contract $contract)
+    {
+      $contract->load('project');
+      $data['types'] = ContractType::orderBy('id', 'desc')->pluck('name', 'id');
+      $data['categories'] = ContractCategory::orderBy('id', 'desc')->pluck('name', 'id');
+      $data['projects'] = $contract->project_id ? Project::where('id', $contract->project_id)->pluck('name', 'id') : [];
+      $data['programs'] = $contract->program_id ? Program::where('id', $contract->program_id)->pluck('name', 'id') : [];
+      $data['companies'] = Company::where('id', $contract->assignable_id)->pluck('name', 'id');
+      $data['contract'] = $contract;
+      $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
+      $data['statuses'] = $contract->getPossibleStatuses();
+      $data['account_balanaces'] = $contract->account_balance_id ? AccountBalance::where('id', $contract->account_balance_id)->pluck('name', 'id') : [];
+      if ($contract->status == 'Terminated')
+        $data['termination_reason'] = $contract->getLatestTerminationReason();
+
+        // Return a view with the summary data 
+        return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.tabs.summary', $data)->render()]);
+        // Your logic to get summary data
+
+    }
+
+    /**
+     * Show the contracts reviewers.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showReviewers(Contract $contract)
+    {
+        // Your logic to get reviewers data
+        // ...
+
+        // Prepare the data to be passed to the view
+        $data = ['contract' => $contract]; // Ensuring the data is passed as a key-value pair
+
+        // Render the 'reviewers' tab view to a string
+        $viewRendered = view('admin.pages.contracts.tabs.reviewers', $data)->render();
+
+        // Return the rendered view within a response
+        return $this->sendRes('success', ['view_data' => $viewRendered]);        
+
+    }
+
+    /**
+     * Show the contracts comments.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showComments(Contract $contract)
+    {
+        // Your logic to get comments data
+        // ...
+
+        // Render the 'reviewers' tab view to a string
+        $viewRendered = view('admin.pages.contracts.tabs.comments', compact('contract'))->render();
+
+        // Return the rendered view within a response
+        
+        return $this->sendRes('success', ['view_data' => $viewRendered]);    
+    }
+
+    /**
+     * Show the contracts activities.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showActivities(Contract $contract)
+    {
+        // Your logic to get activities data
+        // ...
+
+        // Prepare the data to be passed to the view
+        $data = ['contract' => $contract]; // Ensuring the data is passed as a key-value pair
+
+        // Render the 'reviewers' tab view to a string
+        $viewRendered = view('admin.pages.contracts.tabs.activities', $data)->render();
+
+        // Return the rendered view within a response
+        return $this->sendRes('success', ['view_data' => $viewRendered]);    
+    }  
 
   /**
    * Update the specified resource in storage.
@@ -649,71 +779,44 @@ class ContractController extends Controller
       return $dataTable->make(true);
   }
   
-  // public function markPhaseAsComplete($contract_id, $phase_id)
-  // {
-  //     try {
-  //         // Find the contract by its ID
-  //         $contract = Contract::findOrFail($contract_id);
-      
-  //         // Ensure the contract has a phase with the specified phase_id
-  //         $phase = $contract->phases()->where('id', $phase_id)->first();
-      
-  //         if (!$phase) {
-  //             // No such phase for this contract; you can handle the error as you like.
-  //             return $this->sendError('Invalid phase for this contract.');
-  //         }
-      
-  //         // Check if the phase has already been reviewed by the current user
-  //         $existingReview = $phase->reviews()->where('user_id', Auth::id())->first();
-  //         if ($existingReview) {
-  //             // The phase has already been reviewed by the current user; handle this scenario as you prefer
-  //             return $this->sendError('You have already reviewed this phase.');
-  //         }
-      
-  //         // Mark the phase as reviewed
-  //         $review = new Review([
-  //             'user_id' => Auth::id(),
-  //             'reviewed_at' => now(),
-  //         ]);
-  //         $phase->reviews()->save($review);
-      
-  //         return $this->sendRes('Phase marked as reviewed!');
-  //     } catch (Throwable $e) {
-  //         return $this->sendError('Server Error');
-  //     }
-  // }
-  
+  public function toggleContractReviewStatus($contract_id)
+  {
+      try {
+          // Find the contract by its ID
+          $contract = Contract::findOrFail($contract_id);
+          $table_id = 'contracts-table';
+          // Check if the contract has already been reviewed by the current user
+          $existingReview = $contract->reviews()->where('user_id', Auth::id())->first();
+          if (request()->route()->named('contracts.paymentsplan')) {
+            $table_id = 'payment-table';
+          }
 
-  // public function markPhaseAsIncomplete($contract_id, $phase_id)
-  // {
-  //     try {
-  //         // Find the contract by its ID
-  //         $contract = Contract::findOrFail($contract_id);
+          if ($existingReview) {
+              // The contract has already been reviewed by the current user.
+              // Delete the review to mark the contract as "unreviewed"
+              $existingReview->delete();
       
-  //         // Ensure the contract has a phase with the specified phase_id
-  //         $phase = $contract->phases()->where('id', $phase_id)->first();
-      
-  //         if (!$phase) {
-  //             // No such phase for this contract; you can handle the error as you like.
-  //             return $this->sendError('Invalid phase for this contract.');
-  //         }
-      
-  //         // Find the review for this phase by the current user
-  //         $review = $phase->reviews()->where('user_id', Auth::id())->first();
-          
-  //         if (!$review) {
-  //             // The phase hasn't been reviewed by the current user; handle this scenario as you prefer
-  //             return $this->sendError('You have not reviewed this phase.');
-  //         }
-      
-  //         // Delete the review to mark the phase as "incomplete"
-  //         $review->delete();
-      
-  //         return $this->sendRes('Phase marked as unreviewed!');
-  //     } catch (Throwable $e) {
-  //         return $this->sendError('Server Error');
-  //     }
-  // }
+              return $this->sendRes('Contract marked as unreviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal','isReviewed' => false]);
+          } else {
+              // Mark the contract as reviewed
+              $review = new Review([
+                  'user_id' => Auth::id(),
+                  'reviewed_at' => now(),
+              ]);
+              $contract->reviews()->save($review);
+  
+              return $this->sendRes('Contract marked as reviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal','isReviewed' => true]);
+          }
+  
+      } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+          return $this->sendError('Contract not found.');
+      } catch (Throwable $e) {
+          // It's good to log the actual error message in production for debugging.
+          // Log::error($e->getMessage());
+          return $this->sendError('Server Error');
+      }
+  }
+  
 
   public function togglePhaseReviewStatus($contract_id, $phase_id)
   {
