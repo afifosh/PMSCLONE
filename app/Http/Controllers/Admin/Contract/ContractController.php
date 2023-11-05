@@ -24,6 +24,7 @@ use App\Traits\FinanceTrait;
 use Illuminate\Support\Facades\DB;
 use App\Models\Tax;
 use DataTables;
+use Illuminate\Http\Request;
 
 class ContractController extends Controller
 {
@@ -686,8 +687,8 @@ class ContractController extends Controller
               $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid']));
               return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $phase->stage, 'contract_id' => $contract_id, 'is_editable' => $is_editable])->render();
           })
-          ->addColumn('reviewed_by', function ($stage) {
-            $reviewers = $stage->reviews;
+          ->addColumn('reviewed_by', function ($phase) {
+            $reviewers = $phase->reviews;
         
             $html = '<div class="d-flex align-items-center avatar-group my-3">';
         
@@ -862,5 +863,29 @@ class ContractController extends Controller
       }
   }
 
+  public function getContractsWithStagesAndPhases(Request $request)
+  {
+      $contracts = Contract::with(['stages.phases'])->get();
+
+      $contractDataArray = $contracts->map(function ($contract) {
+          return [
+              'contract_name' => $contract->subject,
+             // 'company' => $contract->company->name, // Assuming a 'company' relationship exists
+           //   'start_date' => $contract->start_date->format('Y-m-d H:i:s'),
+          //    'end_date' => $contract->due_date->format('Y-m-d H:i:s'),
+              'value' => $contract->value,
+              'stages' => $contract->stages->map(function ($stage) {
+                  return [
+                      'name' => $stage->name,
+                      'phases' => $stage->phases->map(function ($phase) {
+                          return ['name' => $phase->name];
+                      })->toArray(),
+                  ];
+              })->toArray(),
+          ];
+      });
+
+      return response()->json($contractDataArray);
+  }
   
 }

@@ -248,7 +248,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
   
 // Prefix for all contract-related routes
 Route::prefix('contracts')->group(function () {
-    
+  Route::get('/afif', [ContractController::class, 'getContractsWithStagesAndPhases']);
   // General contract routes
   Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
   Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
