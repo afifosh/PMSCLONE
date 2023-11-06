@@ -55,6 +55,7 @@ class Contract extends BaseModel
   ];
 
   protected $casts = [
+    'visible_to_client' => 'boolean',
     'signature_date' => 'datetime:d M, Y',
     'start_date' => 'datetime:d M, Y',
     'end_date' => 'datetime:d M, Y',
