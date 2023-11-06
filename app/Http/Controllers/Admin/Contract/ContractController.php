@@ -41,7 +41,7 @@ class ContractController extends Controller
         $dataTable->company = $data['company'];
     } if ($data['program']) {
       $dataTable->program = $data['program'];
-    } else {      
+    } else {
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
@@ -354,7 +354,7 @@ class ContractController extends Controller
       $buttonIcon = $userHasMarkedComplete ? 'ti-undo' : 'ti-bell';
       $reviewStatus = $userHasMarkedComplete ? 'true' : 'false';
       $buttonLabelClass = $userHasMarkedComplete ? 'btn-label-danger' : 'btn-label-secondary';
-  
+
       $modalTitle = '
       <h5 class="modal-title" id="globalModalTitle">Edit Contract</h5>
       <div class="flex items-center justify-between border-b-1 w-full">
@@ -367,10 +367,10 @@ class ContractController extends Controller
           </button>
           <button type="button" data-bs-dismiss="modal" aria-label="Close" class="btn-close"></button>
       </div>';
-  
-  
+
+
     return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.create', $data)->render()]);
-    
+
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.create', $data)->render()]);
   }
@@ -417,7 +417,7 @@ class ContractController extends Controller
       if ($contract->status == 'Terminated')
         $data['termination_reason'] = $contract->getLatestTerminationReason();
 
-        // Return a view with the summary data 
+        // Return a view with the summary data
         return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.tabs.summary', $data)->render()]);
         // Your logic to get summary data
 
@@ -440,7 +440,7 @@ class ContractController extends Controller
         $viewRendered = view('admin.pages.contracts.tabs.reviewers', $data)->render();
 
         // Return the rendered view within a response
-        return $this->sendRes('success', ['view_data' => $viewRendered]);        
+        return $this->sendRes('success', ['view_data' => $viewRendered]);
 
     }
 
@@ -458,8 +458,8 @@ class ContractController extends Controller
         $viewRendered = view('admin.pages.contracts.tabs.comments', compact('contract'))->render();
 
         // Return the rendered view within a response
-        
-        return $this->sendRes('success', ['view_data' => $viewRendered]);    
+
+        return $this->sendRes('success', ['view_data' => $viewRendered]);
     }
 
     /**
@@ -476,13 +476,13 @@ class ContractController extends Controller
         ->where('auditable_type', get_class($contract))
         ->orderBy('created_at', 'desc')
         ->get();
-  
+
         // Render the 'reviewers' tab view to a string
         $viewRendered = view('admin.pages.contracts.tabs.activities', compact('contractAudits'))->render();
 
         // Return the rendered view within a response
-        return $this->sendRes('success', ['view_data' => $viewRendered]);    
-    }  
+        return $this->sendRes('success', ['view_data' => $viewRendered]);
+    }
 
   /**
    * Update the specified resource in storage.
@@ -624,7 +624,7 @@ class ContractController extends Controller
         $dataTable->company = $data['company'];
     } if ($data['program']) {
       $dataTable->program = $data['program'];
-    } else {      
+    } else {
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
@@ -660,7 +660,7 @@ class ContractController extends Controller
       $query->where('id', $contract_id);
   })->select('contract_phases.*');
 
-  
+
       $dataTable = DataTables::of($query)
           ->addColumn('stage_name', function ($phase) {
             return $phase->stage ? $phase->stage->name : 'N/A'; // Added a null check in case a phase doesn't have a related stage
@@ -689,32 +689,32 @@ class ContractController extends Controller
           })
           ->addColumn('reviewed_by', function ($phase) {
             $reviewers = $phase->reviews;
-        
+
             $html = '<div class="d-flex align-items-center avatar-group my-3">';
-        
+
             $maxDisplayed = 5;
             for ($i = 0; $i < min($maxDisplayed, $reviewers->count()); $i++) {
                 $reviewer = $reviewers[$i];
                 $avatarUrl = $reviewer->user->avatar; // Assuming 'avatar' is the column name in the 'users' table
                 $userName = htmlspecialchars($reviewer->user->name); // Escape the name to ensure it's safe to display
-        
+
                 $html .= '<div class="avatar pull-up" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" aria-label="' . $userName . '" data-bs-original-title="' . $userName . '">
                             <img src="' . $avatarUrl . '" alt="Avatar" class="rounded-circle">
                           </div>';
             }
-        
+
             if ($reviewers->count() > $maxDisplayed) {
                 $moreCount = $reviewers->count() - $maxDisplayed;
                 $html .= '<div class="avatar pull-up">
                             <span class="avatar-initial rounded-circle" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" data-bs-original-title="' . $moreCount . ' more reviewers">+' . $moreCount . '</span>
                           </div>';
             }
-        
+
             $html .= '</div>';
             return $html;
           })
           ->rawColumns(['actions', 'invoice_id', 'amount','reviewed_by']);
-  
+
           $outputData = $dataTable->make(true)->getData(true); // Get data as an associative array
 
           // Add custom buttons to the data table's output
@@ -743,10 +743,10 @@ class ContractController extends Controller
                   ],
               ],
           ];
-      
+
           return response()->json($outputData); // Return a new JSON response with the modified data
   }
-  
+
   public function ContractPaymentsPlanStages($contract_id)
   {
       $query = ContractStage::where('contract_id', $contract_id)
@@ -754,7 +754,7 @@ class ContractController extends Controller
           ->with(['contract' => function ($q) {
               $q->select(['contracts.id', 'currency']);
           }]);
-  
+
       $dataTable = DataTables::of($query)
           ->editColumn('name', function ($stage) {
               return $stage->name;
@@ -778,10 +778,10 @@ class ContractController extends Controller
               $query->has('phases', $keyword);
           })
           ->rawColumns(['name', 'action']);
-  
+
       return $dataTable->make(true);
   }
-  
+
   public function toggleContractReviewStatus($contract_id)
   {
       try {
@@ -798,7 +798,7 @@ class ContractController extends Controller
               // The contract has already been reviewed by the current user.
               // Delete the review to mark the contract as "unreviewed"
               $existingReview->delete();
-      
+
               return $this->sendRes('Contract marked as unreviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal','isReviewed' => false]);
           } else {
               // Mark the contract as reviewed
@@ -807,10 +807,10 @@ class ContractController extends Controller
                   'reviewed_at' => now(),
               ]);
               $contract->reviews()->save($review);
-  
+
               return $this->sendRes('Contract marked as reviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal','isReviewed' => true]);
           }
-  
+
       } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
           return $this->sendError('Contract not found.');
       } catch (Throwable $e) {
@@ -819,25 +819,25 @@ class ContractController extends Controller
           return $this->sendError('Server Error');
       }
   }
-  
+
 
   public function togglePhaseReviewStatus($contract_id, $phase_id)
   {
       try {
           // Find the contract by its ID
           $contract = Contract::findOrFail($contract_id);
-  
+
           // Ensure the contract has a phase with the specified phase_id
           $phase = $contract->phases()->where('id', $phase_id)->first();
-  
+
           if (!$phase) {
               // No such phase for this contract; handle the error accordingly.
               return $this->sendError('Invalid phase for this contract.');
           }
-  
+
           // Check if the phase has already been reviewed by the current user
           $existingReview = $phase->reviews()->where('user_id', Auth::id())->first();
-  
+
           if ($existingReview) {
               // The phase has already been reviewed by the current user.
               // Delete the review to mark the phase as "unreviewed"
@@ -851,11 +851,11 @@ class ContractController extends Controller
                   'reviewed_at' => now(),
               ]);
               $phase->reviews()->save($review);
-  
+
               //return $this->sendRes('Phase marked as reviewed!');
               return $this->sendRes('Phase marked as reviewed!', ['isReviewed' => true]);
           }
-  
+
       } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
           return $this->sendError('Contract not found.');
       } catch (Throwable $e) {
@@ -887,5 +887,5 @@ class ContractController extends Controller
 
       return response()->json($contractDataArray);
   }
-  
+
 }

@@ -219,22 +219,22 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
   //     Route::get('paymentsplan', [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
   //     Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
   //     Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
-      
+
   //     // Grouped routes for payment plans with contract_id constraint
   //     Route::prefix('paymentsplan/{contract_id}')->where(['contract_id' => '[0-9]+'])->group(function () {
   //         // Route for a contract's payment plan details
   //         Route::get('/', [ContractController::class, 'SpecificContractPaymentsPlan'])->name('contracts.specific.paymentsplan');
-          
+
   //         // Route for phases of a specific contract's payment plan
   //         Route::get('/phases', [ContractController::class, 'ContractPaymentsPlanPhases'])->name('contracts.paymentsplan.phases');
-  
+
   //         // Route for stages of a specific contract's payment plan
   //         Route::get('/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
-  
+
   //         // Phase actions
   //         Route::post('/phases/{phase_id}/mark-complete', [ContractController::class, 'markPhaseAsComplete'])->name('contracts.phases.complete')->where('phase_id', '[0-9]+');
   //         Route::post('/phases/{phase_id}/mark-incomplete', [ContractController::class, 'markPhaseAsIncomplete'])->name('contracts.phases.incomplete')->where('phase_id', '[0-9]+');
-  
+
   //         // Specific phase tab routes with phase_id constraint
   //         Route::prefix('/phase/{phase_id}')->where(['phase_id' => '[0-9]+'])->group(function () {
   //             Route::get('/reviewers', [PhaseController::class, 'reviewersTabContent'])->name('phases.reviewers');
@@ -245,7 +245,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
   //     });
   // });
 
-  
+
 // Prefix for all contract-related routes
 Route::prefix('contracts')->group(function () {
   Route::get('/afif', [ContractController::class, 'getContractsWithStagesAndPhases']);
@@ -254,7 +254,7 @@ Route::prefix('contracts')->group(function () {
   Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
   Route::get('paymentsplan', [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
   // Specific contract routes with contract_id constraint
-  Route::prefix('{contract_id}')->where(['contract_id' => '[0-9]+'])->group(function () {
+  Route::prefix('{contract}')->where(['contract' => '[0-9]+'])->group(function () {
 
         // Display the form for editing contract details
         // Process the action of marking a contract as reviewed
@@ -264,13 +264,13 @@ Route::prefix('contracts')->group(function () {
         Route::get('/reviewers', [ContractController::class, 'showReviewers'])->name('contracts.reviewers');
         Route::get('/comments', [ContractController::class, 'showComments'])->name('contracts.comments');
         Route::get('/activities', [ContractController::class, 'showActivities'])->name('contracts.activities');
-            
+
       // Details of a specific contract
       // Route::get('/', [ContractController::class, 'show'])->name('contracts.show');
 
       // Payment plan and its sub-resources for a specific contract
       Route::group(['prefix' => 'paymentsplan'], function () {
-          
+
           // Route for a contract's payment plan details
           Route::get('/', [ContractController::class, 'SpecificContractPaymentsPlan'])->name('contracts.specific.paymentsplan');
 

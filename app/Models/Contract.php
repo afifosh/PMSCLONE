@@ -196,7 +196,7 @@ class Contract extends BaseModel
   {
       return $this->morphMany(Review::class, 'reviewable');
   }
-  
+
   public function category(): BelongsTo
   {
     return $this->belongsTo(ContractCategory::class);
@@ -371,7 +371,7 @@ class Contract extends BaseModel
   */
   public function commentableName(): string
   {
-    return 'Phase: ' . $this->name . ' Of contract: ' . $this->contract->subject;
+    return 'Contract: ' . $this->contract->subject;
   }
 
   /*
@@ -381,5 +381,5 @@ class Contract extends BaseModel
   public function commentUrl(): string
   {
     return '#';
-  }  
+  }
 }

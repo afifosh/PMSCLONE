@@ -245,7 +245,7 @@ $('#globalModal').on('shown.bs.modal', function (e) {
 
   if($('#globalModal #contract-update-form').length){
     // Echo listen fo phase updates
-    Echo.join(`contracts.${$('#globalModal #contract-update-form').data('contract-id')}`)
+    Echo.join(`contracts-editor.${$('#globalModal #contract-update-form').data('contract-id')}`)
         .here((users) => {
           for (let index = 0; index < users.length; index++) {
             const user = users[index];
@@ -278,24 +278,42 @@ $('#globalModal').on('keyup change paste', '#contract-update-form input, #contra
 
 });
 
- 
+
 function whisperForContractEditing()
 {
-  Echo.private(`contracts.${$('#globalModal #contract-update-form').data('contract-id')}`)
+  // serialize the form data except _method and _token and .select2-hidden-accessible
+  var data = $('#globalModal #contract-update-form').serializeArray().filter(function (item) {
+    return item.name != '_method' && item.name != '_token' && !$('#globalModal #contract-update-form [name="'+item.name+'"]').hasClass('select2-hidden-accessible');
+  });
+
+  // if the element is select2 then get the option text as well
+  $('#globalModal #contract-update-form .select2-hidden-accessible').each(function (index, item) {
+    var name = $(item).attr('name');
+    var value = $(item).val();
+    var text = $(item).find('option[value="'+value+'"]').text();
+    data.push({
+      name: name,
+      value: value,
+      text: text
+    });
+  });
+
+  // push checkbox values even if not checked
+  $('#globalModal #contract-update-form input[type="checkbox"]').each(function (index, item) {
+    var name = $(item).attr('name');
+    var value = $(item).val();
+    var checked = $(item).prop('checked');
+    data.push({
+      name: name,
+      value: value,
+      checked: checked
+    });
+  });
+
+
+  Echo.private(`contracts-editor.${$('#globalModal #contract-update-form').data('contract-id')}`)
         .whisper('editing-model', {
-            data: {
-              name: $('#globalModal #contract-update-form [name="subject"]').val(),
-              // estimated_cost: $('#globalModal #contract-update-form [name="estimated_cost"]').val(),
-              // 'phase_taxes[]': $('#globalModal #contract-update-form [name="phase_taxes[]"]').val(),
-              // adjustment_amount: $('#globalModal #contract-update-form [name="adjustment_amount"]').val(),
-              // total_cost: $('#globalModal #contract-update-form [name="total_cost"]').val(),
-              // start_date: $('#globalModal #contract-update-form [name="start_date"]').val(),
-              // due_date: $('#globalModal #contract-update-form [name="due_date"]').val(),
-              // calc_end_date: $('#globalModal #contract-update-form [name="calc_end_date"]').val(),
-              // cal_end_date_unit: $('#globalModal #contract-update-form [name="cal_end_date_unit"]').val(),
-              description: $('#globalModal #contract-update-form [name="description"]').val(),
-            },
-        
+            data: data
         });
 }
 
@@ -305,14 +323,27 @@ function whisperForContractEditing()
  * */
 $('#globalModal').on('shown.bs.modal', function (e) {
   if($('#globalModal #contract-update-form').length){
-    Echo.private(`contracts.${$('#globalModal #contract-update-form').data('contract-id')}`)
+    Echo.private(`contracts-editor.${$('#globalModal #contract-update-form').data('contract-id')}`)
         .listenForWhisper('editing-model', (e) => {
+          console.log(e);
             disableContractWhisper = true;
-            $.each(e.data, function (name, value) {
-              $('#globalModal #contract-update-form [name="'+name+'"]').val(value);
+            $.each(e.data, function (index, item) {
+              //check if the item is select2
+              if($('#globalModal #contract-update-form [name="'+item.name+'"]').hasClass('select2-hidden-accessible')){
+                // add option if not exist
+                if($('#globalModal #contract-update-form [name="'+item.name+'"] option[value="'+item.value+'"]').length == 0){
+                  $('#globalModal #contract-update-form [name="'+item.name+'"]').append('<option value="'+item.value+'">'+item.text+'</option>').val(item.value).trigger('change');
+                }
+              }
+              // check if the item is checkbox
+              else if($('#globalModal #contract-update-form [name="'+item.name+'"]').attr('type') == 'checkbox'){
+                $('#globalModal #contract-update-form [name="'+item.name+'"]').prop('checked', item.checked).trigger('change');
+              }else {
+                $('#globalModal #contract-update-form [name="'+item.name+'"]').val(item.value);
+              }
             });
             // to updadte all select
-         //   $('#globalModal #contract-update-form [name="phase_taxes[]"]').trigger('change');
+          //  $('#globalModal #contract-update-form .form-select').trigger('change');
             disableContractWhisper = false;
         });
   }
@@ -321,7 +352,7 @@ $('#globalModal').on('shown.bs.modal', function (e) {
  // Leave the contract channel when modal is closed
 $('#globalModal').on('hidden.bs.modal', function (e) {
   if($('#globalModal #contract-update-form').length){
-    Echo.leave(`contracts.${$('#globalModal #contract-update-form').data('contract-id')}`);
+    Echo.leave(`contracts-editor.${$('#globalModal #contract-update-form').data('contract-id')}`);
   }
 });
 

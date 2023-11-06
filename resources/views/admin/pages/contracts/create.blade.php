@@ -31,13 +31,13 @@
         @include('admin.pages.contracts.tabs.summary')
       </div>
       <div class="tab-pane fade {{request()->tab == 'reviewers' ? 'show active' : ''}}" id="navs-top-reviewers" role="tabpanel">
-        @include('admin.pages.contracts.tabs.reviewers')
+        {{-- @include('admin.pages.contracts.tabs.reviewers') --}}
       </div>
       <div class="tab-pane fade {{request()->tab == 'activities' ? 'show active' : ''}}" id="navs-top-activities" role="tabpanel">
-        @include('admin.pages.contracts.tabs.activities')
+        {{-- @include('admin.pages.contracts.tabs.activities') --}}
       </div>
       <div class="tab-pane fade {{request()->tab == 'comments' ? 'show active' : ''}}" id="navs-top-comments-contracts" role="tabpanel">
-        @include('admin.pages.contracts.tabs.comments')
+        {{-- @include('admin.pages.contracts.tabs.comments') --}}
       </div>
     </div>
   </div>
@@ -52,7 +52,7 @@ function toggleContractReviewStatus(buttonElement) {
 
             // Using the route function to dynamically generate the URL
             const url = route('admin.contracts.toggle-review', {
-                contract_id: contractId,
+                contract: contractId,
             });
 
             fetch(url, {
@@ -65,20 +65,20 @@ function toggleContractReviewStatus(buttonElement) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-         
-              
+
+
                   if (data.data.event == 'table_reload') {
-                 
+
                   if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
                     $('#' + data.data.table_id)
                       .DataTable()
                       .ajax.reload();
-                  } 
-             
+                  }
+
                 }
                 if(data.data.close == 'globalModal'){
                   $('#globalModal').modal('hide');
-       
+
           }else if(data.data.close == 'modal'){
             current.closest('.modal').modal('hide');
           }
@@ -189,10 +189,10 @@ function toggleContractReviewStatus(buttonElement) {
 
   $(document).ready(function () {
         window.oURL = window.location.href;
-      });  
+      });
   function reload_contract_summary(contract){
     var url = route('admin.contracts.summary', {
-      contract_id: contract,
+      contract: contract,
     });
     $.ajax({
       url: url,
@@ -205,15 +205,15 @@ function toggleContractReviewStatus(buttonElement) {
 
   function reload_contract_comments(contract){
     var url = route('admin.contracts.comments', {
-      contract_id: contract,
+      contract: contract,
     });
     $.ajax({
       url: url,
       type: "GET",
       success: function(data){
-        $('#navs-top-comments').html(data.data.view_data);
-          Livewire.rescan(document.getElementById('navs-top-comments'));
-          Alpine.initTree(document.getElementById('navs-top-comments'));
+        $('#navs-top-comments-contracts').html(data.data.view_data);
+          Livewire.rescan(document.getElementById('navs-top-comments-contracts'));
+          Alpine.initTree(document.getElementById('navs-top-comments-contracts'));
         setTimeout(function () {
           history.replaceState(null, null, oURL);
         }, 1000);
@@ -221,10 +221,10 @@ function toggleContractReviewStatus(buttonElement) {
     });
   }
 
-  
+
   function reload_contract_activities(contract){
     var url = route('admin.contracts.activities', {
-      contract_id: contract,
+      contract: contract,
     });
     $.ajax({
       url: url,
@@ -237,7 +237,7 @@ function toggleContractReviewStatus(buttonElement) {
 
   function reload_contract_reviewers(contract){
     var url = route('admin.contracts.reviewers', {
-      contract_id: contract,
+      contract: contract,
     });
     $.ajax({
       url: url,

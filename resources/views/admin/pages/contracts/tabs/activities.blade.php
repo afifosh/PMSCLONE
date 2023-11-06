@@ -1,13 +1,3 @@
-@php
-    
-    $contractAudits = \App\Models\Audit::where('auditable_id', $contract->id)
-        ->where('auditable_type', get_class($contract))
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-        
-@endphp
-
 <div class="card-body pb-0 mt-4">
     <ul class="timeline mb-0">
         @foreach($contractAudits as $audit)
@@ -28,17 +18,16 @@
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap pb-0 px-0">
                   <div class="d-flex align-items-center">
-                    <img src="{{ $audit->user->avatar  }}" class="rounded-circle me-3" alt="avatar" height="24" width="24">
+                    <img src="{{ $audit->user->avatar ?? '' }}" class="rounded-circle me-3" alt="avatar" height="24" width="24">
                     <div class="user-info">
                       <p class="my-0">{{ $audit->user->name ?? 'Unknown' }}</p>
-  
+
                     </div>
                   </div>
-  
+
                 </div>
             </div>
         </li>
         @endforeach
     </ul>
   </div>
-  

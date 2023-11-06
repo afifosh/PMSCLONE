@@ -34,6 +34,10 @@ Broadcast::channel('contracts.{id}', function (Admin $user, $id) {
   return ['id' => $user->id, 'name' => $user->name, 'avatar' => $user->avatar];
 });
 
+Broadcast::channel('contracts-editor.{id}', function (Admin $user, $id) {
+  return ['id' => $user->id, 'name' => $user->name, 'avatar' => $user->avatar];
+});
+
 
 /**
  * Presence channel for stage updates

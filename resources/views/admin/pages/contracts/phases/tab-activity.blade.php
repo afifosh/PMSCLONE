@@ -18,7 +18,7 @@
               </div>
               <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap pb-0 px-0">
                 <div class="d-flex align-items-center">
-                  <img src="{{ $audit->user->avatar  }}" class="rounded-circle me-3" alt="avatar" height="24" width="24">
+                  <img src="{{ $audit->user->avatar ?? ''  }}" class="rounded-circle me-3" alt="avatar" height="24" width="24">
                   <div class="user-info">
                     <p class="my-0">{{ $audit->user->name ?? 'Unknown' }}</p>
 

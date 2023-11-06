@@ -106,7 +106,7 @@ $configData = Helper::appClasses();
 
             // Using the route function to dynamically generate the URL
             const url = route('admin.contracts.phases.toggle-review', {
-                contract_id: contractId,
+                contract: contractId,
                 phase_id: phaseId
             });
 
@@ -231,7 +231,7 @@ $(row.node()).next().after(contentRow);
     $('#stages-table-' + contractId).DataTable({
         processing: true,
         serverSide: true,
-        ajax: route('admin.contracts.paymentsplan.stages', { contract_id: contractId }),
+        ajax: route('admin.contracts.paymentsplan.stages', { contract: contractId }),
         columns: [
             // Define your stages columns here. I'm making some assumptions. Adjust accordingly.
             { data: "name", "name": "contract_stages.name", title: 'Stage Name' },
@@ -267,7 +267,7 @@ $(row.node()).next().after(contentRow);
     $('#' + childTableId).DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: route('admin.contracts.paymentsplan.phases', { contract_id: contractId }),
+                ajax: route('admin.contracts.paymentsplan.phases', { contract: contractId }),
                 columns: [
                     { data: "stage_name", "name": "stage_name", title: 'Stage Name' },
                     { data: 'name', title: 'Phase Name' },
@@ -384,7 +384,7 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
   var stageEditingUsers = [];
   var phaseEditingUsers = [];
   var disablePhaseWhisper = false;
-  var contractEditingUsers = [];  
+  var contractEditingUsers = [];
   var disableContractWhisper = false;
   window.oURL = window.location.href;
 </script>

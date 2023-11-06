@@ -13,6 +13,8 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/apex-charts/apex-charts.css')}}" />
+@livewireStyles
+<x-comments::styles />
 @endsection
 
 @section('page-style')
@@ -223,4 +225,10 @@ $configData = Helper::appClasses();
           });
       });
     </script>
+    <script>
+      window.oURL = window.location.href;
+    </script>
+    @livewireScripts
+    <x-comments::scripts />
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endpush

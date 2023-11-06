@@ -118,7 +118,7 @@
   <div class="col-12 mt-2">
     <div class="d-flex">
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="cont-has-end-date" @checked(!$contract->subject || $contract->end_date)>
+        <input class="form-check-input" name="has_end_date" type="checkbox" id="cont-has-end-date" @checked(!$contract->subject || $contract->end_date)>
         <label class="form-check-label me-2" for="cont-has-end-date">
           Has End Date
         </label>
@@ -166,7 +166,7 @@
 <div class="mt-3 d-flex justify-content-between">
   <div class="contract-editing-users">
     ss
-  </div>  
+  </div>
   <div class="btn-flt float-end">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
       @if (!$contract->status || $contract->status == 'Draft')
