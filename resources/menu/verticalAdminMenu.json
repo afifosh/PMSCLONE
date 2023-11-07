@@ -155,7 +155,7 @@
     },
     {
       "name": "Contracts",
-      "slug": ["admin.contracts.", "admin.contract-types", "admin.projects.gantt-chart.index", "admin.contract-categories.index", "admin.change-requests.index", "admin.contract-doc-controls"],
+      "slug": ["admin.contracts.", "admin.contract-types", "admin.tracking.contracts", "admin.tracking.paymentsplan","admin.projects.gantt-chart.index", "admin.contract-categories.index", "admin.change-requests.index", "admin.contract-doc-controls"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "submenu": [
         {
@@ -164,15 +164,31 @@
           "slug": "admin.contracts.index"
         },
         {
-          "url": "/admin/contracts/change-requests",
-          "name": "Change Requests",
-          "slug": "admin.change-requests.index"
-        },
-        {
           "url": "/admin/contracts/paymentsplan",
           "name": "Payments Plan",
           "slug": "admin.contracts.paymentsplan"
         },
+        {
+          "name": "Review Tracking",
+          "slug": ["admin.tracking.contracts", "admin.tracking.paymentsplan"],
+          "submenu": [
+            {
+              "url": "/admin/contracts/tracking/contracts",
+              "name": "Contracts",
+              "slug": "admin.tracking.contracts"
+            },            
+            {
+              "url": "/admin/contracts/tracking/paymentsplan",
+              "name": "Payments Plan",
+              "slug": "admin.tracking.paymentsplan"
+            }
+          ]
+        },
+        {
+          "url": "/admin/contracts/change-requests",
+          "name": "Change Requests",
+          "slug": "admin.change-requests.index"
+        },                
         {
           "url": "/admin/projects/gantt-chart",
           "name": "Gantt Chart",

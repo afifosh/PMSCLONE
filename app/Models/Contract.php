@@ -84,6 +84,59 @@ class Contract extends BaseModel
     return $this->value - $this->phases->sum('total_cost');
   }
 
+
+  public function usersWhoCompletedAllPhases()
+  {
+      // Retrieve the total number of phases for this contract.
+      $totalPhases = $this->phases()->count();
+  
+      // Subquery to get user IDs and their count of distinct reviewed phases.
+      // Note that we need the fully qualified class name for `reviewable_type`.
+      $subQuery = Review::select('user_id')
+          ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
+          ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
+          ->whereIn('reviewable_id', $this->phases()->pluck('id'))
+          ->groupBy('user_id')
+          ->havingRaw('phases_count = ?', [$totalPhases]); // use havingRaw to filter users who reviewed all phases
+  
+      // Main query to get admins who have completed all phases.
+      // Join the subquery to filter users based on the phases count.
+      $adminsWhoCompletedAllPhases = Admin::select('admins.*')
+          ->joinSub($subQuery, 'reviewed_phases', function ($join) {
+              $join->on('admins.id', '=', 'reviewed_phases.user_id');
+          })
+          ->get();
+  
+      return $adminsWhoCompletedAllPhases;
+  }
+  
+  public function usersWhoNotCompletedAllPhases()
+  {
+      // Retrieve the total number of phases for this contract.
+      $totalPhases = $this->phases()->count();
+  
+      // Subquery to get user IDs and their count of distinct reviewed phases.
+      // Note that we need the fully qualified class name for `reviewable_type`.
+      $subQuery = Review::select('user_id')
+          ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
+          ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
+          ->whereIn('reviewable_id', $this->phases()->pluck('id'))
+          ->groupBy('user_id');
+  
+      // Main query to get admins who have NOT completed all phases.
+      // We are doing a LEFT JOIN here with the users table and filtering out the ones that have a phases_count equal to totalPhases.
+      $adminsWhoNotCompletedAllPhases = Admin::select('admins.*')
+          ->leftJoinSub($subQuery, 'reviewed_phases', function ($join) {
+              $join->on('admins.id', '=', 'reviewed_phases.user_id');
+          })
+          // We use 'whereRaw' here to add a SQL raw where clause, checking if phases_count is not the total or there's no review (NULL).
+          ->whereRaw('(reviewed_phases.phases_count IS NULL OR reviewed_phases.phases_count < ?)', [$totalPhases])
+          ->get();
+  
+      return $adminsWhoNotCompletedAllPhases;
+  }
+    
+  
   public function getStatusAttribute()
   {
     $value = $this->getRawOriginal('status');
@@ -190,6 +243,29 @@ class Contract extends BaseModel
         $q->where('end_date', '<=', $date);
       } catch (\Exception $e) {
       }
+    })->when(request('review_status'), function ($q) {
+      $reviewStatus = request('review_status');
+
+      // Join with reviews table
+      $q->leftJoin('reviews', function ($join) {
+          $join->on('reviews.reviewable_id', '=', 'contracts.id')
+               ->where('reviews.reviewable_type', '=', Contract::class);
+      });
+
+      if ($reviewStatus == 'reviewed') {
+          // Filter contracts that have at least one review
+          $q->whereNotNull('reviews.id');
+      } elseif ($reviewStatus == 'not_reviewed') {
+          // Filter contracts that do not have any reviews
+          $q->whereNull('reviews.id');
+      }
+
+      // Remove the reviews table from select to avoid column name conflicts
+      $q->select('contracts.*');
+      })->when(request('reviewed_by') && request('reviewed_by') !== 'all', function ($q) {
+        $q->whereHas('reviews', function ($subQuery) {
+            $subQuery->where('user_id', request('reviewed_by'));
+      });
     });
   }
 

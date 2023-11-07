@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin\Contract;
 
 use App\DataTables\Admin\Contract\ContractsDataTable;
+use App\DataTables\Admin\Contract\ContractsTrackingDataTable;
 use App\DataTables\Admin\Contract\PaymentsPlanDataTable;
+use App\DataTables\Admin\Contract\TrackingPaymentsPlanDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ContractStoreRequest;
 use App\Http\Requests\Admin\ContractUpdateRequest;
@@ -63,6 +65,93 @@ class ContractController extends Controller
 
     return $dataTable->render('admin.pages.contracts.index', $data);
     // view('admin.pages.contracts.index');
+  }
+
+  public function trackingPaymentsPlan(TrackingPaymentsPlanDataTable $dataTable)
+  {
+
+    $data['company'] = Company::find(request()->route('company'));
+    $data['program'] = Program::find(request()->route('program'));
+  // dd($data);
+    if ($data['company']) {
+        $dataTable->company = $data['company'];
+    } if ($data['program']) {
+      $dataTable->program = $data['program'];
+    } else {
+    $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
+    $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
+
+    // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
+    $data['contracts'] = Contract::selectRaw('count(*) as total')
+      // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
+      ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
+      ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
+      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
+      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
+      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
+      ->withTrashed()
+      ->first();
+    }
+
+    return $dataTable->render('admin.pages.contracts.paymentsplan.index', $data);
+
+  }
+
+  public function trackingContract(ContractsTrackingDataTable $dataTable)
+  {
+    $data['company'] = Company::find(request()->route('company'));
+    $data['program'] = Program::find(request()->route('program'));
+
+    if ($data['company']) {
+        $dataTable->company = $data['company'];
+    } if ($data['program']) {
+      $dataTable->program = $data['program'];
+    } else {
+    $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
+    $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
+
+    $reviewers = Review::with('user') // Make sure 'user' corresponds to the relationship method name in the Review model
+                ->where('reviewable_type', Contract::class)
+                ->get()
+                ->pluck('user.name', 'user.id')
+                ->unique()
+                ->sort();
+    // Add an "All" option at the beginning of the collection
+    $reviewers = $reviewers->prepend('All Users', 'all');
+
+    // Prepare the options for the dropdown
+    $review_status = [
+      'all' => 'All Contracts',
+      'reviewed' => 'Reviewed',
+      'not_reviewed' => 'Not Reviewed',
+    ];
+
+
+    $data['contract_reviewers'] = $reviewers;
+    $data['review_status'] = $review_status;
+
+    // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
+    $data['contracts'] = Contract::selectRaw('count(*) as total')
+      // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
+      ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
+      ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
+      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
+      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
+      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
+      ->withTrashed()
+      ->first();
+    }
+
+    return $dataTable->render('admin.pages.contracts.tracking.contracts.index', $data);
+
   }
 
   public function statistics()
