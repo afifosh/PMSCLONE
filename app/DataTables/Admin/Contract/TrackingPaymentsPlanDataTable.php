@@ -31,8 +31,8 @@ class TrackingPaymentsPlanDataTable extends DataTable
     ->addColumn('incomplete_reviewers', function ($contract) {
       // Get the collection of users who have completed all phases 
       // Incomplete Reviewers
-      $usersWhoCompletedAllPhases = $contract->usersWhoNotCompletedAllPhases();
-      
+     // $usersWhoCompletedAllPhases = $contract->usersWhoNotCompletedAllPhases();
+      $usersWhoCompletedAllPhases = $contract->getAdminsWhoDidNotCompleteOrDidNotReviewAnyPhase();
       // Return the count of that collection
      // return $usersWhoCompletedAllPhases->count();
             $html = '<div class="d-flex align-items-center avatar-group my-3">';
