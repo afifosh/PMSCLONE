@@ -465,4 +465,38 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     {
       return $this->belongsToMany(Contract::class, 'contract_notifiable_users', 'admin_id', 'contract_id');
     }
+
+        /**
+     * Get the review status of each stage for a specific contract.
+     *
+     * @param int $contractId
+     * @return array
+     */
+    public function getReviewStatusForContract($contract_id)
+    {
+        // Fetch the contract with its stages
+        $contract = Contract::find($contract_id);
+    
+        if (!$contract) {
+            return []; // or throw an exception, depending on your application's needs
+        }
+    
+        // Use `$this` to refer to the current admin instance
+        $adminId = $this->id;
+    
+        $stagesReviewStatus = $contract->stages->map(function ($stage) use ($adminId) {
+            // Get the status for this stage for the current admin
+            $status = $stage->getUserReviewStatusWithLastReviewDate($adminId);
+    
+            // Add stage information for reference
+            return [
+                'stage_name' => $stage->name,
+                'status' => $status['status'],
+                'last_review_date' => $status['last_review_date'],
+            ];
+        });
+    
+        return $stagesReviewStatus->toArray();
+    }
+    
 }

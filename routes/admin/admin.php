@@ -302,6 +302,9 @@ Route::prefix('contracts')->group(function () {
 
           // Route for the stages of a contract's payment plan
           Route::get('/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
+
+          // Route for the review of a contract's payment plan
+          Route::get('/review', [ContractController::class, 'ContractPaymentsPlanReview'])->name('contracts.paymentsplan.review');          
       });
 
       // Routes for actions on phases

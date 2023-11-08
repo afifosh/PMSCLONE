@@ -134,7 +134,7 @@ $configData = Helper::appClasses();
                     buttonElement.classList.add(newClass);
                     toast_success(data.message)
                 } else {
-                    alert('Error toggling review status.');
+                    // alert('Error toggling review status.');
                     toast_danger(data.message)
                 }
             })
@@ -214,6 +214,11 @@ $(document).ready(function() {
                         <!-- This is where your child table (Datatable) will go -->
                         <table class="table" id="child-table-${contractId}"></table>
                     </div>
+                    <div class="tab-pane fade" id="child-review-${contractId}" role="tabpanel" aria-labelledby="child-review-tab-${contractId}">
+                        <!-- Phases content here -->
+                        <!-- This is where your review table (Datatable) will go -->
+                        <table class="table" id="review-table-${contractId}"></table>
+                    </div>                    
                 </div>
             </td>
         </tr>
@@ -229,6 +234,23 @@ $(row.node()).next().after(contentRow);
     // Insert the content row after the pills row
   //  $(row.node()).after(content);
     var childTableId = "child-table-" + contractId;
+
+    // Stages DataTable
+    $('#review-table-' + contractId).DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: route('admin.contracts.paymentsplan.review', { contract: contractId }),
+        columns: [
+            // Define your stages columns here. I'm making some assumptions. Adjust accordingly.
+            { data: "name", title: 'Reviewer Name' },
+            { data: 'review_status', title: 'Review Status' },
+
+
+        ],
+        destroy: true,
+        dom: 'Blfrtip',
+        // Add more DataTable options if required
+    });
 
     // Stages DataTable
     $('#stages-table-' + contractId).DataTable({
@@ -373,6 +395,16 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         // Get the corresponding phases DataTable and reload it
         $('#child-table-' + contractId).DataTable().ajax.reload();
     });
+
+    // Reload phases DataTable when "Phases" pill tab is clicked
+    $(document).on('click', '.nav-link[data-bs-target^="#child-review-"]', function() {
+        // Extract the contractId from the target attribute of the clicked pill tab
+        var contractId = $(this).attr('data-bs-target').replace("#child-review-", "");
+
+        // Get the corresponding phases DataTable and reload it
+        $('#review-table' + contractId).DataTable().ajax.reload();
+    });
+        
 });
 </script>
 
