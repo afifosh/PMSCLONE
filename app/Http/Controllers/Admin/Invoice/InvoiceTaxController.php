@@ -24,13 +24,8 @@ class InvoiceTaxController extends Controller
       $sync_data[$rate->id] = ['amount' => $rate->getRawOriginal('amount'), 'type' => $rate->type, 'invoice_item_id' => $request->item_id, 'invoice_id' => $invoice->id];
     }
 
-    if ($request->item_id) {
-      $item = $invoice->items()->where('id', $request->item_id)->with('invoiceable')->first();
-      $item->taxes()->sync($sync_data);
-      $item->updateTaxAmount();
-    } else
-      $invoice->taxes()->sync($sync_data);
-      $invoice->reCalculateTotal();
+    $invoice->taxes()->sync($sync_data);
+    $invoice->reCalculateTotal();
 
     return $this->sendRes('success');
   }

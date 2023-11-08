@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Mediable;
@@ -46,11 +45,7 @@ class Invoice extends Model
     'retention_released_at',
     'is_auto_generated',
     'downpayment_amount',
-    'downpayment_before_tax',
-    'is_payable',
-    'is_discount_before_tax',
-    'is_adjustment_before_tax',
-    'is_retention_before_tax'
+    'is_payable'
   ];
 
   protected $casts = [
@@ -95,7 +90,11 @@ class Invoice extends Model
     return $this->morphTo();
   }
 
-  public function items()
+  /**
+   * Has Many Invoice Items
+   * @return HasMany
+   */
+  public function items(): HasMany
   {
     return $this->hasMany(InvoiceItem::class)->orderBy('order');
   }
@@ -118,7 +117,7 @@ class Invoice extends Model
 
   public function phases()
   {
-    return $this->morphedByMany(ContractPhase::class, 'invoiceable', 'invoice_items', 'invoice_id', 'invoiceable_id')->withPivot('amount', 'description');
+    return $this->morphedByMany(ContractPhase::class, 'invoiceable', 'invoice_items', 'invoice_id', 'invoiceable_id')->withPivot('subtotal', 'description');
     // return $this->belongsToMany(ContractPhase::class, 'invoice_items', 'invoice_id', 'invoiceable_id')->where('invoiceable_type', ContractPhase::class);
   }
 
@@ -132,9 +131,22 @@ class Invoice extends Model
     return $this->hasMany(InvoicePayment::class);
   }
 
+  /**
+   * All The taxes (both summary and inline) which are applied on this invoice
+   * @return BelongsToMany
+   */
   public function taxes(): BelongsToMany
   {
     return $this->belongsToMany(Tax::class, 'invoice_taxes')->withPivot('amount', 'type', 'invoice_item_id');
+  }
+
+  /**
+   * Summary taxes which are applied on this invoice
+   * @return BelongsToMany
+   */
+  public function summaryTaxes()
+  {
+    return $this->taxes()->where('invoice_taxes.invoice_item_id', null);
   }
 
   public function getSubtotalAttribute($value)
@@ -221,150 +233,61 @@ class Invoice extends Model
     $this->attributes['downpayment_amount'] = moneyToInt($value);
   }
 
-  public function getDownpaymentBeforeTaxAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setDownpaymentBeforeTaxAttribute($value)
-  {
-    $this->attributes['downpayment_before_tax'] = moneyToInt($value);
-  }
-
   public function getDownpaymentAmountRemainingAttribute()
   {
     return $this->downpaymentAmountRemaining();
   }
 
-  public function updateItemsTaxType(): void
-  {
-    $this->items->each(function ($item) {
-      $item->updateTaxAmount();
-    });
-  }
-
-  public function updateSubtotal(): void
+  /**
+   * Recalculate subtotal, tax, downpayment, retention, adjustment, total amount
+   * @return void
+   */
+  public function reCalculateTotal(): void
   {
     if ($this->type == 'Partial Invoice') {
-      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum('amount') / 1000;
+      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum('total') / 1000;
     } else if ($this->type == 'Regular') {
-      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum('amount') / 1000;
-    }
-    if (!$subtotal) {
-      $this->update(['discount_amount' => 0]);
+      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum('total') / 1000;
     }
 
-    $downpayment_before_tax = $this->downPayments()->wherePivot('is_after_tax', 0)->sum('amount') / 1000;
+    // Sumary Tax Calculation. Inline Tax is settled in each item's total
+    $total_tax = $this->calculateSummaryTax($subtotal);
 
     $total = $subtotal
       - $this->discount_amount
-      - $downpayment_before_tax
-      + $this->total_tax // add total tax. It is calculated in updateTaxAmount() method
+      + $total_tax // add total summary tax.
       + $this->adjustment_amount; // adjustment amount can be negative or positive depending on the user input
 
-    $retention_amount = $this->calRetentionAmount($total, $subtotal);
+    // Retention amount is calculated after tax on total
+    $retention_amount = $this->calRetentionAmount($total);
 
     $this->update([
       'subtotal' => $subtotal,
       'downpayment_amount' => $this->downPayments()->wherePivot('is_after_tax', 1)->sum('amount') / 1000,
-      'downpayment_before_tax' => $downpayment_before_tax,
       'retention_amount' => $retention_amount,
       'total' => $total
     ]);
   }
 
   /**
-   * update tax for regular invoice
+   * Calculate summary tax
    */
-  public function updateRegularInvoiceTax(): void
+  private function calculateSummaryTax($subtotal)
   {
-    if ($this->is_summary_tax) {
-      $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
-      $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
-      $this->update(['total_tax' => $fixed_tax + (($this->taxableSubtotal()) * $percent_tax / 100)]);
-    } else {
-      // $fixed_tax = $this->items()->sum('invoice_items.total_tax_amount') / 1000;
-      // $this->update(['total_tax' => $fixed_tax]);
-      $avg_tax_free_amount = $this->avgTaxFreeAmount();
-      $actual_tax = 0;
+    $fixed_tax = $this->summaryTaxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
+    $percent_tax = $this->summaryTaxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
 
-      foreach ($this->items as $item) {
-        $item_tax = 0;
-        $item_taxable = $item->amount - $avg_tax_free_amount;
-        foreach ($item->pivotTaxes as $tax) {
-          if ($tax->type == 'Fixed') {
-            $item_tax += $tax->amount / 1000;
-          } else {
-            $item_tax += ($item_taxable * $tax->amount / 100);
-          }
-        }
-        $actual_tax += $item_tax;
-      }
-
-      $this->update(['total_tax' => $actual_tax]);
-    }
+    return ($fixed_tax + ($subtotal * $percent_tax / 100));
   }
 
-  /**
-   * update tax for partial invoice
-   */
-  public function updatePartialInvoiceTax(): void
-  {
-    if ($this->is_summary_tax) {
-      $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
-      $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
-      $this->update(['total_tax' => $fixed_tax + (($this->taxableSubtotal()) * $percent_tax / 100)]);
-    } else {
-      $avg_tax_free_amount = $this->avgTaxFreeAmount();
-      $actual_tax = 0;
-
-      foreach ($this->customItems as $item) {
-        $item_tax = 0;
-        $item_taxable = $item->amount - $avg_tax_free_amount;
-        foreach ($item->pivotTaxes as $tax) {
-          if ($tax->type == 'Fixed') {
-            $item_tax += $tax->amount / 1000;
-          } else {
-            $item_tax += ($item_taxable * $tax->amount / 100);
-          }
-        }
-        $actual_tax += $item_tax;
-      }
-
-      $this->update(['total_tax' => $actual_tax]);
-    }
-  }
-
-  /**
-   * Recalculate Tax on invoice
-   */
-  public function updateTaxAmount(): void
-  {
-    $this->updateSubtotal();
-
-    if ($this->type == 'Regular') {
-      $this->updateRegularInvoiceTax();
-    } else if ($this->type == 'Partial Invoice') {
-      $this->updatePartialInvoiceTax();
-    }
-
-    $this->updateSubtotal();
-  }
-
-  public function reCalculateTotal(): void
-  {
-    $this->updateTaxAmount(); // will update subtotal and total tax
-  }
-
-  public function updateRetention($retention_id, $is_retention_before_tax): void
+  public function updateRetention($retention_id): void
   {
     $retenion = Tax::where('is_retention', true)->find($retention_id);
-    $data['is_retention_before_tax'] = $is_retention_before_tax;
     if (!$retenion) {
       $data['retention_amount'] = 0;
       $data['retention_percentage'] = 0;
     } elseif ($retenion->type == 'Percent') {
-      $data['retention_amount'] = (($data['is_retention_before_tax'] ? $this->subtotal : $this->total) * $retenion->amount) / 100;
+      $data['retention_amount'] = ($this->total * $retenion->amount) / 100;
       $data['retention_percentage'] = $retenion->amount;
     } else {
       $data['retention_amount'] = $retenion->amount;
@@ -379,10 +302,10 @@ class Invoice extends Model
   /**
    * Calculate retention amount
    */
-  private function calRetentionAmount($total, $subtotal)
+  private function calRetentionAmount($total)
   {
     if ($this->retention_percentage) {
-      return (($this->is_retention_before_tax ? $subtotal : $total)  * $this->retention_percentage) / 100;
+      return ($total * $this->retention_percentage) / 100;
     }
 
     return $this->retention_amount;
@@ -391,52 +314,9 @@ class Invoice extends Model
   public function reCalculateRetention(): void
   {
     if ($this->retention_percentage) {
-      $data['retention_amount'] = (($this->is_retention_before_tax ? $this->subtotal : $this->total)  * $this->retention_percentage) / 100;
+      $data['retention_amount'] = ($this->total  * $this->retention_percentage) / 100;
       $this->update($data);
     }
-  }
-
-  /**
-   * Amount on which tax will not be applied.
-   * (We will not apply tax on discount, downpayment, adjustment and retention amounts which are before tax)
-   */
-  private function netTaxFreeAmount()
-  {
-    $subtractable = 0;
-
-    if ($this->is_discount_before_tax) {
-      $subtractable += $this->discount_amount;
-    }
-
-    if ($this->is_retention_before_tax) {
-      $subtractable += $this->retention_amount;
-    }
-
-    $subtractable += $this->downpayment_before_tax;
-    $adjustment = $this->is_adjustment_before_tax ? $this->adjustment_amount : 0;
-
-    return - ($adjustment - $subtractable);
-  }
-
-  /**
-   * Invoice Net subtotal  amount on which taxes will be applied.
-   * (We will not apply tax on discount, downpayment, adjustment and retention amounts which are before tax)
-   */
-  private function taxableSubtotal()
-  {
-    return $this->subtotal - $this->netTaxFreeAmount();
-  }
-
-  /**
-   * Tax free amount for each item. So that we can calculate inline tax for each item
-   */
-  private function avgTaxFreeAmount()
-  {
-    $count = ($this->type == 'Regular' ? $this->phaseItems()->count() : $this->customItems()->count());
-    if ($count == 0)
-      return 0;
-
-    return $this->netTaxFreeAmount() / $count;
   }
 
   public function scopeApplyRequestFilters($q)
@@ -530,11 +410,11 @@ class Invoice extends Model
             $invoice->delete();
           else {
             $invoice->update(['status' => 'Cancelled']);
-            $invoice->updateTaxAmount();
+            $invoice->reCalculateTotal();
           }
         });
 
-        $this->updateTaxAmount();
+        $this->reCalculateTotal();
       });
     } catch (\Exception $e) {
       throw $e;
@@ -633,7 +513,7 @@ class Invoice extends Model
               });
             });
         })
-        // Exclude docs which are active and not expired
+          // Exclude docs which are active and not expired
           ->where(function ($q) {
             $q->whereNull('expiry_date')
               ->orWhere('expiry_date', '>=', today());
@@ -655,7 +535,10 @@ class Invoice extends Model
       $data = [];
       foreach ($phase_ids as $phase) {
         $data[$phase] = [
-          'amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('estimated_cost')
+          'subtotal' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('estimated_cost'),
+          'total_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('tax_amount'),
+          'manual_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('manual_tax_amount'),
+          'total' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_cost')
         ]; // convert to cents manually, setter is not working for pivot table
       }
 
@@ -667,11 +550,9 @@ class Invoice extends Model
         foreach ($phase->taxes as $tax) {
           $invPhase->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $this->id]);
         }
-
-        $invPhase->updateTaxAmount();
       }
 
-      $this->updateTaxAmount();
+      $this->reCalculateTotal();
 
       DB::commit();
       return true;

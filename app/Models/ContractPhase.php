@@ -232,23 +232,13 @@ class ContractPhase extends BaseModel
    */
   public function getRemainingAmount()
   {
-    $total = $this->invoices()->sum('total') / 1000;
+    $total = $this->invoices()->sum('invoices.total') / 1000;
     return $this->total_cost - $total;
   }
 
   public function taxes(): BelongsToMany
   {
     return $this->belongsToMany(Tax::class, 'phase_taxes')->withPivot('amount', 'type');
-  }
-
-  public function updateTaxAmount(): void
-  {
-    $fixed_tax = $this->taxes()->where('phase_taxes.type', 'Fixed')->sum('phase_taxes.amount');
-    $percent_tax = $this->taxes()->where('phase_taxes.type', 'Percent')->sum('phase_taxes.amount');
-    $tax_amount = $this->estimated_cost * ($percent_tax / (100 * 1000)) + $fixed_tax;
-    $total_cost = $this->estimated_cost + $tax_amount + $this->adjustment_amount; // Added the adjustment here
-
-    $this->update(['tax_amount' => $tax_amount, 'total_cost' => $total_cost]);
   }
 
   /*

@@ -6,12 +6,12 @@ use App\Models\Invoice;
 use App\Models\Tax;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CustomInvoiceItemStoreRequest extends FormRequest
+class InvoiceItemUpdateRequest extends FormRequest
 {
   /**
    * Taxes
    */
-  public $taxes = [];
+  public $taxes;
 
   /**
    * Total Tax Amount
@@ -34,7 +34,7 @@ class CustomInvoiceItemStoreRequest extends FormRequest
     $this->downpayment = Invoice::find($this->downpayment_id);
     $this->calTaxAmount();
     $this->merge([
-      'subtotal' => $this->price * $this->quantity,
+      'subtotal' => $this->invoice_item->invoiceable->estimated_cost,
       'is_manual_tax' => $this->boolean('is_manual_tax'),
       'manual_tax_amount' => $this->is_manual_tax ? $this->manual_tax_amount : 0,
       'downpayment_amount' => $this->downpayment_id ? $this->downpayment_amount : 0,
@@ -60,9 +60,7 @@ class CustomInvoiceItemStoreRequest extends FormRequest
   public function rules(): array
   {
     $rules = [
-      'name' => 'required|string|max:255',
-      'price' => 'required|numeric|gt:0',
-      'quantity' => 'required|numeric|gt:0',
+      'phase_id' => 'required|exists:contract_phases,id',
       'subtotal' => 'required|numeric|gt:0',
       'downpayment_id' => 'nullable|exists:invoices,id',
       'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->downpayment->downpaymentAmountRemaining() : ''),

@@ -154,7 +154,11 @@ class ProjectPhaseController extends Controller
 
     if ($phase->addedAsInvoiceItem->count()) {
       $phase->addedAsInvoiceItem->each(function ($item) use ($phase) {
-        $item->update(['amount' => $phase->estimated_cost]);
+        $item->update([
+          'subtotal' => $phase->estimated_cost,
+          'total_tax_amount' => $phase->tax_amount,
+          'total' => $phase->total_cost,
+        ]);
 
         $item->taxes()->detach();
 
@@ -162,9 +166,7 @@ class ProjectPhaseController extends Controller
           $item->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $item->invoice_id]);
         }
 
-        $item->updateTaxAmount();
-
-        $item->invoice->updateTaxAmount(); // ERROR HERE
+        $item->invoice->reCalculateTotal(); // ERROR HERE
       });
     }
 

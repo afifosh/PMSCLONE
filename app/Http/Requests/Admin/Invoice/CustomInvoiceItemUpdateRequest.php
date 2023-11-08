@@ -6,7 +6,7 @@ use App\Models\Invoice;
 use App\Models\Tax;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CustomInvoiceItemStoreRequest extends FormRequest
+class CustomInvoiceItemUpdateRequest extends FormRequest
 {
   /**
    * Taxes
@@ -44,6 +44,7 @@ class CustomInvoiceItemStoreRequest extends FormRequest
       'total' => $this->subtotal + ($this->is_manual_tax ? $this->manual_tax_amount : $this->total_tax_amount) - $this->downpayment_amount,
     ]);
   }
+
   /**
    * Determine if the user is authorized to make this request.
    */

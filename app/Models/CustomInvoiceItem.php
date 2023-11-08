@@ -13,7 +13,7 @@ class CustomInvoiceItem extends Model
     'name',
     'price',
     'quantity',
-    'total',
+    'subtotal'
   ];
 
   protected $casts = [
@@ -43,6 +43,11 @@ class CustomInvoiceItem extends Model
   }
 
   public function invoice()
+  {
+    return $this->morphOne(InvoiceItem::class, 'invoiceable');
+  }
+
+  public function invoiceItem()
   {
     return $this->morphOne(InvoiceItem::class, 'invoiceable');
   }
