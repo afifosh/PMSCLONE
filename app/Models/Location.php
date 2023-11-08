@@ -23,6 +23,7 @@ class Location extends Model
     'state_id',
     'added_by',
     'is_public',
+    'is_warehouse',
     'owner_type',
     'owner_id',
     'status',
@@ -32,6 +33,8 @@ class Location extends Model
     'latitude' => 'float',
     'longitude' => 'float',
     'zoomLevel' => 'int',
+    'created_at' => 'datetime:d M, Y',
+    'updated_at' => 'datetime:d M, Y'
   ];
 
   /**
@@ -83,5 +86,10 @@ class Location extends Model
   public function owner(): MorphTo
   {
     return $this->morphTo();
+  }
+
+  public function scopeApplyRequestFilters()
+  {
+    //
   }
 }

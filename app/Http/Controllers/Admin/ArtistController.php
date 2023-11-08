@@ -18,14 +18,6 @@ use Throwable;
 class ArtistController extends Controller
 {
 
-  function __construct()
-  {
-    // $this->middleware('permission:read company|create company|update company|delete company', ['only' => ['index', 'show', 'showUsers', 'showInvitations']]);
-    // $this->middleware('permission:create company', ['only' => ['create', 'store']]);
-    // $this->middleware('permission:update company', ['only' => ['edit', 'update']]);
-    // $this->middleware('permission:delete company', ['only' => ['destroy']]);
-  }
-
   public function index(ArtistsDataTable $datatable)
   {
     return $datatable->render('admin.pages.artist.index');
@@ -38,31 +30,34 @@ class ArtistController extends Controller
     $data['countries'] = ['' => 'Select Country'];
     $data['states'] = ['' => 'Select State'];
     $data['cities'] = ['' => 'Select City'];
-    return $this->sendRes('success', ['view_data' => view('admin.pages.artist.edit', $data)->render(), 'JsMethods' => ['initIntlTel']]);
+    $data['timezones'] = $this->timezones();
+    $data['languages'] = $this->languages();
+    $data['currencies'] = $this->currencies();
+    return view('admin.pages.artist.edit', $data);
   }
 
   public function store(Request $request)
   {
     $att = $request->validate([
-      'name' => ['required', 'string', 'max:255', 'unique:companies,name'],
-      'website' => ['nullable', 'string', 'max:255', 'unique:companies,website'],
-      'email' => ['nullable', 'string', 'max:255', 'unique:companies,email'],
-      // 'status' => 'required',
-      'type' => 'required|in:Company,Person',
-      'phone' => 'nullable|phone',
+      'first_name' => 'required|string|max:255',
+      'last_name' => 'required|string|max:255',
+      'email' => 'required|email|unique:artists,email',
+      'gender' => 'nullable|in:Male,Female,Other',
+      'phone' => 'phone',
       'phone_country' => 'required_with:phone',
       'address' => 'nullable|string|max:255',
-      'city_id' => 'nullable|exists:cities,id',
-      'state_id' => 'nullable|exists:states,id',
-      'zip' => 'nullable|string|max:255',
+      'zip_code' => 'nullable|string|max:8',
       'country_id' => 'nullable|exists:countries,id',
-      'vat_number' => 'nullable|string|max:255',
-      'gst_number' => 'nullable|string|max:255',
+      'state_id' => 'nullable|exists:states,id',
+      'city_id' => 'nullable|exists:cities,id',
+      'language' => 'required|string|max:255',
+      'timezone' => 'nullable|string|max:255',
+      'currency' => 'nullable|string|max:255',
     ]);
 
 
     if (Artist::create($att + ['added_by' => auth()->id()])) {
-      return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Artist::DT_ID, 'close' => 'globalModal']);
+      return $this->sendRes('Created Successfully', ['event' => 'redirect', 'url' => route('admin.artists.index')]);
     }
   }
 
@@ -94,16 +89,8 @@ class ArtistController extends Controller
     //return $this->sendRes('success', ['view_data' => view('admin.pages.artist.edit', $data)->render(), 'JsMethods' => ['initIntlTel']]);
   }
 
-  public function update(Request $request, $id)
+  public function update(Request $request, Artist $artist)
   {
-    // Retrieve the artist from the database by ID
-    $artist = Artist::find($id);
-    
-    if (!$artist) {
-        // Handle the case where the artist with the given ID is not found
-        return response()->json(['message' => 'Artist not found'], 404);
-    }    
-
     $att = $request->validate([
       // 'profile' => 'sometimes|mimetypes:image/*',
       'first_name' => 'required|string|max:255',
@@ -116,42 +103,13 @@ class ArtistController extends Controller
       'country_id' => 'nullable|exists:countries,id',
       'state_id' => 'nullable|exists:states,id',
       'city_id' => 'nullable|exists:cities,id',
-      'language' => 'nullable|string|max:255',
+      'language' => 'required|string|max:255',
       'timezone' => 'nullable|string|max:255',
       'currency' => 'nullable|string|max:255',
     ]);
-
     $artist->update($att);
-
-    $data['artist'] = $artist;
-    $data['timezones'] = $this->timezones();
-    $data['languages'] = $this->languages();
-    $data['currencies'] = $this->currencies();
-    $data['countries'] = $artist->country_id ? Country::where('id', $artist->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
-    $data['states'] = $artist->state_id ? State::where('id', $artist->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
-    $data['cities'] = $artist->city_id ? City::where('id', $artist->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
-
-
-        return $this->sendRes('Updated Successfully', [
-          'view_data' => view('admin.pages.artist.edit', $data)->render(),
-          'JsMethods' => ['initIntlTel'],
-      ]);
-
-    // }
+    return $this->sendRes('Updated Successfully', ['event' => 'redirect', 'url' => route('admin.artists.index')]);
   }
-
-  // public function updatesss(Request $request, Artist $artist)
-  // {
-  //   $att = $request->validate([
-  //     'name' => 'required|string|max:255|unique:programs,name,'.$program->id.',id',
-  //     'program_code' => 'required|string|max:255|unique:programs,program_code,'.$program->id.',id',
-  //     'parent_id' => 'nullable|exists:programs,id',
-  //     'description' => 'nullable|string',
-  //   ]);
-  //   if ($program->update($att)) {
-  //     return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Program::DT_ID, 'close' => 'globalModal']);
-  //   }
-  // }
 
 
   public function destroy(Artist $artist)

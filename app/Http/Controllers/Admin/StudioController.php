@@ -42,7 +42,7 @@ class StudioController extends Controller
         $data['countries'] = $studio->country_id ? Country::where('id', $studio->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
         $data['states'] = $studio->state_id ? State::where('id', $studio->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
         $data['cities'] = $studio->city_id ? City::where('id', $studio->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
-    
+
         return view('admin.pages.studio.show-profile', $data);
     }
 
@@ -55,7 +55,7 @@ class StudioController extends Controller
         $data['countries'] = $studio->country_id ? Country::where('id', $studio->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
         $data['states'] = $studio->state_id ? State::where('id', $studio->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
         $data['cities'] = $studio->city_id ? City::where('id', $studio->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
-    
+
         return view('admin.pages.studio.edit', $data);
     }
 
@@ -79,12 +79,12 @@ class StudioController extends Controller
             'currency' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:255',
         ]);
-    
+
         if (Studio::create($att)) {
             return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Studio::DT_ID, 'close' => 'globalModal']);
         }
     }
-    
+
     public function update(Request $request, Studio $studio)
     {
         $att = $request->validate([
@@ -104,25 +104,12 @@ class StudioController extends Controller
             'currency' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:255',
         ]);
-    
-        $studio->update($att);
-    
 
-        $data['studio'] = $studio;
-        $data['timezones'] = $this->timezones();
-        $data['languages'] = $this->languages();
-        $data['currencies'] = $this->currencies();
-        $data['countries'] = $studio->country_id ? Country::where('id', $studio->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
-        $data['states'] = $studio->state_id ? State::where('id', $studio->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
-        $data['cities'] = $studio->city_id ? City::where('id', $studio->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
-    
-    
-        return $this->sendRes('Updated Successfully', [
-            'view_data' => view('admin.pages.studio.edit', $data)->render(),
-            'JsMethods' => ['initIntlTel'],
-        ]);
+        $studio->update($att);
+
+        return $this->sendRes('Updated Successfully', ['event' => 'redirect', 'url' => route('admin.studios.index')]);
     }
-    
+
     public function destroy(Studio $studio)
     {
       try {
@@ -134,19 +121,19 @@ class StudioController extends Controller
         return $this->sendError('Server Error');
       }
     }
-  
-  
+
+
     public function timezones()
     {
       $timezone = new Timezonelist;
-  
+
       return $timezone->toArray(false);
     }
     public function languages()
     {
       return config('languages');
     }
-  
+
     public function currencies()
     {
       return [
@@ -195,6 +182,5 @@ class StudioController extends Controller
         'QAR' => 'Qatari Riyal',
       ];
     }
-  
+
   }
-  

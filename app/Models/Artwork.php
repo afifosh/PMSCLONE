@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Avatar;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,11 +17,14 @@ class Artwork extends Model
   public const DT_ID = 'artworks_datatable';
 
   protected $fillable = [
-    'year',
-    'medium',
-    'dimension',
     'title',
+    'medium_id',
+    'program_id',
+    'year',
+    'dimension',
     'featured_image',
+    'description',
+    'added_by'
   ];
 
   protected $casts = [
@@ -66,9 +70,19 @@ class Artwork extends Model
   public function locations(): BelongsToMany
   {
     return $this->belongsToMany(Location::class, ArtworkLocation::class)
-      ->withPivot('moved_from', 'added_by', 'added_till') // pivot table's columns will be available when accessing the relationship
+      ->withPivot('moved_from', 'added_by', 'added_till', 'contract_id') // pivot table's columns will be available when accessing the relationship
       ->withTimestamps()
       ->latest(); // order by pivot table's created_at column
+  }
+
+  /**
+   * latest location (pivot) of the artwork.
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasOne
+   */
+  public function latestLocation()
+  {
+    return $this->hasOne(ArtworkLocation::class)->latestOfMany();
   }
 
   /**
@@ -77,5 +91,10 @@ class Artwork extends Model
   public function currentLocation()
   {
     return $this->locations()->latest()->first();
+  }
+
+  public function program(): BelongsTo
+  {
+    return $this->belongsTo(Program::class);
   }
 }
