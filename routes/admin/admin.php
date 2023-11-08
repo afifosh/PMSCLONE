@@ -253,6 +253,15 @@ Route::prefix('contracts')->group(function () {
   Route::get('document-stats', [DocumentStatController::class, 'index'])->name('contracts.document-stats.index');
   Route::get('change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
   Route::get('paymentsplan', [ContractController::class, 'ContractPaymentsPlan'])->name('contracts.paymentsplan');
+
+  Route::prefix('tracking')->group(function () {
+    // Route for reviewing contracts
+    Route::get('contracts', [ContractController::class, 'trackingContract'])->name('tracking.contracts');
+
+    // Route for reviewing payment plans
+    Route::get('paymentsplan', [ContractController::class, 'trackingPaymentsPlan'])->name('tracking.paymentsplan');
+  });
+
   // Specific contract routes with contract_id constraint
   Route::prefix('{contract}')->where(['contract' => '[0-9]+'])->group(function () {
 

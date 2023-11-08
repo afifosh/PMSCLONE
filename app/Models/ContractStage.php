@@ -20,6 +20,13 @@ class ContractStage extends BaseModel
 
   protected $appends = ['status', 'stage_amount', 'start_date', 'due_date'];
 
+  public function reviewersWhoCompleted()
+  {
+      return User::whereHas('reviews.phase', function ($query) {
+          $query->where('stage_id', $this->id);
+      }, '=', $this->phases()->count())->get();
+  }
+
   public function getStatusAttribute()
   {
     // if($this->due_date->isPast()) return 'Expired';
