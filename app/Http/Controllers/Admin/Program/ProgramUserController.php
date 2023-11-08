@@ -40,14 +40,14 @@ class ProgramUserController extends Controller
     if ($isAlreadyAdded) {
       return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'User Already Added To This Program']);
     }
-    $program->users()->attach(array_unique($request->users), ['added_by' => auth()->id()]);
+    $program->auditAttach('users', array_unique($request->users), ['added_by' => auth()->id()]);
 
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => ProgramUser::DT_ID, 'close' => 'globalModal']);
   }
 
   public function destroy(Program $program, Admin $user)
   {
-    if ($program->users()->detach($user)) {
+    if ($program->auditDetach('users', $user)) {
       return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => ProgramUser::DT_ID]);
     }
   }
