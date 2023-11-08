@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin\Invoice;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\InvoiceItemsStoreReqeust;
+use App\Http\Requests\Admin\Invoice\InvoiceItemUpdateRequest;
 use App\Models\ContractPhase;
 use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\Tax;
 use DataTables;
 use Illuminate\Http\Request;
@@ -58,6 +60,37 @@ class InvoiceItemController extends Controller
     return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
 
+  public function edit(Invoice $invoice, InvoiceItem $invoiceItem)
+  {
+    $invoiceItem->load('invoiceable.stage', 'taxes');
+    $data['invoice'] = $invoice;
+    $data['invoiceItem'] = $invoiceItem;
+    $data['tax_rates'] = Tax::where('is_retention', false)->where('status', 'Active')->get();
+    $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
+    $data['stages'] = [$invoiceItem->invoiceable->stage_id => $invoiceItem->invoiceable->stage->name];
+
+    return $this->sendRes('success', [
+      'view_data' => view('admin.pages.invoices.items.edit', $data)->render(),
+    ]);
+  }
+
+  public function update(Invoice $invoice, InvoiceItem $invoiceItem, InvoiceItemUpdateRequest $request)
+  {
+    if(!$invoice->isEditable()){
+      return $this->sendError('Invoice is not editable');
+    }
+
+    $invoiceItem->update($request->validated());
+
+    $invoiceItem->syncTaxes($request->taxes);
+
+    $invoice->reCalculateTotal();
+
+    return $this->sendRes('Item Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+  }
+
+
+
   public function destroy(Invoice $invoice, $invoiceItem, Request $request)
   {
     if(!$invoice->isEditable()){
@@ -79,7 +112,7 @@ class InvoiceItemController extends Controller
       $item->delete();
     });
 
-    $invoice->updateTaxAmount();
+    $invoice->reCalculateTotal();
 
     return $this->sendRes('Item Removed', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
   }

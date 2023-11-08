@@ -1,30 +1,25 @@
-@if ($customInvoiceItem->id)
-    {!! Form::model($customInvoiceItem, ['route' => ['admin.invoices.custom-invoice-items.update', [$invoice, $customInvoiceItem->id]],
+@if ($invoiceItem->id)
+    {!! Form::model($invoiceItem, ['route' => ['admin.invoices.invoice-items.update', [$invoice, $invoiceItem->id]],
     'method' => 'PUT',
-    'id' => 'custom-item-create',
+    'id' => 'item-create',
     ]) !!}
 @else
-    {!! Form::model($customInvoiceItem, ['route' => ['admin.invoices.custom-invoice-items.store', $invoice],
+    {{-- {!! Form::model($invoiceItem, ['route' => ['admin.invoices.invoice-items.store', $invoice],
     'method' => 'POST',
-    'id' => 'custom-item-create'
-    ]) !!}
+    'id' => 'item-create'
+    ]) !!} --}}
 @endif
 
 <div class="row">
-      {{-- Name --}}
+      {{-- Stage --}}
       <div class="form-group col-6">
-        {{ Form::label('name', __('Item Name'), ['class' => 'col-form-label']) }}
-        {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Item Name')]) !!}
+        {{ Form::label('stage_id', __('Stage'), ['class' => 'col-form-label']) }}
+        {!! Form::select('stage_id', $stages ?? [], $invoiceItem->invoiceable->stage_id ?? null, ['class' => 'form-control globalOfSelect2', 'disabled', 'placeholder' => __('Select Stage')]) !!}
       </div>
-      {{-- price --}}
+      {{-- Phase --}}
       <div class="form-group col-6">
-          {{ Form::label('price', __('Price'), ['class' => 'col-form-label']) }}
-          {!! Form::number('price', null, ['class' => 'form-control', 'placeholder' => __('Price')]) !!}
-      </div>
-      {{-- quantity --}}
-      <div class="form-group col-6">
-          {{ Form::label('quantity', __('Quantity'), ['class' => 'col-form-label']) }}
-          {!! Form::number('quantity', null, ['class' => 'form-control', 'placeholder' => __('Quantity')]) !!}
+        {{ Form::label('phase_id', __('Phase'), ['class' => 'col-form-label']) }}
+        {!! Form::select('phase_id', $phases ?? [], $invoiceItem->invoiceable_id ?? null, ['class' => 'form-control globalOfSelect2', 'disabled', 'placeholder' => __('Select Phase')]) !!}
       </div>
       {{-- Subtotal --}}
       <div class="form-group col-6">
@@ -52,7 +47,7 @@
         {{ Form::label('item_taxes', __('Tax'), ['class' => 'col-form-label']) }}
         <select class="form-select globalOfSelect2" name="item_taxes[]" multiple data-placeholder="{{__('Select Tax')}}">
           @forelse ($tax_rates->where('is_retention', false) as $tax)
-            <option @selected($customInvoiceItem->id && $customInvoiceItem->invoiceItem->taxes->contains($tax->id)) data-amount="{{$tax->amount}}" data-type="{{$tax->type}}" value="{{$tax->id}}">{{$tax->name}} (
+            <option @selected($invoiceItem->id && $invoiceItem->taxes->contains($tax->id)) data-amount="{{$tax->amount}}" data-type="{{$tax->type}}" value="{{$tax->id}}">{{$tax->name}} (
               @if($tax->type != 'Percent')
                 @cMoney($tax->amount, $invoice->contract->currency, true)
               @else
@@ -66,12 +61,12 @@
       {{-- Tax Value --}}
       <div class="form-group col-6">
         {{ Form::label('total_tax_amount', __('Tax Value'), ['class' => 'col-form-label']) }}
-        {!! Form::number('total_tax_amount', $customInvoiceItem->invoiceItem->total_tax_amount ?? 0, ['class' => 'form-control', 'disabled','placeholder' => __('Tax Value')]) !!}
+        {!! Form::number('total_tax_amount', $invoiceItem->total_tax_amount ?? 0, ['class' => 'form-control', 'disabled','placeholder' => __('Tax Value')]) !!}
       </div>
       {{-- Adjust Tax --}}
       <div class="col-6 mt-1">
         <label class="switch mt-4">
-          {{ Form::checkbox('is_manual_tax', 1, $customInvoiceItem->id && $customInvoiceItem->invoiceItem->manual_tax_amount > 0 ? 1 : 0,['class' => 'switch-input'])}}
+          {{ Form::checkbox('is_manual_tax', 1, $invoiceItem->id && $invoiceItem->manual_tax_amount > 0 ? 1 : 0,['class' => 'switch-input'])}}
           <span class="switch-toggle-slider">
             <span class="switch-on"></span>
             <span class="switch-off"></span>
@@ -80,14 +75,14 @@
         </label>
       </div>
       {{-- Adjusted Tax --}}
-      <div class="form-group col-6 {{$customInvoiceItem->id && $customInvoiceItem->invoiceItem->manual_tax_amount > 0 ? '' : 'd-none'}}">
+      <div class="form-group col-6 {{$invoiceItem->id && $invoiceItem->manual_tax_amount > 0 ? '' : 'd-none'}}">
         {{ Form::label('manual_tax_amount', __('Adjusted Tax'), ['class' => 'col-form-label']) }}
-        {!! Form::number('manual_tax_amount', $customInvoiceItem->invoiceItem->manual_tax_amount ?? 0, ['class' => 'form-control', 'placeholder' => __('Adjusted Tax')]) !!}
+        {!! Form::number('manual_tax_amount', $invoiceItem->manual_tax_amount ?? 0, ['class' => 'form-control', 'placeholder' => __('Adjusted Tax')]) !!}
       </div>
       {{-- Total --}}
       <div class="form-group col-6">
         {{ Form::label('total', __('Total'), ['class' => 'col-form-label']) }}
-        {!! Form::number('total', $customInvoiceItem->invoiceItem->total ?? 0, ['class' => 'form-control', 'disabled','placeholder' => __('Total')]) !!}
+        {!! Form::number('total', $invoiceItem->total ?? 0, ['class' => 'form-control', 'disabled','placeholder' => __('Total')]) !!}
       </div>
 </div>
 
@@ -101,7 +96,7 @@
 </div>
 <script>
   // calcualte total tax
-  $(document).on('change', '#custom-item-create [name="item_taxes[]"]', function(){
+  $(document).on('change', '#item-create [name="item_taxes[]"]', function(){
     calculateCustomItemValues();
   })
   // calcualte total, quantity * price
@@ -110,51 +105,46 @@
   })
 
   // toggle manual tax
-  $(document).on('change', '#custom-item-create [name="is_manual_tax"]', function(){
+  $(document).on('change', '#item-create [name="is_manual_tax"]', function(){
     if($(this).is(':checked')){
-      $('#custom-item-create [name="manual_tax_amount"]').parent().removeClass('d-none');
+      $('#item-create [name="manual_tax_amount"]').parent().removeClass('d-none');
     }else{
-      $('#custom-item-create [name="manual_tax_amount"]').parent().addClass('d-none');
+      $('#item-create [name="manual_tax_amount"]').parent().addClass('d-none');
     }
     calculateCustomItemValues();
   })
 
   // onchange manual tax amount recalculate total
-  $(document).on('change keyup', '#custom-item-create [name="manual_tax_amount"]', function(){
+  $(document).on('change keyup', '#item-create [name="manual_tax_amount"]', function(){
     calculateCustomItemValues();
   })
 
   // toggle downpayment deduction
-  $(document).on('change', '#custom-item-create [name="downpayment_id"]', function(){
+  $(document).on('change', '#item-create [name="downpayment_id"]', function(){
     if($(this).val()){
-      $('#custom-item-create [name="downpayment_amount"]').parent().removeClass('d-none');
+      $('#item-create [name="downpayment_amount"]').parent().removeClass('d-none');
     }else{
-      $('#custom-item-create [name="downpayment_amount"]').parent().addClass('d-none');
+      $('#item-create [name="downpayment_amount"]').parent().addClass('d-none');
     }
     calculateCustomItemValues();
   })
 
   function calculateCustomItemValues (){
-    const price = parseFloat($('[name="price"]').val());
-    const quantity = parseFloat($('[name="quantity"]').val());
-    let subtotal = price * quantity;
-
-    //set subtotal
-    $('#custom-item-create [name="subtotal"]').val(subtotal.toFixed(3));
+    let subtotal = parseFloat($('#item-create [name="subtotal"]').val());
 
     // downpayment amount
-    if($('#custom-item-create [name="downpayment_id"]').val()){
-      subtotal -= parseFloat($('#custom-item-create [name="downpayment_amount"]').val());
+    if($('#item-create [name="downpayment_id"]').val()){
+      subtotal -= parseFloat($('#item-create [name="downpayment_amount"]').val());
     }
 
 
     let totalTax = 0;
     // calculate total tax
-    var taxes = $('#custom-item-create [name="item_taxes[]"]').val();
+    var taxes = $('#item-create [name="item_taxes[]"]').val();
     if(taxes){
       taxes.forEach(tax => {
-        const taxAmount = parseFloat($('#custom-item-create [name="item_taxes[]"] option[value="'+tax+'"]').data('amount'));
-        const taxType = $('#custom-item-create [name="item_taxes[]"] option[value="'+tax+'"]').data('type');
+        const taxAmount = parseFloat($('#item-create [name="item_taxes[]"] option[value="'+tax+'"]').data('amount'));
+        const taxType = $('#item-create [name="item_taxes[]"] option[value="'+tax+'"]').data('type');
         if(taxType == 'Percent'){
           totalTax += (subtotal * taxAmount) / 100;
         }else{
@@ -166,13 +156,13 @@
     // total amount
     let totalAmount = subtotal + totalTax
     // if manual tax is checked, use the manual tax amount
-    if($('#custom-item-create [name="is_manual_tax"]').is(':checked')){
-      const manualTax = parseFloat($('#custom-item-create [name="manual_tax_amount"]').val());
+    if($('#item-create [name="is_manual_tax"]').is(':checked')){
+      const manualTax = parseFloat($('#item-create [name="manual_tax_amount"]').val());
       totalAmount = subtotal + manualTax;
     }
 
     // set total tax and total amount
-    $('#custom-item-create [name="total_tax_amount"]').val(totalTax.toFixed(3));
-    $('#custom-item-create [name="total"]').val(totalAmount.toFixed(3));
+    $('#item-create [name="total_tax_amount"]').val(totalTax.toFixed(3));
+    $('#item-create [name="total"]').val(totalAmount.toFixed(3));
   }
 </script>

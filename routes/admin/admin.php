@@ -444,8 +444,8 @@ Route::prefix('contracts')->group(function () {
     Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
     Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
     Route::resource('invoices', InvoiceController::class);
-    Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'destroy']);
-    Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store']);
+    Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'edit', 'update', 'destroy']);
+    Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store', 'edit', 'update']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
     Route::resource('invoices.downpayments', DownpaymentController::class)->only(['store']);
     Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');

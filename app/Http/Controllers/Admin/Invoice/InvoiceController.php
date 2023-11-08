@@ -102,8 +102,7 @@ class InvoiceController extends Controller
 
     if ($request->update_tax_type) {
       $invoice->update($request->validated());
-      $invoice->taxes()->detach();
-      $invoice->updateItemsTaxType();
+      $invoice->summaryTaxes()->detach();
       $invoice->reCalculateTotal();
 
       return back()->with('success', 'Tax type updated successfully');
@@ -115,32 +114,17 @@ class InvoiceController extends Controller
         $data['discount_amount'] = $request->discount_value;
         $data['discount_percentage'] = 0;
       }
-      $data['is_discount_before_tax'] = $request->discount_ded_type == 'Before Tax';
       $invoice->update($data + ['discount_type' => $request->discount_type]);
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Discount updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } elseif ($request->update_adjustment) {
-      $invoice->update(['is_adjustment_before_tax' => $request->adjustment_type == 'Before Tax'] + $request->validated());
+      $invoice->update($request->validated());
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Adjustment updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } elseif ($request->update_retention) {
-      $invoice->updateRetention($request->retention_id, $request->retention_type == 'Before Tax');
-      $retenion = Tax::where('is_retention', true)->find($request->retention_id);
-      $data['is_retention_before_tax'] = $request->retention_type == 'Before Tax';
-      if (!$retenion) {
-        $data['retention_amount'] = 0;
-        $data['retention_percentage'] = 0;
-      } elseif ($retenion->type == 'Percent') {
-        $data['retention_amount'] = (($data['is_retention_before_tax'] ? $invoice->subtotal : $invoice->total) * $retenion->amount) / 100;
-        $data['retention_percentage'] = $retenion->amount;
-      } else {
-        $data['retention_amount'] = $retenion->amount;
-        $data['retention_percentage'] = 0;
-      }
-
-      $invoice->update($data + ['retention_id' => $request->retention_id, 'retention_name' => $retenion->name ?? null]);
+      $invoice->updateRetention($request->retention_id);
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Retention updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);

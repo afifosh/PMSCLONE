@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,16 +15,14 @@ class InvoiceItem extends Model
     'invoice_id',
     'invoiceable_type',
     'invoiceable_id',
-    'amount',
+    'subtotal',
     'total_tax_amount',
     'manual_tax_amount',
     'downpayment_id',
-    'is_downpayment_percentage',
     'downpayment_amount',
-    'downpayment_percentage',
-    'manual_downpayment_amount',
     'description',
-    'order'
+    'order',
+    'total'
   ];
 
   protected $casts = [
@@ -32,14 +31,14 @@ class InvoiceItem extends Model
     'updated_at' => 'datetime:d M, Y',
   ];
 
-  public function getAmountAttribute($value)
+  public function getSubtotalAttribute($value)
   {
     return $value / 1000;
   }
 
-  public function setAmountAttribute($value)
+  public function setSubtotalAttribute($value)
   {
-    $this->attributes['amount'] = moneyToInt($value);
+    $this->attributes['subtotal'] = moneyToInt($value);
   }
 
   public function getTotalTaxAmountAttribute($value)
@@ -72,24 +71,14 @@ class InvoiceItem extends Model
     $this->attributes['downpayment_amount'] = moneyToInt($value);
   }
 
-  public function getManualDownpaymentAmountAttribute($value)
+  public function getTotalAttribute($value)
   {
     return $value / 1000;
   }
 
-  public function setManualDownpaymentAmountAttribute($value)
+  public function setTotalAttribute($value)
   {
-    $this->attributes['manual_downpayment_amount'] = moneyToInt($value);
-  }
-
-  public function getDownpaymentPercentageAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setDownpaymentPercentageAttribute($value)
-  {
-    $this->attributes['downpayment_percentage'] = moneyToInt($value);
+    $this->attributes['total'] = moneyToInt($value);
   }
 
   public function invoice()
@@ -116,11 +105,17 @@ class InvoiceItem extends Model
     return $this->hasMany(InvoiceTax::class);
   }
 
-  public function updateTaxAmount(): void
+  /**
+   * Sync taxes for invoice item
+   * @param Collection $taxes
+   */
+  public function syncTaxes(Collection $taxes): void
   {
-    $fixed_tax = $this->taxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
-    $percent_tax = $this->taxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
+    $sync_data = [];
+    foreach ($taxes as $rate) {
+      $sync_data[$rate->id] = ['amount' => $rate->getRawOriginal('amount'), 'type' => $rate->type, 'invoice_item_id' => $this->id, 'invoice_id' => $this->invoice_id];
+    }
 
-    $this->update(['total_tax_amount' => $fixed_tax + (($this->invoiceable->estimated_cost ?? $this->invoiceable->total) * $percent_tax / 100)]);
+    $this->taxes()->sync($sync_data);
   }
 }

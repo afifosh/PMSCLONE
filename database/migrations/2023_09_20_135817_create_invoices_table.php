@@ -33,13 +33,11 @@ return new class extends Migration
       /**
        * Downpayment
        */
-      $table->unsignedBigInteger('downpayment_before_tax')->default(0);
       $table->unsignedBigInteger('downpayment_amount')->default(0);
       /**
        * Discount
        */
       $table->enum('discount_type', ['Fixed', 'Percentage'])->nullable();
-      $table->boolean('is_discount_before_tax')->default(true);
       $table->integer('discount_percentage')->default(0);
       $table->bigInteger('discount_amount')->default(0);
       /**
@@ -47,7 +45,6 @@ return new class extends Migration
        */
       $table->string('adjustment_description')->nullable();
       $table->bigInteger('adjustment_amount')->default(0);
-      $table->boolean('is_adjustment_before_tax')->default(false);
       /**
        * Retention
        */
@@ -56,7 +53,6 @@ return new class extends Migration
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
       $table->timestamp('retention_released_at')->nullable();
-      $table->boolean('is_retention_before_tax')->default(false);
       /**
        * End Retention
        */
