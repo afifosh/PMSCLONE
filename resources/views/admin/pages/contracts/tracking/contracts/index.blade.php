@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Contracts Payments Plan')
+@section('title', 'Contracts Tracking Review')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">

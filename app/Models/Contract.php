@@ -189,6 +189,55 @@ class Contract extends BaseModel
       return $adminsWithoutReviews;
   }
 
+  public function getAllUsersStagesReviewStatusWithlastReviewDate()
+  {
+      // Assuming the Contract model has a 'stages' relationship that contains many ContractStage
+      $stages = $this->stages;
+      $users = $this->program->users; 
+
+      $program = $this->program; // This gives you the program object
+      $parentProgram = $program->parent; // This gives you the parent program object
+      
+      // Get the users of this program
+      $programUsers = $program->users;
+  
+      // If there is a parent program, get those users as well
+      $parentProgramUsers = collect();
+      if ($parentProgram) {
+          $parentProgramUsers = $parentProgram->users;
+      }
+  
+      // Combine the collections, ensuring there are no duplicates
+      $allUsers = $programUsers->merge($parentProgramUsers)->unique('id');
+
+      $allUsersStagesStatus = [];
+
+      foreach ($allUsers as $user) {
+          $userStagesStatus = [];
+  
+          foreach ($stages as $stage) {
+              // Get the status for this stage for this user
+              $status = $stage->getUserReviewStatusWithlastReviewDate($user->id);
+  
+              // Add stage information for reference
+              $userStagesStatus[] = [
+                  'stage_id' => $stage->id,
+                  'stage_name' => $stage->name,
+                  'status' => $status['status'],
+                  'last_review_date' => $status['last_review_date'],
+              ];
+          }
+  
+          // Add user information and their stages status to the final array
+          $allUsersStagesStatus[] = [
+              'user_id' => $user->id,
+              'user_name' => $user->name,
+              'stages_status' => $userStagesStatus,
+          ];
+      }
+  
+      return $allUsersStagesStatus;
+  }
 
   public function getAdminsWhoDidNotCompleteOrDidNotReviewAnyPhase()
   {

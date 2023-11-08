@@ -12,6 +12,7 @@ use App\Http\Requests\Admin\ContractUpdateRequest;
 use App\Models\Client;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Review;
+use App\Models\Admin;
 use App\Models\Company;
 use App\Models\ContractStage;
 use App\Models\Contract;
@@ -97,7 +98,7 @@ class ContractController extends Controller
       ->first();
     }
 
-    return $dataTable->render('admin.pages.contracts.paymentsplan.index', $data);
+    return $dataTable->render('admin.pages.contracts.tracking.paymentsplan.index', $data);
 
   }
 
@@ -737,6 +738,61 @@ class ContractController extends Controller
 
   }
 
+  public function ContractPaymentsPlanReview($contract_id)
+  {
+      // Assuming `program` is a relation on the `Contract` model that retrieves the associated program.
+      // And `users` is a relation on the `Program` model that retrieves all users associated with the program.
+      
+      // Find the contract
+      $contract = Contract::find($contract_id);
+      if (!$contract) {
+          return response()->json(['error' => 'Contract not found'], 404);
+      }
+  
+      // Get the associated program and users with access to the contract
+      $program = $contract->program;
+      $usersWithAccess = $program->users;
+  
+      // If the program has a parent, we should also include users from the parent program
+      $parentProgramUsers = collect();
+      if ($parentProgram = $program->parent) {
+          $parentProgramUsers = $parentProgram->users;
+      }
+  
+      // Combine the collections, ensuring there are no duplicates
+      $allUsers = $usersWithAccess->merge($parentProgramUsers)->unique('id');
+
+      // Start building your query for the DataTable
+      $dataTableQuery = Admin::whereIn('id', $allUsers->pluck('id'));
+  
+      // Create a DataTable
+      $dataTable = DataTables::of($dataTableQuery)
+          ->addColumn('name', function ($user) {
+              return $user->name;
+          })
+          ->addColumn('review_status', function ($user) use ($contract_id) {
+              // This assumes you have a method `getReviewStatusForContract` on the User model
+              // which checks the user's review status for each stage of the contract.
+             // return $user->getReviewStatusForContract($contract_id);
+
+    
+                          // Return the rendered view as a string
+                return view('admin.pages.contracts.tracking.paymentsplan.review', [
+                  'status' => $user->getReviewStatusForContract($contract_id)
+              ])->render();
+          })
+          ->rawColumns(['review_status']);
+  
+      // ... other dataTable configurations ...
+  
+      $outputData = $dataTable->make(true)->getData(true);
+  
+      // ... buttons and other outputData configurations ...
+  
+      return response()->json($outputData);
+  }
+  
+  
   public function ContractPaymentsPlanPhases($contract_id)
   {
     $query = ContractPhase::with(['stage:name,id']) // Load only the name of the related stage
@@ -871,7 +927,7 @@ class ContractController extends Controller
       return $dataTable->make(true);
   }
 
-  public function toggleContractReviewStatus($contract_id)
+  public function toggleContractReviewStatusOLD($contract_id)
   {
       try {
           // Find the contract by its ID
@@ -909,8 +965,129 @@ class ContractController extends Controller
       }
   }
 
+  public function toggleContractReviewStatus($contract_id)
+  {
+      try {
+          // Find the contract by its ID
+          $contract = Contract::findOrFail($contract_id);
+  
+          // Retrieve the program associated with the contract
+          $program = $contract->program;
+  
+          // Retrieve users associated with the program
+          $programUsers = $program->users;
+  
+          // If the program has a parent, retrieve users from the parent program as well
+          $parentProgramUsers = collect();
+          if ($program->parent) {
+              $parentProgramUsers = $program->parent->users;
+          }
+  
+          // Combine users from the program and the parent program
+          $eligibleReviewers = $programUsers->merge($parentProgramUsers);
+  
+          // Check if the current authenticated user is among the eligible reviewers
+          if (!$eligibleReviewers->contains('id', Auth::id())) {
+              // If not, return an error response
+              return $this->sendError('You are not authorized to perform this action.');
+          }
+  
+          // Identify the appropriate table based on the request route
+          $table_id = request()->route()->named('contracts.paymentsplan') ? 'payment-table' : 'contracts-table';
+  
+          // Check if the contract has already been reviewed by the current user
+          $existingReview = $contract->reviews()->where('user_id', Auth::id())->first();
+  
+          if ($existingReview) {
+              // The contract has already been reviewed by the current user.
+              // Delete the review to mark the contract as "unreviewed"
+              $existingReview->delete();
+              return $this->sendRes('Contract marked as unreviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal', 'isReviewed' => false]);
+          } else {
+              // Mark the contract as reviewed
+              $review = new Review([
+                  'user_id' => Auth::id(),
+                  'reviewed_at' => now(),
+              ]);
+              $contract->reviews()->save($review);
+              return $this->sendRes('Contract marked as reviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal', 'isReviewed' => true]);
+          }
+  
+      } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+          return $this->sendError('Contract not found.');
+      } catch (\Throwable $e) {
+          // Log the error message for debugging
+          // Log::error($e->getMessage());
+          return $this->sendError('Server Error');
+      }
+  }
+  
 
   public function togglePhaseReviewStatus($contract_id, $phase_id)
+  {
+      try {
+          // Find the contract by its ID
+          $contract = Contract::findOrFail($contract_id);
+
+        // Retrieve the program associated with the contract
+        $program = $contract->program;
+
+        // Retrieve users associated with the program
+        $programUsers = $program->users;
+
+        // If the program has a parent, retrieve users from the parent program as well
+        $parentProgramUsers = collect();
+        if ($program->parent) {
+            $parentProgramUsers = $program->parent->users;
+        }
+
+        // Combine users from the program and the parent program
+        $eligibleReviewers = $programUsers->merge($parentProgramUsers);
+
+        // Check if the current authenticated user is among the eligible reviewers
+        if (!$eligibleReviewers->contains('id', Auth::id())) {
+            // If not, return an error response
+            return $this->sendError('You are not authorized to perform this action.');
+        }
+          // Ensure the contract has a phase with the specified phase_id
+          $phase = $contract->phases()->where('id', $phase_id)->first();
+
+          if (!$phase) {
+              // No such phase for this contract; handle the error accordingly.
+              return $this->sendError('Invalid phase for this contract.');
+          }
+
+          // Check if the phase has already been reviewed by the current user
+          $existingReview = $phase->reviews()->where('user_id', Auth::id())->first();
+
+          if ($existingReview) {
+              // The phase has already been reviewed by the current user.
+              // Delete the review to mark the phase as "unreviewed"
+              $existingReview->delete();
+              return $this->sendRes('Phase marked as unreviewed!', ['isReviewed' => false]);
+             // return $this->sendRes('Phase marked as unreviewed!');
+          } else {
+              // Mark the phase as reviewed
+              $review = new Review([
+                  'user_id' => Auth::id(),
+                  'reviewed_at' => now(),
+              ]);
+              $phase->reviews()->save($review);
+
+              //return $this->sendRes('Phase marked as reviewed!');
+              return $this->sendRes('Phase marked as reviewed!', ['isReviewed' => true]);
+          }
+
+      } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+          return $this->sendError('Contract not found.');
+      } catch (Throwable $e) {
+          return $this->sendError('Server Error');
+      }
+  }
+
+
+
+  public function togglePhaseReviewStatusOLD($contract_id, $phase_id)
   {
       try {
           // Find the contract by its ID
