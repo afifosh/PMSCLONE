@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Contracts Payments Plan')
+@section('title', 'Contracts Payments Plan Tracking Review')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -42,7 +42,7 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header">
         <div class="d-flex justify-content-between mb-3">
-          <h5 class="card-title mb-0">{{__('Contracts Payments Plan')}}</h5>
+          <h5 class="card-title mb-0">{{__('Contracts Payments Plan Tracking Review')}}</h5>
         </div>
       </div>
       <form class="js-datatable-filter-form">
@@ -188,6 +188,9 @@ $(document).ready(function() {
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#child-phases-${contractId}" aria-controls="child-phases-${contractId}" aria-selected="true">Phases</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-review-${contractId}" aria-controls="child-review-${contractId}" aria-selected="true">Review</button>
+                    </li>                    
                 </ul>
             </td>
         </tr>

@@ -97,7 +97,7 @@ class ContractController extends Controller
       ->first();
     }
 
-    return $dataTable->render('admin.pages.contracts.paymentsplan.index', $data);
+    return $dataTable->render('admin.pages.contracts.tracking.paymentsplan.index', $data);
 
   }
 

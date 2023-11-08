@@ -265,6 +265,20 @@ Route::prefix('contracts')->group(function () {
   // Specific contract routes with contract_id constraint
   Route::prefix('{contract}')->where(['contract' => '[0-9]+'])->group(function () {
 
+
+    Route::get('/stages-status-datatable', function (App\Models\Contract $contract, DataTables $dataTables) {
+  
+      // Assuming you have a method in your Contract model that returns the necessary collection
+      $data = $contract->getAllUsersStagesReviewStatusWithlastReviewDate();
+  dd($data);
+      // Convert the collection to a Laravel Collection if it's not already
+      $collection = collect($data);
+  
+      // Use the DataTables API to handle server-side operations like pagination, search, etc.
+      return $dataTables->collection($collection)
+          ->make(true);
+  })->name('contract.stages-status');
+
         // Display the form for editing contract details
         // Process the action of marking a contract as reviewed
         Route::post('/toggle-review', [ContractController::class, 'toggleContractReviewStatus'])->name('contracts.toggle-review');
