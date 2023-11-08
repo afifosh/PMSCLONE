@@ -2,7 +2,7 @@
 
 namespace App\DataTables\Admin;
 
-use App\Models\artwork;
+use App\Models\Artwork;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -28,10 +28,10 @@ class ArtworksDataTable extends DataTable
             })
             ->addColumn('action', function (artwork $artwork) {
                 return view('admin.pages.artwork.action', compact('artwork'));
-            }) 
+            })
             ->addColumn('medium', function (artwork $artwork) {
-              return $artwork->medium->name;
-          })             
+              return $artwork->medium->name ?? '-';
+          })
             ->filterColumn('added_by', function($query, $keyword){
                 return $query->whereHas('addedBy', function($q) use ($keyword){
                     return $q->where('email', 'like', '%'.$keyword.'%');
@@ -48,7 +48,7 @@ class ArtworksDataTable extends DataTable
      * @param \App\Models\artwork $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function query(artwork $model): QueryBuilder
+    public function query(Artwork $model): QueryBuilder
     {
         $query = $model->newQuery();
 
