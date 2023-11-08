@@ -146,266 +146,102 @@ $configData = Helper::appClasses();
     </script>
 
 
- <script>
+<script>
 $(document).ready(function() {
     var table = $('#paymentsplan-table').DataTable();
-    var expandedRow = null; // Variable to track the currently expanded row
+    var expandedRow = null;
 
-    function createChildTable(row, contractId) {
+    $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
+        var tr = $(this).closest('tr');
+        var row = table.row(tr);
+        var contractId = tr.data('contract-id');
 
-
-
-        // Check if child table already exists, if so, destroy it
-        var existingChildTable = $('#child-table-' + contractId).DataTable();
-    if (existingChildTable) {
-        existingChildTable.destroy();
-    }
-
-
-        if (expandedRow) {
-            // Collapse all other rows in the table except the selected row
-            table.rows().every(function() {
-                var tr = this.node();
-                if (tr !== row.node()) {
-                    var otherRow = table.row(tr);
-                    otherRow.child.hide();
-                    $(tr).removeClass('shown');
-                    $(tr).css('background-color', ''); // Reset the background color
-                }
-            });
+        // Destroy any existing child tables to avoid memory leaks
+        if ($.fn.DataTable.isDataTable('#child-table-' + contractId)) {
+            $('#child-table-' + contractId).DataTable().destroy();
         }
 
-        // var childTableId = 'child-table-' + contractId;
-        // var childTable = row.child('<table id="' + childTableId + '" class="display table dataTable" style="" width="100%"></table>').show();
-    // 1st Row - For the pills
-    var pills = `
-        <tr class="child-row-added">
-            <td colspan="100%">
-                <ul class="nav nav-pills mt-3 mb-3" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-stages-${contractId}" aria-controls="child-stages-${contractId}" aria-selected="false">Stages</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#child-phases-${contractId}" aria-controls="child-phases-${contractId}" aria-selected="true">Phases</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-review-${contractId}" aria-controls="child-review-${contractId}" aria-selected="true">Review</button>
-                    </li>                    
-                </ul>
-            </td>
-        </tr>
-
-    `;
-
-    row.child(pills).show();
-
-    // 2nd Row - For the content
-    var content = `
-        <tr class="child-row-added p-0">
-            <td class="p-0" colspan="100%">
-                <div class="tab-content">
-                    <div class="tab-pane fade" id="child-stages-${contractId}" role="tabpanel" aria-labelledby="child-stages-tab-${contractId}">
-                        <!-- Stages content here -->
-                        <!-- Stages content here -->
-                        <table class="table"  id="stages-table-${contractId}"></table>
-                    </div>
-                    <div class="tab-pane fade show active" id="child-phases-${contractId}" role="tabpanel" aria-labelledby="child-phases-tab-${contractId}">
-                        <!-- Phases content here -->
-                        <!-- This is where your child table (Datatable) will go -->
-                        <table class="table" id="child-table-${contractId}"></table>
-                    </div>
-                    <div class="tab-pane fade" id="child-review-${contractId}" role="tabpanel" aria-labelledby="child-review-tab-${contractId}">
-                        <!-- Phases content here -->
-                        <!-- This is where your review table (Datatable) will go -->
-                        <table class="table" id="review-table-${contractId}"></table>
-                    </div>                    
-                </div>
-            </td>
-        </tr>
-    `;
-
-    // Insert the content row after the pills row
-   // $(row.node()).next().after(content);
-
-    var contentRow = $(content);
-contentRow.addClass("custom-content-row");
-contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
-$(row.node()).next().after(contentRow);
-    // Insert the content row after the pills row
-  //  $(row.node()).after(content);
-    var childTableId = "child-table-" + contractId;
-
-    // Stages DataTable
-    $('#review-table-' + contractId).DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: route('admin.contracts.paymentsplan.review', { contract: contractId }),
-        columns: [
-            // Define your stages columns here. I'm making some assumptions. Adjust accordingly.
-            { data: "name", title: 'Reviewer Name' },
-            { data: 'review_status', title: 'Review Status' },
-
-
-        ],
-        destroy: true,
-        dom: 'Blfrtip',
-        // Add more DataTable options if required
-    });
-
-    // Stages DataTable
-    $('#stages-table-' + contractId).DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: route('admin.contracts.paymentsplan.stages', { contract: contractId }),
-        columns: [
-            // Define your stages columns here. I'm making some assumptions. Adjust accordingly.
-            { data: "name", "name": "contract_stages.name", title: 'Stage Name' },
-            { data: 'phases_count', title: 'Phases' },
-            { data: 'start_date', title: 'Start Date' },
-            { data: 'due_date', title: 'Due Date' },
-            { data: 'total_amount', title: 'Amount' },
-            { data: 'status', title: 'Status' },
-            {
-                        data: 'actions',
-                        title: 'Actions',
-                        orderable: false,
-                        searchable: false
-                    }
-
-        ],
-        buttons : [
-            {
-                text: 'Add Stage',
-                className: 'btn btn-primary',
-                attr: {
-                    'data-toggle': 'ajax-modal',
-                    'data-title': 'Add Stage',
-                    'data-href': route('admin.contracts.stages.create', { contract: contractId, tableId: ('stages-table-' + contractId)  })
-                }
-            }
-        ],
-        destroy: true,
-        dom: 'Blfrtip',
-        // Add more DataTable options if required
-    });
-
-    $('#' + childTableId).DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: route('admin.contracts.paymentsplan.phases', { contract: contractId }),
-                columns: [
-                    { data: "stage_name", "name": "stage_name", title: 'Stage Name' },
-                    { data: 'name', title: 'Phase Name' },
-                    { data: 'start_date', title: 'Start Date' },
-                    { data: 'due_date', title: 'Due Date' },
-                    { data: 'amount', title: 'Amount' },
-                    { data: "reviewed_by", "reviewed_by": "reviewed_by", title: 'Reviewed By' },
-                    { data: 'status', title: 'Status' },
-                    {
-                        data: 'actions',
-                        title: 'Actions',
-                        orderable: false,
-                        searchable: false
-                    }
-                ],
-                destroy: true,
-                dom: 'Blfrtip',
-                buttons: [
-        {
-            text: 'Add Phase',
-            className: 'btn btn-primary',
-            attr: {
-                'data-toggle': 'ajax-modal',
-                'data-title': 'Add Phase',
-                'data-href': route('admin.projects.contracts.stages.phases.create', {project: 'project', contract: contractId, stage: 'stage', tableId: childTableId })
-            }
-        }
-    ],
-                initComplete: function() {
-                    // Move the buttons container near the search bar
-                   // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
-                }    ,drawCallback: function(settings) {
-                    $('[data-bs-toggle="tooltip"]').tooltip('dispose'); // Dispose of any existing tooltips to prevent potential issues
-        $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
-    }
-            });
-
-
-    }
-
-
-    var expandedRow = null; // Variable to track the currently expanded row
-
-$('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
-    var tr = $(this).closest('tr');
-    var selectedRow = table.row(tr);
-    var contractId = $(this).attr('contract-id');
-
-    // If this row is already shown, hide it
-    if (selectedRow.child.isShown()) {
-        // Find any added child rows and remove them
-        tr.nextAll('.child-row-added').remove();
-
-        selectedRow.child.hide();
-        $(tr).removeClass('shown');
-        $(tr).css('background-color', '');
-    } else {
-        // If another row is expanded, collapse it
-        if (expandedRow) {
+        // If another row is expanded, hide it
+        if (expandedRow && expandedRow.node() !== row.node()) {
             expandedRow.child.hide();
             $(expandedRow.node()).removeClass('shown');
-            $(expandedRow.node()).css('background-color', '');
-            $(expandedRow.node()).nextAll('.child-row-added').remove();
         }
 
-        createChildTable(selectedRow, contractId);
-        $(tr).addClass('shown');
-        $(tr).css('background-color', '#f5f5f5');
+        // Expand or collapse this row
+        if (row.child.isShown()) {
+            row.child.hide();
+            tr.removeClass('shown');
+            expandedRow = null;
+        } else {
+            // Insert the tabs (pills) and content rows for the selected row
+            var pillsRow = createPillsRow(contractId);
+            var contentRow = createContentRow(contractId);
 
-        expandedRow = selectedRow; // Update the reference to the currently expanded row
+            row.child(pillsRow + contentRow).show();
+            tr.addClass('shown');
+            expandedRow = row; // Keep track of the currently expanded row
+
+            // Initialize any DataTables here, after the content is added to the DOM
+            initializeChildDataTables(contractId);
+        }
+    });
+
+    function createPillsRow(contractId) {
+        // Return the HTML for the navigation pills
+        return `
+            <tr class="child-row-added">
+                <td colspan="100%">
+                    <ul class="nav nav-pills mt-3 mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-stages-${contractId}" aria-controls="child-stages-${contractId}" aria-selected="false">Stages</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#child-phases-${contractId}" aria-controls="child-phases-${contractId}" aria-selected="true">Phases</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-review-${contractId}" aria-controls="child-review-${contractId}" aria-selected="false">Review</button>
+                        </li>                    
+                    </ul>
+                </td>
+            </tr>
+        `;
+    }
+
+    function createContentRow(contractId) {
+        // Return the HTML for the tab content
+        var content = `
+            <tr class="child-row-added p-0">
+                <td class="p-0" colspan="100%">
+                    <div class="tab-content">
+                        <div class="tab-pane fade" id="child-stages-${contractId}" role="tabpanel" aria-labelledby="child-stages-tab-${contractId}">
+                            <table class="table" id="stages-table-${contractId}"></table>
+                        </div>
+                        <div class="tab-pane fade show active" id="child-phases-${contractId}" role="tabpanel" aria-labelledby="child-phases-tab-${contractId}">
+                            <table class="table" id="child-table-${contractId}"></table>
+                        </div>
+                        <div class="tab-pane fade" id="child-review-${contractId}" role="tabpanel" aria-labelledby="child-review-tab-${contractId}">
+                            <table class="table" id="review-table-${contractId}"></table>
+                        </div>                    
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        var contentRow = $(content);
+        contentRow.addClass("custom-content-row");
+        contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
+        return content;
+    }
+
+    function initializeChildDataTables(contractId) {
+        // Initialize the DataTables for each tab's content
+        // Example for one of the tables:
+        // $('#child-table-' + contractId).DataTable({
+        //     // DataTables configuration options
+        // });
     }
 });
 
-    $('.js-datatable-filter-form :input').on('change', function(e) {
-        console.log('Filter changed');
-        window.LaravelDataTables["paymentsplan-table"].draw();
-    });
-
-    $('#paymentsplan-table').on('preXhr.dt', function(e, settings, data) {
-        console.log('PreXHR event');
-        $('.js-datatable-filter-form :input').each(function() {
-            data[$(this).prop('name')] = $(this).val();
-        });
-    });
-
-        // Reload stages DataTable when "Stages" pill tab is clicked
-        $(document).on('click', '.nav-link[data-bs-target^="#child-stages-"]', function() {
-        // Extract the contractId from the target attribute of the clicked pill tab
-        var contractId = $(this).attr('data-bs-target').replace("#child-stages-", "");
-
-        // Get the corresponding stages DataTable and reload it
-        $('#stages-table-' + contractId).DataTable().ajax.reload();
-    });
-
-    // Reload phases DataTable when "Phases" pill tab is clicked
-    $(document).on('click', '.nav-link[data-bs-target^="#child-phases-"]', function() {
-        // Extract the contractId from the target attribute of the clicked pill tab
-        var contractId = $(this).attr('data-bs-target').replace("#child-phases-", "");
-
-        // Get the corresponding phases DataTable and reload it
-        $('#child-table-' + contractId).DataTable().ajax.reload();
-    });
-
-    // Reload phases DataTable when "Phases" pill tab is clicked
-    $(document).on('click', '.nav-link[data-bs-target^="#child-review-"]', function() {
-        // Extract the contractId from the target attribute of the clicked pill tab
-        var contractId = $(this).attr('data-bs-target').replace("#child-review-", "");
-
-        // Get the corresponding phases DataTable and reload it
-        $('#review-table' + contractId).DataTable().ajax.reload();
-    });
-        
-});
 </script>
 
 {{-- Real Time Editing Scripts --}}
