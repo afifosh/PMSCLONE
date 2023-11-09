@@ -25,6 +25,7 @@ class CreateLocationsTable extends Migration
             $table->integer('zoomLevel')->default(0);
             $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
             $table->boolean('is_public')->default(true);
+            $table->boolean('is_warehouse')->default(false);
             $table->nullableMorphs('owner');
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();

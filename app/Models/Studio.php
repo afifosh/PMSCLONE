@@ -31,6 +31,11 @@ class Studio extends Model
         'status',
     ];
 
+    protected $casts = [
+      'created_at' => 'datetime:d M, Y',
+      'updated_at' => 'datetime:d M, Y',
+    ];
+
     protected $dates = ['deleted_at'];
     protected $appends = ['avatar'];
 
@@ -53,18 +58,18 @@ class Studio extends Model
     {
         return $this->belongsTo(Admin::class, 'added_by');
     }
-   
+
     public function getAvatarAttribute($value)
     {
       if (!$value)
         return Avatar::create($this->name)->toBase64();
       return @Storage::url($value);
     }
-  
+
     public function getPhotoUrlAttribute()
     {
       return $this->avatar;
     }
-  
+
 
 }

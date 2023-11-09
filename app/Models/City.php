@@ -18,4 +18,9 @@ class City extends Model
     {
         return $this->belongsTo(State::class);
     }
+
+    public function scopeApplyRequestFilters()
+    {
+      //
+    }
 }

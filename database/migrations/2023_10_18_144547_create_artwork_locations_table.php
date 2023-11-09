@@ -15,9 +15,11 @@ return new class extends Migration
       $table->id();
       $table->foreignId('artwork_id')->constrained()->cascadeOnDelete();
       $table->foreignId('location_id')->constrained()->cascadeOnDelete();
-      $table->foreignId('moved_from')->nullable()->constrained('artwork_locations')->cascadeOnUpdate()->nullOnDelete(); // in case of preserving movement history, Otherwise not needed
+      $table->foreignId('contract_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
       $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
+      $table->timestamp('added_on')->nullable(); // in case added for some time, null means forever
       $table->timestamp('added_till')->nullable(); // in case added for some time, null means forever
+      $table->boolean('is_current')->default(false);
       $table->timestamps();
     });
   }

@@ -85,7 +85,12 @@
       {{-- <form action="{{ route('admin.artists.update', ['artist' => $artist->id]) }}" method="POST">
       <form action="{{route('admin.artists.update')}}" method="POST" enctype="multipart/form-data"> --}}
         {{-- <form method="POST" action="{{ route('admin.artists.update', $artist->id) }}">  --}}
+      @if($artist->id)
        {!! Form::model($artist, ['route' => ['admin.artists.update', $artist->id], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
+      @else
+       {!! Form::model($artist, ['route' => ['admin.artists.store'], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
+      @endif
+
       <div class="card-body">
         <div class="d-flex align-items-start align-items-sm-center gap-4">
           <img src="{{ $artist->avatar }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" />
@@ -133,8 +138,8 @@
                   <option value="Other" {{ old('gender') == 'Other' || $artist->gender == 'Other' ? 'selected' : '' }}>Other</option>
               </select>
               @error('gender')<div class="text-danger">{{ $message }}</div>@enderror
-            </div>             
-            
+            </div>
+
             <div class="mb-3 col-md-6">
                 <label for="email" class="form-label">Email</label>
                 <input class="form-control" type="email" id="email" name="email"

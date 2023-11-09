@@ -364,6 +364,9 @@ class Company extends BaseModel
     })
     ->when(request()->has('haspayments'), function ($q) {
       $q->has('contracts.invoices.payments');
+    })
+    ->when(request()->has('type'), function ($q) {
+      $q->where('type', request()->type);
     });
   }
 

@@ -21,9 +21,9 @@ class ArtistsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-    ->addColumn('full_name', function ($row) {
-      return view('admin.pages.artist.artist-info', ['user' => $row]);
-    })
+      ->addColumn('full_name', function ($row) {
+        return view('admin.pages.artist.artist-info', ['user' => $row]);
+      })
       ->editColumn('added_by', function ($artist) {
         return $artist->addedBy ? view('admin._partials.sections.user-info', ['user' => $artist->addedBy]) : '-';
       })
@@ -39,15 +39,15 @@ class ArtistsDataTable extends DataTable
       ->addColumn('country', function ($artist) {
         $countryName = $countryName = $artist->country ? ucfirst($artist->country->name) : '-';
         return $countryName;
-      })      
+      })
       ->addColumn('age', function ($artist) {
         return $artist->age;
       })
-      ->filterColumn('added_by', function($query, $keyword){
-        return $query->whereHas('addedBy', function($q) use ($keyword){
-          return $q->where('email', 'like', '%'.$keyword.'%')
-            ->orWhere('first_name', 'like', '%'.$keyword.'%')
-            ->orWhere('last_name', 'like', '%'.$keyword.'%');
+      ->filterColumn('added_by', function ($query, $keyword) {
+        return $query->whereHas('addedBy', function ($q) use ($keyword) {
+          return $q->where('email', 'like', '%' . $keyword . '%')
+            ->orWhere('first_name', 'like', '%' . $keyword . '%')
+            ->orWhere('last_name', 'like', '%' . $keyword . '%');
         });
       })
       ->setRowId('id')
@@ -101,16 +101,14 @@ class ArtistsDataTable extends DataTable
   public function html(): HtmlBuilder
   {
     $buttons = [];
-    if (auth('admin')->user()->can('create company'))
-      $buttons[] = [
-        'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Artist</span>',
-        'className' =>  'btn btn-primary mx-3',
-        'attr' => [
-          'data-toggle' => "ajax-modal",
-          'data-title' => 'Add Artist',
-          'data-href' => route('admin.companies.create')
-        ]
-      ];
+    $buttons[] = [
+      'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Artist</span>',
+      'className' =>  'btn btn-primary mx-3',
+      'href' => route('admin.artists.create'),
+      'attr' => [
+        'onClick' => 'window.location.href="'.route('admin.artists.create'). '"',
+      ]
+    ];
     return $this->builder()
       ->setTableId(Artist::DT_ID)
       ->columns($this->getColumns())

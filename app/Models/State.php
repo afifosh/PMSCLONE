@@ -24,4 +24,9 @@ class State extends Model
     {
         return $this->belongsTo(Country::class);
     }
+
+    public function scopeApplyRequestFilters()
+    {
+      //
+    }
 }

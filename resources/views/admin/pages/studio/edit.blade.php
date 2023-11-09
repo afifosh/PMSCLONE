@@ -111,14 +111,9 @@
           {{-- @method('PUT') --}}
           <div class="row">
             <div class="mb-3 col-md-6">
-              <label for="firstName" class="form-label">First Name</label>
-              <input class="form-control" type="text" id="firstName" name="first_name" value="{{ old('first_name') ?? $studio->first_name }}" autofocus />
-              @error('first_name')<div class="text-danger">{{ $message }}</div>@enderror
-            </div>
-            <div class="mb-3 col-md-6">
-              <label for="lastName" class="form-label">Last Name</label>
-              <input class="form-control" type="text" name="last_name" id="lastName" value="{{ old('last_name') ?? $studio->last_name }}" />
-              @error('last_name')<div class="text-danger">{{ $message }}</div>@enderror
+              <label for="name" class="form-label">Name</label>
+              <input class="form-control" type="text" id="name" name="name" value="{{ old('name') ?? $studio->name }}" autofocus />
+              @error('name')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3 col-md-6">
               <label for="gender" class="form-label">Gender</label>
@@ -128,8 +123,8 @@
                   <option value="Other" {{ old('gender') == 'Other' || $studio->gender == 'Other' ? 'selected' : '' }}>Other</option>
               </select>
               @error('gender')<div class="text-danger">{{ $message }}</div>@enderror
-            </div>             
-            
+            </div>
+
             <div class="mb-3 col-md-6">
                 <label for="email" class="form-label">Email</label>
                 <input class="form-control" type="email" id="email" name="email"

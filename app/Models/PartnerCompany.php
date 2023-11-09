@@ -43,4 +43,9 @@ class PartnerCompany extends BaseModel
   {
     return $this->morphMany(Location::class, 'owner', 'owner_type', 'owner_id');
   }
+
+  public function scopeApplyRequestFilters($query)
+  {
+    //
+  }
 }

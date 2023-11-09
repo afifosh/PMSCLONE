@@ -13,6 +13,7 @@ class ArtworkLocation extends Model
   protected $fillable = [
     'artwork_id',
     'location_id',
+    'contract_id',
     'moved_from',
     'added_by',
     'added_till',
@@ -30,6 +31,14 @@ class ArtworkLocation extends Model
   public function artwork(): BelongsTo
   {
     return $this->belongsTo(Artwork::class);
+  }
+
+  /**
+   * The contract by which artwork is placed.
+   */
+  public function contract(): BelongsTo
+  {
+    return $this->belongsTo(Contract::class);
   }
 
   /**

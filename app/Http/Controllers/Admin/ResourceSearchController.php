@@ -77,7 +77,16 @@ class ResourceSearchController extends Controller
         'select' => ['contract_phases.name as text', 'contract_phases.id'],
         'dependent_column' => 'contract_phases.contract_id'
       ],
-      'Currency' => []
+      'PartnerCompany' => [
+        'search' => 'name',
+        'select' => ['name as text', 'id']
+      ],
+      'Location' => [
+        'search' => 'name',
+        'select' => ['name as text', 'id']
+      ],
+      'Currency' => [],
+      'Owner' => [],
     ];
     if (!isset($allowedResources[$resource])) {
      // return $this->sendError('Invalid resource');
@@ -90,7 +99,9 @@ class ResourceSearchController extends Controller
     } elseif ($resource == 'Contract') {
       return $this->contractSelect($allowedResources);
     } elseif ($resource == 'groupedCompany')
-      return $this->groupedCompanySelect($allowedResources);
+      return $this->groupedCompanySelect();
+    elseif ($resource == 'Owner')
+      return $this->multipleOwners();
 
     $model = 'App\Models\\' . $resource;
 
@@ -195,7 +206,7 @@ class ResourceSearchController extends Controller
     return $data;
   }
 
-  public function groupedCompanySelect($allowedResources)
+  public function groupedCompanySelect()
   {
     // get companies by type
     $companies = Company::applyRequestFilters()->select(['id', 'name', 'type'])->orderBy('type')->paginate(15, ['*'], 'page', request()->get('page'));
@@ -230,5 +241,24 @@ class ResourceSearchController extends Controller
         'more' => $companies->hasMorePages(),
       ],
     ]);
+  }
+
+  private function multipleOwners()
+  {
+    if(request()->dependent_id == 'Company'){
+      request()->merge([
+        'type' => 'Company'
+      ]);
+    }elseif(request()->dependent_id == 'Client'){
+      request()->merge([
+        'type' => 'Client'
+      ]);
+    }elseif(request()->dependent_id == 'PartnerCompany'){
+      request()->merge([
+        'dependent_id' => null,
+      ]);
+      return $this->index('PartnerCompany');
+    }
+    return $this->groupedCompanySelect();
   }
 }
