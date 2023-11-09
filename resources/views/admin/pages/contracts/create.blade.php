@@ -96,7 +96,7 @@ function toggleContractReviewStatus(buttonElement) {
                     buttonElement.classList.add(newClass);
                     toast_success(data.message)
                 } else {
-                    alert('Error toggling review status.');
+                  //  alert('Error toggling review status.');
                     toast_danger(data.message)
                 }
             })
