@@ -41,8 +41,66 @@ class ContractsTrackingDataTable extends DataTable
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
-      ->addColumn('reviewed_by', function ($stage) {
-        $reviewers = $stage->reviews;
+      ->addColumn('incomplete_reviewers', function ($contract) {
+        $users = $contract->getAdminsWhoDidNotReviewContract();
+        if ($users->isEmpty()) {
+          return "N/A";
+      }
+  
+
+        $html = '<div class="d-flex align-items-center avatar-group my-3">';
+    
+        $maxDisplayed = 5;
+        for ($i = 0; $i < min($maxDisplayed, $users->count()); $i++) {
+            $reviewer = $users[$i];
+            $avatarUrl = $reviewer->avatar; // Assuming 'avatar' is the column name in the 'users' table
+            $userName = htmlspecialchars($reviewer->name); // Escape the name to ensure it's safe to display
+    
+            $html .= '<div class="avatar pull-up" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" aria-label="' . $userName . '" data-bs-original-title="' . $userName . '">
+                        <img src="' . $avatarUrl . '" alt="Avatar" class="rounded-circle">
+                      </div>';
+        }
+    
+        if ($users->count() > $maxDisplayed) {
+            $moreCount = $users->count() - $maxDisplayed;
+            $html .= '<div class="avatar pull-up">
+                        <span class="avatar-initial rounded-circle" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" data-bs-original-title="' . $moreCount . ' more reviewers">+' . $moreCount . '</span>
+                      </div>';
+        }
+    
+        $html .= '</div>';
+        return $html;
+      })   
+      ->addColumn('reviews_completed', function ($contract) {
+        $users = $contract->getAdminsWhoReviewedContract();
+        if ($users->isEmpty()) {
+          return "N/A";
+      }
+        $html = '<div class="d-flex align-items-center avatar-group my-3">';
+    
+        $maxDisplayed = 5;
+        for ($i = 0; $i < min($maxDisplayed, $users->count()); $i++) {
+            $reviewer = $users[$i];
+            $avatarUrl = $reviewer->avatar; // Assuming 'avatar' is the column name in the 'users' table
+            $userName = htmlspecialchars($reviewer->name); // Escape the name to ensure it's safe to display
+    
+            $html .= '<div class="avatar pull-up" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" aria-label="' . $userName . '" data-bs-original-title="' . $userName . '">
+                        <img src="' . $avatarUrl . '" alt="Avatar" class="rounded-circle">
+                      </div>';
+        }
+    
+        if ($users->count() > $maxDisplayed) {
+            $moreCount = $users->count() - $maxDisplayed;
+            $html .= '<div class="avatar pull-up">
+                        <span class="avatar-initial rounded-circle" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" data-bs-original-title="' . $moreCount . ' more reviewers">+' . $moreCount . '</span>
+                      </div>';
+        }
+    
+        $html .= '</div>';
+        return $html;
+      })      
+      ->addColumn('reviewed_by', function ($contract) {
+        $reviewers = $contract->reviews;
     
         $html = '<div class="d-flex align-items-center avatar-group my-3">';
     
@@ -99,7 +157,7 @@ class ContractsTrackingDataTable extends DataTable
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
         });
       })
-      ->rawColumns(['id', 'program.name','reviewed_by']);
+      ->rawColumns(['id', 'program.name','reviewed_by','reviews_completed','incomplete_reviewers']);
   }
 
 /**
@@ -220,14 +278,16 @@ public function query(Contract $model): QueryBuilder
   public function getColumns(): array
   {
     return [
-      Column::make('contracts.id')->title('Contract'),
+      // Column::make('contracts.id')->title('Contract'),
       Column::make('subject')->title('Subject'),
       Column::make('program.name')->name('programs.name')->title('Program'),
-      Column::make('refrence_id')->title('Ref ID'),
+      // Column::make('refrence_id')->title('Ref ID'),
       Column::make('assigned_to')->title('Assigned To'),
-      Column::make('value')->title('Amount'),
+      // Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
       Column::make('reviewed_by')->title('Reviewed By'),
+      Column::make('incomplete_reviewers')->title('Incomplete Reviewers'),
+      Column::make('reviews_completed')->title('Reviews Completed'),
       Column::make('start_date'),
       Column::make('end_date'),
       // Column::make('phases_count')->title('Phases')->searchable(false),
