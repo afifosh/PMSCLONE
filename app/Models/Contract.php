@@ -252,7 +252,64 @@ class Contract extends BaseModel
   
       return $combinedAdmins;
   }
+
+  public function getAllUsersFromProgramAndParentProgram()
+  {
+      $program = $this->program; // This gives you the program object
+      $parentProgram = $program->parent; // This gives you the parent program object
   
+      // Get the users of this program
+      $programUsers = $program->users;
+  
+      // If there is a parent program, get those users as well
+      $parentProgramUsers = collect();
+      if ($parentProgram) {
+          $parentProgramUsers = $parentProgram->users;
+      }
+  
+      // Combine the collections, ensuring there are no duplicates
+      $allUsers = $programUsers->merge($parentProgramUsers)->unique('id');
+  
+      return $allUsers;
+  }
+
+  public function getAdminsWhoDidNotReviewContract()
+  {
+    // Get the IDs of admin users who have made reviews for this contract
+    $adminUserIds = Review::where('reviewable_id', $this->id)
+        ->where('reviewable_type', Contract::class)
+        ->distinct()
+        ->pluck('user_id')
+        ->toArray();
+
+    // Get all users from the program and parent program
+    $allUsers = $this->getAllUsersFromProgramAndParentProgram();
+
+    // Filter and return only the admin users from the list of all users
+    $adminsWhoReviewed = $allUsers->whereNotIn('id', $adminUserIds);
+
+    return $adminsWhoReviewed;
+  }
+  
+  
+  public function getAdminsWhoReviewedContract()
+  {
+    // Get the IDs of admin users who have made reviews for this contract
+    $adminUserIds = Review::where('reviewable_id', $this->id)
+        ->where('reviewable_type', Contract::class)
+        ->distinct()
+        ->pluck('user_id')
+        ->toArray();
+
+    // Get all users from the program and parent program
+    $allUsers = $this->getAllUsersFromProgramAndParentProgram();
+
+    // Filter and return only the admin users from the list of all users
+    $adminsWhoReviewed = $allUsers->whereIn('id', $adminUserIds);
+
+    return $adminsWhoReviewed;
+  }  
+
   public function getStatusAttribute()
   {
     $value = $this->getRawOriginal('status');
