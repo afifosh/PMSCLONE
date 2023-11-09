@@ -43,9 +43,10 @@ class ContractsTrackingDataTable extends DataTable
       })
       ->addColumn('incomplete_reviewers', function ($contract) {
         $users = $contract->getAdminsWhoDidNotReviewContract();
-        if ($users->isEmpty()) {
+        if (!$users[0]) {
           return "N/A";
       }
+      // return ($users);
   
 
         $html = '<div class="d-flex align-items-center avatar-group my-3">';
@@ -279,19 +280,19 @@ public function query(Contract $model): QueryBuilder
   {
     return [
       // Column::make('contracts.id')->title('Contract'),
-      Column::make('subject')->title('Subject'),
-      Column::make('program.name')->name('programs.name')->title('Program'),
-      // Column::make('refrence_id')->title('Ref ID'),
-      Column::make('assigned_to')->title('Assigned To'),
+   //  Column::make('subject')->title('Subject'),
+      // Column::make('program.name')->name('programs.name')->title('Program'),
+      // // Column::make('refrence_id')->title('Ref ID'),
+      // Column::make('assigned_to')->title('Assigned To'),
       // Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
-      Column::make('reviewed_by')->title('Reviewed By'),
+  //    Column::make('reviewed_by')->title('Reviewed By'),
       Column::make('incomplete_reviewers')->title('Incomplete Reviewers'),
       Column::make('reviews_completed')->title('Reviews Completed'),
-      Column::make('start_date'),
-      Column::make('end_date'),
+      // Column::make('start_date'),
+      // Column::make('end_date'),
       // Column::make('phases_count')->title('Phases')->searchable(false),
-      Column::make('status'),
+      // Column::make('status'),
     ];
   }
 
