@@ -207,7 +207,10 @@ public function query(Contract $model): QueryBuilder
       ->responsive(true)
       ->parameters([
         'buttons' => $buttons,
-        "scrollX" => true
+        "scrollX" => true,
+        "drawCallback" => "function (settings) {
+            $('[data-bs-toggle=\"tooltip\"]').tooltip();
+          }"
       ]);
   }
 
