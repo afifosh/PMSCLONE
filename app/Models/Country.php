@@ -24,9 +24,4 @@ class Country extends Model
     {
         return $this->hasManyThrough(City::class, State::class);
     }
-
-    public function scopeApplyRequestFilters()
-    {
-      //
-    }
 }

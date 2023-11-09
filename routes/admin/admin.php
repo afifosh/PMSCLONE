@@ -455,6 +455,7 @@ Route::prefix('contracts')->group(function () {
       Route::resource('program-accounts', ProgramAccountController::class);
       Route::resource('program-accounts.transactions', ProgramTransactionController::class)->only(['index', 'create', 'store']);
       Route::get('retentions', [TaxController::class, 'retentions'])->name('retentions.index');
+      Route::get('downpayments', [TaxController::class, 'downpayments'])->name('downpayments.index');
       Route::resource('taxes', TaxController::class);
       Route::resource('payments', PaymentController::class);
     });

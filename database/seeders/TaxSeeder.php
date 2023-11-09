@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Seeders;
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,55 +12,62 @@ class TaxSeeder extends Seeder
    */
   public function run(): void
   {
-    // Tax::factory()->count(5)->create();
-    // Tax::factory()->count(5)->create(['is_retention' => true]);
+    // InvoiceConfig::factory()->count(5)->create();
 
         // No Tax 0%
-        Tax::create([
+        InvoiceConfig::create([
           'name' => 'No Tax',
           'type' => 'Percent',
           'amount' => 0,
           'status' => 'Active',
-          'is_retention' => false,
+          'config_type' => 'Tax',
       ]);
 
       // 5% Tax
-      Tax::create([
+      InvoiceConfig::create([
           'name' => '5% Tax',
           'type' => 'Percent',
           'amount' => 5,
           'status' => 'Active',
-          'is_retention' => false,
+          'config_type' => 'Tax',
       ]);
 
       // 15% Tax
-      Tax::create([
+      InvoiceConfig::create([
           'name' => '15% Tax',
           'type' => 'Percent',
           'amount' => 15,
           'status' => 'Active',
-          'is_retention' => false,
+          'config_type' => 'Tax',
       ]);
 
  
        // 15% Tax
-       Tax::create([
+       InvoiceConfig::create([
         'name' => '5% With Holding Tax',
         'type' => 'Percent',
         'amount' => -5,
         'status' => 'Active',
-        'is_retention' => false,
+        'config_type' => 'Tax',
     ]);     
  
       // 5% Retention
-      Tax::create([
+      InvoiceConfig::create([
         'name' => '5% Retention',
         'type' => 'Percent',
         'amount' => 5,
         'status' => 'Active',
-        'is_retention' => true,  // Assuming this column exists in your Tax model
+        'config_type' => 'Retention',
       ]);
 
 
+      // 5% Down Payment
+      InvoiceConfig::create([
+        'name' => '5% Downpayment',
+        'type' => 'Percent',
+        'amount' => 5,
+        'status' => 'Active',
+        'config_type' => 'Down Payment',
+      ]);
   }
 }

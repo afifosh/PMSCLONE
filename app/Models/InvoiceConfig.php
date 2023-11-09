@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tax extends Model
+class InvoiceConfig extends Model
 {
   use HasFactory;
 
@@ -14,7 +14,7 @@ class Tax extends Model
     'type',
     'amount',
     'status',
-    'is_retention'
+    'config_type'
   ];
 
   protected $casts = [
@@ -25,6 +25,30 @@ class Tax extends Model
   public function getAmountAttribute($value)
   {
     return $value / 1000;
+  }
+
+  /**
+   * Scope Active Retention
+   */
+  public function scopeActiveRetentiones($q)
+  {
+    $q->where('config_type', 'Retention')->activeOnly();
+  }
+
+  /**
+   * Scope Active Tax
+   */
+  public function scopeActiveTaxes($q)
+  {
+    $q->where('config_type', 'Tax')->activeOnly();
+  }
+
+  /**
+   * Scope Active only
+   */
+  public function scopeActiveOnly($q)
+  {
+    $q->where('status', 'Active');
   }
 
   public function setAmountAttribute($value)

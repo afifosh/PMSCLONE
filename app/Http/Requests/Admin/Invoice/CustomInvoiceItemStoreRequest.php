@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Admin\Invoice;
 
 use App\Models\Invoice;
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CustomInvoiceItemStoreRequest extends FormRequest
@@ -30,7 +30,7 @@ class CustomInvoiceItemStoreRequest extends FormRequest
    */
   protected function prepareForValidation(): void
   {
-    $this->taxes = Tax::where('is_retention', 0)->where('status', 'Active')->whereIn('id', filterInputIds($this->item_taxes))->get();
+    $this->taxes = InvoiceConfig::activeTaxes()->whereIn('id', filterInputIds($this->item_taxes))->get();
     $this->downpayment = Invoice::find($this->downpayment_id);
     $this->calTaxAmount();
     $this->merge([
@@ -67,7 +67,7 @@ class CustomInvoiceItemStoreRequest extends FormRequest
       'downpayment_id' => 'nullable|exists:invoices,id',
       'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->downpayment->downpaymentAmountRemaining() : ''),
       'item_taxes' => 'nullable|array',
-      'item_taxes.*' => 'nullable|exists:taxes,id',
+      'item_taxes.*' => 'nullable|exists:invoice_configs,id',
       'total_tax_amount' => 'required|numeric|gte:0',
       'total' => 'required|numeric|gt:0',
       'manual_tax_amount' => 'required|numeric',

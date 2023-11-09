@@ -47,7 +47,7 @@ class InvoiceStoreRequest extends FormRequest
 
     elseif(request()->update_retention){
       return [
-        'retention_id' => 'nullable|exists:taxes,id,is_retention,1',
+        'retention_id' => 'nullable|exists:invoice_configs,id',
         // 'retention_type' => 'required|in:Fixed,Percentage',
         // 'retention_value' => ['nullable', 'numeric', function($attribute, $value, $fail){
         //   if(request()->retention_type == 'Percentage' && ($value > 100 || $value < 0))

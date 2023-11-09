@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class InvoiceItem extends Model
 {
@@ -93,7 +94,7 @@ class InvoiceItem extends Model
 
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(Tax::class, 'invoice_taxes')->withPivot('amount', 'type');
+    return $this->belongsToMany(InvoiceConfig::class, 'invoice_taxes', 'invoice_item_id', 'tax_id')->withPivot('amount', 'type');
   }
 
   /**
@@ -117,5 +118,15 @@ class InvoiceItem extends Model
     }
 
     $this->taxes()->sync($sync_data);
+  }
+
+  /**
+   * pivot table for storing deduction information
+   *
+   * @return MorphOne
+   */
+  public function deduction(): MorphOne
+  {
+    return $this->morphOne(InvoiceDeduction::class, 'deductible');
   }
 }

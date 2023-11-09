@@ -14,8 +14,8 @@ return new class extends Migration
     Schema::create('phase_taxes', function (Blueprint $table) {
       $table->id();
       $table->foreignId('contract_phase_id')->constrained('contract_phases')->cascadeOnDelete();
-      $table->foreignId('tax_id')->constrained()->cascadeOnDelete();
-      $table->unsignedBigInteger('amount')->default(0);
+      $table->foreignId('tax_id')->constrained('invoice_configs')->cascadeOnDelete();
+      $table->bigInteger('amount')->default(0);
       $table->enum('type', ['Percent', 'Fixed'])->default('Percent');
       $table->timestamps();
     });

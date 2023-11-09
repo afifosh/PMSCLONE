@@ -15,8 +15,8 @@ return new class extends Migration
       $table->id();
       $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
       $table->foreignId('invoice_item_id')->nullable()->constrained('invoice_items')->cascadeOnDelete();
-      $table->foreignId('tax_id')->constrained()->cascadeOnDelete();
-      $table->unsignedBigInteger('amount')->default(0);
+      $table->foreignId('tax_id')->constrained('invoice_configs')->cascadeOnDelete();
+      $table->bigInteger('amount')->default(0);
       $table->enum('type', ['Percent', 'Fixed'])->default('Percent');
       $table->timestamps();
     });

@@ -10,7 +10,7 @@ use App\Http\Requests\Admin\Contract\Phase\PhaseUpdateRequest;
 use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\ContractStage;
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use Illuminate\Http\Request;
 
 class ProjectPhaseController extends Controller
@@ -45,7 +45,7 @@ class ProjectPhaseController extends Controller
     $stage = ContractStage::find($stage) ?? 'stage';
     $max_amount = $contract->remaining_amount;
     $phase = new ContractPhase();
-    $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
+    $tax_rates = InvoiceConfig::activeTaxes()->get();
     $stages = $contract->stages->pluck('name', 'id');
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
   }
@@ -93,7 +93,7 @@ class ProjectPhaseController extends Controller
     }
     $stages = $contract->stages->pluck('name', 'id');
     $max_amount = $contract->remaining_amount + $phase->total_cost;
-    $tax_rates = Tax::where('is_retention', false)->where('status', 'Active')->get();
+    $tax_rates = InvoiceConfig::activeTaxes()->get();
 
     $userHasMarkedComplete = $phase->reviews->contains('user_id', auth()->id());
     $buttonLabel = $userHasMarkedComplete ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';

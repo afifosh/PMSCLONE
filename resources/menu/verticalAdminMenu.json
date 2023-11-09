@@ -253,6 +253,11 @@
           "slug": "admin.finances.retentions.index"
         },
         {
+          "url": "/admin/finances/downpayments",
+          "name": "Down Payments",
+          "slug": "admin.finances.downpayments.index"
+        },
+        {
           "url": "/admin/invoices",
           "name": "Invoices",
           "slug": "admin.invoices.index"

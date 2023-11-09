@@ -7,7 +7,7 @@ use App\Http\Requests\Admin\Invoice\CustomInvoiceItemStoreRequest;
 use App\Http\Requests\Admin\Invoice\CustomInvoiceItemUpdateRequest;
 use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use Illuminate\Http\Request;
 
 class CustomInvoiceItemController extends Controller
@@ -16,7 +16,7 @@ class CustomInvoiceItemController extends Controller
   {
     $customInvoiceItem = new CustomInvoiceItem();
 
-    $tax_rates = Tax::where('is_retention', 0)->where('status', 'Active')->get();
+    $tax_rates = InvoiceConfig::whereIn('config_type', ['Tax', 'Down Payment'])->activeOnly()->get();
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.custom-items.create', compact('invoice', 'customInvoiceItem', 'tax_rates'))->render()]);
   }
@@ -45,7 +45,7 @@ class CustomInvoiceItemController extends Controller
 
   public function edit(Invoice $invoice, CustomInvoiceItem $customInvoiceItem)
   {
-    $tax_rates = Tax::where('is_retention', 0)->where('status', 'Active')->get();
+    $tax_rates = InvoiceConfig::activeTaxes()->get();
     return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.custom-items.create', compact('invoice', 'customInvoiceItem', 'tax_rates'))->render()]);
   }
 
@@ -59,6 +59,8 @@ class CustomInvoiceItemController extends Controller
       'manual_tax_amount' => moneyToInt($request->manual_tax_amount),
       'total' => moneyToInt($request->total),
     ]);
+
+    $customInvoiceItem->invoiceItem->syncTaxes($request->taxes);
 
     $invoice->reCalculateTotal();
 

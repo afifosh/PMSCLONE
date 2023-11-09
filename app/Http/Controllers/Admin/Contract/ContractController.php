@@ -25,7 +25,6 @@ use App\Support\LaravelBalance\Dto\TransactionDto;
 use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Traits\FinanceTrait;
 use Illuminate\Support\Facades\DB;
-use App\Models\Tax;
 use DataTables;
 use Illuminate\Http\Request;
 
@@ -742,29 +741,29 @@ class ContractController extends Controller
   {
       // Assuming `program` is a relation on the `Contract` model that retrieves the associated program.
       // And `users` is a relation on the `Program` model that retrieves all users associated with the program.
-      
+
       // Find the contract
       $contract = Contract::find($contract_id);
       if (!$contract) {
           return response()->json(['error' => 'Contract not found'], 404);
       }
-  
+
       // Get the associated program and users with access to the contract
       $program = $contract->program;
       $usersWithAccess = $program->users;
-  
+
       // If the program has a parent, we should also include users from the parent program
       $parentProgramUsers = collect();
       if ($parentProgram = $program->parent) {
           $parentProgramUsers = $parentProgram->users;
       }
-  
+
       // Combine the collections, ensuring there are no duplicates
       $allUsers = $usersWithAccess->merge($parentProgramUsers)->unique('id');
 
       // Start building your query for the DataTable
       $dataTableQuery = Admin::whereIn('id', $allUsers->pluck('id'));
-  
+
       // Create a DataTable
       $dataTable = DataTables::of($dataTableQuery)
           ->addColumn('name', function ($user) {
@@ -775,24 +774,24 @@ class ContractController extends Controller
               // which checks the user's review status for each stage of the contract.
              // return $user->getReviewStatusForContract($contract_id);
 
-    
+
                           // Return the rendered view as a string
                 return view('admin.pages.contracts.tracking.paymentsplan.review', [
                   'status' => $user->getReviewStatusForContract($contract_id)
               ])->render();
           })
           ->rawColumns(['review_status']);
-  
+
       // ... other dataTable configurations ...
-  
+
       $outputData = $dataTable->make(true)->getData(true);
-  
+
       // ... buttons and other outputData configurations ...
-  
+
       return response()->json($outputData);
   }
-  
-  
+
+
   public function ContractPaymentsPlanPhases($contract_id)
   {
     $query = ContractPhase::with(['stage:name,id']) // Load only the name of the related stage
@@ -970,34 +969,34 @@ class ContractController extends Controller
       try {
           // Find the contract by its ID
           $contract = Contract::findOrFail($contract_id);
-  
+
           // Retrieve the program associated with the contract
           $program = $contract->program;
-  
+
           // Retrieve users associated with the program
           $programUsers = $program->users;
-  
+
           // If the program has a parent, retrieve users from the parent program as well
           $parentProgramUsers = collect();
           if ($program->parent) {
               $parentProgramUsers = $program->parent->users;
           }
-  
+
           // Combine users from the program and the parent program
           $eligibleReviewers = $programUsers->merge($parentProgramUsers);
-  
+
           // Check if the current authenticated user is among the eligible reviewers
           if (!$eligibleReviewers->contains('id', Auth::id())) {
               // If not, return an error response
               return $this->sendError('You are not authorized to perform this action.');
           }
-  
+
           // Identify the appropriate table based on the request route
           $table_id = request()->route()->named('contracts.paymentsplan') ? 'payment-table' : 'contracts-table';
-  
+
           // Check if the contract has already been reviewed by the current user
           $existingReview = $contract->reviews()->where('user_id', Auth::id())->first();
-  
+
           if ($existingReview) {
               // The contract has already been reviewed by the current user.
               // Delete the review to mark the contract as "unreviewed"
@@ -1012,7 +1011,7 @@ class ContractController extends Controller
               $contract->reviews()->save($review);
               return $this->sendRes('Contract marked as reviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal', 'isReviewed' => true]);
           }
-  
+
       } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
           return $this->sendError('Contract not found.');
       } catch (\Throwable $e) {
@@ -1021,7 +1020,7 @@ class ContractController extends Controller
           return $this->sendError('Server Error');
       }
   }
-  
+
 
   public function togglePhaseReviewStatus($contract_id, $phase_id)
   {

@@ -238,7 +238,7 @@ class ContractPhase extends BaseModel
 
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(Tax::class, 'phase_taxes')->withPivot('amount', 'type');
+    return $this->belongsToMany(InvoiceConfig::class, 'phase_taxes', 'contract_phase_id', 'tax_id')->withPivot('amount', 'type');
   }
 
   /*

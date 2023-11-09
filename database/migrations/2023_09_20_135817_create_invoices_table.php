@@ -48,7 +48,7 @@ return new class extends Migration
       /**
        * Retention
        */
-      $table->foreignId('retention_id')->nullable()->constrained('taxes')->nullOnDelete();
+      $table->foreignId('retention_id')->nullable()->constrained('invoice_configs')->nullOnDelete();
       $table->string('retention_name')->nullable();
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);

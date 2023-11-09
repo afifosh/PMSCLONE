@@ -9,7 +9,7 @@ use App\Models\ContractPhase;
 use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use DataTables;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,7 @@ class InvoiceItemController extends Controller
   public function index(Invoice $invoice)
   {
     $data['invoice'] = $invoice;
-    $data['tax_rates'] = Tax::get();
+    $data['tax_rates'] = InvoiceConfig::get();
     $data['is_editable'] = $invoice->isEditable();
 
     if (request()->mode == 'edit') {
@@ -65,7 +65,7 @@ class InvoiceItemController extends Controller
     $invoiceItem->load('invoiceable.stage', 'taxes');
     $data['invoice'] = $invoice;
     $data['invoiceItem'] = $invoiceItem;
-    $data['tax_rates'] = Tax::where('is_retention', false)->where('status', 'Active')->get();
+    $data['tax_rates'] = InvoiceConfig::activeTaxes()->get();
     $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
     $data['stages'] = [$invoiceItem->invoiceable->stage_id => $invoiceItem->invoiceable->stage->name];
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Invoice;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use Illuminate\Http\Request;
 
 class InvoiceTaxController extends Controller
@@ -17,7 +17,7 @@ class InvoiceTaxController extends Controller
     ]);
 
     $taxes = filterInputIds($request->taxes ?? []);
-    $rates = Tax::whereIn('id', $taxes)->get();
+    $rates = InvoiceConfig::whereIn('id', $taxes)->get();
 
     $sync_data = [];
     foreach ($rates as $rate) {

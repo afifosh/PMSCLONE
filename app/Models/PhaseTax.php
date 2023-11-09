@@ -23,7 +23,7 @@ class PhaseTax extends Model
 
   public function tax()
   {
-    return $this->belongsTo(Tax::class);
+    return $this->belongsTo(InvoiceConfig::class);
   }
 
   public function getAmountAttribute($value)

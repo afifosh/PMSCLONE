@@ -137,7 +137,7 @@ class Invoice extends Model
    */
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(Tax::class, 'invoice_taxes')->withPivot('amount', 'type', 'invoice_item_id');
+    return $this->belongsToMany(InvoiceConfig::class, 'invoice_taxes', 'invoice_id', 'tax_id')->withPivot('amount', 'type', 'invoice_item_id');
   }
 
   /**
@@ -282,7 +282,7 @@ class Invoice extends Model
 
   public function updateRetention($retention_id): void
   {
-    $retenion = Tax::where('is_retention', true)->find($retention_id);
+    $retenion = InvoiceConfig::where('config_type', 'Retention')->find($retention_id);
     if (!$retenion) {
       $data['retention_amount'] = 0;
       $data['retention_percentage'] = 0;
@@ -625,5 +625,15 @@ class Invoice extends Model
   public function payableAmount()
   {
     return $this->total - $this->paid_amount - $this->retention_amount - $this->downpayment_amount;
+  }
+
+  /**
+   * pivot table for storing deduction information
+   *
+   * @return MorphOne
+   */
+  public function deduction()
+  {
+    return $this->morphOne(InvoiceDeduction::class, 'deductible');
   }
 }
