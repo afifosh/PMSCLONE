@@ -89,7 +89,7 @@ class Contract extends BaseModel
   {
       // // Retrieve the total number of phases for this contract.
       // $totalPhases = $this->phases()->count();
-  
+
       // // Subquery to get user IDs and their count of distinct reviewed phases.
       // // Note that we need the fully qualified class name for `reviewable_type`.
       // $subQuery = Review::select('user_id')
@@ -98,7 +98,7 @@ class Contract extends BaseModel
       //     ->whereIn('reviewable_id', $this->phases()->pluck('id'))
       //     ->groupBy('user_id')
       //     ->havingRaw('phases_count = ?', [$totalPhases]); // use havingRaw to filter users who reviewed all phases
-  
+
       // // Main query to get admins who have completed all phases.
       // // Join the subquery to filter users based on the phases count.
       // $adminsWhoCompletedAllPhases = Admin::select('admins.*')
@@ -121,16 +121,16 @@ class Contract extends BaseModel
 
       // You can now use the $subQuery to get the users who have reviewed all phases.
       // For example, you might want to get these users:
-      $adminsWhoCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();  
+      $adminsWhoCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
 
       return $adminsWhoCompletedAllPhases;
   }
-  
+
   public function usersWhoNotCompletedAllPhases()
   {
       // // Retrieve the total number of phases for this contract.
       // $totalPhases = $this->phases()->count();
-  
+
       // // Subquery to get user IDs and their count of distinct reviewed phases.
       // // Note that we need the fully qualified class name for `reviewable_type`.
       // $subQuery = Review::select('user_id')
@@ -138,7 +138,7 @@ class Contract extends BaseModel
       //     ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
       //     ->whereIn('reviewable_id', $this->phases()->pluck('id'))
       //     ->groupBy('user_id');
-  
+
       // // Main query to get admins who have NOT completed all phases.
       // // We are doing a LEFT JOIN here with the users table and filtering out the ones that have a phases_count equal to totalPhases.
       // $adminsWhoNotCompletedAllPhases = Admin::select('admins.*')
@@ -148,7 +148,7 @@ class Contract extends BaseModel
       //     // We use 'whereRaw' here to add a SQL raw where clause, checking if phases_count is not the total or there's no review (NULL).
       //     ->whereRaw('(reviewed_phases.phases_count IS NULL OR reviewed_phases.phases_count < ?)', [$totalPhases])
       //     ->get();
-  
+
       // Calculate the total number of phases for the current object
       $totalPhases = $this->phases()->count();
 
@@ -166,26 +166,26 @@ class Contract extends BaseModel
 
       return $adminsWhoNotCompletedAllPhases;
   }
-    
+
   public function getAdminsWhoDidNotReviewAnyPhase()
   {
       // Get IDs of all phases associated with this contract's program
       $phaseIds = $this->phases()->pluck('id');
-      
+
       // Get query for all admin user IDs associated with this contract's program
       $programAdminIdsQuery = ProgramUser::ofProgram($this->program_id)->select('admin_id');
-      
+
       // Get query for all admin user IDs who have made a review for any of the phase IDs
       $adminsWhoMadeReviewsQuery = Review::whereIn('reviewable_id', $phaseIds)
           ->where('reviewable_type', get_class($this->phases()->getRelated()))
           ->select('user_id')
           ->distinct();
-      
+
       // Get the list of admin users who have not made any review entries for any phase of this contract's program
       $adminsWithoutReviews = Admin::whereNotIn('id', $adminsWhoMadeReviewsQuery)
           ->whereIn('id', $programAdminIdsQuery)
           ->get();
-  
+
       return $adminsWithoutReviews;
   }
 
@@ -193,20 +193,20 @@ class Contract extends BaseModel
   {
       // Assuming the Contract model has a 'stages' relationship that contains many ContractStage
       $stages = $this->stages;
-      $users = $this->program->users; 
+      $users = $this->program->users;
 
       $program = $this->program; // This gives you the program object
       $parentProgram = $program->parent; // This gives you the parent program object
-      
+
       // Get the users of this program
       $programUsers = $program->users;
-  
+
       // If there is a parent program, get those users as well
       $parentProgramUsers = collect();
       if ($parentProgram) {
           $parentProgramUsers = $parentProgram->users;
       }
-  
+
       // Combine the collections, ensuring there are no duplicates
       $allUsers = $programUsers->merge($parentProgramUsers)->unique('id');
 
@@ -214,11 +214,11 @@ class Contract extends BaseModel
 
       foreach ($allUsers as $user) {
           $userStagesStatus = [];
-  
+
           foreach ($stages as $stage) {
               // Get the status for this stage for this user
               $status = $stage->getUserReviewStatusWithlastReviewDate($user->id);
-  
+
               // Add stage information for reference
               $userStagesStatus[] = [
                   'stage_id' => $stage->id,
@@ -227,7 +227,7 @@ class Contract extends BaseModel
                   'last_review_date' => $status['last_review_date'],
               ];
           }
-  
+
           // Add user information and their stages status to the final array
           $allUsersStagesStatus[] = [
               'user_id' => $user->id,
@@ -235,7 +235,7 @@ class Contract extends BaseModel
               'stages_status' => $userStagesStatus,
           ];
       }
-  
+
       return $allUsersStagesStatus;
   }
 
@@ -243,34 +243,35 @@ class Contract extends BaseModel
   {
       // Get a collection of admins who have not reviewed any phase
       $adminsWithoutAnyReviews = $this->getAdminsWhoDidNotReviewAnyPhase();
-  
+
       // Get a collection of admins who have not completed all phases
       $adminsWhoDidNotCompleteAllPhases = $this->usersWhoNotCompletedAllPhases();
-  
+
       // Combine the two collections and remove duplicates to get a list of unique admins
       $combinedAdmins = $adminsWithoutAnyReviews->merge($adminsWhoDidNotCompleteAllPhases)->unique('id');
-  
+
       return $combinedAdmins;
   }
 
   public function getAllUsersFromProgramAndParentProgram()
   {
+    if (!$this->program) return collect();
       $program = $this->program; // This gives you the program object
       $parentProgram = $program->parent; // This gives you the parent program object
-  
+
       // Get the users of this program
       $programUsers = $program->users;
-  
+
       // If there is a parent program, get those users as well
       $parentProgramUsers = collect();
       if ($parentProgram) {
           $parentProgramUsers = $parentProgram->users;
       }
-  
+
       // Combine the collections, ensuring there are no duplicates
       $allUsers = $programUsers->merge($parentProgramUsers)->unique('id');
-  
-      return $allUsers;
+
+      return $allUsers->values();;
   }
 
   public function getAdminsWhoDidNotReviewContract()
@@ -288,10 +289,10 @@ class Contract extends BaseModel
     // Filter and return only the admin users from the list of all users
     $adminsWhoReviewed = $allUsers->whereNotIn('id', $adminUserIds);
 
-    return $adminsWhoReviewed;
+    return $adminsWhoReviewed->values();
   }
-  
-  
+
+
   public function getAdminsWhoReviewedContract()
   {
     // Get the IDs of admin users who have made reviews for this contract
@@ -308,7 +309,7 @@ class Contract extends BaseModel
     $adminsWhoReviewed = $allUsers->whereIn('id', $adminUserIds);
 
     return $adminsWhoReviewed;
-  }  
+  }
 
   public function getStatusAttribute()
   {
@@ -443,7 +444,7 @@ class Contract extends BaseModel
       $q->where('contracts.id', request()->contracts);
     });
 }
-  
+
   public function scopeApplyRequestFiltersOLD($q)
   {
     return $q->when(request()->filter_status, function ($q) {

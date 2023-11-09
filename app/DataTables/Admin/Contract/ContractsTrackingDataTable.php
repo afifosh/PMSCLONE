@@ -43,7 +43,7 @@ class ContractsTrackingDataTable extends DataTable
       })
       ->addColumn('incomplete_reviewers', function ($contract) {
         $users = $contract->getAdminsWhoDidNotReviewContract();
-        if (!isset($users[1])) {
+        if ($users->isEmpty()) {
           return "N/A";
         }
         return view('admin._partials.sections.user-avatar-group', ['users' => $users, 'limit' => 5]);
