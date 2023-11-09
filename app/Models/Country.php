@@ -28,5 +28,5 @@ class Country extends Model
     public function scopeApplyRequestFilters()
     {
       //
-    }    
+    }
 }
