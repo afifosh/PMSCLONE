@@ -217,19 +217,19 @@ public function query(Contract $model): QueryBuilder
   {
     return [
       // Column::make('contracts.id')->title('Contract'),
-   //  Column::make('subject')->title('Subject'),
-      // Column::make('program.name')->name('programs.name')->title('Program'),
-      // // Column::make('refrence_id')->title('Ref ID'),
-      // Column::make('assigned_to')->title('Assigned To'),
-      // Column::make('value')->title('Amount'),
+    Column::make('subject')->title('Subject'),
+      Column::make('program.name')->name('programs.name')->title('Program'),
+      // Column::make('refrence_id')->title('Ref ID'),
+      Column::make('assigned_to')->title('Assigned To'),
+      Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
   //    Column::make('reviewed_by')->title('Reviewed By'),
       Column::make('incomplete_reviewers')->title('Incomplete Reviewers'),
       Column::make('reviews_completed')->title('Reviews Completed'),
-      // Column::make('start_date'),
-      // Column::make('end_date'),
+      Column::make('start_date'),
+      Column::make('end_date'),
       // Column::make('phases_count')->title('Phases')->searchable(false),
-      // Column::make('status'),
+      Column::make('status'),
     ];
   }
 

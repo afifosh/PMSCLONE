@@ -91,6 +91,7 @@ use Modules\MailClient\Http\Controllers\OAuthEmailAccountController;
 
 use App\Http\Controllers\Admin\ArtworkController;
 use App\Http\Controllers\Admin\LocationController;
+use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\StudioController;
 use App\Http\Controllers\Admin\MediumController;
 use App\Http\Controllers\Admin\ArtistController;
@@ -164,6 +165,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('artworks', ArtworkController::class);
     // Location routes
     Route::resource('locations', LocationController::class);
+    // Warehouse routes
+    Route::resource('warehouses', WarehouseController::class);
     // Studio routes
     Route::resource('studios', StudioController::class);
     // Medium routes

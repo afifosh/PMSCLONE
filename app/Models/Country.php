@@ -29,4 +29,3 @@ class Country extends Model
     {
       //
     }
-}

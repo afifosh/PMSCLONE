@@ -55,7 +55,7 @@
     },
     {
       "name": "Artworks",
-      "slug": ["admin.artworks.index", "admin.artists.index", "admin.studios.index","admin.locations.index", "admin.mediums.index"],
+      "slug": ["admin.artworks.index", "admin.artists.index", "admin.studios.index","admin.locations.index", "admin.mediums.index","admin.warehouses.index"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "submenu": [
         {
@@ -76,6 +76,12 @@
           "icon": "menu-icon fas fa-building",
           "slug": "admin.studios.index"
         },
+        {
+          "url": "/admin/warehouses",
+          "name": "Warehouses",
+          "icon": "menu-icon fas fa-building",
+          "slug": "admin.warehouses.index"
+        },        
         {
           "name": "Settings",
           "slug": ["admin.locations.index", "admin.mediums.index"],
