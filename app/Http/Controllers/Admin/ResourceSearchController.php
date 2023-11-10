@@ -115,7 +115,7 @@ class ResourceSearchController extends Controller
       ->when(request()->except, function ($q) use ($allowedResources, $resource) {
         $q->where('id', '!=', request()->except);
       })
-     // ->applyRequestFilters()
+    //  ->applyRequestFilters()
       ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
   }
 
@@ -251,7 +251,7 @@ class ResourceSearchController extends Controller
       ]);
     }elseif(request()->dependent_id == 'Client'){
       request()->merge([
-        'type' => 'Client'
+        'type' => 'Person'
       ]);
     }elseif(request()->dependent_id == 'PartnerCompany'){
       request()->merge([
