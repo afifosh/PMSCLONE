@@ -44,12 +44,12 @@ class CustomInvoiceItemStoreRequest extends FormRequest
       /** Deduction Related Fields */
       'deduct_downpayment' => $this->boolean('deduct_downpayment'),
       'is_before_tax' => $this->boolean('is_before_tax'),
-      'is_manual_deduction' => $this->boolean('is_manual_deduction'),
+      'is_manual_deduction' => $this->boolean('is_manual_deduction') && $this->boolean('deduct_downpayment'),
       'manual_deduction_amount' => $this->is_manual_deduction ? $this->manual_deduction_amount : 0,
       /** End Deduction Related Fields */
       'add_tax' => $this->boolean('add_tax'),
       'subtotal' => $this->price * $this->quantity,
-      'is_manual_tax' => $this->boolean('is_manual_tax'),
+      'is_manual_tax' => $this->boolean('is_manual_tax') && $this->boolean('add_tax'),
       'manual_tax_amount' => $this->is_manual_tax ? $this->manual_tax_amount : 0,
       'rounding_amount' => $this->boolean('rounding_amount'),
     ]);
@@ -79,6 +79,7 @@ class CustomInvoiceItemStoreRequest extends FormRequest
     ], $this->messaages());
 
     $configs = InvoiceConfig::activeOnly()->whereIn('id', array_merge(filterInputIds($this->item_taxes), [$this->dp_rate_id]))->get();
+    if($this->add_tax)
     $this->taxes = $configs->where('config_type', 'Tax');
     $this->deduction_rate = $configs->where('id', $this->dp_rate_id)->first();
     unset($configs);

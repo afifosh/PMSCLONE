@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\Invoice\CustomInvoiceItemUpdateRequest;
 use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
 use App\Models\InvoiceConfig;
+use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 
 class CustomInvoiceItemController extends Controller
@@ -64,8 +65,22 @@ class CustomInvoiceItemController extends Controller
 
   public function update(Invoice $invoice, CustomInvoiceItem $customInvoiceItem, CustomInvoiceItemUpdateRequest $request)
   {
+    $customInvoiceItem->update($request->validated());
+    $customInvoiceItem->invoiceItem()->update([
+      'subtotal' => moneyToInt($customInvoiceItem->subtotal),
+      'total_tax_amount' => moneyToInt($request->total_tax_amount),
+      'manual_tax_amount' => moneyToInt($request->manual_tax_amount),
+      'total' => moneyToInt($request->total),
+      'rounding_amount' => moneyToInt($request->rounding_amount),
+    ]);
+
     if($request->deduct_downpayment)
-      $customInvoiceItem->invoiceItem->deduction()->update([
+     $customInvoiceItem->invoiceItem->deduction()->updateOrCreate([
+        'deductible_id' => $customInvoiceItem->invoiceItem->id,
+        'deductible_type' => InvoiceItem::class,
+      ], [
+        'deductible_id' => $customInvoiceItem->invoiceItem->id,
+        'deductible_type' => InvoiceItem::class,
         'downpayment_id' => $request->downpayment_id,
         'dp_rate_id' => $request->dp_rate_id,
         'is_percentage' => $request->deduction_rate_type != 'Fixed',
@@ -75,15 +90,10 @@ class CustomInvoiceItemController extends Controller
         'is_before_tax' => $request->is_before_tax,
         'calculation_source' => $request->calculation_source,
       ]);
-
-    $customInvoiceItem->update($request->validated());
-    $customInvoiceItem->invoiceItem()->update([
-      'subtotal' => moneyToInt($customInvoiceItem->subtotal),
-      'total_tax_amount' => moneyToInt($request->total_tax_amount),
-      'manual_tax_amount' => moneyToInt($request->manual_tax_amount),
-      'total' => moneyToInt($request->total),
-      'rounding_amount' => moneyToInt($request->rounding_amount),
-    ]);
+      else{
+        if(@$customInvoiceItem->invoiceItem->deduction)
+        $customInvoiceItem->invoiceItem->deduction->delete();
+      }
 
     $customInvoiceItem->invoiceItem->syncTaxes($request->taxes);
 

@@ -41,6 +41,13 @@
   <span class="me-2">Total:</span>
   <span class="fw-semibold invoice_total" data-amount="{{$invoice->total}}">@cMoney($invoice->total, $invoice->contract->currency, true)</span>
 </div>
+@if($invoice->rounding_amount != 0)
+<hr />
+  <div class="d-flex justify-content-between mb-2">
+    <span class="me-2">Rounding:</span>
+    <span class="fw-semibold">@cMoney($invoice->rounding_amount, $invoice->contract->currency, true)</span>
+  </div>
+@endif
 <div class="d-flex justify-content-between">
   <span class="switch-label mt-2">Round Total</span>
   <label class="col-form-label pe-4">

@@ -109,7 +109,7 @@ class InvoiceItem extends Model
    * Sync taxes for invoice item
    * @param Collection $taxes
    */
-  public function syncTaxes(Collection $taxes): void
+  public function syncTaxes(Collection|Array $taxes): void
   {
     $sync_data = [];
     foreach ($taxes as $rate) {

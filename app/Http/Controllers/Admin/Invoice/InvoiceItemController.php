@@ -75,14 +75,19 @@ class InvoiceItemController extends Controller
   }
 
   public function update(Invoice $invoice, InvoiceItem $invoiceItem, InvoiceItemUpdateRequest $request)
-  {
+  {//dd($request->is_before_tax);
     if(!$invoice->isEditable()){
       return $this->sendError('Invoice is not editable');
     }
 
     $invoiceItem->update($request->validated());
 
-    $invoiceItem->deduction()->update([
+    $invoiceItem->deduction()->updateOrCreate([
+      'deductible_id' => $invoiceItem->id,
+      'deductible_type' => InvoiceItem::class,
+    ], [
+      'deductible_id' => $invoiceItem->id,
+      'deductible_type' => InvoiceItem::class,
       'downpayment_id' => $request->downpayment_id,
       'dp_rate_id' => $request->dp_rate_id,
       'is_percentage' => $request->deduction_rate_type != 'Fixed',
