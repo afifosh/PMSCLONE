@@ -251,7 +251,7 @@ class ResourceSearchController extends Controller
       ]);
     }elseif(request()->dependent_id == 'Client'){
       request()->merge([
-        'type' => 'Client'
+        'type' => 'Person'
       ]);
     }elseif(request()->dependent_id == 'PartnerCompany'){
       request()->merge([

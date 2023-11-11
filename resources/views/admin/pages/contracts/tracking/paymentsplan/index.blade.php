@@ -51,6 +51,7 @@ $configData = Helper::appClasses();
             {!! Form::label('contracts', 'Contracts') !!}
             {!! Form::select('contracts', [], [], [
               'class' => 'form-select select2Remote',
+              'id' => 'contracts-select', // Add the 'id' attribute here
               'data-placeholder' => __('All'),
               'data-allow-clear' => 'true',
               'data-url' => route('resource-select', ['Contract', 'hasContract'])
@@ -85,12 +86,11 @@ $configData = Helper::appClasses();
         </div>
       </form>
 
-    <div class="card-body">
+    <div class="card-body main-table">
       {{$dataTable->table()}}
     </div>
     </div>
   </div>
-
 
 
 @endsection
@@ -147,46 +147,55 @@ $configData = Helper::appClasses();
 
 
 <script>
+    
 $(document).ready(function() {
+
     var table = $('#paymentsplan-table').DataTable();
-    var expandedRow = null;
+    var expandedRow = null; // Variable to track the currently expanded row
+
+
 
     $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
     var tr = $(this).closest('tr');
     var row = table.row(tr);
     var contractId = $(this).attr('contract-id'); // Assuming data-contract-id is stored on the button
+    // Set the value for the "Contracts" filter
+    //$('#contracts').select2().val(contractId).trigger('change'); // Assuming your select field has an ID of "contracts" and uses Select2
+    // Update the Select2 dropdown value
+   // alert(contractId);
+   
+  // alert( $('#contracts-select').select2('data'));
 
+
+   var $contractsSelect = $('#contracts-select'); // Assuming your select field has an ID of "contracts-select" and uses Select2
+
+// Check if the new value is different from the current value
+if ($contractsSelect.val() !== contractId) {
+    // Append a new option and select it
+    $contractsSelect.append(new Option('Contract Name', contractId, true, true));
+    // Trigger the change event
+    $contractsSelect.trigger('change');
+}else{
+    console.log ($contractsSelect.val()  + "            " + contractId);
+}
+
+
+   // $('#contracts-select').val(contractId).trigger('change');
+  // $('#contracts-select').val(contractId).trigger('change');
     // Toggle expansion
     if (row.child.isShown()) {
         // The row is already open - close it and destroy all child tables
         destroyChildTables(contractId);
         row.child.hide();
         tr.removeClass('shown');
+        // Clear the selection
+$contractsSelect.val(null).trigger('change');
                 // Remove the 'child-row-added' rows which contain the pills and content
                 tr.nextAll('tr.child-row-added').remove();
         expandedRow = null;
     } else {
         // Open this row
-        if (expandedRow) {
-            // A different row is expanded - close it and destroy its tables
-            destroyChildTables($(expandedRow.node()).data('contract-id'));
-            expandedRow.child.hide();
-            $(expandedRow.node()).removeClass('shown');
-            $(expandedRow.node()).css('background-color', '');
-            $(expandedRow.node()).nextAll('tr.child-row-added').remove();
 
-                        // Collapse all other rows in the table except the selected row
-                        table.rows().every(function() {
-                var tr = this.node();
-                if (tr !== row.node()) {
-                    var otherRow = table.row(tr);
-                    otherRow.child.hide();
-                    $(tr).removeClass('shown');
-                    $(tr).css('background-color', ''); // Reset the background color
-                }
-            });
-            
-        }
         
         // Create new content for the child row
         var pillsRow = createPillsRow(contractId);
@@ -198,11 +207,12 @@ $(document).ready(function() {
         
         expandedRow = row;
         
-    var contentRow = $(content);
-contentRow.addClass("custom-content-row");
-contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
-$(row.node()).next().after(contentRow);
+        var contentRow = $(content);
+        contentRow.addClass("custom-content-row");
+        contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
+        $(row.node()).next().after(contentRow);
         $(row.node()).next().after(contentRow); // Append the content after the pills
+    // Append the child tables to the expanded-details div
 
         // Initialize DataTables when tabs are clicked, not here
     }
@@ -328,6 +338,13 @@ $(row.node()).next().after(contentRow);
             ],
             destroy: true,
             dom: 'Blfrtip',
+            initComplete: function() {
+                    // Move the buttons container near the search bar
+                   // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
+                }    ,drawCallback: function(settings) {
+                    $('[data-bs-toggle="tooltip"]').tooltip('dispose'); // Dispose of any existing tooltips to prevent potential issues
+        $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
+    }
             // Add more DataTable options if required
         });
     }
@@ -338,6 +355,7 @@ $(row.node()).next().after(contentRow);
         $('#phases-table-' + contractId).DataTable({
                 processing: true,
                 serverSide: true,
+                
                 ajax: route('admin.contracts.paymentsplan.phases', { contract: contractId }),
                 columns: [
                     { data: "stage_name", "name": "stage_name", title: 'Stage Name' },
@@ -392,19 +410,30 @@ $(row.node()).next().after(contentRow);
 
                 ],
                 destroy: true,
-                dom: 'Blfrtip',
+                // dom: 'Blfrtip',
                 // Add more DataTable options if required
+                initComplete: function() {
+                    // Move the buttons container near the search bar
+                   // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
+                }    ,drawCallback: function(settings) {
+                    $('[data-bs-toggle="tooltip"]').tooltip('dispose'); // Dispose of any existing tooltips to prevent potential issues
+        $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
+    }
             });
 
     }
         
-    function initializeChildDataTables(contractId) {
-        // Initialize the DataTables for each tab's content
-        // Example for one of the tables:
-        // $('#child-table-' + contractId).DataTable({
-        //     // DataTables configuration options
-        // });
-    }
+    $('.js-datatable-filter-form :input').on('change', function(e) {
+        console.log('Filter changed');
+        window.LaravelDataTables["paymentsplan-table"].draw();
+    });
+
+    $('#paymentsplan-table').on('preXhr.dt', function(e, settings, data) {
+        console.log('PreXHR event');
+        $('.js-datatable-filter-form :input').each(function() {
+            data[$(this).prop('name')] = $(this).val();
+        });
+    });
 });
 
 </script>

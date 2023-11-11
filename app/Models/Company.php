@@ -571,4 +571,9 @@ class Company extends BaseModel
   {
     return $this->morphMany(Location::class, 'owner', 'owner_type', 'owner_id');
   }
+
+  public function warehouses()
+  {
+      return $this->morphMany(Warehouse::class,'owner');
+  }  
 }

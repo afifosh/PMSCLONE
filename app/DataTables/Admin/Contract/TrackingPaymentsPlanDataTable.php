@@ -211,6 +211,7 @@ public function query(Contract $model): QueryBuilder
    */
   public function html(): HtmlBuilder
   {
+
     $buttons = [];
     $buttons[] = [
       'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Contract</span>',
@@ -237,8 +238,23 @@ public function query(Contract $model): QueryBuilder
       ->responsive(true)
       ->parameters([
         'buttons' => $buttons,
-        "scrollX" => true
-      ]);
+        "scrollX" => true,
+        "drawCallback" => "function (settings) {
+          $('[data-bs-toggle=\"tooltip\"]').tooltip();
+
+          var api = this.api();
+          var dataLists = api.data();
+          if (dataLists.length === 1) {
+              var contractId = dataLists[0].id;
+
+              var expandButton = $('[contract-id=\"' + contractId + '\"]');
+              if (expandButton.length > 0) {
+                  expandButton.trigger('click');
+              }
+          }
+  
+      }"
+  ]);
   }
 
   /**
