@@ -9,7 +9,7 @@ use App\Models\ContractPhase;
 use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use DataTables;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,7 @@ class InvoiceItemController extends Controller
   public function index(Invoice $invoice)
   {
     $data['invoice'] = $invoice;
-    $data['tax_rates'] = Tax::get();
+    $data['tax_rates'] = InvoiceConfig::get();
     $data['is_editable'] = $invoice->isEditable();
 
     if (request()->mode == 'edit') {
@@ -65,7 +65,7 @@ class InvoiceItemController extends Controller
     $invoiceItem->load('invoiceable.stage', 'taxes');
     $data['invoice'] = $invoice;
     $data['invoiceItem'] = $invoiceItem;
-    $data['tax_rates'] = Tax::where('is_retention', false)->where('status', 'Active')->get();
+    $data['tax_rates'] = InvoiceConfig::whereIn('config_type', ['Tax', 'Down Payment'])->activeOnly()->get();
     $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
     $data['stages'] = [$invoiceItem->invoiceable->stage_id => $invoiceItem->invoiceable->stage->name];
 
@@ -81,6 +81,17 @@ class InvoiceItemController extends Controller
     }
 
     $invoiceItem->update($request->validated());
+
+    $invoiceItem->deduction()->update([
+      'downpayment_id' => $request->downpayment_id,
+      'dp_rate_id' => $request->dp_rate_id,
+      'is_percentage' => $request->deduction_rate_type != 'Fixed',
+      'amount' => $request->downpayment_amount,
+      'manual_amount' => $request->manual_deduction_amount,
+      'percentage' => $request->downpayment_rate->amount ?? 0,
+      'is_before_tax' => $request->is_before_tax,
+      'calculation_source' => $request->calculation_source,
+    ]);
 
     $invoiceItem->syncTaxes($request->taxes);
 

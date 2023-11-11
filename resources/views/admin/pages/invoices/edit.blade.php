@@ -98,6 +98,21 @@
     });
   })
 
+  $(document).on('change keyup click', '#invoice-rounding-amount', function(){
+    const rounding = $(this).is(':checked') ? 1 : 0;
+
+    $.ajax({
+      url: route('admin.invoices.update', { invoice: {{$invoice->id}}, type: 'rounding'}),
+      type: "PUT",
+      data: {
+        rounding_amount: rounding
+      },
+      success: function(data) {
+        reloadPhasesList();
+      }
+    });
+  })
+
   function updateSummaryTax(){
     var taxes = [];
     $('[name="invoice_taxes[]"]:checked').each(function(){

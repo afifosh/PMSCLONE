@@ -12,7 +12,7 @@
   {{-- Owner Type --}}
   <div class="form-group col-6">
     {{ Form::label('owner_type', __('Owner Type'), ['class' => 'col-form-label']) }}
-    {!! Form::select('owner_type', [''=> 'Select Type', 'Company' => 'Company', 'PartnerCompany' => 'Partner', 'Client' => 'Client'], $warehouse->owner_type ?? null, [
+    {!! Form::select('owner_type', [''=> 'Select Type', 'Company' => 'Company', 'PartnerCompany' => 'Partner', 'Client' => 'Client'], $ownerType ?? null, [
     'class' => 'form-select globalOfSelect2 dependent-select',
     'id' => 'warehouse-owner-type-id',
     ]) !!}
@@ -28,7 +28,7 @@
     'data-placeholder' => __('Select Owner'),
     'id' => 'warehouse-owner-id',
     ]) !!}
-  </div>  
+  </div>
 
   <div class="form-group mb-4">
     <label for="address-input">Address</label>

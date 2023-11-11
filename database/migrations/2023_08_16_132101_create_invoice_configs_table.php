@@ -11,13 +11,13 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('taxes', function (Blueprint $table) {
+    Schema::create('invoice_configs', function (Blueprint $table) {
       $table->id();
       $table->string('name');
       $table->enum('type', ['Percent', 'Fixed'])->default('Percent');
       $table->BigInteger('amount')->default(0);
       $table->enum('status', ['Active', 'Inactive'])->default('Active');
-      $table->boolean('is_retention')->default(false);
+      $table->enum('config_type', ['Tax', 'Retention', 'Down Payment'])->default('Tax');
       $table->timestamps();
     });
   }

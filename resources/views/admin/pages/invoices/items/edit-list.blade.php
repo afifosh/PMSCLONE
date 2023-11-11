@@ -29,7 +29,7 @@
   <td class="">@cMoney($item->subtotal, $invoice->contract->currency, true)</td>
 
   {{-- Down payment deduction --}}
-  <td class="text-right">@cMoney($item->downpayment_amount, $invoice->contract->currency, true)</td>
+  <td class="text-right">@cMoney($item->deduction->manual_deduction_amount ?? $item->deduction?->amount ? $item->deduction?->amount : 0, $invoice->contract->currency, true)</td>
 
   <!--tax-->
   @if (!$invoice->is_summary_tax)

@@ -10,7 +10,7 @@ use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\Program;
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -78,7 +78,7 @@ class InvoiceController extends Controller
   {
     $invoice->load('items.invoiceable', 'items.taxes', 'contract', 'deductableDownpayments');
     $data['invoice'] = $invoice;
-    $data['tax_rates'] = Tax::get(); // both retention and taxes, will be filtered in view
+    $data['tax_rates'] = InvoiceConfig::get(); // both retention and taxes, will be filtered in view
     $data['pendingDocs'] = $invoice->contract->pendingDocs()->get();
 
     $data['is_editable'] = $invoice->isEditable();
@@ -130,6 +130,16 @@ class InvoiceController extends Controller
       return $this->sendRes('Retention updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } elseif ($request->type == 'downpayment') {
       $invoice->update($request->validated() + ['total' => $request->subtotal]);
+
+      return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
+    } elseif ($request->type == 'rounding') {
+      $invoice->update(['rounding_amount' => $request->boolean('rounding_amount') ? (floor($invoice->total) - $invoice->total): 0]);
+
+      return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
+    } elseif ($request->type == 'Partial Invoice') {
+      $invoice->update($request->validated() + ['total' => $request->subtotal]);
+      $invoice->attachPhasesWithTax([$request->phase_id]);
+      $invoice->update(['is_payable' => false]);
 
       return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
     }

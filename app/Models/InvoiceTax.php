@@ -33,7 +33,7 @@ class InvoiceTax extends Model
 
   public function tax()
   {
-    return $this->belongsTo(Tax::class);
+    return $this->belongsTo(InvoiceConfig::class, 'tax_id');
   }
 
   public function getAmountAttribute($value)

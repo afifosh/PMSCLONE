@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Admin\Contract\Phase;
 
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PhaseUpdateRequest extends FormRequest
@@ -40,7 +40,7 @@ class PhaseUpdateRequest extends FormRequest
    */
   public function rules(): array
   {
-    $this->taxes = Tax::whereIn('id', filterInputIds($this->phase_taxes ?? []))->where('is_retention', false)->where('status', 'Active')->get();
+    $this->taxes = InvoiceConfig::whereIn('id', filterInputIds($this->phase_taxes ?? []))->activeTaxes()->get();
     $fixed_tax = $this->taxes->where('type', 'Fixed')->sum('amount');
     $percent_tax = $this->taxes->where('type', 'Percent')->sum('amount');
     $this->calculated_tax_amount = $fixed_tax + ($percent_tax * $this->estimated_cost / 100);
@@ -60,7 +60,7 @@ class PhaseUpdateRequest extends FormRequest
        // 'max:' . ($this->phase->stage->is_budget_planned ? ($this->phase->stage->remaining_amount + $this->phase->total_cost) : ($this->contract->remaining_amount + $this->phase->total_cost))
       ],
       'phase_taxes' => 'nullable|array',
-      'phase_taxes.*' => 'nullable|exists:taxes,id,is_retention,false',
+      'phase_taxes.*' => 'nullable|exists:invoice_configs,id',
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $this->contract->start_date,
       'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->contract->end_date,

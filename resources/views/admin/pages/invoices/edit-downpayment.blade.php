@@ -33,6 +33,21 @@
   $(document).on('keyup change', '#dp-description', function(){
     $('#dp-form-description').val($(this).val());
   });
+
+  $(document).on('change keyup click', '#invoice-rounding-amount', function(){
+    const rounding = $(this).is(':checked') ? 1 : 0;
+
+    $.ajax({
+      url: route('admin.invoices.update', { invoice: {{$invoice->id}}, type: 'rounding'}),
+      type: "PUT",
+      data: {
+        rounding_amount: rounding
+      },
+      success: function(data) {
+        location.reload();
+      }
+    });
+  })
 </script>
 @endsection
 

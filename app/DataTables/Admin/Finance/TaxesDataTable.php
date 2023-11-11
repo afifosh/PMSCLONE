@@ -2,7 +2,7 @@
 
 namespace App\DataTables\Admin\Finance;
 
-use App\Models\Tax;
+use App\Models\InvoiceConfig;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -30,9 +30,9 @@ class TaxesDataTable extends DataTable
   /**
    * Get the query source of dataTable.
    */
-  public function query(Tax $model): QueryBuilder
+  public function query(InvoiceConfig $model): QueryBuilder
   {
-    return $model->where('is_retention', $this->type == 'Retention')->newQuery();
+    return $model->where('config_type', $this->type)->newQuery();
   }
 
   /**
@@ -47,7 +47,7 @@ class TaxesDataTable extends DataTable
       'attr' => [
         'data-toggle' => "ajax-modal",
         'data-title' => 'Add '.$this->type,
-        'data-href' => route('admin.finances.taxes.create', ['type' => strtolower($this->type)])
+        'data-href' => route('admin.finances.taxes.create', ['type' => $this->type])
       ]
     ];
 

@@ -25,6 +25,7 @@ class Invoice extends Model
     'subtotal',
     'total_tax',
     'total',
+    'rounding_amount',
     'paid_amount',
     'is_summary_tax',
     'note',
@@ -45,7 +46,8 @@ class Invoice extends Model
     'retention_released_at',
     'is_auto_generated',
     'downpayment_amount',
-    'is_payable'
+    'is_payable',
+    'rounding_amount'
   ];
 
   protected $casts = [
@@ -137,7 +139,7 @@ class Invoice extends Model
    */
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(Tax::class, 'invoice_taxes')->withPivot('amount', 'type', 'invoice_item_id');
+    return $this->belongsToMany(InvoiceConfig::class, 'invoice_taxes', 'invoice_id', 'tax_id')->withPivot('amount', 'type', 'invoice_item_id');
   }
 
   /**
@@ -161,7 +163,7 @@ class Invoice extends Model
 
   public function getTotalAttribute($value)
   {
-    return $value / 1000;
+    return ($value / 1000) + $this->rounding_amount;
   }
 
   public function setTotalAttribute($value)
@@ -233,6 +235,16 @@ class Invoice extends Model
     $this->attributes['downpayment_amount'] = moneyToInt($value);
   }
 
+  public function getRoundingAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setRoundingAmountAttribute($value)
+  {
+    $this->attributes['rounding_amount'] = moneyToInt($value);
+  }
+
   public function getDownpaymentAmountRemainingAttribute()
   {
     return $this->downpaymentAmountRemaining();
@@ -265,7 +277,8 @@ class Invoice extends Model
       'subtotal' => $subtotal,
       'downpayment_amount' => $this->downPayments()->wherePivot('is_after_tax', 1)->sum('amount') / 1000,
       'retention_amount' => $retention_amount,
-      'total' => $total
+      'total' => $total,
+      'rounding_amount' => ($this->rounding_amount ? (floor($total) - $total) : 0),
     ]);
   }
 
@@ -282,7 +295,7 @@ class Invoice extends Model
 
   public function updateRetention($retention_id): void
   {
-    $retenion = Tax::where('is_retention', true)->find($retention_id);
+    $retenion = InvoiceConfig::where('config_type', 'Retention')->find($retention_id);
     if (!$retenion) {
       $data['retention_amount'] = 0;
       $data['retention_percentage'] = 0;
@@ -625,5 +638,15 @@ class Invoice extends Model
   public function payableAmount()
   {
     return $this->total - $this->paid_amount - $this->retention_amount - $this->downpayment_amount;
+  }
+
+  /**
+   * pivot table for storing deduction information
+   *
+   * @return MorphOne
+   */
+  public function deduction()
+  {
+    return $this->morphOne(InvoiceDeduction::class, 'deductible');
   }
 }

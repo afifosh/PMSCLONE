@@ -41,6 +41,18 @@
   <span class="me-2">Total:</span>
   <span class="fw-semibold invoice_total" data-amount="{{$invoice->total}}">@cMoney($invoice->total, $invoice->contract->currency, true)</span>
 </div>
+<div class="d-flex justify-content-between">
+  <span class="switch-label mt-2">Round Total</span>
+  <label class="col-form-label pe-4">
+    <label class="switch">
+      {{ Form::checkbox('rounding_amount', 1, $invoice->rounding_amount && 1,['class' => 'switch-input', 'id' => 'invoice-rounding-amount'])}}
+      <span class="switch-toggle-slider">
+        <span class="switch-on"></span>
+        <span class="switch-off"></span>
+      </span>
+    </label>
+  </label>
+</div>
 
 @if($invoice->downpayment_amount != 0 && $invoice->downPayments()->wherePivot('is_after_tax', 1)->count() > 0)
 <hr>

@@ -26,6 +26,7 @@ return new class extends Migration
       $table->bigInteger('subtotal')->default(0);
       $table->bigInteger('total_tax')->default(0);
       $table->bigInteger('total')->default(0);
+      $table->integer('rounding_amount')->default(0);
       $table->bigInteger('paid_amount')->default(0);
       $table->string('description')->nullable();
       $table->text('note')->nullable();
@@ -48,7 +49,7 @@ return new class extends Migration
       /**
        * Retention
        */
-      $table->foreignId('retention_id')->nullable()->constrained('taxes')->nullOnDelete();
+      $table->foreignId('retention_id')->nullable()->constrained('invoice_configs')->nullOnDelete();
       $table->string('retention_name')->nullable();
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
