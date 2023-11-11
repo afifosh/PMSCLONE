@@ -65,7 +65,7 @@ class InvoiceItemController extends Controller
     $invoiceItem->load('invoiceable.stage', 'taxes');
     $data['invoice'] = $invoice;
     $data['invoiceItem'] = $invoiceItem;
-    $data['tax_rates'] = InvoiceConfig::activeTaxes()->get();
+    $data['tax_rates'] = InvoiceConfig::whereIn('config_type', ['Tax', 'Down Payment'])->activeOnly()->get();
     $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
     $data['stages'] = [$invoiceItem->invoiceable->stage_id => $invoiceItem->invoiceable->stage->name];
 
@@ -81,6 +81,17 @@ class InvoiceItemController extends Controller
     }
 
     $invoiceItem->update($request->validated());
+
+    $invoiceItem->deduction()->update([
+      'downpayment_id' => $request->downpayment_id,
+      'dp_rate_id' => $request->dp_rate_id,
+      'is_percentage' => $request->deduction_rate_type != 'Fixed',
+      'amount' => $request->downpayment_amount,
+      'manual_amount' => $request->manual_deduction_amount,
+      'percentage' => $request->downpayment_rate->amount ?? 0,
+      'is_before_tax' => $request->is_before_tax,
+      'calculation_source' => $request->calculation_source,
+    ]);
 
     $invoiceItem->syncTaxes($request->taxes);
 

@@ -19,11 +19,10 @@ class InvoiceItem extends Model
     'subtotal',
     'total_tax_amount',
     'manual_tax_amount',
-    'downpayment_id',
-    'downpayment_amount',
     'description',
     'order',
-    'total'
+    'total',
+    'rounding_amount',
   ];
 
   protected $casts = [
@@ -62,19 +61,19 @@ class InvoiceItem extends Model
     $this->attributes['manual_tax_amount'] = moneyToInt($value);
   }
 
-  public function getDownpaymentAmountAttribute($value)
+  public function getRoundingAmountAttribute($value)
   {
     return $value / 1000;
   }
 
-  public function setDownpaymentAmountAttribute($value)
+  public function setRoundingAmountAttribute($value)
   {
-    $this->attributes['downpayment_amount'] = moneyToInt($value);
+    $this->attributes['rounding_amount'] = moneyToInt($value);
   }
 
   public function getTotalAttribute($value)
   {
-    return $value / 1000;
+    return ($value / 1000) + $this->rounding_amount ;
   }
 
   public function setTotalAttribute($value)

@@ -21,6 +21,10 @@ class InvoiceStoreRequest extends FormRequest
    */
   public function rules(): array
   {
+    if(request()->type == 'rounding')
+      return [
+        'rounding_amount' => 'required|in:0,1',
+      ];
     if(request()->update_tax_type)
       return [
         'is_summary_tax' => 'required|in:0,1',

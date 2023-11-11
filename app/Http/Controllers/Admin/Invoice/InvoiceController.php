@@ -132,6 +132,16 @@ class InvoiceController extends Controller
       $invoice->update($request->validated() + ['total' => $request->subtotal]);
 
       return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
+    } elseif ($request->type == 'rounding') {
+      $invoice->update(['rounding_amount' => $request->boolean('rounding_amount') ? (floor($invoice->total) - $invoice->total): 0]);
+
+      return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
+    } elseif ($request->type == 'Partial Invoice') {
+      $invoice->update($request->validated() + ['total' => $request->subtotal]);
+      $invoice->attachPhasesWithTax([$request->phase_id]);
+      $invoice->update(['is_payable' => false]);
+
+      return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
     }
 
     $invoice->update($request->validated());

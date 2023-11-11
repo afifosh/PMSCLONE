@@ -16,13 +16,10 @@ return new class extends Migration
       $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
       $table->nullableMorphs('invoiceable');
       $table->unsignedBigInteger('subtotal')->default(0)->comment('Amount without tax');
-      // These fields are for inline downpayment.
-      $table->foreignId('downpayment_id')->nullable()->constrained('invoices')->cascadeOnDelete();
-      $table->unsignedBigInteger('downpayment_amount')->default(0);
-      // End of downpayment fields.
       $table->unsignedBigInteger('total_tax_amount')->default(0);
       $table->unsignedBigInteger('manual_tax_amount')->default(0);
       $table->unsignedBigInteger('total')->default(0);
+      $table->integer('rounding_amount')->default(0);
       $table->string('description')->nullable();
       $table->unsignedInteger('order')->default(0);
       $table->timestamps();
