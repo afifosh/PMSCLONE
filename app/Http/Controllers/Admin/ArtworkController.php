@@ -11,6 +11,7 @@ use App\Repositories\FileUploadRepository;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Location;
 use Throwable;
 
 class ArtworkController extends Controller
@@ -30,6 +31,17 @@ class ArtworkController extends Controller
   public function store(ArtworkStoreRequest $request)
   {
     $artwork = Artwork::create($request->validated());
+
+
+    // create location if warehouse is not selected
+    // if(!$request->warehouse_id){
+    //   $location = Location::create([
+    //     // values...
+    //   ]);
+    // }
+
+    // add location for artwork
+    // $artwork->locations()->create(['location_id' => $location->id ?? null] + $request->validated());
 
     $artwork->locations()->attach([
       $request->location_id => [

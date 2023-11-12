@@ -13,10 +13,12 @@ class ArtworkLocation extends Model
   protected $fillable = [
     'artwork_id',
     'location_id',
+    'warehouse_id',
     'contract_id',
-    'moved_from',
     'added_by',
+    'added_on',
     'added_till',
+    'is_current',
   ];
 
   protected $casts = [
@@ -49,12 +51,13 @@ class ArtworkLocation extends Model
     return $this->belongsTo(Location::class);
   }
 
-  /**
-   * The location from where this artwork is moved.
+   /**
+   * The warehouse where this artwork is placed.
+   * Art work can be placed in warehouse or location. But not both.
    */
-  public function movedFrom(): BelongsTo
+  public function warehouse(): BelongsTo
   {
-    return $this->belongsTo(ArtworkLocation::class, 'moved_from', 'id');
+    return $this->belongsTo(Warehouse::class);
   }
 
   /**

@@ -14,7 +14,8 @@ return new class extends Migration
     Schema::create('artwork_locations', function (Blueprint $table) {
       $table->id();
       $table->foreignId('artwork_id')->constrained()->cascadeOnDelete();
-      $table->foreignId('location_id')->constrained()->cascadeOnDelete();
+      $table->foreignId('location_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+      $table->foreignId('warehouse_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
       $table->foreignId('contract_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
       $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
       $table->timestamp('added_on')->nullable(); // in case added for some time, null means forever
