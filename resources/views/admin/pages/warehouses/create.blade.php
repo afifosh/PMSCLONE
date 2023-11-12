@@ -88,7 +88,7 @@
               {{-- Zoom Level --}}
               <div class="form-group">
                 {{ Form::label('zoomLevel', __('Zoom Level'), ['class' => 'col-form-label']) }}
-                {!! Form::number('zoomLevel', null, ['class' => 'form-control', 'placeholder' => __('Zoom Level')]) !!}
+                {!! Form::number('zoomLevel', $zoomLevel, ['class' => 'form-control', 'placeholder' => __('Zoom Level')]) !!}
               </div>       
 
             
