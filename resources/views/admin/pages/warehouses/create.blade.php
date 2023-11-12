@@ -36,7 +36,7 @@
               {{-- Location Address --}}
               <div class="form-group">
                 {{ Form::label('address', __('Location Address'), ['class' => 'col-form-label']) }}
-                {!! Form::text('address', null, ['id' => 'address', 'class' => 'form-control', 'placeholder' => __('Enter Address')]) !!}
+                {!! Form::text('address', $address, ['id' => 'address', 'class' => 'form-control', 'placeholder' => __('Enter Address')]) !!}
               </div>
               
               <div class="form-group">
@@ -72,19 +72,24 @@
                 'data-dependent_id' => 'user-state-id'
                 ]) !!}
               </div>
-            
+              <div class="row"> <!-- Start of the row -->
               {{-- Latitude --}}
-              <div class="form-group">
+              <div class="form-group col-6"">
                 {{ Form::label('latitude', __('Latitude'), ['class' => 'col-form-label']) }}
                 {!! Form::number('latitude', $latitude, ['class' => 'form-control', 'placeholder' => __('Latitude')]) !!}
               </div>
             
               {{-- Longitude --}}
-              <div class="form-group">
+              <div class="form-group  col-6">
                 {{ Form::label('longitude', __('Longitude'), ['class' => 'col-form-label']) }}
                 {!! Form::number('longitude', $longitude, ['class' => 'form-control', 'placeholder' => __('Longitude')]) !!}
               </div>
-       
+            </div>
+              {{-- Zoom Level --}}
+              <div class="form-group">
+                {{ Form::label('zoomLevel', __('Zoom Level'), ['class' => 'col-form-label']) }}
+                {!! Form::number('zoomLevel', null, ['class' => 'form-control', 'placeholder' => __('Zoom Level')]) !!}
+              </div>       
 
             
     </div>

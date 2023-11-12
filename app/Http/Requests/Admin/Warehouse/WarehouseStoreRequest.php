@@ -19,8 +19,14 @@ class WarehouseStoreRequest extends FormRequest
   public function prepareForValidation()
   {
     $owner_types = ['Company' => Company::class, 'Client' => Company::class, 'PartnerCompany' => PartnerCompany::class];
+    // Set 'is_public' and 'is_warehouse' explicitly
+    $isPublic = $this->input('is_public', false); // default to false if not provided
+    $isWarehouse = $this->input('is_warehouse', true); // default to true if not provided
+
     $this->merge([
-      'owner_type' =>  isset($owner_types[$this->owner_type]) ? $owner_types[$this->owner_type] : null,
+        'is_public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
+        'is_warehouse' => filter_var($isWarehouse, FILTER_VALIDATE_BOOLEAN),
+        'owner_type' => isset($owner_types[$this->owner_type]) ? $owner_types[$this->owner_type] : null,
     ]);
 
     if($this->method() == 'POST'){
