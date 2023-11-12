@@ -30,28 +30,14 @@
     'id' => 'warehouse-owner-id',
     ]) !!}
   </div>
-
-                <!-- JSON Preview -->
-                <div id="js-preview-json" class="col-md-12 mb-3"></div>
-
     <!-- Left Column -->
     <div class="col-md-6 col d-flex flex-column">
 
-  
-              {{-- <!-- Address Input -->
-              <div class="form-group mb-4">
-                  <label for="address-input">Address</label>
-                  <input type="text" id="address-input" name="address_address" class="form-control">
-                  <input type="hidden" name="address_latitude" id="address-latitude" />
-                  <input type="hidden" name="address_longitude" id="address-longitude" />
-              </div> --}}
-
               {{-- Location Address --}}
               <div class="form-group">
-                {{ Form::label('address-input', __('Location Address'), ['class' => 'col-form-label']) }}
-                {!! Form::text('address_address', null, ['id' => 'address-input', 'class' => 'form-control', 'placeholder' => __('Enter Address')]) !!}
+                {{ Form::label('address', __('Location Address'), ['class' => 'col-form-label']) }}
+                {!! Form::text('address', null, ['id' => 'address', 'class' => 'form-control', 'placeholder' => __('Enter Address')]) !!}
               </div>
-
               
               <div class="form-group">
                 {{ Form::label('country_id', __('Country'), ['class' => 'col-form-label']) }}
@@ -86,11 +72,6 @@
                 'data-dependent_id' => 'user-state-id'
                 ]) !!}
               </div>
-              {{-- Location Name
-              <div class="form-group">
-                {{ Form::label('location_name', __('Location Name'), ['class' => 'col-form-label']) }}
-                {!! Form::text('location_name', $location_name, ['class' => 'form-control', 'placeholder' => __('Location Name')]) !!}
-              </div> --}}
             
               {{-- Latitude --}}
               <div class="form-group">
@@ -104,11 +85,7 @@
                 {!! Form::number('longitude', $longitude, ['class' => 'form-control', 'placeholder' => __('Longitude')]) !!}
               </div>
        
-              {{-- Zoom Level --}}
-              {{-- <div class="form-group">
-                {{ Form::label('zoomLevel', __('Zoom Level'), ['class' => 'col-form-label']) }}
-                {!! Form::number('zoomLevel', $zoomLevel, ['class' => 'form-control', 'placeholder' => __('Zoom Level')]) !!}
-              </div>  --}}
+
             
     </div>
   
@@ -117,18 +94,6 @@
         <!-- Map -->
         <div class="form-group mt-4 col d-flex flex-column" id="map" styless="height: 400px;"></div>
     </div>
-
-  
-  {{-- <div id="js-preview-json"></div>
-
-  <div class="form-group mb-4">
-    <label for="address-input">Address</label>
-    <input type="text" id="address-input" name="address_address" class="form-control">
-    <input type="hidden" name="address_latitude" id="address-latitude" />
-    <input type="hidden" name="address_longitude" id="address-longitude" />
-</div>
-<div class="form-group mt-4" id="map" style="height: 400px;"></div> --}}
-
 
   {{-- Status --}}
   <div class="form-group col-12">

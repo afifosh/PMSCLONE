@@ -44,6 +44,14 @@ class PartnerCompany extends BaseModel
     return $this->morphMany(Location::class, 'owner', 'owner_type', 'owner_id');
   }
 
+    /**
+     * Get all the warehouses owned by this partner company.
+     */
+    public function warehouses()
+    {
+        return $this->morphMany(Warehouse::class, 'owner');
+    }
+      
   public function scopeApplyRequestFilters($query)
   {
     //
