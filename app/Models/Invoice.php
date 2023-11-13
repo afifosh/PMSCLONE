@@ -585,16 +585,28 @@ class Invoice extends Model
       return 0;
     }
 
-    return $this->total - $this->pivotSetteledDownpaymentInvoices()->sum('amount') / 1000;
+    return $this->total - $this->totalDeductedAmountFromThisInvoice();
   }
 
   /**
-   * Get pivot table invoices which are using this invoice' amount as downpayment.
+   * Get the downpayment amount which is deducted (setteled in any other invoice) from this invoice.
    */
-
-  public function pivotSetteledDownpaymentInvoices(): HasMany
+  public function totalDeductedAmountFromThisInvoice()
   {
-    return $this->hasMany(InvoiceDownpayment::class, 'downpayment_id', 'id');
+    return InvoiceDeduction::where('downpayment_id', $this->id)
+      ->select([
+        DB::raw('COALESCE(NULLIF(manual_amount, 0), amount) as total_amount')
+      ])
+      ->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)')) / 1000;
+
+    // $total = 0;
+    // $deductions = InvoiceDeduction::where('downpayment_id', $this->id)->select('amount', 'manual_amount')->get();
+
+    // foreach ($deductions as $deduction) {
+    //   $total += ($deduction->manual_amount != 0 ? $deduction->manual_amount : $deduction->amount);
+    // }
+
+    // return $total;
   }
 
   /**
@@ -648,5 +660,28 @@ class Invoice extends Model
   public function deduction()
   {
     return $this->morphOne(InvoiceDeduction::class, 'deductible');
+  }
+
+  /**
+   * Total amount deducted from this invoice by downpayment deduction weather from invoice or invoice items
+   */
+  function totalDeductedAmount($downpayment_id = null)
+  {
+    return InvoiceDeduction::where(function ($q) {
+      $q->where('deductible_type', Invoice::class)
+        ->where('deductible_id', $this->id);
+    })->orWhere(function ($q) {
+      $q->where('deductible_type', InvoiceItem::class)
+        ->whereHasMorph('deductible', [InvoiceItem::class], function ($q) {
+          $q->where('invoice_id', $this->id);
+        });
+    })
+      ->when($downpayment_id, function ($q) use ($downpayment_id) {
+        $q->where('downpayment_id', $downpayment_id);
+      })
+      ->select([
+        DB::raw('COALESCE(NULLIF(manual_amount, 0), amount) as total_amount')
+      ])
+      ->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)')) / 1000;
   }
 }

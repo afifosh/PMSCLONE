@@ -73,7 +73,7 @@ class InvoiceItem extends Model
 
   public function getTotalAttribute($value)
   {
-    return ($value / 1000) + $this->rounding_amount ;
+    return ($value / 1000) + $this->rounding_amount;
   }
 
   public function setTotalAttribute($value)
@@ -109,7 +109,7 @@ class InvoiceItem extends Model
    * Sync taxes for invoice item
    * @param Collection $taxes
    */
-  public function syncTaxes(Collection|Array $taxes): void
+  public function syncTaxes(Collection|array $taxes): void
   {
     $sync_data = [];
     foreach ($taxes as $rate) {

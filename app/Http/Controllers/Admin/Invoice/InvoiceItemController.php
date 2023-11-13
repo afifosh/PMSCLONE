@@ -36,6 +36,10 @@ class InvoiceItemController extends Controller
 
   public function create(Invoice $invoice)
   {
+    if(request()->item == 'custom'){
+      return $this->customItemCreate($invoice);
+    }
+    // else bulk phase items
     $data['invoice'] = $invoice;
 
     if (request()->type == 'jsonData') {
@@ -47,7 +51,16 @@ class InvoiceItemController extends Controller
     ]);
   }
 
-  public function store(InvoiceItemsStoreReqeust $request, Invoice $invoice)
+  public function customItemCreate(Invoice $invoice)
+  {
+    $data['invoice'] = $invoice;
+    $data['invoiceItem'] = new CustomInvoiceItem();
+    $data['tax_rates'] = InvoiceConfig::whereIn('config_type', ['Tax', 'Down Payment'])->activeOnly()->get();
+
+    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit', $data)->render()]);
+  }
+
+  public function storeBulk(InvoiceItemsStoreReqeust $request, Invoice $invoice)
   {
     if(!$invoice->isEditable()){
       return $this->sendError('Invoice is not editable');
@@ -60,14 +73,54 @@ class InvoiceItemController extends Controller
     return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
 
+  public function store(Invoice $invoice, InvoiceItemUpdateRequest $request)
+  {
+    $customItem = CustomInvoiceItem::create($request->validated() + ['invoice_id' => $invoice->id]);
+
+    $item = $invoice->items()->create([
+      'invoiceable_id' => $customItem->id,
+      'invoiceable_type' => CustomInvoiceItem::class,
+      'subtotal' => $customItem->subtotal,
+      'total_tax_amount' => $request->total_tax_amount,
+      'manual_tax_amount' => $request->manual_tax_amount,
+      'total' => $request->total,
+      'rounding_amount' => $request->rounding_amount,
+    ]);
+
+    if($request->deduct_downpayment)
+    $item->deduction()->create([
+      'deductible_id' => $item->id,
+      'deductible_type' => InvoiceItem::class,
+      'downpayment_id' => $request->downpayment_id,
+      'dp_rate_id' => $request->dp_rate_id,
+      'is_percentage' => $request->deduction_rate_type != 'Fixed',
+      'amount' => $request->downpayment_amount,
+      'manual_amount' => $request->manual_deduction_amount,
+      'percentage' => $request->downpayment_rate->amount ?? 0,
+      'is_before_tax' => $request->is_before_tax,
+      'calculation_source' => $request->calculation_source,
+    ]);
+
+    $item->syncTaxes($request->taxes);
+
+    $invoice->reCalculateTotal();
+
+    return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+  }
+
   public function edit(Invoice $invoice, InvoiceItem $invoiceItem)
   {
-    $invoiceItem->load('invoiceable.stage', 'taxes');
+    $invoiceItem->load('taxes');
     $data['invoice'] = $invoice;
     $data['invoiceItem'] = $invoiceItem;
     $data['tax_rates'] = InvoiceConfig::whereIn('config_type', ['Tax', 'Down Payment'])->activeOnly()->get();
-    $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
-    $data['stages'] = [$invoiceItem->invoiceable->stage_id => $invoiceItem->invoiceable->stage->name];
+    if($invoiceItem->invoiceable_type == ContractPhase::class){
+      $invoiceItem->load('invoiceable.stage');
+      $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
+      $data['stages'] = [$invoiceItem->invoiceable->stage_id => $invoiceItem->invoiceable->stage->name];
+    }else{
+      request()->merge(['item' => 'custom']);
+    }
 
     return $this->sendRes('success', [
       'view_data' => view('admin.pages.invoices.items.edit', $data)->render(),
@@ -75,13 +128,14 @@ class InvoiceItemController extends Controller
   }
 
   public function update(Invoice $invoice, InvoiceItem $invoiceItem, InvoiceItemUpdateRequest $request)
-  {//dd($request->is_before_tax);
+  {
     if(!$invoice->isEditable()){
       return $this->sendError('Invoice is not editable');
     }
 
     $invoiceItem->update($request->validated());
 
+    if($request->deduct_downpayment)
     $invoiceItem->deduction()->updateOrCreate([
       'deductible_id' => $invoiceItem->id,
       'deductible_type' => InvoiceItem::class,
@@ -97,6 +151,9 @@ class InvoiceItemController extends Controller
       'is_before_tax' => $request->is_before_tax,
       'calculation_source' => $request->calculation_source,
     ]);
+    else{
+      $invoiceItem->deduction()->delete();
+    }
 
     $invoiceItem->syncTaxes($request->taxes);
 

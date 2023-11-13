@@ -76,7 +76,7 @@ class InvoiceController extends Controller
 
   public function edit(Invoice $invoice)
   {
-    $invoice->load('items.invoiceable', 'items.taxes', 'contract', 'deductableDownpayments');
+    $invoice->load('items.invoiceable', 'items.taxes', 'items.deduction', 'contract', 'deductableDownpayments');
     $data['invoice'] = $invoice;
     $data['tax_rates'] = InvoiceConfig::get(); // both retention and taxes, will be filtered in view
     $data['pendingDocs'] = $invoice->contract->pendingDocs()->get();

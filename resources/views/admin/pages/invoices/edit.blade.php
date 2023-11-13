@@ -28,6 +28,7 @@
 <script>
   function initSortable() {
     var sortable = Sortable.create(document.getElementById('billing-items-container'), {
+      filter: '.filtered',
       handle: '.bi-drag',
       group: 'shared',
       animation: 150,
@@ -37,7 +38,9 @@
           url: route('admin.invoices.invoice-items.sort', { invoice: {{$invoice->id}}}),
           type: "PUT",
           data: {
-            items: sortable.toArray(),
+            items: sortable.toArray().filter(function (el) {
+              return el != 'exclude-sort';
+            }),
           },
           success: function(res){
           }
@@ -68,7 +71,8 @@
       url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit' }),
       type: "GET",
       success: function(data) {
-        $('#billing-items-container').html(data.data.view_data);
+        $('#billing-items-container-header').siblings().remove();
+        $('#billing-items-container-header').after(data.data.view_data);
         $('.invoice-calculations').html(data.data.summary);
         $('#balance-summary').html(data.data.balance_summary);
         initSelect2()

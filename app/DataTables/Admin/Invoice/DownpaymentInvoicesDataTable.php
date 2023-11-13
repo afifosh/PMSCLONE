@@ -22,17 +22,17 @@ class DownpaymentInvoicesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('id', function ($pivot) {
-        return '<a href="' . route('admin.invoices.edit', $pivot->invoice_id) . '">' . runtimeInvIdFormat($pivot->invoice_id) . '</a>';
+      ->editColumn('id', function ($invoice) {
+        return '<a href="' . route('admin.invoices.edit', $invoice->id) . '">' . runtimeInvIdFormat($invoice->id) . '</a>';
       })
-      ->editColumn('invoice.company_id', function ($pivot) {
-        return view('admin._partials.sections.company-avatar', ['company' => $pivot->invoice->company])->render();
+      ->editColumn('invoice.company_id', function ($invoice) {
+        return view('admin._partials.sections.company-avatar', ['company' => $invoice->company])->render();
       })
-      ->editColumn('invoice.contract_id', function ($pivot) {
-        return $pivot->invoice->contract->subject;
+      ->editColumn('invoice.contract_id', function ($invoice) {
+        return $invoice->contract->subject;
       })
-      ->editColumn('amount', function ($pivot) {
-        return cMoney($pivot->amount, $this->downpaymentInvoice->contract->currency, true);
+      ->editColumn('amount', function (Invoice $invoice) {
+        return cMoney($invoice->totalDeductedAmount($this->downpaymentInvoice->id), $this->downpaymentInvoice->contract->currency, true);
       })
       ->rawColumns(['invoice.company_id', 'id']);
   }
@@ -40,9 +40,15 @@ class DownpaymentInvoicesDataTable extends DataTable
   /**
    * Get the query source of dataTable.
    */
-  public function query(InvoiceDownpayment $model): QueryBuilder
+  public function query(Invoice $model): QueryBuilder
   {
-    return $model->where('downpayment_id', $this->downpaymentInvoice->id)->with('invoice')->newQuery();
+    return $model->whereHas('deduction', function($q){
+      $q->where('downpayment_id', $this->downpaymentInvoice->id);
+    })->orWherehas('items', function($q){
+      $q->whereHas('deduction', function($q){
+        $q->where('downpayment_id', $this->downpaymentInvoice->id);
+      });
+    })->with(['contract', 'company'])->newQuery();
   }
 
   /**
@@ -78,11 +84,11 @@ class DownpaymentInvoicesDataTable extends DataTable
       Column::make('id'),
       Column::make('invoice.company_id')->title('Client'),
       Column::make('invoice.contract_id')->title('Contract'),
-      Column::make('invoice.due_date')->title('Due Date'),
-      Column::make('invoice.status')->title('Status'),
+      Column::make('due_date')->title('Due Date'),
+      Column::make('status')->title('Status'),
       Column::make('amount')->title('Downpayment Amount'),
-      Column::make('invoice.created_at')->title('Created At'),
-      Column::make('invoice.updated_at')->title('Updated At'),
+      Column::make('created_at')->title('Created At'),
+      Column::make('updated_at')->title('Updated At'),
     ];
   }
 

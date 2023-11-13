@@ -62,7 +62,6 @@ use App\Http\Controllers\Admin\Finance\PaymentController;
 use App\Http\Controllers\Admin\Finance\ProgramAccountController;
 use App\Http\Controllers\Admin\Finance\TaxController;
 use App\Http\Controllers\Admin\Invoice\AttachmentController;
-use App\Http\Controllers\Admin\Invoice\CustomInvoiceItemController;
 use App\Http\Controllers\Admin\Invoice\DownpaymentController;
 use App\Http\Controllers\Admin\Invoice\InvoiceController;
 use App\Http\Controllers\Admin\Invoice\InvoiceItemController;
@@ -270,13 +269,13 @@ Route::prefix('contracts')->group(function () {
 
 
     Route::get('/stages-status-datatable', function (App\Models\Contract $contract, DataTables $dataTables) {
-  
+
       // Assuming you have a method in your Contract model that returns the necessary collection
       $data = $contract->getAllUsersStagesReviewStatusWithlastReviewDate();
   dd($data);
       // Convert the collection to a Laravel Collection if it's not already
       $collection = collect($data);
-  
+
       // Use the DataTables API to handle server-side operations like pagination, search, etc.
       return $dataTables->collection($collection)
           ->make(true);
@@ -307,7 +306,7 @@ Route::prefix('contracts')->group(function () {
           Route::get('/stages', [ContractController::class, 'ContractPaymentsPlanStages'])->name('contracts.paymentsplan.stages');
 
           // Route for the review of a contract's payment plan
-          Route::get('/review', [ContractController::class, 'ContractPaymentsPlanReview'])->name('contracts.paymentsplan.review');          
+          Route::get('/review', [ContractController::class, 'ContractPaymentsPlanReview'])->name('contracts.paymentsplan.review');
       });
 
       // Routes for actions on phases
@@ -474,8 +473,8 @@ Route::prefix('contracts')->group(function () {
     Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
     Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
     Route::resource('invoices', InvoiceController::class);
+    Route::post('invoices/{invoice}/invoice-items/store-bulk', [InvoiceItemController::class, 'storeBulk'])->name('invoices.invoice-items.store-bulk');
     Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'edit', 'update', 'destroy']);
-    Route::resource('invoices.custom-invoice-items', CustomInvoiceItemController::class)->only(['create', 'store', 'edit', 'update']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
     Route::resource('invoices.downpayments', DownpaymentController::class)->only(['store']);
     Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');

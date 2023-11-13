@@ -1,4 +1,4 @@
-{!! Form::open(['route' => ['admin.invoices.invoice-items.store', $invoice->id], 'method' => 'POST']) !!}
+{!! Form::open(['route' => ['admin.invoices.invoice-items.store-bulk', $invoice->id], 'method' => 'POST']) !!}
 
 <div class="row">
   <div class="table-responsive">

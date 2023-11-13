@@ -41,7 +41,7 @@ class InvoiceItemUpdateRequest extends FormRequest
   protected function prepareForValidation(): void
   {
     $this->merge([
-      'subtotal' => $this->invoice_item->invoiceable->estimated_cost,
+      'subtotal' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->invoice_item->invoiceable->estimated_cost)),
       /** Deduction Related Fields */
       'deduct_downpayment' => $this->boolean('deduct_downpayment'),
       'is_before_tax' => $this->boolean('is_before_tax'),
@@ -55,26 +55,7 @@ class InvoiceItemUpdateRequest extends FormRequest
     ]);
 
     // validate
-    $this->validate([
-      'phase_id' => 'required|exists:contract_phases,id',
-      'subtotal' => 'required|numeric|gt:0',
-      // deduction fields
-      'deduct_downpayment' => 'required|boolean',
-      'is_before_tax' => 'required|boolean',
-      'downpayment_id' => 'nullable|required_if:deduct_downpayment,true|exists:invoices,id',
-      //'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->downpayment->downpaymentAmountRemaining() : ''),
-      'dp_rate_id' => 'nullable|required_if:deduct_downpayment,true|exists:invoice_configs,id',
-      'calculation_source' => 'nullable|required_if:deduct_downpayment,true|in:Down Payment,Deductible',
-      'is_manual_deduction' => 'required|boolean',
-      'manual_deduction_amount' => 'nullable|required_if:is_manual_deduction,true|numeric|gte:0',
-      // tax fields
-      'add_tax' => 'required|boolean',
-      'item_taxes' => 'nullable|array|required_if:add_tax,true',
-      'item_taxes.*' => 'nullable|required_if:add_tax,true|exists:invoice_configs,id',
-      //'total_tax_amount' => 'nullable|required_if:add_tax,true|numeric|gt:0',
-      //'total' => 'required|numeric|gt:0',
-      'manual_tax_amount' => 'nullable|required_if:is_manual_tax,true',
-    ], $this->messaages());
+    $this->validate($this->getItemRules(), $this->messaages());
     $configs = InvoiceConfig::activeOnly()->whereIn('id', array_merge(filterInputIds($this->item_taxes), [$this->dp_rate_id]))->get();
     if($this->add_tax)
     $this->taxes = $configs->where('config_type', 'Tax');
@@ -110,27 +91,48 @@ class InvoiceItemUpdateRequest extends FormRequest
    *
    * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
    */
-  public function rules(): array
+  private function getItemRules(): array
   {
-    $rules = [
-      'phase_id' => 'required|exists:contract_phases,id',
+    $generalRules = [
       'subtotal' => 'required|numeric|gt:0',
       // deduction fields
       'deduct_downpayment' => 'required|boolean',
       'is_before_tax' => 'required|boolean',
-      'downpayment_id' => 'nullable|exists:invoices,id',
-      'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->downpayment->downpaymentAmountRemaining() : ''),
+      'downpayment_id' => 'nullable|required_if:deduct_downpayment,true|exists:invoices,id',
+      //'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->downpayment->downpaymentAmountRemaining() : ''),
       'dp_rate_id' => 'nullable|required_if:deduct_downpayment,true|exists:invoice_configs,id',
       'calculation_source' => 'nullable|required_if:deduct_downpayment,true|in:Down Payment,Deductible',
       'is_manual_deduction' => 'required|boolean',
-      'manual_deduction_amount' => 'nullable|required_with:is_manual_deduction|numeric|gte:0',
+      'manual_deduction_amount' => 'nullable|required_if:is_manual_deduction,true|numeric|gte:0',
       // tax fields
       'add_tax' => 'required|boolean',
-      'item_taxes' => 'nullable|array',
-      'item_taxes.*' => 'nullable|exists:invoice_configs,id',
+      'item_taxes' => 'nullable|array|required_if:add_tax,true',
+      'item_taxes.*' => 'nullable|required_if:add_tax,true|exists:invoice_configs,id',
+      //'total_tax_amount' => 'nullable|required_if:add_tax,true|numeric|gt:0',
+      //'total' => 'required|numeric|gt:0',
+      'manual_tax_amount' => 'nullable|required_if:is_manual_tax,true|numeric',
+    ];
+
+    if($this->item == 'custom'){
+      return $generalRules + [
+        'name' => 'required|string|max:255',
+        'price' => 'required|numeric|gt:0',
+        'quantity' => 'required|numeric|gt:0',
+      ];
+    }else{
+      return $generalRules + [
+        'phase_id' => 'required|exists:contract_phases,id',
+      ];
+    }
+  }
+  public function rules(): array
+  {
+    $rules = $this->getItemRules() + [
+      // deduction fields
+      'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->getMaxDeductableAmount() : ''),
+      // tax fields
       'total_tax_amount' => 'nullable|required_if:add_tax,true|numeric',
       'total' => 'required|numeric|gt:0',
-      'manual_tax_amount' => 'required|numeric',
       'rounding_amount' => 'required'
     ];
 
@@ -145,6 +147,19 @@ class InvoiceItemUpdateRequest extends FormRequest
     }
 
     return $rules;
+  }
+
+  private function getMaxDeductableAmount(){
+    $maxDeductable = $this->downpayment->downpaymentAmountRemaining();
+    if($this->method() == 'POST'){
+      return $maxDeductable;
+    }else{
+      if(@$this->invoice_item->deduction){
+        $maxDeductable += ($this->invoice_item->deduction->manual_amount ? $this->invoice_item->deduction->manual_amount : $this->invoice_item->deduction->amount);
+      }
+    }
+
+    return $maxDeductable;
   }
 
   private function calDeductionAmount(): void
@@ -162,7 +177,7 @@ class InvoiceItemUpdateRequest extends FormRequest
         if($this->is_before_tax) {
           $this->downpayment_amount = ($this->subtotal * $this->deduction_rate->amount) / 100;
         } else {
-          $this->downpayment_amount = ($this->subtotal + ($this->is_manual_tax ? $this->manual_tax_amount : $this->total_tax_amount) * $this->deduction_rate->amount) / 100;
+          $this->downpayment_amount = (($this->subtotal + ($this->is_manual_tax ? $this->manual_tax_amount : $this->total_tax_amount)) * $this->deduction_rate->amount) / 100;
         }
       }
     }
