@@ -702,8 +702,9 @@ $(document).on('click', '[data-toggle="ajax-modal"]', function () {
     url: url,
     success: function (response) {
       // Check if modaltitle exists in the response and is not empty
-      var modalTitle = response.data.modaltitle;
-      if (modalTitle && modalTitle.trim() !== "") {
+      var modalTitle = response.data && response.data.modaltitle ? response.data.modaltitle.trim() : null;
+
+      if (modalTitle) {
           $('#globalModal .modal-header').html(modalTitle);
       } else {
           $('#globalModalTitle').html(title);

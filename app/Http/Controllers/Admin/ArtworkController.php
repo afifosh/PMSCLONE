@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Location;
+use App\Enums\LengthUnit;
+use App\Enums\WeightUnit;
 use Throwable;
 
 class ArtworkController extends Controller
@@ -24,6 +26,10 @@ class ArtworkController extends Controller
   public function create()
   {
     $data['artwork'] = new Artwork();
+    $data['weight_unit'] = WeightUnit::asSelectArray() ?? ['' => 'Select Unit'];
+    $data['width_unit'] = LengthUnit::asSelectArray() ?? ['' => 'Select Unit'];
+    $data['height_unit'] = LengthUnit::asSelectArray() ?? ['' => 'Select Unit'];
+    $data['depth_unit'] = LengthUnit::asSelectArray() ?? ['' => 'Select Unit'];
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.artwork.create', $data)->render()]);
   }
@@ -70,7 +76,11 @@ class ArtworkController extends Controller
     $data['mediums'] = $artwork->medium_id ? Medium::where('id', $artwork->medium_id)->pluck('name', 'id')->prepend('Select Medium', '') : ['' => 'Select Medium'];
     $data['programs'] = [$artwork->program_id => $artwork->program->name ?? ''];
     $data['locations'] = [$artwork->latestLocation->location_id ?? '' => $artwork->latestLocation->location->name ?? 'Select Location'];
-    $data['contracts'] = [$artwork->latestLocation->contract_id ?? '' => $artwork->latestLocation->contract->subject ?? 'Select Contract'];
+    $data['weight_unit'] = WeightUnit::asSelectArray() ?? ['' => 'Select Unit'];
+    $data['width_unit'] = LengthUnit::asSelectArray() ?? ['' => 'Select Unit'];
+    $data['height_unit'] = LengthUnit::asSelectArray() ?? ['' => 'Select Unit'];
+    $data['depth_unit'] = LengthUnit::asSelectArray() ?? ['' => 'Select Unit'];
+
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.artwork.create', $data)->render()]);
   }

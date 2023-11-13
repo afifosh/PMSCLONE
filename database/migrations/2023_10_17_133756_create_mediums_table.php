@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('mediums', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Add columns as needed
+            $table->string('name')->unique(); // Making the name column unique
             $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();    
             $table->timestamps();
         });

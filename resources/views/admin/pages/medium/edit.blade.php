@@ -23,54 +23,9 @@
 
 @section('page-script')
 <script src="{{asset('assets/js/pages-account-settings-account.js')}}"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', checkUtilInitialized);
-    function checkUtilInitialized() {
-      if (window.intlTelInputUtils) {
-        validatePhone()
-      } else {
-        setTimeout(checkUtilInitialized, 50); // wait 50 ms
-      }
-    }
-  $(function () {
-    initModalSelect2();
-    var input = document.querySelector("#phone");
-    window.itiPhone = intlTelInput(input, {
-      utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2/build/js/utils.js",
-      initialCountry: "auto",
-      geoIpLookup: function(success) {
-        fetch("https://api.country.is")
-          .then(function(response) {
-            if (!response.ok) return success("");
-            return response.json();
-          })
-          .then(function(ipdata) {
-            success(ipdata.country);
-          });
-        },
-      });
-  });
-  $('#phone').keyup(function (e) {
-    validatePhone()
-  });
-  function validatePhone(){
-    var isValid = itiPhone.isValidNumber();
-    $('#phone').val(itiPhone.getNumber());
-    if(isValid){
-      $('#itiPhone').text('')
-      $('#itiPhoneCountry').val(itiPhone.getSelectedCountryData().iso2)
-    }else{
-      $('#itiPhone').text('Invalid phone number')
-      $('#itiPhone').css('color', 'red')
-    }
-  }
-</script>
 @endsection
 
 @section('content')
-<style>
-  .iti { width: 100%; }
-</style>
 <h4 class="fw-bold py-3 mb-4">
   <span class="text-muted fw-light">Account Settings /</span> Medium
 </h4>

@@ -11,6 +11,8 @@ return new class extends Migration
    */
   public function up(): void
   {
+    Schema::dropIfExists('artwork_locations');
+
     Schema::create('artwork_locations', function (Blueprint $table) {
       $table->id();
       $table->foreignId('artwork_id')->constrained()->cascadeOnDelete();

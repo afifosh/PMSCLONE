@@ -13,6 +13,7 @@ $configData = Helper::appClasses();
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2/build/css/intlTelInput.css">
+{{-- <link rel="stylesheet" href="{{asset('app-assets/css/bootstrap.min.css')}}">  --}}
 <style>
   .iti--show-flags {
     width: 100%;
