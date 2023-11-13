@@ -16,13 +16,15 @@ class ArtworkLocation extends Model
     'warehouse_id',
     'contract_id',
     'added_by',
-    'added_on',
-    'added_till',
+    'datein',
+    'dateout',
+    'remarks',
     'is_current',
   ];
 
   protected $casts = [
-    'added_till' => 'datetime:d M, Y',
+    'datein' => 'datetime:d M, Y',
+    'dateout' => 'datetime:d M, Y',    
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];

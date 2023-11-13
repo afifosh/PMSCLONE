@@ -21,10 +21,20 @@ class LocationsDataTable extends DataTable
     return (new EloquentDataTable($query))
       ->addColumn('owner', function ($location) {
         return $location->owner->name ?? 'N/A';
-      })
+      })        
+      ->addColumn('is_warehouse', function ($location) {
+        if ($location->is_warehouse) {
+            // Return the icon for true value
+            return '<span class="badge bg-label-success">YES</span>'; // Replace with your desired icon
+        } else {
+            // Return something else or nothing for false value
+            return '<span class="badge bg-label-danger">NO</span>'; 
+        }
+    })
       ->addColumn('action', function ($location) {
         return view('admin.pages.locations.action', compact('location'));
-      });
+      })
+      ->rawColumns(['is_warehouse']);
   }
 
   /**
@@ -74,9 +84,9 @@ class LocationsDataTable extends DataTable
   public function getColumns(): array
   {
     return [
-      Column::make('name'),
-      Column::make('owner'),
       Column::make('address'),
+      Column::make('owner'),
+      Column::make('is_warehouse'),
       Column::make('country.name')->title('Country'),
       Column::make('state.name')->title('State'),
       Column::make('city.name')->title('City'),
