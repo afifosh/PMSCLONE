@@ -1,7 +1,7 @@
 @if($modelInstance instanceof \App\Models\Contract)
-  {!! Form::open(['route' => ['admin.contracts.uploaded-documents.update', ['contract' => $modelInstance->id, $uploaded_doc]], 'method' => 'PUT', 'files' => true]) !!}
+  {!! Form::open(['route' => ['admin.contracts.uploaded-documents.update', ['contract' => $modelInstance->id, $uploaded_doc, 'success' => request()->success]], 'method' => 'PUT', 'files' => true]) !!}
 @else
-  {!! Form::open(['route' => ['admin.invoices.uploaded-documents.update', ['invoice' => $modelInstance->id, $uploaded_doc]], 'method' => 'PUT', 'files' => true]) !!}
+  {!! Form::open(['route' => ['admin.invoices.uploaded-documents.update', ['invoice' => $modelInstance->id, $uploaded_doc, 'success' => request()->success]], 'method' => 'PUT', 'files' => true]) !!}
 @endif
 
 {{-- Requested Doc Id --}}

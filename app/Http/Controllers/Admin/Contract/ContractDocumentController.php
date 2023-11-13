@@ -22,16 +22,40 @@ class ContractDocumentController extends Controller
     if ($request->route()->getName() == 'admin.contracts.pending-documents.index') {
       $data['contract'] = $contract = Contract::findOrFail($modal);
       $data['contract'] = $contract;
-      $data['requestable_documents'] = $data['documents'] = $contract->pendingDocs()->get();
+      $data['requestable_documents'] = $data['documents'] = $contract->requestedDocs()->get();
+      $data['valid_documents'] = $contract->uploadedValidDocs()->pluck('id')->toArray();
+      $data['expired_documents'] = $contract->uploadedExpiredDocs()->pluck('id')->toArray();
     } else {
       $data['invoice'] = $invoice = Invoice::findOrFail($modal);
-      $data['requestable_documents'] = $data['documents'] = $invoice->pendingDocs()->get();
+      $data['requestable_documents'] = $data['documents'] = $invoice->requestedDocs()->get();
+      $data['valid_documents'] = $invoice->uploadedValidDocs()->pluck('id')->toArray();
+      $data['expired_documents'] = $invoice->uploadedExpiredDocs()->pluck('id')->toArray();
     }
 
     request()->document_id = request()->document_id ?? $data['requestable_documents'][0]->id ?? 0;
+
+    if (in_array(request()->document_id, $data['valid_documents'])){
+      // update if document is valid
+      $data['uploaded_doc'] = UploadedKycDoc::where('kyc_doc_id', request()->document_id)
+        ->orderBy('id', 'DESC')
+        ->first();
+      if($request->route()->getName() == 'admin.contracts.pending-documents.index'){
+        $data['modelInstance'] = $contract;
+      }else{
+        $data['modelInstance'] = $invoice;
+      }
+      request()->merge([
+        'success' => 'page_reload',
+      ]);
+    }
+
+
     if ($request->fields_only) {
       $data['document'] = $data['documents']->where('id', $request->document_id)->first();
 
+      if (in_array(request()->document_id, $data['valid_documents'])){
+        return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.uploaded-docs.edit', $data)->render()]);
+      }
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.pending-documents.fields', $data)->render()]);
     } else {
 

@@ -47,7 +47,8 @@ class Invoice extends Model
     'is_auto_generated',
     'downpayment_amount',
     'is_payable',
-    'rounding_amount'
+    'rounding_amount',
+    'void_reason'
   ];
 
   protected $casts = [
@@ -63,7 +64,7 @@ class Invoice extends Model
     'Sent',
     'Paid',
     'Partial Paid',
-    'Cancelled'
+    'Void'
   ];
 
   const TYPES = [
@@ -256,7 +257,7 @@ class Invoice extends Model
    */
   public function reCalculateTotal(): void
   {
-    if ($this->type == 'Partial Invoice') {
+    if ($this->type == 'Partial Invoice' || $this->type == 'Down Payment') {
       $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum('total') / 1000;
     } else if ($this->type == 'Regular') {
       $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum('total') / 1000;
@@ -278,6 +279,7 @@ class Invoice extends Model
       'downpayment_amount' => $this->downPayments()->wherePivot('is_after_tax', 1)->sum('amount') / 1000,
       'retention_amount' => $retention_amount,
       'total' => $total,
+      'total_tax' => $total_tax,
       'rounding_amount' => ($this->rounding_amount ? (floor($total) - $total) : 0),
     ]);
   }
@@ -358,6 +360,8 @@ class Invoice extends Model
       $q->whereBetween('due_date', [today()->subQuarter()->startOfQuarter(), today()->subQuarter()->endOfQuarter()]);
     })->when(request()->filter_due_date == 'next_quarter', function ($q) {
       $q->whereBetween('due_date', [today()->addQuarter()->startOfQuarter(), today()->addQuarter()->endOfQuarter()]);
+    })->when(request()->notvoid, function ($q) {
+      $q->where('status', '!=', 'Void');
     });
   }
 
@@ -534,6 +538,81 @@ class Invoice extends Model
       });
   }
 
+  /**
+   * Documents requested to upload against this invoice which are uploaded and not expired (Both global and non global)
+   */
+  public function uploadedValidDocs()
+  {
+    return $this->requestedDocs()
+      ->whereHas('uploadedDocs', function ($q) { // has uploaded docs
+        $q->where(function ($q) {
+          $q->where('doc_requestable_id', $this->id)
+            ->where('doc_requestable_type', $this::class)
+            //global docs which are uploaded in any other invoice of contract of this invoice
+            ->orWhere(function ($q) {
+              $q->whereHasMorph('docRequestable', [Invoice::class], function ($q) {
+                $q->where('contract_id', $this->contract_id);
+              })->whereHas('kycDoc', function ($q) {
+                $q->where('is_global', true);
+              });
+            });
+        })
+          // docs which are active and not expired
+          ->where(function ($q) {
+            $q->whereNull('expiry_date')
+              ->orWhere('expiry_date', '>=', today());
+          });
+      });
+  }
+
+  /**
+   * Documents requested to upload against this invoice which are uploaded and expired (Both global and non global)
+   */
+  public function uploadedExpiredDocs()
+  {
+    return $this->requestedDocs()
+      ->whereHas('uploadedDocs', function ($q) { // has uploaded docs
+        $q->where(function ($q) {
+          $q->where('doc_requestable_id', $this->id)
+            ->where('doc_requestable_type', $this::class)
+            //global docs which are uploaded in any other invoice of contract of this invoice
+            ->orWhere(function ($q) {
+              $q->whereHasMorph('docRequestable', [Invoice::class], function ($q) {
+                $q->where('contract_id', $this->contract_id);
+              })->whereHas('kycDoc', function ($q) {
+                $q->where('is_global', true);
+              });
+            });
+        })
+          // docs which are active and not expired
+          ->where(function ($q) {
+            $q->whereNotNull('expiry_date')
+              ->where('expiry_date', '<', today());
+          });
+      })
+
+      // does not have valid uploaded docs
+      ->whereDoesntHave('uploadedDocs', function ($q) { // filter out by uploaded docs
+        $q->where(function ($q) {
+          $q->where('doc_requestable_id', $this->id)
+            ->where('doc_requestable_type', $this::class)
+            // Exclude global docs which are uploaded in any other invoice of contract of this invoice
+            ->orWhere(function ($q) {
+              $q->whereHasMorph('docRequestable', [Invoice::class], function ($q) {
+                $q->where('contract_id', $this->contract_id);
+              })->whereHas('kycDoc', function ($q) {
+                $q->where('is_global', true);
+              });
+            });
+        })
+          // Exclude docs which are active and not expired
+          ->where(function ($q) {
+            $q->whereNull('expiry_date')
+              ->orWhere('expiry_date', '>=', today());
+          });
+      });
+  }
+
   public function attachPhasesWithTax(array $phase_ids): bool
   {
     DB::beginTransaction();
@@ -665,7 +744,7 @@ class Invoice extends Model
   /**
    * Total amount deducted from this invoice by downpayment deduction weather from invoice or invoice items
    */
-  function totalDeductedAmount($downpayment_id = null)
+  public function totalDeductedAmount($downpayment_id = null)
   {
     return InvoiceDeduction::where(function ($q) {
       $q->where('deductible_type', Invoice::class)
@@ -683,5 +762,38 @@ class Invoice extends Model
         DB::raw('COALESCE(NULLIF(manual_amount, 0), amount) as total_amount')
       ])
       ->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)')) / 1000;
+  }
+
+  /**
+   * Total Tax amount applied on this invoice or invoice items
+   */
+  public function totalAppliedTax()
+  {
+    return $this->total_tax + (InvoiceItem::where('invoice_id', $this->id)
+      ->when($this->type == 'Partial Invoice', function ($q) {
+        $q->where('invoiceable_type', CustomInvoiceItem::class);
+      })
+      ->when($this->type == 'Regular', function ($q) {
+        $q->where('invoiceable_type', ContractPhase::class);
+      })
+      ->select([
+        DB::raw('COALESCE(NULLIF(manual_amount, 0), amount) as total_amount')
+      ])
+      ->sum(DB::raw('COALESCE(NULLIF(manual_tax_amount, 0), total_tax_amount)')) / 1000);
+  }
+
+  /**
+   * subtotal amount of invoice items
+   */
+  public function itemsSubtotalAmount()
+  {
+    return InvoiceItem::where('invoice_id', $this->id)
+      ->when($this->type == 'Partial Invoice', function ($q) {
+        $q->where('invoiceable_type', CustomInvoiceItem::class);
+      })
+      ->when($this->type == 'Regular', function ($q) {
+        $q->where('invoiceable_type', ContractPhase::class);
+      })
+      ->sum('subtotal') / 1000;
   }
 }

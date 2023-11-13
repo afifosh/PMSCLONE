@@ -72,7 +72,7 @@
                 )}}
                 ">
                 <button type="button" class="step-trigger">
-                  <span class="bs-stepper-circle" style="background-color: #FF9F43 !important; color:white !important;">{{$loop->iteration}}</span>
+                  <span class="bs-stepper-circle" style="background-color: {{in_array($document->id, $expired_documents) ? '#FF9F43' : (in_array($document->id, $valid_documents) ? '#008000' : '#FF0000')}} !important; color:white !important;">{{$loop->iteration}}</span>
                   <span class="bs-stepper-label mw-100">
                     <span class="bs-stepper-title">{{$document->title}}</span>
                     <span class="bs-stepper-subtitle">{{$document->description}}</span>
@@ -85,7 +85,8 @@
             {{-- <div class="bs-stepper-content"> --}}
               <div id="kyc-docs-{{$document['id']}}" class="content m-4">
                 @if ($document->id == request()->document_id)
-                  @include('admin.pages.contracts.pending-documents.fields')
+                  @includeWhen(!isset($modelInstance),'admin.pages.contracts.pending-documents.fields')
+                  @includeWhen(isset($modelInstance), 'admin.pages.contracts.uploaded-docs.edit')
                 @endif
               </div>
             {{-- </div> --}}

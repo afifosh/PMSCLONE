@@ -24,7 +24,7 @@ return new class extends Migration
       $table->string('subject');
       $table->string('currency', 5)->default('SAR');
       $table->unsignedBigInteger('value')->default(0);
-      $table->unsignedBigInteger('tax_value')->default(0);
+      $table->bigInteger('tax_value')->default(0);
       $table->enum('invoicing_method', ['Recuring', 'Phase Based'])->default('Phase Based');
       $table->dateTime('start_date')->nullable();
       $table->dateTime('end_date')->nullable();

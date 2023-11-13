@@ -28,6 +28,8 @@
         @endforelse
       </select>
     </div>
+    <div class="col-12 mt-3 downpayment-info">
+    </div>
     {{-- Downpayment Rates --}}
     <div class="form-group col-6">
       {{ Form::label('dp_rate_id', __('Down payment Rate'), ['class' => 'col-form-label']) }}

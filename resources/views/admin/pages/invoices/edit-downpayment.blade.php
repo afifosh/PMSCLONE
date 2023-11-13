@@ -44,10 +44,23 @@
         rounding_amount: rounding
       },
       success: function(data) {
-        location.reload();
+        reloadPhasesList();
       }
     });
   })
+  function reloadPhasesList(){
+    $.ajax({
+      url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit' }),
+      type: "GET",
+      success: function(data) {
+        $('#billing-items-container-header').siblings().remove();
+        $('#billing-items-container-header').after(data.data.view_data);
+        $('.invoice-calculations').html(data.data.summary);
+        $('#balance-summary').html(data.data.balance_summary);
+        initSelect2()
+      }
+    });
+  }
 </script>
 @endsection
 
@@ -129,41 +142,7 @@
         <hr class="my-3 mx-n4" />
 
         <div class="source-item pt-4 px-0 px-sm-4">
-          <div class="col-12">
-            <div class="table-responsive m-t-40 invoice-table-wrapper editing clear-both">
-                <table class="table table-hover invoice-table editing">
-                    <thead>
-                        <tr>
-                            <!--action-->
-                            <th class="text-left x-action bill_col_action"></th>
-                            <!--description-->
-                            <th class="text-left x-description bill_col_description">Amount
-                            </th>
-                            <th class="text-left x-rate bill_col_rate">Description</th>
-                            <!--total-->
-                            <th class="text-right x-total bill_col_total" id="bill_col_total">Total
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="billing-items-container" class="billing-items-container-editing">
-                      <tr class="downpayment-row">
-                        <td class="text-left x-action edit-downpayment cursor-pointer"><i class="ti ti-edit"></i> </td>
-                        <td class="text-left x-rate bill_col_rate">@cMoney($invoice->subtotal, $invoice->contract->currency, true)</td>
-                        <td class="text-left x-rate bill_col_rate">{{$invoice->description}}</td>
-                        <td class="text-left x-rate bill_col_rate">@cMoney($invoice->subtotal, $invoice->contract->currency, true)</td>
-                      </tr>
-                      {{-- For editing : convert to input --}}
-                      <tr class="d-none downpayment-row-edit">
-                        <td class="text-left x-action bill_col_action cursor-pointer" data-form-id="downpayment-form" data-form="ajax-form"><i class="ti ti-check"></i> </td>
-                        <td class="text-left x-rate bill_col_rate"><input type="number" id="dp-subtotal" class="form-control" name="subtotal" value="{{$invoice->subtotal}}"></td>
-                        <td class="text-left x-rate"><input type="text" class="form-control" id="dp-description" name="description" value="{{$invoice->description}}"></td>
-                        <td class="text-left x-rate bill_col_rate">@cMoney($invoice->subtotal, $invoice->contract->currency, true)</td>
-                        </form>
-                      </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+          @include('admin.pages.invoices.items.items-list')
         </div>
 
         <hr class="my-3 mx-n4" />

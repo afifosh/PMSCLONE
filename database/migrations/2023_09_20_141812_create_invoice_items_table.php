@@ -15,10 +15,10 @@ return new class extends Migration
       $table->id();
       $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
       $table->nullableMorphs('invoiceable');
-      $table->unsignedBigInteger('subtotal')->default(0)->comment('Amount without tax');
-      $table->unsignedBigInteger('total_tax_amount')->default(0);
-      $table->unsignedBigInteger('manual_tax_amount')->default(0);
-      $table->unsignedBigInteger('total')->default(0);
+      $table->bigInteger('subtotal')->default(0)->comment('Amount without tax');
+      $table->bigInteger('total_tax_amount')->default(0);
+      $table->bigInteger('manual_tax_amount')->default(0);
+      $table->bigInteger('total')->default(0);
       $table->integer('rounding_amount')->default(0);
       $table->string('description')->nullable();
       $table->unsignedInteger('order')->default(0);

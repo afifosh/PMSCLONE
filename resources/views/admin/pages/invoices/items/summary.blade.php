@@ -1,4 +1,9 @@
 <div class="d-flex justify-content-between mb-2">
+  <span class="me-2">Items Total:</span>
+  <span class="fw-semibold">@cMoney($invoice->itemsSubtotalAmount(), $invoice->contract->currency, true)</span>
+</div>
+<hr>
+<div class="d-flex justify-content-between mb-2">
   <span class="me-2">Subtotal:</span>
   <span class="fw-semibold">@cMoney($invoice->subtotal, $invoice->contract->currency, true)</span>
 </div>
@@ -20,8 +25,14 @@
 @endforelse
 <div class="d-flex justify-content-between">
   <span class="me-2">Total Tax:</span>
-  <span class="fw-semibold">@cMoney($invoice->total_tax, $invoice->contract->currency, true)</span>
+  <span class="fw-semibold">@cMoney($invoice->totalAppliedTax(), $invoice->contract->currency, true)</span>
 </div>
+<hr />
+  <div class="d-flex justify-content-between mb-2">
+    <span class="me-2">Down Payment:</span>
+    <span class="fw-semibold">@cMoney(-$invoice->totalDeductedAmount(), $invoice->contract->currency, true)</span>
+  </div>
+
 @if($invoice->adjustment_amount != 0)
 <hr />
   <div class="d-flex justify-content-between mb-2">

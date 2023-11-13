@@ -126,6 +126,9 @@ class UploadedDocumentController extends Controller
       $uploadedDocument->update($data);
     }
 
+    if(request()->success == 'page_reload'){
+      return $this->sendRes('Document updated successfully.', ['close' => 'globalModal', 'event' => 'page_reload']);
+    }
     return $this->sendRes('Document updated successfully.', ['close' => 'globalModal', 'event' => 'table_reload', 'table_id' => 'uploaded-docs-table']);
   }
 

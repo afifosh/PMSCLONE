@@ -644,19 +644,24 @@
 
   <!-- Invoice Actions -->
   <div class="col-lg-3 col-12 invoice-actions">
-    <div class="card mb-4">
-      <div class="card-body">
-        <button class="btn btn-primary d-grid w-100" type="button" data-form="ajax-form">
-          <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Save Invoice</span>
-        </button>
-        <button class="btn btn-primary d-grid w-100 mt-2" type="button" data-toggle="ajax-modal" data-title="{{__('Merge Invoices')}}" data-href="{{route('admin.invoices.merge-invoices.create', [$invoice])}}">
-          <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Merge Invoice</span>
-        </button>
-        <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id])}}">
-          <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
-        </button>
+    @if($invoice->status != 'Void')
+      <div class="card mb-4">
+        <div class="card-body">
+          <button class="btn btn-primary d-grid w-100" type="button" data-form="ajax-form">
+            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Save Invoice</span>
+          </button>
+          <button class="btn btn-primary d-grid w-100 mt-2" type="button" data-toggle="ajax-modal" data-title="{{__('Merge Invoices')}}" data-href="{{route('admin.invoices.merge-invoices.create', [$invoice])}}">
+            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Merge Invoice</span>
+          </button>
+          <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id])}}">
+            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
+          </button>
+          <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Make Void')}}" data-href="{{route('admin.invoices.status.create',['invoice' => $invoice->id])}}">
+            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Make Void</span>
+          </button>
+        </div>
       </div>
-    </div>
+    @endif
   </div>
 </form>
   <form id="summary_update_from" action="{{route('admin.invoices.update', [$invoice, 'update_tax_type' => 1])}}" method="POST">
@@ -731,7 +736,7 @@
             {{ Form::label('retention_id', __(' Retention'), ['class' => 'col-form-label']) }}
             <select name="retention_id" id="retention_id" class="form-select select2">
               <option value="">{{__('Select Retention')}}</option>
-              @forelse ($tax_rates->where('is_retention', true) as $ret)
+              @forelse ($tax_rates->where('config_type', 'Retention') as $ret)
                 <option value="{{$ret->id}}">{{$ret->name}} (
                   @if ($ret->type != 'Percent')
                       @cMoney($ret->amount, $invoice->contract->currency, true)

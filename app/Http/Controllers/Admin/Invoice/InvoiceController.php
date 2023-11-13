@@ -8,9 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\InvoiceStoreRequest;
 use App\Models\Company;
 use App\Models\Contract;
+use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
 use App\Models\Program;
 use App\Models\InvoiceConfig;
+use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -59,7 +61,23 @@ class InvoiceController extends Controller
   {
     $invoice = Invoice::create($request->validated() + ['total' => $request->subtotal]);
 
-    if($request->type == 'Partial Invoice'){
+    if ($invoice->type == 'Down Payment') {
+      $item = CustomInvoiceItem::create([
+        'name' => 'Down Payment',
+        'price' => $request->subtotal,
+        'quantity' => 1,
+        'subtotal' => $request->subtotal,
+      ]);
+      $invoice->items()->create([
+        'invoiceable_id' => $item->id,
+        'invoiceable_type' => CustomInvoiceItem::class,
+        'subtotal' => $item->subtotal,
+        'total_tax_amount' => 0,
+        'manual_tax_amount' => 0,
+        'total' => $request->subtotal,
+        'rounding_amount' => 0,
+      ]);
+    } elseif ($request->type == 'Partial Invoice') {
       $invoice->attachPhasesWithTax([$request->phase_id]);
       $invoice->update(['is_payable' => false]);
     }
@@ -69,6 +87,17 @@ class InvoiceController extends Controller
 
   public function show(Invoice $invoice)
   {
+    if(request()->downpaymentjson){
+      $data['total_amount'] = $invoice->total;
+      $data['total_deducted_amount'] = $invoice->totalDeductedAmountFromThisInvoice();
+      $data['invoice_deducted_amount'] = $invoice->deducted_amount;
+      if(request()->itemId){
+        $item = InvoiceItem::with('deduction')->find(request()->itemId);
+        $data['total_deducted_amount'] = $data['total_deducted_amount'] - ($item->deduction ? ($item->deduction->manual_amount ? $item->deduction->manual_amount : $item->deduction->amount) : 0);
+      }
+
+      return response()->json($data);
+    }
     if (request()->json) {
       return response()->json($invoice);
     }
@@ -102,7 +131,7 @@ class InvoiceController extends Controller
 
     if ($request->update_tax_type) {
       $invoice->update($request->validated());
-      $invoice->summaryTaxes()->detach();
+      // $invoice->summaryTaxes()->detach();
       $invoice->reCalculateTotal();
 
       return back()->with('success', 'Tax type updated successfully');
@@ -133,7 +162,7 @@ class InvoiceController extends Controller
 
       return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
     } elseif ($request->type == 'rounding') {
-      $invoice->update(['rounding_amount' => $request->boolean('rounding_amount') ? (floor($invoice->total) - $invoice->total): 0]);
+      $invoice->update(['rounding_amount' => $request->boolean('rounding_amount') ? (floor($invoice->total) - $invoice->total) : 0]);
 
       return $this->sendRes('Invoice Updated Successfully', ['event' => 'page_reload']);
     } elseif ($request->type == 'Partial Invoice') {
@@ -151,13 +180,13 @@ class InvoiceController extends Controller
 
   public function destroy($invoice)
   {
-    if($invoice != 'bulk'){
+    if ($invoice != 'bulk') {
       $invoice = Invoice::findOrFail($invoice);
       $invoice->payments()->delete();
       $invoice->delete();
-    }else{
+    } else {
       $invoices = Invoice::whereIn('id', request()->invoices)->get();
-      foreach($invoices as $invoice){
+      foreach ($invoices as $invoice) {
         $invoice->payments()->delete();
         $invoice->delete();
       }

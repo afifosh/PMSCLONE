@@ -65,7 +65,7 @@ class InvoiceStoreRequest extends FormRequest
     elseif(request()->type == 'downpayment')
       return [
         'subtotal' => 'required|numeric|gt:0',
-        'description' => 'required|string|max:255',
+        'description' => 'nullable|string|max:255',
       ];
 
     if(request()->method() == 'PUT')

@@ -22,7 +22,7 @@
             {!! Form::number('subtotal', null, ['class' => 'form-control', 'disabled','placeholder' => __('Subtotal')]) !!}
           </div>
       </div>
-      @if(@$invoiceItem->deduction->is_before_tax && count($invoice->deductableDownpayments ?? []) > 0)
+      @if($invoice->type != 'Down Payment' && @$invoiceItem->deduction->is_before_tax && count($invoice->deductableDownpayments ?? []) > 0)
         @include('admin.pages.invoices.items.edit-deduction')
       @endif
 
@@ -30,7 +30,7 @@
       @include('admin.pages.invoices.items.edit-taxes')
 
       {{-- Deduction --}}
-      @if(!@$invoiceItem->deduction->is_before_tax && count($invoice->deductableDownpayments ?? []) > 0)
+      @if($invoice->type != 'Down Payment' && !@$invoiceItem->deduction->is_before_tax && count($invoice->deductableDownpayments ?? []) > 0)
         @include('admin.pages.invoices.items.edit-deduction')
       @endif
       <hr class="hr mt-3" />
@@ -246,5 +246,32 @@
     }else{
       $('#item-create [name="manual_deduction_amount"]').parent().addClass('d-none');
     }
+  })
+
+  // get downpayment info
+  $(document).on('change', '#item-create [name="downpayment_id"]', function(){
+    const downpaymentId = $(this).val();
+    if(!downpaymentId){
+      return false;
+    }
+    $.ajax({
+      url: route('admin.invoices.show', { invoice: downpaymentId, downpaymentjson: '1', itemId: '{{ $invoiceItem->id }}' }),
+      type: 'GET',
+      success: function (response) {
+        var BsAlert = `
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <div>
+              <strong>Total Down Payment Amount:</strong> <span class="total_amount">${response.total_amount}</span>
+              <br>
+              <strong>Deducted Amount:</strong> <span class="deducted_amount">${response.total_deducted_amount}</span>
+              <br>
+              <strong>Remaining Amount:</strong> <span class="remaining_amount">${response.total_amount - response.total_deducted_amount}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        `;
+        $('#item-create .downpayment-info').html(BsAlert);
+      }
+    })
   })
 </script>

@@ -37,7 +37,7 @@
         'data-placeholder' => 'Select Invoice',
         'data-allow-clear' => 'true',
         'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['Invoice', 'dependent' => 'contract_id']),
+        'data-url' => route('resource-select', ['Invoice', 'dependent' => 'contract_id', 'notvoid' => '1']),
         'data-dependent_id' => 'payment-contract-id',
         'disabled' => isset($selected_invoice)
         ])!!}

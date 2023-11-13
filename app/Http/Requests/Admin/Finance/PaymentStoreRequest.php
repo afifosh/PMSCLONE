@@ -54,4 +54,14 @@ class PaymentStoreRequest extends FormRequest
       'note' => 'nullable|string',
     ];
   }
+
+  // after validation hook
+  public function withValidator($validator)
+  {
+    $validator->after(function ($validator) {
+      if ($this->invoice->status == 'Void') {
+        $validator->errors()->add('invoice_id', 'Unable to pay. Invoice is voided.');
+      }
+    });
+  }
 }

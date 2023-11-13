@@ -58,6 +58,7 @@ return new class extends Migration
        * End Retention
        */
       $table->boolean('is_auto_generated')->default(false);
+      $table->string('void_reason')->nullable();
       $table->boolean('is_payable')->default(true); // if partial invoice total is more than phase total total, it will be false
       $table->enum('status', Invoice::STATUSES)->default('Draft');
       $table->timestamp('deleted_at')->nullable();

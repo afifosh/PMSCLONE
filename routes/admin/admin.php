@@ -95,6 +95,7 @@ use App\Http\Controllers\Admin\StudioController;
 use App\Http\Controllers\Admin\MediumController;
 use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\Admin\Contract\UploadedDoc\SignatureController;
+use App\Http\Controllers\Admin\Invoice\InvoiceStatusController;
 
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'adminVerified', 'mustBeActive', CheckForLockMode::class)->group(function () {
@@ -317,9 +318,9 @@ Route::prefix('contracts')->group(function () {
           Route::post('/toggle-review', [ContractController::class, 'togglePhaseReviewStatus'])->name('contracts.phases.toggle-review');
 
           // Dynamic content loading for each phase tab
-          Route::get('/reviewers', [PhaseController::class, 'reviewersTabContent'])->name('phases.reviewers');
-          Route::get('/comments', [PhaseController::class, 'commentsTabContent'])->name('phases.comments');
-          Route::get('/activity', [PhaseController::class, 'activityTabContent'])->name('phases.activity');
+          // Route::get('/reviewers', [PhaseController::class, 'reviewersTabContent'])->name('phases.reviewers');
+          // Route::get('/comments', [PhaseController::class, 'commentsTabContent'])->name('phases.comments');
+          // Route::get('/activity', [PhaseController::class, 'activityTabContent'])->name('phases.activity');
           // ... additional routes for each tab as needed
       });
   });
@@ -474,6 +475,7 @@ Route::prefix('contracts')->group(function () {
     Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
     Route::resource('invoices', InvoiceController::class);
     Route::post('invoices/{invoice}/invoice-items/store-bulk', [InvoiceItemController::class, 'storeBulk'])->name('invoices.invoice-items.store-bulk');
+    Route::resource('invoices.status', InvoiceStatusController::class)->only(['create', 'store']);
     Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'edit', 'update', 'destroy']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
     Route::resource('invoices.downpayments', DownpaymentController::class)->only(['store']);

@@ -692,6 +692,45 @@ class Contract extends BaseModel
       });
   }
 
+  /**
+   * Documents requested to upload against this Contract which are uploaded and not expired
+   */
+  public function uploadedValidDocs()
+  {
+    return $this->requestedDocs()
+      ->whereHas('uploadedDocs', function ($q) { // filter by uploaded docs
+        $q->where('doc_requestable_id', $this->id)
+          ->where('doc_requestable_type', Contract::class)
+          ->where(function ($q) {
+            $q->whereNull('expiry_date')
+              ->orWhere('expiry_date', '>=', today());
+          });
+      });
+  }
+
+  /**
+   * Documents requested to upload against this Contract which are uploaded but expired.
+   */
+  public function uploadedExpiredDocs()
+  {
+    return $this->requestedDocs()
+      ->whereHas('uploadedDocs', function ($q) { // filter by uploaded docs
+        $q->where('doc_requestable_id', $this->id)
+          ->where('doc_requestable_type', Contract::class)
+          ->where('expiry_date', '<', today());
+      })
+
+      // does not have valid uploaded docs
+      ->whereDoesntHave('uploadedDocs', function ($q) { // filter by uploaded docs
+        $q->where('doc_requestable_id', $this->id)
+          ->where('doc_requestable_type', Contract::class)
+          ->where(function ($q) {
+            $q->whereNull('expiry_date')
+              ->orWhere('expiry_date', '>=', today());
+          });
+      });
+  }
+
   public function releaseInvoicesRetentions()
   {
     $this->invoices->each(function ($invoice) {
