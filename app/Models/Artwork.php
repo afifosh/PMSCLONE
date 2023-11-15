@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Avatar;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
@@ -83,5 +84,10 @@ class Artwork extends Model
   public function program(): BelongsTo
   {
     return $this->belongsTo(Program::class);
+  }
+
+  public function artists(): BelongsToMany
+  {
+    return $this->belongsToMany(Artist::class, 'artwork_artists');
   }
 }

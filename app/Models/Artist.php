@@ -36,32 +36,32 @@ class Artist extends Model
         'birth_date',
         'status',
     ];
-   
+
      protected $casts = [
        'verified_at' => 'datetime:d M, Y',
        'created_at' => 'datetime:d M, Y',
        'updated_at' => 'datetime:d M, Y'
      ];
-   
+
      protected $appends = ['avatar'];
-   
+
      public function getAvatarAttribute($value)
      {
        if (!$value)
          return Avatar::create($this->full_name)->toBase64();
        return @Storage::url($value);
      }
-   
+
      public function getPhotoUrlAttribute()
      {
        return $this->avatar;
      }
-   
+
      public function getNameAttribute()
      {
        return $this->full_name;
      }
-   
+
      public function getFullNameAttribute()
      {
        return ucwords($this->first_name . ' ' . $this->last_name);
@@ -77,7 +77,7 @@ class Artist extends Model
     {
         $birthDate = Carbon::parse($this->attributes['birth_date']);
         return $birthDate->age;
-        
+
     }
 
     public function country()
@@ -95,5 +95,8 @@ class Artist extends Model
         return $this->belongsTo(City::class, 'city_id');
     }
 
-     
+    public function artworks()
+    {
+        return $this->belongsToMany(Artwork::class, 'artwork_artists');
+    }
 }

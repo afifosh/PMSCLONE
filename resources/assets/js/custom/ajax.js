@@ -596,14 +596,8 @@ window.initModalSelect2 = function(){
         return {
           id: term,
           text: term,
-          isNew: true // Custom property to indicate that this is a new tag
+          isTag: true // Custom property to indicate that this is a new tag
         };
-      },
-      insertTag: function (data, tag) {
-        // Insert the tag at the end of the results
-        if (!data.some(datum => datum.text === tag.text)) {
-          data.push(tag);
-        }
       },
       // templateResult: function (data) {
       //   // Check if this is the special 'Add' tag

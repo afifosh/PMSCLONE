@@ -40,7 +40,7 @@
   {{-- Medium --}}
   <div class="form-group col-6">
     {{ Form::label('medium_id', __('Medium'), ['class' => 'col-form-label']) }}
-    {!! Form::select('medium_id', $mediums ?? [], $artwork->medium_id, ['class' => 'form-select globalOfSelect2Remote', 'data-url' => route('resource-select', ['Medium']), 'data-allow-clear' => 'true', 'data-tags' => 'true', 'data-placeholder' => __('Select Medium'), 'id' => 'artwork-mediums-id']) !!}
+    {!! Form::select('medium_id', $mediums ?? ['' => 'Select Medium'], $artwork->medium_id, ['class' => 'form-select globalOfSelect2Remote', 'data-url' => route('resource-select', ['Medium']),  'data-allow-clear' => 'true', 'data-tags' => 'true', 'data-placeholder' => __('Select Medium'), 'id' => 'artwork-mediums-id']) !!}
   </div>
 
   {{-- Program --}}
