@@ -121,7 +121,7 @@ $configData = Helper::appClasses();
 $(document).on('select2:select', '#artwork-mediums-id', function(e) {
   var data = e.params.data;
 console.dir(e);
-  if (data.isTag) { // Assuming `isNew` is a property you add to new tags
+  if (data.isNew) { // Assuming `isNew` is a property you add to new tags
     // Handle new tag creation here
     // alert('New tag detected: ' + data.text);
     $.ajax({
