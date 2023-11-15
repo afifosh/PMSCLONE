@@ -123,7 +123,7 @@ $(document).on('select2:select', '#artwork-mediums-id', function(e) {
 console.dir(e);
   if (data.isTag) { // Assuming `isNew` is a property you add to new tags
     // Handle new tag creation here
-    alert('New tag detected: ' + data.text);
+    // alert('New tag detected: ' + data.text);
     $.ajax({
             url: "{{ route('admin.mediums.store') }}",
             type: 'POST',
@@ -136,14 +136,16 @@ console.dir(e);
             // var newOption = new Option(response.data.name, response.data.id, true, true);
             // // Append the new option to the Select2 element
             // $(this).append(newOption).trigger('change');
-            alert("ecsadsads adasd0");
+            toast_success(response.message);
         } else {
             // Handle the case where the server response indicates failure
+            toast_danger(response.message);
             console.error('Failed to add new medium:', response.message);
         }
     },
     error: function(jqXHR, textStatus, errorThrown) {
         // Handle AJAX errors
+        toast_danger(e.statusText);
         console.error('AJAX error:', textStatus, errorThrown);
     }
 });
