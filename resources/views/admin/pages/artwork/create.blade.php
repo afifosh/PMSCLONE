@@ -30,7 +30,7 @@
       </div>
     </div>
   </div>
-  <hr class="my-0">  
+  <hr class="my-0">
   {{-- Title --}}
   <div class="form-group col-6">
     {{ Form::label('title', __('Title'), ['class' => 'col-form-label']) }}
@@ -40,7 +40,7 @@
   {{-- Medium --}}
   <div class="form-group col-6">
     {{ Form::label('medium_id', __('Medium'), ['class' => 'col-form-label']) }}
-    {!! Form::select('medium_id', $mediums ?? [], $artwork->medium_id, ['class' => 'form-select globalOfSelect2Remote', 'data-url' => route('resource-select', ['Medium']), 'data-allow-clear' => 'true', 'data-placeholder' => __('Select Medium'), 'id' => 'artwork-mediums-id']) !!}
+    {!! Form::select('medium_id', $mediums ?? [], $artwork->medium_id, ['class' => 'form-select globalOfSelect2Remote', 'data-url' => route('resource-select', ['Medium']), 'data-allow-clear' => 'true', 'data-tags' => 'true', 'data-placeholder' => __('Select Medium'), 'id' => 'artwork-mediums-id']) !!}
   </div>
 
   {{-- Program --}}
@@ -64,7 +64,7 @@
     </div>
   </div>
 
-  
+
   {{-- Width --}}
   <div class="form-group col-6">
     {{ Form::label('width', __('Width'), ['class' => 'col-form-label']) }}

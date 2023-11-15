@@ -36,7 +36,8 @@ class ArtworkController extends Controller
 
   public function store(ArtworkStoreRequest $request)
   {
-    $artwork = Artwork::create($request->validated());
+    $medium = Medium::where('id', $request->medium_id)->firstOrCreate(['name' => $request->medium_id]);
+    $artwork = Artwork::create(['medium_id' => $medium->id] + $request->validated());
 
 
     // create location if warehouse is not selected

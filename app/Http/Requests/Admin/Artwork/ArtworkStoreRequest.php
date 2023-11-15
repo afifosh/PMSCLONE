@@ -37,17 +37,17 @@ class ArtworkStoreRequest extends FormRequest
   {
     $rules = [
       'title' => ['required', 'string', 'max:255'],
-      'medium_id' => 'required|exists:mediums,id',
+      'medium_id' => ['required'],
       'program_id' => ['nullable', 'required_without:year', 'integer', 'exists:programs,id'],
       'year' => ['nullable', 'required_without:program_id', 'digits:4'],
-      'dimension' => ['required', 'string', 'max:255'],
+      // 'dimension' => ['required', 'string', 'max:255'],
       'featured_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-      'location_id' => ['required', 'integer', 'exists:locations,id'],
+      // 'location_id' => ['required', 'integer', 'exists:locations,id'],
       'description' => ['nullable', 'string', 'max:255'],
-      'location_id' => ['required', 'integer', 'exists:locations,id'],
+      // 'location_id' => ['required', 'integer', 'exists:locations,id'],
       'contract_id' => ['nullable', 'integer', 'exists:contracts,id'],
-      'is_temporary_location' => ['boolean'],
-      'added_till' => ['nullable', 'required_if:is_temporary_location,true', 'date'],
+      // 'is_temporary_location' => ['boolean'],
+      // 'added_till' => ['nullable', 'required_if:is_temporary_location,true', 'date'],
     ];
 
     if($this->method() == 'POST')
