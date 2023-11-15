@@ -42,41 +42,42 @@ class InvoiceItemUpdateRequest extends FormRequest
   {
     $this->merge([
       'subtotal' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->invoice_item->invoiceable->estimated_cost)),
-      /** Deduction Related Fields */
-      'deduct_downpayment' => $this->boolean('deduct_downpayment'),
-      'is_before_tax' => $this->boolean('is_before_tax'),
-      'is_manual_deduction' => $this->boolean('is_manual_deduction') && $this->boolean('deduct_downpayment'),
-      'manual_deduction_amount' => $this->is_manual_deduction ? $this->manual_deduction_amount : 0,
-      /** End Deduction Related Fields */
-      'add_tax' => $this->boolean('add_tax'),
-      'is_manual_tax' => $this->boolean('is_manual_tax') && $this->boolean('add_tax'),
-      'manual_tax_amount' => $this->is_manual_tax ? $this->manual_tax_amount : 0,
-      'rounding_amount' => $this->boolean('rounding_amount'),
+      'total' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->invoice_item->invoiceable->estimated_cost)),
+      // /** Deduction Related Fields */
+      // 'deduct_downpayment' => $this->boolean('deduct_downpayment'),
+      // 'is_before_tax' => $this->boolean('is_before_tax'),
+      // 'is_manual_deduction' => $this->boolean('is_manual_deduction') && $this->boolean('deduct_downpayment'),
+      // 'manual_deduction_amount' => $this->is_manual_deduction ? $this->manual_deduction_amount : 0,
+      // /** End Deduction Related Fields */
+      // 'add_tax' => $this->boolean('add_tax'),
+      // 'is_manual_tax' => $this->boolean('is_manual_tax') && $this->boolean('add_tax'),
+      // 'manual_tax_amount' => $this->is_manual_tax ? $this->manual_tax_amount : 0,
+      // 'rounding_amount' => $this->boolean('rounding_amount'),
     ]);
 
     // validate
     $this->validate($this->getItemRules(), $this->messaages());
-    $configs = InvoiceConfig::activeOnly()->whereIn('id', array_merge(filterInputIds($this->item_taxes), [$this->dp_rate_id]))->get();
-    if($this->add_tax)
-    $this->taxes = $configs->where('config_type', 'Tax');
-    $this->deduction_rate = $configs->where('id', $this->dp_rate_id)->first();
-    unset($configs);
+    // $configs = InvoiceConfig::activeOnly()->whereIn('id', array_merge(filterInputIds($this->item_taxes), [$this->dp_rate_id]))->get();
+    // if($this->add_tax)
+    // $this->taxes = $configs->where('config_type', 'Tax');
+    // $this->deduction_rate = $configs->where('id', $this->dp_rate_id)->first();
+    // unset($configs);
 
-    $this->downpayment = Invoice::find($this->downpayment_id);
+    // $this->downpayment = Invoice::find($this->downpayment_id);
 
-    $this->calTaxAmount();
-    $this->calDeductionAmount();
+    // $this->calTaxAmount();
+    // $this->calDeductionAmount();
 
-    $this->merge([
-      'total_tax_amount' => $this->total_tax_amount,
-      'downpayment_amount' => $this->downpayment_id ? $this->downpayment_amount : 0,
-      'total' => $this->subtotal + ($this->is_manual_tax ? $this->manual_tax_amount : $this->total_tax_amount) - ($this->is_manual_deduction ? $this->manual_deduction_amount : $this->downpayment_amount),
-    ]);
+    // $this->merge([
+    //   'total_tax_amount' => $this->total_tax_amount,
+    //   'downpayment_amount' => $this->downpayment_id ? $this->downpayment_amount : 0,
+    //   'total' => $this->subtotal + ($this->is_manual_tax ? $this->manual_tax_amount : $this->total_tax_amount) - ($this->is_manual_deduction ? $this->manual_deduction_amount : $this->downpayment_amount),
+    // ]);
 
-    $this->merge([
-      // get the value after floating point (decimal) of total
-      'rounding_amount' => $this->rounding_amount ? (floor($this->total) - $this->total) : 0,
-    ]);
+    // $this->merge([
+    //   // get the value after floating point (decimal) of total
+    //   'rounding_amount' => $this->rounding_amount ? (floor($this->total) - $this->total) : 0,
+    // ]);
   }
   /**
    * Determine if the user is authorized to make this request.
@@ -95,22 +96,23 @@ class InvoiceItemUpdateRequest extends FormRequest
   {
     $generalRules = [
       'subtotal' => 'required|numeric|gt:0',
+      'description' => 'nullable|string|max:255'
       // deduction fields
-      'deduct_downpayment' => 'required|boolean',
-      'is_before_tax' => 'required|boolean',
-      'downpayment_id' => 'nullable|required_if:deduct_downpayment,true|exists:invoices,id',
-      //'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->downpayment->downpaymentAmountRemaining() : ''),
-      'dp_rate_id' => 'nullable|required_if:deduct_downpayment,true|exists:invoice_configs,id',
-      'calculation_source' => 'nullable|required_if:deduct_downpayment,true|in:Down Payment,Deductible',
-      'is_manual_deduction' => 'required|boolean',
-      'manual_deduction_amount' => 'nullable|required_if:is_manual_deduction,true|numeric|gte:0',
-      // tax fields
-      'add_tax' => 'required|boolean',
-      'item_taxes' => 'nullable|array|required_if:add_tax,true',
-      'item_taxes.*' => 'nullable|required_if:add_tax,true|exists:invoice_configs,id',
-      //'total_tax_amount' => 'nullable|required_if:add_tax,true|numeric|gt:0',
-      //'total' => 'required|numeric|gt:0',
-      'manual_tax_amount' => 'nullable|required_if:is_manual_tax,true|numeric',
+      // 'deduct_downpayment' => 'required|boolean',
+      // 'is_before_tax' => 'required|boolean',
+      // 'downpayment_id' => 'nullable|required_if:deduct_downpayment,true|exists:invoices,id',
+      // //'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->downpayment->downpaymentAmountRemaining() : ''),
+      // 'dp_rate_id' => 'nullable|required_if:deduct_downpayment,true|exists:invoice_configs,id',
+      // 'calculation_source' => 'nullable|required_if:deduct_downpayment,true|in:Down Payment,Deductible',
+      // 'is_manual_deduction' => 'required|boolean',
+      // 'manual_deduction_amount' => 'nullable|required_if:is_manual_deduction,true|numeric|gte:0',
+      // // tax fields
+      // 'add_tax' => 'required|boolean',
+      // 'item_taxes' => 'nullable|array|required_if:add_tax,true',
+      // 'item_taxes.*' => 'nullable|required_if:add_tax,true|exists:invoice_configs,id',
+      // //'total_tax_amount' => 'nullable|required_if:add_tax,true|numeric|gt:0',
+      // //'total' => 'required|numeric|gt:0',
+      // 'manual_tax_amount' => 'nullable|required_if:is_manual_tax,true|numeric',
     ];
 
     if($this->item == 'custom'){
@@ -128,23 +130,23 @@ class InvoiceItemUpdateRequest extends FormRequest
   public function rules(): array
   {
     $rules = $this->getItemRules() + [
-      // deduction fields
-      'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->getMaxDeductableAmount() : ''),
-      // tax fields
-      'total_tax_amount' => 'nullable|required_if:add_tax,true|numeric',
+      // // deduction fields
+      // 'downpayment_amount' => 'nullable|required_with:downpayment_id|numeric|gte:0' . ($this->downpayment ? '|max:' . $this->getMaxDeductableAmount() : ''),
+      // // tax fields
+      // 'total_tax_amount' => 'nullable|required_if:add_tax,true|numeric',
       'total' => 'required|numeric|gt:0',
-      'rounding_amount' => 'required'
+      // 'rounding_amount' => 'required'
     ];
 
-    if ($this->is_manual_tax) {
-      // manual tax should be between +-1 of calculated tax amount
-      $rules['manual_tax_amount'] = 'required|numeric|between:' . ($this->total_tax_amount - 1) . ',' . ($this->total_tax_amount + 1);
-    }
+    // if ($this->is_manual_tax) {
+    //   // manual tax should be between +-1 of calculated tax amount
+    //   $rules['manual_tax_amount'] = 'required|numeric|between:' . ($this->total_tax_amount - 1) . ',' . ($this->total_tax_amount + 1);
+    // }
 
-    if ($this->is_manual_deduction) {
-      // manual deduction should be between +-1 of calculated deduction amount
-      $rules['manual_deduction_amount'] = 'required|numeric|between:' . ($this->downpayment_amount - 1) . ',' . ($this->downpayment_amount + 1);
-    }
+    // if ($this->is_manual_deduction) {
+    //   // manual deduction should be between +-1 of calculated deduction amount
+    //   $rules['manual_deduction_amount'] = 'required|numeric|between:' . ($this->downpayment_amount - 1) . ',' . ($this->downpayment_amount + 1);
+    // }
 
     return $rules;
   }

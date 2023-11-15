@@ -1,7 +1,7 @@
 <div class="col-12">
   <div class="table-responsive m-t-40 invoice-table-wrapper editing clear-both">
       <table class="table table-hover invoice-table editing" id="billing-items-container">
-      @if($invoice->type != 'Down Payment')
+      @if($invoice->type != 'Down Payment' && $tab == 'summary')
         <button type="button" class="btn btn-primary btn-sm float-end me-2 select-items-btn">Select Items</button>
         <button type="button" class="btn btn-primary btn-sm float-end me-2 d-none delete-items-btn">Delete Selected</button>
         @if ($is_editable)

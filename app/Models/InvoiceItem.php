@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Facades\DB;
 
 class InvoiceItem extends Model
 {
@@ -16,12 +17,13 @@ class InvoiceItem extends Model
     'invoice_id',
     'invoiceable_type',
     'invoiceable_id',
+    'description',
     'subtotal',
     'total_tax_amount',
-    'manual_tax_amount',
     'description',
     'order',
     'total',
+    'authority_inv_total',
     'rounding_amount',
   ];
 
@@ -51,16 +53,6 @@ class InvoiceItem extends Model
     $this->attributes['total_tax_amount'] = moneyToInt($value);
   }
 
-  public function getManualTaxAmountAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setManualTaxAmountAttribute($value)
-  {
-    $this->attributes['manual_tax_amount'] = moneyToInt($value);
-  }
-
   public function getRoundingAmountAttribute($value)
   {
     return $value / 1000;
@@ -81,6 +73,16 @@ class InvoiceItem extends Model
     $this->attributes['total'] = moneyToInt($value);
   }
 
+  public function getAuthorityInvTotalAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setAuthorityInvTotalAttribute($value)
+  {
+    $this->attributes['authority_inv_total'] = moneyToInt($value);
+  }
+
   public function invoice()
   {
     return $this->belongsTo(Invoice::class);
@@ -93,7 +95,7 @@ class InvoiceItem extends Model
 
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(InvoiceConfig::class, 'invoice_taxes', 'invoice_item_id', 'tax_id')->withPivot('amount', 'type');
+    return $this->belongsToMany(InvoiceConfig::class, 'invoice_taxes', 'invoice_item_id', 'tax_id')->withPivot('amount', 'type', 'calculated_amount', 'manual_amount', 'is_simple_tax', 'pay_on_behalf', 'is_authority_tax', 'id');
   }
 
   /**
@@ -106,20 +108,6 @@ class InvoiceItem extends Model
   }
 
   /**
-   * Sync taxes for invoice item
-   * @param Collection $taxes
-   */
-  public function syncTaxes(Collection|array $taxes): void
-  {
-    $sync_data = [];
-    foreach ($taxes as $rate) {
-      $sync_data[$rate->id] = ['amount' => $rate->getRawOriginal('amount'), 'type' => $rate->type, 'invoice_item_id' => $this->id, 'invoice_id' => $this->invoice_id];
-    }
-
-    $this->taxes()->sync($sync_data);
-  }
-
-  /**
    * pivot table for storing deduction information
    *
    * @return MorphOne
@@ -127,5 +115,27 @@ class InvoiceItem extends Model
   public function deduction(): MorphOne
   {
     return $this->morphOne(InvoiceDeduction::class, 'deductible');
+  }
+
+  public function reCalculateTotal(): void
+  {
+    $this->load('deduction');
+    $invoiceTaxes = InvoiceTax::where('invoice_item_id', $this->id)
+      ->select([
+        'pay_on_behalf',
+        'is_authority_tax',
+        'is_simple_tax',
+        DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount) as total_amount')
+      ])
+      ->get();
+
+    $simpleTax = $invoiceTaxes->where('pay_on_behalf', false)->sum('total_amount') / 1000;
+    $behalfTax = $invoiceTaxes->where('pay_on_behalf', true)->sum('total_amount') / 1000;
+    $authorityTax = $invoiceTaxes->where('is_authority_tax', true)->sum('total_amount') / 1000;
+
+    $this->total_tax_amount = $simpleTax + $behalfTax;
+    $this->total = $this->subtotal + $this->simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    $this->authority_inv_total = $this->subtotal + $authorityTax - ($this->deduction && $this->deduction->is_before_tax ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    $this->save();
   }
 }

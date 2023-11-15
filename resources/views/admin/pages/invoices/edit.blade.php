@@ -66,15 +66,19 @@
         ]
     });
   }
-  function reloadPhasesList(){
+  function reloadPhasesList(tab){
+    tab = tab ? tab : (window.invoice_active_tab ? window.invoice_active_tab : 'summary');
+    $('#nav-' + tab).html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>');
+    window.invoice_active_tab = tab;
     $.ajax({
-      url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit' }),
+      url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit', tab: tab }),
       type: "GET",
       success: function(data) {
-        $('#billing-items-container-header').siblings().remove();
-        $('#billing-items-container-header').after(data.data.view_data);
-        $('.invoice-calculations').html(data.data.summary);
-        $('#balance-summary').html(data.data.balance_summary);
+        $('#nav-' + window.invoice_active_tab).html(data.data.view_data);
+        // $('#billing-items-container-header').siblings().remove();
+        // $('#billing-items-container-header').after(data.data.view_data);
+        // $('.invoice-calculations').html(data.data.summary);
+        // $('#balance-summary').html(data.data.balance_summary);
         initSelect2()
       }
     });
@@ -488,19 +492,29 @@
         @endif
 
         <hr class="my-3 mx-n4" />
-
-        <div class="source-item pt-4 px-0 px-sm-4">
-              @include('admin.pages.invoices.items.items-list')
-        </div>
-
-        <hr class="my-3 mx-n4" />
-
-        <div class="row p-0 p-sm-4">
-          <div class="col-md-8 mb-md-0 mb-3">
-          </div>
-          <div class="col-md-4">
-            <div class="invoice-calculations">
-              @include('admin.pages.invoices.items.summary')
+        <div class="row mb-4">
+          <div class="nav-align-top">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item" onclick="reloadPhasesList('summary')">
+                <button type="button" class="nav-link show active" role="tab" data-bs-toggle="tab" data-bs-target="#nav-summary" aria-selected="true">Summary</button>
+              </li>
+                <li class="nav-item" onclick="reloadPhasesList('tax-report')">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#nav-tax-report" aria-selected="false">Tax Report</button>
+                </li>
+                <li class="nav-item" onclick="reloadPhasesList('authority-tax')">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#nav-authority-tax" aria-selected="false">Authority Tax</button>
+                </li>
+            </ul>
+            <div class="tab-content p-0">
+              <div class="tab-pane active show" id="nav-summary" role="tabpanel">
+                @include('admin.pages.invoices.tabs.summary', ['tab' => 'summary'])
+              </div>
+              <div class="tab-pane fade" id="nav-tax-report" role="tabpanel">
+                {{-- @include('admin.pages.invoices.tabs.summary', ['tab' => 'tax-report']) --}}
+              </div>
+              <div class="tab-pane fade" id="nav-authority-tax" role="tabpanel">
+                {{-- @include('admin.pages.invoices.tabs.summary', ['tab' => 'authority-tax']) --}}
+              </div>
             </div>
           </div>
         </div>

@@ -96,6 +96,8 @@ use App\Http\Controllers\Admin\MediumController;
 use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\Admin\Contract\UploadedDoc\SignatureController;
 use App\Http\Controllers\Admin\Invoice\InvoiceStatusController;
+use App\Http\Controllers\Admin\Invoice\ItemDeductionController;
+use App\Http\Controllers\Admin\Invoice\ItemTaxController;
 
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'adminVerified', 'mustBeActive', CheckForLockMode::class)->group(function () {
@@ -477,6 +479,8 @@ Route::prefix('contracts')->group(function () {
     Route::post('invoices/{invoice}/invoice-items/store-bulk', [InvoiceItemController::class, 'storeBulk'])->name('invoices.invoice-items.store-bulk');
     Route::resource('invoices.status', InvoiceStatusController::class)->only(['create', 'store']);
     Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'edit', 'update', 'destroy']);
+    Route::resource('invoices.invoice-items.taxes', ItemTaxController::class)->except(['index', 'show']);
+    Route::resource('invoices.invoice-items.deductions', ItemDeductionController::class)->except(['index', 'show']);
     Route::resource('invoices.tax-rates', InvoiceTaxController::class);
     Route::resource('invoices.downpayments', DownpaymentController::class)->only(['store']);
     Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');

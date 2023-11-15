@@ -23,6 +23,8 @@ class InvoiceItemController extends Controller
 
     if (request()->mode == 'edit') {
       $data['invoice']->load('items.invoiceable');
+      $data['tab'] = request()->tab;
+      return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.tabs.summary', $data)->render()]);
 
       return $this->sendRes('success', [
         'view_data' => view('admin.pages.invoices.items.edit-list', $data)->render(),
@@ -55,7 +57,6 @@ class InvoiceItemController extends Controller
   {
     $data['invoice'] = $invoice;
     $data['invoiceItem'] = new CustomInvoiceItem();
-    $data['tax_rates'] = InvoiceConfig::whereIn('config_type', ['Tax', 'Down Payment'])->activeOnly()->get();
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit', $data)->render()]);
   }
@@ -77,31 +78,18 @@ class InvoiceItemController extends Controller
   {
     $customItem = CustomInvoiceItem::create($request->validated() + ['invoice_id' => $invoice->id]);
 
-    $item = $invoice->items()->create([
+    $invoice->items()->create([
       'invoiceable_id' => $customItem->id,
       'invoiceable_type' => CustomInvoiceItem::class,
       'subtotal' => $customItem->subtotal,
+      'description' => $request->description,
       'total_tax_amount' => $request->total_tax_amount,
       'manual_tax_amount' => $request->manual_tax_amount,
       'total' => $request->total,
       'rounding_amount' => $request->rounding_amount,
     ]);
 
-    if($request->deduct_downpayment)
-    $item->deduction()->create([
-      'deductible_id' => $item->id,
-      'deductible_type' => InvoiceItem::class,
-      'downpayment_id' => $request->downpayment_id,
-      'dp_rate_id' => $request->dp_rate_id,
-      'is_percentage' => $request->deduction_rate_type != 'Fixed',
-      'amount' => $request->downpayment_amount,
-      'manual_amount' => $request->manual_deduction_amount,
-      'percentage' => $request->downpayment_rate->amount ?? 0,
-      'is_before_tax' => $request->is_before_tax,
-      'calculation_source' => $request->calculation_source,
-    ]);
-
-    $item->syncTaxes($request->taxes);
+    // $item->syncTaxes($request->taxes);
 
     $invoice->reCalculateTotal();
 
@@ -113,7 +101,6 @@ class InvoiceItemController extends Controller
     $invoiceItem->load('taxes');
     $data['invoice'] = $invoice;
     $data['invoiceItem'] = $invoiceItem;
-    $data['tax_rates'] = InvoiceConfig::whereIn('config_type', ['Tax', 'Down Payment'])->activeOnly()->get();
     if($invoiceItem->invoiceable_type == ContractPhase::class){
       $invoiceItem->load('invoiceable.stage');
       $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
@@ -135,6 +122,9 @@ class InvoiceItemController extends Controller
 
     $invoiceItem->update($request->validated());
 
+    if($invoiceItem->invoiceable_type == CustomInvoiceItem::class)
+      $invoiceItem->invoiceable->update($request->validated() + ['invoice_id' => $invoice->id]);
+
     if($request->deduct_downpayment)
     $invoiceItem->deduction()->updateOrCreate([
       'deductible_id' => $invoiceItem->id,
@@ -154,8 +144,6 @@ class InvoiceItemController extends Controller
     else{
       $invoiceItem->deduction()->delete();
     }
-
-    $invoiceItem->syncTaxes($request->taxes);
 
     $invoice->reCalculateTotal();
 

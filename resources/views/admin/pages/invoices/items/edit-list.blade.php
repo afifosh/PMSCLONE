@@ -12,12 +12,14 @@
           <i class="ti ti-pencil"></i></a>
         <div class="dropdown-menu dropdown-menu-end m-0">
             @if ($item->invoiceable_type == 'App\Models\CustomInvoiceItem')
-              <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Edit Item')}}" data-href="{{route('admin.invoices.invoice-items.edit', [$invoice,'invoice_item' => $item->id])}}">Edit</i></li>
+              <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Edit Item')}}" data-href="{{route('admin.invoices.invoice-items.edit', [$invoice,'invoice_item' => $item->id, 'tab' => $tab])}}">Edit</i></li>
             @elseif ($item->invoiceable_type == 'App\Models\ContractPhase')
-              <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Edit Phase')}}" data-href="{{route('admin.invoices.invoice-items.edit', [$invoice,'invoice_item' => $item->id])}}">Edit</i></li>
+              <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Edit Phase')}}" data-href="{{route('admin.invoices.invoice-items.edit', [$invoice,'invoice_item' => $item->id, 'tab' => $tab])}}">Edit</i></li>
             @endif
-            <li href="javascript:;" class="dropdown-item">Edit Tax</li>
-            <li href="javascript:;" class="dropdown-item">Edit Deduction</li>
+            <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Add Tax')}}" data-href="{{route('admin.invoices.invoice-items.taxes.create', [$invoice, 'invoice_item' => $item->id, 'tab' => $tab])}}">Add Tax</li>
+            @if(!$item->deduction)
+              <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Add Deduction')}}" data-href="{{route('admin.invoices.invoice-items.deductions.create', [$invoice, 'invoice_item' => $item->id, 'tab' => $tab])}}">Add Deduction</li>
+            @endif
         </div>
       </td>
     @endif
@@ -36,15 +38,15 @@
     <!--total-->
     <td class="text-right">@cMoney($item->subtotal, $invoice->contract->currency, true)</td>
   @includeWhen(@$item->deduction && @$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
-  @includeWhen($item->total_tax_amount != 0, 'admin.pages.invoices.items.show.item-tax')
-  @includeWhen(@$item->deduction && !@$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
+  @includeWhen(count($item->taxes) > 0, 'admin.pages.invoices.items.show.item-tax')
+  @includeWhen($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
   <tr>
     <td></td>
     <td></td>
     <td></td>
     <td></td>
     <td></td>
-    <td>@cMoney($item->total, $invoice->contract->currency, true)</td>
+    <td>@cMoney($tab == 'summary' ? $item->total : $item->authority_inv_total, $invoice->contract->currency, true)</td>
   </tr>
 </tbody>
 @empty

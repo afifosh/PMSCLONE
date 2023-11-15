@@ -1,7 +1,9 @@
 <div class="deduction-section">
   <hr class="hr mt-3" />
+    <span class="fw-bold">Deduction</span>
+  <hr class="hr mt-3" />
   {{-- Deduct Downpayment --}}
-  <div class="">
+  {{-- <div class="">
     <label class="switch">
       <span class="switch-label fw-bold">Deduct Down Payment?</span>
       {{ Form::checkbox('deduct_downpayment', 1, @$invoiceItem->deduction->id && 1,['class' => 'switch-input'])}}
@@ -10,12 +12,12 @@
         <span class="switch-off"></span>
       </span>
     </label>
-  </div>
-  <div class="row {{($invoiceItem->deduction->id ?? 0) ? '' : 'd-none'}}">
+  </div> --}}
+  <div class="row">
     {{-- is_before_tax --}}
     <div class="form-group col-6">
-      {{ Form::label('is_before_tax', __('Before Tax'), ['class' => 'col-form-label']) }}
-      {!! Form::select('is_before_tax', ['1' => 'Yes', '0' => 'No'], @$invoiceItem->deduction->is_before_tax ? 1 : 0, ['class' => 'form-select globalOfSelect2', 'id' => 'is_before_tax']) !!}
+      {{ Form::label('is_before_tax', __('Deduction Calculation'), ['class' => 'col-form-label']) }}
+      {!! Form::select('is_before_tax', ['1' => 'Excluding Tax', '0' => 'Including Tax'], @$invoiceItem->deduction->is_before_tax ? 1 : 0, ['class' => 'form-select globalOfSelect2', 'id' => 'is_before_tax']) !!}
     </div>
     {{-- Downpayment Deduction --}}
     <div class="form-group col-6">
@@ -35,7 +37,7 @@
       {{ Form::label('dp_rate_id', __('Down payment Rate'), ['class' => 'col-form-label']) }}
       <select class="form-select globalOfSelect2" name="dp_rate_id" data-allow-clear='true' data-placeholder="{{__('Select Deduction Rate')}}">
         <option value="">{{__('Select Deduction Rate')}}</option>
-        @forelse ($tax_rates->where('config_type', 'Down Payment') as $tax)
+        @forelse ($deduction_rates->where('config_type', 'Down Payment') as $tax)
           <option @selected($invoiceItem->deduction->dp_rate_id ?? 0 == $tax->id) data-amount="{{$tax->amount}}" data-type="{{$tax->type}}" value="{{$tax->id}}">{{$tax->name}} (
             @if($tax->type != 'Percent')
               @cMoney($tax->amount, $invoice->contract->currency, true)
@@ -73,9 +75,9 @@
       </label>
     </div>
     {{-- Adjusted Deduction Amount --}}
-    <div class="form-group col-6 {{($invoiceItem->deduction->manual_amount ?? 0) ? '' : 'd-none'}}">
+    {{-- <div class="form-group col-6 {{($invoiceItem->deduction->manual_amount ?? 0) ? '' : 'd-none'}}">
       {{ Form::label('manual_deduction_amount', __('Adjusted Deduction Amount'), ['class' => 'col-form-label']) }}
       {!! Form::number('manual_deduction_amount', $invoiceItem->deduction->manual_amount ?? 0, ['class' => 'form-control', 'placeholder' => __('Adjusted Deduction Amount')]) !!}
-    </div>
+    </div> --}}
   </div>
 </div>

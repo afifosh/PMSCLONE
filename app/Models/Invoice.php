@@ -629,7 +629,7 @@ class Invoice extends Model
         $data[$phase] = [
           'subtotal' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('estimated_cost'),
           'total_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('tax_amount'),
-          'manual_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('manual_tax_amount'),
+          // 'manual_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('manual_tax_amount'),
           'total' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_cost')
         ]; // convert to cents manually, setter is not working for pivot table
       }
@@ -776,10 +776,7 @@ class Invoice extends Model
       ->when($this->type == 'Regular', function ($q) {
         $q->where('invoiceable_type', ContractPhase::class);
       })
-      ->select([
-        DB::raw('COALESCE(NULLIF(manual_amount, 0), amount) as total_amount')
-      ])
-      ->sum(DB::raw('COALESCE(NULLIF(manual_tax_amount, 0), total_tax_amount)')) / 1000);
+      ->sum('total_tax_amount') / 1000);
   }
 
   /**
@@ -795,5 +792,10 @@ class Invoice extends Model
         $q->where('invoiceable_type', ContractPhase::class);
       })
       ->sum('subtotal') / 1000;
+  }
+
+  public function authorityInvoice()
+  {
+    return $this->hasOne(AuthorityInvoice::class);
   }
 }
