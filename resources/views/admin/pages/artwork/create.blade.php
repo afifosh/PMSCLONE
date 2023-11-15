@@ -5,6 +5,32 @@
 @endif
 
 <div class="row">
+  {{-- Featured Image --}}
+  <div class="card-body mb-3">
+    <div class="d-flex align-items-start align-items-sm-center gap-4">
+      <img src="{{ $artwork->featured_image }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" />
+      <div class="button-wrapper">
+          @csrf
+          <label for="upload" class="btn btn-primary me-2 mb-3" tabindex="0">
+            <span class="d-none d-sm-block">Upload new photo</span>
+            <i class="ti ti-upload d-block d-sm-none"></i>
+            <input type="file" id="upload" name="featured_image" class="account-file-input" hidden accept="image/png, image/jpeg" />
+          </label>
+          <button type="button" class="btn btn-label-secondary account-image-reset mb-3">
+            <i class="ti ti-refresh-dot d-block d-sm-none "></i>
+            <span class="d-none d-sm-block">Reset</span>
+          </button>
+          <div class="text-muted">Allowed JPG, GIF or PNG. Max size of 800K</div>
+          @error('featured_image')
+            <div class="alert alert-danger alert-dismissible my-2">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {{ $message }}
+            </div>
+          @enderror
+      </div>
+    </div>
+  </div>
+  <hr class="my-0">  
   {{-- Title --}}
   <div class="form-group col-6">
     {{ Form::label('title', __('Title'), ['class' => 'col-form-label']) }}
@@ -29,28 +55,22 @@
     {{ Form::text('year', null, ['class' => 'form-control', 'placeholder' => __('Year')]) }}
   </div>
 
-  {{-- Description --}}
-  <div class="form-group col-12">
-    {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}
-    {{ Form::textarea('description', null, ['class' => 'form-control', 'placeholder' => __('Description'), 'rows' => 5]) }}
-  </div>
-
   {{-- Weight --}}
   <div class="form-group col-6">
     {{ Form::label('weight', __('Weight'), ['class' => 'col-form-label']) }}
     <div class="input-group form-group">
-      {{ Form::number('weight', null, ['class' => 'form-control', 'placeholder' => __('Weight'), 'step' => '0.01']) }}
-      {!! Form::select('weight_unit', $weight_unit, $artwork->weight_unit, ['class' => 'form-select', 'id' => 'weight-unit-id']) !!}
+      {{ Form::number('weight', null, ['class' => 'form-control w-75', 'placeholder' => __('Weight'), 'step' => '0.01']) }}
+      {!! Form::select('weight_unit', $weight_unit, $artwork->weight_unit, ['class' => 'form-select w-25', 'id' => 'weight-unit-id']) !!}
     </div>
   </div>
 
   
   {{-- Width --}}
   <div class="form-group col-6">
-    {{ Form::label('width_unit', __('Width Unit'), ['class' => 'col-form-label']) }}
+    {{ Form::label('width', __('Width'), ['class' => 'col-form-label']) }}
     <div class="input-group form-group">
-      {{ Form::number('width', null, ['class' => 'form-control', 'placeholder' => __('Width'), 'step' => '0.01']) }}
-      {!! Form::select('width_unit', $width_unit, $artwork->width_unit, ['class' => 'form-select', 'id' => 'width-unit-id']) !!}
+      {{ Form::number('width', null, ['class' => 'form-control w-75', 'placeholder' => __('Width'), 'step' => '0.01']) }}
+      {!! Form::select('width_unit', $width_unit, $artwork->width_unit, ['class' => 'form-select w-25', 'id' => 'width-unit-id']) !!}
     </div>
   </div>
 
@@ -58,8 +78,8 @@
   <div class="form-group col-6">
     {{ Form::label('height', __('Height'), ['class' => 'col-form-label']) }}
     <div class="input-group form-group">
-      {{ Form::number('height', null, ['class' => 'form-control', 'placeholder' => __('Height'), 'step' => '0.01']) }}
-      {!! Form::select('height_unit', $height_unit, $artwork->height_unit, ['class' => 'form-select', 'id' => 'height-unit-id']) !!}
+      {{ Form::number('height', null, ['class' => 'form-control w-75', 'placeholder' => __('Height'), 'step' => '0.01']) }}
+      {!! Form::select('height_unit', $height_unit, $artwork->height_unit, ['class' => 'form-select w-25', 'id' => 'height-unit-id']) !!}
     </div>
   </div>
 
@@ -67,23 +87,17 @@
   <div class="form-group col-6">
     {{ Form::label('depth', __('Depth'), ['class' => 'col-form-label']) }}
     <div class="input-group form-group">
-      {{ Form::number('depth', null, ['class' => 'form-control', 'placeholder' => __('Depth'), 'step' => '0.01']) }}
-      {!! Form::select('depth_unit', $depth_unit, $artwork->depth_unit, ['class' => 'form-select', 'id' => 'depth-unit-id']) !!}
+      {{ Form::number('depth', null, ['class' => 'form-control w-75', 'placeholder' => __('Depth'), 'step' => '0.01']) }}
+      {!! Form::select('depth_unit', $depth_unit, $artwork->depth_unit, ['class' => 'form-select w-25', 'id' => 'depth-unit-id']) !!}
     </div>
   </div>
 
-
-  {{-- Is Sold Checkbox --}}
-  <div class="col-6 mt-4">
-    <label class="switch mt-3">
-      {{ Form::checkbox('is_sold', 1, $artwork->is_sold, ['class' => 'switch-input']) }}
-      <span class="switch-toggle-slider">
-        <span class="switch-on"></span>
-        <span class="switch-off"></span>
-      </span>
-      <span class="switch-label">Is Sold?</span>
-    </label>
+  {{-- Description --}}
+  <div class="form-group col-12">
+    {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}
+    {{ Form::textarea('description', null, ['class' => 'form-control', 'placeholder' => __('Description'), 'rows' => 4]) }}
   </div>
+
 
   {{-- Save and Close Buttons --}}
   <div class="mt-3 d-flex justify-content-end">
@@ -115,4 +129,56 @@
       $('#stage-create-form [name="added_till"]').parent().addClass('d-none');
     }
   })
+
+
+
+// // Handle the 'select2:selecting' event
+// $('#artwork-mediums-id').on('select2:selecting', function (e) {
+//   let selectedOption = e.params.args.data;
+//   alert('select event');
+
+//   // Check if the option to add a new tag was selected
+//   if (selectedOption.isTag) {
+//     e.preventDefault(); // Prevent the default behavior of adding the tag
+//     e.stopPropagation(); // Stop the event from propagating further
+//     // Trigger the custom 'select2:add-new' event
+//     $(e.currentTarget).trigger('select2:add-new', selectedOption);
+//   }
+// });
+
+
+// // Event handler for when a selection is made
+// $('#artwork-mediums-id').on('select2:select', function () {
+//   console.log('select event');
+//   alert('select event');
+
+//   e.preventDefault(); // Prevent the default selection behavior
+//   // var data = e.params.data;
+//   // // Use the jQuery data method to check for the 'select2-tag' data attribute
+//   // if ($(data.element).data('select2-tag')) {
+//   //   e.preventDefault(); // Prevent the default selection behavior
+//   //   // Your logic to handle the 'Add' selection
+
+//   //   $.ajax({
+//   //               url: "/test",
+//   //               method: "post",
+//   //               dataType: "json",
+//   //               data: {
+//   //                   name: $(this).find("option:selected").val(),
+//   //               },
+//   //               success: function(response) {
+//   //                   // alert(response.status);
+//   //                   if (response.status) {
+//   //                       $(this).find("option:selected").val(response.data.id);
+//   //                       $(this).find("option:selected").text(response.data.name);
+//   //                   }
+//   //               }
+//   //           })
+//   //   console.log('Custom logic for adding the new tag.');
+//   // } else {
+//   //   // Logic for handling other selections
+//   // }
+// });
+
+
 </script>

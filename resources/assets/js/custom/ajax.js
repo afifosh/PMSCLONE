@@ -587,6 +587,24 @@ window.initModalSelect2 = function(){
   // select2 with remote data for global modal
   $('.globalOfSelect2Remote').each(function (){
     $(this).select2({
+
+      tags: true, // Enable tagging
+      insertTag: function (data, tag) {
+        // Modify the tag text to indicate that this is an addable tag
+        tag.text = '+ Add: ' + tag.text;
+        tag.isTag = true; // Custom property to identify this tag as an addable option
+        // Push the new tag onto the list of data
+        data.push(tag);
+      },
+      // templateResult: function (data) {
+      //   // Check if this is the special 'Add' tag
+      //   if (data.isTag) {
+      //     // Return a div with the 'select2-tag' data attribute set to true
+      //     return $('<div>' + data.text + '</div>').data("select2-tag", true);
+      //   }
+      //   // Return the normal display for other results
+      //   return data.text;
+      // },
       ajax: {
         url: $(this).data('url'),
         dataType: 'json',

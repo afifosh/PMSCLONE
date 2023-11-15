@@ -96,4 +96,77 @@ $configData = Helper::appClasses();
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>
+    <script>
+
+      
+  $(document).ready(function(){
+//     $(document).on('select2:selecting', '#artwork-mediums-id', function(e) {
+//   // Prevent the default behavior, which finalizes the selection
+//   e.preventDefault();
+  
+//   // Optionally, stop the event from propagating to higher-level event handlers
+//   e.stopPropagation();
+
+//   // Get the attempted-to-select item's data
+//   var data = e.params.args.data;
+
+//   // Display an alert box with the attempted-to-select option's text
+//   alert('Attempted to select: ' + data.text);
+  
+//   // Return false to further ensure the event is cancelled (not usually necessary when you've called preventDefault)
+//   return false;
+// });
+
+          // Event handler for when an option is selected
+$(document).on('select2:select', '#artwork-mediums-id', function(e) {
+  var data = e.params.data;
+console.dir(e);
+  if (data.isTag) { // Assuming `isNew` is a property you add to new tags
+    // Handle new tag creation here
+    alert('New tag detected: ' + data.text);
+    $.ajax({
+            url: "{{ route('admin.mediums.store') }}",
+            type: 'POST',
+    data: {
+        name: $(this).select2('data')[0].text.replace(/^\+ Add: /, ''),
+    },
+    success: function(response) {
+        if (response.success) {
+            // // Create a new option using the response data
+            // var newOption = new Option(response.data.name, response.data.id, true, true);
+            // // Append the new option to the Select2 element
+            // $(this).append(newOption).trigger('change');
+            alert("ecsadsads adasd0");
+        } else {
+            // Handle the case where the server response indicates failure
+            console.error('Failed to add new medium:', response.message);
+        }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        // Handle AJAX errors
+        console.error('AJAX error:', textStatus, errorThrown);
+    }
+});
+
+  //   $('#artwork-mediums-id').val("").trigger("change");
+  //   e.stopPropagation();
+  //   return false;
+
+  //   $('#artwork-mediums-id').val(null).trigger('change');
+  //   return false;
+
+  //   alert('New tag detected: ' + data.text);
+  // e.preventDefault();
+  // $(this).select2('close');
+
+
+  } else {
+    // Handle regular selection
+    // alert('You have selected: ' + data.text);
+  }
+});
+
+    });
+
+    </script>
 @endpush
