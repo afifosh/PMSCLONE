@@ -21,7 +21,6 @@ return new class extends Migration
       $table->bigInteger('total')->default(0);
       $table->bigInteger('authority_inv_total')->default(0);
       $table->integer('rounding_amount')->default(0);
-      $table->string('description')->nullable();
       $table->unsignedInteger('order')->default(0);
       $table->timestamps();
     });
