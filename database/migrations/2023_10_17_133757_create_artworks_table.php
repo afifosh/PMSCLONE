@@ -22,13 +22,13 @@ return new class extends Migration
             $table->foreignId('program_id')->nullable()->constrained('programs')->cascadeOnUpdate()->nullOnDelete();
             $table->text('description')->nullable(); // Add description column
             $table->string('featured_image')->nullable(); // Add featured_image column
-            $table->decimal('weight', 8, 2);
+            $table->decimal('weight', 8, 2)->default(0);
             $table->string('weight_unit')->default(WeightUnit::KILOGRAM->value);
-            $table->decimal('width', 8, 2);
+            $table->decimal('width', 8, 2)->default(0);
             $table->string('width_unit')->default(LengthUnit::CENTIMETER->value);
-            $table->decimal('height', 8, 2);
+            $table->decimal('height', 8, 2)->default(0);
             $table->string('height_unit')->default(LengthUnit::CENTIMETER->value);
-            $table->decimal('depth', 8, 2);
+            $table->decimal('depth', 8, 2)->default(0);
             $table->string('depth_unit')->default(LengthUnit::CENTIMETER->value);
             $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
             $table->boolean('is_sold')->default(false);
