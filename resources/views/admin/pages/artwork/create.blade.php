@@ -14,9 +14,9 @@
           <label for="upload" class="btn btn-primary me-2 mb-3" tabindex="0">
             <span class="d-none d-sm-block">Upload new photo</span>
             <i class="ti ti-upload d-block d-sm-none"></i>
-            <input type="file" id="upload" name="featured_image" class="account-file-input" hidden accept="image/png, image/jpeg" />
+            <input type="file" id="upload" name="featured_image" class="artwork-file-input" hidden accept="image/png, image/jpeg" />
           </label>
-          <button type="button" class="btn btn-label-secondary account-image-reset mb-3">
+          <button type="button" class="btn btn-label-secondary artwork-image-reset mb-3">
             <i class="ti ti-refresh-dot d-block d-sm-none "></i>
             <span class="d-none d-sm-block">Reset</span>
           </button>
@@ -109,76 +109,26 @@
 </div>
 
 {!! Form::close() !!}
-
 <script>
-  //if program_id selected, hide year
-  $(document).on('change', '#artwork-programs-id', function(){
-    console.log($(this).val());
-    if($(this).val()){
-      $('#stage-create-form [name="year"]').parent().addClass('d-none');
-    }else{
-      $('#stage-create-form [name="year"]').parent().removeClass('d-none');
+(function () {
+  // Update/reset user image of account page
+  let artworkImage = document.getElementById('uploadedAvatar');
+  const fileInput = document.querySelector('.artwork-file-input'),
+        resetFileInput = document.querySelector('.artwork-image-reset');
+  
+  let currentArtworkImage = artworkImage.src; // Store the initial or last uploaded image URL
+
+  fileInput.onchange = () => {
+    if (fileInput.files[0]) {
+      lastUploadedImage = window.URL.createObjectURL(fileInput.files[0]); // Update with new uploaded image URL
+      artworkImage.src = lastUploadedImage;
     }
-  })
+  };
 
-  // if temporary location selected, show added till
-  $(document).on('change', '#stage-create-form [name="is_temporary_location"]', function(){
-    if($(this).is(':checked')){
-      $('#stage-create-form [name="added_till"]').parent().removeClass('d-none');
-    }else{
-      $('#stage-create-form [name="added_till"]').parent().addClass('d-none');
-    }
-  })
-
-
-
-// // Handle the 'select2:selecting' event
-// $('#artwork-mediums-id').on('select2:selecting', function (e) {
-//   let selectedOption = e.params.args.data;
-//   alert('select event');
-
-//   // Check if the option to add a new tag was selected
-//   if (selectedOption.isTag) {
-//     e.preventDefault(); // Prevent the default behavior of adding the tag
-//     e.stopPropagation(); // Stop the event from propagating further
-//     // Trigger the custom 'select2:add-new' event
-//     $(e.currentTarget).trigger('select2:add-new', selectedOption);
-//   }
-// });
-
-
-// // Event handler for when a selection is made
-// $('#artwork-mediums-id').on('select2:select', function () {
-//   console.log('select event');
-//   alert('select event');
-
-//   e.preventDefault(); // Prevent the default selection behavior
-//   // var data = e.params.data;
-//   // // Use the jQuery data method to check for the 'select2-tag' data attribute
-//   // if ($(data.element).data('select2-tag')) {
-//   //   e.preventDefault(); // Prevent the default selection behavior
-//   //   // Your logic to handle the 'Add' selection
-
-//   //   $.ajax({
-//   //               url: "/test",
-//   //               method: "post",
-//   //               dataType: "json",
-//   //               data: {
-//   //                   name: $(this).find("option:selected").val(),
-//   //               },
-//   //               success: function(response) {
-//   //                   // alert(response.status);
-//   //                   if (response.status) {
-//   //                       $(this).find("option:selected").val(response.data.id);
-//   //                       $(this).find("option:selected").text(response.data.name);
-//   //                   }
-//   //               }
-//   //           })
-//   //   console.log('Custom logic for adding the new tag.');
-//   // } else {
-//   //   // Logic for handling other selections
-//   // }
-// });
-
+  resetFileInput.onclick = () => {
+    fileInput.value = '';
+    artworkImage.src = currentArtworkImage || 'https://preview.keenthemes.com/metronic8/demo1/assets/media/svg/avatars/blank.svg'; // Reset to last uploaded image or default
+  };
+})();
 
 </script>

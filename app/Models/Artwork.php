@@ -15,6 +15,7 @@ class Artwork extends Model
   use HasFactory;
 
   public const DT_ID = 'artworks_datatable';
+  public const ARTWORK_PATH = 'artworks-images';
 
   protected $fillable = [
     'title',
@@ -24,7 +25,15 @@ class Artwork extends Model
     'dimension',
     'featured_image',
     'description',
-    'added_by'
+    'added_by',
+    'weight',
+    'weight_unit',
+    'width',
+    'width_unit',
+    'height',
+    'height_unit',
+    'depth',
+    'depth_unit',
   ];
 
   protected $casts = [

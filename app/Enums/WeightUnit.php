@@ -13,7 +13,7 @@ enum WeightUnit: string {
      * @return array
      */
     public static function asSelectArray(): array {
-        return array_column(self::cases(), 'value', 'name');
+        return array_column(self::cases(), 'value', 'value');
     }
         
 }
