@@ -15,7 +15,7 @@ class ArtworkFactory extends Factory
             'title' => $this->faker->sentence,
             'year' => $this->faker->year,
             'medium_id' => null, // Define how you want to generate the 'medium_id' attribute.
-            'dimension' => $this->faker->sentence,
+            // 'dimension' => $this->faker->sentence,
             'description' => $this->faker->text, // Add description column
             'featured_image' => null, // Define how you want to generate the 'featured_image' attribute.
             'added_by' => null, // Define how you want to generate the 'added_by' attribute.

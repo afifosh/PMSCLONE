@@ -39,10 +39,10 @@ class ArtworkStoreRequest extends FormRequest
       'owner_type' => 'nullable|string|max:255', // For the morphs 'owner' (if using in form)
       'owner_id' => 'nullable|integer|exists:owners,id', // Replace 'owners' with actual table name if needed
       'year' => 'required|digits:4|integer|min:1900|max:' . date('Y'), // Year must be a valid year, change range if needed
-      'medium_id' => 'required|exists:mediums,id', // Check if medium_id exists in mediums table
+      'medium_id' => 'required', // Check if medium_id exists in mediums table
       'program_id' => 'required|exists:programs,id', // Check if program_id exists in programs table
       'description' => 'nullable|string', // Assuming any string is acceptable for description
-      'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // This rule validates the file type and size.
+      'featured_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // This rule validates the file type and size.
       'weight' => 'required|numeric|min:0|max:999999.99', // Adjust the range if needed
       'weight_unit' => 'required|in:' . implode(',', array_values(WeightUnit::asSelectArray())),
       'width' => 'required|numeric|min:0|max:999999.99',
@@ -52,7 +52,7 @@ class ArtworkStoreRequest extends FormRequest
       'depth' => 'required|numeric|min:0|max:999999.99',
       'depth_unit' => 'required|in:' . implode(',', array_values(LengthUnit::asSelectArray())),
       'added_by' => 'nullable|exists:admins,id', // Check if added_by exists in admins table
-  ];    
+  ];
 
     if($this->method() == 'POST')
       $rules['added_by'] = 'required';
@@ -75,7 +75,7 @@ class ArtworkStoreRequest extends FormRequest
       'width_unit.in' => 'The selected width unit is invalid. Allowed options are: ' . implode(', ', array_values(LengthUnit::asSelectArray())),
       'height_unit.in' => 'The selected height unit is invalid. Allowed options are: ' . implode(', ', array_values(LengthUnit::asSelectArray())),
       'depth_unit.in' => 'The selected depth unit is invalid. Allowed options are: ' . implode(', ', array_values(LengthUnit::asSelectArray())),
-   
+
     ];
   }
 }
