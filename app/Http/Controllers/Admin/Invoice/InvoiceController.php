@@ -112,6 +112,7 @@ class InvoiceController extends Controller
 
     $data['is_editable'] = $invoice->isEditable();
 
+    $data['tab'] = request()->tab ?? 'summary';
     if ($invoice->type == 'Down Payment') {
       $dataTable = app(DownpaymentInvoicesDataTable::class);
       $dataTable->downpaymentInvoice = $invoice;
