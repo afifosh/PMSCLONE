@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\Finance;
 
+use App\Models\AuthorityInvoice;
 use App\Models\Invoice;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -24,7 +25,7 @@ class PaymentStoreRequest extends FormRequest
 
   public function prepareForValidation()
   {
-    $this->invoice = Invoice::findOrFail($this->invoice_id);
+    $this->invoice = $this->invoice_type == 'Invoice' ? Invoice::findOrFail($this->invoice_id) : AuthorityInvoice::findOrFail($this->invoice_id);
     $this->payableAmount = $this->invoice->payableAmount();
     if ($this->method() == 'PUT') {
       $this->payableAmount += $this->payment->amount;

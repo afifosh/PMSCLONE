@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Finance;
 use App\DataTables\Admin\Finance\PaymentsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Finance\PaymentStoreRequest;
+use App\Models\AuthorityInvoice;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ContractCategory;
@@ -87,10 +88,17 @@ class PaymentController extends Controller
   public function edit(InvoicePayment $payment)
   {
     $data['invoicePayment'] = $payment;
-    $data['invoice'] = $payment->invoice;
-    $data['invoiceId'] = [
-      $payment->invoice_id => runtimeInvIdFormat($payment->invoice_id) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount - $data['invoice']->downpayment_amount
-    ];
+    $data['invoice'] = $payment->payable;
+    if($payment->payable_type == Invoice::class){
+      $data['invoiceId'] = [
+        $payment->payable_id => runtimeInvIdFormat($payment->payable_id) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount - $data['invoice']->downpayment_amount
+      ];
+    }elseif($payment->payable_type == AuthorityInvoice::class){
+      $data['invoiceId'] = [
+        $payment->payable_id => runtimeTAInvIdFormat($payment->payable_id) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount - $data['invoice']->downpayment_amount
+      ];
+      $data['invoice_type'] = 'AuthorityInvoice';
+    }
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.create', $data)->render()]);
   }
@@ -111,10 +119,10 @@ class PaymentController extends Controller
   public function destroy($payment)
   {
     if($payment != 'bulk'){
-      $payment = InvoicePayment::with('invoice')->findOrFail($payment);
+      $payment = InvoicePayment::with('payable')->findOrFail($payment);
       $this->deletePayment($payment);
     }else{
-      $payments = InvoicePayment::whereIn('id', request()->payments)->with('invoice')->get();
+      $payments = InvoicePayment::whereIn('id', request()->payments)->with('payable')->get();
       foreach($payments as $payment){
         $this->deletePayment($payment);
       }
@@ -125,7 +133,7 @@ class PaymentController extends Controller
 
   private function deletePayment($payment): void
   {
-    $invoice = $payment->invoice;
+    $invoice = $payment->payable_type == Invoice::class ? $payment->payable : $payment->payable->invoice;
 
     $status = '';
     if ($invoice->paid_amount - $payment->amount >= $invoice->payableAmount() + $invoice->paid_amount) {

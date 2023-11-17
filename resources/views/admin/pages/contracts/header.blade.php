@@ -111,6 +111,7 @@
       <ul class="nav nav-stretch nav-line-tabs border-transparent fs-6 fw-semibold">
         {{-- <li class="nav-item"><a class="nav-link text-active-primary py-3 active" href="/metronic8/demo1/../demo1/apps/projects/project.html">Overview</li> --}}
           <li class="nav-item"><a class="nav-link py-3 {{$tab == 'overview' ? 'active' : ''}}" href="{{route('admin.contracts.show', [$contract])}}"><i class='ti ti-user-check ti-xs me-1'></i> Overview</a></li>
+      <li class="nav-item"><a class="nav-link py-3 {{$tab == 'parties' ? 'active' : ''}}" href="{{route('admin.contracts.contract-parties.index', [$contract])}}"><i class='ti ti-users ti-xs me-1'></i> Parties</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'events' ? 'active' : ''}}" href="{{route('admin.contracts.events.index', [$contract])}}"><i class='ti ti-users ti-xs me-1'></i> Events</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'change-requests' ? 'active' : ''}}" href="{{route('admin.contracts.change-requests.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Change Requests</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'stages' ? 'active' : ''}}" href="{{route('admin.contracts.stages.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Stages</a></li>
@@ -134,7 +135,7 @@
   var contractViewingUsers = [];
   var stageEditingUsers = [];
   var phaseEditingUsers = [];
-  var contractEditingUsers = [];  
+  var contractEditingUsers = [];
   var disablePhaseWhisper = false;
   var disableContractWhisper = false;
 </script>

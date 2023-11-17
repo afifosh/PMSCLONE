@@ -1,8 +1,11 @@
 @forelse ($invoice->items as $item)
+@continue($tab == 'tax-report' && count($item->taxes->where(function($tax){
+  return $tax->pivot->is_simple_tax == 1;
+ })) == 0)
 @continue($invoice->type == 'Partial Invoice' && $item->invoiceable_type == 'App\Models\ContractPhase')
 <tbody data-id="{{$item->id}}">
   <tr data-id="{{$item->id}}">
-    @if ($is_editable)
+    @if ($is_editable && $tab != 'tax-report')
       <!--action-->
       <td class="cursor-pointer">
         {!! Form::checkbox('selected_phases[]', $item->id, null, ['class' => 'form-check-input mt-1 d-none']) !!}
@@ -46,7 +49,11 @@
     <td></td>
     <td></td>
     <td></td>
-    <td>@cMoney($tab == 'summary' ? $item->total : $item->authority_inv_total, $invoice->contract->currency, true)</td>
+    <td>
+      @if($tab != 'tax-report')
+        @cMoney($tab == 'summary' ? $item->total : $item->authority_inv_total, $invoice->contract->currency, true)
+      @endif
+    </td>
   </tr>
 </tbody>
 @empty

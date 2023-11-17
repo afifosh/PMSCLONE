@@ -29,16 +29,26 @@
         'disabled' => isset($selected_invoice)
         ])!!}
     </div>
+    {{-- invoice type --}}
+    <div class="form-group col-6">
+        {{ Form::label('invoice_type', __('Invoice Type'), ['class' => 'col-form-label']) }}
+        {!! Form::select('invoice_type', ['Invoice' => 'Customer', 'AuthorityInvoice' => 'Tax Authority'], $invoice_type ?? null, [
+          'class' => 'form-select globalOfSelect2 dependent-select',
+          'disabled' => isset($selected_invoice),
+          'id' => 'payment-invoice-type',
+        ]) !!}
+    </div>
     {{-- invoice --}}
     <div class="form-group col-6">
         {{ Form::label('invoice_id', __('Invoice'), ['class' => 'col-form-label']) }}
-        {!! Form::select('invoice_id', $invoiceId ?? [], $invoicePayment->invoice_id ?? null, [
+        {!! Form::select('invoice_id', $invoiceId ?? [], $invoicePayment->payable_id ?? null, [
         'disabled' => $invoicePayment->id ? true : false,
         'data-placeholder' => 'Select Invoice',
         'data-allow-clear' => 'true',
         'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['Invoice', 'dependent' => 'contract_id', 'notvoid' => '1']),
+        'data-url' => route('resource-select', ['InvoiceOrAuthorityInvoice', 'dependent' => 'contract_id', 'notvoid' => '1']),
         'data-dependent_id' => 'payment-contract-id',
+        'data-dependent' => 'payment-invoice-type',
         'disabled' => isset($selected_invoice)
         ])!!}
     </div>
@@ -121,11 +131,11 @@
 
   // get and fill invoice data on change of invoice
   $(document).on('change', '.add-payment-form [name="invoice_id"]', function() {
-    console.log($(this).val())
     var invoiceId = $(this).val()
+    var invoiceType = $('.add-payment-form [name="invoice_type"]').val()
     if (invoiceId) {
       $.ajax({
-        url: route('admin.invoices.show', {invoice: invoiceId, 'json': true}),
+        url: invoiceType == 'Invoice' ? route('admin.invoices.show', {invoice: invoiceId, 'json': true}) : route('admin.tax-authority-invoices.show', {tax_authority_invoice: invoiceId, 'json': true}),
         type: 'GET',
         dataType: 'JSON',
         success: function(data) {

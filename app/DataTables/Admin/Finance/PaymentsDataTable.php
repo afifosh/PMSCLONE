@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin\Finance;
 
+use App\Models\AuthorityInvoice;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Invoice;
@@ -29,16 +30,22 @@ class PaymentsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('invoice_id', function ($invoicePayment) {
-        return '<a href="' . route('admin.invoices.edit', $invoicePayment->invoice_id) . '">' . runtimeInvIdFormat($invoicePayment->invoice_id) . '</a>';
+        if($invoicePayment->payable_type == Invoice::class)
+        return '<a href="' . route('admin.invoices.edit', $invoicePayment->payable_id) . '">' . runtimeInvIdFormat($invoicePayment->payable_id) . '</a>';
+        elseif($invoicePayment->payable_type == AuthorityInvoice::class)
+        return '<a href="' . route('admin.invoices.edit', [$invoicePayment->payable->invoice_id, 'tab' => 'authority-tax']) . '">' . runtimeTAInvIdFormat($invoicePayment->payable_id) . '</a>';
       })
       ->editColumn('checkbox', function ($payment) {
         return '<input class="form-check-input payment-check" name="selected_payments[]" type="checkbox" value="' . $payment->id . '">';
       })
       ->editColumn('contract.id', function ($invoicePayment) {
-        return '<a href="' . route('admin.contracts.show', $invoicePayment->contract->id) . '">' . runtimeContractIdFormat($invoicePayment->contract->id) . '</a>';
+        if($invoicePayment->payable_type == Invoice::class)
+        return '<a href="' . route('admin.contracts.show', $invoicePayment->payable->contract->id) . '">' . runtimeContractIdFormat($invoicePayment->payable->contract->id) . '</a>';
+        elseif($invoicePayment->payable_type == AuthorityInvoice::class)
+        return '<a href="' . route('admin.contracts.show', $invoicePayment->payable->invoice->contract->id) . '">' . runtimeContractIdFormat($invoicePayment->payable->invoice->contract->id) . '</a>';
       })
       ->editColumn('amount', function ($invoicePayment) {
-        return cMoney($invoicePayment->amount, $invoicePayment->contract->currency, true);
+        return cMoney($invoicePayment->amount, $invoicePayment->payable->contract->currency ?? $invoicePayment->payable->invoice->contract->currency, true);
       })
       ->addColumn('action', function($invoicePayment){
         return view('admin.pages.finances.payment.action', compact('invoicePayment'));
@@ -54,12 +61,24 @@ class PaymentsDataTable extends DataTable
     $query = $model->newQuery();
 
     if ($this->filterBy instanceof Contract) {
-      $query->whereHas('invoice', function ($q) {
+      $query->whereHasMorph('payable', Invoice::class, function ($q) {
         $q->where('contract_id', $this->filterBy->id);
+      })->orWhereHasMorph('payable', AuthorityInvoice::class, function ($q) {
+        $q->whereHas('invoice', function ($q) {
+          $q->where('contract_id', $this->filterBy->id);
+        });
       });
     } else if ($this->filterBy instanceof Company) {
-      $query->whereHas('invoice', function ($q) {
-        $q->where('company_id', $this->filterBy->id);
+      $query->whereHasMorph('payable', Invoice::class, function ($q) {
+        $q->whereHas('contract', function ($q) {
+          $q->where('company_id', $this->filterBy->id);
+        });
+      })->orWhereHasMorph('payable', AuthorityInvoice::class, function ($q) {
+        $q->whereHas('invoice', function ($q) {
+          $q->whereHas('contract', function ($q) {
+            $q->where('company_id', $this->filterBy->id);
+          });
+        });
       });
     } else if ($this->filterBy instanceof Program) {
         // Fetch child program IDs
@@ -68,16 +87,20 @@ class PaymentsDataTable extends DataTable
         // Include the main program's ID
         $programIds = array_merge([$this->filterBy->id], $childProgramIds);
 
-        $query->whereHas('invoice', function ($query) use ($programIds) {
-            $query->whereIn('program_id', $programIds);
+        $query->whereHasMorph('payable', Invoice::class, function ($q) use ($programIds) {
+            $q->whereIn('program_id', $programIds);
         });
     } else if($this->filterBy instanceof Invoice){
-      $query->where('invoice_id', $this->filterBy->id);
+      $query->whereHasMorph('payable', Invoice::class, function ($q) {
+        $q->where('id', $this->filterBy->id);
+      })->orWhereHasMorph('payable', AuthorityInvoice::class, function ($q) {
+        $q->whereHas('invoice', function ($q) {
+          $q->where('id', $this->filterBy->id);
+        });
+      });
     }
 
-    return $query->applyRequestFilters()->with(['contract' => function($q){
-      $q->select(['contracts.id', 'currency']);
-    }]);
+    return $query->applyRequestFilters();
   }
 
   /**
@@ -138,7 +161,7 @@ class PaymentsDataTable extends DataTable
     return [
       Column::make('checkbox')->title('<input class="form-check-input payment-check-all" type="checkbox">')->orderable(false)->searchable(false)->printable(false)->exportable(false)->visible(false)->width(1),
       Column::make('id'),
-      Column::make('contract.id'),
+      Column::make('contract.id')->title('Contract'),
       Column::make('invoice_id'),
       Column::make('transaction_id'),
       Column::make('amount'),

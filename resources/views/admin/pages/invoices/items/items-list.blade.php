@@ -15,7 +15,7 @@
           <thead data-id="exclude-sort" id="billing-items-container-header">
               <tr>
                   <!--action-->
-                  @if ($is_editable)
+                  @if ($is_editable && $tab != 'tax-report')
                     <th class="text-left x-action bill_col_action"><input type="checkbox" class="form-check-input select-all-items d-none"> Action</th>
                   @endif
                   <!--description-->

@@ -131,7 +131,7 @@ class Invoice extends Model
 
   public function payments()
   {
-    return $this->hasMany(InvoicePayment::class);
+    return $this->morphMany(InvoicePayment::class, 'payable');
   }
 
   /**
@@ -282,6 +282,17 @@ class Invoice extends Model
       'total_tax' => $total_tax,
       'rounding_amount' => ($this->rounding_amount ? (floor($total) - $total) : 0),
     ]);
+
+    $this->reCalculateTaxAuthorityInvoice();
+  }
+
+  public function reCalculateTaxAuthorityInvoice()
+  {
+    $ta_invoice = $this->authorityInvoice()->firstOrNew(['invoice_id' => $this->id]);
+    $ta_invoice->total_tax = $this->totalAuthorityTax();
+    $ta_invoice->total = $this->totalAuthorityTax();
+    $ta_invoice->due_date = $this->due_date;
+    $ta_invoice->save();
   }
 
   /**
@@ -797,5 +808,10 @@ class Invoice extends Model
   public function authorityInvoice()
   {
     return $this->hasOne(AuthorityInvoice::class);
+  }
+
+  public function totalAuthorityTax()
+  {
+    return $this->items->sum('authority_inv_total');
   }
 }

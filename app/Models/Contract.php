@@ -405,6 +405,8 @@ class Contract extends BaseModel
       $q->has('invoices.payments');
     })->when(request()->has('hasinv'), function($q){
       $q->has('invoices');
+    })->when(request()->has('has-ta-inv'), function($q){
+      $q->has('invoices.authorityInvoice');
     })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function($q){
       try {
         $date = Carbon::parse(explode(' to ', request()->date_range)[0]);
@@ -754,5 +756,10 @@ class Contract extends BaseModel
   public function commentUrl(): string
   {
     return '#';
+  }
+
+  public function contract_parties()
+  {
+    return $this->hasMany(ContractParty::class);
   }
 }

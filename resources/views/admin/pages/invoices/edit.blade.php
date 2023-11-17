@@ -496,24 +496,24 @@
           <div class="nav-align-top">
             <ul class="nav nav-tabs" role="tablist">
               <li class="nav-item" onclick="reloadPhasesList('summary')">
-                <button type="button" class="nav-link show active" role="tab" data-bs-toggle="tab" data-bs-target="#nav-summary" aria-selected="true">Summary</button>
+                <button type="button" class="nav-link {{$tab == 'summary' ? 'show active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#nav-summary" aria-selected="true">Summary</button>
               </li>
                 <li class="nav-item" onclick="reloadPhasesList('tax-report')">
-                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#nav-tax-report" aria-selected="false">Tax Report</button>
+                  <button type="button" class="nav-link {{$tab == 'tax-report' ? 'show active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#nav-tax-report" aria-selected="false">Tax Report</button>
                 </li>
                 <li class="nav-item" onclick="reloadPhasesList('authority-tax')">
-                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#nav-authority-tax" aria-selected="false">Authority Tax</button>
+                  <button type="button" class="nav-link {{$tab == 'authority-tax' ? 'show active' : ''}}" role="tab" data-bs-toggle="tab" data-bs-target="#nav-authority-tax" aria-selected="false">Tax Authority</button>
                 </li>
             </ul>
             <div class="tab-content p-0">
-              <div class="tab-pane active show" id="nav-summary" role="tabpanel">
-                @include('admin.pages.invoices.tabs.summary', ['tab' => 'summary'])
+              <div class="tab-pane {{$tab == 'summary' ? 'show active' : 'fade'}}" id="nav-summary" role="tabpanel">
+                @includeWhen(!isset($tab) || $tab == 'summary', 'admin.pages.invoices.tabs.summary', ['tab' => 'summary'])
               </div>
-              <div class="tab-pane fade" id="nav-tax-report" role="tabpanel">
-                {{-- @include('admin.pages.invoices.tabs.summary', ['tab' => 'tax-report']) --}}
+              <div class="tab-pane {{$tab == 'tax-report' ? 'show active' : 'fade'}}" id="nav-tax-report" role="tabpanel">
+                @includeWhen(isset($tab) && $tab == 'tax-report','admin.pages.invoices.tabs.summary', ['tab' => 'tax-report'])
               </div>
-              <div class="tab-pane fade" id="nav-authority-tax" role="tabpanel">
-                {{-- @include('admin.pages.invoices.tabs.summary', ['tab' => 'authority-tax']) --}}
+              <div class="tab-pane {{$tab == 'authority-tax' ? 'show active' : 'fade'}}" id="nav-authority-tax" role="tabpanel">
+                @includeWhen(isset($tab) && $tab == 'authority-tax', 'admin.pages.invoices.tabs.summary', ['tab' => 'authority-tax'])
               </div>
             </div>
           </div>

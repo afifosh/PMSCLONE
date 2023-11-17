@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AuthorityInvoice extends Model
 {
-  use HasFactory;
+  use HasFactory, SoftDeletes;
 
   protected $fillable = [
     'invoice_id',
@@ -28,11 +29,22 @@ class AuthorityInvoice extends Model
     'retention_percentage',
     'retention_amount',
     'retention_released_at',
+    'due_date',
+    'status',
   ];
 
   protected $casts = [
+    'due_date' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
+  ];
+
+  const STATUSES = [
+    'Draft',
+    'Sent',
+    'Paid',
+    'Partial Paid',
+    'Void'
   ];
 
   public function invoice()
@@ -127,5 +139,49 @@ class AuthorityInvoice extends Model
   public function setRoundingAmountAttribute($value)
   {
     $this->attributes['rounding_amount'] = moneyToInt($value);
+  }
+
+  /**
+   * Get the amount which can be paid against this invoice.
+   */
+  public function payableAmount()
+  {
+    return $this->total - $this->paid_amount - $this->retention_amount - $this->downpayment_amount;
+  }
+
+  public function scopeApplyRequestFilters($q)
+  {
+    $q->when(request()->filter_company, function ($q) {
+      $q->whereHas('invoice', function ($q) {
+        $q->where('company_id', request()->filter_company);
+      });
+    })->when(request()->filter_contract, function ($q) {
+      $q->whereHas('invoice', function ($q) {
+        $q->where('contract_id', request()->filter_contract);
+      });
+    })->when(request()->filter_status, function ($q) {
+      $q->where('status', request()->filter_status);
+    })->when(request()->filter_due_date == 'this_month', function ($q) {
+      $q->whereBetween('due_date', [today()->startOfMonth(), today()->endOfMonth()]);
+    })->when(request()->filter_due_date == 'next_month', function ($q) {
+      $q->whereBetween('due_date', [today()->addMonth()->startOfMonth(), today()->addMonth()->endOfMonth()]);
+    })->when(request()->filter_due_date == 'prev_month', function ($q) {
+      $q->whereBetween('due_date', [today()->subMonth()->startOfMonth(), today()->subMonth()->endOfMonth()]);
+    })->when(request()->filter_due_date == 'over_due', function ($q) {
+      $q->where('due_date', '<', today())->where('status', '!=', 'Paid');
+    })->when(request()->filter_due_date == 'this_quarter', function ($q) {
+      $q->whereBetween('due_date', [today()->startOfQuarter(), today()->endOfQuarter()]);
+    })->when(request()->filter_due_date == 'prev_quarter', function ($q) {
+      $q->whereBetween('due_date', [today()->subQuarter()->startOfQuarter(), today()->subQuarter()->endOfQuarter()]);
+    })->when(request()->filter_due_date == 'next_quarter', function ($q) {
+      $q->whereBetween('due_date', [today()->addQuarter()->startOfQuarter(), today()->addQuarter()->endOfQuarter()]);
+    })->when(request()->notvoid, function ($q) {
+      $q->where('status', '!=', 'Void');
+    });
+  }
+
+  public function payments()
+  {
+    return $this->morphMany(InvoicePayment::class, 'payable');
   }
 }

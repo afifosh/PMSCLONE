@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuthorityInvoice;
 use App\Models\Company;
 use App\Models\Contract;
+use App\Models\Invoice;
 use App\Models\User;
 use App\Support\LaravelBalance\Models\AccountBalance;
 use Illuminate\Http\Request;
@@ -87,6 +89,7 @@ class ResourceSearchController extends Controller
       ],
       'Currency' => [],
       'Owner' => [],
+      'InvoiceOrAuthorityInvoice' => []
     ];
     if (!isset($allowedResources[$resource])) {
      // return $this->sendError('Invalid resource');
@@ -102,6 +105,8 @@ class ResourceSearchController extends Controller
       return $this->groupedCompanySelect();
     elseif ($resource == 'Owner')
       return $this->multipleOwners();
+    elseif ($resource == 'InvoiceOrAuthorityInvoice')
+      return $this->invoiceOrAuthorityInvoiceSelect($allowedResources);
 
     $model = 'App\Models\\' . $resource;
 
@@ -133,6 +138,17 @@ class ResourceSearchController extends Controller
       })
       ->applyRequestFilters()
       ->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
+  }
+
+  protected function invoiceOrAuthorityInvoiceSelect()
+  {
+    if(request()->dependent == 'AuthorityInvoice'){
+      return AuthorityInvoice::applyRequestFilters()
+      ->select(['id', DB::raw("CONCAT('TAINV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/1000) as text")])->paginate(15, ['*'], 'page', request()->get('page'));
+    }elseif(request()->dependent == 'Invoice'){
+      return  Invoice::applyRequestFilters()
+      ->select(['id', DB::raw("CONCAT('INV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/1000) as text")])->paginate(15, ['*'], 'page', request()->get('page'));
+    }
   }
 
   protected function accountBalanceSelect($allowedResources)

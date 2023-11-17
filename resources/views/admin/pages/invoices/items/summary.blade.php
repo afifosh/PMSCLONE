@@ -25,7 +25,13 @@
 @endforelse
 <div class="d-flex justify-content-between">
   <span class="me-2">Total Tax:</span>
-  <span class="fw-semibold">@cMoney($invoice->totalAppliedTax(), $invoice->contract->currency, true)</span>
+  <span class="fw-semibold">
+    @if($tab != 'authority-tax')
+      @cMoney($invoice->totalAppliedTax(), $invoice->contract->currency, true)
+    @else
+      @cMoney($invoice->authorityInvoice->total_tax, $invoice->contract->currency, true)
+    @endif
+  </span>
 </div>
 <hr />
   <div class="d-flex justify-content-between mb-2">
@@ -50,27 +56,37 @@
 <hr />
 <div class="d-flex justify-content-between">
   <span class="me-2">Total:</span>
-  <span class="fw-semibold invoice_total" data-amount="{{$invoice->total}}">@cMoney($invoice->total, $invoice->contract->currency, true)</span>
+  @if($tab != 'authority-tax')
+    <span class="fw-semibold invoice_total" data-amount="{{$invoice->total}}">
+      @cMoney($invoice->total, $invoice->contract->currency, true)
+    </span>
+  @else
+    <span class="fw-semibold invoice_total" data-amount="{{$invoice->authorityInvoice->total}}">
+      @cMoney($invoice->authorityInvoice->total, $invoice->contract->currency, true)
+    </span>
+  @endif
 </div>
-@if($invoice->rounding_amount != 0)
-<hr />
-  <div class="d-flex justify-content-between mb-2">
-    <span class="me-2">Rounding:</span>
-    <span class="fw-semibold">@cMoney($invoice->rounding_amount, $invoice->contract->currency, true)</span>
+@if($tab == 'summary')
+  @if($invoice->rounding_amount != 0)
+  <hr />
+    <div class="d-flex justify-content-between mb-2">
+      <span class="me-2">Rounding:</span>
+      <span class="fw-semibold">@cMoney($invoice->rounding_amount, $invoice->contract->currency, true)</span>
+    </div>
+  @endif
+  <div class="d-flex justify-content-between">
+    <span class="switch-label mt-2">Round Total</span>
+    <label class="col-form-label pe-4">
+      <label class="switch">
+        {{ Form::checkbox('rounding_amount', 1, $invoice->rounding_amount && 1,['class' => 'switch-input', 'id' => 'invoice-rounding-amount'])}}
+        <span class="switch-toggle-slider">
+          <span class="switch-on"></span>
+          <span class="switch-off"></span>
+        </span>
+      </label>
+    </label>
   </div>
 @endif
-<div class="d-flex justify-content-between">
-  <span class="switch-label mt-2">Round Total</span>
-  <label class="col-form-label pe-4">
-    <label class="switch">
-      {{ Form::checkbox('rounding_amount', 1, $invoice->rounding_amount && 1,['class' => 'switch-input', 'id' => 'invoice-rounding-amount'])}}
-      <span class="switch-toggle-slider">
-        <span class="switch-on"></span>
-        <span class="switch-off"></span>
-      </span>
-    </label>
-  </label>
-</div>
 
 @if($invoice->downpayment_amount != 0 && $invoice->downPayments()->wherePivot('is_after_tax', 1)->count() > 0)
 <hr>
@@ -97,16 +113,22 @@
     <span class="fw-semibold">@cMoney(-$invoice->retention_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif
-@if ($invoice->paid_amount)
+@if ($tab == 'summary' && $invoice->paid_amount != 0)
   <hr />
   <div class="d-flex justify-content-between">
     <span class="w-px-100">Paid:</span>
     <span class="fw-semibold">@cMoney(-$invoice->paid_amount, $invoice->contract->currency, true)</span>
+  </div>
+@elseif($tab == 'authority-tax' && $invoice->authorityInvoice->paid_amount != 0)
+  <hr />
+  <div class="d-flex justify-content-between">
+    <span class="w-px-100">Paid:</span>
+    <span class="fw-semibold">@cMoney(-$invoice->authorityInvoice->paid_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif
 
 <hr />
 <div class="d-flex justify-content-between">
   <span class="w-px-100">Payable:</span>
-  <span class="fw-semibold">@cMoney($invoice->payableAmount(), $invoice->contract->currency, true)</span>
+  <span class="fw-semibold">@cMoney($tab == 'summary' ? $invoice->payableAmount() : $invoice->authorityInvoice->payableAmount(), $invoice->contract->currency, true)</span>
 </div>

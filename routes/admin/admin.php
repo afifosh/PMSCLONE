@@ -94,10 +94,12 @@ use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\StudioController;
 use App\Http\Controllers\Admin\MediumController;
 use App\Http\Controllers\Admin\ArtistController;
+use App\Http\Controllers\Admin\Contract\ContractPartyController;
 use App\Http\Controllers\Admin\Contract\UploadedDoc\SignatureController;
 use App\Http\Controllers\Admin\Invoice\InvoiceStatusController;
 use App\Http\Controllers\Admin\Invoice\ItemDeductionController;
 use App\Http\Controllers\Admin\Invoice\ItemTaxController;
+use App\Http\Controllers\Admin\Invoice\TaxAuthorityInvoiceController;
 
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
 Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'adminVerified', 'mustBeActive', CheckForLockMode::class)->group(function () {
@@ -338,6 +340,7 @@ Route::prefix('contracts')->group(function () {
     Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');
     Route::post('contracts/{contract}/release-retentions', [ContractController::class, 'releaseRetention'])->name('contracts.release-retentions');
     Route::resource('contracts', ContractController::class);
+    Route::resource('contracts.contract-parties', ContractPartyController::class);
     Route::resource('contracts.logs', LogController::class)->only(['index']);
     Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
     Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
@@ -476,6 +479,7 @@ Route::prefix('contracts')->group(function () {
     Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
     Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
     Route::resource('invoices', InvoiceController::class);
+    Route::resource('tax-authority-invoices', TaxAuthorityInvoiceController::class)->only(['index', 'show', 'destroy']);
     Route::post('invoices/{invoice}/invoice-items/store-bulk', [InvoiceItemController::class, 'storeBulk'])->name('invoices.invoice-items.store-bulk');
     Route::resource('invoices.status', InvoiceStatusController::class)->only(['create', 'store']);
     Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'edit', 'update', 'destroy']);

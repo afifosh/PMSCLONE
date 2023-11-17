@@ -206,6 +206,15 @@ function runtimeInvIdFormat($invoice_id = '')
   }
 }
 
+function runtimeTAInvIdFormat($invoice_id = '')
+{
+  if (is_numeric($invoice_id)) {
+    return 'TAINV-' . str_pad($invoice_id, 6, '0', STR_PAD_LEFT);
+  } else {
+    return '---';
+  }
+}
+
 function moneyToInt($amount)
 {
   return round($amount * 1000, 0, config('app.rounding_mode'));

@@ -11,7 +11,8 @@ class InvoicePayment extends Model
   use HasFactory;
 
   protected $fillable = [
-    'invoice_id',
+    'payable_type',
+    'payable_id',
     'transaction_id',
     'payment_date',
     'amount',
@@ -25,9 +26,9 @@ class InvoicePayment extends Model
     'updated_at' => 'datetime:d M, Y',
   ];
 
-  public function invoice()
+  public function payable()
   {
-    return $this->belongsTo(Invoice::class);
+    return $this->morphTo();
   }
 
   public function getAmountAttribute($value)

@@ -1,11 +1,13 @@
 @forelse ($item->taxes as $tax)
   @continue($tab == 'authority-tax' && !$tax->pivot->is_authority_tax)
   @continue($tab == 'summary' && !$tax->pivot->is_simple_tax)
-  @continue($tab == 'tax-report' && $tax->pivot->is_authority_tax)
+  @continue($tab == 'tax-report' && !$tax->pivot->is_simple_tax)
 <tr data-id="{{$item->id}}">
-  <td>
-    <a data-toggle="ajax-delete" data-href="{{ route('admin.invoices.invoice-items.taxes.destroy', [$invoice, 'invoice_item' => $item->id, 'tax' => $tax->pivot->id]) }}"><i class="ti ti-trash"></i></a>
-  </td>
+  @if($tab != 'tax-report')
+    <td>
+      <a data-toggle="ajax-delete" data-href="{{ route('admin.invoices.invoice-items.taxes.destroy', [$invoice, 'invoice_item' => $item->id, 'tax' => $tax->pivot->id]) }}"><i class="ti ti-trash"></i></a>
+    </td>
+  @endif
   <!--description-->
   <td>{{$tax->name}}</td>
   <td>

@@ -132,10 +132,9 @@ class InvoiceItem extends Model
     $simpleTax = $invoiceTaxes->where('pay_on_behalf', false)->sum('total_amount') / 1000;
     $behalfTax = $invoiceTaxes->where('pay_on_behalf', true)->sum('total_amount') / 1000;
     $authorityTax = $invoiceTaxes->where('is_authority_tax', true)->sum('total_amount') / 1000;
-
     $this->total_tax_amount = $simpleTax + $behalfTax;
-    $this->total = $this->subtotal + $this->simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
-    $this->authority_inv_total = $this->subtotal + $authorityTax - ($this->deduction && $this->deduction->is_before_tax ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    $this->total = $this->subtotal + $simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    $this->authority_inv_total = $authorityTax;
     $this->save();
   }
 }

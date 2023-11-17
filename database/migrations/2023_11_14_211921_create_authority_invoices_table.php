@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AuthorityInvoice;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -43,6 +44,9 @@ return new class extends Migration
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
       $table->timestamp('retention_released_at')->nullable();
+      $table->date('due_date');
+      $table->enum('status', AuthorityInvoice::STATUSES)->default('Draft');
+      $table->softDeletes();
       $table->timestamps();
     });
   }
