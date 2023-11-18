@@ -168,73 +168,8 @@
     }
   })
 
-  $(document).on('change click', '[name="phase_taxes[]"]', function(){
-    calculateTotalCost();
-  })
-  $(document).on('change keyup', '[name="estimated_cost"]', function(){
-    calculateTotalCost();
-  })
-
-  $(document).on('change keyup', '[name="manual_tax_amount"]', function(){
-    calculateTotalCost();
-  });
-
-  $(document).on('change', '[name="is_manual_tax"]', function(){
-    calculateTotalCost();
-  });
-
-
-  function calculateTotalCost()
-  {
-    const estimatedCost = $('[name="estimated_cost"]').val();
-
-    var totalTax = parseFloat(0);
-    const taxes = $('[name="phase_taxes[]"]').val();
-    let totalCost = parseFloat(estimatedCost);
-    if(estimatedCost && taxes){
-      var percentagTax = 0;
-      var fixedTax = 0;
-
-      taxes.forEach(tax => {
-        const taxAmount = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('amount');
-        const taxType = $('[name="phase_taxes[]"] option[value="'+tax+'"]').data('type');
-        if(taxType == 'Percent'){
-          percentagTax += taxAmount;
-        }else{
-          fixedTax += taxAmount;
-        }
-
-      });
-
-      totalTax += (totalCost * percentagTax) / 100;
-      totalTax += fixedTax;
-
-      totalCost += (totalCost * percentagTax) / 100;
-      totalCost += fixedTax;
-
-    }
-    $('[name="total_tax"]').val(totalTax.toFixed(3));
-
-    const manualTax = parseFloat($('[name="manual_tax_amount"]').val());
-    if($('[name="is_manual_tax"]').is(':checked') && manualTax){
-      totalCost = parseFloat(estimatedCost) + manualTax;
-    }
-
-    totalCost = totalCost.toFixed(3);
-    $('[name="total_cost"]').val(totalCost);
-    validateTotalCost();
-  }
-
   $(document).on('change', '[name="total_cost"]', function(){
     validateTotalCost();
-  })
-
-  $(document).on('change', '[name="is_manual_tax"]', function (){
-    if($(this).is(':checked')){
-      $('[name="manual_tax_amount"]').parent().removeClass('d-none');
-    }else{
-      $('[name="manual_tax_amount"]').parent().addClass('d-none');
-    }
   })
 
   function validateTotalCost(){

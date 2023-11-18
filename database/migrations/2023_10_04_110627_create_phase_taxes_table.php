@@ -17,6 +17,10 @@ return new class extends Migration
       $table->foreignId('tax_id')->constrained('invoice_configs')->cascadeOnDelete();
       $table->bigInteger('amount')->default(0);
       $table->enum('type', ['Percent', 'Fixed'])->default('Percent');
+      $table->bigInteger('calculated_amount')->default(0);
+      $table->bigInteger('manual_amount')->default(0);
+      $table->boolean('is_authority_tax')->default(false);
+      $table->boolean('pay_on_behalf')->default(false);
       $table->timestamps();
     });
   }

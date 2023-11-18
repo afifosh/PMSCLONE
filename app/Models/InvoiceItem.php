@@ -117,8 +117,9 @@ class InvoiceItem extends Model
     return $this->morphOne(InvoiceDeduction::class, 'deductible');
   }
 
-  public function reCalculateTotal(): void
+  public function reCalculateTotal($deductionUpdated = false, $taxUpdated = false ): void
   {
+    $deductionAmount = $this->calculateDeductionAmount();
     $this->load('deduction');
     $invoiceTaxes = InvoiceTax::where('invoice_item_id', $this->id)
       ->select([
@@ -136,5 +137,17 @@ class InvoiceItem extends Model
     $this->total = $this->subtotal + $simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
     $this->authority_inv_total = $authorityTax;
     $this->save();
+  }
+
+  private function calculateDeductionAmount()
+  {
+    // $deductionAmount = 0;
+    // if($this->deduction && $this->deduction->is_before_tax) {
+    //   if(!$this->deduction->is_percentage){
+    //     $deductionAmount = $this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount;
+    //   } else {
+    //     $deductionAmount = ($this->subtotal * $this->deduction->amount) / 100;
+    //   }
+    // }
   }
 }

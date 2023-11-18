@@ -14,6 +14,10 @@ class PhaseTax extends Model
     'tax_id',
     'amount',
     'type',
+    'calculated_amount',
+    'manual_amount',
+    'is_authority_tax',
+    'pay_on_behalf'
   ];
 
   public function contractPhase()
@@ -34,5 +38,25 @@ class PhaseTax extends Model
   public function setAmountAttribute($value)
   {
     $this->attributes['amount'] = moneyToInt($value);
+  }
+
+  public function getCalculatedAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setCalculatedAmountAttribute($value)
+  {
+    $this->attributes['calculated_amount'] = moneyToInt($value);
+  }
+
+  public function getManualAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setManualAmountAttribute($value)
+  {
+    $this->attributes['manual_amount'] = moneyToInt($value);
   }
 }

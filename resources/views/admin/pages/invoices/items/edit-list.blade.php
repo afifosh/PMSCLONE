@@ -13,7 +13,7 @@
         <span class="bi-drag pt-1 cursor-grab"><i class="ti ti-menu-2"></i></span>
         <a class="dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
           <i class="ti ti-pencil"></i></a>
-        <div class="dropdown-menu dropdown-menu-end m-0">
+        <div class="dropdown-menu dropdown-menu-end m-0" style="z-index: 99999;">
             @if ($item->invoiceable_type == 'App\Models\CustomInvoiceItem')
               <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Edit Item')}}" data-href="{{route('admin.invoices.invoice-items.edit', [$invoice,'invoice_item' => $item->id, 'tab' => $tab])}}">Edit</i></li>
             @elseif ($item->invoiceable_type == 'App\Models\ContractPhase')

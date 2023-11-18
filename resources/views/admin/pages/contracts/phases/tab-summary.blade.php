@@ -1,13 +1,14 @@
 @if ($phase->id)
     {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.update', ['project' => 'project', 'contract' => $contract, 'phase' => $phase->id, 'stage' => $stage, 'tableId' => request()->tableId]],
       'method' => 'PUT',
+      'class' => 'phase-create-form',
       'id' => 'phase-update-form',
       'data-phase-id' => $phase->id,
     ]) !!}
 @else
-    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.store',  ['project' => 'project', 'contract' => $contract, 'stage' => $stage, 'tableId' => request()->tableId]], 'method' => 'POST']) !!}
+    {!! Form::model($phase, ['route' => ['admin.projects.contracts.stages.phases.store',  ['project' => 'project', 'contract' => $contract, 'stage' => $stage, 'tableId' => request()->tableId]], 'method' => 'POST', 'class' => 'phase-create-form',]) !!}
 @endif
-<div class="row rr-single">
+<div class="row rr-single repeater">
   <div class="form-group col-6">
       {{ Form::label('name', __('Name'), ['class' => 'col-form-label']) }}
       {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
@@ -35,43 +36,20 @@
     </div>
     {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
   </div>
-  {{-- taxes --}}
-  <div class="col-6">
-    {{ Form::label('phase_taxes', __('Tax'), ['class' => 'col-form-label']) }}
-    <select class="form-select globalOfSelect2" name="phase_taxes[]" multiple data-placeholder="{{__('Select Tax')}}" data-allow-clear=true>
-      @forelse ($tax_rates->where('is_retention', false) as $tax)
-        <option @selected($phase->taxes->contains($tax)) value="{{$tax->id}}" data-amount="{{$tax->amount}}" data-type={{$tax->type}}>{{$tax->name}} (
-          @if($tax->type != 'Percent')
-            @cMoney($tax->amount, $phase->contract->currency, true)
-          @else
-            {{$tax->amount}}%
-          @endif
-        )</option>
-      @empty
-      @endforelse
-    </select>
-  </div>
-  {{-- total Tax Value --}}
-  <div class="form-group col-6">
-    {{ Form::label('total_tax', __('Tax Value'), ['class' => 'col-form-label']) }}
-    {!! Form::number('total_tax', $phase->tax_amount, ['class' => 'form-control', 'placeholder' => __('Tax Value'), 'disabled'])!!}
-  </div>
-  {{-- is Mantual Tax --}}
-  <div class="col-6 mt-1">
-    <label class="switch mt-4">
-      {{ Form::checkbox('is_manual_tax', 1, $phase->manual_tax_amount != 0,['class' => 'switch-input'])}}
-      <span class="switch-toggle-slider">
-        <span class="switch-on"></span>
-        <span class="switch-off"></span>
-      </span>
-      <span class="switch-label">Is Manual Tax?</span>
-    </label>
-  </div>
-  {{-- End is Mantual Tax --}}
-  <!-- Manual Tax field -->
-  <div class="form-group col-6 {{$phase->manual_tax_amount != 0 ? '' : 'd-none'}}">
-    {{ Form::label('manual_tax_amount', __('Manual Tax Amount'), ['class' => 'col-form-label']) }}
-    {!! Form::number('manual_tax_amount', null, ['class' => 'form-control', 'placeholder' => __('Manual Tax Amount')]) !!}
+  <div class="col-12 rounded mt-3" data-repeater-list="taxes">
+    <hr>
+    <div class="d-flex">
+      <span class="pt-1 me-2">Phase Tax</span>
+      <button type="button" class="btn btn-sm btn-primary" data-repeater-create>
+          <i class="fas fa-plus-circle"></i>
+      </button>
+    </div>
+    <hr>
+    @forelse ($phase->taxes as $tax)
+      @include('admin.pages.contracts.phases.tax-repeater', ['tax' => $tax, 'index' => $loop->index])
+    @empty
+      @include('admin.pages.contracts.phases.tax-repeater', ['index' => 0])
+    @endforelse
   </div>
   {{-- total cost --}}
   <div class="form-group col-6">

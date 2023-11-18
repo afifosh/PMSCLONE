@@ -3,10 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Comments\Models\Concerns\HasComments;
 
 class ContractPhase extends BaseModel
@@ -19,8 +17,8 @@ class ContractPhase extends BaseModel
     'name',
     'estimated_cost',
     'tax_amount',
-    'manual_tax_amount',
     'total_cost',
+    'rounding_amount',
     'start_date',
     'due_date',
     'description',
@@ -60,16 +58,6 @@ class ContractPhase extends BaseModel
     $this->attributes['estimated_cost'] = moneyToInt($value);
   }
 
-  public function getManualTaxAmountAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setManualTaxAmountAttribute($value)
-  {
-    $this->attributes['manual_tax_amount'] = moneyToInt($value);
-  }
-
   public function getTaxAmountAttribute($value)
   {
     return $value / 1000;
@@ -88,6 +76,16 @@ class ContractPhase extends BaseModel
   public function setTotalCostAttribute($value)
   {
     $this->attributes['total_cost'] = moneyToInt($value);
+  }
+
+  public function getRoundingAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setRoundingAmountAttribute($value)
+  {
+    $this->attributes['rounding_amount'] = moneyToInt($value);
   }
 
   public function getStatusAttribute()
@@ -125,9 +123,6 @@ class ContractPhase extends BaseModel
 
   public function scopeApplyRequestFilters($q)
   {
-
-
-
     return $q->when(request()->filter_status, function ($q) {
       if (request()->filter_status == 'Draft') return $q->where('contracts.status', 'Draft');
       else if (request()->filter_status == 'Not started') {
@@ -238,7 +233,7 @@ class ContractPhase extends BaseModel
 
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(InvoiceConfig::class, 'phase_taxes', 'contract_phase_id', 'tax_id')->withPivot('amount', 'type');
+    return $this->belongsToMany(InvoiceConfig::class, 'phase_taxes', 'contract_phase_id', 'tax_id')->withPivot('amount', 'type', 'calculated_amount', 'manual_amount', 'is_authority_tax', 'pay_on_behalf')->withTimestamps();
   }
 
   /*

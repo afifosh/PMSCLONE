@@ -41,16 +41,6 @@ class TaxSeeder extends Seeder
           'config_type' => 'Tax',
       ]);
 
- 
-       // 15% Tax
-       InvoiceConfig::create([
-        'name' => '5% With Holding Tax',
-        'type' => 'Percent',
-        'amount' => -5,
-        'status' => 'Active',
-        'config_type' => 'Tax',
-    ]);     
- 
       // 5% Retention
       InvoiceConfig::create([
         'name' => '5% Retention',

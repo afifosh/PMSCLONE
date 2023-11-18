@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Invoice\ItemDeductionStoreRequest;
 use App\Models\Invoice;
 use App\Models\InvoiceConfig;
 use App\Models\InvoiceItem;
+use Illuminate\Support\Facades\DB;
 
 class ItemDeductionController extends Controller
 {
@@ -25,33 +26,46 @@ class ItemDeductionController extends Controller
 
   public function store(Invoice $invoice, InvoiceItem $invoiceItem, ItemDeductionStoreRequest $request)
   {
-    $invoiceItem->deduction()->delete();
-    $invoiceItem->deduction()->create([
-      'deductible_id' => $invoiceItem->id,
-      'deductible_type' => InvoiceItem::class,
-      'downpayment_id' => $request->downpayment_id,
-      'dp_rate_id' => $request->dp_rate_id,
-      'is_percentage' => $request->deduction_rate->type != 'Fixed',
-      'amount' => $request->calculated_downpayment_amount,
-      'manual_amount' => $request->manual_deduction_amount,
-      'percentage' => $request->downpayment_rate->amount ?? 0,
-      'is_before_tax' => $request->is_before_tax,
-      'calculation_source' => $request->calculation_source,
-    ]);
+    DB::beginTransaction();
+    try{
+      $invoiceItem->deduction()->delete();
+      $invoiceItem->deduction()->create([
+        'deductible_id' => $invoiceItem->id,
+        'deductible_type' => InvoiceItem::class,
+        'downpayment_id' => $request->downpayment_id,
+        'dp_rate_id' => $request->dp_rate_id,
+        'is_percentage' => $request->deduction_rate->type != 'Fixed',
+        'amount' => $request->calculated_downpayment_amount,
+        'manual_amount' => $request->manual_deduction_amount,
+        'percentage' => $request->deduction_rate->amount ?? 0,
+        'is_before_tax' => $request->is_before_tax,
+        'calculation_source' => $request->calculation_source,
+      ]);
 
-    $invoiceItem->reCalculateTotal();
-    $invoice->reCalculateTotal();
+      $invoiceItem->reCalculateTotal();
+      $invoice->reCalculateTotal();
+    }catch(\Exception $e){
+      DB::rollback();
+      return $this->sendError($e->getMessage());
+    }
+    DB::commit();
 
     return $this->sendRes('Deduction Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
 
   public function destroy(Invoice $invoice, InvoiceItem $invoiceItem, $deduction)
   {
-    $invoiceItem->deduction()->delete();
+    DB::beginTransaction();
+    try{
+      $invoiceItem->deduction()->delete();
+      $invoiceItem->reCalculateTotal();
+      $invoice->reCalculateTotal();
+      DB::commit();
 
-    $invoiceItem->reCalculateTotal();
-    $invoice->reCalculateTotal();
-
-    return $this->sendRes('Deduction Removed Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+      return $this->sendRes('Deduction Removed Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+    }catch(\Exception $e){
+      DB::rollback();
+      return $this->sendError($e->getMessage());
+    }
   }
 }

@@ -10,14 +10,22 @@
   @endif
   <!--description-->
   <td>{{$tax->name}}</td>
-  <td>
+  <td
+    @if($tax->pivot->manual_amount)
+      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->pay_on_behalf && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 1000), $invoice->contract->currency, true)}}"
+    @endif
+    >
     {{$tax->pivot->pay_on_behalf && $tab == 'summary' ? '-' : ''}} @cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 1000, $invoice->contract->currency, true)
     @if($tax->pivot->manual_amount)
       <span class="text-danger">*</span>
     @endif
   </td>
   <td></td>
-  <td>
+  <td
+    @if($tax->pivot->manual_amount)
+      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->pay_on_behalf && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 1000), $invoice->contract->currency, true)}}"
+    @endif
+    >
     {{$tax->pivot->pay_on_behalf && $tab == 'summary' ? '-' : ''}}@cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 1000, $invoice->contract->currency, true)
     @if($tax->pivot->manual_amount)
       <span class="text-danger">*</span>
@@ -25,7 +33,11 @@
   </td>
 
   <!--total-->
-  <td class="text-right">
+  <td class="text-right"
+    @if($tax->pivot->manual_amount)
+      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->pay_on_behalf && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 1000), $invoice->contract->currency, true)}}"
+    @endif
+    >
     {{$tax->pivot->pay_on_behalf && $tab == 'summary' ? '-' : ''}}@cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 1000, $invoice->contract->currency, true)
     @if($tax->pivot->manual_amount)
       <span class="text-danger">*</span>

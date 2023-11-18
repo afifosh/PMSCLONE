@@ -12,6 +12,7 @@ use App\Models\ContractPhase;
 use App\Models\ContractStage;
 use App\Models\InvoiceConfig;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProjectPhaseController extends Controller
 {
@@ -47,35 +48,47 @@ class ProjectPhaseController extends Controller
     $phase = new ContractPhase();
     $tax_rates = InvoiceConfig::activeTaxes()->get();
     $stages = $contract->stages->pluck('name', 'id');
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render(), 'JsMethods' => ['initTaxRepeater']]);
   }
 
   public function store($project, Contract $contract, $stage, PhaseStoreRequest $request)
   {
+    DB::beginTransaction();
+    try{
+      $data['total_cost'] = $request->estimated_cost + $request->total_tax_amount;
+      $data['tax_amount'] = $request->total_tax_amount;
+      $data['stage_id'] = $request->stage_id;
 
-    $data['total_cost'] = $request->estimated_cost + ($request->is_manual_tax ? $request->manual_tax_amount : $request->calculated_tax_amount);
-    $data['manual_tax_amount'] = $request->manual_tax_amount;
-    $data['tax_amount'] = $request->calculated_tax_amount;
-    $data['stage_id'] = $request->stage_id;
+      $phase = $contract->phases()->create(
+        $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id'])
+      );
 
-    $phase = $contract->phases()->create(
-      $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id'])
-    );
-
-    $this->storeTaxes($phase, $request->taxes);
+      $this->storeTaxes($phase, $request);
+    }catch(\Exception $e){
+      DB::rollback();
+      return $this->sendError($e->getMessage());
+    }
+    DB::commit();
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
     return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => request()->tableId ? request()->tableId : 'phases-table', 'close' => 'globalModal']);
   }
 
-  protected function storeTaxes($phase, $taxes): void
+  protected function storeTaxes($phase, $request): void
   {
-    $sync_data = [];
-    foreach ($taxes as $rate) {
-      $sync_data[$rate->id] = ['amount' => $rate->getRawOriginal('amount'), 'type' => $rate->type, 'contract_phase_id' => $phase->id];
+    $phase->taxes()->detach();
+    foreach ($request->taxes as $tax) {
+      $rate = $request->tax_rates->where('id', $tax['phase_tax'])->first();
+      $calTaxAmount = $rate->type == 'Fixed' ? $rate->amount : ($rate->amount * $request->estimated_cost / 100);
+      $phase->taxes()->attach($rate->id, [
+        'amount' => $rate->getRawOriginal('amount'),
+        'type' => $rate->type,
+        'calculated_amount' => moneyToInt($calTaxAmount),
+        'manual_amount' => $calTaxAmount == $tax['total_tax'] ? 0 : moneyToInt($tax['total_tax']),
+        'pay_on_behalf' => $tax['pay_on_behalf'][0] ? 1 : 0,
+        'is_authority_tax' => $tax['pay_on_behalf'][0] ? 1 : ($tax['is_authority_tax'][0] ? 1 : 0),
+      ]);
     }
-
-    $phase->taxes()->sync($sync_data);
   }
 
   public function edit($project, $contract, $stage, ContractPhase $phase)
@@ -116,7 +129,7 @@ class ProjectPhaseController extends Controller
     </div>';
 
 
-    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
+    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render(), 'JsMethods' => ['initTaxRepeater']]);
   }
 
   public function prepareActivityTab($phase)
@@ -141,33 +154,49 @@ class ProjectPhaseController extends Controller
       return $this->sendError('You can not update this phase because it is in paid invoice');
     }
 
-    $data['total_cost'] = $request->estimated_cost + ($request->is_manual_tax ? $request->manual_tax_amount : $request->calculated_tax_amount);
-    $data['manual_tax_amount'] = $request->manual_tax_amount;
-    $data['tax_amount'] = $request->calculated_tax_amount;
+    DB::beginTransaction();
+    try{
+      $data['total_cost'] = $request->estimated_cost + $request->total_tax_amount;
+      $data['tax_amount'] = $request->total_tax_amount;
 
-    $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
+      $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
 
-    $this->storeTaxes($phase, $request->taxes);
+      $this->storeTaxes($phase, $request);
 
-    // if added in invoice then update invoice item and tax amount
-    $phase->load('addedAsInvoiceItem.invoice');
+      // if added in invoice then update invoice item and tax amount
+      $phase->load('addedAsInvoiceItem.invoice');
 
-    if ($phase->addedAsInvoiceItem->count()) {
-      $phase->addedAsInvoiceItem->each(function ($item) use ($phase) {
-        $item->update([
-          'subtotal' => $phase->estimated_cost,
-          'total_tax_amount' => $phase->tax_amount,
-          'total' => $phase->total_cost,
-        ]);
+      if ($phase->addedAsInvoiceItem->count()) {
+        $phase->addedAsInvoiceItem->each(function ($item) use ($phase) {
+          $item->update([
+            'subtotal' => $phase->estimated_cost,
+            'total_tax_amount' => $phase->tax_amount,
+            'total' => $phase->total_cost,
+            'rounding_amount' => $phase->rounding_amount,
+          ]);
 
-        $item->taxes()->detach();
+          $item->taxes()->detach();
 
-        foreach ($phase->taxes as $tax) {
-          $item->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $item->invoice_id]);
-        }
+          foreach ($phase->taxes as $tax) {
+            $item->taxes()->attach($tax->id, [
+              'amount' => $tax->pivot->amount,
+              'type' => $tax->pivot->type,
+              'invoice_id' => $item->invoice_id,
+              'is_simple_tax' => 1,
+              'calculated_amount' => $tax->pivot->calculated_amount,
+              'manual_amount' => $tax->pivot->manual_amount,
+              'pay_on_behalf' => $tax->pivot->pay_on_behalf,
+              'is_authority_tax' => $tax->pivot->is_authority_tax
+            ]);
+          }
 
-        $item->invoice->reCalculateTotal(); // ERROR HERE
-      });
+          $item->invoice->reCalculateTotal(); // ERROR HERE
+          DB::commit();
+        });
+      }
+    }catch(\Exception $e){
+      DB::rollback();
+      return $this->sendError($e->getMessage());
     }
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();

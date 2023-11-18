@@ -120,7 +120,7 @@ class Invoice extends Model
 
   public function phases()
   {
-    return $this->morphedByMany(ContractPhase::class, 'invoiceable', 'invoice_items', 'invoice_id', 'invoiceable_id')->withPivot('subtotal', 'description');
+    return $this->morphedByMany(ContractPhase::class, 'invoiceable', 'invoice_items', 'invoice_id', 'invoiceable_id')->withPivot('subtotal', 'description', 'total_tax_amount', 'total', 'rounding_amount')->withTimestamps();
     // return $this->belongsToMany(ContractPhase::class, 'invoice_items', 'invoice_id', 'invoiceable_id')->where('invoiceable_type', ContractPhase::class);
   }
 
@@ -641,7 +641,8 @@ class Invoice extends Model
           'subtotal' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('estimated_cost'),
           'total_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('tax_amount'),
           // 'manual_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('manual_tax_amount'),
-          'total' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_cost')
+          'total' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_cost'),
+          'rounding_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('rounding_amount'),
         ]; // convert to cents manually, setter is not working for pivot table
       }
 
@@ -651,7 +652,16 @@ class Invoice extends Model
         $invPhase = $this->items()->where('invoiceable_id', $phase->id)->first();
 
         foreach ($phase->taxes as $tax) {
-          $invPhase->taxes()->attach($tax->id, ['amount' => $tax->pivot->amount, 'type' => $tax->pivot->type, 'invoice_id' => $this->id]);
+          $invPhase->taxes()->attach($tax->id, [
+            'amount' => $tax->pivot->amount,
+            'is_simple_tax' => 1,
+            'calculated_amount' => $tax->pivot->calculated_amount,
+            'manual_amount' => $tax->pivot->manual_amount,
+            'pay_on_behalf' => $tax->pivot->pay_on_behalf,
+            'is_authority_tax' => $tax->pivot->is_authority_tax,
+            'type' => $tax->pivot->type,
+            'invoice_id' => $this->id
+          ]);
         }
       }
 

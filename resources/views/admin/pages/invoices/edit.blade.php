@@ -80,6 +80,7 @@
         // $('.invoice-calculations').html(data.data.summary);
         // $('#balance-summary').html(data.data.balance_summary);
         initSelect2()
+        $('[data-bs-toggle="tooltip"]').tooltip();
       }
     });
   }
