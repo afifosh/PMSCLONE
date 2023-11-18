@@ -3,30 +3,30 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Support\Facades\DB;
-use App\DataTables\Admin\StudiosDataTable;
+use App\DataTables\Admin\GalleriesDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
 use App\Models\State;
 use App\Models\City;
-use App\Models\Studio;
+use App\Models\Gallery;
 use Illuminate\Http\Request;
 use App\Repositories\FileUploadRepository;
 use App\Support\Timezonelist;
-use App\Http\Requests\Admin\Studio\StudioStoreRequest;
+use App\Http\Requests\Admin\Gallery\GalleryStoreRequest;
 use Illuminate\Validation\Rule;
 
 use Throwable;
 
-class StudioController extends Controller
+class GalleryController extends Controller
 {
-    public function index(StudiosDataTable $datatable)
+    public function index(GalleriesDataTable $datatable)
     {
-        return $datatable->render('admin.pages.studio.index');
+        return $datatable->render('admin.pages.gallery.index');
     }
 
     public function create()
     {
-        $data['studio'] = new Studio();
+        $data['gallery'] = new Gallery();
         $data['countries'] = ['' => 'Select Country'];
         $data['states'] = ['' => 'Select State'];
         $data['cities'] = ['' => 'Select City'];
@@ -34,59 +34,59 @@ class StudioController extends Controller
         $data['languages'] = $this->languages();
         $data['currencies'] = $this->currencies();
         // You can add more data as needed
-        return $this->sendRes('success', ['view_data' => view('admin.pages.studio.create', $data)->render(), 'JsMethods' => ['initIntlTel']]);
+        return $this->sendRes('success', ['view_data' => view('admin.pages.gallery.create', $data)->render(), 'JsMethods' => ['initIntlTel']]);
  
     }
 
 
-    public function show(Studio $studio)
+    public function show(Gallery $gallery)
     {
-        $data['studio'] = $studio;
+        $data['gallery'] = $gallery;
         $data['timezones'] = $this->timezones();
         $data['languages'] = $this->languages();
         $data['currencies'] = $this->currencies();
-        $data['countries'] = $studio->country_id ? Country::where('id', $studio->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
-        $data['states'] = $studio->state_id ? State::where('id', $studio->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
-        $data['cities'] = $studio->city_id ? City::where('id', $studio->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
+        $data['countries'] = $gallery->country_id ? Country::where('id', $gallery->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
+        $data['states'] = $gallery->state_id ? State::where('id', $gallery->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
+        $data['cities'] = $gallery->city_id ? City::where('id', $gallery->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
 
-        return view('admin.pages.studio.show-profile', $data);
+        return view('admin.pages.gallery.show-profile', $data);
     }
 
-    public function edit(Studio $studio)
+    public function edit(Gallery $gallery)
     {
-        $data['studio'] = $studio;
+        $data['gallery'] = $gallery;
         $data['timezones'] = $this->timezones();
         $data['languages'] = $this->languages();
         $data['currencies'] = $this->currencies();
-        $data['countries'] = $studio->country_id ? Country::where('id', $studio->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
-        $data['states'] = $studio->state_id ? State::where('id', $studio->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
-        $data['cities'] = $studio->city_id ? City::where('id', $studio->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
+        $data['countries'] = $gallery->country_id ? Country::where('id', $gallery->country_id)->pluck('name', 'id')->prepend('Select Country', '') : ['' => 'Select Country'];
+        $data['states'] = $gallery->state_id ? State::where('id', $gallery->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
+        $data['cities'] = $gallery->city_id ? City::where('id', $gallery->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
 
         // You can add more data as needed
-        return $this->sendRes('success', ['view_data' => view('admin.pages.studio.create', $data)->render(), 'JsMethods' => ['initIntlTel']]);
+        return $this->sendRes('success', ['view_data' => view('admin.pages.gallery.create', $data)->render(), 'JsMethods' => ['initIntlTel']]);
  
     }
-    public function store(StudioStoreRequest $request, FileUploadRepository $file_repo)
+    public function store(GalleryStoreRequest $request, FileUploadRepository $file_repo)
     {
         DB::beginTransaction(); // Start the transaction
     
         try {
-            $studioData = $request->validated(); // Get validated data
+            $galleryData = $request->validated(); // Get validated data
     
             // Check for avatar in the request and process if present
             if ($request->hasFile('avatar')) {
-                $path = Studio::STUDIO_PATH; // Use the STUDIO_PATH constant
-                $StudioImage = $path . '/' . $file_repo->addAttachment($request->file('avatar'), $path);
-                $studioData['avatar'] = $StudioImage; // Add avatar to studio data
+                $path = Gallery::GALLERY_PATH; // Use the GALLERY_PATH constant
+                $GalleryImage = $path . '/' . $file_repo->addAttachment($request->file('avatar'), $path);
+                $galleryData['avatar'] = $GalleryImage; // Add avatar to studio data
             }
     
-            // Create the Studio record
-            $studio = Studio::create($studioData);
+            // Create the Gallery record
+            $gallery = Gallery::create($galleryData);
     
             DB::commit(); // Commit the transaction
     
             // Return a success response
-            return $this->sendRes('Studio Created Successfully', ['event' => 'table_reload', 'table_id' => Studio::DT_ID, 'close' => 'globalModal']);
+            return $this->sendRes('Gallery Created Successfully', ['event' => 'table_reload', 'table_id' => Gallery::DT_ID, 'close' => 'globalModal']);
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback the transaction on error
             // Handle exceptions
@@ -95,13 +95,13 @@ class StudioController extends Controller
     }
     
 
-    public function update(Studio $studio, StudioStoreRequest $request)
+    public function update(Gallery $gallery, GalleryStoreRequest $request)
     {
         $att = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('studios', 'name')->ignore($studio->id)],
-            'website' => ['nullable', 'string', 'max:255', Rule::unique('studios', 'website')->ignore($studio->id)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('galleries', 'name')->ignore($gallery->id)],
+            'website' => ['nullable', 'string', 'max:255', Rule::unique('galleries', 'website')->ignore($gallery->id)],
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Update with your image validation rules
-            'email' => ['nullable', 'string', 'max:255', Rule::unique('studios', 'email')->ignore($studio->id)],
+            'email' => ['nullable', 'string', 'max:255', Rule::unique('galleries', 'email')->ignore($gallery->id)],
             'phone' => 'nullable|phone',
             'phone_country' => 'required_with:phone',
             'address' => 'nullable|string|max:255',
@@ -115,16 +115,16 @@ class StudioController extends Controller
             'status' => 'nullable|string|max:255',
         ]);
 
-        $studio->update($att);
+        $gallery->update($att);
 
-        return $this->sendRes('Updated Successfully', ['event' => 'redirect', 'url' => route('admin.studios.index')]);
+        return $this->sendRes('Updated Successfully', ['event' => 'redirect', 'url' => route('admin.galleries.index')]);
     }
 
-    public function destroy(Studio $studio)
+    public function destroy(Gallery $gallery)
     {
       try {
-        if ($studio->delete()) {
-          return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => Studio::DT_ID]);
+        if ($gallery->delete()) {
+          return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => Gallery::DT_ID]);
         }
         return $this->sendError('Something Went Wrong');
       } catch (Throwable $e) {

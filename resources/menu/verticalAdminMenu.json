@@ -55,7 +55,7 @@
     },
     {
       "name": "Artworks",
-      "slug": ["admin.artworks.index", "admin.artists.index", "admin.studios.index","admin.locations.index", "admin.mediums.index","admin.warehouses.index"],
+      "slug": ["admin.artworks.index","admin.galleries.index","admin.museums.index", "admin.institution.index","admin.artists.index", "admin.studios.index","admin.locations.index", "admin.mediums.index","admin.warehouses.index"],
       "icon": "menu-icon tf-icons ti ti-color-swatch",
       "submenu": [
         {
@@ -76,6 +76,24 @@
           "icon": "menu-icon fas fa-building",
           "slug": "admin.studios.index"
         },
+        {
+          "url": "/admin/galleries",
+          "name": "Galleries",
+          "icon": "menu-icon fas fa-building",
+          "slug": "admin.galleries.index"
+        },
+        {
+          "url": "/admin/museums",
+          "name": "Museums",
+          "icon": "menu-icon fas fa-building",
+          "slug": "admin.museums.index"
+        },
+        {
+          "url": "/admin/institutions",
+          "name": "Institutions",
+          "icon": "menu-icon fas fa-building",
+          "slug": "admin.institution.index"
+        },                        
         {
           "url": "/admin/warehouses",
           "name": "Warehouses",

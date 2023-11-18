@@ -2,14 +2,14 @@
 
 namespace App\DataTables\Admin;
 
-use App\Models\Studio;
+use App\Models\Institution;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class StudiosDataTable extends DataTable
+class InstitutionsDataTable extends DataTable
 {
     /**
      * Build DataTable class.
@@ -21,7 +21,7 @@ class StudiosDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function ($row) {
-                return view('admin.pages.studio.studio-info', ['user' => $row]);
+                return view('admin.pages.institution.studio-info', ['user' => $row]);
             })
             ->editColumn('added_by', function ($studio) {
                 return $studio->addedBy ? view('admin._partials.sections.user-info', ['user' => $studio->addedBy]) : '-';
@@ -29,8 +29,8 @@ class StudiosDataTable extends DataTable
             ->editColumn('status', function ($row) {
                 return $this->makeStatus($row->status);
             })
-            ->addColumn('action', function (Studio $studio) {
-                return view('admin.pages.studio.action', compact('studio'));
+            ->addColumn('action', function (Institution $studio) {
+                return view('admin.pages.institution.action', compact('studio'));
             })
             ->addColumn('country', function ($studio) {
                 $countryName = $countryName = $studio->country ? ucfirst($studio->country->name) : '-';
@@ -68,10 +68,10 @@ class StudiosDataTable extends DataTable
     /**
      * Get query source of dataTable.
      *
-     * @param \App\Models\Studio $model
+     * @param \App\Models\Institution $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function query(Studio $model): QueryBuilder
+    public function query(Institution $model): QueryBuilder
     {
         $query = $model->newQuery();
 
@@ -91,16 +91,16 @@ class StudiosDataTable extends DataTable
         $buttons = [];
         if (auth('admin')->user()->can('create company'))
           $buttons[] = [
-            'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Studio</span>',
+            'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Institution</span>',
             'className' =>  'btn btn-primary mx-3',
             'attr' => [
               'data-toggle' => "ajax-modal",
-              'data-title' => 'Add Studio',
+              'data-title' => 'Add Institution',
               'data-href' => route('admin.studios.create')
             ]
           ];
         return $this->builder()
-          ->setTableId(Studio::DT_ID)
+          ->setTableId(Institution::DT_ID)
           ->columns($this->getColumns())
           ->minifiedAjax()
           ->responsive(true)
@@ -125,7 +125,7 @@ class StudiosDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('name')->title(__('Studio Name')),
+            Column::make('name')->title(__('Institution Name')),
             Column::make('country')->title(__('Country')), // Display the 'country' attribute
             Column::make('added_by'),
             Column::make('status'),
@@ -140,6 +140,6 @@ class StudiosDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Studios_' . date('YmdHis');
+        return 'Institutions_' . date('YmdHis');
     }
 }

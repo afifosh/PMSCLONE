@@ -30,7 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable, Locali
     use MustVerifyNewEmail;
 
     public const DT_ID = 'users_dataTable';
-    public const AVATAR_PATH = 'admins-avatars';
+    public const AVATAR_PATH = 'users-avatars';
     /**
      * The attributes that are mass assignable.
      *

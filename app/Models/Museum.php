@@ -9,11 +9,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Avatar;
 
-class Studio extends Model
+class Museum extends Model
 {
     use HasFactory, SoftDeletes;
-    public const DT_ID = 'studios_datatable';
-    public const STUDIO_PATH = 'studio-images';
+    public const DT_ID = 'museums_datatable';
+    public const GALLERY_PATH = 'museums-images';
     
     protected $fillable = [
         'added_by',
