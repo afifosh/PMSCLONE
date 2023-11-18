@@ -21,19 +21,19 @@ class InstitutionsDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function ($row) {
-                return view('admin.pages.institution.studio-info', ['user' => $row]);
+                return view('admin.pages.institution.institution-info', ['user' => $row]);
             })
-            ->editColumn('added_by', function ($studio) {
-                return $studio->addedBy ? view('admin._partials.sections.user-info', ['user' => $studio->addedBy]) : '-';
+            ->editColumn('added_by', function ($institution) {
+                return $institution->addedBy ? view('admin._partials.sections.user-info', ['user' => $institution->addedBy]) : '-';
             })
             ->editColumn('status', function ($row) {
                 return $this->makeStatus($row->status);
             })
-            ->addColumn('action', function (Institution $studio) {
-                return view('admin.pages.institution.action', compact('studio'));
+            ->addColumn('action', function (Institution $institution) {
+                return view('admin.pages.institution.action', compact('institution'));
             })
-            ->addColumn('country', function ($studio) {
-                $countryName = $countryName = $studio->country ? ucfirst($studio->country->name) : '-';
+            ->addColumn('country', function ($institution) {
+                $countryName = $countryName = $institution->country ? ucfirst($institution->country->name) : '-';
                 return $countryName;
               })   
             ->filterColumn('added_by', function($query, $keyword){
@@ -96,7 +96,7 @@ class InstitutionsDataTable extends DataTable
             'attr' => [
               'data-toggle' => "ajax-modal",
               'data-title' => 'Add Institution',
-              'data-href' => route('admin.studios.create')
+              'data-href' => route('admin.institutions.create')
             ]
           ];
         return $this->builder()

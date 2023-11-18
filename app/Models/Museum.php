@@ -13,7 +13,7 @@ class Museum extends Model
 {
     use HasFactory, SoftDeletes;
     public const DT_ID = 'museums_datatable';
-    public const GALLERY_PATH = 'museums-images';
+    public const MUSEUM_PATH = 'museums-images';
     
     protected $fillable = [
         'added_by',

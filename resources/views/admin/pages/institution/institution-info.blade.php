@@ -5,7 +5,7 @@
   </div>
   <div class="d-flex flex-column">
     <span class="text-body text-truncate">
-      <span class="fw-semibold"><a href="{{ route('admin.institution.show', $user->id) }}"> {{ $user->name }}</a></span>
+      <span class="fw-semibold"><a href="{{ route('admin.institutions.show', $user->id) }}"> {{ $user->name }}</a></span>
     </span>
     <small class="text-muted">{{ $user->email }}</small>
   </div>

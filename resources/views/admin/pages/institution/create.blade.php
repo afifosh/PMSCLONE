@@ -1,7 +1,7 @@
 @if ($institution->id)
-    {!! Form::model($institution, ['route' => ['admin.institution.update', $institution->id], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
+    {!! Form::model($institution, ['route' => ['admin.institutions.update', $institution->id], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
 @else
-    {!! Form::model($institution, ['route' => ['admin.institution.store'], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
+    {!! Form::model($institution, ['route' => ['admin.institutions.store'], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
 @endif
 <div class="row">
   {{-- Featured Image --}}
@@ -14,12 +14,12 @@
             <span class="d-none d-sm-block">Upload new photo</span>
             <i class="ti ti-upload d-block d-sm-none"></i>
           </label>
-          <button type="button" class="btn btn-label-secondary studio-image-reset mb-3">
+          <button type="button" class="btn btn-label-secondary institution-image-reset mb-3">
             <i class="ti ti-refresh-dot d-block d-sm-none "></i>
             <span class="d-none d-sm-block">Reset</span>
           </button>
           <div class="text-muted">Allowed JPG, GIF or PNG. Max size of 800K</div>
-          <input type="file" id="upload" name="avatar" class="studio-file-input" hidden accept="image/png, image/jpeg" />
+          <input type="file" id="upload" name="avatar" class="institution-file-input" hidden accept="image/png, image/jpeg" />
           @error('avatar')
             <div class="alert alert-danger alert-dismissible my-2">
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -145,22 +145,22 @@
 <script>
   (function () {
     // Update/reset user image of account page
-    let studioImage = document.getElementById('uploadedAvatar');
-    const fileInput = document.querySelector('.studio-file-input'),
-          resetFileInput = document.querySelector('.studio-image-reset');
+    let institutionImage = document.getElementById('uploadedAvatar');
+    const fileInput = document.querySelector('.institution-file-input'),
+          resetFileInput = document.querySelector('.institution-image-reset');
   
-    let currentArtworkImage = studioImage.src; // Store the initial or last uploaded image URL
+    let currentArtworkImage = institutionImage.src; // Store the initial or last uploaded image URL
   
     fileInput.onchange = () => {
       if (fileInput.files[0]) {
         lastUploadedImage = window.URL.createObjectURL(fileInput.files[0]); // Update with new uploaded image URL
-        studioImage.src = lastUploadedImage;
+        institutionImage.src = lastUploadedImage;
       }
     };
   
     resetFileInput.onclick = () => {
       fileInput.value = '';
-      studioImage.src = currentArtworkImage || 'https://preview.keenthemes.com/metronic8/demo1/assets/media/svg/avatars/blank.svg'; // Reset to last uploaded image or default
+      institutionImage.src = currentArtworkImage || 'https://preview.keenthemes.com/metronic8/demo1/assets/media/svg/avatars/blank.svg'; // Reset to last uploaded image or default
     };
   })();
   

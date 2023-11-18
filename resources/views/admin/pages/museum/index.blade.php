@@ -4,7 +4,7 @@ $configData = Helper::appClasses();
 
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Studios')
+@section('title', 'Museums')
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -80,7 +80,7 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-<h4 class="fw-semibold mb-4">{{__('Studios')}}</h4>
+<h4 class="fw-semibold mb-4">{{__('Museums')}}</h4>
 
 <div class="mt-3  col-12">
   <div class="card">
