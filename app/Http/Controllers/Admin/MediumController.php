@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\DataTables\Admin\MediumsDataTable;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Medium\MediumStoreRequest;
 use App\Models\Medium;
 
 use Illuminate\Http\Request;
@@ -29,20 +30,17 @@ class MediumController extends Controller
 
   public function create()
   {
-    $data['Medium'] = new Medium();
-    return $this->sendRes('success', ['view_data' => view('admin.pages.medium.edit', $data)->render(), 'JsMethods' => ['initIntlTel']]);
+    $data['medium'] = new Medium();
+    return $this->sendRes('success', ['view_data' => view('admin.pages.medium.create', $data)->render()]);
   }
 
-  public function store(Request $request)
-  {
-    $att = $request->validate([
-      'name' => ['required', 'string', 'max:255', 'unique:companies,name'],
-    ]);
+  public function store(MediumStoreRequest $request)
+  { 
 
+      Medium::create($request->validated());
 
-    if (Medium::create($att + ['added_by' => auth()->id()])) {
       return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Medium::DT_ID, 'close' => 'globalModal']);
-    }
+
   }
 
   public function show(Medium $medium)
@@ -57,34 +55,15 @@ class MediumController extends Controller
   {
     $data['medium'] = $medium;
 
-    return view('admin.pages.medium.edit', $data);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.medium.create', $data)->render()]);
   }
 
-  public function update(Request $request, $id)
+  public function update(Medium $medium, MediumStoreRequest $request)
   {
-    // Retrieve the Medium from the database by ID
-    $medium = Medium::find($id);
-    
-    if (!$medium) {
-        // Handle the case where the Medium with the given ID is not found
-        return response()->json(['message' => 'Medium not found'], 404);
-    }    
+    $medium->update($request->validated());
 
-    $att = $request->validate([
-      'name' => ['required', 'string', 'max:255', 'unique:companies,name'],
-    ]);
-
-    $medium->update($att);
-
-    $data['medium'] = $medium;
- 
-        return $this->sendRes('Updated Successfully', [
-          'view_data' => view('admin.pages.medium.edit', $data)->render(),
-          'JsMethods' => ['initIntlTel'],
-      ]);
-
-    // }
-  }
+    return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Medium::DT_ID, 'close' => 'globalModal']);
+  }  
 
 
   public function destroy(Medium $medium)

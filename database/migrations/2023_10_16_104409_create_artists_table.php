@@ -20,17 +20,18 @@ return new class extends Migration
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('phone')->nullable();
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
             $table->string('avatar')->nullable();
             $table->string('website')->unique()->nullable();
             $table->string('job_title')->nullable();
-            $table->enum('gender', ['Male', 'Female', 'Other'])->default('Male');
+            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
             $table->string('address')->nullable();
             $table->string('zip_code')->nullable();
             $table->string('timezone')->nullable();
             $table->string('currency')->nullable();
             $table->date('birth_date')->nullable();
-            $table->string('language')->default('en'); // Add language column
+            $table->date('death_date')->nullable();
+            $table->string('language')->nullable();  // Add language column
             $table->enum('status', ['active', 'suspended'])->default('active');
             $table->timestamp('deleted_at')->nullable();
             $table->timestamps();

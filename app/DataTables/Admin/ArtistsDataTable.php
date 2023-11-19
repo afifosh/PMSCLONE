@@ -104,9 +104,10 @@ class ArtistsDataTable extends DataTable
     $buttons[] = [
       'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add Artist</span>',
       'className' =>  'btn btn-primary mx-3',
-      'href' => route('admin.artists.create'),
       'attr' => [
-        'onClick' => 'window.location.href="'.route('admin.artists.create'). '"',
+        'data-toggle' => "ajax-modal",
+        'data-title' => 'Add Arist',
+        'data-href' => route('admin.artists.create')
       ]
     ];
     return $this->builder()

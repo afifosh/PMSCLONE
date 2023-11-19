@@ -24,7 +24,6 @@ class WarehouseController extends Controller
     $data['cities'] = ['' => 'Select City'];
 
     // Include location details
-    $data['location_name'] =  '';
     $data['address'] = '';
     $data['latitude'] =  '';
     $data['longitude'] =  '';
@@ -53,7 +52,6 @@ class WarehouseController extends Controller
       try {
           // Extract location data from the request
           $locationData = [
-              'name' => $request->input('location_name'), // Adjust field names as per your request
               'country_id' => $request->input('country_id'),
               'state_id' => $request->input('state_id'),
               'city_id' => $request->input('city_id'),
@@ -63,6 +61,8 @@ class WarehouseController extends Controller
               'zoomLevel' => $request->input('zoomLevel'),
               'owner_type' => $request->input('owner_type'),
               'owner_id' => $request->input('owner_id'),
+              'is_public' => false, // Set is_public to false
+              'is_warehouse' => true, // Set is_warehouse to true
               'added_by' => $request->input('added_by'),
               'status' => $request->input('status'),
           ];
@@ -116,7 +116,6 @@ class WarehouseController extends Controller
       $data['ownerType'] = $warehouse->owner_type == 'App\Models\PartnerCompany' ? 'PartnerCompany' : ($warehouse->owner ?  ($warehouse->owner->type == 'Company' ? 'Company' : 'Client') : 'Select Owner');
   
       // Include location details
-      $data['location_name'] = $warehouse->location->name ?? '';
       $data['address'] = $warehouse->location->address ?? '';
       $data['latitude'] = $warehouse->location->latitude ?? '';
       $data['longitude'] = $warehouse->location->longitude ?? '';
@@ -135,7 +134,6 @@ class WarehouseController extends Controller
           $warehouseData = $request->validated(); // Adjust as necessary
           // Retrieve the associated Location and update it
           $locationData = [
-            'name' => $request->input('location_name'), // Adjust field names as per your request
             'country_id' => $request->input('country_id'),
             'state_id' => $request->input('state_id'),
             'city_id' => $request->input('city_id'),

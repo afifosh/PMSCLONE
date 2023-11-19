@@ -20,7 +20,7 @@ class Warehouse extends Model
         'owner_id',
         'status',
       ];
-    
+
       protected $casts = [
         'created_at' => 'datetime:d M, Y',
         'updated_at' => 'datetime:d M, Y'

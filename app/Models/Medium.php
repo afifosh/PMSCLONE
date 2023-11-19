@@ -13,12 +13,14 @@ class Medium extends Model
 
   protected $table = 'mediums';
 
-  protected $fillable = ['name'];
-
   public const DT_ID = 'mediums_datatable';
 
+  protected $fillable = [
+    'name',
+    'added_by',
+  ];
+
   protected $casts = [
-    'verified_at' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y'
   ];
@@ -37,5 +39,10 @@ class Medium extends Model
   { 
     //
   }
+
+  public function mediumable()
+  {
+      return $this->morphTo();
+  }  
 
 }

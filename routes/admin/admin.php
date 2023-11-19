@@ -92,6 +92,9 @@ use App\Http\Controllers\Admin\ArtworkController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\StudioController;
+use App\Http\Controllers\Admin\GalleryController;
+use App\Http\Controllers\Admin\InstitutionController;
+use App\Http\Controllers\Admin\MuseumController;
 use App\Http\Controllers\Admin\MediumController;
 use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\Admin\Contract\ContractPartyController;
@@ -173,6 +176,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('warehouses', WarehouseController::class);
     // Studio routes
     Route::resource('studios', StudioController::class);
+    // Museum routes
+    Route::resource('museums', MuseumController::class);
+    // Institution routes
+    Route::resource('institutions', InstitutionController::class);
+    // Gallery routes
+    Route::resource('galleries', GalleryController::class);            
     // Medium routes
     Route::resource('mediums', MediumController::class);
 

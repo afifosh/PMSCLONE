@@ -47,7 +47,7 @@ class MediumsDataTable extends DataTable
      */
     public function query(Medium $model): QueryBuilder
     {
-        $query = $model->newQuery();
+        return $model->with('addedBy')->newQuery();
 
         // Customize your query, add relationships, etc.
         // Example: $query->with('relatedModel');
@@ -70,7 +70,7 @@ class MediumsDataTable extends DataTable
             'attr' => [
               'data-toggle' => "ajax-modal",
               'data-title' => 'Add Medium',
-              'data-href' => route('admin.companies.create')
+              'data-href' => route('admin.mediums.create')
             ]
           ];
         return $this->builder()

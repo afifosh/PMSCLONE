@@ -22,6 +22,15 @@ class WarehousesDataTable extends DataTable
       ->addColumn('owner', function ($warehouse) {
         return $warehouse->owner->name ?? 'N/A';
       })
+      ->addColumn('country.name', function ($warehouse) {
+        return $warehouse->location->country->name ?? 'N/A';
+      })
+      ->addColumn('state.name', function ($warehouse) {
+        return $warehouse->location->state->name ?? 'N/A';
+      })
+      ->addColumn('city.name', function ($warehouse) {
+        return $warehouse->location->city->name ?? 'N/A';
+      })            
       ->addColumn('action', function ($warehouse) {
         return view('admin.pages.warehouses.action', compact('warehouse'));
       });
@@ -77,9 +86,9 @@ class WarehousesDataTable extends DataTable
       Column::make('name'),
       Column::make('owner'),
       // Column::make('address'),
-      // Column::make('country.name')->title('Country'),
-      // Column::make('state.name')->title('State'),
-      // Column::make('city.name')->title('City'),
+      Column::make('country.name')->title('Country'),
+      Column::make('state.name')->title('State'),
+      Column::make('city.name')->title('City'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

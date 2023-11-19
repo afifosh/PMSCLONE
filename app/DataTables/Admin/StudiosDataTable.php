@@ -96,7 +96,7 @@ class StudiosDataTable extends DataTable
             'attr' => [
               'data-toggle' => "ajax-modal",
               'data-title' => 'Add Studio',
-              'data-href' => route('admin.companies.create')
+              'data-href' => route('admin.studios.create')
             ]
           ];
         return $this->builder()

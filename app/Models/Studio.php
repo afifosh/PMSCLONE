@@ -6,13 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Avatar;
 
 class Studio extends Model
 {
     use HasFactory, SoftDeletes;
     public const DT_ID = 'studios_datatable';
-
+    public const STUDIO_PATH = 'studio-images';
+    
     protected $fillable = [
         'added_by',
         'country_id',

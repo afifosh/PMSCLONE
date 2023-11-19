@@ -588,6 +588,27 @@ window.initModalSelect2 = function(){
   // select2 with remote data for global modal
   $('.globalOfSelect2Remote').each(function (){
     $(this).select2({
+      createTag: function (params) {
+        // Return an object for the new tag with a custom property isNew
+        var term = $.trim(params.term);
+        if (term === '') {
+          return null; // Don't allow empty tags
+        }
+        return {
+          id: term,
+          text: term,
+          isTag: true // Custom property to indicate that this is a new tag
+        };
+      },
+      // templateResult: function (data) {
+      //   // Check if this is the special 'Add' tag
+      //   if (data.isTag) {
+      //     // Return a div with the 'select2-tag' data attribute set to true
+      //     return $('<div>' + data.text + '</div>').data("select2-tag", true);
+      //   }
+      //   // Return the normal display for other results
+      //   return data.text;
+      // },
       ajax: {
         url: $(this).data('url'),
         dataType: 'json',
@@ -704,8 +725,9 @@ $(document).on('click', '[data-toggle="ajax-modal"]', function () {
     url: url,
     success: function (response) {
       // Check if modaltitle exists in the response and is not empty
-      var modalTitle = response.data.modaltitle;
-      if (modalTitle && modalTitle.trim() !== "") {
+      var modalTitle = response.data && response.data.modaltitle ? response.data.modaltitle.trim() : null;
+
+      if (modalTitle) {
           $('#globalModal .modal-header').html(modalTitle);
       } else {
           $('#globalModalTitle').html(title);

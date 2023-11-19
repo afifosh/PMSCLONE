@@ -1,6 +1,6 @@
 <div class="d-inline-block text-nowrap">
     @can('update company')
-    <a class="text-body" href="{{route('admin.studios.edit', $studio)}}"><i class="ti ti-edit"></i></a>
+    <button class="btn btn-sm btn-icon" data-title={{__('Edit Studio')}} data-toggle="ajax-modal" data-href="{{ route('admin.studios.edit', $studio) }}"><i class="ti ti-edit"></i></button>
     @endcan
     @can('delete company')
         <button class="btn btn-sm btn-icon delete-record" data-toggle="ajax-delete"

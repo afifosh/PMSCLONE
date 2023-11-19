@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 use Avatar;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 class Artwork extends Model
@@ -15,6 +15,7 @@ class Artwork extends Model
   use HasFactory;
 
   public const DT_ID = 'artworks_datatable';
+  public const ARTWORK_PATH = 'artworks-images';
 
   protected $fillable = [
     'title',
@@ -24,7 +25,15 @@ class Artwork extends Model
     'dimension',
     'featured_image',
     'description',
-    'added_by'
+    'added_by',
+    'weight',
+    'weight_unit',
+    'width',
+    'width_unit',
+    'height',
+    'height_unit',
+    'depth',
+    'depth_unit',
   ];
 
   protected $casts = [
@@ -65,14 +74,10 @@ class Artwork extends Model
 
   /**
    * Locations of the artwork.
-   * latest location will be the current location
    */
-  public function locations(): BelongsToMany
+  public function locations(): HasMany
   {
-    return $this->belongsToMany(Location::class, ArtworkLocation::class)
-      ->withPivot('moved_from', 'added_by', 'added_till', 'contract_id') // pivot table's columns will be available when accessing the relationship
-      ->withTimestamps()
-      ->latest(); // order by pivot table's created_at column
+    return $this->hasMany(ArtworkLocation::class);
   }
 
   /**
@@ -82,19 +87,22 @@ class Artwork extends Model
    */
   public function latestLocation()
   {
-    return $this->hasOne(ArtworkLocation::class)->latestOfMany();
-  }
-
-  /**
-   * The current location of the artwork.
-   */
-  public function currentLocation()
-  {
-    return $this->locations()->latest()->first();
+    return $this->hasOne(ArtworkLocation::class)->where('is_current', true);
   }
 
   public function program(): BelongsTo
   {
     return $this->belongsTo(Program::class);
   }
+
+  public function artists(): BelongsToMany
+  {
+    return $this->belongsToMany(Artist::class, 'artwork_artists');
+  }
+
+  public function mediums()
+  {
+      return $this->morphMany(Medium::class, 'mediumable');
+  }
+    
 }

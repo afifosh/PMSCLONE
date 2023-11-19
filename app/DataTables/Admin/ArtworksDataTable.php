@@ -32,6 +32,12 @@ class ArtworksDataTable extends DataTable
       ->addColumn('medium', function (artwork $artwork) {
         return $artwork->medium->name ?? '-';
       })
+      ->addColumn('year', function (artwork $artwork) {
+        return $artwork->year ?? '-';
+      })
+      ->addColumn('program', function (artwork $artwork) {
+        return $artwork->program->name ?? '-';
+      })            
       ->filterColumn('added_by', function ($query, $keyword) {
         return $query->whereHas('addedBy', function ($q) use ($keyword) {
           return $q->where('email', 'like', '%' . $keyword . '%');
@@ -99,6 +105,8 @@ class ArtworksDataTable extends DataTable
     return [
       Column::make('name')->title(__('Artwork Name')),
       Column::make('medium')->title(__('Medium')), // Display the 'medium' attribute
+      Column::make('program')->title(__('Program')), // Display the 'medium' attribute
+      Column::make('year')->title(__('Year')), // Display the 'medium' attribute
       Column::make('added_by'),
       Column::make('updated_at'),
     ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\DB;
 use App\DataTables\Admin\StudiosDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
@@ -11,6 +12,7 @@ use App\Models\Studio;
 use Illuminate\Http\Request;
 use App\Repositories\FileUploadRepository;
 use App\Support\Timezonelist;
+use App\Http\Requests\Admin\Studio\StudioStoreRequest;
 use Illuminate\Validation\Rule;
 
 use Throwable;
@@ -28,8 +30,12 @@ class StudioController extends Controller
         $data['countries'] = ['' => 'Select Country'];
         $data['states'] = ['' => 'Select State'];
         $data['cities'] = ['' => 'Select City'];
+        $data['timezones'] = $this->timezones();
+        $data['languages'] = $this->languages();
+        $data['currencies'] = $this->currencies();
         // You can add more data as needed
-        return view('admin.pages.studio.edit', $data);
+        return $this->sendRes('success', ['view_data' => view('admin.pages.studio.create', $data)->render(), 'JsMethods' => ['initIntlTel']]);
+ 
     }
 
 
@@ -56,36 +62,40 @@ class StudioController extends Controller
         $data['states'] = $studio->state_id ? State::where('id', $studio->state_id)->pluck('name', 'id')->prepend('Select State', '') : ['' => 'Select State'];
         $data['cities'] = $studio->city_id ? City::where('id', $studio->city_id)->pluck('name', 'id')->prepend('Select City', '') : ['' => 'Select City'];
 
-        return view('admin.pages.studio.edit', $data);
+        // You can add more data as needed
+        return $this->sendRes('success', ['view_data' => view('admin.pages.studio.create', $data)->render(), 'JsMethods' => ['initIntlTel']]);
+ 
     }
-
-
-    public function store(Request $request)
+    public function store(StudioStoreRequest $request, FileUploadRepository $file_repo)
     {
-        $att = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:studios,name'],
-            'website' => ['nullable', 'string', 'max:255', 'unique:studios,website'],
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Update with your image validation rules
-            'email' => ['nullable', 'string', 'max:255', 'unique:studios,email'],
-            'phone' => 'nullable|phone',
-            'phone_country' => 'required_with:phone',
-            'address' => 'nullable|string|max:255',
-            'city_id' => 'nullable|exists:cities,id',
-            'state_id' => 'nullable|exists:states,id',
-            'zip' => 'nullable|string|max:255',
-            'country_id' => 'nullable|exists:countries,id',
-            'language' => 'nullable|string|max:255',
-            'timezone' => 'nullable|string|max:255',
-            'currency' => 'nullable|string|max:255',
-            'status' => 'nullable|string|max:255',
-        ]);
-
-        if (Studio::create($att)) {
-            return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => Studio::DT_ID, 'close' => 'globalModal']);
+        DB::beginTransaction(); // Start the transaction
+    
+        try {
+            $studioData = $request->validated(); // Get validated data
+    
+            // Check for avatar in the request and process if present
+            if ($request->hasFile('avatar')) {
+                $path = Studio::STUDIO_PATH; // Use the STUDIO_PATH constant
+                $StudioImage = $path . '/' . $file_repo->addAttachment($request->file('avatar'), $path);
+                $studioData['avatar'] = $StudioImage; // Add avatar to studio data
+            }
+    
+            // Create the Studio record
+            $studio = Studio::create($studioData);
+    
+            DB::commit(); // Commit the transaction
+    
+            // Return a success response
+            return $this->sendRes('Studio Created Successfully', ['event' => 'table_reload', 'table_id' => Studio::DT_ID, 'close' => 'globalModal']);
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback the transaction on error
+            // Handle exceptions
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
         }
     }
+    
 
-    public function update(Request $request, Studio $studio)
+    public function update(Studio $studio, StudioStoreRequest $request)
     {
         $att = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('studios', 'name')->ignore($studio->id)],
@@ -114,7 +124,7 @@ class StudioController extends Controller
     {
       try {
         if ($studio->delete()) {
-          return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => Artist::DT_ID]);
+          return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => Studio::DT_ID]);
         }
         return $this->sendError('Something Went Wrong');
       } catch (Throwable $e) {
