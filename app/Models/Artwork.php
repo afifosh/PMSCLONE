@@ -99,4 +99,10 @@ class Artwork extends Model
   {
     return $this->belongsToMany(Artist::class, 'artwork_artists');
   }
+
+  public function mediums()
+  {
+      return $this->morphMany(Medium::class, 'mediumable');
+  }
+    
 }

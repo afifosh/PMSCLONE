@@ -40,4 +40,9 @@ class Medium extends Model
     //
   }
 
+  public function mediumable()
+  {
+      return $this->morphTo();
+  }  
+
 }

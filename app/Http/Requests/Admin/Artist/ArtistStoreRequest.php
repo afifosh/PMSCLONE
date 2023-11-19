@@ -71,9 +71,9 @@ class ArtistStoreRequest extends FormRequest
     if ($this->method() == 'PUT' || $this->method() == 'PATCH') {
       $rules['email'] = [
           'required',
-          'string',
+          'email',
           'max:255',
-          Rule::unique('artists')->ignore($artistId)
+          Rule::unique('artists')->ignore($this->artist->id)
       ];
 
       $rules['first_name'] = [
@@ -82,7 +82,7 @@ class ArtistStoreRequest extends FormRequest
         Rule::unique('artists')->where(function ($query) {
             return $query->where('first_name', $this->input('first_name'))
                          ->where('last_name', $this->input('last_name'));
-        })->ignore($this->id), // Use 'ignore' to exclude the current record when updating
+        })->ignore($this->artist->id), // Use 'ignore' to exclude the current record when updating
       ];
     }
   
@@ -99,10 +99,13 @@ class ArtistStoreRequest extends FormRequest
   public function messages(): array
   {
     return [
-      'first_name.required' => 'Artist name is required',
-      'first_name.string' => 'Artist name must be a string',
-      'first_name.max' => 'Artist name should not be greater than 255 characters',
+      'first_name.required' => 'Artist first name is required',
+      'first_name.string' => 'Artist first name must be a string',
+      'first_name.max' => 'Artist first name should not be greater than 255 characters',
       'first_name.unique' => 'The combination of first name and last name already exists.',
+      'last_name.required' => 'Artist last name is required',
+      'last_name.string' => 'Artist last name must be a string',
+      'last_name.max' => 'Artist last name should not be greater than 255 characters',      
       'country_id.required' => 'Country is required',
       'avatar.mimetypes' => 'Artist image must be an image file.',
       'phone.phone' => 'Phone number is invalid.',

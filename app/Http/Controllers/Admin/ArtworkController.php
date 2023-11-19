@@ -133,13 +133,38 @@ class ArtworkController extends Controller
     return $this->sendRes('success', ['view_data' => view('admin.pages.artwork.create', $data)->render()]);
   }
 
-  public function update(Artwork $artwork, ArtworkStoreRequest $request)
+  public function update(Artwork $artwork, ArtworkStoreRequest $request, FileUploadRepository $file_repo)
   {
-    $artwork->update($request->validated());
-
-
-    return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Artwork::DT_ID, 'close' => 'globalModal']);
+      DB::beginTransaction(); // Start the transaction
+      
+      try {
+          $artworkData = $request->validated(); // Get validated data
+  
+          // Check for featured_image in the request
+          if ($request->hasFile('featured_image')) {
+  
+              // Assuming you have a service or method to handle the file upload
+              // Update the path according to your application structure
+              $path = Artwork::ARTWORK_PATH; // Use the ARTWORK_PATH constant
+  
+              $featuredImage = $path . '/' . $file_repo->addAttachment($request->file('featured_image'), $path);
+              $artworkData['featured_image'] = $featuredImage; // Update featured_image in artwork data
+          }
+  
+          // Update the Artwork record
+          $artwork->update($artworkData);
+  
+          DB::commit(); // Commit the transaction
+  
+          // Return a success response, for example:
+          return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => Artwork::DT_ID, 'close' => 'globalModal']);
+      } catch (\Exception $e) {
+          DB::rollBack(); // Rollback the transaction on error
+          // Handle exceptions
+          return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+      }
   }
+  
 
   public function destroy(Artwork $artwork)
   {
