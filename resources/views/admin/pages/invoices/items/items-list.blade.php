@@ -23,7 +23,7 @@
                   <th class="text-left x-description bill_col_description">Price</th>
                   <th class="text-left x-description bill_col_description">QTY</th>
                   <th class="text-left x-rate bill_col_rate">Subtotal</th>
-                  <th class="text-right x-total bill_col_total" id="bill_col_total">Total</th>
+                  <th class="text-end x-total bill_col_total" id="bill_col_total">Total</th>
               </tr>
           </thead>
           @include('admin.pages.invoices.items.edit-list')

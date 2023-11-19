@@ -39,16 +39,14 @@ class ItemDeductionStoreRequest extends FormRequest
       'subtotal' => $this->invoice_item->subtotal,
       /** Deduction Related Fields */
       'is_before_tax' => $this->boolean('is_before_tax'),
-      'is_manual_deduction' => $this->boolean('is_manual_deduction'),
-      // /** End Deduction Related Fields */
-      // 'add_tax' => $this->boolean('add_tax'),
-      // 'is_manual_tax' => $this->boolean('is_manual_tax') && $this->boolean('add_tax'),
-      // 'manual_tax_amount' => $this->is_manual_tax ? $this->manual_tax_amount : 0,
-      // 'rounding_amount' => $this->boolean('rounding_amount'),
+      'is_manual_deduction' => $this->boolean('is_fixed_amount') ? false : $this->boolean('is_manual_deduction'),
+      'is_fixed_amount' => $this->boolean('is_fixed_amount'),
+      'downpayment_amount' => $this->downpayment_amount,
     ]);
 
     // validate
     $this->validate($this->getItemRules(), $this->messaages());
+    if(!$this->is_fixed_amount)
     $this->deduction_rate = InvoiceConfig::activeOnly()->findOrFail($this->dp_rate_id);
 
     $this->downpayment = Invoice::findOrFail($this->downpayment_id);
@@ -84,19 +82,20 @@ class ItemDeductionStoreRequest extends FormRequest
       'subtotal' => 'required|numeric|gt:0',
       // deduction fields
       'is_before_tax' => 'required|boolean',
+      'is_fixed_amount' => 'required|boolean',
       'downpayment_id' => 'required|exists:invoices,id',
-      'downpayment_amount' => 'required|numeric|gte:0',
-      'dp_rate_id' => 'required|exists:invoice_configs,id',
+      'downpayment_amount' => 'required|numeric|gt:0',
+      'dp_rate_id' => 'nullable|required_if:is_fixed_amount,false|exists:invoice_configs,id',
       'calculation_source' => 'required|in:Down Payment,Deductible',
       'is_manual_deduction' => 'required|boolean',
     ];
   }
   public function rules(): array
   {
-    $rules = $this->getItemRules() + [
-      'downpayment_amount' => 'required|numeric|gte:0|max:' . $this->getMaxDeductableAmount(),
+    $rules = [
+      'downpayment_amount' => 'required|numeric|gt:0|max:' . $this->getMaxDeductableAmount(),
       'manual_deduction_amount' => 'required|numeric|gte:0',
-    ];
+    ] + $this->getItemRules();
 
     if ($this->is_manual_deduction) {
       // manual deduction should be between +-1 of calculated deduction amount
@@ -122,6 +121,11 @@ class ItemDeductionStoreRequest extends FormRequest
   private function calDeductionAmount(): void
   {
     $this->calculated_downpayment_amount = 0;
+
+    if($this->is_fixed_amount){
+      $this->calculated_downpayment_amount = $this->downpayment_amount;
+      return;
+    }
 
     if ($this->deduction_rate->type == 'Fixed') {
       $this->calculated_downpayment_amount = $this->deduction_rate->amount;

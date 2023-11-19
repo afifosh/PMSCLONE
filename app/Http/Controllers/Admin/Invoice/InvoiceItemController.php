@@ -12,6 +12,7 @@ use App\Models\InvoiceItem;
 use App\Models\InvoiceConfig;
 use DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InvoiceItemController extends Controller
 {
@@ -120,32 +121,32 @@ class InvoiceItemController extends Controller
       return $this->sendError('Invoice is not editable');
     }
 
-    $invoiceItem->update($request->validated());
+    DB::beginTransaction();
+    try{
+      $invoiceItem->update($request->validated());
 
-    if($invoiceItem->invoiceable_type == CustomInvoiceItem::class)
-      $invoiceItem->invoiceable->update($request->validated() + ['invoice_id' => $invoice->id]);
+      if($invoiceItem->invoiceable_type == CustomInvoiceItem::class)
+        $invoiceItem->invoiceable->update($request->validated() + ['invoice_id' => $invoice->id]);
 
-    if($request->deduct_downpayment)
-    $invoiceItem->deduction()->updateOrCreate([
-      'deductible_id' => $invoiceItem->id,
-      'deductible_type' => InvoiceItem::class,
-    ], [
-      'deductible_id' => $invoiceItem->id,
-      'deductible_type' => InvoiceItem::class,
-      'downpayment_id' => $request->downpayment_id,
-      'dp_rate_id' => $request->dp_rate_id,
-      'is_percentage' => $request->deduction_rate_type != 'Fixed',
-      'amount' => $request->downpayment_amount,
-      'manual_amount' => $request->manual_deduction_amount,
-      'percentage' => $request->downpayment_rate->amount ?? 0,
-      'is_before_tax' => $request->is_before_tax,
-      'calculation_source' => $request->calculation_source,
-    ]);
-    else{
-      $invoiceItem->deduction()->delete();
+      if($invoiceItem->deduction && $invoiceItem->deduction->is_before_tax){
+        $invoiceItem->recalculateDeductionAmount();
+        $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts();
+        $invoiceItem->reCalculateTotal();
+      }else{
+        $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts(false);
+        $invoiceItem->reCalculateTotal();
+        if($invoiceItem->deduction){
+          $invoiceItem->recalculateDeductionAmount();
+          $invoiceItem->reCalculateTotal();
+        }
+      }
+
+      $invoice->reCalculateTotal();
+    }catch(\Exception $e){
+      DB::rollback();
+      return $this->sendError($e->getMessage());
     }
-
-    $invoice->reCalculateTotal();
+    DB::commit();
 
     return $this->sendRes('Item Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }

@@ -1,12 +1,13 @@
 <tr data-id="{{$item->id}}">
   <td>
     <a data-toggle="ajax-delete" data-href="{{ route('admin.invoices.invoice-items.deductions.destroy', [$invoice, 'invoice_item' => $item->id, $item->deduction->id]) }}"><i class="ti ti-trash"></i></a>
+    <a data-toggle="ajax-modal" data-title="{{__('Edit Deduction')}}" data-href="{{ route('admin.invoices.invoice-items.deductions.edit', [$invoice, 'invoice_item' => $item->id, $item->deduction->id]) }}"><i class="ti ti-pencil"></i></a>
   </td>
   <!--description-->
   <td>
     Down Payment Deduction
     @if($item->deduction->is_percentage)
-      ({{$item->deduction->amount}}%)
+      ({{$item->deduction->percentage}}%)
     @endif
   </td>
   <td
@@ -32,7 +33,7 @@
   </td>
 
   <!--total-->
-  <td class="text-right"
+  <td class="text-end"
     @if($item->deduction->manual_amount)
       data-bs-toggle="tooltip" title="Calculated amount: {{cMoney(-($item->deduction?->amount ?? 0), $invoice->contract->currency, true)}}"
     @endif

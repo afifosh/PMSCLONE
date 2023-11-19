@@ -117,10 +117,58 @@ class InvoiceItem extends Model
     return $this->morphOne(InvoiceDeduction::class, 'deductible');
   }
 
-  public function reCalculateTotal($deductionUpdated = false, $taxUpdated = false ): void
+  public function recalculateDeductionAmount(): void
   {
-    $deductionAmount = $this->calculateDeductionAmount();
     $this->load('deduction');
+    $invoiceTaxes = InvoiceTax::where('invoice_item_id', $this->id)
+      ->select([
+        'pay_on_behalf',
+        'is_authority_tax',
+        'is_simple_tax',
+        DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount) as total_amount')
+      ])
+      ->get();
+
+    $simpleTax = $invoiceTaxes->where('pay_on_behalf', false)->sum('total_amount') / 1000;
+    $behalfTax = $invoiceTaxes->where('pay_on_behalf', true)->sum('total_amount') / 1000;
+    $total_tax = $simpleTax - $behalfTax;
+    $deductionAmount = $this->calculateDeductionAmount($total_tax);
+    // if manua amount difference is greater than 1 then reset manual amount
+    $deduction = $this->deduction;
+    if ($deduction && $deduction->manual_amount && abs($deduction->manual_amount - $deductionAmount) > 1) {
+      $deduction->manual_amount = 0;
+    }
+    $deduction->amount = $deductionAmount;
+    $deduction->save();
+  }
+
+  private function calculateDeductionAmount($total_tax = 0)
+  {
+    $deductionAmount = 0;
+    if (!$this->deduction) {
+      return $deductionAmount;
+    }
+
+    if (!$this->deduction->is_percentage) {
+      $deductionAmount = $this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount;
+      return $deductionAmount;
+    } else {
+      if ($this->deduction->source == 'Down Payment')
+        $deductionAmount = $this->deduction->downpayment->total * $this->deduction->percentage / 100;
+      elseif ($this->deduction->is_before_tax) {
+        $deductionAmount = ($this->subtotal * $this->deduction->percentage) / 100;
+      } else {
+        $deductionAmount = ($this->subtotal + $total_tax) * $this->deduction->percentage / 100;
+      }
+    }
+
+    return $deductionAmount;
+  }
+
+  public function reCalculateTotal($deductionUpdated = false, $taxUpdated = false): void
+  {
+    $this->load('deduction');
+
     $invoiceTaxes = InvoiceTax::where('invoice_item_id', $this->id)
       ->select([
         'pay_on_behalf',
@@ -139,15 +187,22 @@ class InvoiceItem extends Model
     $this->save();
   }
 
-  private function calculateDeductionAmount()
+  /**
+   * Recalculate tax amounts and reset manual amounts to 0
+   * This function is called when deduction is created
+   */
+  public function reCalculateTaxAmountsAndResetManualAmounts($considerDeduction = true): void
   {
-    // $deductionAmount = 0;
-    // if($this->deduction && $this->deduction->is_before_tax) {
-    //   if(!$this->deduction->is_percentage){
-    //     $deductionAmount = $this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount;
-    //   } else {
-    //     $deductionAmount = ($this->subtotal * $this->deduction->amount) / 100;
-    //   }
-    // }
+    $this->load('pivotTaxes');
+    $taxableAmount = $this->subtotal - ($considerDeduction && $this->deduction && $this->deduction->is_before_tax ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    foreach($this->pivotTaxes as $tax){
+      if($tax->type == 'Fixed'){
+        continue;
+      }else{
+        $tax->manual_amount = 0;
+        $tax->calculated_amount = $taxableAmount * $tax->amount / 100;
+        $tax->save();
+      }
+    }
   }
 }

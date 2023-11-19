@@ -5,6 +5,18 @@
     'method' => 'PUT',
     'id' => 'item-create',
     ]) !!}
+  @elseif(isset($tax_rates) && isset($pivot_tax))
+    {{-- Item Tax Update --}}
+    {!! Form::model($invoiceItem, ['route' => ['admin.invoices.invoice-items.taxes.update', [$invoice, $invoiceItem->id, $pivot_tax, 'item' => request()->item, 'tab' => request()->tab]],
+    'method' => 'PUT',
+    'id' => 'item-create',
+    ]) !!}
+  @elseif(isset($deduction_rates) && isset($added_deduction))
+    {{-- Item Deduction Update --}}
+    {!! Form::model($invoiceItem, ['route' => ['admin.invoices.invoice-items.deductions.update', [$invoice, $invoiceItem->id, $added_deduction, 'item' => request()->item, 'tab' => request()->tab]],
+    'method' => 'PUT',
+    'id' => 'item-create',
+    ]) !!}
   @elseif(isset($tax_rates))
     {{-- Item Tax Store --}}
     {!! Form::model($invoiceItem, ['route' => ['admin.invoices.invoice-items.taxes.store', [$invoice, $invoiceItem->id, 'item' => request()->item, 'tab' => request()->tab]],
@@ -32,8 +44,8 @@
         @php
           $disabled = isset($tax_rates) || isset($deduction_rates) ? 'disabled' : '';
         @endphp
-        @includeWhen(request()->item != 'custom', 'admin.pages.invoices.items.edit-phases-general')
-        @includeWhen(request()->item == 'custom', 'admin.pages.invoices.items.edit-custom-item-general')
+        @includeWhen((request()->item != 'custom'), 'admin.pages.invoices.items.edit-phases-general')
+        @includeWhen((request()->item == 'custom'), 'admin.pages.invoices.items.edit-custom-item-general')
           {{-- Subtotal --}}
           <div class="form-group col-6">
             {{ Form::label('subtotal', __('Subtotal'), ['class' => 'col-form-label']) }}
@@ -108,10 +120,19 @@
   })
   // toggle downpayment deduction
   $(document).on('change', '#item-create [name="downpayment_id"]', function(){
-    if($(this).val()){
+    if($(this).val() && !$('#item-create [name="is_fixed_amount"]').is(':checked')){
       $('#item-create [name="dp_rate_id"]').parent().removeClass('d-none');
     }else{
       $('#item-create [name="dp_rate_id"]').parent().addClass('d-none');
+    }
+  })
+
+  // if pay_on_behalf is checked than check and disable is_authority_tax
+  $(document).on('change', '#item-create [name="pay_on_behalf"]', function(){
+    if($(this).is(':checked')){
+      $('#item-create [name="is_authority_tax"]').prop('checked', true).prop('disabled', true);
+    }else{
+      $('#item-create [name="is_authority_tax"]').prop('disabled', false);
     }
   })
 
@@ -129,6 +150,11 @@
     let totalDownpaymentAmount = calDPAmount();
 
     let totalTax = calItemTax();
+
+    // if pay_on_behalf is checked than deduct the tax amount
+    if($('#item-create [name="pay_on_behalf"]').is(':checked')){
+      totalTax = -totalTax;
+    }
     // total amount
     let totalAmount = subtotal + totalTax - totalDownpaymentAmount;
 
@@ -166,7 +192,7 @@
     let totalDownpaymentAmount = 0;
 
     const downpaymentId = $('#item-create [name="downpayment_id"]').val();
-    if(downpaymentId && !$('#item-create [name="is_manual_deduction"]').is(':checked')){
+    if(downpaymentId && !$('#item-create [name="is_manual_deduction"]').is(':checked') && !$('#item-create [name="is_fixed_amount"]').is(':checked')){
       var deductionRate = parseFloat($('#item-create [name="dp_rate_id"] option:selected').data('amount'));
       // is Percentage
       const isPercentageRate = $('#item-create [name="dp_rate_id"] option:selected').data('type') == 'Percent';
@@ -196,7 +222,7 @@
       }
     }
 
-    if($('#item-create [name="is_manual_deduction"]').is(':checked')){
+    if($('#item-create [name="is_manual_deduction"]').is(':checked') || $('#item-create [name="is_fixed_amount"]').is(':checked')){
       totalDownpaymentAmount = parseFloat($('#item-create [name="downpayment_amount"]').val());
     }else{
       // set downpayment amount
@@ -269,5 +295,18 @@
         $('#item-create .downpayment-info').html(BsAlert);
       }
     })
+  })
+
+  // on change is_fixed_amount, show/hide and cal-deduction-section
+  $(document).on('change', '#item-create [name="is_fixed_amount"]', function(){
+    if($(this).is(':checked')){
+      $('#item-create .cal-deduction-section').addClass('d-none');
+      // enable downpayment_amount
+      $('#item-create [name="downpayment_amount"]').prop('disabled', false);
+    }else{
+      $('#item-create .cal-deduction-section').removeClass('d-none');
+      // disable downpayment_amount
+      $('#item-create [name="downpayment_amount"]').prop('disabled', true);
+    }
   })
 </script>

@@ -191,13 +191,13 @@ class ProjectPhaseController extends Controller
           }
 
           $item->invoice->reCalculateTotal(); // ERROR HERE
-          DB::commit();
         });
       }
     }catch(\Exception $e){
       DB::rollback();
       return $this->sendError($e->getMessage());
     }
+    DB::commit();
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 

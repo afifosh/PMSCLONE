@@ -35,6 +35,12 @@ class PaymentsDataTable extends DataTable
         elseif($invoicePayment->payable_type == AuthorityInvoice::class)
         return '<a href="' . route('admin.invoices.edit', [$invoicePayment->payable->invoice_id, 'tab' => 'authority-tax']) . '">' . runtimeTAInvIdFormat($invoicePayment->payable_id) . '</a>';
       })
+      ->editColumn('invoice_type', function ($invoicePayment) {
+        if($invoicePayment->payable_type == Invoice::class)
+        return $invoicePayment->payable->type;
+        elseif($invoicePayment->payable_type == AuthorityInvoice::class)
+        return 'Authority Invoice';
+      })
       ->editColumn('checkbox', function ($payment) {
         return '<input class="form-check-input payment-check" name="selected_payments[]" type="checkbox" value="' . $payment->id . '">';
       })
@@ -163,6 +169,7 @@ class PaymentsDataTable extends DataTable
       Column::make('id'),
       Column::make('contract.id')->title('Contract'),
       Column::make('invoice_id'),
+      Column::make('invoice_type'),
       Column::make('transaction_id'),
       Column::make('amount'),
       Column::make('created_at'),

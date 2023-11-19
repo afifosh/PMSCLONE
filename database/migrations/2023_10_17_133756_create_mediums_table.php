@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('mediums', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique(); // Making the name column unique
-            $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();    
+            $table->foreignId('added_by')->nullable()->constrained('admins')->cascadeOnUpdate()->nullOnDelete();
             // Adding the morphs method to create polymorphic columns
-            $table->morphs('mediumable');
+            $table->nullableMorphs('mediumable');
             $table->timestamps();
         });
     }

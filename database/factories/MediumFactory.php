@@ -12,7 +12,7 @@ class MediumFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->word, // Generate a random word as the name
+            'name' => $this->faker->unique()->word, // Generate a random word as the name
         ];
     }
 }

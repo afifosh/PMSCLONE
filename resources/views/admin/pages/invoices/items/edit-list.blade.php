@@ -20,7 +20,7 @@
               <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Edit Phase')}}" data-href="{{route('admin.invoices.invoice-items.edit', [$invoice,'invoice_item' => $item->id, 'tab' => $tab])}}">Edit</i></li>
             @endif
             <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Add Tax')}}" data-href="{{route('admin.invoices.invoice-items.taxes.create', [$invoice, 'invoice_item' => $item->id, 'tab' => $tab])}}">Add Tax</li>
-            @if(!$item->deduction)
+            @if(!$item->deduction && $invoice->type != 'Down Payment')
               <li class="dropdown-item" data-toggle="ajax-modal" data-title="{{__('Add Deduction')}}" data-href="{{route('admin.invoices.invoice-items.deductions.create', [$invoice, 'invoice_item' => $item->id, 'tab' => $tab])}}">Add Deduction</li>
             @endif
         </div>
@@ -39,17 +39,19 @@
     <td>{{$item->invoiceable->quantity ?? 1}}</td>
     <td>@cMoney($item->subtotal, $invoice->contract->currency, true)</td>
     <!--total-->
-    <td class="text-right">@cMoney($item->subtotal, $invoice->contract->currency, true)</td>
+    <td class="text-end">@cMoney($item->subtotal, $invoice->contract->currency, true)</td>
   @includeWhen(@$item->deduction && @$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
   @includeWhen(count($item->taxes) > 0, 'admin.pages.invoices.items.show.item-tax')
   @includeWhen($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
   <tr>
+    @if($invoice->isEditable())
+      <td></td>
+    @endif
     <td></td>
     <td></td>
     <td></td>
     <td></td>
-    <td></td>
-    <td>
+    <td class="text-end">
       @if($tab != 'tax-report')
         @cMoney($tab == 'summary' ? $item->total : $item->authority_inv_total, $invoice->contract->currency, true)
       @endif
