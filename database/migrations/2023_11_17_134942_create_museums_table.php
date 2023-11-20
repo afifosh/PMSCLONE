@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('zip')->nullable();
             $table->string('phone')->nullable();
+            $table->text('biography')->nullable();
             $table->string('language')->nullable();  // Add language column
             $table->string('timezone')->nullable(); // Add timezone column
             $table->string('currency')->nullable(); // Add currency column            

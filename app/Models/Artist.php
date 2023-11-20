@@ -14,7 +14,7 @@ class Artist extends Model
     use HasFactory;
 
     public const DT_ID = 'artists_datatable';
-    public const ARTIST_PATH = 'artworks-images';
+    public const ARTIST_PATH = 'artists-images';
 
     protected $fillable = [
         'added_by',
