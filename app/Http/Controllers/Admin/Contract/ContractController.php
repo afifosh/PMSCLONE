@@ -819,10 +819,10 @@ class ContractController extends Controller
               return $phase->name;
           })
           ->addColumn('start_date', function ($phase) {
-              return $phase->start_date->format('d M, Y');
+              return $phase->start_date ? $phase->start_date->format('d M, Y') : 'N/A';
           })
           ->addColumn('due_date', function ($phase) {
-              return $phase->due_date->format('d M, Y');
+              return $phase->due_date ? $phase->due_date->format('d M, Y') : 'N/A';
           })
           ->addColumn('amount', function ($phase) {
               return view('admin.pages.contracts.paymentsplan.value-column', compact('phase'));
