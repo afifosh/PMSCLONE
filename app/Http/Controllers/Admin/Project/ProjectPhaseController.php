@@ -161,7 +161,11 @@ class ProjectPhaseController extends Controller
 
       $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
 
-      $this->storeTaxes($phase, $request);
+      // Check if there are taxes associated with the phase
+      if ($phase->taxes->count() > 0) {
+          $this->storeTaxes($phase, $request);        
+      }      
+
 
       // if added in invoice then update invoice item and tax amount
       $phase->load('addedAsInvoiceItem.invoice');

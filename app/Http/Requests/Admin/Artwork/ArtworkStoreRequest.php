@@ -42,7 +42,7 @@ class ArtworkStoreRequest extends FormRequest
       'medium_id' => 'required', // Check if medium_id exists in mediums table
       'program_id' => 'required|exists:programs,id', // Check if program_id exists in programs table
       'description' => 'nullable|string', // Assuming any string is acceptable for description
-      'featured_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // This rule validates the file type and size.
+      'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // This rule validates the file type and size.
       'weight' => 'required|numeric|min:0|max:999999.99', // Adjust the range if needed
       'weight_unit' => 'required|in:' . implode(',', array_values(WeightUnit::asSelectArray())),
       'width' => 'required|numeric|min:0|max:999999.99',
