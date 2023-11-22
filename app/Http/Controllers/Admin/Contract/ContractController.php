@@ -973,6 +973,11 @@ class ContractController extends Controller
           // Retrieve the program associated with the contract
           $program = $contract->program;
 
+        // Check if a program is associated with the contract
+        if (!$program) {
+          return $this->sendError('This contract is not associated with any program.');
+        }
+
           // Retrieve users associated with the program
           $programUsers = $program->users;
 
@@ -985,6 +990,11 @@ class ContractController extends Controller
           // Combine users from the program and the parent program
           $eligibleReviewers = $programUsers->merge($parentProgramUsers);
 
+          if ($eligibleReviewers->isEmpty()) {
+            return $this->sendError('No eligible reviewers found for this program.');
+          }
+
+        
           // Check if the current authenticated user is among the eligible reviewers
           if (!$eligibleReviewers->contains('id', Auth::id())) {
               // If not, return an error response
@@ -1017,7 +1027,7 @@ class ContractController extends Controller
       } catch (\Throwable $e) {
           // Log the error message for debugging
           // Log::error($e->getMessage());
-          return $this->sendError('Server Error');
+          return $this->sendError($e->getMessage());
       }
   }
 
@@ -1028,8 +1038,13 @@ class ContractController extends Controller
           // Find the contract by its ID
           $contract = Contract::findOrFail($contract_id);
 
-        // Retrieve the program associated with the contract
-        $program = $contract->program;
+          // Retrieve the program associated with the contract
+          $program = $contract->program;
+
+        // Check if a program is associated with the contract
+        if (!$program) {
+          return $this->sendError('This contract is not associated with any program.');
+        }
 
         // Retrieve users associated with the program
         $programUsers = $program->users;
@@ -1043,6 +1058,11 @@ class ContractController extends Controller
         // Combine users from the program and the parent program
         $eligibleReviewers = $programUsers->merge($parentProgramUsers);
 
+
+        if ($eligibleReviewers->isEmpty()) {
+          return $this->sendError('No eligible reviewers found for this program.');
+        }
+                
         // Check if the current authenticated user is among the eligible reviewers
         if (!$eligibleReviewers->contains('id', Auth::id())) {
             // If not, return an error response
@@ -1080,7 +1100,7 @@ class ContractController extends Controller
       } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
           return $this->sendError('Contract not found.');
       } catch (Throwable $e) {
-          return $this->sendError('Server Error');
+          return $this->sendError($e->getMessage());
       }
   }
 
