@@ -118,17 +118,80 @@
 
   let currentArtworkImage = artworkImage.src; // Store the initial or last uploaded image URL
 
-  fileInput.onchange = () => {
-    if (fileInput.files[0]) {
-      lastUploadedImage = window.URL.createObjectURL(fileInput.files[0]); // Update with new uploaded image URL
-      artworkImage.src = lastUploadedImage;
-    }
-  };
-
   resetFileInput.onclick = () => {
     fileInput.value = '';
     artworkImage.src = currentArtworkImage || 'https://preview.keenthemes.com/metronic8/demo1/assets/media/svg/avatars/blank.svg'; // Reset to last uploaded image or default
   };
+
+  function isImageFile(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+
+        reader.onloadend = function (e) {
+            const arr = new Uint8Array(e.target.result);
+            let header = '';
+            for (let i = 0; i < arr.length; i++) {
+                header += arr[i].toString(16).padStart(2, '0');
+            }
+
+            // Check the file signature against known image magic numbers
+            switch (header) {
+                case '89504e47': // PNG
+                case 'ffd8ffe0':
+                case 'ffd8ffe1':
+                case 'ffd8ffe2':
+                case 'ffd8ffe3':
+                case 'ffd8ffe8': // JPEG
+                case '47494638': // GIF
+                case '424d':     // BMP
+                    resolve(true);
+                    break;
+                default:
+                    resolve(false);
+                    break;
+            }
+        };
+
+        // Read enough bytes to cover the longest signature (PNG)
+        reader.readAsArrayBuffer(file.slice(0, 4));
+    });
+}
+
+
+fileInput.onchange = () => {
+    const file = fileInput.files[0];
+    if (file) {
+        isImageFile(file).then(isImage => {
+            if (isImage) {
+                const uploadedImageUrl = window.URL.createObjectURL(file);
+                artworkImage.src = uploadedImageUrl;
+                removeErrorMessage(); // Remove error message if it exists
+            } else {
+                showErrorMessage('Please select a valid image file.');
+            }
+        });
+    }
+};
+
+function showErrorMessage(message) {
+    removeErrorMessage(); // Remove any existing error messages first
+
+    const errorMessageDiv = document.createElement('div');
+    errorMessageDiv.classList.add('text-danger', 'validation-error');
+    errorMessageDiv.textContent = message;
+
+    fileInput.insertAdjacentElement('afterend', errorMessageDiv);
+}
+
+function removeErrorMessage() {
+    const existingError = document.querySelector('.validation-error');
+    if (existingError) {
+        existingError.remove();
+    }
+}
+
+
 })();
+
 
 </script>

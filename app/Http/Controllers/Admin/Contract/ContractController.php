@@ -6,6 +6,7 @@ use App\DataTables\Admin\Contract\ContractsDataTable;
 use App\DataTables\Admin\Contract\ContractsTrackingDataTable;
 use App\DataTables\Admin\Contract\PaymentsPlanDataTable;
 use App\DataTables\Admin\Contract\TrackingPaymentsPlanDataTable;
+use App\DataTables\Admin\Contract\ContractPaymentsPlanReviewDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ContractStoreRequest;
 use App\Http\Requests\Admin\ContractUpdateRequest;
@@ -621,7 +622,7 @@ class ContractController extends Controller
 
     $contract->update($data + $request->validated());
 
-    return $this->sendRes(__('Contract updated successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table']);
+    return $this->sendRes(__('Contract updated successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
   }
 
   protected function updateValueAndAccount(Contract $contract, $request): void
@@ -737,7 +738,19 @@ class ContractController extends Controller
 
   }
 
-  public function ContractPaymentsPlanReview($contract_id)
+
+  public function ContractPaymentsPlanReview(Contract $contract, ContractPaymentsPlanReviewDataTable $dataTable)
+  {
+        // Set the contract ID in the DataTable. This assumes that your DataTable
+        // has a method to accept a contract object or ID.
+        $dataTable->setContract($contract);
+
+        // Generate and return the DataTable as a JSON response.
+        // This will use the DataTable's internal mechanisms to create a JSON representation
+        // of the data based on the current request (like pagination, filtering, etc.).
+        return $dataTable->ajax();
+  }  
+  public function ContractPaymentsPlanReview_OLD($contract_id)
   {
       // Assuming `program` is a relation on the `Contract` model that retrieves the associated program.
       // And `users` is a relation on the `Program` model that retrieves all users associated with the program.
@@ -819,10 +832,10 @@ class ContractController extends Controller
               return $phase->name;
           })
           ->addColumn('start_date', function ($phase) {
-              return $phase->start_date->format('d M, Y');
+              return $phase->start_date ? $phase->start_date->format('d M, Y') : 'N/A';
           })
           ->addColumn('due_date', function ($phase) {
-              return $phase->due_date->format('d M, Y');
+              return $phase->due_date ? $phase->due_date->format('d M, Y') : 'N/A';
           })
           ->addColumn('amount', function ($phase) {
               return view('admin.pages.contracts.paymentsplan.value-column', compact('phase'));
@@ -973,6 +986,11 @@ class ContractController extends Controller
           // Retrieve the program associated with the contract
           $program = $contract->program;
 
+        // Check if a program is associated with the contract
+        if (!$program) {
+          return $this->sendError('This contract is not associated with any program.');
+        }
+
           // Retrieve users associated with the program
           $programUsers = $program->users;
 
@@ -985,6 +1003,11 @@ class ContractController extends Controller
           // Combine users from the program and the parent program
           $eligibleReviewers = $programUsers->merge($parentProgramUsers);
 
+          if ($eligibleReviewers->isEmpty()) {
+            return $this->sendError('No eligible reviewers found for this program.');
+          }
+
+        
           // Check if the current authenticated user is among the eligible reviewers
           if (!$eligibleReviewers->contains('id', Auth::id())) {
               // If not, return an error response
@@ -1017,7 +1040,7 @@ class ContractController extends Controller
       } catch (\Throwable $e) {
           // Log the error message for debugging
           // Log::error($e->getMessage());
-          return $this->sendError('Server Error');
+          return $this->sendError($e->getMessage());
       }
   }
 
@@ -1028,8 +1051,13 @@ class ContractController extends Controller
           // Find the contract by its ID
           $contract = Contract::findOrFail($contract_id);
 
-        // Retrieve the program associated with the contract
-        $program = $contract->program;
+          // Retrieve the program associated with the contract
+          $program = $contract->program;
+
+        // Check if a program is associated with the contract
+        if (!$program) {
+          return $this->sendError('This contract is not associated with any program.');
+        }
 
         // Retrieve users associated with the program
         $programUsers = $program->users;
@@ -1043,6 +1071,11 @@ class ContractController extends Controller
         // Combine users from the program and the parent program
         $eligibleReviewers = $programUsers->merge($parentProgramUsers);
 
+
+        if ($eligibleReviewers->isEmpty()) {
+          return $this->sendError('No eligible reviewers found for this program.');
+        }
+                
         // Check if the current authenticated user is among the eligible reviewers
         if (!$eligibleReviewers->contains('id', Auth::id())) {
             // If not, return an error response
@@ -1063,8 +1096,9 @@ class ContractController extends Controller
               // The phase has already been reviewed by the current user.
               // Delete the review to mark the phase as "unreviewed"
               $existingReview->delete();
-              return $this->sendRes('Phase marked as unreviewed!', ['isReviewed' => false]);
-             // return $this->sendRes('Phase marked as unreviewed!');
+              return $this->sendRes('Phase marked as unreviewed!', ['isReviewed' => false, 'close' => 'globalModal' ]);
+      
+             // return $this->sendRes('Phase marked as unreviewed!');  
           } else {
               // Mark the phase as reviewed
               $review = new Review([
@@ -1074,13 +1108,13 @@ class ContractController extends Controller
               $phase->reviews()->save($review);
 
               //return $this->sendRes('Phase marked as reviewed!');
-              return $this->sendRes('Phase marked as reviewed!', ['isReviewed' => true]);
+              return $this->sendRes('Phase marked as reviewed!', ['isReviewed' => true, 'close' => 'globalModal' ]);
           }
 
       } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
           return $this->sendError('Contract not found.');
       } catch (Throwable $e) {
-          return $this->sendError('Server Error');
+          return $this->sendError($e->getMessage());
       }
   }
 

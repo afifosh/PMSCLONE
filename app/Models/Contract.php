@@ -171,23 +171,35 @@ class Contract extends BaseModel
   {
       // Get IDs of all phases associated with this contract's program
       $phaseIds = $this->phases()->pluck('id');
-
+  
+      // Check if there are any phases; if not, return an empty collection
+      if ($phaseIds->isEmpty()) {
+          return collect();
+      }
+  
       // Get query for all admin user IDs associated with this contract's program
-      $programAdminIdsQuery = ProgramUser::ofProgram($this->program_id)->select('admin_id');
-
+      $programAdminIdsQuery = ProgramUser::ofProgram($this->program_id)
+                                          ->select('admin_id');
+  
       // Get query for all admin user IDs who have made a review for any of the phase IDs
       $adminsWhoMadeReviewsQuery = Review::whereIn('reviewable_id', $phaseIds)
-          ->where('reviewable_type', get_class($this->phases()->getRelated()))
-          ->select('user_id')
-          ->distinct();
-
+                                          ->where('reviewable_type', get_class($this->phases()->getRelated()))
+                                          ->select('user_id')
+                                          ->distinct();
+  
+      // Check if there are admins associated with the program; if not, return an empty collection
+      if (!$programAdminIdsQuery->exists()) {
+          return collect();
+      }
+  
       // Get the list of admin users who have not made any review entries for any phase of this contract's program
       $adminsWithoutReviews = Admin::whereNotIn('id', $adminsWhoMadeReviewsQuery)
-          ->whereIn('id', $programAdminIdsQuery)
-          ->get();
-
+                                   ->whereIn('id', $programAdminIdsQuery)
+                                   ->get();
+  
       return $adminsWithoutReviews;
   }
+  
 
   public function getAllUsersStagesReviewStatusWithlastReviewDate()
   {

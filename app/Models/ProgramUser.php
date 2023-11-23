@@ -19,13 +19,24 @@ class ProgramUser extends BaseModel
 
     public function scopeOfProgram($query, $program)
     {
-      if(!($program instanceof Program))
-      {
-        $program = Program::find($program);
-      }
-
-      return $query->where('program_id', $program->id)->orWhere('program_id', $program->parent_id);
+        if (!$program instanceof Program) {
+            $program = Program::find($program);
+        }
+    
+        // Check if $program is not null before accessing its properties
+        if ($program) {
+            return $query->where('program_id', $program->id)
+                         ->orWhere(function($q) use ($program) {
+                             if($program->parent_id) {
+                                 $q->where('program_id', $program->parent_id);
+                             }
+                         });
+        }
+    
+        // Return an empty query if $program is null
+        return $query->whereNull('id');
     }
+    
 
     public function user()
     {

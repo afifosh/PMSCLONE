@@ -25,9 +25,11 @@ $configData = Helper::appClasses();
 <script src="{{asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js')}}"></script>
+
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
+<script src="{{ asset('assets/vendor/libs/jquery-repeater/jquery-repeater.js') }}"></script>
 @endsection
 
 @section('page-script')
@@ -98,6 +100,118 @@ $configData = Helper::appClasses();
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script>
+
+        
+function initTaxRepeater()
+{
+  $('.repeater').repeater({
+      defaultValues: {
+          'label': '',
+          'type': 'text'
+      },
+      show: function () {
+          $(this).slideDown();
+
+          $(this).find('.select2').each(function() {
+            if (!$(this).data('select2')) {
+              var $this = $(this);
+              $this.wrap('<div class="position-relative"></div>');
+              $this.select2({
+                dropdownParent: $this.parent()
+              });
+            }
+          });
+          calculateTotalCost();
+          // $('.repeaters').animate({ scrollTop: 9999 }, 'slow');
+      },
+      hide: function (deleteElement) {
+        // add class to delete element
+        $(this).addClass('removed-element');
+        $(this).slideUp(deleteElement);
+        calculateTotalCost();
+      },
+      ready: function (setIndexes) {
+          // $dragAndDrop.on('drop', setIndexes);
+      },
+      isFirstItemUndeletable: false
+  })
+
+  /**************************
+   * Phase create form js  **
+   **************************/
+  $(document).on('change', '.is-manual-tax', function(){
+    const isChecked = $(this).is(':checked');
+    const parent = $(this).parents('[data-repeater-item]');
+    const taxAmount = parent.find('.tax-amount');
+    const taxRate = parent.find('.tax-rate');
+    const taxRateAmount = taxRate.find(':selected').data('amount');
+    const taxRateType = taxRate.find(':selected').data('type');
+    if(isChecked){
+      taxAmount.prop('disabled', false);
+    }else{
+      taxAmount.prop('disabled', true);
+    }
+    calculateTotalCost();
+  })
+
+  $(document).on('change keyup', '.pay-on-behalf, .is-authority-tax, .tax-amount, .tax-rate, [name="estimated_cost"], .is-manual-tax', function(){
+    calculateTotalCost();
+  })
+
+  // if pay-on-behalf is checked, check and disable is-authority-tax
+  $(document).on('change', '.pay-on-behalf', function(){
+    const isChecked = $(this).is(':checked');
+    const parent = $(this).parents('[data-repeater-item]');
+    const isAuthorityTax = parent.find('.is-authority-tax');
+    if(isChecked){
+      isAuthorityTax.prop('checked', true);
+      isAuthorityTax.prop('disabled', true);
+    }else{
+      isAuthorityTax.prop('disabled', false);
+    }
+  })
+
+  function calculateTotalCost()
+  {
+    const estimatedCost = $('[name="estimated_cost"]').val();
+
+    var totalTax = parseFloat(0);
+    let totalCost = parseFloat(estimatedCost);
+    if(!totalCost){
+      return;
+    }
+    $('.phase-create-form .tax-rate').each(function (index, element) {
+      // element == this
+      $this = $(this);
+      const taxAmount = $this.find(':selected').data('amount');
+      const taxType = $this.find(':selected').data('type');
+      var amount = 0;
+      if(taxType == 'Percent'){
+        amount = (estimatedCost * taxAmount) / 100;
+      }else{
+        amount = taxAmount;
+      }
+      // if manual tax is checked, use manual tax amount
+      if($this.parents('[data-repeater-item]').find('.is-manual-tax').is(':checked')){
+        amount = parseFloat($this.parents('[data-repeater-item]').find('.tax-amount').val());
+      }else if(amount != undefined){
+        $(this).parents('[data-repeater-item]').find('.tax-amount').val(amount.toFixed(3));
+      }
+      // if pay on behalf use -ve amount
+      if($this.parents('[data-repeater-item]').find('.pay-on-behalf').is(':checked')){
+        amount = -amount;
+      }
+      totalCost += amount;
+    });
+    totalCost = totalCost.toFixed(3);
+    $('[name="total_cost"]').val(totalCost);
+    validateTotalCost();
+  }
+
+  /**
+   * End Phase create form js
+   */
+}        
         function togglePhaseReviewStatus(buttonElement) {
             // Extract data attributes
             const contractId = buttonElement.getAttribute('data-contract-id');
@@ -120,6 +234,23 @@ $configData = Helper::appClasses();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+
+                                    
+                  if (data.data.event == 'table_reload') {
+
+if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
+  $('#' + data.data.table_id)
+    .DataTable()
+    .ajax.reload();
+}
+
+}
+if(data.data.close == 'globalModal'){
+$('#globalModal').modal('hide');
+
+}else if(data.data.close == 'modal'){
+current.closest('.modal').modal('hide');
+}
                     // Use the review status from the server response
                     const isReviewedFromResponse = data.data.isReviewed;
 
@@ -233,23 +364,20 @@ $contractsSelect.val(null).trigger('change');
      $(document).on('click', '.nav-link[data-contract-id]', function() {
         var contractId = $(this).data('contract-id');
         var tabSelected = $(this).attr('data-bs-target');
-
+        console.log('Tab clicked' + tabSelected + ' contractId ' + contractId ); // Add this line 
         // Only initialize DataTable if it hasn't been initialized before
-        if (!$(tabSelected).hasClass('loaded')) {
-            switch (tabSelected) {
-                case '#child-stages-' + contractId:
-                    loadStagesDataTable(contractId);
-                    break;
-                case '#child-phases-' + contractId:
-                    loadPhasesDataTable(contractId);
-                    break;
-                case '#child-review-' + contractId:
-                    loadReviewDataTable(contractId);
-                    break;
-                default:
-                    console.error('No tab selected');
-            }
-            $(tabSelected).addClass('loaded');
+        switch (tabSelected) {
+          case '#child-stages-' + contractId:
+              loadStagesDataTable(contractId);
+              break;
+          case '#child-phases-' + contractId:
+              loadPhasesDataTable(contractId);
+              break;
+          case '#child-review-' + contractId:
+              loadReviewDataTable(contractId);
+              break;
+          default:
+              console.error('No tab selected');
         }
     });
 
@@ -302,7 +430,7 @@ $contractsSelect.val(null).trigger('change');
     }
 
     function loadStagesDataTable(contractId) {
-        
+      console.log('#stages-table-' + contractId);
     
         // Stages DataTable
         $('#stages-table-' + contractId).DataTable({
@@ -350,7 +478,7 @@ $contractsSelect.val(null).trigger('change');
     }
 
     function loadPhasesDataTable(contractId) {
-
+console.log('#phases-table-' + contractId);
         
         $('#phases-table-' + contractId).DataTable({
                 processing: true,
@@ -373,7 +501,9 @@ $contractsSelect.val(null).trigger('change');
                     }
                 ],
                 destroy: true,
-                dom: 'Blfrtip',
+               dom: 'Blfrtip',
+          //    dom: '<"top"Bf>rt<"bottom"ip>',
+           //  dom: 'ilpftr'
                 buttons: [
         {
             text: 'Add Phase',
@@ -397,6 +527,7 @@ $contractsSelect.val(null).trigger('change');
     }
 
     function loadReviewDataTable(contractId) {
+      console.log('#review-table-' + contractId);
             // Stages DataTable
             $('#review-table-' + contractId).DataTable({
                 processing: true,

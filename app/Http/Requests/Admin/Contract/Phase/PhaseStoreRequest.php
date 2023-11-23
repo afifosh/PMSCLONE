@@ -86,7 +86,7 @@ class PhaseStoreRequest extends FormRequest
       foreach ($this->taxes as $index => $tax) {
         $rate = $this->tax_rates->where('id', $tax['phase_tax'])->first();
         // calculate tax amount for each tax and validate it with difference of 1
-        $tax_amount = $rate->type == 'Fixed' ? $rate->amount : ($rate->amount * $this->estimated_cost / 100);
+        $tax_amount = $rate->amount * $this->estimated_cost / 100;
         if (abs($this->taxes[$index]['total_tax'] - $tax_amount) > 1) {
           $validator->errors()->add('taxes.' . $index . '.total_tax', 'Tax amount should be between ' . ($tax_amount - 1) . ' and ' . ($tax_amount + 1));
         }

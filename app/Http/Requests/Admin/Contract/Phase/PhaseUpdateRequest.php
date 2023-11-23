@@ -34,11 +34,24 @@ class PhaseUpdateRequest extends FormRequest
    */
   public function rules(): array
   {
-    $tax_ids = array_column($this->taxes, 'phase_tax');
-    $this->tax_rates = InvoiceConfig::whereIn('id', filterInputIds($tax_ids))->activeTaxes()->get();
+    // $tax_ids = array_column($this->taxes, 'phase_tax');
+    // $this->tax_rates = InvoiceConfig::whereIn('id', filterInputIds($tax_ids))->activeTaxes()->get();
     // $fixed_tax = $this->taxes->where('type', 'Fixed')->sum('amount');
     // $percent_tax = $this->taxes->where('type', 'Percent')->sum('amount');
     // $this->calculated_tax_amount = $fixed_tax + ($percent_tax * $this->estimated_cost / 100);
+
+    // Initialize $tax_ids as an empty array
+    $tax_ids = [];
+
+    // Check if $this->taxes is an array before using array_column
+    if (is_array($this->taxes)) {
+        $tax_ids = array_column($this->taxes, 'phase_tax');
+    }
+
+    // Retrieve tax rates based on the $tax_ids
+    $this->tax_rates = InvoiceConfig::whereIn('id', filterInputIds($tax_ids))
+                                     ->activeTaxes()
+                                     ->get();
 
     $rules = [
       'name' => 'required|string|max:255|unique:contract_phases,name,' . $this->phase->id . ',id,stage_id,' . $this->phase->stage_id,
@@ -80,23 +93,48 @@ class PhaseUpdateRequest extends FormRequest
   }
 
   // after validation hook
+  // public function withValidator($validator)
+  // {
+  //   $validator->after(function ($validator) {
+  //     foreach ($this->taxes as $index => $tax) {
+  //       $rate = $this->tax_rates->where('id', $tax['phase_tax'])->first();
+  //       // calculate tax amount for each tax and validate it with difference of 1
+  //       $tax_amount = $rate->amount * $this->estimated_cost / 100;
+  //       if (abs($this->taxes[$index]['total_tax'] - $tax_amount) > 1) {
+  //         $validator->errors()->add('taxes.' . $index . '.total_tax', 'Tax amount should be between ' . ($tax_amount - 1) . ' and ' . ($tax_amount + 1));
+  //       }
+
+  //       if ($tax['pay_on_behalf'][0])
+  //         $this->total_tax_amount -= $tax_amount;
+  //       else {
+  //         $this->total_tax_amount += $tax_amount;
+  //       }
+  //     }
+  //   });
+  // }
+
   public function withValidator($validator)
   {
-    $validator->after(function ($validator) {
-      foreach ($this->taxes as $index => $tax) {
-        $rate = $this->tax_rates->where('id', $tax['phase_tax'])->first();
-        // calculate tax amount for each tax and validate it with difference of 1
-        $tax_amount = $rate->type == 'Fixed' ? $rate->amount : ($rate->amount * $this->estimated_cost / 100);
-        if (abs($this->taxes[$index]['total_tax'] - $tax_amount) > 1) {
-          $validator->errors()->add('taxes.' . $index . '.total_tax', 'Tax amount should be between ' . ($tax_amount - 1) . ' and ' . ($tax_amount + 1));
-        }
-
-        if ($tax['pay_on_behalf'][0])
-          $this->total_tax_amount -= $tax_amount;
-        else {
-          $this->total_tax_amount += $tax_amount;
-        }
-      }
-    });
+      $validator->after(function ($validator) {
+          // Check if $this->taxes is an array before iterating over it
+        // Check if $this->taxes is set and is an array
+         if (isset($this->taxes) && is_array($this->taxes)) { 
+              foreach ($this->taxes as $index => $tax) {
+                  $rate = $this->tax_rates->where('id', $tax['phase_tax'])->first();
+                  // calculate tax amount for each tax and validate it with a difference of 1
+                  $tax_amount = $rate->amount * $this->estimated_cost / 100;
+                  if (abs($this->taxes[$index]['total_tax'] - $tax_amount) > 1) {
+                      $validator->errors()->add('taxes.' . $index . '.total_tax', 'Tax amount should be between ' . ($tax_amount - 1) . ' and ' . ($tax_amount + 1));
+                  }
+  
+                  if ($tax['pay_on_behalf'][0]) {
+                      $this->total_tax_amount -= $tax_amount;
+                  } else {
+                      $this->total_tax_amount += $tax_amount;
+                  }
+              }
+          }
+      });
   }
+  
 }

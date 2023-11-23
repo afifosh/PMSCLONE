@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('email')->nullable();
             $table->string('address')->nullable();
+            $table->text('biography')->nullable();
             $table->string('zip')->nullable();
             $table->string('phone')->nullable();
             $table->string('language')->nullable();  // Add language column

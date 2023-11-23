@@ -133,6 +133,23 @@ $configData = Helper::appClasses();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+
+                                      
+                  if (data.data.event == 'table_reload') {
+
+if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
+  $('#' + data.data.table_id)
+    .DataTable()
+    .ajax.reload();
+}
+
+}
+if(data.data.close == 'globalModal'){
+$('#globalModal').modal('hide');
+
+}else if(data.data.close == 'modal'){
+current.closest('.modal').modal('hide');
+}
                     // Use the review status from the server response
                     const isReviewedFromResponse = data.data.isReviewed;
 
