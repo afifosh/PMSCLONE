@@ -234,6 +234,23 @@ function initTaxRepeater()
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+
+                                    
+                  if (data.data.event == 'table_reload') {
+
+if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
+  $('#' + data.data.table_id)
+    .DataTable()
+    .ajax.reload();
+}
+
+}
+if(data.data.close == 'globalModal'){
+$('#globalModal').modal('hide');
+
+}else if(data.data.close == 'modal'){
+current.closest('.modal').modal('hide');
+}
                     // Use the review status from the server response
                     const isReviewedFromResponse = data.data.isReviewed;
 
@@ -347,23 +364,20 @@ $contractsSelect.val(null).trigger('change');
      $(document).on('click', '.nav-link[data-contract-id]', function() {
         var contractId = $(this).data('contract-id');
         var tabSelected = $(this).attr('data-bs-target');
-
+        console.log('Tab clicked' + tabSelected + ' contractId ' + contractId ); // Add this line 
         // Only initialize DataTable if it hasn't been initialized before
-        if (!$(tabSelected).hasClass('loaded')) {
-            switch (tabSelected) {
-                case '#child-stages-' + contractId:
-                    loadStagesDataTable(contractId);
-                    break;
-                case '#child-phases-' + contractId:
-                    loadPhasesDataTable(contractId);
-                    break;
-                case '#child-review-' + contractId:
-                    loadReviewDataTable(contractId);
-                    break;
-                default:
-                    console.error('No tab selected');
-            }
-            $(tabSelected).addClass('loaded');
+        switch (tabSelected) {
+          case '#child-stages-' + contractId:
+              loadStagesDataTable(contractId);
+              break;
+          case '#child-phases-' + contractId:
+              loadPhasesDataTable(contractId);
+              break;
+          case '#child-review-' + contractId:
+              loadReviewDataTable(contractId);
+              break;
+          default:
+              console.error('No tab selected');
         }
     });
 
@@ -416,7 +430,7 @@ $contractsSelect.val(null).trigger('change');
     }
 
     function loadStagesDataTable(contractId) {
-        
+      console.log('#stages-table-' + contractId);
     
         // Stages DataTable
         $('#stages-table-' + contractId).DataTable({
@@ -464,7 +478,7 @@ $contractsSelect.val(null).trigger('change');
     }
 
     function loadPhasesDataTable(contractId) {
-
+console.log('#phases-table-' + contractId);
         
         $('#phases-table-' + contractId).DataTable({
                 processing: true,
@@ -487,7 +501,9 @@ $contractsSelect.val(null).trigger('change');
                     }
                 ],
                 destroy: true,
-                dom: 'Blfrtip',
+               dom: 'Blfrtip',
+          //    dom: '<"top"Bf>rt<"bottom"ip>',
+           //  dom: 'ilpftr'
                 buttons: [
         {
             text: 'Add Phase',
@@ -511,6 +527,7 @@ $contractsSelect.val(null).trigger('change');
     }
 
     function loadReviewDataTable(contractId) {
+      console.log('#review-table-' + contractId);
             // Stages DataTable
             $('#review-table-' + contractId).DataTable({
                 processing: true,

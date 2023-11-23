@@ -193,8 +193,8 @@ public function query(Contract $model): QueryBuilder
       ->addClass('text-center')
       ->title(''), // This is an empty title for the expand/collapse column
       Column::make('subject')->title('Contract Name'),
-      Column::make('program.name')->name('programs.name')->title('Program'),
-      Column::make('assigned_to')->title('Assigned To'),
+      // Column::make('program.name')->name('programs.name')->title('Program'),
+      // Column::make('assigned_to')->title('Assigned To'),
       Column::make('stages_count')->title('Payments Plans')->searchable(false),
       Column::make('phases_count')->title('Payments Terms')->searchable(false),
       Column::make('value')->title('Amount'),

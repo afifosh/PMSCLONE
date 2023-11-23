@@ -125,7 +125,7 @@ class ContractStage extends BaseModel
       // Return both the status and the last review date
       return [
           'status' => $status,
-          'last_review_date' => $lastReviewDate ? $lastReviewDate->format('Y-m-d H:i:s') : null
+          'last_review_date' => $lastReviewDate ? $lastReviewDate->format('Y-m-d') : null
       ];
   }
    

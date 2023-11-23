@@ -205,7 +205,7 @@ class ProjectPhaseController extends Controller
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
-    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload', 'table_id' => request()->tableId ? request()->tableId : 'phases-table']);
+    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload',  'close' => 'globalModal', 'table_id' => request()->tableId ? request()->tableId : 'phases-table']);
   }
 
   public function destroy($project, Contract $contract, $stage, ContractPhase $phase)
@@ -242,6 +242,6 @@ class ProjectPhaseController extends Controller
     }
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
-    return $this->sendRes(__('Phases Sorted Successfully'), ['event' => 'functionCall', 'function' => 'refreshPhaseList']);
+    return $this->sendRes(__('Phases Sorted Successfully'), ['event' => 'functionCall', 'function' => 'refreshPhaseList', 'close' => 'globalModal',]);
   }
 }
