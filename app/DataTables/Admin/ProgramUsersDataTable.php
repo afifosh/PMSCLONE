@@ -30,6 +30,9 @@ class ProgramUsersDataTable extends DataTable
       ->editColumn('added_by', function ($row) {
         return view('admin._partials.sections.user-info', ['user' => $row->addedBy]);
       })
+      ->addColumn('permanent_access', function ($row) {
+        return $row->permanent_access ? 'Yes' : 'No';
+      })
       ->addColumn('user_organization', function ($row) {
         return @$row->user->designation->department->company->name ? view('admin._partials.sections.company-avatar', ['company' => @$row->user->designation->department->company]) : '-';
       })
@@ -113,8 +116,10 @@ class ProgramUsersDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('user'),
-      Column::make('added_by'),
+      Column::make('permanent_access'),
+      Column::make('until_at'), 
       Column::make('user_organization')->title('User Organization'),
+      Column::make('added_by'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

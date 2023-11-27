@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ProgramUser extends BaseModel
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public const DT_ID = 'Program-Users-DataTable';
 
@@ -15,6 +15,7 @@ class ProgramUser extends BaseModel
     protected $casts = [
       'created_at' => 'datetime:d M, Y',
       'updated_at' => 'datetime:d M, Y',
+       'until_at'  => 'datetime:d M, Y',
     ];
 
     public function scopeOfProgram($query, $program)

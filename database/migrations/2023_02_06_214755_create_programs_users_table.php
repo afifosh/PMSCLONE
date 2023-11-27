@@ -18,6 +18,9 @@ return new class extends Migration
             $table->foreignId('program_id')->constrained('programs')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('admin_id')->constrained('admins')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('added_by')->constrained('admins')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->softDeletes();  // Adds the 'deleted_at' column
+            $table->boolean('permanent_access')->default(true);
+            $table->timestamp('until_at')->nullable();
             $table->timestamps();
         });
     }
