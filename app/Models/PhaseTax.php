@@ -16,8 +16,7 @@ class PhaseTax extends Model
     'type',
     'calculated_amount',
     'manual_amount',
-    'is_authority_tax',
-    'pay_on_behalf'
+    'category'
   ];
 
   public function contractPhase()

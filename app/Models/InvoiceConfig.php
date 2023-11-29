@@ -14,12 +14,22 @@ class InvoiceConfig extends Model
     'type',
     'amount',
     'status',
-    'config_type'
+    'config_type',
+    'category'
   ];
 
   protected $casts = [
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
+  ];
+
+  const Categories = [
+    // 'Regular',
+    // 'Reverse Charge',
+    // 'Authority Tax',
+   1 => 'Value Added Tax',
+   2 => 'Withholding Tax',
+   3 => 'Reverse Charge Tax'
   ];
 
   public function getAmountAttribute($value)
@@ -54,5 +64,10 @@ class InvoiceConfig extends Model
   public function setAmountAttribute($value)
   {
     $this->attributes['amount'] = moneyToInt($value);
+  }
+
+  public function categoryName($category = null)
+  {
+    return self::Categories[$category ? $category : $this->category];
   }
 }

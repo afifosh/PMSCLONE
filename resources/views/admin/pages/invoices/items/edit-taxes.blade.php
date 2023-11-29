@@ -8,14 +8,34 @@
     <div class="form-group col-6">
       {{ Form::label('item_taxes', __('Tax'), ['class' => 'col-form-label']) }}
       <select class="form-select globalOfSelect2" name="item_tax" data-placeholder="{{__('Select Tax')}}">
+        @php
+          $optGroup = '';
+        @endphp
         @forelse ($tax_rates->where('config_type', 'Tax') as $tax)
-          <option @selected(isset($pivot_tax) && $pivot_tax->tax_id == $tax->id) data-amount="{{$tax->amount}}" data-type="{{$tax->type}}" value="{{$tax->id}}">{{$tax->name}} (
-            @if($tax->type != 'Percent')
-              @cMoney($tax->amount, $invoice->contract->currency, true)
-            @else
-              {{$tax->amount}}%
-            @endif
-          )</option>
+        {{-- opt group --}}
+          @if($optGroup != $tax->category)
+            @php
+                $optGroup = $tax->category;
+            @endphp
+            <optgroup label="{{$tax->categoryName()}}">
+          @endif
+
+          {{-- Option --}}
+          <option @selected(isset($pivot_tax) && $pivot_tax->tax_id == $tax->id) data-amount="{{$tax->amount}}" data-type="{{$tax->type}}" value="{{$tax->id}}" data-category="{{$tax->category}}">
+            {{$tax->name}}
+            (
+              @if($tax->type != 'Percent')
+                @cMoney($tax->amount, $invoice->contract->currency, true)
+              @else
+                {{$tax->amount}}%
+              @endif
+            )
+          </option>
+
+          {{-- close opt group --}}
+          @if($optGroup != $tax->category)
+          </optgroup>
+          @endif
         @empty
         @endforelse
       </select>
@@ -40,29 +60,5 @@
         <span class="switch-label">Adjust tax</span>
       </label>
     </div>
-    @if($invoice->type != 'Down Payment' && request()->tab != 'authority-tax')
-      {{-- pay_on_behalf --}}
-      <div class="col-6 mt-1">
-        <label class="switch mt-4">
-          {{ Form::checkbox('pay_on_behalf', 1, @$pivot_tax->pay_on_behalf ?? 0, ['class' => 'switch-input'])}}
-          <span class="switch-toggle-slider">
-            <span class="switch-on"></span>
-            <span class="switch-off"></span>
-          </span>
-          <span class="switch-label">Pay On Behalf</span>
-        </label>
-      </div>
-      {{-- is_authority_tax --}}
-      <div class="col-6 mt-1">
-        <label class="switch mt-4">
-          {{ Form::checkbox('is_authority_tax', 1, @$pivot_tax->is_authority_tax ?? 0, ['class' => 'switch-input'])}}
-          <span class="switch-toggle-slider">
-            <span class="switch-on"></span>
-            <span class="switch-off"></span>
-          </span>
-          <span class="switch-label">Authority Tax</span>
-        </label>
-      </div>
-    @endif
   </div>
 </div>

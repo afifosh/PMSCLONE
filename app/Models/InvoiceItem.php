@@ -95,7 +95,7 @@ class InvoiceItem extends Model
 
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(InvoiceConfig::class, 'invoice_taxes', 'invoice_item_id', 'tax_id')->withPivot('amount', 'type', 'calculated_amount', 'manual_amount', 'is_simple_tax', 'pay_on_behalf', 'is_authority_tax', 'id');
+    return $this->belongsToMany(InvoiceConfig::class, 'invoice_taxes', 'invoice_item_id', 'tax_id')->withPivot('amount', 'type', 'calculated_amount', 'manual_amount', 'category', 'id');
   }
 
   /**
@@ -122,16 +122,14 @@ class InvoiceItem extends Model
     $this->load('deduction');
     $invoiceTaxes = InvoiceTax::where('invoice_item_id', $this->id)
       ->select([
-        'pay_on_behalf',
-        'is_authority_tax',
-        'is_simple_tax',
+        'category',
         DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount) as total_amount')
       ])
       ->get();
 
-    $simpleTax = $invoiceTaxes->where('pay_on_behalf', false)->sum('total_amount') / 1000;
-    $behalfTax = $invoiceTaxes->where('pay_on_behalf', true)->sum('total_amount') / 1000;
-    $total_tax = $simpleTax - $behalfTax;
+    $simpleTax = $invoiceTaxes->where('category', 1)->sum('total_amount') / 1000;
+    $reverseCharge = $invoiceTaxes->where('category', 2)->sum('total_amount') / 1000;
+    $total_tax = $simpleTax - $reverseCharge;
     $deductionAmount = $this->calculateDeductionAmount($total_tax);
     // if manua amount difference is greater than 1 then reset manual amount
     $deduction = $this->deduction;
@@ -171,16 +169,14 @@ class InvoiceItem extends Model
 
     $invoiceTaxes = InvoiceTax::where('invoice_item_id', $this->id)
       ->select([
-        'pay_on_behalf',
-        'is_authority_tax',
-        'is_simple_tax',
+        'category',
         DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount) as total_amount')
       ])
       ->get();
 
-    $simpleTax = $invoiceTaxes->where('pay_on_behalf', false)->sum('total_amount') / 1000;
-    $behalfTax = $invoiceTaxes->where('pay_on_behalf', true)->sum('total_amount') / 1000;
-    $authorityTax = $invoiceTaxes->where('is_authority_tax', true)->sum('total_amount') / 1000;
+    $simpleTax = $invoiceTaxes->where('category', 1)->sum('total_amount') / 1000;
+    $behalfTax = $invoiceTaxes->where('category', 2)->sum('total_amount') / 1000;
+    $authorityTax = $invoiceTaxes->whereIn('category', [2, 3])->sum('total_amount') / 1000;
     $this->total_tax_amount = $simpleTax + $behalfTax;
     $this->total = $this->subtotal + $simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
     $this->authority_inv_total = $authorityTax;
@@ -194,7 +190,7 @@ class InvoiceItem extends Model
   public function reCalculateTaxAmountsAndResetManualAmounts($considerDeduction = true): void
   {
     $this->load('pivotTaxes');
-    $taxableAmount = $this->subtotal - ($considerDeduction && $this->deduction && $this->deduction->is_before_tax ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    $taxableAmount = $this->subtotal - (($considerDeduction && $this->deduction && $this->deduction->is_before_tax) ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
     foreach($this->pivotTaxes as $tax){
       if($tax->type == 'Fixed'){
         continue;

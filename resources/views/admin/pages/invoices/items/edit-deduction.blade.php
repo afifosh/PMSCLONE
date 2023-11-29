@@ -33,7 +33,7 @@
       </label>
     </div>
     {{-- Downpayment Rates --}}
-    <div class="form-group col-6 cal-deduction-section {{@$invoiceItem->deduction->db_rate_id ? '' : 'd-none'}}">
+    <div class="form-group col-6 cal-deduction-section {{@$invoiceItem->deduction->dp_rate_id ? '' : 'd-none'}}">
       {{ Form::label('dp_rate_id', __('Down payment Rate'), ['class' => 'col-form-label']) }}
       <select class="form-select globalOfSelect2" name="dp_rate_id" data-allow-clear='true' data-placeholder="{{__('Select Deduction Rate')}}">
         <option value="">{{__('Select Deduction Rate')}}</option>
@@ -50,7 +50,7 @@
       </select>
     </div>
     {{-- calculation_source --}}
-    <div class="form-group col-6 cal-deduction-section {{@$invoiceItem->deduction->db_rate_id ? '' : 'd-none'}}">
+    <div class="form-group col-6 cal-deduction-section {{@$invoiceItem->deduction->dp_rate_id ? '' : 'd-none'}}">
       {{ Form::label('calculation_source', __('Percentage Calculation Source'), ['class' => 'col-form-label']) }}
       {!! Form::select('calculation_source', ['Down Payment' => 'Down Payment Total', 'Deductible' => 'Item Total'], $invoiceItem->deduction->calculation_source ??null, [
         'class' => 'form-control globalOfSelect2',
@@ -63,12 +63,12 @@
       {{ Form::label('downpayment_amount', __('Downpayment Amount'), ['class' => 'col-form-label']) }}
       {!! Form::number('downpayment_amount', @$invoiceItem->deduction->manual_amount ? @$invoiceItem->deduction->manual_amount : ($invoiceItem->deduction->amount ?? 0), [
         'class' => 'form-control',
-        'disabled' => @$invoiceItem->deduction->db_rate_id ? true : false,
+        'disabled' => @$invoiceItem->deduction->dp_rate_id ? true : false,
         'placeholder' => __('Downpayment Amount')
       ]) !!}
     </div>
     {{-- Adjust Deduction --}}
-    <div class="col-6 mt-3 cal-deduction-section {{@$invoiceItem->deduction->db_rate_id ? '' : 'd-none'}}">
+    <div class="col-6 mt-3 cal-deduction-section {{@$invoiceItem->deduction->dp_rate_id ? '' : 'd-none'}}">
       <label class="switch mt-4">
         {{ Form::checkbox('is_manual_deduction', 1, ($invoiceItem->deduction->manual_amount ?? 0) && 1,['class' => 'switch-input'])}}
         <span class="switch-toggle-slider">

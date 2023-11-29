@@ -23,6 +23,14 @@
         {!! Form::number('amount', null, ['class' => 'form-control', 'placeholder' => __('0.0')]) !!}
     </div>
 
+    @if($tax->config_type == 'Tax' || request()->type == 'Tax')
+      {{-- category --}}
+      <div class="form-group col-6">
+        {{ Form::label('category', __('Category'), ['class' => 'col-form-label']) }}
+        {!! Form::select('category', [1 => 'Value Added Tax', 2 => 'Withholding Tax', 3 => 'Reverse Charge Tax'], null, ['class' => 'form-control globalOfSelect2']) !!}
+      </div>
+    @endif
+
     {{-- status --}}
     <div class="form-group col-6">
         {{ Form::label('status', __('Status'), ['class' => 'col-form-label']) }}

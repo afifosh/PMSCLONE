@@ -55,7 +55,7 @@ class ItemDeductionStoreRequest extends FormRequest
     $this->calDeductionAmount();
 
     $this->merge([
-      'manual_deduction_amount' => $this->downpayment_amount != $this->calculated_downpayment_amount ? $this->downpayment_amount : 0,
+      'manual_deduction_amount' => ($this->is_manual_deduction && $this->downpayment_amount != $this->calculated_downpayment_amount) ? $this->downpayment_amount : 0,
     ]);
 
     $this->merge([
@@ -150,10 +150,15 @@ class ItemDeductionStoreRequest extends FormRequest
     }
     $this->invoice_item->load('taxes');
     foreach ($this->invoice_item->taxes as $tax) {
-      if ($tax->pivot->type == 'Fixed') {
+      if($tax->pivot->category == 3)
+        continue;
+      // if method post then no need to reset manual amount
+      if($this->method() == 'POST'){
+        $this->total_tax_amount += (((($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) * ($tax->pivot->category == 2 ? -1 : 1)))/1000);
+      }else if ($tax->pivot->type == 'Fixed') {
         $this->total_tax_amount += $tax->amount;
       } else {
-        $this->total_tax_amount += ($this->taxableAmount() * $tax->amount) / 100;
+        $this->total_tax_amount += ((($this->taxableAmount() * $tax->amount) / 100) * ($tax->pivot->category == 2 ? -1 : 1));
       }
     }
   }

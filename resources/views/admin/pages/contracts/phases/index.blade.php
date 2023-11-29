@@ -121,15 +121,20 @@ function initTaxRepeater()
       },
       show: function () {
           $(this).slideDown();
-
-          $(this).find('.select2').each(function() {
-            if (!$(this).data('select2')) {
-              var $this = $(this);
-              $this.wrap('<div class="position-relative"></div>');
-              $this.select2({
-                dropdownParent: $this.parent()
-              });
-            }
+          // find selected options and remove selected from them
+          $(this).find('option:selected').removeAttr('selected');
+          $(this).find('.taxesSelect').each(function() {
+            $(this).removeAttr('data-select2-id').removeClass('select2-hidden-accessible').next('.select2-container').remove();
+            // remove selected from options
+            $(this).find('option:selected').removeAttr('selected');
+            // remove data-select2-id from options
+            $(this).find('option').removeAttr('data-select2-id');
+            $(this).val(null).trigger('change');
+            var $this = $(this);
+            $this.wrap('<div class="position-relative"></div>');
+            $this.select2({
+              dropdownParent: $this.parent()
+            });
           });
           calculateTotalCost();
           // $('.repeaters').animate({ scrollTop: 9999 }, 'slow');
@@ -144,6 +149,11 @@ function initTaxRepeater()
           // $dragAndDrop.on('drop', setIndexes);
       },
       isFirstItemUndeletable: false
+  })
+
+  // if data-keep-item is 0, click data-repeater-delete of that element
+  $('.repeater [data-keep-item="0"]').each(function(){
+    $(this).find('[data-repeater-delete]').trigger('click');
   })
 
   /**************************
@@ -164,25 +174,13 @@ function initTaxRepeater()
     calculateTotalCost();
   })
 
-  $(document).on('change keyup', '.pay-on-behalf, .is-authority-tax, .tax-amount, .tax-rate, [name="estimated_cost"], .is-manual-tax', function(){
+  $(document).on('change keyup', '.tax-amount, .tax-rate, [name="estimated_cost"], .is-manual-tax, .phase-create-form :input, .phase-create-form select', function(){
     calculateTotalCost();
-  })
-
-  // if pay-on-behalf is checked, check and disable is-authority-tax
-  $(document).on('change', '.pay-on-behalf', function(){
-    const isChecked = $(this).is(':checked');
-    const parent = $(this).parents('[data-repeater-item]');
-    const isAuthorityTax = parent.find('.is-authority-tax');
-    if(isChecked){
-      isAuthorityTax.prop('checked', true);
-      isAuthorityTax.prop('disabled', true);
-    }else{
-      isAuthorityTax.prop('disabled', false);
-    }
   })
 
   function calculateTotalCost()
   {
+    console.log('calculateTotalCost')
     const estimatedCost = $('[name="estimated_cost"]').val();
 
     var totalTax = parseFloat(0);
@@ -190,14 +188,98 @@ function initTaxRepeater()
     if(!totalCost){
       return;
     }
+    // taxes
+    totalCost = totalCost + calcPhaseTaxes() - calcDeductionAmount();
+    totalCost = totalCost.toFixed(3);
+    $('[name="total_cost"]').val(totalCost);
+    validateTotalCost();
+  }
+
+  function getTaxableAmount(){
+    var estimated_cost = parseFloat($('[name="estimated_cost"]').val());
+    // if !add_deduction, return estimated_cost
+    if(!$('.phase-create-form [name="add_deduction"]').is(':checked')){
+      return estimated_cost;
+    }else if($('.phase-create-form [name="is_before_tax"]').val() == 1){
+      console.log('is_before_taxTAbvl', $('.phase-create-form [name="is_before_tax"]').val());
+      return estimated_cost - calcDeductionAmount();
+    }else{
+      return estimated_cost;
+    }
+  }
+
+  function calcDeductionAmount()
+  {
+    var deductionAmount = parseFloat(0);
+    var itemCost = parseFloat($('[name="estimated_cost"]').val());
+    // if !add_deduction, return 0
+    if(!$('.phase-create-form [name="add_deduction"]').is(':checked')){
+      return deductionAmount;
+    }
+
+    if($('.phase-create-form [name="is_before_tax"]').val() == 0){
+      console.log('is_before_tax', $('.phase-create-form [name="is_before_tax"]').val());
+      itemCost = itemCost + calcPhaseTaxes();
+    }
+
+    const downpaymentId = $('.phase-create-form [name="downpayment_id"]').val();
+    if(downpaymentId && !$('.phase-create-form [name="is_manual_deduction"]').is(':checked') && !$('.phase-create-form [name="is_fixed_amount"]').is(':checked')){
+      var deductionRate = parseFloat($('.phase-create-form [name="dp_rate_id"] option:selected').data('amount'));
+      // is Percentage
+      const isPercentageRate = $('.phase-create-form [name="dp_rate_id"] option:selected').data('type') == 'Percent';
+      if(deductionRate){
+        if(!isPercentageRate){
+          deductionAmount = deductionRate;
+        }else{
+          // is before tax or after tax
+          if($('.phase-create-form [name="is_before_tax"]').val() == 0){
+            // source
+            if($('.phase-create-form [name="calculation_source"]').val() == 'Down Payment'){
+              const selectedDPTotal = parseFloat($('.phase-create-form [name="downpayment_id"] option:selected').data('amount'));
+              deductionAmount = (selectedDPTotal * deductionRate) / 100;
+            }else{
+              deductionAmount = (itemCost * deductionRate) / 100;
+            }
+          }else{
+            // source
+            if($('.phase-create-form [name="calculation_source"]').val() == 'Down Payment'){
+              const selectedDPTotal = parseFloat($('.phase-create-form [name="downpayment_id"] option:selected').data('amount'));
+              deductionAmount = (selectedDPTotal * deductionRate) / 100;
+            }else{
+              deductionAmount = ((itemCost + calcPhaseTaxes()) * deductionRate) / 100;
+            }
+          }
+        }
+      }
+    }
+console.log(deductionAmount);
+    if($('.phase-create-form [name="is_manual_deduction"]').is(':checked') || $('.phase-create-form [name="is_fixed_amount"]').is(':checked')){
+      deductionAmount = parseFloat($('.phase-create-form [name="downpayment_amount"]').val());
+    }else{
+      // set downpayment amount
+      $('.phase-create-form [name="downpayment_amount"]').val(deductionAmount.toFixed(3));
+    }
+
+    return deductionAmount;
+  }
+
+  function calcPhaseTaxes(){
+    var totalTax = parseFloat(0);
+    console.log('calcPhaseTaxes')
+    let taxableAmount = getTaxableAmount();
     $('.phase-create-form .tax-rate').each(function (index, element) {
       // element == this
       $this = $(this);
+      // if this element has removed-element class, skip it
+      if($this.parents('[data-repeater-item]').hasClass('removed-element')){
+        return;
+      }
       const taxAmount = $this.find(':selected').data('amount');
       const taxType = $this.find(':selected').data('type');
+      const taxCategory = $this.find(':selected').data('category');
       var amount = 0;
       if(taxType == 'Percent'){
-        amount = (estimatedCost * taxAmount) / 100;
+        amount = (taxableAmount * taxAmount) / 100;
       }else{
         amount = taxAmount;
       }
@@ -207,17 +289,85 @@ function initTaxRepeater()
       }else if(amount != undefined){
         $(this).parents('[data-repeater-item]').find('.tax-amount').val(amount.toFixed(3));
       }
-      // if pay on behalf use -ve amount
-      if($this.parents('[data-repeater-item]').find('.pay-on-behalf').is(':checked')){
+      // if tax category is 3 (reverse tax), skip it
+      if(taxCategory == 3){
+        return;
+      }
+      // if withholding tax use -ve amount
+      if(taxCategory == 2){
         amount = -amount;
       }
-      totalCost += amount;
+      totalTax += amount;
     });
-    totalCost = totalCost.toFixed(3);
-    $('[name="total_cost"]').val(totalCost);
-    validateTotalCost();
+
+    console.log('totalTax:', totalTax);
+    return totalTax;
   }
 
+  // on change is_before_tax, if 1 move deduction section to before tax else move to after tax
+  $(document).on('change', '.phase-create-form [name="is_before_tax"]', function(){
+    const isBeforeTax = $(this).val();
+    if(isBeforeTax == 1){
+      $('.deduction-section').insertBefore('.taxes-section');
+    }else{
+      $('.deduction-section').insertAfter('.taxes-section');
+    }
+  });
+
+  // on change add_deduction show/hide deduction-inputs, if checked show else hide
+  $(document).on('change', '.phase-create-form [name="add_deduction"]', function(){
+    const isDeduction = $(this).is(':checked');
+    if(isDeduction){
+      $('.deduction-inputs').removeClass('d-none');
+    }else{
+      $('.deduction-inputs').addClass('d-none');
+    }
+  });
+
+  // toggle manual deduction
+  $(document).on('change', '.phase-create-form [name="is_manual_deduction"]', function(){
+    $('.phase-create-form [name="downpayment_amount"]').prop('disabled', !$(this).is(':checked'));
+  })
+
+  // get downpayment info
+  $(document).on('change', '.phase-create-form [name="downpayment_id"]', function(){
+    const downpaymentId = $(this).val();
+    if(!downpaymentId){
+      return false;
+    }
+    $.ajax({
+      url: route('admin.invoices.show', { invoice: downpaymentId, downpaymentjson: '1', itemId: '' }),
+      type: 'GET',
+      success: function (response) {
+        var BsAlert = `
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <div>
+              <strong>Total Down Payment Amount:</strong> <span class="total_amount">${response.total_amount}</span>
+              <br>
+              <strong>Deducted Amount:</strong> <span class="deducted_amount">${response.total_deducted_amount}</span>
+              <br>
+              <strong>Remaining Amount:</strong> <span class="remaining_amount">${response.total_amount - response.total_deducted_amount}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        `;
+        $('.phase-create-form .downpayment-info').html(BsAlert);
+      }
+    })
+  })
+
+  // on change is_fixed_amount, show/hide and cal-deduction-section
+  $(document).on('change', '.phase-create-form [name="is_fixed_amount"]', function(){
+    if($(this).is(':checked')){
+      $('.phase-create-form .cal-deduction-section').addClass('d-none');
+      // enable downpayment_amount
+      $('.phase-create-form [name="downpayment_amount"]').prop('disabled', false);
+    }else{
+      $('.phase-create-form .cal-deduction-section').removeClass('d-none');
+      // disable downpayment_amount
+      $('.phase-create-form [name="downpayment_amount"]').prop('disabled', true);
+    }
+  })
   /**
    * End Phase create form js
    */

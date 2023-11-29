@@ -6,6 +6,7 @@ use App\DataTables\Admin\Finance\TaxesDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\InvoiceConfig;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TaxController extends Controller
 {
@@ -45,6 +46,7 @@ class TaxController extends Controller
       'amount' => 'required|numeric|gt:0',
       'status' => 'required|in:Active,Inactive',
       'tax-type' => 'required|in:Tax,Retention,Down Payment',
+      'category' => 'nullable|required_if:tax-type,Tax|in:1,2,3'
     ]);
 
     InvoiceConfig::create($validated + ['config_type' => $request->get('tax-type')]);
@@ -56,7 +58,7 @@ class TaxController extends Controller
   {
     $data['tax'] = $tax;
 
-    return $this->sendRes('Tax Added Succefully', ['view_data' => view('admin.pages.finances.taxes.create', $data)->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.finances.taxes.create', $data)->render()]);
   }
 
   public function update(Request $request, InvoiceConfig $tax)
@@ -66,6 +68,7 @@ class TaxController extends Controller
       'type' => 'required|in:Fixed,Percent',
       'amount' => 'required|numeric|gt:0',
       'status' => 'required|in:Active,Inactive',
+      'category' => ['nullable', Rule::requiredIf($tax->config_type == 'Tax'), Rule::in([1, 2, 3])]
     ]);
 
     $tax->update($request->all());

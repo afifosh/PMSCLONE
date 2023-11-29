@@ -44,9 +44,10 @@ class ProjectPhaseController extends Controller
   public function create($project, Contract $contract, $stage)
   {
     $stage = ContractStage::find($stage) ?? 'stage';
+    $contract->load('deductableDownpayments');
     $max_amount = $contract->remaining_amount;
     $phase = new ContractPhase();
-    $tax_rates = InvoiceConfig::activeTaxes()->get();
+    $tax_rates = InvoiceConfig::activeOnly()->get();
     $stages = $contract->stages->pluck('name', 'id');
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render(), 'JsMethods' => ['initTaxRepeater']]);
   }
@@ -54,8 +55,9 @@ class ProjectPhaseController extends Controller
   public function store($project, Contract $contract, $stage, PhaseStoreRequest $request)
   {
     DB::beginTransaction();
-    try{
-      $data['total_cost'] = $request->estimated_cost + $request->total_tax_amount;
+    try {
+      $data['total_cost'] = $request->estimated_cost + $request->total_tax_amount -
+        ($request->add_deduction ? ($request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount) : 0);
       $data['tax_amount'] = $request->total_tax_amount;
       $data['stage_id'] = $request->stage_id;
 
@@ -64,7 +66,22 @@ class ProjectPhaseController extends Controller
       );
 
       $this->storeTaxes($phase, $request);
-    }catch(\Exception $e){
+
+      if ($request->add_deduction) {
+        $phase->deduction()->create([
+          'deductible_id' => $phase->id,
+          'deductible_type' => ContractPhase::class,
+          'downpayment_id' => $request->downpayment_id,
+          'dp_rate_id' => $request->dp_rate_id,
+          'is_percentage' => $request->is_fixed_amount ? false : ($request->deduction_rate->type != 'Fixed'),
+          'amount' => $request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount,
+          'manual_amount' => $request->manual_deduction_amount,
+          'percentage' => $request->deduction_rate->amount ?? 0,
+          'is_before_tax' => $request->is_before_tax,
+          'calculation_source' => $request->calculation_source,
+        ]);
+      }
+    } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());
     }
@@ -77,7 +94,7 @@ class ProjectPhaseController extends Controller
   protected function storeTaxes($phase, $request): void
   {
     $phase->taxes()->detach();
-    foreach ($request->taxes as $tax) {
+    foreach ($request->taxes ?? [] as $tax) {
       $rate = $request->tax_rates->where('id', $tax['phase_tax'])->first();
       $calTaxAmount = $rate->type == 'Fixed' ? $rate->amount : ($rate->amount * $request->estimated_cost / 100);
       $phase->taxes()->attach($rate->id, [
@@ -85,8 +102,7 @@ class ProjectPhaseController extends Controller
         'type' => $rate->type,
         'calculated_amount' => moneyToInt($calTaxAmount),
         'manual_amount' => $calTaxAmount == $tax['total_tax'] ? 0 : moneyToInt($tax['total_tax']),
-        'pay_on_behalf' => $tax['pay_on_behalf'][0] ? 1 : 0,
-        'is_authority_tax' => $tax['pay_on_behalf'][0] ? 1 : ($tax['is_authority_tax'][0] ? 1 : 0),
+        'category' => $rate->category,
       ]);
     }
   }
@@ -95,7 +111,7 @@ class ProjectPhaseController extends Controller
   {
     if (request()->tab == 'activity') {
       return $this->prepareActivityTab($phase);
-    }else if(request()->tab == 'comments'){
+    } else if (request()->tab == 'comments') {
       return $this->prepareCommentsTab($phase);
     }
     $phase->load(['addedAsInvoiceItem.invoice', 'contract']);
@@ -106,7 +122,7 @@ class ProjectPhaseController extends Controller
     }
     $stages = $contract->stages->pluck('name', 'id');
     $max_amount = $contract->remaining_amount + $phase->total_cost;
-    $tax_rates = InvoiceConfig::activeTaxes()->get();
+    $tax_rates = InvoiceConfig::activeOnly()->get();
 
     $userHasMarkedComplete = $phase->reviews->contains('user_id', auth()->id());
     $buttonLabel = $userHasMarkedComplete ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
@@ -155,52 +171,66 @@ class ProjectPhaseController extends Controller
     }
 
     DB::beginTransaction();
-    try{
-      $data['total_cost'] = $request->estimated_cost + $request->total_tax_amount;
-      $data['tax_amount'] = $request->total_tax_amount;
+    // try{
+    $data['total_cost'] = $request->estimated_cost + $request->total_tax_amount -
+      ($request->add_deduction ? ($request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount) : 0);
+    $data['tax_amount'] = $request->total_tax_amount;
 
-      $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
+    $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
 
-      // Check if there are taxes associated with the phase
-      if ($phase->taxes->count() > 0) {
-          $this->storeTaxes($phase, $request);        
-      }      
+    $this->storeTaxes($phase, $request);
 
-
-      // if added in invoice then update invoice item and tax amount
-      $phase->load('addedAsInvoiceItem.invoice');
-
-      if ($phase->addedAsInvoiceItem->count()) {
-        $phase->addedAsInvoiceItem->each(function ($item) use ($phase) {
-          $item->update([
-            'subtotal' => $phase->estimated_cost,
-            'total_tax_amount' => $phase->tax_amount,
-            'total' => $phase->total_cost,
-            'rounding_amount' => $phase->rounding_amount,
-          ]);
-
-          $item->taxes()->detach();
-
-          foreach ($phase->taxes as $tax) {
-            $item->taxes()->attach($tax->id, [
-              'amount' => $tax->pivot->amount,
-              'type' => $tax->pivot->type,
-              'invoice_id' => $item->invoice_id,
-              'is_simple_tax' => 1,
-              'calculated_amount' => $tax->pivot->calculated_amount,
-              'manual_amount' => $tax->pivot->manual_amount,
-              'pay_on_behalf' => $tax->pivot->pay_on_behalf,
-              'is_authority_tax' => $tax->pivot->is_authority_tax
-            ]);
-          }
-
-          $item->invoice->reCalculateTotal(); // ERROR HERE
-        });
-      }
-    }catch(\Exception $e){
-      DB::rollback();
-      return $this->sendError($e->getMessage());
+    // add or update deduction if add_deduction is true
+    if ($request->add_deduction) {
+      $phase->deduction()->updateOrCreate([
+        'deductible_id' => $phase->id,
+        'deductible_type' => ContractPhase::class,
+      ], [
+        'downpayment_id' => $request->downpayment_id,
+        'dp_rate_id' => $request->dp_rate_id,
+        'is_percentage' => $request->is_fixed_amount ? false : ($request->deduction_rate->type != 'Fixed'),
+        'amount' => $request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount,
+        'manual_amount' => $request->manual_deduction_amount,
+        'percentage' => $request->deduction_rate->amount ?? 0,
+        'is_before_tax' => $request->is_before_tax,
+        'calculation_source' => $request->calculation_source,
+      ]);
+    } else {
+      $phase->deduction()->delete();
     }
+
+    // if added in invoice then update invoice item and tax amount
+    $phase->load('addedAsInvoiceItem.invoice');
+
+    if ($phase->addedAsInvoiceItem->count()) {
+      $phase->addedAsInvoiceItem->each(function ($item) use ($phase) {
+        $item->update([
+          'subtotal' => $phase->estimated_cost,
+          'total_tax_amount' => $phase->tax_amount,
+          'total' => $phase->total_cost,
+          'rounding_amount' => $phase->rounding_amount,
+        ]);
+
+        $item->taxes()->detach();
+
+        foreach ($phase->taxes as $tax) {
+          $item->taxes()->attach($tax->id, [
+            'amount' => $tax->pivot->amount,
+            'type' => $tax->pivot->type,
+            'invoice_id' => $item->invoice_id,
+            'calculated_amount' => $tax->pivot->calculated_amount,
+            'manual_amount' => $tax->pivot->manual_amount,
+            'category' => $tax->pivot->category,
+          ]);
+        }
+
+        $item->invoice->reCalculateTotal(); // ERROR HERE
+      });
+    }
+    // }catch(\Exception $e){
+    //   DB::rollback();
+    //   return $this->sendError($e->getMessage());
+    // }
     DB::commit();
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
@@ -218,9 +248,11 @@ class ProjectPhaseController extends Controller
     $phase->addedAsInvoiceItem->each(function ($item) {
       $item->taxes()->detach();
       $item->delete();
+      $item->deduction()->delete();
     });
 
     $phase->taxes()->detach();
+    $phase->deduction()->delete();
 
     $phase->delete();
 
