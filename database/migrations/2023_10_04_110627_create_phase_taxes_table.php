@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\InvoiceConfig;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,8 +20,7 @@ return new class extends Migration
       $table->enum('type', ['Percent', 'Fixed'])->default('Percent');
       $table->bigInteger('calculated_amount')->default(0);
       $table->bigInteger('manual_amount')->default(0);
-      $table->boolean('is_authority_tax')->default(false);
-      $table->boolean('pay_on_behalf')->default(false);
+      $table->integer('category')->default(1)->comment('1: Value Added Tax, 2: Withholding Tax, 3: Reverse Charge Tax');
       $table->timestamps();
     });
   }

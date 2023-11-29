@@ -88,12 +88,6 @@ class ItemDeductionController extends Controller
       return $this->sendError('Deduction Not Found');
     DB::beginTransaction();
     try{
-      $oldDeduction = $invoiceItem->deduction;
-      if(!$request->is_before_tax){
-        $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts(false); // false to not calculate deduction amount in tax calculation
-        $invoiceItem->reCalculateTotal();
-        $invoiceItem->refresh();
-      }
       $invoiceItem->deduction()->update([
         'downpayment_id' => $request->downpayment_id,
         'dp_rate_id' => $request->dp_rate_id,
@@ -104,15 +98,15 @@ class ItemDeductionController extends Controller
         'is_before_tax' => $request->is_before_tax,
         'calculation_source' => $request->calculation_source,
       ]);
+      $invoiceItem->reCalculateTotal();
       $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts();
-      $invoiceItem->reCalculateDeductionAmount();
       $invoiceItem->reCalculateTotal();
       $invoice->reCalculateTotal();
+      DB::commit();
     }catch(\Exception $e){
       DB::rollback();
       return $this->sendError($e->getMessage());
     }
-    DB::commit();
 
     return $this->sendRes('Deduction Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }

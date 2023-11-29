@@ -24,6 +24,9 @@ class TaxesDataTable extends DataTable
       ->addColumn('action', function($tax){
         return view('admin.pages.finances.taxes.action', compact('tax'));
       })
+      ->editColumn('category', function($tax){
+        return InvoiceConfig::Categories[$tax->category];
+      })
       ->setRowId('id');
   }
 
@@ -75,6 +78,18 @@ class TaxesDataTable extends DataTable
    */
   public function getColumns(): array
   {
+    if($this->type == 'Tax')
+    {
+      return [
+        Column::make('name'),
+        Column::make('amount'),
+        Column::make('type'),
+        Column::make('category'),
+        Column::make('status'),
+        Column::make('created_at'),
+        Column::make('updated_at'),
+      ];
+    }
     return [
       Column::make('name'),
       Column::make('amount'),

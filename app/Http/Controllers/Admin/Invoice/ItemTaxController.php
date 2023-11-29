@@ -36,15 +36,12 @@ class ItemTaxController extends Controller
     DB::beginTransaction();
     try{
       $invoiceItem->taxes()->attach($request->tax->id, [
+        'invoice_id' => $invoice->id,
         'calculated_amount' => moneyToInt($request->calculated_tax_amount),
         'manual_amount' => moneyToInt($request->manual_tax_amount),
-        'pay_on_behalf' => $request->pay_on_behalf,
-        'is_authority_tax' => $request->pay_on_behalf ? true : $request->is_authority_tax,
         'amount' => $request->tax->getRawOriginal('amount'),
         'type' => $request->tax->type,
-        'is_simple_tax' => $request->tab == 'summary',
-        'invoice_item_id' => $invoiceItem->id,
-        'invoice_id' => $invoiceItem->invoice_id
+        'category' => $request->tax->category
       ]);
 
       if ($invoiceItem->deduction && !$invoiceItem->deduction->is_before_tax) {
@@ -56,7 +53,7 @@ class ItemTaxController extends Controller
       $invoice->reCalculateTotal();
     } catch (\Exception $e) {
       DB::rollBack();
-      return $this->sendError('Something went wrong');
+      return $this->sendError($e->getMessage());
     }
     DB::commit();
 
@@ -90,10 +87,9 @@ class ItemTaxController extends Controller
         'tax_id' => $request->tax->id,
         'calculated_amount' => $request->calculated_tax_amount,
         'manual_amount' => $request->manual_tax_amount,
-        'pay_on_behalf' => $request->pay_on_behalf,
-        'is_authority_tax' => $request->pay_on_behalf ? true : $request->is_authority_tax,
         'amount' => $request->tax->amount,
-        'type' => $request->tax->type
+        'type' => $request->tax->type,
+        'category' => $request->tax->category
       ]);
 
       if ($invoiceItem->deduction && !$invoiceItem->deduction->is_before_tax) {

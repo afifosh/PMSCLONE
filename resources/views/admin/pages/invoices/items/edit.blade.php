@@ -127,15 +127,6 @@
     }
   })
 
-  // if pay_on_behalf is checked than check and disable is_authority_tax
-  $(document).on('change', '#item-create [name="pay_on_behalf"]', function(){
-    if($(this).is(':checked')){
-      $('#item-create [name="is_authority_tax"]').prop('checked', true).prop('disabled', true);
-    }else{
-      $('#item-create [name="is_authority_tax"]').prop('disabled', false);
-    }
-  })
-
   function calculateCustomItemValues (){
     let subtotal = getSubtotalAmount();
 
@@ -151,9 +142,12 @@
 
     let totalTax = calItemTax();
 
-    // if pay_on_behalf is checked than deduct the tax amount
-    if($('#item-create [name="pay_on_behalf"]').is(':checked')){
+    // if tax category is 2, then make total tax negative
+    const taxCategory = $('#item-create [name="item_tax"]').find('option:selected').data('category');
+    if(taxCategory == 2){
       totalTax = -totalTax;
+    }else if(taxCategory == 3){
+      totalTax = 0;
     }
     // total amount
     let totalAmount = subtotal + totalTax - totalDownpaymentAmount;

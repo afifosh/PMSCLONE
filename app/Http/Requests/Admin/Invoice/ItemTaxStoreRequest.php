@@ -40,8 +40,7 @@ class ItemTaxStoreRequest extends FormRequest
     $this->merge([
       'subtotal' => $this->invoice_item->subtotal,
       'rounding_amount' => $this->boolean('rounding_amount'),
-      'pay_on_behalf' => $this->boolean('pay_on_behalf'),
-      'is_authority_tax' => $this->boolean('is_authority_tax') || $this->tab == 'authority-tax',
+      'is_manual_tax' => $this->boolean('is_manual_tax'),
     ]);
 
     // validate
@@ -52,7 +51,7 @@ class ItemTaxStoreRequest extends FormRequest
     $this->calDeductionAmount();
 
     $this->merge([
-      'manual_tax_amount' => $this->calculated_tax_amount != $this->total_tax_amount ? $this->total_tax_amount : 0,
+      'manual_tax_amount' => ($this->is_manual_tax && $this->calculated_tax_amount != $this->total_tax_amount) ? $this->total_tax_amount : 0,
     ]);
   }
 
@@ -69,8 +68,6 @@ class ItemTaxStoreRequest extends FormRequest
       'item_tax' => 'required|exists:invoice_configs,id',
       'total_tax_amount' => 'required|numeric',
       // 'manual_tax_amount' => 'nullable|required_if:is_manual_tax,true|numeric',
-      'pay_on_behalf' => 'required|boolean',
-      'is_authority_tax' => 'required|boolean',
     ];
   }
   public function rules(): array
@@ -91,7 +88,7 @@ class ItemTaxStoreRequest extends FormRequest
   private function calDeductionAmount(): void
   {
     if($this->invoice_item->deduction && $this->invoice_item->deduction->is_before_tax) {
-      $this->downpayment_amount = $this->invoice_item->deduction->amount;
+      $this->downpayment_amount = ($this->invoice_item->deduction->manual_amount ? $this->invoice_item->deduction->manual_amount : $this->invoice_item->deduction->amount);
     }
       return;
   }

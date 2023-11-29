@@ -1,6 +1,6 @@
 @forelse ($invoice->items as $item)
 @continue($tab == 'tax-report' && count($item->taxes->where(function($tax){
-  return $tax->pivot->is_simple_tax == 1;
+  return $tax->pivot->category == 1;
  })) == 0)
 @continue($invoice->type == 'Partial Invoice' && $item->invoiceable_type == 'App\Models\ContractPhase')
 <tbody data-id="{{$item->id}}">
@@ -41,13 +41,49 @@
     <!--total-->
     <td class="text-end">@cMoney($item->subtotal, $invoice->contract->currency, true)</td>
   @includeWhen(@$item->deduction && @$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
+  {{-- item subtoital if deduction is before tax --}}
+  @if (@$item->deduction && @$item->deduction->is_before_tax)
+    <tr style="background-color: #efeff163;">
+      <td>Subtotal</td>
+      @if($invoice->isEditable())
+        <td></td>
+      @endif
+      <td></td>
+      <td></td>
+      <td></td>
+      <td class="text-end">
+        @if($tab != 'tax-report')
+          @cMoney($item->subtotal - ($item->deduction->manual_amount ? @$item->deduction->manual_amount : ($item->deduction->amount ?? 0)), $invoice->contract->currency, true)
+        @endif
+      </td>
+    </tr>
+
+  @endif
   @includeWhen(count($item->taxes) > 0, 'admin.pages.invoices.items.show.item-tax')
+
+  {{-- item subtotal if deduction after tax --}}
+  @if($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax)
+    <tr style="background-color: #efeff163;">
+      <td>Subtotal</td>
+      @if($invoice->isEditable())
+        <td></td>
+      @endif
+      <td></td>
+      <td></td>
+      <td></td>
+      <td class="text-end">
+        @if($tab != 'tax-report')
+        @cMoney($item->total + ($item->deduction->manual_amount ? @$item->deduction->manual_amount : ($item->deduction->amount ?? 0)), $invoice->contract->currency, true)
+        @endif
+      </td>
+    </tr>
+  @endif
   @includeWhen($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
-  <tr>
+  <tr style="background-color: #efeff1;">
+    <td>Item Total</td>
     @if($invoice->isEditable())
       <td></td>
     @endif
-    <td></td>
     <td></td>
     <td></td>
     <td></td>

@@ -117,13 +117,13 @@
   <hr />
   <div class="d-flex justify-content-between">
     <span class="w-px-100">Paid:</span>
-    <span class="fw-semibold">@cMoney(-$invoice->paid_amount, $invoice->contract->currency, true)</span>
+    <span class="fw-semibold">@cMoney($invoice->paid_amount, $invoice->contract->currency, true)</span>
   </div>
 @elseif($tab == 'authority-tax' && $invoice->authorityInvoice->paid_amount != 0)
   <hr />
   <div class="d-flex justify-content-between">
     <span class="w-px-100">Paid:</span>
-    <span class="fw-semibold">@cMoney(-$invoice->authorityInvoice->paid_amount, $invoice->contract->currency, true)</span>
+    <span class="fw-semibold">@cMoney($invoice->authorityInvoice->paid_amount, $invoice->contract->currency, true)</span>
   </div>
 @endif
 

@@ -16,9 +16,8 @@ class InvoiceTax extends Model
     'amount',
     'calculated_amount',
     'manual_amount',
-    'is_simple_tax',
-    'is_authority_tax',
-    'pay_on_behalf'
+    'category', // 1: Value Added Tax, 2: Withholding Tax, 3: Reverse Charge Tax
+    'type' // Percent, Fixed
   ];
 
   protected $casts = [

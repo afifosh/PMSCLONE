@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Spatie\Comments\Models\Concerns\HasComments;
 
 class ContractPhase extends BaseModel
@@ -233,7 +236,7 @@ class ContractPhase extends BaseModel
 
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(InvoiceConfig::class, 'phase_taxes', 'contract_phase_id', 'tax_id')->withPivot('amount', 'type', 'calculated_amount', 'manual_amount', 'is_authority_tax', 'pay_on_behalf')->withTimestamps();
+    return $this->belongsToMany(InvoiceConfig::class, 'phase_taxes', 'contract_phase_id', 'tax_id')->withPivot('amount', 'type', 'calculated_amount', 'manual_amount', 'category')->withTimestamps();
   }
 
   /*
@@ -252,5 +255,15 @@ class ContractPhase extends BaseModel
   public function commentUrl(): string
   {
     return '#';
+  }
+
+  /**
+   * pivot table for storing deduction information
+   *
+   * @return MorphOne
+   */
+  public function deduction(): MorphOne
+  {
+    return $this->morphOne(InvoiceDeduction::class, 'deductible');
   }
 }

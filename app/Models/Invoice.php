@@ -654,13 +654,11 @@ class Invoice extends Model
         foreach ($phase->taxes as $tax) {
           $invPhase->taxes()->attach($tax->id, [
             'amount' => $tax->pivot->amount,
-            'is_simple_tax' => 1,
             'calculated_amount' => $tax->pivot->calculated_amount,
             'manual_amount' => $tax->pivot->manual_amount,
-            'pay_on_behalf' => $tax->pivot->pay_on_behalf,
-            'is_authority_tax' => $tax->pivot->is_authority_tax,
             'type' => $tax->pivot->type,
-            'invoice_id' => $this->id
+            'invoice_id' => $this->id,
+            'category' => $tax->pivot->category,
           ]);
         }
       }

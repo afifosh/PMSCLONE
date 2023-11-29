@@ -21,6 +21,7 @@ class TaxSeeder extends Seeder
           'amount' => 0,
           'status' => 'Active',
           'config_type' => 'Tax',
+          'category' => 1 // Value Added Tax
       ]);
 
       // 5% Tax
@@ -30,6 +31,7 @@ class TaxSeeder extends Seeder
           'amount' => 5,
           'status' => 'Active',
           'config_type' => 'Tax',
+          'category' => 1 // Value Added Tax
       ]);
 
       // 15% Tax
@@ -39,6 +41,7 @@ class TaxSeeder extends Seeder
           'amount' => 15,
           'status' => 'Active',
           'config_type' => 'Tax',
+          'category' => 1 // Value Added Tax
       ]);
 
       // 5% Retention
@@ -58,6 +61,46 @@ class TaxSeeder extends Seeder
         'amount' => 5,
         'status' => 'Active',
         'config_type' => 'Down Payment',
+      ]);
+
+      // 5% Reverse Charge Tax
+      InvoiceConfig::create([
+        'name' => '5% Reverse Charge',
+        'type' => 'Percent',
+        'amount' => 5,
+        'status' => 'Active',
+        'config_type' => 'Tax',
+        'category' => 3, // Reverse Charge Tax
+      ]);
+
+      // 10% Reverse Charge Tax
+      InvoiceConfig::create([
+        'name' => '10% Reverse Charge',
+        'type' => 'Percent',
+        'amount' => 10,
+        'status' => 'Active',
+        'config_type' => 'Tax',
+        'category' => 3, // Reverse Charge Tax
+      ]);
+
+      // 5% Withholding Tax
+      InvoiceConfig::create([
+        'name' => '5% Withholding Tax',
+        'type' => 'Percent',
+        'amount' => 5,
+        'status' => 'Active',
+        'config_type' => 'Tax',
+        'category' => 2, // Withholding Tax
+      ]);
+
+      // 10% Withholding Tax
+      InvoiceConfig::create([
+        'name' => '10% Withholding Tax',
+        'type' => 'Percent',
+        'amount' => 10,
+        'status' => 'Active',
+        'config_type' => 'Tax',
+        'category' => 2,  // Withholding Tax
       ]);
   }
 }
