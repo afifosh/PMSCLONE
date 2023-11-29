@@ -49,17 +49,19 @@
     });
   })
   function reloadPhasesList(){
-    $.ajax({
-      url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit' }),
-      type: "GET",
-      success: function(data) {
-        $('#billing-items-container-header').siblings().remove();
-        $('#billing-items-container-header').after(data.data.view_data);
-        $('.invoice-calculations').html(data.data.summary);
-        $('#balance-summary').html(data.data.balance_summary);
-        initSelect2()
-      }
-    });
+    // reload page
+    window.location.reload();
+    // $.ajax({
+    //   url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit' }),
+    //   type: "GET",
+    //   success: function(data) {
+    //     $('#billing-items-container-header').siblings().remove();
+    //     $('#billing-items-container-header').after(data.data.view_data);
+    //     $('.invoice-calculations').html(data.data.summary);
+    //     $('#balance-summary').html(data.data.balance_summary);
+    //     initSelect2()
+    //   }
+    // });
   }
 </script>
 @endsection

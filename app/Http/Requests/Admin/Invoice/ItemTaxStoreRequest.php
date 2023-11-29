@@ -41,7 +41,7 @@ class ItemTaxStoreRequest extends FormRequest
       'subtotal' => $this->invoice_item->subtotal,
       'rounding_amount' => $this->boolean('rounding_amount'),
       'pay_on_behalf' => $this->boolean('pay_on_behalf'),
-      'is_authority_tax' => $this->boolean('is_authority_tax'),
+      'is_authority_tax' => $this->boolean('is_authority_tax') || $this->tab == 'authority-tax',
     ]);
 
     // validate
