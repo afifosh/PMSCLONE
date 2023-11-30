@@ -2,11 +2,9 @@
 
 namespace App\DataTables\Admin\Contract;
 
-use App\Models\Admin; //
+use App\Models\Admin;
 use App\Models\Contract;
-use App\Models\Program;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
-use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
@@ -38,33 +36,16 @@ class ContractPaymentsPlanReviewDataTable extends DataTable
 
     public function query(): QueryBuilder
     {
-        // Get the associated program and users with access to the contract
-        $program = $this->contract->program;
-        if (!$program) {
-            // Handle the case where $program is null, e.g., by returning an empty query or an error response.
-            // You can customize this part based on your application's requirements.
-            return Admin::where('id', '=', 0)->newQuery(); // Example: Return an empty query.
-        }
-        $usersWithAccess = $program->users;
+      // Get the associated program and users with access to the contract
+      $program = $this->contract->program;
+      if (!$program) {
+          // Handle the case where $program is null, e.g., by returning an empty query or an error response.
+          return Admin::where('id', '=', 0)->newQuery(); // Example: Return an empty query.
+      }
 
-    
-        // If the program has a parent, include users from the parent program
-        $parentProgramUsers = collect();
-        if ($parentProgram = $program->parent) {
-            $parentProgramUsers = $parentProgram->users;
-        }
-
-        // Combine the collections, ensuring there are no duplicates
-        $allUsers = $usersWithAccess->merge($parentProgramUsers)->unique('id');
-    // Check if $allUsers is empty
-    if ($allUsers->isEmpty()) {
-        // Handle the case where $allUsers is empty, e.g., by returning an empty query or an error response.
-        // You can customize this part based on your application's requirements.
-        return Admin::where('id', '=', 0)->newQuery(); // Example: Return an empty query.
-    }
-
-        // Start building your query for the DataTable
-        return Admin::whereIn('id', $allUsers->pluck('id'))->newQuery();
+      return Admin::whereHas('accessiblePrograms', function ($q) use ($program) {
+          $q->where('accessable_id', $program->id);
+      });
     }
 
     public function setContract($contract)

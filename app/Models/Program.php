@@ -28,18 +28,7 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
       }
       return $query->whereHas('users', function($q){
         return $q->where('admins.id', auth()->id());
-      })->orWhereHas('parent.users', function($q){
-        return $q->where('admins.id', auth()->id());
       });
-    }
-
-    public function programUsers()
-    {
-      return Admin::whereHas('programs', function($q){
-        return $q->where('programs.id', $this->id);
-      })->orWhereHas('programs', function($q){
-        return $q->where('programs.id', $this->parent_id);
-      })->get();
     }
 
     public function scopeApplyRequestFilters($query)
@@ -52,7 +41,9 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
 
     public function users()
     {
-      return $this->belongsToMany(Admin::class, ProgramUser::class, 'program_id', 'admin_id')->withTimestamps();
+      return $this->belongsToMany(Admin::class, AdminAccessList::class, 'accessable_id', 'admin_id')
+                  ->where('accessable_type', self::class)
+                  ->withTimestamps();
     }
 
     public function parent()

@@ -9,7 +9,7 @@
     {
       "name": "Roles",
       "icon": "menu-icon tf-icons ti ti-settings",
-      "slug": ["admin.roles"],
+      "slug": ["admin.roles", "admin.admin-access-lists"],
       "permission" : ["read role","read user"],
       "submenu": [
         {
@@ -17,6 +17,11 @@
           "name": "Admin Roles",
           "slug": "admin.roles.index",
           "permission" : ["read role", "read user"]
+        },
+        {
+          "url": "/admin/admin-access-lists",
+          "name": "Admin Access List",
+          "slug": "admin.admin-access-lists.index"
         }
       ]
     },
@@ -93,7 +98,7 @@
           "name": "Institutions",
           "icon": "menu-icon fas fa-building",
           "slug": "admin.institutions.index"
-        },                        
+        },
         {
           "url": "/admin/warehouses",
           "name": "Warehouses",

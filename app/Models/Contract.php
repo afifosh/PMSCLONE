@@ -178,7 +178,7 @@ class Contract extends BaseModel
       }
 
       // Get query for all admin user IDs associated with this contract's program
-      $programAdminIdsQuery = ProgramUser::ofProgram($this->program_id)
+      $programAdminIdsQuery = AdminAccessList::ofProgram($this->program_id)
                                           ->select('admin_id');
 
       // Get query for all admin user IDs who have made a review for any of the phase IDs
@@ -207,24 +207,9 @@ class Contract extends BaseModel
       $stages = $this->stages;
       $users = $this->program->users;
 
-      $program = $this->program; // This gives you the program object
-      $parentProgram = $program->parent; // This gives you the parent program object
-
-      // Get the users of this program
-      $programUsers = $program->users;
-
-      // If there is a parent program, get those users as well
-      $parentProgramUsers = collect();
-      if ($parentProgram) {
-          $parentProgramUsers = $parentProgram->users;
-      }
-
-      // Combine the collections, ensuring there are no duplicates
-      $allUsers = $programUsers->merge($parentProgramUsers)->unique('id');
-
       $allUsersStagesStatus = [];
 
-      foreach ($allUsers as $user) {
+      foreach ($users as $user) {
           $userStagesStatus = [];
 
           foreach ($stages as $stage) {
@@ -268,22 +253,8 @@ class Contract extends BaseModel
   public function getAllUsersFromProgramAndParentProgram()
   {
     if (!$this->program) return collect();
-      $program = $this->program; // This gives you the program object
-      $parentProgram = $program->parent; // This gives you the parent program object
 
-      // Get the users of this program
-      $programUsers = $program->users;
-
-      // If there is a parent program, get those users as well
-      $parentProgramUsers = collect();
-      if ($parentProgram) {
-          $parentProgramUsers = $parentProgram->users;
-      }
-
-      // Combine the collections, ensuring there are no duplicates
-      $allUsers = $programUsers->merge($parentProgramUsers)->unique('id');
-
-      return $allUsers->values();;
+    return $this->program->users;
   }
 
   public function getAdminsWhoDidNotReviewContract()

@@ -295,9 +295,12 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     return $this->authorizedToApproveOrDisapprove($mod);
   }
 
-  public function programs()
+  /**
+   * The programs which are accessible by the admin, It can be program or child program
+   */
+  public function accessiblePrograms()
   {
-    return $this->belongsToMany(Program::class, ProgramUser::class, 'admin_id', 'program_id')->withTimestamps();
+    return $this->morphedByMany(Program::class, 'accessable', 'admin_access_lists', 'admin_id', 'accessable_id')->withTimestamps();
   }
 
   public function emailAccounts()
@@ -476,18 +479,18 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     {
         // Fetch the contract with its stages
         $contract = Contract::find($contract_id);
-    
+
         if (!$contract) {
             return []; // or throw an exception, depending on your application's needs
         }
-    
+
         // Use `$this` to refer to the current admin instance
         $adminId = $this->id;
-    
+
         $stagesReviewStatus = $contract->stages->map(function ($stage) use ($adminId) {
             // Get the status for this stage for the current admin
             $status = $stage->getUserReviewStatusWithLastReviewDate($adminId);
-    
+
             // Add stage information for reference
             return [
                 'stage_name' => $stage->name,
@@ -495,8 +498,8 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
                 'last_review_date' => $status['last_review_date'],
             ];
         });
-    
+
         return $stagesReviewStatus->toArray();
     }
-    
+
 }

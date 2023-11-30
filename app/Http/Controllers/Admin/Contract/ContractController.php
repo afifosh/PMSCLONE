@@ -749,7 +749,7 @@ class ContractController extends Controller
         // This will use the DataTable's internal mechanisms to create a JSON representation
         // of the data based on the current request (like pagination, filtering, etc.).
         return $dataTable->ajax();
-  }  
+  }
   public function ContractPaymentsPlanReview_OLD($contract_id)
   {
       // Assuming `program` is a relation on the `Contract` model that retrieves the associated program.
@@ -761,24 +761,8 @@ class ContractController extends Controller
           return response()->json(['error' => 'Contract not found'], 404);
       }
 
-      // Get the associated program and users with access to the contract
-      $program = $contract->program;
-      $usersWithAccess = $program->users;
-
-      // If the program has a parent, we should also include users from the parent program
-      $parentProgramUsers = collect();
-      if ($parentProgram = $program->parent) {
-          $parentProgramUsers = $parentProgram->users;
-      }
-
-      // Combine the collections, ensuring there are no duplicates
-      $allUsers = $usersWithAccess->merge($parentProgramUsers)->unique('id');
-
-      // Start building your query for the DataTable
-      $dataTableQuery = Admin::whereIn('id', $allUsers->pluck('id'));
-
       // Create a DataTable
-      $dataTable = DataTables::of($dataTableQuery)
+      $dataTable = DataTables::of($contract->program->users)
           ->addColumn('name', function ($user) {
               return $user->name;
           })
@@ -981,35 +965,20 @@ class ContractController extends Controller
   {
       try {
           // Find the contract by its ID
-          $contract = Contract::findOrFail($contract_id);
-
-          // Retrieve the program associated with the contract
-          $program = $contract->program;
+          $contract = Contract::with('program.users')->findOrFail($contract_id);
 
         // Check if a program is associated with the contract
-        if (!$program) {
+        if (!$contract->program) {
           return $this->sendError('This contract is not associated with any program.');
         }
 
-          // Retrieve users associated with the program
-          $programUsers = $program->users;
-
-          // If the program has a parent, retrieve users from the parent program as well
-          $parentProgramUsers = collect();
-          if ($program->parent) {
-              $parentProgramUsers = $program->parent->users;
-          }
-
-          // Combine users from the program and the parent program
-          $eligibleReviewers = $programUsers->merge($parentProgramUsers);
-
-          if ($eligibleReviewers->isEmpty()) {
+          if ($contract->program->users->isEmpty()) {
             return $this->sendError('No eligible reviewers found for this program.');
           }
 
-        
+
           // Check if the current authenticated user is among the eligible reviewers
-          if (!$eligibleReviewers->contains('id', Auth::id())) {
+          if (!$contract->program->users->contains('id', Auth::id())) {
               // If not, return an error response
               return $this->sendError('You are not authorized to perform this action.');
           }
@@ -1049,35 +1018,19 @@ class ContractController extends Controller
   {
       try {
           // Find the contract by its ID
-          $contract = Contract::findOrFail($contract_id);
-
-          // Retrieve the program associated with the contract
-          $program = $contract->program;
+          $contract = Contract::with('program.users')->findOrFail($contract_id);
 
         // Check if a program is associated with the contract
-        if (!$program) {
+        if (!$contract->program) {
           return $this->sendError('This contract is not associated with any program.');
         }
 
-        // Retrieve users associated with the program
-        $programUsers = $program->users;
-
-        // If the program has a parent, retrieve users from the parent program as well
-        $parentProgramUsers = collect();
-        if ($program->parent) {
-            $parentProgramUsers = $program->parent->users;
-        }
-
-        // Combine users from the program and the parent program
-        $eligibleReviewers = $programUsers->merge($parentProgramUsers);
-
-
-        if ($eligibleReviewers->isEmpty()) {
+        if ($contract->program->users->isEmpty()) {
           return $this->sendError('No eligible reviewers found for this program.');
         }
-                
+
         // Check if the current authenticated user is among the eligible reviewers
-        if (!$eligibleReviewers->contains('id', Auth::id())) {
+        if (!$contract->program->users->contains('id', Auth::id())) {
             // If not, return an error response
             return $this->sendError('You are not authorized to perform this action.');
         }
@@ -1097,8 +1050,8 @@ class ContractController extends Controller
               // Delete the review to mark the phase as "unreviewed"
               $existingReview->delete();
               return $this->sendRes('Phase marked as unreviewed!', ['isReviewed' => false, 'close' => 'globalModal' ]);
-      
-             // return $this->sendRes('Phase marked as unreviewed!');  
+
+             // return $this->sendRes('Phase marked as unreviewed!');
           } else {
               // Mark the phase as reviewed
               $review = new Review([

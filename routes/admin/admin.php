@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AccessList\AdminAccessListController;
 use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -181,7 +182,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     // Institution routes
     Route::resource('institutions', InstitutionController::class);
     // Gallery routes
-    Route::resource('galleries', GalleryController::class);            
+    Route::resource('galleries', GalleryController::class);
     // Medium routes
     Route::resource('mediums', MediumController::class);
 
@@ -501,6 +502,7 @@ Route::prefix('contracts')->group(function () {
     Route::resource('invoice-doc-controls', DocControlController::class);
     Route::resource('invoices.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
     Route::resource('invoices.uploaded-documents', UploadedDocumentController::class);
+    Route::resource('admin-access-lists', AdminAccessListController::class);
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
