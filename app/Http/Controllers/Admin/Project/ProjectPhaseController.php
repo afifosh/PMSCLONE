@@ -11,6 +11,7 @@ use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\ContractStage;
 use App\Models\InvoiceConfig;
+use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -222,6 +223,25 @@ class ProjectPhaseController extends Controller
             'manual_amount' => $tax->pivot->manual_amount,
             'category' => $tax->pivot->category,
           ]);
+        }
+
+        $phase->load('deduction');
+        if($phase->deduction){
+          $item->deduction()->updateOrCreate([
+            'deductible_id' => $item->id,
+            'deductible_type' => InvoiceItem::class,
+          ], [
+            'downpayment_id' => $phase->deduction->downpayment_id,
+            'dp_rate_id' => $phase->deduction->dp_rate_id,
+            'is_percentage' => $phase->deduction->is_percentage,
+            'amount' => $phase->deduction->amount,
+            'manual_amount' => $phase->deduction->manual_amount,
+            'percentage' => $phase->deduction->percentage,
+            'is_before_tax' => $phase->deduction->is_before_tax,
+            'calculation_source' => $phase->deduction->calculation_source,
+          ]);
+        }else{
+          $item->deduction()->delete();
         }
 
         $item->invoice->reCalculateTotal(); // ERROR HERE

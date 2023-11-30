@@ -631,7 +631,7 @@ class Invoice extends Model
       $pivot_amounts = ContractPhase::whereIn('id', $phase_ids)
         ->where('contract_id', $this->contract_id)
         // ->has('addedAsInvoiceItem', 0)
-        ->with('taxes')
+        ->with('taxes', 'deduction')
         ->get();
 
       // formate data for pivot table
@@ -659,6 +659,21 @@ class Invoice extends Model
             'type' => $tax->pivot->type,
             'invoice_id' => $this->id,
             'category' => $tax->pivot->category,
+          ]);
+        }
+
+        if($phase->deduction){
+          $invPhase->deduction()->create([
+            'deductible_id' => $invPhase->id,
+            'deductible_type' => InvoiceItem::class,
+            'downpayment_id' => $phase->deduction->downpayment_id,
+            'dp_rate_id' => $phase->deduction->dp_rate_id,
+            'is_percentage' => $phase->deduction->is_percentage,
+            'amount' => $phase->deduction->amount,
+            'manual_amount' => $phase->deduction->manual_amount,
+            'percentage' => $phase->deduction->percentage,
+            'is_before_tax' => $phase->deduction->is_before_tax,
+            'calculation_source' => $phase->deduction->calculation_source,
           ]);
         }
       }

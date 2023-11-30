@@ -64,7 +64,7 @@ class FileShareController extends Controller
           'expires_at' => $request->expires_at,
           'shared_by' => auth()->id(),
         ]);
-        \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileShared($file_share));
+        \Notification::send($file->rfp->program->users->where('id', '!=', auth()->id()), new FileShared($file_share));
         \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileShared($file_share, ['data' => ['url' => route('admin.shared-files.index')]]));
         $file->createLog('Shared File with ' . Admin::find($user)->full_name . ' with ' . FileShare::Permissions[$request->permission] . ' permission' . ($request->expires_at ? ' till ' . $request->expires_at : ''));
       }
@@ -101,7 +101,7 @@ class FileShareController extends Controller
         $notiData['image'] = auth()->user()->avatar;
         $notiData['user'] = auth()->user();
         \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData + ['url' => route('admin.shared-files.index')]));
-        \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData));
+        \Notification::send($file->rfp->program->users->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData));
         return $this->sendRes('File Share Revoked Successfully', ['event' => 'table_reload', 'table_id' => 'sharedfiles-table', 'close' => 'modal']);
       } elseif ($request->isMethod('get')) {
         return $this->sendRes('Confirmation', ['view_data' => view('admin.pages.rfp.file-share.revoke-confirmation', compact('share'))->render()]);
@@ -126,7 +126,7 @@ class FileShareController extends Controller
         'expires_at' => $request->expires_at,
         'shared_by' => auth()->id(),
       ]);
-      \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileShared($file_share));
+      \Notification::send($file->rfp->program->users->where('id', '!=', auth()->id()), new FileShared($file_share));
       \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileShared($file_share, ['data' => ['url' => route('admin.shared-files.index')]]));
       $file->createLog('Reshared File with ' . $share->user->full_name . ' with ' . FileShare::Permissions[$request->permission] . ' permission' . ($request->expires_at ? ' till ' . $request->expires_at : ''));
 

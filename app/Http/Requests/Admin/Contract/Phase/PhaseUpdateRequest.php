@@ -5,6 +5,7 @@ namespace App\Http\Requests\Admin\Contract\Phase;
 use App\Models\Invoice;
 use App\Models\InvoiceConfig;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PhaseUpdateRequest extends FormRequest
 {
@@ -54,18 +55,21 @@ class PhaseUpdateRequest extends FormRequest
   protected function prepareForValidation(): void
   {
     $this->merge([
+      'taxes' => $this->taxes ? $this->taxes : [],
       'add_deduction' => $this->boolean('add_deduction'),
       'is_fixed_amount' => $this->boolean('is_fixed_amount'),
       'is_before_tax' => $this->boolean('is_before_tax'),
       'is_manual_deduction' => $this->boolean('is_fixed_amount') ? false : $this->boolean('is_manual_deduction'),
-      'downpayment_amount' => $this->downpayment_amount,
+      'downpayment_amount' => $this->boolean('add_deduction') ? $this->downpayment_amount : 0,
     ]);
 
     $this->validate($this->getValidationRules(), $this->messages());
-    if(!$this->is_fixed_amount)
-    $this->deduction_rate = InvoiceConfig::activeOnly()->findOrFail($this->dp_rate_id);
+    if($this->add_deduction){
+      if(!$this->is_fixed_amount)
+        $this->deduction_rate = InvoiceConfig::activeOnly()->findOrFail($this->dp_rate_id);
 
-    $this->downpayment = Invoice::findOrFail($this->downpayment_id);
+      $this->downpayment = Invoice::findOrFail($this->downpayment_id);
+    }
 
     $tax_ids = array_column($this->taxes, 'phase_tax');
     $this->tax_rates = InvoiceConfig::whereIn('id', filterInputIds($tax_ids))->activeTaxes()->get();
@@ -113,9 +117,9 @@ class PhaseUpdateRequest extends FormRequest
       'add_deduction' => 'boolean',
       'is_before_tax' => 'required_if:add_deduction,true|boolean',
       'is_fixed_amount' => 'required_if:add_deduction,true|boolean',
-      'downpayment_id' => 'required_if:add_deduction,true|exists:invoices,id',
-      'downpayment_amount' => 'required_if:add_deduction,true|numeric|gt:0',
-      'dp_rate_id' => 'nullable|required_if:is_fixed_amount,false|exists:invoice_configs,id',
+      'downpayment_id' => 'nullable|required_if:add_deduction,true|exists:invoices,id',
+      'downpayment_amount' => 'required_if:add_deduction,true|numeric|gte:0',
+      'dp_rate_id' => ['nullable', Rule::requiredIf($this->add_deduction && $this->is_fixed_amount == false), 'exists:invoice_configs,id'],
       'calculation_source' => 'required_if:add_deduction,true|in:Down Payment,Deductible',
       'is_manual_deduction' => 'required_if:add_deduction,true|boolean',
       // end deduction fields
@@ -133,7 +137,7 @@ class PhaseUpdateRequest extends FormRequest
   public function rules(): array
   {
     $rules = [
-      'downpayment_amount' => 'required|numeric|gt:0|max:' . $this->getMaxDeductableAmount(),
+      'downpayment_amount' => 'required|numeric|gte:0|max:' . $this->getMaxDeductableAmount(),
       'manual_deduction_amount' => 'required|numeric|gte:0',
     ] + $this->getValidationRules();
 
@@ -156,6 +160,10 @@ class PhaseUpdateRequest extends FormRequest
   }
 
   private function getMaxDeductableAmount(){
+    if(!$this->add_deduction){
+      return 0;
+    }
+
     $maxDeductable = $this->downpayment->downpaymentAmountRemaining();
     if(@$this->phase->deduction){
       $maxDeductable += ($this->phase->deduction->manual_amount ? $this->phase->deduction->manual_amount : $this->phase->deduction->amount);

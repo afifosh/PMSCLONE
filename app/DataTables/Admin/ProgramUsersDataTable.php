@@ -2,15 +2,11 @@
 
 namespace App\DataTables\Admin;
 
-use App\Models\Program;
-use App\Models\ProgramUser;
+use App\Models\AdminAccessList;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class ProgramUsersDataTable extends DataTable
@@ -28,15 +24,12 @@ class ProgramUsersDataTable extends DataTable
         return view('admin._partials.sections.user-info', ['user' => $row->user]);
       })
       ->editColumn('added_by', function ($row) {
-        return view('admin._partials.sections.user-info', ['user' => $row->addedBy]);
-      })
-      ->addColumn('permanent_access', function ($row) {
-        return $row->permanent_access ? 'Yes' : 'No';
+        return view('admin._partials.sections.user-info', ['user' => $row->grantedBy]);
       })
       ->addColumn('user_organization', function ($row) {
         return @$row->user->designation->department->company->name ? view('admin._partials.sections.company-avatar', ['company' => @$row->user->designation->department->company]) : '-';
       })
-      ->addColumn('action', function (ProgramUser $programUser) {
+      ->addColumn('action', function (AdminAccessList $programUser) {
         return view('admin.pages.programs.users.action', compact('programUser'));
       })
       ->filterColumn('user', function ($query, $keyword) {
@@ -45,7 +38,7 @@ class ProgramUsersDataTable extends DataTable
         });
       })
       ->filterColumn('added_by', function ($query, $keyword) {
-        return $query->whereHas('addedBy', function ($q) use ($keyword) {
+        return $query->whereHas('grantedBy', function ($q) use ($keyword) {
           return $q->where('email', 'like', "%" . $keyword . "%");
         });
       })
@@ -56,16 +49,16 @@ class ProgramUsersDataTable extends DataTable
   /**
    * Get query source of dataTable.
    *
-   * @param \App\Models\ProgramUser $model
+   * @param \App\Models\AdminAccessList $model
    * @return \Illuminate\Database\Eloquent\Builder
    */
-  public function query(ProgramUser $model): QueryBuilder
+  public function query(AdminAccessList $model): QueryBuilder
   {
     $query = $model->query();
     $query->when(request()->program, function ($query) {
-      return $query->ofProgram(request()->program);
+      return $query->ofProgram(request()->program->id);
     });
-    return $query->with(['addedBy', 'user.designation.department.company']);
+    return $query->with(['grantedBy', 'user.designation.department.company']);
   }
 
   /**
@@ -88,7 +81,7 @@ class ProgramUsersDataTable extends DataTable
       ];
 
     return $this->builder()
-      ->setTableId(ProgramUser::DT_ID)
+      ->setTableId(AdminAccessList::DT_ID)
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->responsive(true)
@@ -116,12 +109,11 @@ class ProgramUsersDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('user'),
-      Column::make('permanent_access'),
-      Column::make('until_at'), 
+      Column::make('granted_till'),
       Column::make('user_organization')->title('User Organization'),
       Column::make('added_by'),
       Column::make('created_at'),
-      Column::make('updated_at'),
+      Column::make('updated_at')
     ];
   }
 

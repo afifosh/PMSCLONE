@@ -180,7 +180,6 @@ function initTaxRepeater()
 
   function calculateTotalCost()
   {
-    console.log('calculateTotalCost')
     const estimatedCost = $('[name="estimated_cost"]').val();
 
     var totalTax = parseFloat(0);
@@ -201,7 +200,6 @@ function initTaxRepeater()
     if(!$('.phase-create-form [name="add_deduction"]').is(':checked')){
       return estimated_cost;
     }else if($('.phase-create-form [name="is_before_tax"]').val() == 1){
-      console.log('is_before_taxTAbvl', $('.phase-create-form [name="is_before_tax"]').val());
       return estimated_cost - calcDeductionAmount();
     }else{
       return estimated_cost;
@@ -218,7 +216,6 @@ function initTaxRepeater()
     }
 
     if($('.phase-create-form [name="is_before_tax"]').val() == 0){
-      console.log('is_before_tax', $('.phase-create-form [name="is_before_tax"]').val());
       itemCost = itemCost + calcPhaseTaxes();
     }
 
@@ -232,27 +229,16 @@ function initTaxRepeater()
           deductionAmount = deductionRate;
         }else{
           // is before tax or after tax
-          if($('.phase-create-form [name="is_before_tax"]').val() == 0){
-            // source
-            if($('.phase-create-form [name="calculation_source"]').val() == 'Down Payment'){
+          if($('.phase-create-form [name="calculation_source"]').val() == 'Down Payment'){
               const selectedDPTotal = parseFloat($('.phase-create-form [name="downpayment_id"] option:selected').data('amount'));
               deductionAmount = (selectedDPTotal * deductionRate) / 100;
             }else{
               deductionAmount = (itemCost * deductionRate) / 100;
             }
-          }else{
-            // source
-            if($('.phase-create-form [name="calculation_source"]').val() == 'Down Payment'){
-              const selectedDPTotal = parseFloat($('.phase-create-form [name="downpayment_id"] option:selected').data('amount'));
-              deductionAmount = (selectedDPTotal * deductionRate) / 100;
-            }else{
-              deductionAmount = ((itemCost + calcPhaseTaxes()) * deductionRate) / 100;
-            }
-          }
         }
       }
     }
-console.log(deductionAmount);
+
     if($('.phase-create-form [name="is_manual_deduction"]').is(':checked') || $('.phase-create-form [name="is_fixed_amount"]').is(':checked')){
       deductionAmount = parseFloat($('.phase-create-form [name="downpayment_amount"]').val());
     }else{
@@ -265,7 +251,6 @@ console.log(deductionAmount);
 
   function calcPhaseTaxes(){
     var totalTax = parseFloat(0);
-    console.log('calcPhaseTaxes')
     let taxableAmount = getTaxableAmount();
     $('.phase-create-form .tax-rate').each(function (index, element) {
       // element == this
@@ -300,7 +285,6 @@ console.log(deductionAmount);
       totalTax += amount;
     });
 
-    console.log('totalTax:', totalTax);
     return totalTax;
   }
 

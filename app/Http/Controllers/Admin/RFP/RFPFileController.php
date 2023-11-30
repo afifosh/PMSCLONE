@@ -107,7 +107,7 @@ class RFPFileController extends Controller
     }
     $uploaded_file->createLog('Uploaded File');
     unlink($file->getPathname());
-    Notification::send($uploaded_file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUploaded($uploaded_file));
+    Notification::send($uploaded_file->rfp->program->users->where('id', '!=', auth()->id()), new FileUploaded($uploaded_file));
     return $this->sendRes('Uploaded Successfully', ['event' => 'page_reload', 'close' => 'modal']);
   }
 
@@ -176,7 +176,7 @@ class RFPFileController extends Controller
     $notiData['image'] = auth()->user()->avatar;
     $notiData['user'] = auth()->user();
     \Notification::send($file->sharedUsers->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData + ['url' => route('admin.shared-files.index')]));
-    \Notification::send($file->rfp->program->programUsers()->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData));
+    \Notification::send($file->rfp->program->users->where('id', '!=', auth()->id()), new FileUpdated($file, $notiData));
     $data['draft_rfp'] = $rfp;
 
     return view('admin.pages.rfp.files.only-office-editor', $data);
