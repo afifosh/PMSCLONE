@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AccessList\AdminAccessListController;
+use App\Http\Controllers\Admin\AccessList\AdminAccessListProgramController;
 use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -503,6 +504,7 @@ Route::prefix('contracts')->group(function () {
     Route::resource('invoices.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
     Route::resource('invoices.uploaded-documents', UploadedDocumentController::class);
     Route::resource('admin-access-lists', AdminAccessListController::class);
+    Route::resource('admin-access-lists.programs', AdminAccessListProgramController::class);
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
