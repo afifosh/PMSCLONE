@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Support\LaravelBalance\Models\Interfaces\AccountBalanceHolderInterface;
 use Avatar;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Program extends BaseModel implements AccountBalanceHolderInterface
 {
-    use HasFactory;
+    use HasFactory, HasRecursiveRelationships;
 
     public const DT_ID = 'programs-dataTable';
 
@@ -43,7 +44,26 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
     {
       return $this->belongsToMany(Admin::class, AdminAccessList::class, 'accessable_id', 'admin_id')
                   ->where('accessable_type', self::class)
+                  ->withPivot('granted_till')
                   ->withTimestamps();
+    }
+
+    public function pivotAccessLists()
+    {
+      return $this->hasMany(AdminAccessList::class, 'accessable_id', 'id')->where('accessable_type', self::class);
+    }
+
+    /**
+     * Scope a query to only include programs accessible by the specified admin.
+     */
+    public function scopeAccessibleByAdmin($query, $admin_id)
+    {
+      return $query->whereHas('users', function ($q) use ($admin_id) {
+        $q->where('admins.id', $admin_id);
+      })
+      ->with(['pivotAccessLists' => function ($q) use ($admin_id) {
+        $q->where('admin_id', $admin_id);
+      }]);
     }
 
     public function parent()

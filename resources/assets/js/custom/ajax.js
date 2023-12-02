@@ -740,7 +740,11 @@ $(document).on('click', '[data-toggle="ajax-modal"]', function () {
       }
       if(response.data.JsMethods != undefined && response.data.JsMethods != null && response.data.JsMethods != ''){
         for(var i = 0; i < response.data.JsMethods.length; i++){
-          eval(response.data.JsMethods[i]+'()');
+          if(response.data.JsMethodsParams != undefined && response.data.JsMethodsParams != null && response.data.JsMethodsParams != ''){
+            eval(response.data.JsMethods[i]+'('+response.data.JsMethodsParams[i]+')');
+          }else{
+            eval(response.data.JsMethods[i]+'()');
+          }
         }
       }
       $('[data-bs-toggle="tooltip"]').tooltip();

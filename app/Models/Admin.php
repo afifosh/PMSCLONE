@@ -80,6 +80,8 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
    */
   protected $casts = [
     'email_verified_at' => 'datetime',
+    'created_at' => 'datetime: M d, Y',
+    'updated_at' => 'datetime: M d, Y'
   ];
 
   protected static function boot(): void
@@ -300,7 +302,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
    */
   public function accessiblePrograms()
   {
-    return $this->morphedByMany(Program::class, 'accessable', 'admin_access_lists', 'admin_id', 'accessable_id')->withTimestamps();
+    return $this->morphedByMany(Program::class, 'accessable', 'admin_access_lists', 'admin_id', 'accessable_id')->withPivot('granted_till')->withTimestamps();
   }
 
   public function emailAccounts()
