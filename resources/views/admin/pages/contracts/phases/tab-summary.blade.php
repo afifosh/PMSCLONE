@@ -22,7 +22,7 @@
 
   </div>
   <div class="form-group col-12">
-    {{ Form::label('estimated_cost', __('Estimated Cost'), ['class' => 'col-form-label']) }}
+    {{ Form::label('estimated_cost', __('Cost'), ['class' => 'col-form-label']) }}
     <div class="dropdown open d-inline">
       <span data-bs-toggle="dropdown" aria-haspopup="true">
           <i class="fas fa-calculator"></i>
@@ -34,34 +34,7 @@
         </div>
       </div>
     </div>
-    {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Estimated Cost')]) !!}
-  </div>
-  @includeWhen(count($contract->deductableDownpayments) && (@$phase->deduction->is_before_tax), 'admin.pages.contracts.phases.add-deduction')
-  <div class="col-12 rounded mt-3 taxes-section" data-repeater-list="taxes">
-    <hr>
-    <div class="d-flex">
-      <span class="pt-1 me-2">Phase Tax</span>
-      <button type="button" class="btn btn-sm btn-primary" data-repeater-create>
-          <i class="fas fa-plus-circle"></i>
-      </button>
-    </div>
-    <hr>
-    @forelse ($phase->taxes as $tax)
-      @include('admin.pages.contracts.phases.tax-repeater', ['tax' => $tax, 'index' => $loop->index])
-    @empty
-      @include('admin.pages.contracts.phases.tax-repeater', ['index' => 0])
-    @endforelse
-  </div>
-  {{-- include deduction section --}}
-  @includeWhen(count($contract->deductableDownpayments) && !(@$phase->deduction->is_before_tax), 'admin.pages.contracts.phases.add-deduction')
-  <div>
-    <hr class="mt-2">
-  </div>
-
-  {{-- total cost --}}
-  <div class="form-group col-6">
-    {{ Form::label('total_cost', __('Total Cost'), ['class' => 'col-form-label']) }}
-    {!! Form::number('total_cost', null, ['class' => 'form-control', 'placeholder' => __('Total Cost'), 'disabled', 'data-max' => $max_amount])!!}
+    {!! Form::number('estimated_cost', null, ['class' => 'form-control', 'placeholder' => __('Cost')]) !!}
   </div>
   {{-- start date --}}
   <div class="form-group col-6">

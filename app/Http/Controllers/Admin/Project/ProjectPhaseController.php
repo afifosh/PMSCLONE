@@ -26,8 +26,11 @@ class ProjectPhaseController extends Controller
     // abort_if(!$project->isMine(), 403);
 
     $page = 'Project';
-    if (request()->route()->getName() == 'admin.contracts.stages.phases.index') {
-      $page = 'Contract';
+    if (in_array(request()->route()->getName(), ['admin.contracts.stages.phases.index', 'admin.contracts.phases.index'])) {
+      if(request()->route()->getName() == 'admin.contracts.stages.phases.index')
+        $page = 'Contract';
+      else
+        $page = 'Contract All';
       $contract->load('notifiableUsers');
     }
     return $dataTable->render('admin.pages.contracts.phases.index', compact('contract', 'project', 'stage', 'page'));
@@ -35,11 +38,19 @@ class ProjectPhaseController extends Controller
     return view('admin.pages.contracts.phases.index', compact('contract', 'project', 'phase_statuses', 'colors', 'page', 'stage'));
   }
 
-  public function contractPhases(Contract $contract, $stage, PhasesDataTable $dataTable)
+  public function contractPhases(Contract $contract, PhasesDataTable $dataTable, $stage = null,)
   {
     $stage = ContractStage::find($stage) ?? 'stage';
 
     return $this->index('project', $contract, $stage, $dataTable);
+  }
+
+  public function show($contract, Contractphase $phase)
+  {
+    if(request()->type == 'expandDT'){
+      $phase->load(['taxes', 'deduction']);
+      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.show.show', compact('phase'))->render()]);
+    }
   }
 
   public function create($project, Contract $contract, $stage)
@@ -50,38 +61,21 @@ class ProjectPhaseController extends Controller
     $phase = new ContractPhase();
     $tax_rates = InvoiceConfig::activeOnly()->get();
     $stages = $contract->stages->pluck('name', 'id');
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render(), 'JsMethods' => ['initTaxRepeater']]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
   }
 
   public function store($project, Contract $contract, $stage, PhaseStoreRequest $request)
   {
     DB::beginTransaction();
     try {
-      $data['total_cost'] = $request->estimated_cost + $request->total_tax_amount -
-        ($request->add_deduction ? ($request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount) : 0);
-      $data['tax_amount'] = $request->total_tax_amount;
-      $data['stage_id'] = $request->stage_id;
+      $data['total_cost'] = $request->estimated_cost;
+      $stage = ContractStage::where('id', $request->stage_id)->firstOrCreate(['contract_id' => $contract->id, 'name' => $request->stage_id]);
+      $data['stage_id'] = $stage->id;
 
-      $phase = $contract->phases()->create(
+      $contract->phases()->create(
         $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id'])
       );
 
-      $this->storeTaxes($phase, $request);
-
-      if ($request->add_deduction) {
-        $phase->deduction()->create([
-          'deductible_id' => $phase->id,
-          'deductible_type' => ContractPhase::class,
-          'downpayment_id' => $request->downpayment_id,
-          'dp_rate_id' => $request->dp_rate_id,
-          'is_percentage' => $request->is_fixed_amount ? false : ($request->deduction_rate->type != 'Fixed'),
-          'amount' => $request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount,
-          'manual_amount' => $request->manual_deduction_amount,
-          'percentage' => $request->deduction_rate->amount ?? 0,
-          'is_before_tax' => $request->is_before_tax,
-          'calculation_source' => $request->calculation_source,
-        ]);
-      }
     } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());
@@ -90,22 +84,6 @@ class ProjectPhaseController extends Controller
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
     return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => request()->tableId ? request()->tableId : 'phases-table', 'close' => 'globalModal']);
-  }
-
-  protected function storeTaxes($phase, $request): void
-  {
-    $phase->taxes()->detach();
-    foreach ($request->taxes ?? [] as $tax) {
-      $rate = $request->tax_rates->where('id', $tax['phase_tax'])->first();
-      $calTaxAmount = $rate->type == 'Fixed' ? $rate->amount : ($rate->amount * $request->estimated_cost / 100);
-      $phase->taxes()->attach($rate->id, [
-        'amount' => $rate->getRawOriginal('amount'),
-        'type' => $rate->type,
-        'calculated_amount' => moneyToInt($calTaxAmount),
-        'manual_amount' => $calTaxAmount == $tax['total_tax'] ? 0 : moneyToInt($tax['total_tax']),
-        'category' => $rate->category,
-      ]);
-    }
   }
 
   public function edit($project, $contract, $stage, ContractPhase $phase)
@@ -146,7 +124,7 @@ class ProjectPhaseController extends Controller
     </div>';
 
 
-    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render(), 'JsMethods' => ['initTaxRepeater']]);
+    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
   }
 
   public function prepareActivityTab($phase)
@@ -173,32 +151,20 @@ class ProjectPhaseController extends Controller
 
     DB::beginTransaction();
     // try{
-    $data['total_cost'] = $request->estimated_cost + $request->total_tax_amount -
-      ($request->add_deduction ? ($request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount) : 0);
-    $data['tax_amount'] = $request->total_tax_amount;
+    $data['total_cost'] = $request->estimated_cost;
+    $stage = ContractStage::where('id', $request->stage_id)->firstOrCreate(['contract_id' => $contract->id, 'name' => $request->stage_id]);
+    $data['stage_id'] = $stage->id;
 
     $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
 
-    $this->storeTaxes($phase, $request);
-
-    // add or update deduction if add_deduction is true
-    if ($request->add_deduction) {
-      $phase->deduction()->updateOrCreate([
-        'deductible_id' => $phase->id,
-        'deductible_type' => ContractPhase::class,
-      ], [
-        'downpayment_id' => $request->downpayment_id,
-        'dp_rate_id' => $request->dp_rate_id,
-        'is_percentage' => $request->is_fixed_amount ? false : ($request->deduction_rate->type != 'Fixed'),
-        'amount' => $request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount,
-        'manual_amount' => $request->manual_deduction_amount,
-        'percentage' => $request->deduction_rate->amount ?? 0,
-        'is_before_tax' => $request->is_before_tax,
-        'calculation_source' => $request->calculation_source,
-      ]);
-    } else {
-      $phase->deduction()->delete();
-    }
+    $phase->reCalculateTaxAmountsAndResetManualAmounts(false);
+    $phase->reCalculateTotal();
+    $phase->recalculateDeductionAmount();
+    $phase->reCalculateTotal();
+    $phase->reCalculateTaxAmountsAndResetManualAmounts();
+    $phase->reCalculateTotal();
+    $phase->recalculateDeductionAmount();
+    $phase->reCalculateTotal();
 
     // if added in invoice then update invoice item and tax amount
     $phase->load('addedAsInvoiceItem.invoice');

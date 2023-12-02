@@ -100,6 +100,8 @@ use App\Http\Controllers\Admin\MuseumController;
 use App\Http\Controllers\Admin\MediumController;
 use App\Http\Controllers\Admin\ArtistController;
 use App\Http\Controllers\Admin\Contract\ContractPartyController;
+use App\Http\Controllers\Admin\Contract\Phase\PhaseDeductionController;
+use App\Http\Controllers\Admin\Contract\Phase\PhaseTaxController;
 use App\Http\Controllers\Admin\Contract\UploadedDoc\SignatureController;
 use App\Http\Controllers\Admin\Invoice\InvoiceStatusController;
 use App\Http\Controllers\Admin\Invoice\ItemDeductionController;
@@ -345,6 +347,10 @@ Route::prefix('contracts')->group(function () {
 
 
     Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
+    Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
+    Route::get('contracts/{contract}/phases/{phase}', [ProjectPhaseController::class, 'show'])->name('contracts.phases.show');
+    Route::resource('contracts.phases.taxes', PhaseTaxController::class);
+    Route::resource('contracts.phases.deductions', PhaseDeductionController::class);
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     // Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
     Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');

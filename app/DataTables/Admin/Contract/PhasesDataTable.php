@@ -22,6 +22,9 @@ class PhasesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
+      ->addColumn('stage', function ($phase) {
+        return $phase->stage->name;
+      })
       ->editColumn('checkbox', function ($phase) {
         return '<input class="form-check-input phase-check" name="selected_phases[]" type="checkbox" value="' . $phase->id . '">';
       })
@@ -35,12 +38,12 @@ class PhasesDataTable extends DataTable
           ? '<a href="' . route('admin.invoices.edit', $invoiceItem->invoice_id) . '">' . runtimeInvIdFormat($invoiceItem->invoice_id) . '</a>'
           : 'N/A';
       })
-      ->editColumn('estimated_cost', function ($phase) {
-        return cMoney($phase->estimated_cost, $phase->contract->currency, true);
-      })
-      ->editColumn('tax_amount', function ($phase) {
-        return cMoney($phase->tax_amount, $phase->contract->currency, true);
-      })
+      // ->editColumn('estimated_cost', function ($phase) {
+      //   return cMoney($phase->estimated_cost, $phase->contract->currency, true);
+      // })
+      // ->editColumn('tax_amount', function ($phase) {
+      //   return cMoney($phase->tax_amount, $phase->contract->currency, true);
+      // })
       ->editColumn('total_cost', function ($phase) {
         return cMoney($phase->total_cost, $phase->contract->currency, true);
       })->rawColumns(['invoice_id', 'action', 'checkbox'])
@@ -63,7 +66,7 @@ class PhasesDataTable extends DataTable
       ->when($this->contract_id, function ($q) {
         $q->where('contract_id', $this->contract_id);
       })
-      ->with('addedAsInvoiceItem.invoice')
+      ->with(['addedAsInvoiceItem.invoice', 'stage:name,id'])
       ->newQuery();
   }
 
@@ -116,6 +119,7 @@ class PhasesDataTable extends DataTable
         "scrollX" => true,
         "drawCallback" => "function (settings) {
           initSortable();
+          expandPendingPhase();
         }"
       ]);
   }
@@ -129,10 +133,11 @@ class PhasesDataTable extends DataTable
       Column::make('order')->visible(false),
       Column::make('checkbox')->title('<input class="form-check-input phase-check-all" type="checkbox">')->orderable(false)->searchable(false)->printable(false)->exportable(false)->visible(false)->width(1),
       Column::make('name'),
+      Column::make('stage'),
       Column::make('start_date'),
       Column::make('due_date')->title('End Date'),
-      Column::make('estimated_cost'),
-      Column::make('tax_amount'),
+      // Column::make('estimated_cost'),
+      // Column::make('tax_amount'),
       Column::make('total_cost'),
       Column::make('status'),
       Column::make('invoice_id')->title('Invoice ID')->orderable(true), // Add the new column for invoice_id

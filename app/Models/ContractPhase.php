@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Facades\DB;
 use Spatie\Comments\Models\Concerns\HasComments;
 
 class ContractPhase extends BaseModel
@@ -236,7 +237,12 @@ class ContractPhase extends BaseModel
 
   public function taxes(): BelongsToMany
   {
-    return $this->belongsToMany(InvoiceConfig::class, 'phase_taxes', 'contract_phase_id', 'tax_id')->withPivot('amount', 'type', 'calculated_amount', 'manual_amount', 'category')->withTimestamps();
+    return $this->belongsToMany(InvoiceConfig::class, 'phase_taxes', 'contract_phase_id', 'tax_id')->withPivot('id', 'amount', 'type', 'calculated_amount', 'manual_amount', 'category')->withTimestamps();
+  }
+
+  public function pivotTaxes(): HasMany
+  {
+    return $this->hasMany(PhaseTax::class, 'contract_phase_id');
   }
 
   /*
@@ -265,5 +271,88 @@ class ContractPhase extends BaseModel
   public function deduction(): MorphOne
   {
     return $this->morphOne(InvoiceDeduction::class, 'deductible');
+  }
+
+  public function recalculateDeductionAmount($reset_manual_amount = true): void
+  {
+    $this->load('deduction');
+    if(!$this->deduction) return;
+    $phaseTaxes = PhaseTax::where('contract_phase_id', $this->id)
+      ->select([
+        'category',
+        DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount) as total_amount')
+      ])
+      ->get();
+
+    $simpleTax = $phaseTaxes->where('category', 1)->sum('total_amount') / 1000;
+    $reverseCharge = $phaseTaxes->where('category', 2)->sum('total_amount') / 1000;
+    $total_tax = $simpleTax - $reverseCharge;
+    $deductionAmount = $this->calculateDeductionAmount($total_tax);
+    $deduction = $this->deduction;
+    if ($deduction && $deduction->manual_amount && $reset_manual_amount) {
+      $deduction->manual_amount = 0;
+    }
+    $deduction->amount = $deductionAmount;
+    $deduction->save();
+  }
+
+  private function calculateDeductionAmount($total_tax = 0)
+  {
+    $deductionAmount = 0;
+    if (!$this->deduction) {
+      return $deductionAmount;
+    }
+
+    if (!$this->deduction->is_percentage) {
+      $deductionAmount = $this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount;
+      return $deductionAmount;
+    } else {
+      if ($this->deduction->source == 'Down Payment')
+        $deductionAmount = $this->deduction->downpayment->total * $this->deduction->percentage / 100;
+      elseif ($this->deduction->is_before_tax) {
+        $deductionAmount = ($this->estimated_cost * $this->deduction->percentage) / 100;
+      } else {
+        $deductionAmount = ($this->estimated_cost + $total_tax) * $this->deduction->percentage / 100;
+      }
+    }
+
+    return $deductionAmount;
+  }
+
+  public function reCalculateTotal(): void
+  {
+    $this->load('deduction');
+
+    $phaseTaxes = PhaseTax::where('contract_phase_id', $this->id)
+      ->select([
+        'category',
+        DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount) as total_amount')
+      ])
+      ->get();
+
+    $simpleTax = $phaseTaxes->where('category', 1)->sum('total_amount') / 1000;
+    $behalfTax = $phaseTaxes->where('category', 2)->sum('total_amount') / 1000;
+    $this->tax_amount = $simpleTax + $behalfTax;
+    $this->total_cost = $this->estimated_cost + $simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    $this->save();
+  }
+
+  /**
+   * Recalculate tax amounts and reset manual amounts to 0
+   * This function is called when deduction is created
+   */
+  public function reCalculateTaxAmountsAndResetManualAmounts($considerDeduction = true): void
+  {
+    $this->load('pivotTaxes');
+    $taxableAmount = $this->subtotal - (($considerDeduction && $this->deduction && $this->deduction->is_before_tax) ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    foreach($this->pivotTaxes as $tax){
+      if($tax->type == 'Fixed'){
+        continue;
+      }else{
+        $tax->manual_amount = 0;
+        $tax->calculated_amount = $taxableAmount * $tax->amount / 100;
+        $tax->save();
+      }
+    }
   }
 }
