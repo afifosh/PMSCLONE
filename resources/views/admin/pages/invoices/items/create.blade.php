@@ -7,6 +7,7 @@
         <tr>
           <th>{!! Form::checkbox('checkAll', 1, 0, ['class' => 'form-check-input phase-check-all']) !!}</th>
           <th scope="col">Phase</th>
+          <th scope="col">Stage</th>
           <th scope="col">Cost</th>
           <th scope="col">Status</th>
         </tr>

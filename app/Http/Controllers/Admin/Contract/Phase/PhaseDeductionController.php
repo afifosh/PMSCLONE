@@ -53,6 +53,9 @@ class PhaseDeductionController extends Controller
 
       $phase->reCalculateTotal();
 
+      // if added in invoice then update invoice item and tax amount
+      $phase->syncUpdateWithInvoices();
+
       DB::commit();
 
       return $this->sendRes('Deduction added successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id]), 'close' => 'globalModal']);
@@ -78,19 +81,26 @@ class PhaseDeductionController extends Controller
   {
     DB::beginTransaction();
     try {
+      $old_is_before_tax = $phase->deduction->is_before_tax;
       $phase->deduction()->update([
         'downpayment_id' => $request->downpayment_id,
         'dp_rate_id' => $request->dp_rate_id,
         'is_percentage' => $request->is_fixed_amount ? false : ($request->deduction_rate->type != 'Fixed'),
         'amount' => moneyToInt($request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount),
-        'manual_amount' => $request->manual_deduction_amount,
+        'manual_amount' => moneyToInt($request->manual_deduction_amount),
         'percentage' => $request->deduction_rate->amount ?? 0,
         'is_before_tax' => $request->is_before_tax,
         'calculation_source' => $request->calculation_source,
       ]);
       $phase->reCalculateTotal();
-      $phase->reCalculateTaxAmountsAndResetManualAmounts();
-      $phase->reCalculateTotal();
+      if($old_is_before_tax || $request->is_before_tax){
+        $phase->reCalculateTaxAmountsAndResetManualAmounts();
+        $phase->reCalculateTotal();
+      }
+
+      // if added in invoice then update invoice item and tax amount
+      $phase->syncUpdateWithInvoices();
+
       DB::commit();
 
       return $this->sendRes('Deduction updated successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id]), 'close' => 'globalModal']);
@@ -109,6 +119,10 @@ class PhaseDeductionController extends Controller
       if ($is_before_tax)
         $phase->reCalculateTaxAmountsAndResetManualAmounts(false);
       $phase->reCalculateTotal();
+
+      // if added in invoice then update invoice item and tax amount
+      $phase->syncUpdateWithInvoices();
+
       DB::commit();
 
       return $this->sendRes('Deduction removed successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id])]);

@@ -40,6 +40,9 @@ class PhaseTaxController extends Controller
 
       $phase->reCalculateTotal();
 
+      // if added in invoice then update invoice item and tax amount
+      $phase->syncUpdateWithInvoices();
+
       DB::commit();
 
       return $this->sendRes('Tax added successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id]), 'close' => 'globalModal']);
@@ -78,6 +81,9 @@ class PhaseTaxController extends Controller
 
       $phase->reCalculateTotal();
 
+      // if added in invoice then update invoice item and tax amount
+      $phase->syncUpdateWithInvoices();
+
       DB::commit();
 
       return $this->sendRes('Tax Updated successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id]), 'close' => 'globalModal']);
@@ -98,6 +104,9 @@ class PhaseTaxController extends Controller
       }
 
       $phase->reCalculateTotal();
+
+      // if added in invoice then update invoice item and tax amount
+      $phase->syncUpdateWithInvoices();
 
       DB::commit();
 
