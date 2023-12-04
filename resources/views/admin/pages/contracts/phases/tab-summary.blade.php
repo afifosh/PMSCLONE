@@ -18,7 +18,7 @@
     @php
     $selectedStageId = isset($stage->id) ? $stage->id : null;
     @endphp
-    {!! Form::select('stage_id', $stages, $selectedStageId, ['class' => 'form-control globalOfSelect2', 'placeholder' => 'Select Stage']) !!}
+    {!! Form::select('stage_id', $stages, $selectedStageId, ['class' => 'form-control globalOfSelect2', 'placeholder' => 'Select Stage', 'data-tags' => 'true']) !!}
 
   </div>
   <div class="form-group col-12">

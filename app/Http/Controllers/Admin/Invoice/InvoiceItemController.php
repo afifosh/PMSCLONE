@@ -39,14 +39,14 @@ class InvoiceItemController extends Controller
 
   public function create(Invoice $invoice)
   {
-    if(request()->item == 'custom'){
+    if (request()->item == 'custom') {
       return $this->customItemCreate($invoice);
     }
     // else bulk phase items
     $data['invoice'] = $invoice;
 
     if (request()->type == 'jsonData') {
-      return DataTables::eloquent($invoice->contract->phases()->has('addedAsInvoiceItem', 0))->toJson();
+      return DataTables::eloquent($invoice->contract->phases()->has('addedAsInvoiceItem', 0)->with('stage'))->toJson();
     }
 
     return $this->sendRes('success', [
@@ -64,7 +64,7 @@ class InvoiceItemController extends Controller
 
   public function storeBulk(InvoiceItemsStoreReqeust $request, Invoice $invoice)
   {
-    if(!$invoice->isEditable()){
+    if (!$invoice->isEditable()) {
       return $this->sendError('Invoice is not editable');
     }
 
@@ -77,24 +77,30 @@ class InvoiceItemController extends Controller
 
   public function store(Invoice $invoice, InvoiceItemUpdateRequest $request)
   {
-    $customItem = CustomInvoiceItem::create($request->validated() + ['invoice_id' => $invoice->id]);
+    DB::beginTransaction();
+    try {
+      $customItem = CustomInvoiceItem::create($request->validated() + ['invoice_id' => $invoice->id]);
 
-    $invoice->items()->create([
-      'invoiceable_id' => $customItem->id,
-      'invoiceable_type' => CustomInvoiceItem::class,
-      'subtotal' => $customItem->subtotal,
-      'description' => $request->description,
-      'total_tax_amount' => $request->total_tax_amount,
-      'manual_tax_amount' => $request->manual_tax_amount,
-      'total' => $request->total,
-      'rounding_amount' => $request->rounding_amount,
-    ]);
+      $invoice->items()->create([
+        'invoiceable_id' => $customItem->id,
+        'invoiceable_type' => CustomInvoiceItem::class,
+        'subtotal' => $customItem->subtotal,
+        'description' => $request->description,
+        'total_tax_amount' => $request->total_tax_amount,
+        'manual_tax_amount' => $request->manual_tax_amount,
+        'total' => $request->total,
+        'rounding_amount' => $request->rounding_amount,
+      ]);
 
-    // $item->syncTaxes($request->taxes);
+      // $item->syncTaxes($request->taxes);
 
-    $invoice->reCalculateTotal();
+      $invoice->reCalculateTotal();
 
-    return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+      return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+    } catch (\Exception $e) {
+      DB::rollback();
+      return $this->sendError($e->getMessage());
+    }
   }
 
   public function edit(Invoice $invoice, InvoiceItem $invoiceItem)
@@ -102,11 +108,11 @@ class InvoiceItemController extends Controller
     $invoiceItem->load('taxes');
     $data['invoice'] = $invoice;
     $data['invoiceItem'] = $invoiceItem;
-    if($invoiceItem->invoiceable_type == ContractPhase::class){
+    if ($invoiceItem->invoiceable_type == ContractPhase::class) {
       $invoiceItem->load('invoiceable.stage');
       $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
       $data['stages'] = [$invoiceItem->invoiceable->stage_id => $invoiceItem->invoiceable->stage->name];
-    }else{
+    } else {
       request()->merge(['item' => 'custom']);
     }
 
@@ -117,45 +123,48 @@ class InvoiceItemController extends Controller
 
   public function update(Invoice $invoice, InvoiceItem $invoiceItem, InvoiceItemUpdateRequest $request)
   {
-    if(!$invoice->isEditable()){
+    if (!$invoice->isEditable()) {
       return $this->sendError('Invoice is not editable');
     }
 
     DB::beginTransaction();
-    try{
+    try {
       $invoiceItem->update($request->validated());
 
-      if($invoiceItem->invoiceable_type == CustomInvoiceItem::class)
+      if ($invoiceItem->invoiceable_type == CustomInvoiceItem::class)
         $invoiceItem->invoiceable->update($request->validated() + ['invoice_id' => $invoice->id]);
 
-      if($invoiceItem->deduction && $invoiceItem->deduction->is_before_tax){
+      if ($invoiceItem->deduction && $invoiceItem->deduction->is_before_tax) {
         $invoiceItem->recalculateDeductionAmount();
         $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts();
         $invoiceItem->reCalculateTotal();
-      }else{
+      } else {
         $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts(false);
         $invoiceItem->reCalculateTotal();
-        if($invoiceItem->deduction){
+        if ($invoiceItem->deduction) {
           $invoiceItem->recalculateDeductionAmount();
           $invoiceItem->reCalculateTotal();
         }
       }
 
       $invoice->reCalculateTotal();
-    }catch(\Exception $e){
+
+      $invoiceItem->syncUpdateWithPhase();
+
+      DB::commit();
+
+      return $this->sendRes('Item Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+    } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());
     }
-    DB::commit();
-
-    return $this->sendRes('Item Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
 
 
 
   public function destroy(Invoice $invoice, $invoiceItem, Request $request)
   {
-    if(!$invoice->isEditable()){
+    if (!$invoice->isEditable()) {
       return $this->sendError('Invoice is not editable');
     }
 
@@ -164,18 +173,24 @@ class InvoiceItemController extends Controller
       'ids.*' => 'required|exists:invoice_items,id'
     ]);
 
-    $items = $invoice->items()->whereIn('invoice_items.id', $request->ids)->get();
+    DB::beginTransaction();
+    try {
+      $items = $invoice->items()->whereIn('invoice_items.id', $request->ids)->get();
 
-    $items->each(function($item){
-      if ($item->invoiceable_type == CustomInvoiceItem::class)
-        $item->invoiceable->delete();
+      $items->each(function ($item) {
+        if ($item->invoiceable_type == CustomInvoiceItem::class)
+          $item->invoiceable->delete();
 
-      $item->taxes()->detach();
-      $item->delete();
-    });
+        $item->taxes()->detach();
+        $item->delete();
+      });
 
-    $invoice->reCalculateTotal();
+      $invoice->reCalculateTotal();
 
-    return $this->sendRes('Item Removed', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
+      return $this->sendRes('Item Removed', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
+    } catch (\Exception $e) {
+      DB::rollback();
+      return $this->sendError($e->getMessage());
+    }
   }
 }

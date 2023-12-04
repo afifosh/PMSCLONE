@@ -24,7 +24,7 @@ class AdminAccessListsDataTable extends DataTable
         return view('admin._partials.sections.user-info', ['user' => $user]);
       })
       ->addColumn('programs', function ($user) {
-        return view('admin._partials.sections.programs-avatar-group', ['programs' => $user->accessiblePrograms]);
+        return view('admin._partials.sections.programs-avatar-group', ['programs' => $user->accessiblePrograms, 'limit' => 5]);
       })
       ->addColumn('action', function ($user) {
         return view('admin.pages.access-lists.action', compact('user'));

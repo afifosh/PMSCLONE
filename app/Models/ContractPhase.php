@@ -344,7 +344,7 @@ class ContractPhase extends BaseModel
   public function reCalculateTaxAmountsAndResetManualAmounts($considerDeduction = true): void
   {
     $this->load('pivotTaxes');
-    $taxableAmount = $this->subtotal - (($considerDeduction && $this->deduction && $this->deduction->is_before_tax) ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    $taxableAmount = $this->estimated_cost - (($considerDeduction && $this->deduction && $this->deduction->is_before_tax) ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
     foreach($this->pivotTaxes as $tax){
       if($tax->type == 'Fixed'){
         continue;
@@ -353,6 +353,65 @@ class ContractPhase extends BaseModel
         $tax->calculated_amount = $taxableAmount * $tax->amount / 100;
         $tax->save();
       }
+    }
+  }
+
+  /**
+   * Sync Taxes, deduction, total with invoices
+   */
+  public function syncUpdateWithInvoices(string $except = null): void
+  {
+    $this->load('addedAsInvoiceItem.invoice', 'pivotTaxes', 'deduction');
+
+    // if added in invoice then update invoice item and tax amount, deduction amount and total
+    if ($this->addedAsInvoiceItem->count()) {
+      $this->addedAsInvoiceItem->each(function ($item) use ($except) {
+        // if $except is passed then skip this item
+        if ($except && $item->invoice_id == $except) return;
+
+        $item->update([
+          'subtotal' => $this->estimated_cost,
+          'total_tax_amount' => $this->tax_amount,
+          'authority_inv_total' =>
+          // pivot taxes
+          $this->pivotTaxes()->whereIn('category', [2,3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000,
+          'total' => $this->total_cost,
+          'rounding_amount' => $this->rounding_amount,
+        ]);
+
+        $item->taxes()->detach();
+
+        foreach($this->pivotTaxes as $tax){
+          $item->taxes()->attach($tax->tax_id, [
+            'amount' => $tax->getRawOriginal('amount'),
+            'type' => $tax->type,
+            'invoice_id' => $item->invoice_id,
+            'calculated_amount' => $tax->getRawOriginal('calculated_amount'),
+            'manual_amount' => $tax->getRawOriginal('manual_amount'),
+            'category' => $tax->category,
+          ]);
+        }
+
+        if($this->deduction){
+          $item->deduction()->updateOrCreate([
+            'deductible_id' => $item->id,
+            'deductible_type' => InvoiceItem::class,
+          ], [
+            'downpayment_id' => $this->deduction->downpayment_id,
+            'dp_rate_id' => $this->deduction->dp_rate_id,
+            'is_percentage' => $this->deduction->is_percentage,
+            'amount' => $this->deduction->amount,
+            'manual_amount' => $this->deduction->manual_amount,
+            'percentage' => $this->deduction->percentage,
+            'is_before_tax' => $this->deduction->is_before_tax,
+            'calculation_source' => $this->deduction->calculation_source,
+          ]);
+        }else{
+          $item->deduction()->delete();
+        }
+
+        $item->invoice->reCalculateTotal();
+      });
     }
   }
 }

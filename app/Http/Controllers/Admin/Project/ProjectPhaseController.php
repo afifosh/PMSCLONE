@@ -27,7 +27,7 @@ class ProjectPhaseController extends Controller
 
     $page = 'Project';
     if (in_array(request()->route()->getName(), ['admin.contracts.stages.phases.index', 'admin.contracts.phases.index'])) {
-      if(request()->route()->getName() == 'admin.contracts.stages.phases.index')
+      if (request()->route()->getName() == 'admin.contracts.stages.phases.index')
         $page = 'Contract';
       else
         $page = 'Contract All';
@@ -47,8 +47,8 @@ class ProjectPhaseController extends Controller
 
   public function show($contract, Contractphase $phase)
   {
-    if(request()->type == 'expandDT'){
-      $phase->load(['taxes', 'deduction']);
+    if (request()->type == 'expandDT') {
+      $phase->load(['taxes', 'deduction', 'contract.deductableDownpayments']);
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.show.show', compact('phase'))->render()]);
     }
   }
@@ -68,14 +68,16 @@ class ProjectPhaseController extends Controller
   {
     DB::beginTransaction();
     try {
+
       $data['total_cost'] = $request->estimated_cost;
-      $stage = ContractStage::where('id', $request->stage_id)->firstOrCreate(['contract_id' => $contract->id, 'name' => $request->stage_id]);
+      $stage = ContractStage::where('id', $request->stage_id)->firstOr(function () use ($contract, $request) {
+        return ContractStage::create(['contract_id' => $contract->id, 'name' => $request->stage_id]);
+      });
       $data['stage_id'] = $stage->id;
 
       $contract->phases()->create(
         $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id'])
       );
-
     } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());
@@ -150,73 +152,30 @@ class ProjectPhaseController extends Controller
     }
 
     DB::beginTransaction();
-    // try{
-    $data['total_cost'] = $request->estimated_cost;
-    $stage = ContractStage::where('id', $request->stage_id)->firstOrCreate(['contract_id' => $contract->id, 'name' => $request->stage_id]);
-    $data['stage_id'] = $stage->id;
-
-    $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
-
-    $phase->reCalculateTaxAmountsAndResetManualAmounts(false);
-    $phase->reCalculateTotal();
-    $phase->recalculateDeductionAmount();
-    $phase->reCalculateTotal();
-    $phase->reCalculateTaxAmountsAndResetManualAmounts();
-    $phase->reCalculateTotal();
-    $phase->recalculateDeductionAmount();
-    $phase->reCalculateTotal();
-
-    // if added in invoice then update invoice item and tax amount
-    $phase->load('addedAsInvoiceItem.invoice');
-
-    if ($phase->addedAsInvoiceItem->count()) {
-      $phase->addedAsInvoiceItem->each(function ($item) use ($phase) {
-        $item->update([
-          'subtotal' => $phase->estimated_cost,
-          'total_tax_amount' => $phase->tax_amount,
-          'total' => $phase->total_cost,
-          'rounding_amount' => $phase->rounding_amount,
-        ]);
-
-        $item->taxes()->detach();
-
-        foreach ($phase->taxes as $tax) {
-          $item->taxes()->attach($tax->id, [
-            'amount' => $tax->pivot->amount,
-            'type' => $tax->pivot->type,
-            'invoice_id' => $item->invoice_id,
-            'calculated_amount' => $tax->pivot->calculated_amount,
-            'manual_amount' => $tax->pivot->manual_amount,
-            'category' => $tax->pivot->category,
-          ]);
-        }
-
-        $phase->load('deduction');
-        if($phase->deduction){
-          $item->deduction()->updateOrCreate([
-            'deductible_id' => $item->id,
-            'deductible_type' => InvoiceItem::class,
-          ], [
-            'downpayment_id' => $phase->deduction->downpayment_id,
-            'dp_rate_id' => $phase->deduction->dp_rate_id,
-            'is_percentage' => $phase->deduction->is_percentage,
-            'amount' => $phase->deduction->amount,
-            'manual_amount' => $phase->deduction->manual_amount,
-            'percentage' => $phase->deduction->percentage,
-            'is_before_tax' => $phase->deduction->is_before_tax,
-            'calculation_source' => $phase->deduction->calculation_source,
-          ]);
-        }else{
-          $item->deduction()->delete();
-        }
-
-        $item->invoice->reCalculateTotal(); // ERROR HERE
+    try {
+      $data['total_cost'] = $request->estimated_cost;
+      $stage = ContractStage::where('id', $request->stage_id)->firstOr(function () use ($contract, $request) {
+        return ContractStage::create(['contract_id' => $contract->id, 'name' => $request->stage_id]);
       });
+      $data['stage_id'] = $stage->id;
+
+      $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
+
+      $phase->reCalculateTaxAmountsAndResetManualAmounts(false);
+      $phase->reCalculateTotal();
+      $phase->recalculateDeductionAmount();
+      $phase->reCalculateTotal();
+      $phase->reCalculateTaxAmountsAndResetManualAmounts();
+      $phase->reCalculateTotal();
+      $phase->recalculateDeductionAmount();
+      $phase->reCalculateTotal();
+
+      // if added in invoice then update invoice item and tax amount
+      $phase->syncUpdateWithInvoices();
+    } catch (\Exception $e) {
+      DB::rollback();
+      return $this->sendError($e->getMessage());
     }
-    // }catch(\Exception $e){
-    //   DB::rollback();
-    //   return $this->sendError($e->getMessage());
-    // }
     DB::commit();
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
@@ -235,6 +194,7 @@ class ProjectPhaseController extends Controller
       $item->taxes()->detach();
       $item->delete();
       $item->deduction()->delete();
+      $item->invoice->reCalculateTotal();
     });
 
     $phase->taxes()->detach();

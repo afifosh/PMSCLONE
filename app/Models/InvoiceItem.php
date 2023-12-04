@@ -191,14 +191,59 @@ class InvoiceItem extends Model
   {
     $this->load('pivotTaxes');
     $taxableAmount = $this->subtotal - (($considerDeduction && $this->deduction && $this->deduction->is_before_tax) ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
-    foreach($this->pivotTaxes as $tax){
-      if($tax->type == 'Fixed'){
+    foreach ($this->pivotTaxes as $tax) {
+      if ($tax->type == 'Fixed') {
         continue;
-      }else{
+      } else {
         $tax->manual_amount = 0;
         $tax->calculated_amount = $taxableAmount * $tax->amount / 100;
         $tax->save();
       }
+    }
+  }
+
+  public function syncUpdateWithPhase(): void
+  {
+    // if invoice item is added from phase then update phase, otherwise do nothing. this will sync the phase with other invoices.
+    if ($this->invoiceable_type == ContractPhase::class) {
+      $this->load('invoiceable', 'pivotTaxes', 'deduction');
+      $this->invoiceable->update([
+        'estimated_cost' => $this->subtotal,
+        'tax_amount' => $this->total_tax_amount,
+        'total_cost' => $this->total
+      ]);
+
+      $this->invoiceable->taxes()->detach();
+
+      foreach ($this->pivotTaxes as $tax) {
+        $this->invoiceable->taxes()->attach($tax->tax_id, [
+          'amount' => $tax->getRawOriginal('amount'),
+          'type' => $tax->type,
+          'calculated_amount' => $tax->getRawOriginal('calculated_amount'),
+          'manual_amount' => $tax->getRawOriginal('manual_amount'),
+          'category' => $tax->category,
+        ]);
+      }
+
+      if ($this->deduction) {
+        $this->invoiceable->deduction()->updateOrCreate([
+          'deductible_id' => $this->invoiceable->id,
+          'deductible_type' => $this->invoiceable_type,
+        ], [
+          'downpayment_id' => $this->deduction->downpayment_id,
+          'dp_rate_id' => $this->deduction->dp_rate_id,
+          'is_percentage' => $this->deduction->is_percentage,
+          'amount' => $this->deduction->amount,
+          'manual_amount' => $this->deduction->manual_amount,
+          'percentage' => $this->deduction->percentage,
+          'is_before_tax' => $this->deduction->is_before_tax,
+          'calculation_source' => $this->deduction->calculation_source,
+        ]);
+      } else {
+        $this->invoiceable->deduction()->delete();
+      }
+
+      $this->invoiceable->syncUpdateWithInvoices($this->id);
     }
   }
 }

@@ -120,18 +120,19 @@ function toggleCheckboxes(){
   /**************************
    * Phase create form js  **
    **************************/
+
+  // calcDeductionAmount on change of downpayment_amount, dp_rate_id, is_manual_deduction, is_fixed_amount
+  $(document).on('change keyup', '.phase-create-form [name="dp_rate_id"], .phase-create-form [name="is_manual_deduction"], .phase-create-form [name="is_fixed_amount"], .phase-create-form [name="downpayment_id"], .phase-create-form [name="calculation_source"], .phase-create-form [name="is_before_tax"]', function(){
+    calcDeductionAmount();
+  })
+
   function calcDeductionAmount()
   {
     var deductionAmount = parseFloat(0);
     var itemCost = parseFloat($('[name="estimated_cost"]').val());
-    // if !add_deduction, return 0
-    if(!$('.phase-create-form [name="add_deduction"]').is(':checked')){
-      return deductionAmount;
-    }
-
-    if($('.phase-create-form [name="is_before_tax"]').val() == 0){
-      itemCost = itemCost + calcPhaseTaxes();
-    }
+    // if($('.phase-create-form [name="is_before_tax"]').val() == 0){
+    //   itemCost = itemCost + calcPhaseTaxes();
+    // }
 
     const downpaymentId = $('.phase-create-form [name="downpayment_id"]').val();
     if(downpaymentId && !$('.phase-create-form [name="is_manual_deduction"]').is(':checked') && !$('.phase-create-form [name="is_fixed_amount"]').is(':checked')){
@@ -326,22 +327,25 @@ function toggleCheckboxes(){
         var expandedPhase = null;
         window.expandPhaseDetails = function(contract_id, phase_id, element)
         {
+          if(expandedPhase){
+            expandedPhase.child.hide();
+            expandedPhase.row.child.hide();
+            expandedPhase.child.remove();
+            expandedPhase.row.child.remove();
+            expandedPhase.child = null;
+            expandedPhase.row.child = null;
+            expandedPhase = null;
+            // remove css color from expanded row
+            $('#phases-table tbody tr').removeClass('expanded-row');
+          }
+          // show loading in child row
+          $(element).closest('tr').after('<tr class="loading-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+          //
           // if will get data from ajax and add another row in the table. also remove older row if added with ajax
           $.ajax({
             type: "get",
             url: route('admin.contracts.phases.show', {contract: contract_id, phase: phase_id, 'type': 'expandDT' }),
             success: function (response) {
-              if(expandedPhase){
-                expandedPhase.child.hide();
-                expandedPhase.row.child.hide();
-                expandedPhase.child.remove();
-                expandedPhase.row.child.remove();
-                expandedPhase.child = null;
-                expandedPhase.row.child = null;
-                expandedPhase = null;
-                // remove css color from expanded row
-                $('#phases-table tbody tr').removeClass('expanded-row');
-              }
               var row = table.row(element.closest('tr'));
               var data = response.data;
               var child = row.child(data.view_data).show();
@@ -354,7 +358,12 @@ function toggleCheckboxes(){
               // add css color to expanded row
               $(element).closest('tr').addClass('expanded-row');
             }
+          })
+          .always(function(){
+            // remove loading row
+            $('.loading-row').remove();
           });
+
         }
       });
     </script>

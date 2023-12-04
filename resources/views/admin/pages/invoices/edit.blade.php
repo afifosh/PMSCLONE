@@ -61,6 +61,7 @@
               },
               orderable: false, searchable: false},
             { data: 'name', name: 'name' },
+            { data: 'stage.name', name: 'stage.name' },
             { data: 'total_cost', name: 'total_cost' },
             { data: 'status', name: 'status', searchable: false },
         ]
@@ -68,7 +69,7 @@
   }
   function reloadPhasesList(tab){
     tab = tab ? tab : (window.invoice_active_tab ? window.invoice_active_tab : 'summary');
-    $('#nav-' + tab).html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>');
+    $('#nav-' + tab).html('<div class="text-center my-5"><div class="spinner-border text-primary mt-5" role="status"><span class="visually-hidden">Loading...</span></div></div>');
     window.invoice_active_tab = tab;
     $.ajax({
       url: route('admin.invoices.invoice-items.index', { invoice: {{$invoice->id}}, mode: 'edit', tab: tab }),

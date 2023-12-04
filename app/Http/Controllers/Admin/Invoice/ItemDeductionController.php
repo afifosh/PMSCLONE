@@ -54,13 +54,16 @@ class ItemDeductionController extends Controller
         $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts();
       $invoiceItem->reCalculateTotal();
       $invoice->reCalculateTotal();
+
+      $invoiceItem->syncUpdateWithPhase();
+
+      DB::commit();
+
+      return $this->sendRes('Deduction Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
     }catch(\Exception $e){
       DB::rollback();
       return $this->sendError($e->getMessage());
     }
-    DB::commit();
-
-    return $this->sendRes('Deduction Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
 
   public function edit(Invoice $invoice, InvoiceItem $invoiceItem, $deduction)
@@ -88,6 +91,7 @@ class ItemDeductionController extends Controller
       return $this->sendError('Deduction Not Found');
     DB::beginTransaction();
     try{
+      $old_is_before_tax = $invoiceItem->deduction->is_before_tax;
       $invoiceItem->deduction()->update([
         'downpayment_id' => $request->downpayment_id,
         'dp_rate_id' => $request->dp_rate_id,
@@ -99,16 +103,21 @@ class ItemDeductionController extends Controller
         'calculation_source' => $request->calculation_source,
       ]);
       $invoiceItem->reCalculateTotal();
-      $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts();
-      $invoiceItem->reCalculateTotal();
+      if($old_is_before_tax || $request->is_before_tax){
+        $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts();
+        $invoiceItem->reCalculateTotal();
+      }
       $invoice->reCalculateTotal();
+
+      $invoiceItem->syncUpdateWithPhase();
+
       DB::commit();
+
+      return $this->sendRes('Deduction Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
     }catch(\Exception $e){
       DB::rollback();
       return $this->sendError($e->getMessage());
     }
-
-    return $this->sendRes('Deduction Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
   }
 
   public function destroy(Invoice $invoice, InvoiceItem $invoiceItem, $deduction)
@@ -121,6 +130,9 @@ class ItemDeductionController extends Controller
         $invoiceItem->reCalculateTaxAmountsAndResetManualAmounts(false);
       $invoiceItem->reCalculateTotal();
       $invoice->reCalculateTotal();
+
+      $invoiceItem->syncUpdateWithPhase();
+
       DB::commit();
 
       return $this->sendRes('Deduction Removed Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
