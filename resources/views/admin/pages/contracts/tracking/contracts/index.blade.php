@@ -72,8 +72,8 @@ $configData = Helper::appClasses();
           <div class="col">
             {!! Form::label('reviewed_by', 'Reviewed By') !!}
             {!! Form::select('reviewed_by', $contract_reviewers, 'all', [
-                'class' => 'form-select select2', 
-                'data-placeholder' => 'Select Reviewer', 
+                'class' => 'form-select select2',
+                'data-placeholder' => 'Select Reviewer',
                 'data-allow-clear' => 'true'
             ]) !!}
           </div>
@@ -134,13 +134,13 @@ $configData = Helper::appClasses();
             .then(data => {
                 if (data.success) {
 
-                                      
+
                   if (data.data.event == 'table_reload') {
 
 if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
   $('#' + data.data.table_id)
     .DataTable()
-    .ajax.reload();
+    .ajax.reload(null, false);
 }
 
 }
@@ -389,7 +389,7 @@ $('#contracts-table tbody').on('click', '.btn-expand', function() {
         var contractId = $(this).attr('data-bs-target').replace("#child-stages-", "");
 
         // Get the corresponding stages DataTable and reload it
-        $('#stages-table-' + contractId).DataTable().ajax.reload();
+        $('#stages-table-' + contractId).DataTable().ajax.reload(null, false);
     });
 
     // Reload phases DataTable when "Phases" pill tab is clicked
@@ -398,7 +398,7 @@ $('#contracts-table tbody').on('click', '.btn-expand', function() {
         var contractId = $(this).attr('data-bs-target').replace("#child-phases-", "");
 
         // Get the corresponding phases DataTable and reload it
-        $('#child-table-' + contractId).DataTable().ajax.reload();
+        $('#child-table-' + contractId).DataTable().ajax.reload(null, false);
     });
 });
 </script>

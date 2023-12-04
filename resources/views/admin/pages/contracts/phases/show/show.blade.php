@@ -1,9 +1,10 @@
-<div class="source-item pt-0 px-0 px-sm-4">
+<div class="source-item pt-2">
     <div class="col-12">
+      @if($phase->id)
         <div class="table-responsive m-t-40 invoice-table-wrapper editing clear-both">
-            <button type="button" class="btn btn-primary btn-sm float-end me-2 waves-effect waves-light" data-href="{{route('admin.contracts.phases.taxes.create', ['contract' => $phase->contract_id, 'phase' => $phase->id])}}" data-toggle="ajax-modal" data-title="Add Tax" >{{__('Add Tax')}}</button>
-            @if(count($phase->contract->deductableDownpayments) > 0 && !$phase->deduction)
-            <button type="button" class="btn btn-primary btn-sm float-end me-2 waves-effect waves-light" data-href="{{route('admin.contracts.phases.deductions.create', ['contract' => $phase->contract_id, 'phase' => $phase->id])}}" data-toggle="ajax-modal" data-title="Add Deduction" >{{__('Add Deduction')}}</button>
+            <button type="button" class="btn btn-primary btn-sm float-end me-2 waves-effect waves-light" onclick="createPhasetax({{$phase->id}}, this)">{{__('Add Tax')}}</button>
+            @if(count(@$phase->contract->deductableDownpayments ?? []) > 0 && !$phase->deduction)
+            <button type="button" class="btn btn-primary btn-sm float-end me-2 waves-effect waves-light" onclick="createPhaseDeduction({{$phase->id}}, this)">{{__('Add Deduction')}}</button>
             @endif
             <table class="table table-hover invoice-table editing" id="billing-items-container">
                 <thead data-id="exclude-sort" id="billing-items-container-header">
@@ -18,7 +19,7 @@
                 </thead>
                 <tbody>
                     <tr style="background-color: #efeff163;">
-                      <td></td>
+                      <td><a onclick="editPhaseDetails({{$phase->id}}, this)"><i class="ti ti-pencil"></i></a></td>
                       <td>{{$phase->name}}</td>
                       <td class="text-end">
                           @cMoney($phase->estimated_cost, $phase->contract->currency, true)
@@ -58,5 +59,8 @@
                 </tbody>
             </table>
         </div>
+      @else
+        @include('admin.pages.contracts.phases.create-form')
+      @endif
     </div>
 </div>

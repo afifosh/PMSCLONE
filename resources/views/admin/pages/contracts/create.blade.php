@@ -72,7 +72,7 @@ function toggleContractReviewStatus(buttonElement) {
                   if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
                     $('#' + data.data.table_id)
                       .DataTable()
-                      .ajax.reload();
+                      .ajax.reload(null, false);
                   }
 
                 }

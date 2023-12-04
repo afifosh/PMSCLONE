@@ -45,7 +45,7 @@ class PhaseTaxController extends Controller
 
       DB::commit();
 
-      return $this->sendRes('Tax added successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id]), 'close' => 'globalModal']);
+      return $this->sendRes('Tax added successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id])]);
     } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());
@@ -86,7 +86,7 @@ class PhaseTaxController extends Controller
 
       DB::commit();
 
-      return $this->sendRes('Tax Updated successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id]), 'close' => 'globalModal']);
+      return $this->sendRes('Tax Updated successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id])]);
     } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());

@@ -16,6 +16,20 @@ $configData = Helper::appClasses();
   .treeselect .treeselect-list {
     position: relative !important;
   }
+  .treeselect-list__item--checked .treeselect-list__item-checkbox-container, .treeselect-list__item--partial-checked .treeselect-list__item-checkbox-container {
+   background-color: #cd545b !important;
+  }
+  .treeselect-list__item--checked {
+    background-color: #ff959ab2 !important;
+  }
+
+  .treeselect-list .treeselect-list__item--focused {
+    background-color: #ff959ab2 !important;
+  }
+  .treeselect-input__tags-element {
+  background-color: #cd545b !important;
+  color: #fff !important;
+  }
 </style>
 @endsection
 
@@ -42,7 +56,9 @@ $configData = Helper::appClasses();
       options: params.programs_tree,
       isIndependentNodes: true,
       showCount: true,
-      openLevel: 150
+      openLevel: 150,
+      alwaysOpen: true,
+      staticList: true
     })
 
     $('#acl-create-form .accessible-programs-input').val(params.selected_programs);

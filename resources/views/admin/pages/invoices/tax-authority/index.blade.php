@@ -208,7 +208,7 @@ $configData = Helper::appClasses();
 
       function toggleCheckboxes(){
         $('#authority-invoices-table').DataTable().column(0).visible(!$('#authority-invoices-table').DataTable().column(0).visible());
-        $('#authority-invoices-table').DataTable().ajax.reload();
+        $('#authority-invoices-table').DataTable().ajax.reload(null, false);
       }
     </script>
 @endpush
