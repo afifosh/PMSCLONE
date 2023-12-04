@@ -67,7 +67,7 @@ class AdminAccessListController extends Controller
     } catch (\Exception $e) {
       DB::rollback();
 
-      return $this->sendErr($e->getMessage());
+      return $this->sendError($e->getMessage());
     }
     return $this->sendRes('Added Successfully', ['event' => 'table_reload', 'table_id' => 'admin-access-lists-table', 'close' => 'globalModal']);
   }
@@ -121,7 +121,7 @@ class AdminAccessListController extends Controller
     } catch (\Exception $e) {
       DB::rollback();
 
-      return $this->sendErr($e->getMessage());
+      return $this->sendError($e->getMessage());
     }
 
     return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => 'admin-access-lists-table', 'close' => 'globalModal']);
@@ -138,7 +138,7 @@ class AdminAccessListController extends Controller
     } catch (\Exception $e) {
       DB::rollback();
 
-      return $this->sendErr($e->getMessage());
+      return $this->sendError($e->getMessage());
     }
 
     return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => 'admin-access-lists-table']);

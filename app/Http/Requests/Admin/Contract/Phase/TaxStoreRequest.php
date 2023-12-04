@@ -43,7 +43,7 @@ class TaxStoreRequest extends FormRequest
   {
     return [
       'tax' => 'required|exists:invoice_configs,id,config_type,tax',
-      'total_tax' => 'required|numeric|gte:0',
+      'total_tax' => 'nullable|numeric|gte:0',
       'is_manual_tax' => 'required|boolean',
     ];
   }
@@ -55,7 +55,7 @@ class TaxStoreRequest extends FormRequest
       // calculate total tax amount
       $this->calCulateTaxAmount();
       // total tax amount should be +-1 of calculated tax amount
-      if (abs($this->total_tax - $this->calculated_tax_amount) > 1) {
+      if ($this->is_manual_tax && abs($this->total_tax - $this->calculated_tax_amount) > 1) {
         $validator->errors()->add('total_tax', 'Total tax amount should be between ' . ($this->calculated_tax_amount - 1) . ' and ' . ($this->calculated_tax_amount + 1));
       }
     });

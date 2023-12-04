@@ -35,6 +35,7 @@ $configData = Helper::appClasses();
 @section('page-script')
 <script src={{asset('assets/js/custom/select2.js')}}></script>
 <script src={{asset('assets/js/custom/flatpickr.js')}}></script>
+<script src={{asset('assets/js/custom/admin-contract-phase-create.js')}}></script>
 @endsection
 
 @section('content')

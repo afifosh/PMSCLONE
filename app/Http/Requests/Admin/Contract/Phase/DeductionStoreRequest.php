@@ -70,7 +70,7 @@ class DeductionStoreRequest extends FormRequest
     $this->tax_rates = $this->phase->taxes;
     // $fixed_tax = $this->taxes->where('type', 'Fixed')->sum('amount');
     // $percent_tax = $this->taxes->where('type', 'Percent')->sum('amount');
-    // $this->calculated_tax_amount = $fixed_tax + ($percent_tax * $this->estimated_cost / 100);
+    // $this->calculated_tax_amount = $fixed_tax + ($percent_tax * $this->phase->estimated_cost / 100);
 
     $this->calDeductionAmount();
 
@@ -85,7 +85,7 @@ class DeductionStoreRequest extends FormRequest
       'is_before_tax' => 'required|boolean',
       'is_fixed_amount' => 'required|boolean',
       'downpayment_id' => 'required|exists:invoices,id',
-      'downpayment_amount' => 'required|numeric|gte:0',
+      'downpayment_amount' => 'nullable|numeric|gte:0',
       'dp_rate_id' => ['nullable', Rule::requiredIf($this->is_fixed_amount == false), 'exists:invoice_configs,id,config_type,Down Payment'],
       'calculation_source' => 'required|in:Down Payment,Deductible',
       'is_manual_deduction' => 'required|boolean',
@@ -100,7 +100,7 @@ class DeductionStoreRequest extends FormRequest
   public function rules(): array
   {
     $rules = [
-      'downpayment_amount' => 'required|numeric|gte:0|max:' . $this->getMaxDeductableAmount(),
+      'downpayment_amount' => 'nullable|numeric|gte:0|max:' . $this->getMaxDeductableAmount(),
       'manual_deduction_amount' => 'required|numeric|gte:0',
     ] + $this->getValidationRules();
 
@@ -163,10 +163,10 @@ class DeductionStoreRequest extends FormRequest
       $this->calculated_downpayment_amount = ($this->downpayment->total * $this->deduction_rate->amount) / 100;
     } else {
       if($this->is_before_tax) {
-        $this->calculated_downpayment_amount = ($this->estimated_cost * $this->deduction_rate->amount) / 100;
+        $this->calculated_downpayment_amount = ($this->phase->estimated_cost * $this->deduction_rate->amount) / 100;
       } else {
         $this->calTaxAmount();
-        $this->calculated_downpayment_amount = (($this->estimated_cost + ($this->total_tax_amount)) * $this->deduction_rate->amount) / 100;
+        $this->calculated_downpayment_amount = (($this->phase->estimated_cost + ($this->total_tax_amount)) * $this->deduction_rate->amount) / 100;
       }
     }
   }

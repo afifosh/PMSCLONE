@@ -27,7 +27,7 @@ class PhaseStoreRequest extends FormRequest
       'estimated_cost' => [
         'required',
         'numeric',
-        'gt:0',
+        'gte:0',
         //'max:' .  ($this->contract->remaining_amount - $this->calculated_tax_amount))
       ],
       'description' => 'nullable|string|max:2000',
