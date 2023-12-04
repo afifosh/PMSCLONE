@@ -4,9 +4,7 @@
       <a data-toggle="ajax-delete"
           data-href="{{route('admin.contracts.phases.taxes.destroy', ['contract', $phase->contract_id, 'phase' => $phase->id, 'tax' => $tax->pivot->id])}}"><i
               class="ti ti-trash"></i></a>
-      <a data-toggle="ajax-modal" data-title="Edit Tax"
-          data-href="{{route('admin.contracts.phases.taxes.edit', ['contract', $phase->contract_id, 'phase' => $phase->id, 'tax' => $tax->pivot->id])}}"><i
-              class="ti ti-pencil"></i></a>
+      <a onclick="editPhaseTax({{$phase->id}}, {{$tax->pivot->id}}, this)"><i class="ti ti-pencil"></i></a>
   </td>
   <!--description-->
   <td>

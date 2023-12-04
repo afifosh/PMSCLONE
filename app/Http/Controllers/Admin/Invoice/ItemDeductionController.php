@@ -27,7 +27,7 @@ class ItemDeductionController extends Controller
       request()->merge(['item' => 'custom']);
     }
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit', $data)->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit.edit-form', $data)->render()]);
   }
 
   public function store(Invoice $invoice, InvoiceItem $invoiceItem, ItemDeductionStoreRequest $request)
@@ -82,7 +82,7 @@ class ItemDeductionController extends Controller
       request()->merge(['item' => 'custom']);
     }
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit', $data)->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit.edit-form', $data)->render()]);
   }
 
   public function update(Invoice $invoice, InvoiceItem $invoiceItem, $deduction, ItemDeductionStoreRequest $request)

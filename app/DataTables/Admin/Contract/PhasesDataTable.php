@@ -119,7 +119,6 @@ class PhasesDataTable extends DataTable
         "scrollX" => true,
         "drawCallback" => "function (settings) {
           initSortable();
-          expandPendingPhase();
         }"
       ]);
   }

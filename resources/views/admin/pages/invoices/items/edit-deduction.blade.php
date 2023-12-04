@@ -1,7 +1,4 @@
 <div class="deduction-section">
-  <hr class="hr mt-3" />
-    <span class="fw-bold">Deduction</span>
-  <hr class="hr mt-3" />
   <div class="row">
     {{-- is_before_tax --}}
     <div class="form-group col-6">

@@ -126,6 +126,98 @@ function toggleCheckboxes(){
     calcDeductionAmount();
   })
 
+  function createPhasetax(phase_id)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $('#phase-addons tr:last').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.contracts.phases.taxes.create', { contract: window.active_contract, phase: phase_id }),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $('#phase-addons tr:last').after(res.data.view_data);
+        initModalSelect2();
+      }
+    });
+  }
+
+  function createPhaseDeduction(phase_id)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $('#phase-addons tr:last').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.contracts.phases.deductions.create', { contract: window.active_contract, phase: phase_id }),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $('#phase-addons tr:last').after(res.data.view_data);
+        initModalSelect2();
+      }
+    });
+  }
+
+  function editPhaseDetails(phase_id, element)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.projects.contracts.stages.phases.edit', { project:'project', contract: window.active_contract, stage: 'stage', phase: phase_id, 'type': 'edit-form' }),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $(element).closest('tr').after(res.data.view_data);
+        initModalSelect2();
+        initFlatPickr()
+      }
+    });
+  }
+
+  function editPhaseTax(phase_id, pivot_tax_id, element)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.contracts.phases.taxes.edit', { contract: window.active_contract, phase: phase_id, tax: pivot_tax_id }),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $(element).closest('tr').after(res.data.view_data);
+        initModalSelect2();
+      }
+    });
+  }
+
+  function editPhaseDeduction(phase_id, deduction_id, element)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.contracts.phases.deductions.edit', { contract: window.active_contract, phase: phase_id, deduction: deduction_id }),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $(element).closest('tr').after(res.data.view_data);
+        initModalSelect2();
+      }
+    });
+  }
+
+  function reloadPhaseAddons(phase_id)
+  {
+    $.ajax({
+      url: route('admin.contracts.phases.show', { contract: window.active_contract, phase: phase_id, 'type': 'addons-list' }),
+      type: "GET",
+      success: function(res){
+        $('#phase-addons').html(res.data.view_data);
+      }
+    });
+  }
+
   function calcDeductionAmount()
   {
     var deductionAmount = parseFloat(0);
@@ -234,14 +326,19 @@ function toggleCheckboxes(){
   var expandPhase = null;
   window.reloadTableAndActivePhase = function(param)
   {
-    expandPhase = JSON.parse(param).phase_id;
-    $('#phases-table').DataTable().ajax.reload();
-  }
+    // expandPhase = JSON.parse(param).phase_id;
+    const phase_id = JSON.parse(param).phase_id;
+    // show loading in phase-addons
+    $('#phase-addons').html('<div class="text-center my-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+    $.ajax({
+      url: route('admin.contracts.phases.show', { contract: window.active_contract, phase: phase_id, 'type': 'addons-list' }),
+      type: "GET",
+      success: function(res){
+        $('#phase-addons').html(res.data.view_data);
+      }
+    });
 
-  window.expandPendingPhase = function()
-  {
-    if(expandPhase)
-    $('#phase-ex-'+expandPhase).click();
+    $('#phases-table').DataTable().ajax.reload();
   }
 
   // on change add_deduction show/hide deduction-inputs, if checked show else hide
@@ -319,53 +416,6 @@ function toggleCheckboxes(){
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script>
       window.oURL = window.location.href;
-    </script>
-    <script>
-      $(document).ready(function () {
-        var table = $('#phases-table').DataTable();
-
-        var expandedPhase = null;
-        window.expandPhaseDetails = function(contract_id, phase_id, element)
-        {
-          if(expandedPhase){
-            expandedPhase.child.hide();
-            expandedPhase.row.child.hide();
-            expandedPhase.child.remove();
-            expandedPhase.row.child.remove();
-            expandedPhase.child = null;
-            expandedPhase.row.child = null;
-            expandedPhase = null;
-            // remove css color from expanded row
-            $('#phases-table tbody tr').removeClass('expanded-row');
-          }
-          // show loading in child row
-          $(element).closest('tr').after('<tr class="loading-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
-          //
-          // if will get data from ajax and add another row in the table. also remove older row if added with ajax
-          $.ajax({
-            type: "get",
-            url: route('admin.contracts.phases.show', {contract: contract_id, phase: phase_id, 'type': 'expandDT' }),
-            success: function (response) {
-              var row = table.row(element.closest('tr'));
-              var data = response.data;
-              var child = row.child(data.view_data).show();
-              expandedPhase = {
-                row: row,
-                child: child,
-              };
-              child.show();
-              row.child(data.view_data).show();
-              // add css color to expanded row
-              $(element).closest('tr').addClass('expanded-row');
-            }
-          })
-          .always(function(){
-            // remove loading row
-            $('.loading-row').remove();
-          });
-
-        }
-      });
     </script>
     @livewireScripts
     <x-comments::scripts />

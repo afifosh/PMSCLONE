@@ -28,7 +28,7 @@ class ItemTaxController extends Controller
       request()->merge(['item' => 'custom']);
     }
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit', $data)->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit.edit-form', $data)->render()]);
   }
 
   public function store(Invoice $invoice, InvoiceItem $invoiceItem, ItemTaxStoreRequest $request)
@@ -56,7 +56,7 @@ class ItemTaxController extends Controller
 
       DB::commit();
 
-      return $this->sendRes('Tax Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+      return $this->sendRes('Tax Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } catch (\Exception $e) {
       DB::rollBack();
 
@@ -80,7 +80,7 @@ class ItemTaxController extends Controller
 
     $data['pivot_tax'] = $tax;
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit', $data)->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit.edit-form', $data)->render()]);
   }
 
   public function update(Invoice $invoice, InvoiceItem $invoiceItem, InvoiceTax $tax, ItemTaxStoreRequest $request)
@@ -108,7 +108,7 @@ class ItemTaxController extends Controller
 
       DB::commit();
 
-      return $this->sendRes('Tax Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+      return $this->sendRes('Tax Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } catch (\Exception $e) {
       DB::rollBack();
       return $this->sendError('Something went wrong');
@@ -132,7 +132,7 @@ class ItemTaxController extends Controller
 
       DB::commit();
 
-      return $this->sendRes('Tax Removed Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+      return $this->sendRes('Tax Removed Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } catch (\Exception $e) {
       DB::rollBack();
       return $this->sendError($e->getMessage());

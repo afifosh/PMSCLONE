@@ -1,7 +1,7 @@
 <tr>
     <td>
       <a data-toggle="ajax-delete" data-href="{{route('admin.contracts.phases.deductions.destroy', ['contract' => $phase->contract_id, 'phase' => $phase->id, 'deduction' => $phase->deduction->id])}}"><i class="ti ti-trash"></i></a>
-      <a data-toggle="ajax-modal" data-title="{{__('Edit Deduction')}}" data-href="{{route('admin.contracts.phases.deductions.edit', ['contract' => $phase->contract_id, 'phase' => $phase->id, 'deduction' => $phase->deduction->id])}}"><i class="ti ti-pencil"></i></a>
+      <a onclick="editPhaseDeduction({{$phase->id}}, {{$phase->deduction->id}}, this)"><i class="ti ti-pencil"></i></a>
     </td>
   <!--description-->
   <td>

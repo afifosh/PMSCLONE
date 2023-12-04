@@ -58,7 +58,7 @@ class PhaseDeductionController extends Controller
 
       DB::commit();
 
-      return $this->sendRes('Deduction added successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id]), 'close' => 'globalModal']);
+      return $this->sendRes('Deduction added successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id])]);
     } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());
@@ -103,7 +103,7 @@ class PhaseDeductionController extends Controller
 
       DB::commit();
 
-      return $this->sendRes('Deduction updated successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id]), 'close' => 'globalModal']);
+      return $this->sendRes('Deduction updated successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id])]);
     } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());

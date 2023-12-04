@@ -1,8 +1,4 @@
-@forelse ($invoice->items as $item)
-@continue($tab == 'tax-report' && count($item->taxes->where(function($tax){
-  return $tax->pivot->category == 1;
- })) == 0)
-@continue($invoice->type == 'Partial Invoice' && $item->invoiceable_type == 'App\Models\ContractPhase')
+
 <tbody data-id="{{$item->id}}">
   <tr data-id="{{$item->id}}">
     @if ($is_editable && $tab != 'tax-report')
@@ -11,7 +7,7 @@
         {!! Form::checkbox('selected_phases[]', $item->id, null, ['class' => 'form-check-input mt-1 d-none']) !!}
 
         <span class="bi-drag pt-1 cursor-grab"><i class="ti ti-menu-2"></i></span>
-        <a data-toggle="ajax-modal" data-size='modal-xl' data-title="{{__('Edit Item')}}" data-href="{{route('admin.invoices.invoice-items.edit', [$invoice,'invoice_item' => $item->id, 'tab' => $tab, 'type' => 'edit-form'])}}">
+        <a onclick="editItemDetails({{$item->invoice_id}}, {{$item->id}}, this)">
           <i class="ti ti-pencil"></i></a>
       </td>
     @endif
@@ -29,7 +25,7 @@
     <td>@cMoney($item->subtotal, $invoice->contract->currency, true)</td>
     <!--total-->
     <td class="text-end">@cMoney($item->subtotal, $invoice->contract->currency, true)</td>
-  @includeWhen(@$item->deduction && @$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
+  @includeWhen(@$item->deduction && @$item->deduction->is_before_tax, 'admin.pages.invoices.items.edit.deduction-row')
   {{-- item subtoital if deduction is before tax --}}
   @if (@$item->deduction && @$item->deduction->is_before_tax)
     <tr style="background-color: #efeff163;">
@@ -48,16 +44,16 @@
     </tr>
 
   @endif
-  @includeWhen(count($item->taxes) > 0, 'admin.pages.invoices.items.show.item-tax')
+  @include('admin.pages.invoices.items.edit.tax-row')
 
   {{-- item subtotal if deduction after tax --}}
   @if($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax)
     <tr style="background-color: #efeff163;">
-      <td></td>
       <td>Subtotal</td>
       @if($invoice->isEditable())
         <td></td>
       @endif
+      <td></td>
       <td></td>
       <td></td>
       <td class="text-end">
@@ -67,13 +63,13 @@
       </td>
     </tr>
   @endif
-  @includeWhen($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
+  @includeWhen($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax, 'admin.pages.invoices.items.edit.deduction-row')
   <tr style="background-color: #efeff1;">
-    <td></td>
     <td>Item Total</td>
     @if($invoice->isEditable())
       <td></td>
     @endif
+    <td></td>
     <td></td>
     <td></td>
     <td class="text-end">
@@ -83,5 +79,3 @@
     </td>
   </tr>
 </tbody>
-@empty
-@endforelse

@@ -96,6 +96,8 @@ class InvoiceItemController extends Controller
 
       $invoice->reCalculateTotal();
 
+      DB::commit();
+
       return $this->sendRes('Item Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
     } catch (\Exception $e) {
       DB::rollback();
@@ -116,8 +118,22 @@ class InvoiceItemController extends Controller
       request()->merge(['item' => 'custom']);
     }
 
+    $data['is_editable'] = $invoice->isEditable();
+
+    if(request()->type == 'edit-form')
+      return $this->sendRes('success', [
+        'view_data' => view('admin.pages.invoices.items.edit.modal-wrapper', $data)->render(),
+      ]);
+
+    if(request()->type == 'reload-modal'){
+      $data['tab'] = request()->tab ?? 'summary';
+      return $this->sendRes('success', [
+        'view_data' => view('admin.pages.invoices.items.edit.table-wrapper', $data)->render(),
+      ]);
+    }
+
     return $this->sendRes('success', [
-      'view_data' => view('admin.pages.invoices.items.edit', $data)->render(),
+      'view_data' => view('admin.pages.invoices.items.edit.edit-item', $data)->render(),
     ]);
   }
 
@@ -153,7 +169,7 @@ class InvoiceItemController extends Controller
 
       DB::commit();
 
-      return $this->sendRes('Item Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
+      return $this->sendRes('Item Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());
@@ -182,10 +198,13 @@ class InvoiceItemController extends Controller
           $item->invoiceable->delete();
 
         $item->taxes()->detach();
+        $item->deduction()->delete();
         $item->delete();
       });
 
       $invoice->reCalculateTotal();
+
+      DB::commit();
 
       return $this->sendRes('Item Removed', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } catch (\Exception $e) {

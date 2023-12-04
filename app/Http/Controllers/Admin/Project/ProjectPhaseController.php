@@ -47,7 +47,7 @@ class ProjectPhaseController extends Controller
 
   public function show($contract, Contractphase $phase)
   {
-    if (request()->type == 'expandDT') {
+    if (request()->type == 'addons-list') {
       $phase->load(['taxes', 'deduction', 'contract.deductableDownpayments']);
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.show.show', compact('phase'))->render()]);
     }
@@ -104,6 +104,10 @@ class ProjectPhaseController extends Controller
     $stages = $contract->stages->pluck('name', 'id');
     $max_amount = $contract->remaining_amount + $phase->total_cost;
     $tax_rates = InvoiceConfig::activeOnly()->get();
+
+    if(request()->type == 'edit-form'){
+      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create-form', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
+    }
 
     $userHasMarkedComplete = $phase->reviews->contains('user_id', auth()->id());
     $buttonLabel = $userHasMarkedComplete ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
@@ -180,7 +184,7 @@ class ProjectPhaseController extends Controller
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
-    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'table_reload',  'close' => 'globalModal', 'table_id' => request()->tableId ? request()->tableId : 'phases-table']);
+    return $this->sendRes(__('Phase Updated Successfully'), ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id])]);
   }
 
   public function destroy($project, Contract $contract, $stage, ContractPhase $phase)
