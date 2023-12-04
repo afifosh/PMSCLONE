@@ -169,7 +169,7 @@ $configData = Helper::appClasses();
 
       function toggleCheckboxes(){
         $('#payments-table').DataTable().column(0).visible(!$('#payments-table').DataTable().column(0).visible());
-        $('#payments-table').DataTable().ajax.reload();
+        $('#payments-table').DataTable().ajax.reload(null, false);
       }
     </script>
 @endpush

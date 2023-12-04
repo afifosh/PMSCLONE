@@ -83,9 +83,9 @@ $(document).on('click', '[data-toggle="delete_ajax"]', function (e) {
           if (response.datatable_id != undefined && response.datatable_id != null && response.datatable_id != '') {
             $('#' + response.datatable_id)
               .DataTable()
-              .ajax.reload();
+              .ajax.reload(null, false);
           } else {
-            $('#dataTableBuilder').DataTable().ajax.reload();
+            $('#dataTableBuilder').DataTable().ajax.reload(null, false);
           }
         }
         toast_success(response.message);
@@ -297,7 +297,7 @@ for (const input of inputs) {
           if (data.data.event == 'table_reload' && data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
             $('#' + data.data.table_id)
               .DataTable()
-              .ajax.reload();
+              .ajax.reload(null, false);
           }
           if(data.data.event == 'page_reload'){
             setTimeout(function() { // wait for 1 second
@@ -454,9 +454,9 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
               toast_success(response.message)
             if (response.data.event == 'table_reload') {
               if (response.data.table_id != undefined && response.data.table_id != null && response.data.table_id != '') {
-                $('#' + response.data.table_id).DataTable().ajax.reload();
+                $('#' + response.data.table_id).DataTable().ajax.reload(null, false);
               } else {
-                $('#dataTableBuilder').DataTable().ajax.reload();
+                $('#dataTableBuilder').DataTable().ajax.reload(null, false);
               }
             }
             if(response.data.event == 'page_reload'){
@@ -537,9 +537,9 @@ $(document).on('click', '[data-toggle="confirm-action"]', function () {
               toast_success(response.message)
             if (response.data.event == 'table_reload') {
               if (response.data.table_id != undefined && response.data.table_id != null && response.data.table_id != '') {
-                $('#' + response.data.table_id).DataTable().ajax.reload();
+                $('#' + response.data.table_id).DataTable().ajax.reload(null, false);
               } else {
-                $('#dataTableBuilder').DataTable().ajax.reload();
+                $('#dataTableBuilder').DataTable().ajax.reload(null, false);
               }
             }
             if(response.data.event == 'page_reload'){

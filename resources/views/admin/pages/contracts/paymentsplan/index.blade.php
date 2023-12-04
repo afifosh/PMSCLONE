@@ -99,7 +99,7 @@ $configData = Helper::appClasses();
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script>
-        
+
 function initTaxRepeater()
 {
   $('.repeater').repeater({
@@ -233,13 +233,13 @@ function initTaxRepeater()
             .then(data => {
                 if (data.success) {
 
-                  
+
                   if (data.data.event == 'table_reload') {
 
 if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
   $('#' + data.data.table_id)
     .DataTable()
-    .ajax.reload();
+    .ajax.reload(null, false);
 }
 
 }
@@ -488,7 +488,7 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         var contractId = $(this).attr('data-bs-target').replace("#child-stages-", "");
 
         // Get the corresponding stages DataTable and reload it
-        $('#stages-table-' + contractId).DataTable().ajax.reload();
+        $('#stages-table-' + contractId).DataTable().ajax.reload(null, false);
     });
 
     // Reload phases DataTable when "Phases" pill tab is clicked
@@ -497,7 +497,7 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         var contractId = $(this).attr('data-bs-target').replace("#child-phases-", "");
 
         // Get the corresponding phases DataTable and reload it
-        $('#child-table-' + contractId).DataTable().ajax.reload();
+        $('#child-table-' + contractId).DataTable().ajax.reload(null, false);
     });
 });
 </script>

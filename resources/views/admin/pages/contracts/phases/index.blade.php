@@ -114,7 +114,7 @@ $(document).on('click change', '.phase-check', function(){
 
 function toggleCheckboxes(){
   $('#phases-table').DataTable().column(1).visible(!$('#phases-table').DataTable().column(1).visible());
-  $('#phases-table').DataTable().ajax.reload();
+  $('#phases-table').DataTable().ajax.reload(null, false);
 }
 
   /**************************
@@ -338,7 +338,7 @@ function toggleCheckboxes(){
       }
     });
 
-    $('#phases-table').DataTable().ajax.reload();
+    $('#phases-table').DataTable().ajax.reload(null, false);
   }
 
   // on change add_deduction show/hide deduction-inputs, if checked show else hide

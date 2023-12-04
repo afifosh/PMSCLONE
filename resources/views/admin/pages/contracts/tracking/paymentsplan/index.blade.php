@@ -101,7 +101,7 @@ $configData = Helper::appClasses();
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script>
 
-        
+
 function initTaxRepeater()
 {
   $('.repeater').repeater({
@@ -211,7 +211,7 @@ function initTaxRepeater()
   /**
    * End Phase create form js
    */
-}        
+}
         function togglePhaseReviewStatus(buttonElement) {
             // Extract data attributes
             const contractId = buttonElement.getAttribute('data-contract-id');
@@ -235,13 +235,13 @@ function initTaxRepeater()
             .then(data => {
                 if (data.success) {
 
-                                    
+
                   if (data.data.event == 'table_reload') {
 
 if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
   $('#' + data.data.table_id)
     .DataTable()
-    .ajax.reload();
+    .ajax.reload(null, false);
 }
 
 }
@@ -278,7 +278,7 @@ current.closest('.modal').modal('hide');
 
 
 <script>
-    
+
 $(document).ready(function() {
 
     var table = $('#paymentsplan-table').DataTable();
@@ -294,7 +294,7 @@ $(document).ready(function() {
     //$('#contracts').select2().val(contractId).trigger('change'); // Assuming your select field has an ID of "contracts" and uses Select2
     // Update the Select2 dropdown value
    // alert(contractId);
-   
+
   // alert( $('#contracts-select').select2('data'));
 
 
@@ -327,17 +327,17 @@ $contractsSelect.val(null).trigger('change');
     } else {
         // Open this row
 
-        
+
         // Create new content for the child row
         var pillsRow = createPillsRow(contractId);
         var content = createContentRow(contractId);
-        
+
         row.child(pillsRow).show();
         $(tr).addClass('shown');
         $(tr).css('background-color', '#f5f5f5');
-        
+
         expandedRow = row;
-        
+
         var contentRow = $(content);
         contentRow.addClass("custom-content-row");
         contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
@@ -347,7 +347,7 @@ $contractsSelect.val(null).trigger('change');
 
         // Initialize DataTables when tabs are clicked, not here
     }
-});    
+});
     function destroyChildTables(contractId) {
     // Modify this function to destroy all the DataTables for the given contractId
     ['stages', 'phases', 'review'].forEach(function(section) {
@@ -360,11 +360,11 @@ $contractsSelect.val(null).trigger('change');
 
     // Event delegation for dynamic tabs
 
- 
+
      $(document).on('click', '.nav-link[data-contract-id]', function() {
         var contractId = $(this).data('contract-id');
         var tabSelected = $(this).attr('data-bs-target');
-        console.log('Tab clicked' + tabSelected + ' contractId ' + contractId ); // Add this line 
+        console.log('Tab clicked' + tabSelected + ' contractId ' + contractId ); // Add this line
         // Only initialize DataTable if it hasn't been initialized before
         switch (tabSelected) {
           case '#child-stages-' + contractId:
@@ -396,7 +396,7 @@ $contractsSelect.val(null).trigger('change');
                         </li>
                         <li class="nav-item" role="presentation">
                             <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-review-${contractId}" data-contract-id="${contractId}" aria-controls="child-review-${contractId}" aria-selected="false">Review</button>
-                        </li>                    
+                        </li>
                     </ul>
                 </td>
             </tr>
@@ -417,7 +417,7 @@ $contractsSelect.val(null).trigger('change');
                         </div>
                         <div class="tab-pane fade" id="child-review-${contractId}" role="tabpanel" aria-labelledby="child-review-tab-${contractId}">
                             <table class="table" id="review-table-${contractId}"></table>
-                        </div>                    
+                        </div>
                     </div>
                 </td>
             </tr>
@@ -431,7 +431,7 @@ $contractsSelect.val(null).trigger('change');
 
     function loadStagesDataTable(contractId) {
       console.log('#stages-table-' + contractId);
-    
+
         // Stages DataTable
         $('#stages-table-' + contractId).DataTable({
             processing: true,
@@ -479,11 +479,11 @@ $contractsSelect.val(null).trigger('change');
 
     function loadPhasesDataTable(contractId) {
 console.log('#phases-table-' + contractId);
-        
+
         $('#phases-table-' + contractId).DataTable({
                 processing: true,
                 serverSide: true,
-                
+
                 ajax: route('admin.contracts.paymentsplan.phases', { contract: contractId }),
                 columns: [
                     { data: "stage_name", "name": "stage_name", title: 'Stage Name' },
@@ -553,7 +553,7 @@ console.log('#phases-table-' + contractId);
             });
 
     }
-        
+
     $('.js-datatable-filter-form :input').on('change', function(e) {
         console.log('Filter changed');
         window.LaravelDataTables["paymentsplan-table"].draw();
