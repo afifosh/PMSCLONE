@@ -115,7 +115,7 @@ class AdminAccessListController extends Controller
     try {
       $users = Admin::whereHas('accessiblePrograms')->whereIn('id', $validated['users'])->get();
       foreach ($users as $user) {
-        $user->auditSync('accessiblePrograms', filterInputIds($validated['accessible_programs']), ['granted_till' => $validated['granted_till']]);
+        $user->accessiblePrograms()->syncWithPivotValues(filterInputIds($validated['accessible_programs']), ['granted_till' => $validated['granted_till']]);
       }
       DB::commit();
     } catch (\Exception $e) {
