@@ -67,7 +67,7 @@ class AdminAccessListController extends Controller
     } catch (\Exception $e) {
       DB::rollback();
 
-      return $this->sendErr($e->getMessage());
+      return $this->sendError($e->getMessage());
     }
     return $this->sendRes('Added Successfully', ['event' => 'table_reload', 'table_id' => 'admin-access-lists-table', 'close' => 'globalModal']);
   }
@@ -115,13 +115,13 @@ class AdminAccessListController extends Controller
     try {
       $users = Admin::whereHas('accessiblePrograms')->whereIn('id', $validated['users'])->get();
       foreach ($users as $user) {
-        $user->auditSync('accessiblePrograms', filterInputIds($validated['accessible_programs']), ['granted_till' => $validated['granted_till']]);
+        $user->accessiblePrograms()->syncWithPivotValues(filterInputIds($validated['accessible_programs']), ['granted_till' => $validated['granted_till']]);
       }
       DB::commit();
     } catch (\Exception $e) {
       DB::rollback();
 
-      return $this->sendErr($e->getMessage());
+      return $this->sendError($e->getMessage());
     }
 
     return $this->sendRes('Updated Successfully', ['event' => 'table_reload', 'table_id' => 'admin-access-lists-table', 'close' => 'globalModal']);
@@ -138,7 +138,7 @@ class AdminAccessListController extends Controller
     } catch (\Exception $e) {
       DB::rollback();
 
-      return $this->sendErr($e->getMessage());
+      return $this->sendError($e->getMessage());
     }
 
     return $this->sendRes('Deleted Successfully', ['event' => 'table_reload', 'table_id' => 'admin-access-lists-table']);

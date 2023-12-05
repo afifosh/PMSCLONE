@@ -105,7 +105,7 @@ class ProjectPhaseController extends Controller
     $max_amount = $contract->remaining_amount + $phase->total_cost;
     $tax_rates = InvoiceConfig::activeOnly()->get();
 
-    if(request()->type == 'edit-form'){
+    if (request()->type == 'edit-form') {
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create-form', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
     }
 
@@ -157,6 +157,7 @@ class ProjectPhaseController extends Controller
 
     DB::beginTransaction();
     try {
+      $old_cost = $phase->estimated_cost;
       $data['total_cost'] = $request->estimated_cost;
       $stage = ContractStage::where('id', $request->stage_id)->firstOr(function () use ($contract, $request) {
         return ContractStage::create(['contract_id' => $contract->id, 'name' => $request->stage_id]);
@@ -165,14 +166,19 @@ class ProjectPhaseController extends Controller
 
       $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
 
-      $phase->reCalculateTaxAmountsAndResetManualAmounts(false);
-      $phase->reCalculateTotal();
-      $phase->recalculateDeductionAmount();
-      $phase->reCalculateTotal();
-      $phase->reCalculateTaxAmountsAndResetManualAmounts();
-      $phase->reCalculateTotal();
-      $phase->recalculateDeductionAmount();
-      $phase->reCalculateTotal();
+      if ($request->estimated_cost == 0) {
+        $phase->taxes()->detach();
+        $phase->deduction()->delete();
+      } elseif ($old_cost != $request->estimated_cost) {
+        $phase->reCalculateTaxAmountsAndResetManualAmounts(false);
+        $phase->reCalculateTotal();
+        $phase->recalculateDeductionAmount();
+        $phase->reCalculateTotal();
+        $phase->reCalculateTaxAmountsAndResetManualAmounts();
+        $phase->reCalculateTotal();
+        $phase->recalculateDeductionAmount();
+        $phase->reCalculateTotal();
+      }
 
       // if added in invoice then update invoice item and tax amount
       $phase->syncUpdateWithInvoices();
