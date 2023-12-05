@@ -22,16 +22,7 @@ class ProjectPhaseUpdated implements ShouldBroadcast
   {
     $this->project = $project;
     $this->modifiedTab = $modifiedTab;
-
-    if ($message) {
-      $this->sendMessage($message);
-    }
   }
-
-  public function sendMessage($message)
-    {
-        $this->project->sendMessageInChat($message);
-    }
 
   /**
    * Get the channels the event should broadcast on.

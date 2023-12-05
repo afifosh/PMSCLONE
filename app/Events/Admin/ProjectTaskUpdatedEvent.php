@@ -21,15 +21,6 @@ class ProjectTaskUpdatedEvent implements ShouldBroadcast
     {
         $this->projectTask = $projectTask;
         $this->modifiedTab = $modifiedTab;
-
-        if ($message) {
-            $this->sendMessage($message);
-        }
-    }
-
-    public function sendMessage($message)
-    {
-        $this->projectTask->project->sendMessageInChat($message);
     }
 
     /**

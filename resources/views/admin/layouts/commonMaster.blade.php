@@ -75,8 +75,5 @@
         })
     }
   </script>
-  @auth
-    <script src="{{ mix('chat/assets/js/set-user-on-off.js') }}"></script>
-  @endauth
 </body>
 </html>

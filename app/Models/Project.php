@@ -6,9 +6,6 @@ use App\Traits\HasLogs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Modules\Chat\Models\Conversation;
-use Modules\Chat\Models\Group;
-use Modules\Chat\Repositories\GroupRepository;
 
 class Project extends Model
 {
@@ -134,29 +131,6 @@ class Project extends Model
     }
 
     return $data;
-  }
-
-  public function group()
-  {
-    return $this->hasOne(Group::class, 'project_id', 'id');
-  }
-
-  public function sendMessageInChat($message, $toOthers = true, $type = Conversation::MESSAGE_TYPE_BADGES)
-  {
-    if (!$this->group) {
-      return false;
-    }
-    $msgInput = [
-      'to_id' => $this->group->id,
-      'message' => $message,
-      'is_group' => true,
-      'message_type' => $type,
-    ];
-
-    $repo = app(GroupRepository::class);
-    $repo->sendMessage($msgInput, $toOthers);
-
-    return true;
   }
 
   public function companies()
