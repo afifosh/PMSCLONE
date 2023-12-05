@@ -18,7 +18,7 @@
     {{ Form::label('contract_party_id', __('Contract Party'), ['class' => 'col-form-label']) }}
     {!! Form::select('contract_party_id', $contractParties ?? [], $contractParty->contract_party_id, [
     'class' => 'form-select globalOfSelect2Remote',
-    'data-url' => route('resource-select', ['Owner']),
+    'data-url' => route('resource-select', ['Owner', 'except-parties-of-contract' => $contract->id]),
     'data-dependent_id' => 'contract-party-type-id',
     'data-allow-clear' => 'true',
     'data-placeholder' => __('Select Party')

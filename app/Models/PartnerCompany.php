@@ -51,9 +51,22 @@ class PartnerCompany extends BaseModel
     {
         return $this->morphMany(Warehouse::class, 'owner');
     }
-      
-  public function scopeApplyRequestFilters($query)
+
+  public function scopeApplyRequestFilters($q)
   {
-    //
+    $q->when(request()->has('except-parties-of-contract') && request()->get('except-parties-of-contract'), function($q) {
+      $q->whereDoesntHave('pivotPartyOfContracts', function($q) {
+        $q->where('contract_id', request()->get('except-parties-of-contract'));
+      });
+    });
+
+  }
+
+  /**
+   * Pivot contract which has this company as party
+   */
+  public function pivotPartyOfContracts()
+  {
+    return $this->hasMany(ContractParty::class, 'contract_party_id', 'id')->where('contract_party_type', self::class);
   }
 }

@@ -367,7 +367,20 @@ class Company extends BaseModel
     })
     ->when(request()->has('type'), function ($q) {
       $q->where('type', request()->type);
+    })
+    ->when(request()->has('except-parties-of-contract') && request()->get('except-parties-of-contract'), function ($q) {
+      $q->whereDoesntHave('pivotPartyOfContracts', function ($q) {
+        $q->where('contract_id', request()->get('except-parties-of-contract'));
+      });
     });
+  }
+
+  /**
+   * Pivot contract which has this company as party
+   */
+  public function pivotPartyOfContracts()
+  {
+    return $this->hasMany(ContractParty::class, 'contract_party_id')->where('contract_party_type', self::class);
   }
 
   public function canBeSentForApproval()
@@ -575,5 +588,5 @@ class Company extends BaseModel
   public function warehouses()
   {
       return $this->morphMany(Warehouse::class,'owner');
-  }  
+  }
 }

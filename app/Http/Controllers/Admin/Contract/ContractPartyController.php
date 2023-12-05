@@ -29,6 +29,10 @@ class ContractPartyController extends Controller
 
   public function store(ContractPartyRequest $request, Contract $contract)
   {
+    if($contract->contract_parties()->where('contract_party_type', $request->contract_party_type)->where('contract_party_id', $request->contract_party_id)->exists()) {
+      return $this->sendError('Contract Party Already Exists');
+    }
+
     $contractParty = new ContractParty();
     $contractParty->contract_id = $contract->id;
     $contractParty->contract_party_type = $request->contract_party_type;
@@ -50,6 +54,9 @@ class ContractPartyController extends Controller
 
   public function update(Contract $contract, ContractParty $contractParty, ContractPartyRequest $request)
   {
+    if($contract->contract_parties()->where('contract_party_type', $request->contract_party_type)->where('contract_party_id', $request->contract_party_id)->where('id', '!=', $contractParty->id)->exists()) {
+      return $this->sendError('Contract Party Already Exists');
+    }
     $contractParty->contract_party_type = $request->contract_party_type;
     $contractParty->contract_party_id = $request->contract_party_id;
     $contractParty->save();
