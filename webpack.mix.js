@@ -11,7 +11,6 @@ mix.webpackConfig({
     })]
   }
 })
-const chatConfig = require('./webpack.chat.mix.js');
 
 /*
  |--------------------------------------------------------------------------

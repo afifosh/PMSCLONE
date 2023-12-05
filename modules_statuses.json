@@ -1,6 +1,5 @@
 {
     "Posts": true,
     "MailClient": true,
-    "Core": true,
-    "Chat": true
+    "Core": true
 }
