@@ -127,7 +127,7 @@ class ResourceSearchController extends Controller
   protected function contractSelect($allowedResources)
   {
     $resource = 'Contract';
-    return Contract::when(request()->dependent == 'company_id', function ($q) {
+    return Contract::when(request()->dependent == 'company_id' && request()->dependent_id, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->dependent_id);
     })
       ->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {

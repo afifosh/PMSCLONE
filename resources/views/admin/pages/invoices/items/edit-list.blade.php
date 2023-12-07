@@ -33,10 +33,10 @@
   {{-- item subtoital if deduction is before tax --}}
   @if (@$item->deduction && @$item->deduction->is_before_tax)
     <tr style="background-color: #efeff163;">
-      <td>Subtotal</td>
-      @if($invoice->isEditable())
+      @if($invoice->isEditable() && $tab != 'tax-report')
         <td></td>
       @endif
+      <td>Subtotal</td>
       <td></td>
       <td></td>
       <td></td>
@@ -53,11 +53,11 @@
   {{-- item subtotal if deduction after tax --}}
   @if($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax)
     <tr style="background-color: #efeff163;">
-      <td></td>
-      <td>Subtotal</td>
-      @if($invoice->isEditable())
+      @if($invoice->isEditable() && $tab != 'tax-report')
         <td></td>
       @endif
+      <td>Subtotal</td>
+      <td></td>
       <td></td>
       <td></td>
       <td class="text-end">
@@ -69,11 +69,11 @@
   @endif
   @includeWhen($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
   <tr style="background-color: #efeff1;">
-    <td></td>
-    <td>Item Total</td>
-    @if($invoice->isEditable())
+    @if($invoice->isEditable() && $tab != 'tax-report')
       <td></td>
     @endif
+    <td>Item Total</td>
+    <td></td>
     <td></td>
     <td></td>
     <td class="text-end">

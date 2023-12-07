@@ -574,7 +574,7 @@ $(document).on('click', '[data-toggle="confirm-action"]', function () {
 // reset dependent select2 on change of parent select2
 $(document).on('change', '.dependent-select', function(){
   $('[data-dependent_id="'+$(this).attr('id')+'"]').val('').trigger('change');
-  $('[data-dependent="'+$(this).attr('id')+'"]').val('').trigger('change');
+  $('[data-dependent_2="'+$(this).attr('id')+'"]').val('').trigger('change');
 })
 
 window.initModalSelect2 = function(){
@@ -618,7 +618,7 @@ window.initModalSelect2 = function(){
             q: params.term,
             page: params.page || 1,
             dependent_id: $(this).data('dependent_id') ? $('#'+$(this).data('dependent_id')).val() : null,
-            dependent: $(this).data('dependent') ? $('#'+$(this).data('dependent')).val() : null
+            dependent_2: $(this).data('dependent_2') ? $('#'+$(this).data('dependent_2')).val() : null
           };
         },
         processResults: function(data, params) {

@@ -218,7 +218,7 @@ class ContractPhase extends BaseModel
   public function addedAsInvoiceItem()
   {
     // have invoices table and invoice_items table. Invoice items table is polymorphic many to many. so checking is this phase class is added as invoice item
-    return $this->morphMany(InvoiceItem::class, 'invoiceable');
+    return $this->morphMany(InvoiceItem::class, 'invoiceable')->has('invoice');
   }
 
   public function invoices(): BelongsToMany

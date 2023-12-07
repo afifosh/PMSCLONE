@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\AccessList;
 
 use App\DataTables\Admin\AccessList\AdminAccessListsDataTable;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AccessList\AccessListStoreRequest;
 use App\Models\Admin;
 use App\Models\AdminAccessList;
 use App\Models\Program;
@@ -35,32 +36,14 @@ class AdminAccessListController extends Controller
     ]);
   }
 
-  public function store(Request $request)
+  public function store(AccessListStoreRequest $request)
   {
-    // convert accessible_programs to array
-    $validated = $request->validate([
-      'users' => 'required|array',
-      'users.*' => 'required|exists:admins,id',
-      'granted_till' => 'required|date',
-      'accessible_programs' => 'required',
-    ]);
-    // convert and validate accessible_programs
-    $request->merge(['accessible_programs' => explode(',', $validated['accessible_programs'])]);
-
-    $validated = $request->validate([
-      'users' => 'required|array',
-      'users.*' => 'required|exists:admins,id',
-      'granted_till' => 'required|date',
-      'accessible_programs' => 'required|array',
-      'accessible_programs.*' => 'required|exists:programs,id',
-    ]);
-
     DB::beginTransaction();
     try {
-      $users = Admin::whereDoesntHave('accessiblePrograms')->whereIn('id', $validated['users'])->get();
+      $users = Admin::whereDoesntHave('accessiblePrograms')->whereIn('id', $request->users)->get();
 
       foreach ($users as $user) {
-        $user->auditAttach('accessiblePrograms', filterInputIds($validated['accessible_programs']), ['granted_till' => $validated['granted_till']]);
+        $user->auditAttach('accessiblePrograms', filterInputIds($request->accessible_programs), ['granted_till' => $request->granted_till]);
       }
 
       DB::commit();
@@ -90,32 +73,14 @@ class AdminAccessListController extends Controller
     ]);
   }
 
-  public function update($admin_id, Request $request)
+  public function update($admin_id, AccessListStoreRequest $request)
   {
-    // convert accessible_programs to array
-    $validated = $request->validate([
-      'users' => 'required|array',
-      'users.*' => 'required|exists:admins,id',
-      'granted_till' => 'required|date',
-      'accessible_programs' => 'required',
-    ]);
-    // convert and validate accessible_programs
-    $request->merge(['accessible_programs' => explode(',', $validated['accessible_programs'])]);
-
-    $validated = $request->validate([
-      'users' => 'required|array',
-      'users.*' => 'required|exists:admins,id',
-      'granted_till' => 'required|date',
-      'accessible_programs' => 'required|array',
-      'accessible_programs.*' => 'required|exists:programs,id',
-    ]);
-
     DB::beginTransaction();
 
     try {
-      $users = Admin::whereHas('accessiblePrograms')->whereIn('id', $validated['users'])->get();
+      $users = Admin::whereHas('accessiblePrograms')->whereIn('id', $request->users)->get();
       foreach ($users as $user) {
-        $user->accessiblePrograms()->syncWithPivotValues(filterInputIds($validated['accessible_programs']), ['granted_till' => $validated['granted_till']]);
+        $user->accessiblePrograms()->syncWithPivotValues(filterInputIds($request->accessible_programs), ['granted_till' => $request->granted_till]);
       }
       DB::commit();
     } catch (\Exception $e) {

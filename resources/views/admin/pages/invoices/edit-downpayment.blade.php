@@ -22,6 +22,7 @@
 @section('page-script')
 <script src="{{asset('assets/js/custom/flatpickr.js')}}"></script>
 <script src="{{asset('assets/js/custom/select2.js')}}"></script>
+<script src="{{asset('assets/js/custom/admin-invoice-item-update.js')}}"></script>
 <script>
   $(document).on('click', '.edit-downpayment', function(){
     $('.downpayment-row').addClass('d-none');

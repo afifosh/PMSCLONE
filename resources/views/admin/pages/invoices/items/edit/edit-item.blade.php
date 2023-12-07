@@ -23,7 +23,7 @@
               {{-- Subtotal --}}
               <div class="form-group col-6">
                 {{ Form::label('subtotal', __('Subtotal'), ['class' => 'col-form-label']) }}
-                {!! Form::number('subtotal', null, ['class' => 'form-control', 'disabled','placeholder' => __('Subtotal')]) !!}
+                {!! Form::number('subtotal', null, ['class' => 'form-control', $disabled,'placeholder' => __('Subtotal')]) !!}
               </div>
           </div>
           <div class="row">

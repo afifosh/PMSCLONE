@@ -84,7 +84,7 @@ class ProgramUserController extends Controller
       return $this->sendRes('', ['event' => 'functionCall', 'function' => 'toast_danger', 'function_params' => 'User Already Added To This Program']);
     }
 
-    $program->auditAttach('users', [$att['user']], ['granted_by' => auth()->id(), 'granted_till' => $att['granted_till'], 'accessable_type' => Program::class]);
+    $program->auditAttach('users', [$att['user']], ['granted_till' => $att['granted_till'], 'accessable_type' => Program::class]);
 
     return $this->sendRes('Created Successfully', ['event' => 'table_reload', 'table_id' => AdminAccessList::DT_ID, 'close' => 'globalModal']);
   }

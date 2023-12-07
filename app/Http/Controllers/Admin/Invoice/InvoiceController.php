@@ -59,7 +59,7 @@ class InvoiceController extends Controller
 
   public function store(InvoiceStoreRequest $request)
   {
-    $invoice = Invoice::create($request->validated() + ['total' => $request->subtotal]);
+    $invoice = Invoice::create(['company_id' => Contract::findOrFail($request->contract_id)->assignable_id] + $request->validated() + ['total' => $request->subtotal]);
 
     if ($invoice->type == 'Down Payment') {
       $item = CustomInvoiceItem::create([

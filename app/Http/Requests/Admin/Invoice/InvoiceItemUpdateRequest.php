@@ -41,8 +41,8 @@ class InvoiceItemUpdateRequest extends FormRequest
   protected function prepareForValidation(): void
   {
     $this->merge([
-      'subtotal' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->invoice_item->invoiceable->estimated_cost)),
-      'total' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->invoice_item->invoiceable->estimated_cost)),
+      'subtotal' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->subtotal)),
+      'total' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->subtotal)),
       // /** Deduction Related Fields */
       // 'deduct_downpayment' => $this->boolean('deduct_downpayment'),
       // 'is_before_tax' => $this->boolean('is_before_tax'),
@@ -95,7 +95,7 @@ class InvoiceItemUpdateRequest extends FormRequest
   private function getItemRules(): array
   {
     $generalRules = [
-      'subtotal' => 'required|numeric|gt:0',
+      'subtotal' => 'required|numeric|gte:0',
       'description' => 'nullable|string|max:255'
       // deduction fields
       // 'deduct_downpayment' => 'required|boolean',
