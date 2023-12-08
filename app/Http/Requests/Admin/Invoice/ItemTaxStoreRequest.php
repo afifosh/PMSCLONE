@@ -66,7 +66,7 @@ class ItemTaxStoreRequest extends FormRequest
       'subtotal' => 'required|numeric|gt:0',
       // tax fields
       'item_tax' => 'required|exists:invoice_configs,id',
-      'total_tax_amount' => 'required|numeric',
+      'total_tax_amount' => 'nullable|numeric',
       // 'manual_tax_amount' => 'nullable|required_if:is_manual_tax,true|numeric',
     ];
   }

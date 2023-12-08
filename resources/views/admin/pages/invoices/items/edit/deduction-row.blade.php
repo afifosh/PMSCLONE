@@ -2,7 +2,7 @@
   @if($tab != 'tax-report')
     <td>
       <a data-toggle="ajax-delete" data-href="{{ route('admin.invoices.invoice-items.deductions.destroy', [$invoice, 'invoice_item' => $item->id, $item->deduction->id]) }}"><i class="ti ti-trash"></i></a>
-      <a data-toggle="ajax-modal" onclick="editItemDeduction({{$item->invoice_id}}, {{$item->id}}, {{$item->deduction->id}}, this)"><i class="ti ti-pencil"></i></a>
+      <a onclick="editItemDeduction({{$item->invoice_id}}, {{$item->id}}, {{$item->deduction->id}}, this)"><i class="ti ti-pencil"></i></a>
     </td>
   @endif
   <!--description-->

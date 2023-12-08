@@ -32,53 +32,33 @@
   @includeWhen(@$item->deduction && @$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
   {{-- item subtoital if deduction is before tax --}}
   @if (@$item->deduction && @$item->deduction->is_before_tax)
-    <tr style="background-color: #efeff163;">
-      @if($invoice->isEditable() && $tab != 'tax-report')
-        <td></td>
-      @endif
-      <td>Subtotal</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td class="text-end">
-        @if($tab != 'tax-report')
-          @cMoney($item->subtotal - ($item->deduction->manual_amount ? @$item->deduction->manual_amount : ($item->deduction->amount ?? 0)), $invoice->contract->currency, true)
-        @endif
-      </td>
-    </tr>
-
+    @include('admin.pages.invoices.items.show.subtotal-row')
   @endif
   @includeWhen(count($item->taxes) > 0, 'admin.pages.invoices.items.show.item-tax')
 
   {{-- item subtotal if deduction after tax --}}
   @if($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax)
-    <tr style="background-color: #efeff163;">
-      @if($invoice->isEditable() && $tab != 'tax-report')
-        <td></td>
-      @endif
-      <td>Subtotal</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td class="text-end">
-        @if($tab != 'tax-report')
-        @cMoney($item->total + ($item->deduction->manual_amount ? @$item->deduction->manual_amount : ($item->deduction->amount ?? 0)), $invoice->contract->currency, true)
-        @endif
-      </td>
-    </tr>
+    @include('admin.pages.invoices.items.show.subtotal-row')
   @endif
   @includeWhen($tab != 'authority-tax' && @$item->deduction && !@$item->deduction->is_before_tax, 'admin.pages.invoices.items.show.item-deduction')
   <tr style="background-color: #efeff1;">
     @if($invoice->isEditable() && $tab != 'tax-report')
       <td></td>
     @endif
-    <td>Item Total</td>
+    <td class="fw-bold">Item Total</td>
     <td></td>
     <td></td>
     <td></td>
-    <td class="text-end">
+    <td class="text-end fw-bold"
+      @if($tab == 'summary' && $item->total_amount_adjustment)
+        data-bs-toggle="tooltip" title="Calculated amount: {{cMoney($item->getRawOriginal('total') /1000, $invoice->contract->currency, true)}}"
+      @endif
+      >
       @if($tab != 'tax-report')
         @cMoney($tab == 'summary' ? $item->total : $item->authority_inv_total, $invoice->contract->currency, true)
+        @if($tab == 'summary' && $item->total_amount_adjustment)
+          <span class="text-danger">*</span>
+        @endif
       @endif
     </td>
   </tr>

@@ -22,6 +22,8 @@ class ContractPhase extends BaseModel
     'estimated_cost',
     'tax_amount',
     'total_cost',
+    'subtotal_amount_adjustment',
+    'total_amount_adjustment',
     'rounding_amount',
     'start_date',
     'due_date',
@@ -74,7 +76,7 @@ class ContractPhase extends BaseModel
 
   public function getTotalCostAttribute($value)
   {
-    return $value / 1000;
+    return ($value + $this->total_amount_adjustment) / 1000;
   }
 
   public function setTotalCostAttribute($value)
@@ -90,6 +92,48 @@ class ContractPhase extends BaseModel
   public function setRoundingAmountAttribute($value)
   {
     $this->attributes['rounding_amount'] = moneyToInt($value);
+  }
+
+  public function getSubtotalAmountAdjustmentAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setSubtotalAmountAdjustmentAttribute($value)
+  {
+    $this->attributes['subtotal_amount_adjustment'] = moneyToInt($value);
+  }
+
+  public function getTotalAmountAdjustmentAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setTotalAmountAdjustmentAttribute($value)
+  {
+    $this->attributes['total_amount_adjustment'] = moneyToInt($value);
+  }
+
+  /**
+   * subtotal row in phase edit table
+   */
+  public function getSubtotalRowRawAttribute()
+  {
+    if(!$this->deduction)
+      return $this->estimated_cost;
+    if ($this->deduction->is_before_tax) {
+      return $this->estimated_cost - $this->deduction->amount;
+    } else {
+      return $this->estimated_cost + $this->tax_amount;
+    }
+  }
+
+  /**
+   * subtotal row in phase edit table
+   */
+  public function getSubtotalRowAttribute()
+  {
+    return $this->subtotal_row_raw + $this->subtotal_amount_adjustment;
   }
 
   public function getStatusAttribute()
@@ -375,7 +419,9 @@ class ContractPhase extends BaseModel
           'authority_inv_total' =>
           // pivot taxes
           $this->pivotTaxes()->whereIn('category', [2,3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000,
-          'total' => $this->total_cost,
+          'total' => $this->getRawOriginal('total_cost') / 1000,
+          'subtotal_amount_adjustment' => $this->subtotal_amount_adjustment,
+          'total_amount_adjustment' => $this->total_amount_adjustment,
           'rounding_amount' => $this->rounding_amount,
         ]);
 

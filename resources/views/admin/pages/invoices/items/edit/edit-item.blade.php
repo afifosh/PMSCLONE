@@ -20,14 +20,16 @@
             @endphp
             @includeWhen((request()->item != 'custom'), 'admin.pages.invoices.items.edit-phases-general')
             @includeWhen((request()->item == 'custom'), 'admin.pages.invoices.items.edit-custom-item-general')
+            @if(isset($deduction_rates))
               {{-- Subtotal --}}
               <div class="form-group col-6">
                 {{ Form::label('subtotal', __('Subtotal'), ['class' => 'col-form-label']) }}
                 {!! Form::number('subtotal', null, ['class' => 'form-control', $disabled,'placeholder' => __('Subtotal')]) !!}
               </div>
+            @endif
           </div>
-          <div class="row">
-            @if(isset($deduction_rates))
+          @if(isset($deduction_rates))
+            <div class="row">
               {{-- total_tax_amount --}}
               <div class="form-group col-6">
                 {{ Form::label('t_total_tax_amount', __('Total Tax'), ['class' => 'col-form-label']) }}
@@ -38,13 +40,13 @@
                 {{ Form::label('t_total', __('Total'), ['class' => 'col-form-label']) }}
                 {!! Form::number('t_total', $invoiceItem->total, ['class' => 'form-control', 'disabled','placeholder' => __('Total')]) !!}
               </div>
-            @endif
-            {{-- decription --}}
-            <div class="form-group col-12">
-              {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}
-              {!! Form::text('description', null, ['class' => 'form-control', $disabled, 'placeholder' => __('Description')]) !!}
+              {{-- decription --}}
+              <div class="form-group col-12">
+                {{ Form::label('description', __('Description'), ['class' => 'col-form-label']) }}
+                {!! Form::text('description', null, ['class' => 'form-control', $disabled, 'placeholder' => __('Description')]) !!}
+              </div>
             </div>
-          </div>
+          @endif
     </div>
 
     <div class="mt-3">

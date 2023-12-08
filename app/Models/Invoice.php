@@ -644,6 +644,8 @@ class Invoice extends Model
           'authority_inv_total' => $pivot_amounts->where('id', $phase)->first()->pivotTaxes()->whereIn('category', [2, 3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')),
           'total' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_cost'),
           'rounding_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('rounding_amount'),
+          'subtotal_amount_adjustment' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('subtotal_amount_adjustment'),
+          'total_amount_adjustment' =>$pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_amount_adjustment'),
         ]; // convert to cents manually, setter is not working for pivot table
       }
 

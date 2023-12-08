@@ -84,6 +84,36 @@ function createItemtax(invoice_id, item_id, element)
     });
   }
 
+  function editItemSubtotalAmount(item_id, element)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.invoice-items.subtotal-adjustments.create', { invoice_item: item_id}),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $(element).closest('tr').after(res.data.view_data);
+      }
+    });
+  }
+
+  function editItemTotalAmount(item_id, element)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.invoice-items.total-amount-adjustments.create', { invoice_item: item_id}),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $(element).closest('tr').after(res.data.view_data);
+      }
+    });
+  }
+
   function reloadItemEditModal()
   {
     // check if invoice-item-edit-modal is in the dom
@@ -310,6 +340,89 @@ function createItemtax(invoice_id, item_id, element)
       $('#item-create [name="downpayment_amount"]').prop('disabled', true);
     }
   })
+
+
+  $(document).on('change', '#cal-phase-end-date', function() {
+    if ($(this).is(':checked')) {
+      $('#end-date-cal-form').removeClass('d-none');
+      calContEndDate();
+    } else {
+      $('#end_date').val('');
+      $('#end-date-cal-form').addClass('d-none');
+      initFlatPickr();
+    }
+  });
+
+  $(document).on('change', '[name="start_date"]', function(){
+    calContEndDate();
+  })
+
+  $(document).on('change keyup', '.cal-phase-end-date', function() {
+    calContEndDate();
+  });
+
+  $(document).on('change', '[name="add-phase"]', function() {
+    if ($(this).val() == 'rule') {
+      $('.rr-single').addClass('d-none');
+      $('.rr-rule').removeClass('d-none');
+    } else {
+      $('.rr-single').removeClass('d-none');
+      $('.rr-rule').addClass('d-none');
+    }
+  }
+  );
+
+  function calContEndDate()
+  {
+    const count = $('#cont-add-count').val();
+    const unit = $('.cont-add-unit').val();
+    const startDate = $('#start_date').val();
+    if(!startDate) return;
+    if (count && unit) {
+      let endDate = new Date(startDate);
+      if(unit == 'Days') {
+        endDate.setDate(endDate.getDate() + parseInt(count));
+      } else if(unit == 'Weeks') {
+        endDate.setDate(endDate.getDate() + (parseInt(count) * 7));
+      } else if(unit == 'Months') {
+        endDate.setMonth(endDate.getMonth() + parseInt(count));
+      } else if(unit == 'Years') {
+        endDate.setFullYear(endDate.getFullYear() + parseInt(count));
+      }
+      $('#phase_end_date').val(endDate.toISOString().slice(0, 10));
+    }else{
+      $('#phase_end_date').val('');
+    }
+    initFlatPickr();
+  }
+
+  $('#percent-value').on('change keyup', function(){
+    const percent = $(this).val();
+    const balance = $(this).data('balance');
+    if(percent && balance){
+      const estimatedCost = (balance * percent) / 100;
+      $('[name="estimated_cost"]').val(estimatedCost).trigger('change');
+    }else{
+      $('[name="estimated_cost"]').val('').trigger('change');
+    }
+  })
+
+  $(document).on('change', '[name="total_cost"]', function(){
+    validateTotalCost();
+  })
+
+  function validateTotalCost(){
+    let $this = $('[name="total_cost"]');
+    $($this).parent().find('.validation-error').remove();
+    const totalCost = $($this).val();
+    const balance = $($this).data('max');
+    if(totalCost && balance){
+      // show validation error if total cost is greater than balance
+      // if(totalCost > balance){
+      //   $($this).after('<div class="text-danger validation-error">The total cost must not be greater than '+balance+'.</div>');
+      // }
+    }
+  }
 
   /**********************************************************************************************************
   ****************************************** Invoice Item Modal Script **************************************
