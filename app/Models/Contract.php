@@ -87,167 +87,167 @@ class Contract extends BaseModel
 
   public function usersWhoCompletedAllPhases()
   {
-      // // Retrieve the total number of phases for this contract.
-      // $totalPhases = $this->phases()->count();
+    // // Retrieve the total number of phases for this contract.
+    // $totalPhases = $this->phases()->count();
 
-      // // Subquery to get user IDs and their count of distinct reviewed phases.
-      // // Note that we need the fully qualified class name for `reviewable_type`.
-      // $subQuery = Review::select('user_id')
-      //     ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-      //     ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
-      //     ->whereIn('reviewable_id', $this->phases()->pluck('id'))
-      //     ->groupBy('user_id')
-      //     ->havingRaw('phases_count = ?', [$totalPhases]); // use havingRaw to filter users who reviewed all phases
+    // // Subquery to get user IDs and their count of distinct reviewed phases.
+    // // Note that we need the fully qualified class name for `reviewable_type`.
+    // $subQuery = Review::select('user_id')
+    //     ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
+    //     ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
+    //     ->whereIn('reviewable_id', $this->phases()->pluck('id'))
+    //     ->groupBy('user_id')
+    //     ->havingRaw('phases_count = ?', [$totalPhases]); // use havingRaw to filter users who reviewed all phases
 
-      // // Main query to get admins who have completed all phases.
-      // // Join the subquery to filter users based on the phases count.
-      // $adminsWhoCompletedAllPhases = Admin::select('admins.*')
-      //     ->joinSub($subQuery, 'reviewed_phases', function ($join) {
-      //         $join->on('admins.id', '=', 'reviewed_phases.user_id');
-      //     })
-      //     ->get();
+    // // Main query to get admins who have completed all phases.
+    // // Join the subquery to filter users based on the phases count.
+    // $adminsWhoCompletedAllPhases = Admin::select('admins.*')
+    //     ->joinSub($subQuery, 'reviewed_phases', function ($join) {
+    //         $join->on('admins.id', '=', 'reviewed_phases.user_id');
+    //     })
+    //     ->get();
 
-      // Calculate the total number of phases for the current object
-      $totalPhases = $this->phases()->count();
+    // Calculate the total number of phases for the current object
+    $totalPhases = $this->phases()->count();
 
-      // Subquery to get user IDs and their count of distinct reviewed phases.
-      // We ensure the reviews are only for the specific phases related to the current object.
-      $subQuery = Review::select('user_id')
-          ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-          ->where('reviewable_type', get_class($this->phases()->getRelated())) // Ensure we're looking at the correct reviewable type
-          ->whereIn('reviewable_id', $this->phases()->pluck('id')->toArray()) // Select only reviews for these phase IDs
-          ->groupBy('user_id') // Group the results by user ID
-          ->having('phases_count', $totalPhases); // Filter to users who reviewed all phases
+    // Subquery to get user IDs and their count of distinct reviewed phases.
+    // We ensure the reviews are only for the specific phases related to the current object.
+    $subQuery = Review::select('user_id')
+      ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
+      ->where('reviewable_type', get_class($this->phases()->getRelated())) // Ensure we're looking at the correct reviewable type
+      ->whereIn('reviewable_id', $this->phases()->pluck('id')->toArray()) // Select only reviews for these phase IDs
+      ->groupBy('user_id') // Group the results by user ID
+      ->having('phases_count', $totalPhases); // Filter to users who reviewed all phases
 
-      // You can now use the $subQuery to get the users who have reviewed all phases.
-      // For example, you might want to get these users:
-      $adminsWhoCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
+    // You can now use the $subQuery to get the users who have reviewed all phases.
+    // For example, you might want to get these users:
+    $adminsWhoCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
 
-      return $adminsWhoCompletedAllPhases;
+    return $adminsWhoCompletedAllPhases;
   }
 
   public function usersWhoNotCompletedAllPhases()
   {
-      // // Retrieve the total number of phases for this contract.
-      // $totalPhases = $this->phases()->count();
+    // // Retrieve the total number of phases for this contract.
+    // $totalPhases = $this->phases()->count();
 
-      // // Subquery to get user IDs and their count of distinct reviewed phases.
-      // // Note that we need the fully qualified class name for `reviewable_type`.
-      // $subQuery = Review::select('user_id')
-      //     ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-      //     ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
-      //     ->whereIn('reviewable_id', $this->phases()->pluck('id'))
-      //     ->groupBy('user_id');
+    // // Subquery to get user IDs and their count of distinct reviewed phases.
+    // // Note that we need the fully qualified class name for `reviewable_type`.
+    // $subQuery = Review::select('user_id')
+    //     ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
+    //     ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
+    //     ->whereIn('reviewable_id', $this->phases()->pluck('id'))
+    //     ->groupBy('user_id');
 
-      // // Main query to get admins who have NOT completed all phases.
-      // // We are doing a LEFT JOIN here with the users table and filtering out the ones that have a phases_count equal to totalPhases.
-      // $adminsWhoNotCompletedAllPhases = Admin::select('admins.*')
-      //     ->leftJoinSub($subQuery, 'reviewed_phases', function ($join) {
-      //         $join->on('admins.id', '=', 'reviewed_phases.user_id');
-      //     })
-      //     // We use 'whereRaw' here to add a SQL raw where clause, checking if phases_count is not the total or there's no review (NULL).
-      //     ->whereRaw('(reviewed_phases.phases_count IS NULL OR reviewed_phases.phases_count < ?)', [$totalPhases])
-      //     ->get();
+    // // Main query to get admins who have NOT completed all phases.
+    // // We are doing a LEFT JOIN here with the users table and filtering out the ones that have a phases_count equal to totalPhases.
+    // $adminsWhoNotCompletedAllPhases = Admin::select('admins.*')
+    //     ->leftJoinSub($subQuery, 'reviewed_phases', function ($join) {
+    //         $join->on('admins.id', '=', 'reviewed_phases.user_id');
+    //     })
+    //     // We use 'whereRaw' here to add a SQL raw where clause, checking if phases_count is not the total or there's no review (NULL).
+    //     ->whereRaw('(reviewed_phases.phases_count IS NULL OR reviewed_phases.phases_count < ?)', [$totalPhases])
+    //     ->get();
 
-      // Calculate the total number of phases for the current object
-      $totalPhases = $this->phases()->count();
+    // Calculate the total number of phases for the current object
+    $totalPhases = $this->phases()->count();
 
-      // Subquery to get user IDs and their count of distinct reviewed phases
-      // for the specific phases related to the current object.
-      $subQuery = Review::select('user_id')
-          ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-          ->where('reviewable_type', get_class($this->phases()->getRelated())) // Check against the correct reviewable type
-          ->whereIn('reviewable_id', $this->phases()->pluck('id')->toArray()) // Only select reviews for these phase IDs
-          ->groupBy('user_id') // Group the results by user ID
-          ->having('phases_count', '<', $totalPhases); // Filter to users who have NOT reviewed all phases
+    // Subquery to get user IDs and their count of distinct reviewed phases
+    // for the specific phases related to the current object.
+    $subQuery = Review::select('user_id')
+      ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
+      ->where('reviewable_type', get_class($this->phases()->getRelated())) // Check against the correct reviewable type
+      ->whereIn('reviewable_id', $this->phases()->pluck('id')->toArray()) // Only select reviews for these phase IDs
+      ->groupBy('user_id') // Group the results by user ID
+      ->having('phases_count', '<', $totalPhases); // Filter to users who have NOT reviewed all phases
 
-      // Now, get only the admins who have not reviewed all phases.
-      $adminsWhoNotCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
+    // Now, get only the admins who have not reviewed all phases.
+    $adminsWhoNotCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
 
-      return $adminsWhoNotCompletedAllPhases;
+    return $adminsWhoNotCompletedAllPhases;
   }
 
   public function getAdminsWhoDidNotReviewAnyPhase()
   {
-      // Get IDs of all phases associated with this contract's program
-      $phaseIds = $this->phases()->pluck('id');
+    // Get IDs of all phases associated with this contract's program
+    $phaseIds = $this->phases()->pluck('id');
 
-      // Check if there are any phases; if not, return an empty collection
-      if ($phaseIds->isEmpty()) {
-          return collect();
-      }
+    // Check if there are any phases; if not, return an empty collection
+    if ($phaseIds->isEmpty()) {
+      return collect();
+    }
 
-      // Get query for all admin user IDs associated with this contract's program
-      $programAdminIdsQuery = AdminAccessList::ofProgram($this->program_id)
-                                          ->select('admin_id');
+    // Get query for all admin user IDs associated with this contract's program
+    $programAdminIdsQuery = AdminAccessList::ofProgram($this->program_id)
+      ->select('admin_id');
 
-      // Get query for all admin user IDs who have made a review for any of the phase IDs
-      $adminsWhoMadeReviewsQuery = Review::whereIn('reviewable_id', $phaseIds)
-                                          ->where('reviewable_type', get_class($this->phases()->getRelated()))
-                                          ->select('user_id')
-                                          ->distinct();
+    // Get query for all admin user IDs who have made a review for any of the phase IDs
+    $adminsWhoMadeReviewsQuery = Review::whereIn('reviewable_id', $phaseIds)
+      ->where('reviewable_type', get_class($this->phases()->getRelated()))
+      ->select('user_id')
+      ->distinct();
 
-      // Check if there are admins associated with the program; if not, return an empty collection
-      if (!$programAdminIdsQuery->exists()) {
-          return collect();
-      }
+    // Check if there are admins associated with the program; if not, return an empty collection
+    if (!$programAdminIdsQuery->exists()) {
+      return collect();
+    }
 
-      // Get the list of admin users who have not made any review entries for any phase of this contract's program
-      $adminsWithoutReviews = Admin::whereNotIn('id', $adminsWhoMadeReviewsQuery)
-                                   ->whereIn('id', $programAdminIdsQuery)
-                                   ->get();
+    // Get the list of admin users who have not made any review entries for any phase of this contract's program
+    $adminsWithoutReviews = Admin::whereNotIn('id', $adminsWhoMadeReviewsQuery)
+      ->whereIn('id', $programAdminIdsQuery)
+      ->get();
 
-      return $adminsWithoutReviews;
+    return $adminsWithoutReviews;
   }
 
 
   public function getAllUsersStagesReviewStatusWithlastReviewDate()
   {
-      // Assuming the Contract model has a 'stages' relationship that contains many ContractStage
-      $stages = $this->stages;
-      $users = $this->program->users;
+    // Assuming the Contract model has a 'stages' relationship that contains many ContractStage
+    $stages = $this->stages;
+    $users = $this->program->users;
 
-      $allUsersStagesStatus = [];
+    $allUsersStagesStatus = [];
 
-      foreach ($users as $user) {
-          $userStagesStatus = [];
+    foreach ($users as $user) {
+      $userStagesStatus = [];
 
-          foreach ($stages as $stage) {
-              // Get the status for this stage for this user
-              $status = $stage->getUserReviewStatusWithlastReviewDate($user->id);
+      foreach ($stages as $stage) {
+        // Get the status for this stage for this user
+        $status = $stage->getUserReviewStatusWithlastReviewDate($user->id);
 
-              // Add stage information for reference
-              $userStagesStatus[] = [
-                  'stage_id' => $stage->id,
-                  'stage_name' => $stage->name,
-                  'status' => $status['status'],
-                  'last_review_date' => $status['last_review_date'],
-              ];
-          }
-
-          // Add user information and their stages status to the final array
-          $allUsersStagesStatus[] = [
-              'user_id' => $user->id,
-              'user_name' => $user->name,
-              'stages_status' => $userStagesStatus,
-          ];
+        // Add stage information for reference
+        $userStagesStatus[] = [
+          'stage_id' => $stage->id,
+          'stage_name' => $stage->name,
+          'status' => $status['status'],
+          'last_review_date' => $status['last_review_date'],
+        ];
       }
 
-      return $allUsersStagesStatus;
+      // Add user information and their stages status to the final array
+      $allUsersStagesStatus[] = [
+        'user_id' => $user->id,
+        'user_name' => $user->name,
+        'stages_status' => $userStagesStatus,
+      ];
+    }
+
+    return $allUsersStagesStatus;
   }
 
   public function getAdminsWhoDidNotCompleteOrDidNotReviewAnyPhase()
   {
-      // Get a collection of admins who have not reviewed any phase
-      $adminsWithoutAnyReviews = $this->getAdminsWhoDidNotReviewAnyPhase();
+    // Get a collection of admins who have not reviewed any phase
+    $adminsWithoutAnyReviews = $this->getAdminsWhoDidNotReviewAnyPhase();
 
-      // Get a collection of admins who have not completed all phases
-      $adminsWhoDidNotCompleteAllPhases = $this->usersWhoNotCompletedAllPhases();
+    // Get a collection of admins who have not completed all phases
+    $adminsWhoDidNotCompleteAllPhases = $this->usersWhoNotCompletedAllPhases();
 
-      // Combine the two collections and remove duplicates to get a list of unique admins
-      $combinedAdmins = $adminsWithoutAnyReviews->merge($adminsWhoDidNotCompleteAllPhases)->unique('id');
+    // Combine the two collections and remove duplicates to get a list of unique admins
+    $combinedAdmins = $adminsWithoutAnyReviews->merge($adminsWhoDidNotCompleteAllPhases)->unique('id');
 
-      return $combinedAdmins;
+    return $combinedAdmins;
   }
 
   public function getAllUsersFromProgramAndParentProgram()
@@ -261,10 +261,10 @@ class Contract extends BaseModel
   {
     // Get the IDs of admin users who have made reviews for this contract
     $adminUserIds = Review::where('reviewable_id', $this->id)
-        ->where('reviewable_type', Contract::class)
-        ->distinct()
-        ->pluck('user_id')
-        ->toArray();
+      ->where('reviewable_type', Contract::class)
+      ->distinct()
+      ->pluck('user_id')
+      ->toArray();
 
     // Get all users from the program and parent program
     $allUsers = $this->getAllUsersFromProgramAndParentProgram();
@@ -275,23 +275,13 @@ class Contract extends BaseModel
     return $adminsWhoReviewed->values();
   }
 
-
-  public function getAdminsWhoReviewedContract()
+  /**
+   * Users who have reviewed this contract
+   */
+  public function reviewedBy()
   {
-    // Get the IDs of admin users who have made reviews for this contract
-    $adminUserIds = Review::where('reviewable_id', $this->id)
-        ->where('reviewable_type', Contract::class)
-        ->distinct()
-        ->pluck('user_id')
-        ->toArray();
-
-    // Get all users from the program and parent program
-    $allUsers = $this->getAllUsersFromProgramAndParentProgram();
-
-    // Filter and return only the admin users from the list of all users
-    $adminsWhoReviewed = $allUsers->whereIn('id', $adminUserIds);
-
-    return $adminsWhoReviewed;
+    return $this->belongsToMany(Admin::class, 'reviews', 'reviewable_id', 'user_id')
+      ->where('reviewable_type', self::class);
   }
 
   public function getStatusAttribute()
@@ -365,70 +355,79 @@ class Contract extends BaseModel
     })->when(request()->companies, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);
     })
-    ->when(request()->search_q, function ($q) {
-      $q->where(function ($q) {
-        $q->where('subject', 'like', '%' . request()->search_q . '%')
-          ->orWhereHas('phases', function ($q) {
-            $q->where('name', 'like', '%' . request()->search_q . '%');
-          });
-      });
-    })->when(request()->contract_type, function ($q) {
+      ->when(request()->search_q, function ($q) {
+        $q->where(function ($q) {
+          $q->where('subject', 'like', '%' . request()->search_q . '%')
+            ->orWhereHas('phases', function ($q) {
+              $q->where('name', 'like', '%' . request()->search_q . '%');
+            });
+        });
+      })->when(request()->contract_type, function ($q) {
         $q->where('type_id', request()->contract_type);
-    })->when(request()->contract_category, function ($q) {
+      })->when(request()->contract_category, function ($q) {
         $q->where('category_id', request()->contract_category);
-    })->when(request()->projects, function ($q) {
-      $q->whereHas('project', function ($q) {
-        $q->where('id', request()->projects);
-      });
-    })->when(request()->programs, function ($q) {
-      $q->whereHas('program', function ($q) {
-        $q->where('id', request()->programs);
-      });
-    })->when(request()->has('haspayments'), function($q){
-      $q->has('invoices.payments');
-    })->when(request()->has('hasinv'), function($q){
-      $q->has('invoices');
-    })->when(request()->has('has-ta-inv'), function($q){
-      $q->has('invoices.authorityInvoice');
-    })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function($q){
-      try {
-        $date = Carbon::parse(explode(' to ', request()->date_range)[0]);
-        $q->where('start_date', '>=', $date);
-      } catch (\Exception $e) {
-      }
-    })->when(request()->date_range && @explode(' to ', request()->date_range)[1], function($q){
-      try {
-        $date = Carbon::parse(explode(' to ', request()->date_range)[1]);
-        $q->where('end_date', '<=', $date);
-      } catch (\Exception $e) {
-      }
-    })->when(request('review_status'), function ($q) {
-      $reviewStatus = request('review_status');
+      })->when(request()->projects, function ($q) {
+        $q->whereHas('project', function ($q) {
+          $q->where('id', request()->projects);
+        });
+      })->when(request()->programs, function ($q) {
+        $q->whereHas('program', function ($q) {
+          $q->where('id', request()->programs);
+        });
+      })->when(request()->has('haspayments'), function ($q) {
+        $q->has('invoices.payments');
+      })->when(request()->has('hasinv'), function ($q) {
+        $q->has('invoices');
+      })->when(request()->has('has-ta-inv'), function ($q) {
+        $q->has('invoices.authorityInvoice');
+      })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function ($q) {
+        try {
+          $date = Carbon::parse(explode(' to ', request()->date_range)[0]);
+          $q->where('start_date', '>=', $date);
+        } catch (\Exception $e) {
+        }
+      })->when(request()->date_range && @explode(' to ', request()->date_range)[1], function ($q) {
+        try {
+          $date = Carbon::parse(explode(' to ', request()->date_range)[1]);
+          $q->where('end_date', '<=', $date);
+        } catch (\Exception $e) {
+        }
+      })->when(request('review_status'), function ($q) {
+        $reviewStatus = request('review_status');
 
-      // Join with reviews table
-      $q->leftJoin('reviews', function ($join) {
+        // Join with reviews table
+        $q->leftJoin('reviews', function ($join) {
           $join->on('reviews.reviewable_id', '=', 'contracts.id')
-               ->where('reviews.reviewable_type', '=', Contract::class);
-      });
+            ->where('reviews.reviewable_type', '=', Contract::class);
+        });
 
-      if ($reviewStatus == 'reviewed') {
+        if ($reviewStatus == 'reviewed') {
           // Filter contracts that have at least one review
           $q->whereNotNull('reviews.id');
-      } elseif ($reviewStatus == 'not_reviewed') {
+        } elseif ($reviewStatus == 'not_reviewed') {
           // Filter contracts that do not have any reviews
           $q->whereNull('reviews.id');
-      }
+        }
 
-      // Remove the reviews table from select to avoid column name conflicts
-      $q->select('contracts.*');
+        // Remove the reviews table from select to avoid column name conflicts
+        $q->select('contracts.*');
       })->when(request('reviewed_by') && request('reviewed_by') !== 'all', function ($q) {
         $q->whereHas('reviews', function ($subQuery) {
-            $subQuery->where('user_id', request('reviewed_by'));
+          $subQuery->where('user_id', request('reviewed_by'));
+        });
+      })->when(request()->contracts, function ($q) {
+        $q->where('contracts.id', request()->contracts);
+      })
+      // does not have access list rule for this admin
+      ->when(request()->has('dnh_acl_rule_for') && request()->dnh_acl_rule_for, function ($q) {
+        $q->whereDoesntHave('program', function ($q) {
+          $q->accessibleByAdmin(request()->dnh_acl_rule_for);
+        })
+          ->whereDoesntHave('directACLRules', function ($q) {
+            $q->where('admin_id', request()->dnh_acl_rule_for);
+          });
       });
-    })->when(request()->contracts, function($q){
-      $q->where('contracts.id', request()->contracts);
-    });
-}
+  }
 
   public function scopeApplyRequestFiltersOLD($q)
   {
@@ -450,70 +449,96 @@ class Contract extends BaseModel
     })->when(request()->companies, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);
     })
-    ->when(request()->search_q, function ($q) {
-      $q->where(function ($q) {
-        $q->where('subject', 'like', '%' . request()->search_q . '%')
-          ->orWhereHas('phases', function ($q) {
-            $q->where('name', 'like', '%' . request()->search_q . '%');
-          });
-      });
-    })->when(request()->contract_type, function ($q) {
+      ->when(request()->search_q, function ($q) {
+        $q->where(function ($q) {
+          $q->where('subject', 'like', '%' . request()->search_q . '%')
+            ->orWhereHas('phases', function ($q) {
+              $q->where('name', 'like', '%' . request()->search_q . '%');
+            });
+        });
+      })->when(request()->contract_type, function ($q) {
         $q->where('type_id', request()->contract_type);
-    })->when(request()->contract_category, function ($q) {
+      })->when(request()->contract_category, function ($q) {
         $q->where('category_id', request()->contract_category);
-    })->when(request()->projects, function ($q) {
-      $q->whereHas('project', function ($q) {
-        $q->where('id', request()->projects);
-      });
-    })->when(request()->programs, function ($q) {
-      $q->whereHas('program', function ($q) {
-        $q->where('id', request()->programs);
-      });
-    })->when(request()->has('haspayments'), function($q){
-      $q->has('invoices.payments');
-    })->when(request()->has('hasinv'), function($q){
-      $q->has('invoices');
-    })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function($q){
-      try {
-        $date = Carbon::parse(explode(' to ', request()->date_range)[0]);
-        $q->where('start_date', '>=', $date);
-      } catch (\Exception $e) {
-      }
-    })->when(request()->date_range && @explode(' to ', request()->date_range)[1], function($q){
-      try {
-        $date = Carbon::parse(explode(' to ', request()->date_range)[1]);
-        $q->where('end_date', '<=', $date);
-      } catch (\Exception $e) {
-      }
-    })->when(request('review_status'), function ($q) {
-      $reviewStatus = request('review_status');
+      })->when(request()->projects, function ($q) {
+        $q->whereHas('project', function ($q) {
+          $q->where('id', request()->projects);
+        });
+      })->when(request()->programs, function ($q) {
+        $q->whereHas('program', function ($q) {
+          $q->where('id', request()->programs);
+        });
+      })->when(request()->has('haspayments'), function ($q) {
+        $q->has('invoices.payments');
+      })->when(request()->has('hasinv'), function ($q) {
+        $q->has('invoices');
+      })->when(request()->date_range && @explode(' to ', request()->date_range)[0], function ($q) {
+        try {
+          $date = Carbon::parse(explode(' to ', request()->date_range)[0]);
+          $q->where('start_date', '>=', $date);
+        } catch (\Exception $e) {
+        }
+      })->when(request()->date_range && @explode(' to ', request()->date_range)[1], function ($q) {
+        try {
+          $date = Carbon::parse(explode(' to ', request()->date_range)[1]);
+          $q->where('end_date', '<=', $date);
+        } catch (\Exception $e) {
+        }
+      })->when(request('review_status'), function ($q) {
+        $reviewStatus = request('review_status');
 
-      // Join with reviews table
-      $q->leftJoin('reviews', function ($join) {
+        // Join with reviews table
+        $q->leftJoin('reviews', function ($join) {
           $join->on('reviews.reviewable_id', '=', 'contracts.id')
-               ->where('reviews.reviewable_type', '=', Contract::class);
-      });
+            ->where('reviews.reviewable_type', '=', Contract::class);
+        });
 
-      if ($reviewStatus == 'reviewed') {
+        if ($reviewStatus == 'reviewed') {
           // Filter contracts that have at least one review
           $q->whereNotNull('reviews.id');
-      } elseif ($reviewStatus == 'not_reviewed') {
+        } elseif ($reviewStatus == 'not_reviewed') {
           // Filter contracts that do not have any reviews
           $q->whereNull('reviews.id');
-      }
+        }
 
-      // Remove the reviews table from select to avoid column name conflicts
-      $q->select('contracts.*');
+        // Remove the reviews table from select to avoid column name conflicts
+        $q->select('contracts.*');
       })->when(request('reviewed_by') && request('reviewed_by') !== 'all', function ($q) {
         $q->whereHas('reviews', function ($subQuery) {
-            $subQuery->where('user_id', request('reviewed_by'));
+          $subQuery->where('user_id', request('reviewed_by'));
+        });
       });
-    });
+  }
+
+  /**
+   * Explicit ACL rules for this contract instead of inherited from program
+   */
+  public function directACLRules()
+  {
+    return $this->hasMany(AdminAccessList::class, 'accessable_id', 'id')->where('accessable_type', self::class);
+  }
+
+  public function scopeHasAccessListOfAdmin($q, $admin_id)
+  {
+    $q->whereHas('program', function ($q) use ($admin_id) {
+      $q->accessibleByAdmin($admin_id);
+    })
+      ->orWhereHas('directACLRules', function ($q) use ($admin_id) {
+        $q->where('admin_id', $admin_id);
+      })
+      ->with([
+        'program.pivotAccessLists' => function ($q) use ($admin_id) {
+          $q->where('admin_id', $admin_id);
+        },
+        'directACLRules' => function ($q) use ($admin_id) {
+          $q->where('admin_id', $admin_id);
+        }
+      ]);
   }
 
   public function reviews()
   {
-      return $this->morphMany(Review::class, 'reviewable');
+    return $this->morphMany(Review::class, 'reviewable');
   }
 
   public function category(): BelongsTo
@@ -723,7 +748,7 @@ class Contract extends BaseModel
     });
   }
 
-    /*
+  /*
   * This string will be used in notifications on what a new comment
   * was made.
   */

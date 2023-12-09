@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\ContractType;
+use App\Models\Program;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -28,6 +29,7 @@ class ContractFactory extends Factory
     return [
       'type_id' => ContractType::inRandomOrder()->first()->id,
       'project_id' => $this->faker->boolean() ?  Project::inRandomOrder()->first()->id : null,
+      'program_id' => Program::inRandomOrder()->first()->id,
       'assignable_type' => Company::class, //$assignToNone ? null : ($assignToCompany ? Company::class : Client::class),
       'assignable_id' =>  Company::inRandomOrder()->first()->id, // $assignToNone? null : ($assignToCompany ? Company::inRandomOrder()->first()->id : Client::inRandomOrder()->first()->id),
       'refrence_id' => $this->faker->unique()->sentence(),

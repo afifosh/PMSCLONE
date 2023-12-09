@@ -258,9 +258,9 @@ class Invoice extends Model
   public function reCalculateTotal(): void
   {
     if ($this->type == 'Partial Invoice' || $this->type == 'Down Payment') {
-      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum('total') / 1000;
+      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum(DB::raw('total + total_amount_adjustment')) / 1000;
     } else if ($this->type == 'Regular') {
-      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum('total') / 1000;
+      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum(DB::raw('total + total_amount_adjustment')) / 1000;
     }
 
     // Sumary Tax Calculation. Inline Tax is settled in each item's total
@@ -645,7 +645,7 @@ class Invoice extends Model
           'total' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_cost'),
           'rounding_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('rounding_amount'),
           'subtotal_amount_adjustment' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('subtotal_amount_adjustment'),
-          'total_amount_adjustment' =>$pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_amount_adjustment'),
+          'total_amount_adjustment' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_amount_adjustment'),
         ]; // convert to cents manually, setter is not working for pivot table
       }
 
@@ -824,7 +824,9 @@ class Invoice extends Model
    */
   public function totalDeductedAmount($downpayment_id = null)
   {
-    return InvoiceDeduction::where(function ($q) {
+    $currency = $this->contract->currency;
+
+    $deductedAmounts = InvoiceDeduction::where(function ($q) {
       $q->where('deductible_type', Invoice::class)
         ->where('deductible_id', $this->id);
     })->orWhere(function ($q) {
@@ -836,7 +838,21 @@ class Invoice extends Model
       ->when($downpayment_id, function ($q) use ($downpayment_id) {
         $q->where('downpayment_id', $downpayment_id);
       })
-      ->sum(DB::raw('COALESCE(NULLIF(TRUNCATE(manual_amount/1000, 2), 0), TRUNCATE(amount/1000, 2))'));
+      ->when($this->type == 'Partial Invoice', function ($q) {
+        $q->where(function ($q) {
+          $q->whereHasMorph('deductible', [InvoiceItem::class], function ($q) {
+            $q->where('invoiceable_type', CustomInvoiceItem::class);
+          })->orWhere('deductible_type', self::class);
+        });
+      })
+      ->select(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)/1000 as deducted_amount'))
+      ->get();
+
+    // return sum of each rounded amount by cMoney() helper function
+
+    return $deductedAmounts->sum(function ($item) use ($currency) {
+      return cMoney($item->deducted_amount, $currency)->getAmount(true);
+    });
   }
 
   /**

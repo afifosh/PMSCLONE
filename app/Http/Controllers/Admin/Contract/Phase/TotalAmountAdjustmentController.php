@@ -32,7 +32,7 @@ class TotalAmountAdjustmentController extends Controller
 
     try {
       $phase->update([
-        'total_amount_adjustment' => moneyToInt($request->adjuted_total_amount - $phase_total),
+        'total_amount_adjustment' => $request->adjuted_total_amount - $phase_total,
       ]);
 
       $phase->syncUpdateWithInvoices();

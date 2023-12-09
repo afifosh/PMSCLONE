@@ -17,19 +17,24 @@ $configData = Helper::appClasses();
     position: relative !important;
   }
   .treeselect-list__item--checked .treeselect-list__item-checkbox-container, .treeselect-list__item--partial-checked .treeselect-list__item-checkbox-container {
-   background-color: #cd545b !important;
-  }
-  .treeselect-list__item--checked {
-    background-color: #ff959ab2 !important;
+   background-color: var(--bs-primary) !important;
   }
 
-  .treeselect-list .treeselect-list__item--focused {
-    background-color: #ff959ab2 !important;
-  }
-  .treeselect-input__tags-element {
-  background-color: #cd545b !important;
+  /* check item bg */
+  /* .treeselect-list__item--checked {
+    background-color: var(--bs-primary) !important;
+  } */
+
+  /* on hover of list item */
+  /* .treeselect-list .treeselect-list__item--focused {
+    background-color: var(--bs-primary) !important;
+  } */
+
+  /* tags in input */
+  /* .treeselect-input__tags-element {
+  background-color: var(--bs-primary) !important;
   color: #fff !important;
-  }
+  } */
 </style>
 @endsection
 
@@ -67,6 +72,27 @@ $configData = Helper::appClasses();
       $('#acl-create-form .accessible-programs-input').val(e.detail);
     })
   }
+
+  function initProgramACLEditTreeSelect(params)
+  {
+    const domElement = document.querySelector('.acl-create-treeselect')
+    const treeselect = new Treeselect({
+      parentHtmlContainer: domElement,
+      value: params.selected_programs,
+      options: params.programs_tree,
+      isIndependentNodes: true,
+      showCount: true,
+      openLevel: 150,
+      alwaysOpen: true,
+      staticList: true,
+    })
+
+    $('#acl-create-form .accessible-programs-input').val(params.selected_programs);
+
+    treeselect.srcElement.addEventListener('input', (e) => {
+      $('#acl-create-form .accessible-programs-input').val(e.detail);
+    })
+  }
 </script>
 @endsection
 
@@ -87,6 +113,23 @@ $configData = Helper::appClasses();
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>
     <script>
+      function revokeContractAccess(admin_id, contract_id){
+        // create a button element with data-toggle="confirm-action" and click it with jquery
+        var button = $('<button type="button" class="d-none" data-toggle="confirm-action" data-confirmation-desc="Are you sure to revoke this access?" data-href="' + route('admin.admin-access-lists.contracts.revoke-access', {admin_access_list: admin_id, contract: contract_id}) + '"></button>');
+        // append the button to the body
+        $('body').append(button);
+        // click the button
+        button.click();
+      }
+
+      function revokeProgramAccess(admin_id, program_id)
+      {
+        var button = $('<button type="button" class="d-none" data-toggle="confirm-action" data-confirmation-desc="Are you sure to revoke this access?" data-href="' + route('admin.admin-access-lists.programs.revoke-access', {admin_access_list: admin_id, program: program_id}) + '"></button>');
+        // append the button to the body
+        $('body').append(button);
+        // click the button
+        button.click();
+      }
       $(document).ready(function() {
         // Variable to track the currently expanded row
         var expandedRow = null;
@@ -138,37 +181,113 @@ $configData = Helper::appClasses();
               });
           }
 
-          var childTableId = 'programs-child-table-' + user_id;
-          var childTable = row.child('<table id="' + childTableId + '" class="display table dataTable" style="" width="100%"></table>').show();
+
+          // 1st Row - For the pills
+          var pills = `
+              <tr class="child-row-added">
+                  <td colspan="100%">
+                      <ul class="nav nav-pills mt-3 mb-3" role="tablist">
+                          <li class="nav-item" role="presentation">
+                              <button type="button" onClick="$('#programs-child-table-${user_id}').DataTable().ajax.reload(null, false)" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#programs-table-${user_id}" aria-controls="programs-table-${user_id}" aria-selected="false">Programs</button>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                              <button type="button" onClick="$('#child-table-${user_id}').DataTable().ajax.reload(null, false)" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#child-contracts-${user_id}" aria-controls="child-contracts-${user_id}" aria-selected="true">Contracts</button>
+                          </li>
+                      </ul>
+                  </td>
+              </tr>`;
+
+          row.child(pills).show();
+
+          // 2nd Row - For the content
           var content = `
-          <tr class="child-row-added p-0">
-              <td class="p-0" colspan="100%">
-                      <div class="" id="child-phases-${user_id}">
-                          <!-- Phases content here -->
-                          <!-- This is where your child table (Datatable) will go -->
-                          <table class="table" id="programs-child-table-${user_id}"></table>
+              <tr class="child-row-added p-0">
+                  <td class="p-0" colspan="100%">
+                      <div class="tab-content">
+                          <div class="tab-pane fade show active" id="programs-table-${user_id}" role="tabpanel" aria-labelledby="programs-table-tab-${user_id}">
+                              <table class="table"  id="programs-child-table-${user_id}"></table>
+                          </div>
+                          <div class="tab-pane fade" id="child-contracts-${user_id}" role="tabpanel" aria-labelledby="child-contracts-tab-${user_id}">
+                              <table class="table" id="child-table-${user_id}"></table>
+                          </div>
                       </div>
-              </td>
-          </tr>
+                  </td>
+              </tr>
           `;
+
+          // Insert the content row after the pills row
+          // $(row.node()).next().after(content);
+
           var contentRow = $(content);
           contentRow.addClass("custom-content-row");
-          contentRow.css("background-color", "#f9f9f9");
+          contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
           $(row.node()).next().after(contentRow);
-          var childTableId = "programs-child-table-" + user_id;
+          // Insert the content row after the pills row
+          //  $(row.node()).after(content);
+          var childTableId = "child-table-" + user_id;
+
+          // Programs DataTable
+          $('#programs-child-table-' + user_id).DataTable({
+              processing: true,
+              serverSide: true,
+              ajax: route('admin.admin-access-lists.programs.index', { admin_access_list: user_id }),
+              columns: [
+                { data: "id", "name": "programs.id", title: 'ID' },
+                { data: "name", "name": "programs.name", title: 'Program Name' },
+                { data: "granted_till", title: 'Granted Till' },
+                { data: "status", title: 'Status' },
+                { data: "actions", title: 'Actions', orderable: false, searchable: false }
+              ],
+              buttons : [
+                {
+                  text: 'Add Program',
+                  className: 'btn btn-primary',
+                  attr: {
+                      'data-toggle': 'ajax-modal',
+                      'data-title': 'Add Program',
+                      'data-href': route('admin.admin-access-lists.programs.create', { admin_access_list: user_id })
+                  }
+                }
+              ],
+              destroy: true,
+              dom: 'Blfrtip',
+              // Add more DataTable options if required
+          });
+
           $('#' + childTableId).DataTable({
             processing: true,
-          serverSide: true,
-          ajax: route('admin.admin-access-lists.programs.index', { admin_access_list: user_id }),
-          columns: [
-            { data: "id", "name": "programs.id", title: 'ID' },
-            { data: "name", "name": "programs.name", title: 'Program Name' },
-            { data: "granted_till", title: 'Granted Till' },
-            { data: "actions", title: 'Actions', orderable: false, searchable: false }
-          ],
-          buttons: [],
-          destroy: true,
-          dom: 'Blfrtip',
+            serverSide: true,
+            ajax: route('admin.admin-access-lists.contracts.index', { admin_access_list: user_id }),
+            columns: [
+              { data: "id", "name": "contracts.id", title: 'ID' },
+              { data: "subject", title: 'subject' },
+              { data: "program", title: "Program"},
+              { data: "access_type", title: "Type"},
+              { data: "granted_till", title: 'Granted Till' },
+              { data: "status", title: 'Status' },
+              { data: "actions", title: 'Actions', orderable: false, searchable: false }
+            ],
+            destroy: true,
+            dom: 'Blfrtip',
+            buttons: [
+              {
+                text: 'Add Contract',
+                className: 'btn btn-primary',
+                attr: {
+                    'data-toggle': 'ajax-modal',
+                    'data-title': 'Add Contract Access Rule',
+                    'data-href': route('admin.admin-access-lists.contracts.create', { admin_access_list: user_id })
+                }
+              }
+            ],
+            initComplete: function() {
+              // Move the buttons container near the search bar
+              // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
+            },
+            drawCallback: function(settings) {
+              $('[data-bs-toggle="tooltip"]').tooltip('dispose'); // Dispose of any existing tooltips to prevent potential issues
+              $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
+            }
           });
         }
       });

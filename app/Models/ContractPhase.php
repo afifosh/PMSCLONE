@@ -76,7 +76,7 @@ class ContractPhase extends BaseModel
 
   public function getTotalCostAttribute($value)
   {
-    return ($value + $this->total_amount_adjustment) / 1000;
+    return ($value) / 1000 + $this->total_amount_adjustment;
   }
 
   public function setTotalCostAttribute($value)

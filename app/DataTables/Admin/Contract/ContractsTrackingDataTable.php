@@ -49,19 +49,11 @@ class ContractsTrackingDataTable extends DataTable
         return view('admin._partials.sections.user-avatar-group', ['users' => $users, 'limit' => 5]);
       })
       ->addColumn('reviews_completed', function ($contract) {
-        $users = $contract->getAdminsWhoReviewedContract();
+        $users = $contract->reviewedBy;
         if ($users->isEmpty()) {
           return "N/A";
-      }
+        }
         return view('admin._partials.sections.user-avatar-group', ['users' => $users, 'limit' => 5]);
-      })
-      ->addColumn('reviewed_by', function ($contract) {
-        $reviewers = $contract->reviews;
-
-        if ($reviewers->isEmpty()) {
-          return "N/A";
-      }
-        return view('admin._partials.sections.user-avatar-group', ['users' => $reviewers, 'limit' => 5]);
       })
       ->addColumn('assigned_to', function ($project) {
         if ($project->assignable instanceof Company) {
@@ -95,7 +87,7 @@ class ContractsTrackingDataTable extends DataTable
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
         });
       })
-      ->rawColumns(['id', 'program.name','reviewed_by','reviews_completed','incomplete_reviewers']);
+      ->rawColumns(['id', 'program.name','reviews_completed','incomplete_reviewers']);
   }
 
 /**
@@ -218,12 +210,11 @@ public function query(Contract $model): QueryBuilder
     return [
       // Column::make('contracts.id')->title('Contract'),
     Column::make('subject')->title('Subject'),
-      Column::make('program.name')->name('programs.name')->title('Program'),
+      // Column::make('program.name')->name('programs.name')->title('Program'),
       // Column::make('refrence_id')->title('Ref ID'),
-      Column::make('assigned_to')->title('Assigned To'),
+      // Column::make('assigned_to')->title('Assigned To'),
       Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
-  //    Column::make('reviewed_by')->title('Reviewed By'),
       Column::make('incomplete_reviewers')->title('Incomplete Reviewers'),
       Column::make('reviews_completed')->title('Reviews Completed'),
       Column::make('start_date'),

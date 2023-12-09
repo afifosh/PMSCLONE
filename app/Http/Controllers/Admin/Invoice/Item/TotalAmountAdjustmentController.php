@@ -32,10 +32,12 @@ class TotalAmountAdjustmentController extends Controller
 
     try{
       $invoiceItem->update([
-        'total_amount_adjustment' => moneyToInt($request->adjuted_total_amount - $item_total),
+        'total_amount_adjustment' => $request->adjuted_total_amount - $item_total,
       ]);
 
       $invoiceItem->syncUpdateWithPhase();
+
+      $invoiceItem->invoice->reCalculateTotal();
 
       DB::commit();
 

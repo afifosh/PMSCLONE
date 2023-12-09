@@ -66,7 +66,7 @@ class InvoiceItem extends Model
 
   public function getTotalAttribute($value)
   {
-    return (($value + $this->total_amount_adjustment) / 1000) + $this->rounding_amount;
+    return ($value / 1000) + $this->total_amount_adjustment + $this->rounding_amount;
   }
 
   public function setTotalAttribute($value)

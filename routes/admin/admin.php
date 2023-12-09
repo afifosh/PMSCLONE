@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AccessList\AdminAccessListContractController;
 use App\Http\Controllers\Admin\AccessList\AdminAccessListController;
 use App\Http\Controllers\Admin\AccessList\AdminAccessListProgramController;
 use App\Http\Controllers\AppsController;
@@ -517,8 +518,11 @@ Route::prefix('contracts')->group(function () {
     Route::resource('invoice-doc-controls', DocControlController::class);
     Route::resource('invoices.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
     Route::resource('invoices.uploaded-documents', UploadedDocumentController::class);
+    Route::post('admin-access-lists/{admin_access_list}/programs/{program}/revoke', [AdminAccessListProgramController::class, 'revoke'])->name('admin-access-lists.programs.revoke-access');
+    Route::post('admin-access-lists/{admin_access_list}/contracts/{contract}/revoke', [AdminAccessListContractController::class, 'revoke'])->name('admin-access-lists.contracts.revoke-access');
     Route::resource('admin-access-lists', AdminAccessListController::class);
     Route::resource('admin-access-lists.programs', AdminAccessListProgramController::class);
+    Route::resource('admin-access-lists.contracts', AdminAccessListContractController::class);
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

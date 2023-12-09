@@ -504,4 +504,62 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
         return $stagesReviewStatus->toArray();
     }
 
+    /**
+     * Get the ACL rules for the admin.
+     */
+    public function ACLRules()
+    {
+      return $this->hasMany(AdminAccessList::class, 'admin_id', 'id');
+    }
+
+    /**
+     * admins which can review the given contract (not revked nor expired)
+     */
+    public function scopeCanReviewContract($q, $contract_id, $program_id)
+    {
+      $q->whereHas('ACLRules', function ($q) use ($contract_id) {
+        $q->where('accessable_id', $contract_id)
+            ->where('accessable_type', Contract::class)
+            ->where('is_revoked', false)
+            ->where(function ($q) {
+                $q->where('granted_till', '>=', now())
+                    ->orWhereNull('granted_till');
+            });
+      })->orWhere(function ($q) use ($program_id, $contract_id) {
+        $q->whereHas('ACLRules', function ($q) use ($program_id) {
+          $q->where('accessable_id', $program_id)
+            ->where('accessable_type', Program::class)
+            ->where('is_revoked', false)
+            ->where(function ($q) {
+              $q->where('granted_till', '>=', now())
+                ->orWhereNull('granted_till');
+            });
+        })->whereDoesntHave('ACLRules', function ($q) use ($contract_id) {
+          $q->where('accessable_id', $contract_id)
+            ->where('accessable_type', Contract::class)->where(function ($q) {
+              $q->where('is_revoked', true)
+                ->orWhere(function ($q){
+                  $q->where('granted_till', '<', now())
+                    ->whereNotNull('granted_till');
+                });
+          });
+        });
+      });
+    }
+
+    public function addedReviews()
+    {
+      return $this->hasMany(Review::class, 'user_id', 'id');
+    }
+
+    /**
+     * Admins who added review for the given contract
+     */
+    public function scopeWhoReviewedContract($q, $contract_id)
+    {
+      $q->whereHas('addedReviews', function ($q) use ($contract_id) {
+        $q->where('reviewable_id', $contract_id)
+          ->where('reviewable_type', Contract::class);
+      });
+    }
 }
