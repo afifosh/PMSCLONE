@@ -84,123 +84,6 @@ class Contract extends BaseModel
     return $this->value - $this->phases->sum('total_cost');
   }
 
-
-  public function usersWhoCompletedAllPhases()
-  {
-    // // Retrieve the total number of phases for this contract.
-    // $totalPhases = $this->phases()->count();
-
-    // // Subquery to get user IDs and their count of distinct reviewed phases.
-    // // Note that we need the fully qualified class name for `reviewable_type`.
-    // $subQuery = Review::select('user_id')
-    //     ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-    //     ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
-    //     ->whereIn('reviewable_id', $this->phases()->pluck('id'))
-    //     ->groupBy('user_id')
-    //     ->havingRaw('phases_count = ?', [$totalPhases]); // use havingRaw to filter users who reviewed all phases
-
-    // // Main query to get admins who have completed all phases.
-    // // Join the subquery to filter users based on the phases count.
-    // $adminsWhoCompletedAllPhases = Admin::select('admins.*')
-    //     ->joinSub($subQuery, 'reviewed_phases', function ($join) {
-    //         $join->on('admins.id', '=', 'reviewed_phases.user_id');
-    //     })
-    //     ->get();
-
-    // Calculate the total number of phases for the current object
-    $totalPhases = $this->phases()->count();
-
-    // Subquery to get user IDs and their count of distinct reviewed phases.
-    // We ensure the reviews are only for the specific phases related to the current object.
-    $subQuery = Review::select('user_id')
-      ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-      ->where('reviewable_type', get_class($this->phases()->getRelated())) // Ensure we're looking at the correct reviewable type
-      ->whereIn('reviewable_id', $this->phases()->pluck('id')->toArray()) // Select only reviews for these phase IDs
-      ->groupBy('user_id') // Group the results by user ID
-      ->having('phases_count', $totalPhases); // Filter to users who reviewed all phases
-
-    // You can now use the $subQuery to get the users who have reviewed all phases.
-    // For example, you might want to get these users:
-    $adminsWhoCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
-
-    return $adminsWhoCompletedAllPhases;
-  }
-
-  public function usersWhoNotCompletedAllPhases()
-  {
-    // // Retrieve the total number of phases for this contract.
-    // $totalPhases = $this->phases()->count();
-
-    // // Subquery to get user IDs and their count of distinct reviewed phases.
-    // // Note that we need the fully qualified class name for `reviewable_type`.
-    // $subQuery = Review::select('user_id')
-    //     ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-    //     ->where('reviewable_type', get_class($this->phases()->getRelated())) // assuming 'phases' is the name of the relation method
-    //     ->whereIn('reviewable_id', $this->phases()->pluck('id'))
-    //     ->groupBy('user_id');
-
-    // // Main query to get admins who have NOT completed all phases.
-    // // We are doing a LEFT JOIN here with the users table and filtering out the ones that have a phases_count equal to totalPhases.
-    // $adminsWhoNotCompletedAllPhases = Admin::select('admins.*')
-    //     ->leftJoinSub($subQuery, 'reviewed_phases', function ($join) {
-    //         $join->on('admins.id', '=', 'reviewed_phases.user_id');
-    //     })
-    //     // We use 'whereRaw' here to add a SQL raw where clause, checking if phases_count is not the total or there's no review (NULL).
-    //     ->whereRaw('(reviewed_phases.phases_count IS NULL OR reviewed_phases.phases_count < ?)', [$totalPhases])
-    //     ->get();
-
-    // Calculate the total number of phases for the current object
-    $totalPhases = $this->phases()->count();
-
-    // Subquery to get user IDs and their count of distinct reviewed phases
-    // for the specific phases related to the current object.
-    $subQuery = Review::select('user_id')
-      ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-      ->where('reviewable_type', get_class($this->phases()->getRelated())) // Check against the correct reviewable type
-      ->whereIn('reviewable_id', $this->phases()->pluck('id')->toArray()) // Only select reviews for these phase IDs
-      ->groupBy('user_id') // Group the results by user ID
-      ->having('phases_count', '<', $totalPhases); // Filter to users who have NOT reviewed all phases
-
-    // Now, get only the admins who have not reviewed all phases.
-    $adminsWhoNotCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
-
-    return $adminsWhoNotCompletedAllPhases;
-  }
-
-  public function getAdminsWhoDidNotReviewAnyPhase()
-  {
-    // Get IDs of all phases associated with this contract's program
-    $phaseIds = $this->phases()->pluck('id');
-
-    // Check if there are any phases; if not, return an empty collection
-    if ($phaseIds->isEmpty()) {
-      return collect();
-    }
-
-    // Get query for all admin user IDs associated with this contract's program
-    $programAdminIdsQuery = AdminAccessList::ofProgram($this->program_id)
-      ->select('admin_id');
-
-    // Get query for all admin user IDs who have made a review for any of the phase IDs
-    $adminsWhoMadeReviewsQuery = Review::whereIn('reviewable_id', $phaseIds)
-      ->where('reviewable_type', get_class($this->phases()->getRelated()))
-      ->select('user_id')
-      ->distinct();
-
-    // Check if there are admins associated with the program; if not, return an empty collection
-    if (!$programAdminIdsQuery->exists()) {
-      return collect();
-    }
-
-    // Get the list of admin users who have not made any review entries for any phase of this contract's program
-    $adminsWithoutReviews = Admin::whereNotIn('id', $adminsWhoMadeReviewsQuery)
-      ->whereIn('id', $programAdminIdsQuery)
-      ->get();
-
-    return $adminsWithoutReviews;
-  }
-
-
   public function getAllUsersStagesReviewStatusWithlastReviewDate()
   {
     // Assuming the Contract model has a 'stages' relationship that contains many ContractStage
@@ -236,43 +119,12 @@ class Contract extends BaseModel
     return $allUsersStagesStatus;
   }
 
-  public function getAdminsWhoDidNotCompleteOrDidNotReviewAnyPhase()
+  /**
+   * All The admins which can review this contract (having active ACL)
+   */
+  public function canReviewedBy()
   {
-    // Get a collection of admins who have not reviewed any phase
-    $adminsWithoutAnyReviews = $this->getAdminsWhoDidNotReviewAnyPhase();
-
-    // Get a collection of admins who have not completed all phases
-    $adminsWhoDidNotCompleteAllPhases = $this->usersWhoNotCompletedAllPhases();
-
-    // Combine the two collections and remove duplicates to get a list of unique admins
-    $combinedAdmins = $adminsWithoutAnyReviews->merge($adminsWhoDidNotCompleteAllPhases)->unique('id');
-
-    return $combinedAdmins;
-  }
-
-  public function getAllUsersFromProgramAndParentProgram()
-  {
-    if (!$this->program) return collect();
-
-    return $this->program->users;
-  }
-
-  public function getAdminsWhoDidNotReviewContract()
-  {
-    // Get the IDs of admin users who have made reviews for this contract
-    $adminUserIds = Review::where('reviewable_id', $this->id)
-      ->where('reviewable_type', Contract::class)
-      ->distinct()
-      ->pluck('user_id')
-      ->toArray();
-
-    // Get all users from the program and parent program
-    $allUsers = $this->getAllUsersFromProgramAndParentProgram();
-
-    // Filter and return only the admin users from the list of all users
-    $adminsWhoReviewed = $allUsers->whereNotIn('id', $adminUserIds);
-
-    return $adminsWhoReviewed->values();
+    return Admin::canReviewContract($this->id, $this->program_id);
   }
 
   /**
@@ -282,6 +134,36 @@ class Contract extends BaseModel
   {
     return $this->belongsToMany(Admin::class, 'reviews', 'reviewable_id', 'user_id')
       ->where('reviewable_type', self::class);
+  }
+
+  /**
+   * Users who reviewed all the phases of this contract
+   */
+  public function usersCompletedPhasesReview()
+  {
+    $phases_count = $this->phases()->count();
+
+    return Admin::whereHas('addedReviews', function ($q) {
+      $q->where('reviewable_type', ContractPhase::class)->whereHas('phase', function ($q) {
+        $q->where('contract_id', $this->id);
+      });
+    }, '>=', $phases_count)
+      ->when($phases_count == 0, function ($q) {
+        $q->where('id', 0); // just to return empty collection
+      });
+  }
+
+  /**
+   * Get logged in user's review progress (%) based on phases of this contract.
+   */
+  public function myPhasesReviewProgress()
+  {
+    $totalPhases = $this->phases()->count();
+    $myPhases = $this->phases()->whereHas('reviews', function ($q) {
+      $q->where('user_id', auth()->id());
+    })->count();
+
+    return $myPhases / $totalPhases * 100;
   }
 
   public function getStatusAttribute()
@@ -518,6 +400,62 @@ class Contract extends BaseModel
     return $this->hasMany(AdminAccessList::class, 'accessable_id', 'id')->where('accessable_type', self::class);
   }
 
+  /**
+   * Explicit ACL rules for this contract instead of inherited from program and not expired or revoked
+   */
+  public function validDirectACLRules()
+  {
+    return $this->hasMany(AdminAccessList::class, 'accessable_id', 'id')
+      ->where('accessable_type', self::class)
+      ->where('is_revoked', false)
+      ->where(function ($q) {
+        $q->whereNull('granted_till')
+          ->orWhere('granted_till', '>=', now());
+      });
+  }
+
+  /**
+   * Explicit ACL rules for this contract instead of inherited from program and expired or revoked
+   */
+  public function invalidDirectACLRules()
+  {
+    return $this->hasMany(AdminAccessList::class, 'accessable_id', 'id')
+      ->where('accessable_type', self::class)
+      ->where(function ($q) {
+        $q->where('granted_till', '<', now())
+          ->orWhere('is_revoked', true);
+      });
+  }
+
+
+
+  /**
+   * ACL rules inherited from program
+   */
+  public function programACLRules()
+  {
+    return $this->hasMany(AdminAccessList::class, 'accessable_id', 'program_id')->where('accessable_type', Program::class);
+  }
+
+  /**
+   * ACL rules inherited from program and not expired or revoked
+   */
+  public function validProgramACLRules()
+  {
+    return $this->hasMany(AdminAccessList::class, 'accessable_id', 'program_id')
+      ->where('accessable_type', Program::class)
+      ->where('is_revoked', false)
+      ->where(function ($q) {
+        $q->whereNull('granted_till')
+          ->orWhere('granted_till', '>=', now());
+      });
+  }
+
+  /**
+   * Contracts which have ACL rules for this admin
+   * @param $admin_id int
+   * @return QueryBuilder
+   */
   public function scopeHasAccessListOfAdmin($q, $admin_id)
   {
     $q->whereHas('program', function ($q) use ($admin_id) {
@@ -534,6 +472,24 @@ class Contract extends BaseModel
           $q->where('admin_id', $admin_id);
         }
       ]);
+  }
+
+  /**
+   * Contracts which have Active ACL rule for the given admin and not expired or revoked
+   */
+  public function scopeValidAccessibleByAdmin($q, $admin_id)
+  {
+    $q->where(function ($q) use ($admin_id) {
+      $q->whereHas('validProgramACLRules', function ($q) use ($admin_id) {
+        $q->where('admin_id', $admin_id);
+      })
+        ->orWhereHas('validDirectACLRules', function ($q) use ($admin_id) {
+          $q->where('admin_id', $admin_id);
+        });
+    })
+    ->whereDoesntHave('invalidDirectACLRules', function ($q) use ($admin_id) {
+      $q->where('admin_id', $admin_id);
+    });
   }
 
   public function reviews()

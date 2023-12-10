@@ -254,6 +254,15 @@ class ContractPhase extends BaseModel
     return $this->morphMany(Review::class, 'reviewable');
   }
 
+  /**
+   * Admins who reviewed this phase
+   */
+  public function reviewdByAdmins()
+  {
+    return $this->belongsToMany(Admin::class, 'reviews', 'reviewable_id', 'user_id')
+      ->where('reviewable_type', self::class);
+  }
+
   public function stage(): BelongsTo
   {
     return $this->belongsTo(ContractStage::class);

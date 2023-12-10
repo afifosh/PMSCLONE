@@ -15,5 +15,6 @@
       @break
       @endif
     @empty
+     N/A
     @endforelse
 </ul>

@@ -109,7 +109,7 @@ class ProjectPhaseController extends Controller
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create-form', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
     }
 
-    $userHasMarkedComplete = $phase->reviews->contains('user_id', auth()->id());
+    $userHasMarkedComplete = $phase->reviewdByAdmins()->where('admins.id', auth()->id())->exists();
     $buttonLabel = $userHasMarkedComplete ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
     $buttonIcon = $userHasMarkedComplete ? 'ti-undo' : 'ti-bell';
     $reviewStatus = $userHasMarkedComplete ? 'true' : 'false';
