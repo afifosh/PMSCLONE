@@ -6,7 +6,7 @@
   @if($tab != 'tax-report' && $is_editable)
     <td>
       <a data-toggle="ajax-delete" data-href="{{ route('admin.invoices.invoice-items.taxes.destroy', [$invoice, 'invoice_item' => $item->id, 'tax' => $tax->pivot->id]) }}"><i class="ti ti-trash"></i></a>
-      <a data-toggle="ajax-modal" onclick="editItemTax({{$item->invoice_id}}, {{$item->id}}, {{$tax->pivot->id}}, this)"><i class="ti ti-pencil"></i></a>
+      <a onclick="editItemTax({{$item->invoice_id}}, {{$item->id}}, {{$tax->pivot->id}}, this)"><i class="ti ti-pencil"></i></a>
     </td>
   @endif
   <!--description-->

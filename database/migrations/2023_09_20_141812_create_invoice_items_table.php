@@ -19,6 +19,9 @@ return new class extends Migration
       $table->bigInteger('subtotal')->default(0)->comment('Amount without tax');
       $table->bigInteger('total_tax_amount')->default(0);
       $table->bigInteger('total')->default(0);
+      // subtotal = ($this->deduction->is_before_tax) ? $this->subtotal - $this->deduction->amount : $item->subtotal + $this->total_tax_amount;
+      $table->integer('subtotal_amount_adjustment')->default(0);
+      $table->integer('total_amount_adjustment')->default(0);
       $table->bigInteger('authority_inv_total')->default(0);
       $table->integer('rounding_amount')->default(0);
       $table->unsignedInteger('order')->default(0);

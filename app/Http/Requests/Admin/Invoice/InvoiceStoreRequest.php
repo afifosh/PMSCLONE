@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\Invoice;
 
+use App\Models\Contract;
 use Illuminate\Foundation\Http\FormRequest;
 
 class InvoiceStoreRequest extends FormRequest
@@ -81,7 +82,7 @@ class InvoiceStoreRequest extends FormRequest
       'type' => 'required|in:Regular,Down Payment,Partial Invoice',
       'subtotal' => 'nullable|required_if:type,Down Payment|numeric'.(request()->type == 'Down Payment' ? '|gt:0' : ''),
       'description' => 'nullable|required_if:type,Down Payment|string|max:255',
-      'company_id' => 'required|exists:companies,id',
+      'company_id' => 'nullable|exists:companies,id',
       'contract_id' => 'required|exists:contracts,id',
       'invoice_date' => 'required|date',
       'due_date' => 'required|date',

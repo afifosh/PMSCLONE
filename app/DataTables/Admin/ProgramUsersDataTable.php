@@ -23,9 +23,6 @@ class ProgramUsersDataTable extends DataTable
       ->addColumn('user', function ($row) {
         return view('admin._partials.sections.user-info', ['user' => $row->user]);
       })
-      ->editColumn('added_by', function ($row) {
-        return view('admin._partials.sections.user-info', ['user' => $row->grantedBy]);
-      })
       ->addColumn('user_organization', function ($row) {
         return @$row->user->designation->department->company->name ? view('admin._partials.sections.company-avatar', ['company' => @$row->user->designation->department->company]) : '-';
       })
@@ -37,13 +34,8 @@ class ProgramUsersDataTable extends DataTable
           return $q->where('email', 'like', "%" . $keyword . "%");
         });
       })
-      ->filterColumn('added_by', function ($query, $keyword) {
-        return $query->whereHas('grantedBy', function ($q) use ($keyword) {
-          return $q->where('email', 'like', "%" . $keyword . "%");
-        });
-      })
       ->setRowId('id')
-      ->rawColumns(['user', 'added_by', 'action']);
+      ->rawColumns(['user', 'action']);
   }
 
   /**
@@ -58,7 +50,7 @@ class ProgramUsersDataTable extends DataTable
     $query->when(request()->program, function ($query) {
       return $query->ofProgram(request()->program->id);
     });
-    return $query->with(['grantedBy', 'user.designation.department.company']);
+    return $query->with(['user.designation.department.company']);
   }
 
   /**
@@ -111,7 +103,6 @@ class ProgramUsersDataTable extends DataTable
       Column::make('user'),
       Column::make('granted_till'),
       Column::make('user_organization')->title('User Organization'),
-      Column::make('added_by'),
       Column::make('created_at'),
       Column::make('updated_at')
     ];

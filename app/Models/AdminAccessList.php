@@ -16,7 +16,6 @@ class AdminAccessList extends Model
     'accessable_id',
     'accessable_type',
     'granted_till',
-    'granted_by',
     'is_revoked',
   ];
 
@@ -33,14 +32,6 @@ class AdminAccessList extends Model
   public function user()
   {
     return $this->belongsTo(Admin::class, 'admin_id', 'id');
-  }
-
-  /**
-   * The Admin that granted this access
-   */
-  public function grantedBy()
-  {
-    return $this->belongsTo(Admin::class, 'granted_by', 'id');
   }
 
   /**

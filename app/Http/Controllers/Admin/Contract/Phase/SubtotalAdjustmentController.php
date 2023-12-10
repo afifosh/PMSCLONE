@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Controllers\Admin\Contract\Phase;
+
+use App\Http\Controllers\Controller;
+use App\Models\ContractPhase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+
+class SubtotalAdjustmentController extends Controller
+{
+  public function create(ContractPhase $phase)
+  {
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.subtotal-adjustments.create', compact('phase'))->render()]);
+  }
+
+  public function store(ContractPhase $phase, Request $request)
+  {
+    $request->validate([
+      'adjuted_subtotal_amount' => ['required', 'numeric'],
+    ]);
+
+    $phase_subtotal = cMoney($phase->subtotal_row_raw, $phase->contract->currency)->getAmount();
+
+    // adjusted amount should be +- 0.5 difference from total amount
+    if (abs($request->adjuted_subtotal_amount - $phase_subtotal) > 0.5) {
+      throw ValidationException::withMessages(['adjuted_subtotal_amount' => 'Adjusted amount should be between ' . ($phase_subtotal - 0.5) . ' and ' . ($phase_subtotal + 0.5) . '.']);
+    }
+
+    DB::beginTransaction();
+
+    try {
+      $phase->update([
+        'subtotal_amount_adjustment' => ($request->adjuted_subtotal_amount - $phase_subtotal),
+      ]);
+
+      $phase->syncUpdateWithInvoices();
+
+      DB::commit();
+
+      return $this->sendRes('Subtotal amount adjustment added successfully.', ['event' => 'functionCall', 'function' => 'reloadTableAndActivePhase', 'function_params' => json_encode(['phase_id' => $phase->id])]);
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return $this->sendErr($e->getMessage());
+    }
+  }
+}

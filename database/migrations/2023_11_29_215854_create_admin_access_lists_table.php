@@ -15,8 +15,7 @@ return new class extends Migration
       $table->id();
       $table->foreignId('admin_id')->constrained('admins')->onDelete('cascade');
       $table->morphs('accessable');
-      $table->timestamp('granted_till');
-      $table->foreignId('granted_by')->nullable()->constrained('admins')->onDelete('set null');
+      $table->timestamp('granted_till')->nullable()->comment('null means forever');
       $table->boolean('is_revoked')->default(false);
       $table->timestamps();
     });

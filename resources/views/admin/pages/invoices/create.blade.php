@@ -67,7 +67,8 @@
         'id' => 'client_id-select',
         'class' => 'form-select globalOfSelect2Remote dependent-select required',
         'data-placeholder' => 'Select Client',
-        'data-url' => route('resource-select', ['groupedCompany', 'hasContract'])
+        'data-url' => route('resource-select', ['groupedCompany', 'hasContract']),
+        'data-allow-clear' => 'true'
         ]) !!}
     </div>
     {{-- Contract --}}
@@ -78,6 +79,7 @@
         'data-url' => route('resource-select', ['Contract', 'dependent' => 'company_id']),
         'data-placeholder' => 'Select Contract',
         'data-dependent_id' => 'client_id-select',
+        'data-allow-clear' => 'true'
       ]) !!}
     </div>
     {{-- Phase --}}

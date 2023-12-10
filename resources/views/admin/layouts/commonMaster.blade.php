@@ -38,7 +38,7 @@
 
 <body style="overflow-x: hidden;"  class="{{ !empty($body_class) ? $body_class : '' }}">
   <audio id="notificationSound">
-    <source src="{{ getNotificationSound() ? getNotificationSound() : asset('notification.wav')}}" type="audio/mp3">
+    <source src="{{asset('notification.wav')}}" type="audio/mp3">
   </audio>
 
   <!-- Layout Content -->
@@ -75,8 +75,5 @@
         })
     }
   </script>
-  @auth
-    <script src="{{ mix('chat/assets/js/set-user-on-off.js') }}"></script>
-  @endauth
 </body>
 </html>

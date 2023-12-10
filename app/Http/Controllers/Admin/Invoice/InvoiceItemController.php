@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\InvoiceItemsStoreReqeust;
 use App\Http\Requests\Admin\Invoice\InvoiceItemUpdateRequest;
 use App\Models\ContractPhase;
+use App\Models\ContractStage;
 use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -111,21 +112,21 @@ class InvoiceItemController extends Controller
     $data['invoice'] = $invoice;
     $data['invoiceItem'] = $invoiceItem;
     if ($invoiceItem->invoiceable_type == ContractPhase::class) {
-      $invoiceItem->load('invoiceable.stage');
+      $invoiceItem->load('invoiceable.stage', 'invoiceable.contract');
       $data['phases'] = [$invoiceItem->invoiceable_id => $invoiceItem->invoiceable->name];
-      $data['stages'] = [$invoiceItem->invoiceable->stage_id => $invoiceItem->invoiceable->stage->name];
+      $data['stages'] = ContractStage::where('contract_id', $invoiceItem->invoiceable->contract_id)->pluck('name', 'id');
     } else {
       request()->merge(['item' => 'custom']);
     }
 
     $data['is_editable'] = $invoice->isEditable();
 
-    if(request()->type == 'edit-form')
+    if (request()->type == 'edit-form')
       return $this->sendRes('success', [
         'view_data' => view('admin.pages.invoices.items.edit.modal-wrapper', $data)->render(),
       ]);
 
-    if(request()->type == 'reload-modal'){
+    if (request()->type == 'reload-modal') {
       $data['tab'] = request()->tab ?? 'summary';
       return $this->sendRes('success', [
         'view_data' => view('admin.pages.invoices.items.edit.table-wrapper', $data)->render(),
@@ -147,8 +148,16 @@ class InvoiceItemController extends Controller
     try {
       $invoiceItem->update($request->validated());
 
-      if ($invoiceItem->invoiceable_type == CustomInvoiceItem::class)
+      if ($invoiceItem->invoiceable_type == CustomInvoiceItem::class) {
         $invoiceItem->invoiceable->update($request->validated() + ['invoice_id' => $invoice->id]);
+      } elseif ($invoiceItem->invoiceable_type == ContractPhase::class) {
+        $stage = ContractStage::where('id', $request->stage_id)->firstOr(function () use ($invoiceItem, $request) {
+          return ContractStage::create(['contract_id' => $invoiceItem->invoiceable->contract_id, 'name' => $request->stage_id]);
+        });
+
+        $invoiceItem->invoiceable->update(['stage_id' => $stage->id, 'estimated_cost' => $request->subtotal] + $request->validated());
+      }
+
 
       if ($invoiceItem->deduction && $invoiceItem->deduction->is_before_tax) {
         $invoiceItem->recalculateDeductionAmount();

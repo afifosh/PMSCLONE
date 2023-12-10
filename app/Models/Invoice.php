@@ -258,9 +258,9 @@ class Invoice extends Model
   public function reCalculateTotal(): void
   {
     if ($this->type == 'Partial Invoice' || $this->type == 'Down Payment') {
-      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum('total') / 1000;
+      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum(DB::raw('total + total_amount_adjustment')) / 1000;
     } else if ($this->type == 'Regular') {
-      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum('total') / 1000;
+      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum(DB::raw('total + total_amount_adjustment')) / 1000;
     }
 
     // Sumary Tax Calculation. Inline Tax is settled in each item's total
@@ -641,9 +641,11 @@ class Invoice extends Model
           'subtotal' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('estimated_cost'),
           'total_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('tax_amount'),
           // 'manual_tax_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('manual_tax_amount'),
-          'authority_inv_total' => $pivot_amounts->where('id', $phase)->first()->pivotTaxes()->whereIn('category', [2,3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000,
+          'authority_inv_total' => $pivot_amounts->where('id', $phase)->first()->pivotTaxes()->whereIn('category', [2, 3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')),
           'total' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_cost'),
           'rounding_amount' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('rounding_amount'),
+          'subtotal_amount_adjustment' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('subtotal_amount_adjustment'),
+          'total_amount_adjustment' => $pivot_amounts->where('id', $phase)->first()->getRawOriginal('total_amount_adjustment'),
         ]; // convert to cents manually, setter is not working for pivot table
       }
 
@@ -663,7 +665,7 @@ class Invoice extends Model
           ]);
         }
 
-        if($phase->deduction){
+        if ($phase->deduction) {
           $invPhase->deduction()->create([
             'deductible_id' => $invPhase->id,
             'deductible_type' => InvoiceItem::class,
@@ -707,20 +709,61 @@ class Invoice extends Model
    */
   public function totalDeductedAmountFromThisInvoice()
   {
-    return InvoiceDeduction::where('downpayment_id', $this->id)
-      ->select([
-        DB::raw('COALESCE(NULLIF(manual_amount, 0), amount) as total_amount')
-      ])
+    /**
+     * sum of deduction from the phases which are not added in any invoice.
+     * +
+     * sum of deduction from the phases which are in partial invoice. +  sum of deduction from the custom invoice items of partial invoice.
+     * +
+     * sum of deduction from the invoice items of regular invoice.
+     * +
+     * sum of deduction from invoice. which is for summary invoice deduction
+     *
+     */
+    return InvoiceDeduction::Where(function ($q) { //sum of deduction from the phases which are not added in any invoice.
+      $q->where('downpayment_id', $this->id)
+        ->whereHasMorph('deductible', [ContractPhase::class], function ($q) {
+          $q->where('contract_id', $this->contract_id)
+            ->has('addedAsInvoiceItem', 0);
+        });
+    })
+
+      ->orWhere(function ($q) { // sum of deduction from the phases which are in partial invoice. +  sum of deduction from the custom invoice items of partial invoice.
+        $q->where(function ($q) { //sum of deduction from the phases which are in partial invoice
+          $q->where('downpayment_id', $this->id)
+            ->whereHasMorph('deductible', [ContractPhase::class], function ($q) {
+              $q->where('contract_id', $this->contract_id)
+                ->whereHas('addedAsInvoiceItem', function ($q) {
+                  $q->whereHas('invoice', function ($q) {
+                    $q->where('type', 'Partial Invoice');
+                  });
+                });
+            });
+        })->orWhere(function ($q) { //sum of deduction from the custom invoice items of partial invoice.
+          $q->where('downpayment_id', $this->id)
+            ->whereHasMorph('deductible', [InvoiceItem::class], function ($q) {
+              $q->whereHas('invoice', function ($q) {
+                $q->where('type', 'Partial Invoice');
+              })->where('invoiceable_type', CustomInvoiceItem::class);
+            });
+        });
+      })
+
+      ->orWhere(function ($q) { // sum of deduction from the invoice items of regular invoice.
+        $q->where('downpayment_id', $this->id)
+          ->whereHasMorph('deductible', [InvoiceItem::class], function ($q) {
+            $q->whereHas('invoice', function ($q) {
+              $q->where('type', 'Regular');
+            })->where('invoiceable_type', ContractPhase::class);
+          });
+      })
+
+      ->orWhere(function ($q) { // sum of deduction from invoice model. which is for summary invoice deduction
+        $q->where('downpayment_id', $this->id)
+          ->whereHasMorph('deductible', [Invoice::class], function ($q) {
+            $q->where('contract_id', $this->contract_id);
+          });
+      })
       ->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)')) / 1000;
-
-    // $total = 0;
-    // $deductions = InvoiceDeduction::where('downpayment_id', $this->id)->select('amount', 'manual_amount')->get();
-
-    // foreach ($deductions as $deduction) {
-    //   $total += ($deduction->manual_amount != 0 ? $deduction->manual_amount : $deduction->amount);
-    // }
-
-    // return $total;
   }
 
   /**
@@ -777,11 +820,13 @@ class Invoice extends Model
   }
 
   /**
-   * Total amount deducted from this invoice by downpayment deduction weather from invoice or invoice items
+   * Total amount deducted by this invoice (setteled in that invoice) from downpayment invoices.
    */
   public function totalDeductedAmount($downpayment_id = null)
   {
-    return InvoiceDeduction::where(function ($q) {
+    $currency = $this->contract->currency;
+
+    $deductedAmounts = InvoiceDeduction::where(function ($q) {
       $q->where('deductible_type', Invoice::class)
         ->where('deductible_id', $this->id);
     })->orWhere(function ($q) {
@@ -793,10 +838,21 @@ class Invoice extends Model
       ->when($downpayment_id, function ($q) use ($downpayment_id) {
         $q->where('downpayment_id', $downpayment_id);
       })
-      ->select([
-        DB::raw('COALESCE(NULLIF(manual_amount, 0), amount) as total_amount')
-      ])
-      ->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)')) / 1000;
+      ->when($this->type == 'Partial Invoice', function ($q) {
+        $q->where(function ($q) {
+          $q->whereHasMorph('deductible', [InvoiceItem::class], function ($q) {
+            $q->where('invoiceable_type', CustomInvoiceItem::class);
+          })->orWhere('deductible_type', self::class);
+        });
+      })
+      ->select(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)/1000 as deducted_amount'))
+      ->get();
+
+    // return sum of each rounded amount by cMoney() helper function
+
+    return $deductedAmounts->sum(function ($item) use ($currency) {
+      return cMoney($item->deducted_amount, $currency)->getAmount(true);
+    });
   }
 
   /**

@@ -6,15 +6,10 @@ use App\DataTables\Admin\Project\ProjectsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProjectStoreRequest;
 use App\Http\Requests\Admin\ProjectUpdateRequest;
-use App\Models\Admin;
 use App\Models\Company;
-use App\Models\Contract;
 use App\Models\Program;
 use App\Models\Project;
 use App\Models\ProjectCategory;
-use Illuminate\Http\Request;
-use Modules\Chat\Models\Group;
-use Modules\Chat\Repositories\GroupRepository;
 
 class ProjectController extends Controller
 {
@@ -45,34 +40,16 @@ class ProjectController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(ProjectStoreRequest $request, GroupRepository $groupRepository)
+  public function store(ProjectStoreRequest $request)
   {
     $project = Project::create(['is_progress_calculatable' => $request->boolean('is_progress_calculatable')] + $request->validated());
 
     $project->members()->sync(filterInputIds($request->members));
     $project->companies()->sync(filterInputIds($request->companies));
 
-    if ($request->boolean('create_chat_group'))
-      $this->createGroupForProject($project, $groupRepository);
-
     $project->createLog('Project Created', $project->toArray());
 
     return $this->sendRes('Created Successfully', ['event' => 'redirect', 'url' => route('admin.projects.index')]);
-  }
-
-  protected function createGroupForProject(Project $project, GroupRepository $groupRepository)
-  {
-    $group = $groupRepository->storeForProject([
-      'name' => $project->name,
-      'project_id' => $project->id,
-      'description' => $project->description,
-      'group_type' => Group::TYPE_OPEN,
-      'privacy' => Group::PRIVACY_PRIVATE,
-      'created_by' => getLoggedInUserId(),
-      'users' => $project->members->pluck('id')->toArray(),
-    ]);
-
-    return $group;
   }
 
   /**

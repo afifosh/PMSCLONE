@@ -71,8 +71,7 @@ class ProjectTaskController extends Controller
       }
     }
 
-    $chatMessage = auth()->user()->name. ' created a new task: '.$task->subject;
-    broadcast(new ProjectTaskUpdatedEvent($task, 'new_task_added', $chatMessage))->toOthers();
+    broadcast(new ProjectTaskUpdatedEvent($task, 'new_task_added'))->toOthers();
 
     if(request()->from == 'task-board'){
       return $this->sendRes('Task created successfully', ['event' => 'functionCall', 'function' => 'refreshTaskList', 'close' => 'globalModal']);
@@ -137,12 +136,10 @@ class ProjectTaskController extends Controller
     $task->assignees()->sync(remove_null_values($request->assignees));
     $task->followers()->sync(remove_null_values($request->followers));
 
-    $chatMessage = auth()->user()->name. ' updated task: '.$task->subject;
-
     $project->load('tasks');
     if($project->tasks->count() >= 0 && $project->tasks->count() == $project->tasks->where('status', 'Completed')->count())
       $project->update(['status' => 4]);
-    broadcast(new ProjectTaskUpdatedEvent($task, 'summary', $chatMessage))->toOthers();
+    broadcast(new ProjectTaskUpdatedEvent($task, 'summary'))->toOthers();
 
     if(request()->from == 'task-board')
       return $this->sendRes('Task Updated successfully', ['event' => 'functionCall', 'function' => 'refreshTaskList', 'close' => 'globalModal']);

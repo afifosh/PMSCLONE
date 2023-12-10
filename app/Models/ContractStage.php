@@ -184,7 +184,7 @@ class ContractStage extends BaseModel
 
   public function getStageAmountAttribute()
   {
-    return $this->phases->sum('estimated_cost');
+    return $this->phases->sum('total_cost');
   }
 
   public function getStartDateAttribute()

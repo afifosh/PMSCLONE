@@ -22,6 +22,7 @@
 @section('page-script')
 <script src="{{asset('assets/js/custom/flatpickr.js')}}"></script>
 <script src="{{asset('assets/js/custom/select2.js')}}"></script>
+<script src="{{asset('assets/js/custom/admin-invoice-item-update.js')}}"></script>
 <script>
   $(document).on('click', '.edit-downpayment', function(){
     $('.downpayment-row').addClass('d-none');
@@ -187,16 +188,18 @@
 
   <!-- Invoice Actions -->
   <div class="col-lg-3 col-12 invoice-actions">
-    <div class="card mb-4">
-      <div class="card-body">
-        <button class="btn btn-primary d-grid w-100" type="button" data-form="ajax-form">
-          <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Save Invoice</span>
-        </button>
-        <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id])}}">
-          <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
-        </button>
+    @if($invoice->status != 'Paid')
+      <div class="card mb-4">
+        <div class="card-body">
+          <button class="btn btn-primary d-grid w-100" type="button" data-form="ajax-form">
+            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Save Invoice</span>
+          </button>
+          <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id])}}">
+            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
+          </button>
+        </div>
       </div>
-    </div>
+    @endif
   </div>
 </form>
 <div class="mt-3 col-lg-9 col-12">

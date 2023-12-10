@@ -17,6 +17,5 @@ class BroadcastServiceProvider extends ServiceProvider
         Broadcast::routes(['middleware' => ['web', 'auth:admin']]);
 
         require base_path('routes/channels.php');
-        require base_path('Modules/Chat/Routes/Channels.php');
     }
 }

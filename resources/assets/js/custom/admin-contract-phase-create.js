@@ -88,6 +88,36 @@
     });
   }
 
+  function editPhaseSubtotalAmount(phase_id, element)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.phases.subtotal-adjustments.create', { phase: phase_id}),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $(element).closest('tr').after(res.data.view_data);
+      }
+    });
+  }
+
+  function editPhaseTotalAmount(phase_id, element)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.phases.total-amount-adjustments.create', { phase: phase_id}),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $(element).closest('tr').after(res.data.view_data);
+      }
+    });
+  }
+
   function reloadPhaseAddons(phase_id)
   {
     $.ajax({
@@ -95,6 +125,8 @@
       type: "GET",
       success: function(res){
         $('#phase-addons').html(res.data.view_data);
+        // init bs tooltip
+        $('[data-bs-toggle="tooltip"]').tooltip();
       }
     });
   }
@@ -216,6 +248,8 @@
       type: "GET",
       success: function(res){
         $('#phase-addons').html(res.data.view_data);
+        // init bs tooltip
+        $('[data-bs-toggle="tooltip"]').tooltip();
       }
     });
 

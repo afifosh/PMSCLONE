@@ -57,9 +57,8 @@ class TaskBoardController extends Controller
       }
     }
 
-    $chatMessage = auth()->user()->name . ' sorted tasks in project : "' . $project->name . '"';
     $task = Task::where('project_id', $project->id)->first();
-    broadcast(new ProjectTaskUpdatedEvent($task, 'summary', $chatMessage))->toOthers();
+    broadcast(new ProjectTaskUpdatedEvent($task, 'summary'))->toOthers();
 
     return $this->sendRes('success', ['message' => 'Tasks sorted successfully.']);
   }

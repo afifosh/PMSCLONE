@@ -97,7 +97,7 @@ class ItemDeductionController extends Controller
         'dp_rate_id' => $request->dp_rate_id,
         'is_percentage' => $request->is_fixed_amount ? false : ($request->deduction_rate->type != 'Fixed'),
         'amount' => moneyToInt($request->is_fixed_amount ? $request->downpayment_amount : $request->calculated_downpayment_amount),
-        'manual_amount' => $request->manual_deduction_amount,
+        'manual_amount' => moneyToInt($request->manual_deduction_amount),
         'percentage' => $request->deduction_rate->amount ?? 0,
         'is_before_tax' => $request->is_before_tax,
         'calculation_source' => $request->calculation_source,

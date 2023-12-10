@@ -1,5 +1,5 @@
 <tr data-id="{{$item->id}}">
-  @if($tab != 'tax-report')
+  @if($invoice->isEditable() && $tab != 'tax-report')
     <td>
       {{-- <a data-toggle="ajax-delete" data-href="{{ route('admin.invoices.invoice-items.deductions.destroy', [$invoice, 'invoice_item' => $item->id, $item->deduction->id]) }}"><i class="ti ti-trash"></i></a>
       <a data-toggle="ajax-modal" data-title="{{__('Edit Deduction')}}" data-href="{{ route('admin.invoices.invoice-items.deductions.edit', [$invoice, 'invoice_item' => $item->id, $item->deduction->id]) }}"><i class="ti ti-pencil"></i></a> --}}

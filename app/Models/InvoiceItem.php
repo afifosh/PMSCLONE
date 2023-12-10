@@ -19,10 +19,11 @@ class InvoiceItem extends Model
     'invoiceable_id',
     'description',
     'subtotal',
+    'subtotal_amount_adjustment',
     'total_tax_amount',
-    'description',
     'order',
     'total',
+    'total_amount_adjustment',
     'authority_inv_total',
     'rounding_amount',
   ];
@@ -65,7 +66,7 @@ class InvoiceItem extends Model
 
   public function getTotalAttribute($value)
   {
-    return ($value / 1000) + $this->rounding_amount;
+    return ($value / 1000) + $this->total_amount_adjustment + $this->rounding_amount;
   }
 
   public function setTotalAttribute($value)
@@ -81,6 +82,48 @@ class InvoiceItem extends Model
   public function setAuthorityInvTotalAttribute($value)
   {
     $this->attributes['authority_inv_total'] = moneyToInt($value);
+  }
+
+  public function getSubtotalAmountAdjustmentAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setSubtotalAmountAdjustmentAttribute($value)
+  {
+    $this->attributes['subtotal_amount_adjustment'] = moneyToInt($value);
+  }
+
+  public function getTotalAmountAdjustmentAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setTotalAmountAdjustmentAttribute($value)
+  {
+    $this->attributes['total_amount_adjustment'] = moneyToInt($value);
+  }
+
+  /**
+   * subtotal row in item edit table
+   */
+  public function getSubtotalRowRawAttribute()
+  {
+    if(!$this->deduction)
+      return $this->subtotal;
+    if ($this->deduction->is_before_tax) {
+      return $this->subtotal - $this->deduction->amount;
+    } else {
+      return $this->subtotal + $this->total_tax_amount;
+    }
+  }
+
+  /**
+   * subtotal row in item edit table
+   */
+  public function getSubtotalRowAttribute()
+  {
+    return $this->subtotal_row_raw + $this->subtotal_amount_adjustment;
   }
 
   public function invoice()
@@ -210,7 +253,9 @@ class InvoiceItem extends Model
       $this->invoiceable->update([
         'estimated_cost' => $this->subtotal,
         'tax_amount' => $this->total_tax_amount,
-        'total_cost' => $this->total
+        'total_cost' => $this->getRawOriginal('total') / 1000,
+        'subtotal_amount_adjustment' => $this->subtotal_amount_adjustment,
+        'total_amount_adjustment' => $this->total_amount_adjustment
       ]);
 
       $this->invoiceable->taxes()->detach();

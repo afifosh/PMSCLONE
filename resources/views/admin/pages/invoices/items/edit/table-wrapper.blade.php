@@ -2,7 +2,7 @@
   <div class="table-responsive m-t-40">
       <table class="table table-hover" id="billing-items-container">
         <button type="button" class="btn btn-primary btn-sm float-end me-2 test123" onclick="createItemtax({{$invoiceItem->invoice_id}}, {{$invoiceItem->id}}, this)">Add Tax</button>
-        @if(!$invoiceItem->deduction)
+        @if(!$invoiceItem->deduction && count($invoiceItem->invoice->deductableDownpayments) > 0)
           <button type="button" class="btn btn-primary btn-sm float-end me-2" onclick="createItemDeduction({{$invoiceItem->invoice_id}}, {{$invoiceItem->id}}, this)">Add Deduction</button>
         @endif
           <thead data-id="exclude-sort" id="billing-items-container-header">

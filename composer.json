@@ -94,7 +94,6 @@
     "files": [
       "app/Helpers/Helpers.php",
       "app/Helpers/helper.php",
-      "Modules/Chat/helpers.php",
       "app/Helpers/onlyofficeHelpers.php",
       "app/Support/Helpers.php"
     ]

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\Invoice;
 
+use App\Models\ContractPhase;
 use App\Models\Invoice;
 use App\Models\InvoiceConfig;
 use Illuminate\Foundation\Http\FormRequest;
@@ -34,15 +35,24 @@ class InvoiceItemUpdateRequest extends FormRequest
   public $downpayment_amount = 0;
 
   /**
+   * Contract
+   */
+  public $contract = null;
+
+  /**
    * Prepare the data for validation.
    *
    * @return void
    */
   protected function prepareForValidation(): void
   {
+    if(@$this->invoice_item->invoiceable_type == ContractPhase::class){
+      $this->contract = $this->invoice_item->invoiceable->contract;
+    }
+
     $this->merge([
-      'subtotal' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->invoice_item->invoiceable->estimated_cost)),
-      'total' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->invoice_item->invoiceable->estimated_cost)),
+      'subtotal' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->subtotal)),
+      'total' => (($this->item == 'custom') ? ($this->price * $this->quantity) : ($this->subtotal)),
       // /** Deduction Related Fields */
       // 'deduct_downpayment' => $this->boolean('deduct_downpayment'),
       // 'is_before_tax' => $this->boolean('is_before_tax'),
@@ -95,7 +105,7 @@ class InvoiceItemUpdateRequest extends FormRequest
   private function getItemRules(): array
   {
     $generalRules = [
-      'subtotal' => 'required|numeric|gt:0',
+      'subtotal' => 'required|numeric|gte:0',
       'description' => 'nullable|string|max:255'
       // deduction fields
       // 'deduct_downpayment' => 'required|boolean',
@@ -123,7 +133,16 @@ class InvoiceItemUpdateRequest extends FormRequest
       ];
     }else{
       return $generalRules + [
-        'phase_id' => 'required|exists:contract_phases,id',
+        'stage_id' => 'required',
+        'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,stage_id,' . $this->stage_id,
+        'subtotal' => [
+          'required',
+          'numeric',
+          'gte:0',
+        ],
+        'description' => 'nullable|string|max:2000',
+        'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $this->contract->start_date,
+        'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->contract->end_date,
       ];
     }
   }

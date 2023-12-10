@@ -965,23 +965,9 @@ class ContractController extends Controller
   {
       try {
           // Find the contract by its ID
-          $contract = Contract::with('program.users')->findOrFail($contract_id);
+          $contract = Contract::findOrFail($contract_id);
 
-        // Check if a program is associated with the contract
-        if (!$contract->program) {
-          return $this->sendError('This contract is not associated with any program.');
-        }
-
-          if ($contract->program->users->isEmpty()) {
-            return $this->sendError('No eligible reviewers found for this program.');
-          }
-
-
-          // Check if the current authenticated user is among the eligible reviewers
-          if (!$contract->program->users->contains('id', Auth::id())) {
-              // If not, return an error response
-              return $this->sendError('You are not authorized to perform this action.');
-          }
+          Admin::canReviewContract($contract, $contract->program_id)->findOrFail(auth()->id());
 
           // Identify the appropriate table based on the request route
           $table_id = request()->route()->named('contracts.paymentsplan') ? 'payment-table' : 'contracts-table';
@@ -1017,30 +1003,10 @@ class ContractController extends Controller
   public function togglePhaseReviewStatus($contract_id, $phase_id)
   {
       try {
-          // Find the contract by its ID
-          $contract = Contract::with('program.users')->findOrFail($contract_id);
+          // Find the phase by its ID
+          $phase = ContractPhase::where('contract_id', $contract_id)->with('contract.program:id')->findOrFail($phase_id);
 
-        // Check if a program is associated with the contract
-        if (!$contract->program) {
-          return $this->sendError('This contract is not associated with any program.');
-        }
-
-        if ($contract->program->users->isEmpty()) {
-          return $this->sendError('No eligible reviewers found for this program.');
-        }
-
-        // Check if the current authenticated user is among the eligible reviewers
-        if (!$contract->program->users->contains('id', Auth::id())) {
-            // If not, return an error response
-            return $this->sendError('You are not authorized to perform this action.');
-        }
-          // Ensure the contract has a phase with the specified phase_id
-          $phase = $contract->phases()->where('id', $phase_id)->first();
-
-          if (!$phase) {
-              // No such phase for this contract; handle the error accordingly.
-              return $this->sendError('Invalid phase for this contract.');
-          }
+          Admin::canReviewContract($contract_id, $phase->contract->program_id)->findOrFail(auth()->id());
 
           // Check if the phase has already been reviewed by the current user
           $existingReview = $phase->reviews()->where('user_id', Auth::id())->first();

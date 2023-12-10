@@ -29,32 +29,30 @@
                     @includeWhen($phase->deduction && $phase->deduction->is_before_tax ,'admin.pages.contracts.phases.show.deduction')
                     {{--  --}}
                     @if (@$phase->deduction && @$phase->deduction->is_before_tax)
-                      <tr style="background-color: #efeff163;">
-                        <td>Subtotal</td>
-                        <td></td>
-                        <td class="text-end">
-                            @cMoney($phase->estimated_cost - ($phase->deduction->manual_amount ? @$phase->deduction->manual_amount : ($phase->deduction->amount ?? 0)), $phase->contract->currency, true)
-                        </td>
-                      </tr>
+                      @include('admin.pages.contracts.phases.show.subtotal-row')
                     @endif
                     {{--  --}}
                     @include('admin.pages.contracts.phases.show.taxes')
                     {{--  --}}
                     @if(@$phase->deduction && !@$phase->deduction->is_before_tax)
-                      <tr style="background-color: #efeff163;">
-                        <td>Subtotalll</td>
-                        <td></td>
-                        <td class="text-end">
-                            @cMoney($phase->estimated_cost + $phase->tax_amount, $phase->contract->currency, true)
-                        </td>
-                      </tr>
+                      @include('admin.pages.contracts.phases.show.subtotal-row')
                     @endif
                     {{--  --}}
                     @includeWhen($phase->deduction && !$phase->deduction->is_before_tax,'admin.pages.contracts.phases.show.deduction')
                     <tr style="background-color: #efeff1;">
-                        <td>Item Total</td>
-                        <td></td>
-                        <td class="text-end">@cMoney($phase->total_cost, $phase->contract->currency, true)</td>
+                        <td>
+                          <a onclick="editPhaseTotalAmount({{$phase->id}}, this)"><i class="ti ti-pencil"></i></a>
+                        </td>
+                        <td class="fw-bold">Item Total</td>
+                        <td class="text-end fw-bold"
+                          @if($phase->total_amount_adjustment)
+                            data-bs-toggle="tooltip" title="Calculated amount: {{cMoney(($phase->getRawOriginal('total_cost') / 1000), $phase->contract->currency, true)}}"
+                          @endif
+                            >@cMoney($phase->total_cost, $phase->contract->currency, true)
+                              @if($phase->total_amount_adjustment)
+                                <span class="text-danger">*</span>
+                              @endif
+                        </td>
                     </tr>
                 </tbody>
             </table>
