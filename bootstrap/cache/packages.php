@@ -53,20 +53,6 @@
       0 => 'Imanghafoori\\PasswordHistory\\PasswordHistoryServiceProvider',
     ),
   ),
-  'infyomlabs/coreui-templates' => 
-  array (
-    'providers' => 
-    array (
-      0 => '\\InfyOm\\CoreUITemplates\\CoreUITemplatesServiceProvider',
-    ),
-  ),
-  'infyomlabs/laravel-generator' => 
-  array (
-    'providers' => 
-    array (
-      0 => '\\InfyOm\\Generator\\InfyOmGeneratorServiceProvider',
-    ),
-  ),
   'intervention/image' => 
   array (
     'providers' => 
@@ -112,17 +98,6 @@
     'aliases' => 
     array (
       'LaravelPwa' => 'Ladumor\\LaravelPwa\\LaravelPwa',
-    ),
-  ),
-  'laracasts/flash' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Laracasts\\Flash\\FlashServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Flash' => 'Laracasts\\Flash\\Flash',
     ),
   ),
   'laravel/fortify' => 
@@ -214,13 +189,6 @@
     'aliases' => 
     array (
       'Batch' => 'Mavinoo\\Batch\\BatchFacade',
-    ),
-  ),
-  'mhmiton/laravel-modules-livewire' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Mhmiton\\LaravelModulesLivewire\\LaravelModulesLivewireServiceProvider',
     ),
   ),
   'nesbot/carbon' => 

@@ -882,7 +882,7 @@ class Invoice extends Model
       ->when($this->type == 'Regular', function ($q) {
         $q->where('invoiceable_type', ContractPhase::class);
       })
-      ->sum('subtotal') / 1000;
+      ->sum(DB::raw('subtotal + subtotal_amount_adjustment')) / 1000;
   }
 
   public function authorityInvoice()
