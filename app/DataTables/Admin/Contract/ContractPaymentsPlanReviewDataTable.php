@@ -4,6 +4,7 @@ namespace App\DataTables\Admin\Contract;
 
 use App\Models\Admin;
 use App\Models\Contract;
+use App\Models\ContractPhase;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -36,15 +37,10 @@ class ContractPaymentsPlanReviewDataTable extends DataTable
 
     public function query(): QueryBuilder
     {
-      // Get the associated program and users with access to the contract
-      $program = $this->contract->program;
-      if (!$program) {
-          // Handle the case where $program is null, e.g., by returning an empty query or an error response.
-          return Admin::where('id', '=', 0)->newQuery(); // Example: Return an empty query.
-      }
-
-      return Admin::whereHas('accessiblePrograms', function ($q) use ($program) {
-          $q->where('accessable_id', $program->id);
+      return Admin::whereHas('addedReviews', function ($q) {
+        $q->where('reviewable_type', ContractPhase::class)->whereHas('phase', function ($q) {
+          $q->where('contract_id', $this->contract->id);
+        });
       });
     }
 

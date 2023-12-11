@@ -750,59 +750,14 @@ class ContractController extends Controller
         // of the data based on the current request (like pagination, filtering, etc.).
         return $dataTable->ajax();
   }
-  public function ContractPaymentsPlanReview_OLD($contract_id)
-  {
-      // Assuming `program` is a relation on the `Contract` model that retrieves the associated program.
-      // And `users` is a relation on the `Program` model that retrieves all users associated with the program.
-
-      // Find the contract
-      $contract = Contract::find($contract_id);
-      if (!$contract) {
-          return response()->json(['error' => 'Contract not found'], 404);
-      }
-
-      // Create a DataTable
-      $dataTable = DataTables::of($contract->program->users)
-          ->addColumn('name', function ($user) {
-              return $user->name;
-          })
-          ->addColumn('review_status', function ($user) use ($contract_id) {
-              // This assumes you have a method `getReviewStatusForContract` on the User model
-              // which checks the user's review status for each stage of the contract.
-             // return $user->getReviewStatusForContract($contract_id);
-
-
-                          // Return the rendered view as a string
-                return view('admin.pages.contracts.tracking.paymentsplan.review', [
-                  'status' => $user->getReviewStatusForContract($contract_id)
-              ])->render();
-          })
-          ->rawColumns(['review_status']);
-
-      // ... other dataTable configurations ...
-
-      $outputData = $dataTable->make(true)->getData(true);
-
-      // ... buttons and other outputData configurations ...
-
-      return response()->json($outputData);
-  }
-
 
   public function ContractPaymentsPlanPhases($contract_id)
   {
-    $query = ContractPhase::with(['stage:name,id']) // Load only the name of the related stage
-    ->whereHas('stage.contract', function ($query) use ($contract_id) {
-        $query->where('id', $contract_id);
-    })
-    ->select('contract_phases.*'); // Select all columns from contract_phases
-
     $query = ContractPhase::whereHas('stage.contract', function ($query) use ($contract_id) {
       $query->where('id', $contract_id);
-  })->select('contract_phases.*');
+    })->with('reviewdByAdmins');
 
-
-      $dataTable = DataTables::of($query)
+      return DataTables::of($query)
           ->addColumn('stage_name', function ($phase) {
             return $phase->stage ? $phase->stage->name : 'N/A'; // Added a null check in case a phase doesn't have a related stage
           })
@@ -812,14 +767,8 @@ class ContractController extends Controller
                   ? '<a href="' . route('admin.invoices.edit', $invoiceItem->invoice_id) . '">' . runtimeInvIdFormat($invoiceItem->invoice_id) . '</a>'
                   : 'N/A';
           })
-          ->addColumn('phase_name', function ($phase) {
-              return $phase->name;
-          })
-          ->addColumn('start_date', function ($phase) {
-              return $phase->start_date ? $phase->start_date->format('d M, Y') : 'N/A';
-          })
-          ->addColumn('due_date', function ($phase) {
-              return $phase->due_date ? $phase->due_date->format('d M, Y') : 'N/A';
+          ->addColumn('can_reviewed_by', function ($phase) {
+              return view('admin._partials.sections.user-avatar-group', ['users' => $phase->contract->canReviewedBy()->get()]);
           })
           ->addColumn('amount', function ($phase) {
               return view('admin.pages.contracts.paymentsplan.value-column', compact('phase'));
@@ -828,64 +777,11 @@ class ContractController extends Controller
               $is_editable = !(@$phase->addedAsInvoiceItem[0]->invoice->status && in_array(@$phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid']));
               return view('admin.pages.contracts.phases.actions', ['phase' => $phase, 'stage' => $phase->stage, 'contract_id' => $contract_id, 'is_editable' => $is_editable])->render();
           })
-          ->addColumn('reviewed_by', function ($phase) {
-            $reviewers = $phase->reviews;
-
-            $html = '<div class="d-flex align-items-center avatar-group my-3">';
-
-            $maxDisplayed = 5;
-            for ($i = 0; $i < min($maxDisplayed, $reviewers->count()); $i++) {
-                $reviewer = $reviewers[$i];
-                $avatarUrl = $reviewer->user->avatar; // Assuming 'avatar' is the column name in the 'users' table
-                $userName = htmlspecialchars($reviewer->user->name); // Escape the name to ensure it's safe to display
-
-                $html .= '<div class="avatar pull-up" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" aria-label="' . $userName . '" data-bs-original-title="' . $userName . '">
-                            <img src="' . $avatarUrl . '" alt="Avatar" class="rounded-circle">
-                          </div>';
-            }
-
-            if ($reviewers->count() > $maxDisplayed) {
-                $moreCount = $reviewers->count() - $maxDisplayed;
-                $html .= '<div class="avatar pull-up">
-                            <span class="avatar-initial rounded-circle" data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom" data-bs-original-title="' . $moreCount . ' more reviewers">+' . $moreCount . '</span>
-                          </div>';
-            }
-
-            $html .= '</div>';
-            return $html;
+          ->addColumn('reviewed_by', function (ContractPhase $phase) {
+            return view('admin._partials.sections.user-avatar-group', ['users' => $phase->reviewdByAdmins]);
           })
-          ->rawColumns(['actions', 'invoice_id', 'amount','reviewed_by']);
-
-          $outputData = $dataTable->make(true)->getData(true); // Get data as an associative array
-
-          // Add custom buttons to the data table's output
-          $outputData['buttons'] = [
-              [
-                  'text' => 'Select Phases',
-                  'className' => 'btn btn-primary mx-3 select-phases-btn',
-                  'attr' => [
-                      'onclick' => 'toggleCheckboxes()',
-                  ],
-              ],
-              [
-                  'text' => 'Create Invoices',
-                  'className' => 'btn btn-primary mx-3 create-inv-btn d-none',
-                  'attr' => [
-                      'onclick' => 'createInvoices()',
-                  ],
-              ],
-              [
-                  'text' => 'Add Phase',
-                  'className' => 'btn btn-primary',
-                  'attr' => [
-                      'data-toggle' => "ajax-modal",
-                      'data-title' => 'Add Phase',
-                      'data-href' => route('admin.projects.contracts.stages.phases.create', ['project' => 'project', $contract_id, $this->stage->id ?? 'stage']),
-                  ],
-              ],
-          ];
-
-          return response()->json($outputData); // Return a new JSON response with the modified data
+          ->rawColumns(['actions', 'invoice_id', 'amount','reviewed_by'])
+          ->make(true);
   }
 
   public function ContractPaymentsPlanStages($contract_id)
@@ -893,7 +789,7 @@ class ContractController extends Controller
       $query = ContractStage::where('contract_id', $contract_id)
           ->withCount('phases')
           ->with(['contract' => function ($q) {
-              $q->select(['contracts.id', 'currency']);
+              $q->select(['contracts.id', 'contracts.program_id', 'currency']);
           }]);
 
       $dataTable = DataTables::of($query)
@@ -908,6 +804,15 @@ class ContractController extends Controller
           })
           ->addColumn('total_amount', function ($stage) {
             return cMoney($stage->stage_amount ?? 0, $stage->contract->currency, true);
+          })
+          ->addColumn('can_reviewed_by', function (ContractStage $stage) {
+              return view('admin._partials.sections.user-avatar-group', ['users' => $stage->contract->canReviewedBy()->get(), 'limit' => 5]);
+          })
+          ->addColumn('reviewed_by', function (ContractStage $stage) {
+            return view('admin._partials.sections.user-avatar-group', ['users' => $stage->completelyReviewedBy()->get()]);
+          })
+          ->addColumn('my_review_progress', function (ContractStage $stage) {
+            return view('admin._partials.sections.progressBar', ['perc' => $stage->getMyReviewProgress(), 'color' => 'primary', 'show_perc' => true, 'height' => '15px']);
           })
           ->addColumn('actions', function($stage){
             return view('admin.pages.contracts.stages.actions', compact('stage'));

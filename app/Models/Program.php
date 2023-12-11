@@ -66,6 +66,20 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
       }]);
     }
 
+    /**
+     * Scope a query to only include active programs accessible by the specified admin. (not revoked and not expired)
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActiveAccessibleByAdmin($q, $admin_id)
+    {
+      return $q->whereHas('pivotAccessLists', function ($q) use ($admin_id) {
+        $q->where('admin_id', $admin_id)->where('is_revoked', false)->where(function ($q) {
+          $q->where('granted_till', '>=', now())->orWhereNull('granted_till');
+        });
+      });
+    }
+
     public function parent()
     {
       return $this->belongsTo(Program::class, 'parent_id', 'id');

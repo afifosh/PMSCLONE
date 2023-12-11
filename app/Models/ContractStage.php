@@ -28,49 +28,28 @@ class ContractStage extends BaseModel
       }, '=', $this->phases()->count())->get();
   }
 
-  public function reviewersWhoCompletedAllPhases()
+  /**
+   * Get the users who have completely reviewed this stage.
+   */
+  public function completelyReviewedBy()
   {
-      $totalPhases = $this->phases()->count();
-
-      $subQuery = Review::select('user_id')
-          ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-          ->where('reviewable_type', ContractPhase::class) // Assuming that the reviewable type is ContractPhase
-          ->whereIn('reviewable_id', $this->phases->pluck('id')->toArray())
-          ->groupBy('user_id')
-          ->having('phases_count', '=', $totalPhases);
-
-      $usersWhoCompletedAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
-
-      return $usersWhoCompletedAllPhases;
+    return Admin::whereHas('addedReviews', function ($q) {
+      $q->where('reviewable_type', ContractPhase::class)->whereHas('phase', function ($q) {
+        $q->where('stage_id', $this->id);
+      });
+    }, '>=', $this->phases()->count());
   }
 
-  public function reviewersWhoDidNotCompleteAllPhases()
+  /**
+   * Get logged in user's review progress (%) for this stage.
+   */
+  public function getMyReviewProgress()
   {
-      $totalPhases = $this->phases()->count();
+    $reviewedPhasesCount = $this->phases()->whereHas('reviews', function ($query) {
+        $query->where('user_id', auth()->id());
+    })->count();
 
-      $subQuery = Review::select('user_id')
-          ->selectRaw('COUNT(DISTINCT reviewable_id) as phases_count')
-          ->where('reviewable_type', ContractPhase::class) // Assuming that the reviewable type is ContractPhase
-          ->whereIn('reviewable_id', $this->phases->pluck('id')->toArray())
-          ->groupBy('user_id')
-          ->having('phases_count', '<', $totalPhases);
-
-      $usersWhoDidNotCompleteAllPhases = Admin::whereIn('id', $subQuery->pluck('user_id'))->get();
-
-      return $usersWhoDidNotCompleteAllPhases;
-  }
-
-  public function hasUserCompletedStage($userId)
-  {
-      $totalPhases = $this->phases()->count();
-
-      $reviewedPhasesCount = Review::where('user_id', $userId)
-          ->where('reviewable_type', ContractPhase::class) // Replace with your phase model if different
-          ->whereIn('reviewable_id', $this->phases->pluck('id')->toArray())
-          ->distinct()
-          ->count('reviewable_id');
-
-      return $reviewedPhasesCount === $totalPhases;
+    return round($reviewedPhasesCount / $this->phases()->count(), 2) * 100;
   }
 
   public function getUserReviewStatus($userId)

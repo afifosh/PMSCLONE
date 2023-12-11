@@ -445,6 +445,9 @@ $contractsSelect.val(null).trigger('change');
                 { data: 'start_date', title: 'Start Date' },
                 { data: 'due_date', title: 'Due Date' },
                 { data: 'total_amount', title: 'Amount' },
+                { data: 'can_reviewed_by', title: 'Can Review'},
+                { data: "reviewed_by", "reviewed_by": "reviewed_by", title: 'Reviewed By' },
+                { data: 'my_review_progress', title: 'Progress'},
                 { data: 'status', title: 'Status' },
                 {
                             data: 'actions',
@@ -492,6 +495,7 @@ console.log('#phases-table-' + contractId);
                     { data: 'start_date', title: 'Start Date' },
                     { data: 'due_date', title: 'Due Date' },
                     { data: 'amount', title: 'Amount' },
+                    { data: 'can_reviewed_by', title: 'Can Review'},
                     { data: "reviewed_by", "reviewed_by": "reviewed_by", title: 'Reviewed By' },
                     { data: 'status', title: 'Status' },
                     {

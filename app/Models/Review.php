@@ -10,15 +10,20 @@ class Review extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'reviewable_id', 'reviewable_type', 'reviewed_at'];
-      
+
     public function reviewable()
     {
         return $this->morphTo();
     }
 
     // Adding this relationship
-    public function user() 
+    public function user()
     {
         return $this->belongsTo(Admin::class);
-    }    
+    }
+
+    public function phase()
+    {
+      return $this->belongsTo(ContractPhase::class, 'reviewable_id');
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Admin\Contract;
 
+use App\Models\Admin;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
@@ -41,25 +42,15 @@ class ContractsTrackingDataTable extends DataTable
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
-      ->addColumn('incomplete_reviewers', function ($contract) {
-        $users = $contract->getAdminsWhoDidNotReviewContract();
-        if ($users->isEmpty()) {
-          return "N/A";
-        }
-        return view('admin._partials.sections.user-avatar-group', ['users' => $users, 'limit' => 5]);
+      ->addColumn('reviewers', function ($contract) {
+        return view('admin._partials.sections.user-avatar-group', ['users' => $contract->canReviewedBy()->get(), 'limit' => 5]);
       })
       ->addColumn('reviews_completed', function ($contract) {
-        $users = $contract->reviewedBy;
-        if ($users->isEmpty()) {
-          return "N/A";
-        }
-        return view('admin._partials.sections.user-avatar-group', ['users' => $users, 'limit' => 5]);
+        return view('admin._partials.sections.user-avatar-group', ['users' => $contract->reviewedBy, 'limit' => 5]);
       })
       ->addColumn('assigned_to', function ($project) {
         if ($project->assignable instanceof Company) {
           return view('admin._partials.sections.company-avatar', ['company' => $project->assignable]);
-        } else if ($project->assignable instanceof Client) {
-          return view('admin._partials.sections.client-info', ['user' => $project->assignable]);
         } else {
           return '-';
         }
@@ -76,18 +67,12 @@ class ContractsTrackingDataTable extends DataTable
       ->editColumn('value', function (Contract $contract) {
         return view('admin.pages.contracts.value-column', compact('contract'));
       })
-      ->editColumn('start_date', function ($project) {
-        return $project->start_date ? $project->start_date->format('d M, Y') : '-';
-      })
-      ->editColumn('end_date', function ($project) {
-        return $project->end_date ? $project->end_date->format('d M, Y') : '-';
-      })
       ->filterColumn('assigned_to', function ($query, $keyword) {
         $query->whereHasMorph('assignable', Company::class, function ($q) use ($keyword) {
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
         });
       })
-      ->rawColumns(['id', 'program.name','reviews_completed','incomplete_reviewers']);
+      ->rawColumns(['id', 'program.name','reviews_completed']);
   }
 
 /**
@@ -96,7 +81,7 @@ class ContractsTrackingDataTable extends DataTable
 public function query(Contract $model): QueryBuilder
 {
     // Start the base query
-    $query = $model->newQuery()
+    $query = $model->validAccessibleByAdmin(auth()->id())->newQuery()
         ->select([
             'contracts.id',
             'contracts.program_id',
@@ -215,7 +200,7 @@ public function query(Contract $model): QueryBuilder
       // Column::make('assigned_to')->title('Assigned To'),
       Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
-      Column::make('incomplete_reviewers')->title('Incomplete Reviewers'),
+      Column::make('reviewers')->title('Reviewers'),
       Column::make('reviews_completed')->title('Reviews Completed'),
       Column::make('start_date'),
       Column::make('end_date'),
