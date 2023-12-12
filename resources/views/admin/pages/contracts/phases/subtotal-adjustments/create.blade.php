@@ -1,4 +1,4 @@
-<tr class="expanded-edit-row" style="background-color: #efb7c461">
+<tr class="expanded-edit-row" style="background-color: var(--bs-light)">
   <td colspan="3">
   {!! Form::open(['route' => ['admin.phases.subtotal-adjustments.store',  ['phase' => $phase->id,]], 'method' => 'POST']) !!}
 

@@ -81,7 +81,7 @@ class InvoiceStoreRequest extends FormRequest
     return [
       'type' => 'required|in:Regular,Down Payment,Partial Invoice',
       'subtotal' => 'nullable|required_if:type,Down Payment|numeric'.(request()->type == 'Down Payment' ? '|gt:0' : ''),
-      'description' => 'nullable|required_if:type,Down Payment|string|max:255',
+      'description' => 'nullable|string|max:255',
       'company_id' => 'nullable|exists:companies,id',
       'contract_id' => 'required|exists:contracts,id',
       'invoice_date' => 'required|date',

@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Plank\Mediable\Mediable;
+use Spatie\Comments\Models\Concerns\HasComments;
 
 class Invoice extends Model
 {
-  use HasFactory, Mediable, SoftDeletes;
+  use HasFactory, Mediable, SoftDeletes, HasComments;
 
   protected $fillable = [
     'company_id',
@@ -893,5 +894,31 @@ class Invoice extends Model
   public function totalAuthorityTax()
   {
     return $this->items->sum('authority_inv_total');
+  }
+
+  /*
+ * This string will be used in notifications on what a new comment
+ * was made.
+ */
+  public function commentableName(): string
+  {
+    return 'Invoice: ' . runtimeInvIdFormat($this->id) . ' Of contract: ' . $this->contract->subject;
+  }
+
+  /*
+* This URL will be used in notifications to let the user know
+* where the comment itself can be read.
+*/
+  public function commentUrl(): string
+  {
+    return route('admin.contracts.invoices.edit', [$this->contract_id, $this->id, 'tab' => 'summary', 'popup' => 'comments']);
+  }
+
+  /**
+   * All the (pivot) taxes (from invoice or invoice items) which are applied on this invoice
+   */
+  public function allPivotTaxes()
+  {
+    return $this->hasMany(InvoiceTax::class, 'invoice_id', 'id');
   }
 }

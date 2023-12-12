@@ -134,7 +134,7 @@ class InvoiceItemUpdateRequest extends FormRequest
     }else{
       return $generalRules + [
         'stage_id' => 'required',
-        'name' => 'required|string|max:255|unique:contract_phases,name,NULL,id,stage_id,' . $this->stage_id,
+        'name' => 'required|string|max:255|unique:contract_phases,name,' . $this->invoice_item->invoiceable_id . ',id,stage_id,' . $this->stage_id,
         'subtotal' => [
           'required',
           'numeric',

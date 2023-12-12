@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 
 class ContractPartyController extends Controller
 {
+  public function __construct()
+  {
+    // check if contract party belongs to contract
+    $this->middleware('verifyContractNotTempered:contract_party,contract_id')->only(['edit', 'update', 'destroy']);
+  }
+
   public function index(Contract $contract, ContractPartiesDataTable $dataTable)
   {
     $dataTable->contract = $contract;

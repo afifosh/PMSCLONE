@@ -1,4 +1,4 @@
-<tr class="expanded-edit-row" style="background-color: #efb7c461">
+<tr class="expanded-edit-row" style="background-color: var(--bs-light)">
   <td colspan="6">
   {!! Form::open(['route' => ['admin.invoice-items.total-amount-adjustments.store',  ['invoice_item' => $invoiceItem->id,]], 'method' => 'POST']) !!}
 

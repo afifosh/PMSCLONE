@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\DB;
 
 class PhaseTaxController extends Controller
 {
+  public function __construct()
+  {
+    // check if phase belongs to contract
+    $this->middleware('verifyContractNotTempered:phase,contract_id')->only(['create', 'store', 'show', 'edit', 'update', 'destroy']);
+
+    // check if tax belongs to phase
+    $this->middleware('verifyContractNotTempered:tax,contract_phase_id,phase,id')->only(['edit', 'update', 'destroy']);
+  }
+
   public function create($contract, ContractPhase $phase)
   {
     $data['phase'] = $phase;

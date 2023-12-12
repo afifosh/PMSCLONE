@@ -14,6 +14,15 @@ use Illuminate\Support\Facades\DB;
 
 class PhaseDeductionController extends Controller
 {
+  public function __construct()
+  {
+    // check if phase belongs to contract
+    $this->middleware('verifyContractNotTempered:phase,contract_id')->only(['create', 'store', 'show', 'edit', 'update', 'destroy']);
+
+    // check if deduction belongs to phase
+    $this->middleware('verifyContractNotTempered:deduction,deductible_id,phase,id')->only(['edit', 'update', 'destroy']);
+  }
+
   public function create(Contract $contract, ContractPhase $phase)
   {
     $contract->load('deductableDownpayments');
