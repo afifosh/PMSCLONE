@@ -165,7 +165,7 @@
 </div>
 <div class="mt-3 d-flex justify-content-between">
   <div class="contract-editing-users">
-    ss
+
   </div>
   <div class="btn-flt float-end">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>

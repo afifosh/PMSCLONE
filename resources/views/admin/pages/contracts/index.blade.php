@@ -212,6 +212,23 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+    {{-- Real Time Editing Scripts --}}
+    <script>
+      /***
+       * Variables used in this file
+       **/
+      var activeContractId = "";
+      var activeContractTab = "";
+      var contractViewingUsers = [];
+      var stageEditingUsers = [];
+      var phaseEditingUsers = [];
+      var disablePhaseWhisper = false;
+      var contractEditingUsers = [];
+      var disableContractWhisper = false;
+      window.oURL = window.location.href;
+    </script>
+    <script src="{{asset('assets/js/custom/contracts-realtime-updates.js')}}"></script>
+    {{-- End Real Time Editing Scripts --}}
     <script>
       $(document).ready(function () {
           $('.js-datatable-filter-form :input').on('change', function (e) {
