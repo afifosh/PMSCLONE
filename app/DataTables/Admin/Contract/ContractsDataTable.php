@@ -104,6 +104,8 @@ public function query(Contract $model): QueryBuilder
             DB::raw('sum(invoices.total_tax)/1000 as total_tax'),
             DB::raw('(sum(invoices.paid_amount)/sum(contracts.value))*1000 as paid_percent'),
             // contract invoice count whose retention_released_at is null as pending_retentions_count
+            DB::raw('sum(CASE WHEN invoices.retention_amount IS NOT NULL AND invoices.retention_released_at IS NULL THEN invoices.retention_amount ELSE 0 END) as pending_retentions_sum'),
+
             DB::raw('count(CASE WHEN invoices.retention_amount IS NOT NULL AND invoices.retention_released_at IS NULL THEN 1 ELSE NULL END) as pending_retentions_count')
         ])
         ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
