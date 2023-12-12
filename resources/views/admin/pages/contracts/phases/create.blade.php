@@ -15,13 +15,13 @@
           <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-selected="true">Summary</button>
         </li>
         @if($phase->id)
-          <li class="nav-item" onclick="reload_phase_activity({{$phase->id}})">
+          <li class="nav-item" onclick="reload_phase_activity({{$phase->id}}, {{$phase->contract->id}})">
             <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-selected="false">Activities</button>
           </li>
-          <li class="nav-item" onclick="reload_phase_reviewers({{$phase->id}})">
+          <li class="nav-item" onclick="reload_phase_reviewers({{$phase->id}}, {{$phase->contract->id}})">
             <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-reviewers" aria-selected="false">Reviewers</button>
           </li>
-          <li class="nav-item" onclick="reload_phase_comments({{$phase->id}})">
+          <li class="nav-item" onclick="reload_phase_comments({{$phase->id}}, {{$phase->contract->id}})">
             <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments" aria-selected="false">Comments</button>
           </li>
         @endif
@@ -43,10 +43,10 @@
 
 
 <script>
-  function reload_phase_comments(phase){
+  function reload_phase_comments(phase, contract){
     var url = route('admin.projects.contracts.stages.phases.edit', {
       project: 'project',
-      contract: 'contract',
+      contract: contract,
       stage: 'stage',
       phase: phase,
       tab: 'comments'
@@ -69,10 +69,10 @@
         window.oURL = window.location.href;
       });
 
-  function reload_phase_activity(phase){
+  function reload_phase_activity(phase, contract){
     var url = route('admin.projects.contracts.stages.phases.edit', {
       project: 'project',
-      contract: 'contract',
+      contract: contract,
       stage: 'stage',
       phase: phase,
       tab: 'activity'
@@ -86,10 +86,10 @@
     });
   }
 
-  function reload_phase_reviewers(phase){
+  function reload_phase_reviewers(phase, contract){
     var url = route('admin.projects.contracts.stages.phases.edit', {
       project: 'project',
-      contract: 'contract',
+      contract: contract,
       stage: 'stage',
       phase: phase,
       tab: 'reviewers'

@@ -65,7 +65,8 @@ class ContractsTrackingDataTable extends DataTable
         return $project->category ? $project->category->name : '-';
       })
       ->editColumn('value', function (Contract $contract) {
-        return view('admin.pages.contracts.value-column', compact('contract'));
+        return @cMoney($contract->value ?? 0, $contract->currency, true);
+        // return view('admin.pages.contracts.value-column', compact('contract'));
       })
       ->filterColumn('assigned_to', function ($query, $keyword) {
         $query->whereHasMorph('assignable', Company::class, function ($q) use ($keyword) {
