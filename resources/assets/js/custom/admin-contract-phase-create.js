@@ -129,6 +129,11 @@
         $('[data-bs-toggle="tooltip"]').tooltip();
       }
     });
+
+    // if function reloadPhasesList exists, call it
+    if(typeof reloadPhasesList == 'function'){
+      reloadPhasesList();
+    }
   }
 
   function calcDeductionAmount()
@@ -254,6 +259,11 @@
     });
 
     $('#phases-table').DataTable().ajax.reload(null, false);
+
+    // if function reloadPhasesList exists, call it
+    if(typeof reloadPhasesList == 'function'){
+      reloadPhasesList();
+    }
   }
 
   // on change add_deduction show/hide deduction-inputs, if checked show else hide

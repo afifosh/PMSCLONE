@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Comments\Models\Concerns\HasComments;
 
 class AuthorityInvoice extends Model
 {
-  use HasFactory, SoftDeletes;
+  use HasFactory, SoftDeletes, HasComments;
 
   protected $fillable = [
     'invoice_id',
@@ -183,5 +184,23 @@ class AuthorityInvoice extends Model
   public function payments()
   {
     return $this->morphMany(InvoicePayment::class, 'payable');
+  }
+
+  /*
+  * This string will be used in notifications on what a new comment
+  * was made.
+  */
+  public function commentableName(): string
+  {
+    return 'Invoice: TA-' . runtimeInvIdFormat($this->id) . ' Of contract: ' . $this->invoice->contract->subject;
+  }
+
+  /*
+  * This URL will be used in notifications to let the user know
+  * where the comment itself can be read.
+  */
+  public function commentUrl(): string
+  {
+    return route('admin.contracts.invoices.edit', [$this->invoice->contract_id, $this->invoice_id, 'tab' => 'authority-tax', 'popup' => 'comments']);
   }
 }

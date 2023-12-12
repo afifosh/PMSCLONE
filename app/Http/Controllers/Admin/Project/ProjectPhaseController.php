@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\DB;
 
 class ProjectPhaseController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('verifyContractNotTempered:phase,contract_id')->only(['show', 'edit', 'update', 'destroy']);
+  }
+
   public function index($project, Contract $contract, string|ContractStage $stage, PhasesDataTable $dataTable)
   {
     $dataTable->stage = $stage;
@@ -94,6 +99,8 @@ class ProjectPhaseController extends Controller
       return $this->prepareActivityTab($phase);
     } else if (request()->tab == 'comments') {
       return $this->prepareCommentsTab($phase);
+    } else if (request()->tab == 'reviewers'){
+      return $this->sendRes('success', ['view_data' => 'Reviewers Tab']);
     }
     $phase->load(['addedAsInvoiceItem.invoice', 'contract']);
     $contract = $phase->contract;

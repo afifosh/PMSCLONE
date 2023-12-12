@@ -8,6 +8,13 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/dropzone/dropzone.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
+<style>
+  .expanded-row{
+    background-color: rgb(202, 202, 209) !important;
+  }
+</style>
+@livewireStyles
+<x-comments::styles />
 @endsection
 
 @section('page-style')
@@ -25,7 +32,9 @@
 @section('page-script')
 <script src="{{asset('assets/js/custom/flatpickr.js')}}"></script>
 <script src="{{asset('assets/js/custom/select2.js')}}"></script>
+<script src={{asset('assets/js/custom/admin-contract-phase-create.js')}}></script>
 <script>
+  window.active_contract = {{$invoice->contract->id}};
   function initSortable() {
     var sortable = Sortable.create(document.getElementById('billing-items-container'), {
       filter: '.filtered',
@@ -823,3 +832,18 @@
   {{-- end downpayment popover --}}
 </div>
 @endsection
+<script>
+  window.oURL = window.location.href;
+
+  function liveWireRescan()
+  {
+    Livewire.rescan(document.getElementById('comments-section'));
+    Alpine.initTree(document.getElementById('comments-section'));
+    setTimeout(function () {
+          history.replaceState(null, null, oURL);
+    }, 1000);
+  }
+</script>
+@livewireScripts
+<x-comments::scripts />
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

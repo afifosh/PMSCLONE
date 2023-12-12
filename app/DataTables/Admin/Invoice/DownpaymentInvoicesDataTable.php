@@ -34,6 +34,9 @@ class DownpaymentInvoicesDataTable extends DataTable
       ->editColumn('amount', function (Invoice $invoice) {
         return cMoney($invoice->totalDeductedAmount($this->downpaymentInvoice->id), $this->downpaymentInvoice->contract->currency, true);
       })
+      ->editColumn('invoice_total', function (Invoice $invoice) {
+        return cMoney($invoice->total, $this->downpaymentInvoice->contract->currency, true);
+      })
       ->rawColumns(['invoice.company_id', 'id']);
   }
 
@@ -87,6 +90,7 @@ class DownpaymentInvoicesDataTable extends DataTable
       Column::make('due_date')->title('Due Date'),
       Column::make('status')->title('Status'),
       Column::make('amount')->title('Downpayment Amount'),
+      Column::make('invoice_total')->title('Invoice Total'),
       Column::make('created_at')->title('Created At'),
       Column::make('updated_at')->title('Updated At'),
     ];

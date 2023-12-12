@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Facade;
-use InfyOm\CoreUITemplates\CoreUITemplatesServiceProvider;
-use InfyOm\Generator\InfyOmGeneratorServiceProvider;
 
 return [
 
@@ -179,8 +177,6 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Jenssegers\Agent\AgentServiceProvider::class,
-        InfyOmGeneratorServiceProvider::class,
-        CoreUITemplatesServiceProvider::class,
         /*
          * Package Service Providers...
          */

@@ -1,4 +1,4 @@
-<tr class="expanded-edit-row" style="background-color: #efb7c461">
+<tr class="expanded-edit-row" style="background-color: var(--bs-light)">
   <td colspan="3">
     @if ($tax->id)
     {!! Form::model($phase, ['route' => ['admin.contracts.phases.taxes.update', ['contract' => $phase->contract_id, 'phase' => $phase->id, 'tax' => $tax->id]],

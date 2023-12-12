@@ -98,7 +98,7 @@
       url: url,
       type: "GET",
       success: function(data){
-        $('#navs-top-reviewers').html(data.data.view_data);
+        $('#navs-top-activities').html(data.data.view_data);
       }
     });
   }

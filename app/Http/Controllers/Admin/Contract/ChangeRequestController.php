@@ -15,6 +15,12 @@ class ChangeRequestController extends Controller
 {
   use FinanceTrait;
 
+  public function __construct()
+  {
+    // check if change request belongs to contract
+    $this->middleware('verifyContractNotTempered:changeRequest,contract_id')->only(['destroy', 'approve', 'reject']);
+  }
+
   public function index(Contract $contract, ChangeRequestsDataTable $dataTable)
   {
     $data['contract'] = $contract;

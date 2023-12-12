@@ -12,6 +12,12 @@ use App\Models\ContractStage;
 
 class ContractStageController extends Controller
 {
+  public function __construct()
+  {
+    // check if stage belongs to contract
+    $this->middleware('verifyContractNotTempered:stage,contract_id')->only(['edit', 'update', 'destroy']);
+  }
+
   public function index(Contract $contract, StagesDataTable $dataTable)
   {
     $dataTable->contract = $contract;

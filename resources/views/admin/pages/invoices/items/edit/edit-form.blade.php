@@ -1,4 +1,4 @@
-<tr class="expanded-edit-row" style="background-color: #efb7c461">
+<tr class="expanded-edit-row" style="background-color: var(--bs-light)">
   <td colspan="6">
     @if ($invoiceItem->id)
       @if(!isset($tax_rates) && !isset($deduction_rates))

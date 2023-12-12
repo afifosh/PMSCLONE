@@ -202,7 +202,7 @@
     @endif
   </div>
 </form>
-<div class="mt-3 col-lg-9 col-12">
+<div class="mt-3 col-lg-12 col-12">
   <div class="card">
     <h5 class="card-header">Invoices using this downpayment</h5>
     <div class="card-body">

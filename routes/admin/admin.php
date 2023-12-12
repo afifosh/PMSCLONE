@@ -106,6 +106,7 @@ use App\Http\Controllers\Admin\Contract\Phase\PhaseTaxController;
 use App\Http\Controllers\Admin\Contract\Phase\SubtotalAdjustmentController;
 use App\Http\Controllers\Admin\Contract\Phase\TotalAmountAdjustmentController;
 use App\Http\Controllers\Admin\Contract\UploadedDoc\SignatureController;
+use App\Http\Controllers\Admin\Invoice\CommentController;
 use App\Http\Controllers\Admin\Invoice\InvoiceStatusController;
 use App\Http\Controllers\Admin\Invoice\Item\SubtotalAdjustmentController as ItemSubtotalAdjustmentController;
 use App\Http\Controllers\Admin\Invoice\Item\TotalAmountAdjustmentController as ItemTotalAmountAdjustmentController;
@@ -351,43 +352,52 @@ Route::prefix('contracts')->group(function () {
 
 
 
-    Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
-    Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
-    Route::get('contracts/{contract}/phases/{phase}', [ProjectPhaseController::class, 'show'])->name('contracts.phases.show');
-    Route::resource('contracts.phases.taxes', PhaseTaxController::class);
-    Route::resource('contracts.phases.deductions', PhaseDeductionController::class);
+    Route::middleware('contractACL')->group(function () {
+      Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
+      Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
+      Route::get('contracts/{contract}/phases/{phase}', [ProjectPhaseController::class, 'show'])->name('contracts.phases.show');
+      Route::resource('contracts.phases.taxes', PhaseTaxController::class);
+      Route::resource('contracts.phases.deductions', PhaseDeductionController::class);
+      Route::resource('contracts.invoices.comments', CommentController::class)->only(['index']);
+      Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');
+      Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');//contract middlware pending
+      Route::post('contracts/{contract}/release-retentions', [ContractController::class, 'releaseRetention'])->name('contracts.release-retentions');
+      Route::resource('contracts.contract-parties', ContractPartyController::class);
+
+      Route::resource('contracts.logs', LogController::class)->only(['index']);
+      Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
+      Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
+      Route::post('contracts/{contract}/change-requests/{change_request}/reject', [ChangeRequestController::class, 'reject'])->name('contracts.change-requests.reject');
+      Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
+      Route::resource('contracts.notifiable-users', NotifiableUserController::class)->only(['create', 'store', 'destroy']);
+      Route::resource('contracts.events', EventController::class)->only(['index']);
+      Route::put('contracts/{contract}/terminate', [ContractSettingController::class, 'terminate'])->name('contracts.terminate');
+      Route::put('contracts/{contract}/undo-terminate', [ContractSettingController::class, 'undoTerminate'])->name('contracts.undo-terminate');
+      Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');
+      Route::put('contracts/{contract}/resume', [ContractSettingController::class, 'resume'])->name('contracts.resume');
+      Route::post('contracts/{contract}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('contracts.upload-requested-doc');//contract middlware pending
+
+      Route::resource('contracts.stages', ContractStageController::class);
+      Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);//contract middlware pending
+      Route::resource('contracts.uploaded-documents', UploadedDocumentController::class); //contract middlware pending
+      Route::resource('contracts.bulk-invoices', BulkInvoiceController::class)->only(['store']);
+      Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
+    });
+
     Route::resource('phases.subtotal-adjustments', SubtotalAdjustmentController::class)->only(['create', 'store']);
     Route::resource('phases.total-amount-adjustments', TotalAmountAdjustmentController::class)->only(['create', 'store']);
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     // Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
-    Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');
-    Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');
-    Route::post('contracts/{contract}/release-retentions', [ContractController::class, 'releaseRetention'])->name('contracts.release-retentions');
+
     Route::resource('contracts', ContractController::class);
-    Route::resource('contracts.contract-parties', ContractPartyController::class);
-    Route::resource('contracts.logs', LogController::class)->only(['index']);
-    Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
-    Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
-    Route::post('contracts/{contract}/change-requests/{change_request}/reject', [ChangeRequestController::class, 'reject'])->name('contracts.change-requests.reject');
-    Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
-    Route::resource('contracts.notifiable-users', NotifiableUserController::class)->only(['create', 'store', 'destroy']);
-    Route::resource('contracts.events', EventController::class)->only(['index']);
-    Route::put('contracts/{contract}/terminate', [ContractSettingController::class, 'terminate'])->name('contracts.terminate');
-    Route::put('contracts/{contract}/undo-terminate', [ContractSettingController::class, 'undoTerminate'])->name('contracts.undo-terminate');
-    Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');
-    Route::put('contracts/{contract}/resume', [ContractSettingController::class, 'resume'])->name('contracts.resume');
-    Route::post('contracts/{contract}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('contracts.upload-requested-doc');
+
     Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
     // Route::resource('contracts.stages', ContractStageController::class);
     Route::resource('contract-types', ContractTypeController::class);
     Route::resource('contract-categories', ContractCategoryController::class);
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
-    Route::resource('contracts.stages', ContractStageController::class);
-    Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
-    Route::resource('contracts.uploaded-documents', UploadedDocumentController::class);
-    Route::resource('contracts.bulk-invoices', BulkInvoiceController::class)->only(['store']);
-    Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
+
     Route::resource('contract-doc-controls', DocControlController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');
     Route::get('projects/{project}/gantt-chart', [ProjectController::class, 'ganttChart'])->name('projects.gantt-chart');

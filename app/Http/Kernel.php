@@ -71,5 +71,7 @@ class Kernel extends HttpKernel
         'passwordMustNotBeExpired' => \App\Http\Middleware\EnsurePasswordNotExpired::class,
         'passwordMustBeExpired' => \App\Http\Middleware\PasswordMustBeExpired::class,
         'companyMustBeEditable' => \App\Http\Middleware\EnsureCompanyIsEditable::class,
+        'contractACL' => \App\Http\Middleware\ContractACL::class,
+        'verifyContractNotTempered' => \App\Http\Middleware\VerifyContractNotTempered::class,
     ];
 }
