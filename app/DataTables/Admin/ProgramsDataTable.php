@@ -33,11 +33,17 @@ class ProgramsDataTable extends DataTable
       ->addColumn('children', function ($program) {
         return view('admin._partials.sections.programs-avatar-group', ['programs' => $program->children, 'limit' => 5]);
       })
+    ->addColumn('contracts_count', function ($program) {
+        return '<span class="badge badge-center rounded-pill bg-label-success">'.$program->contracts_count.'</span>';
+    })
+    ->orderColumn('contracts_count', function ($query, $order) {
+      $query->orderByRaw("(select count(*) from `contracts` where `programs`.`id` = `contracts`.`program_id` and `contracts`.`deleted_at` is null) $order");
+  })
       ->addColumn('action', function (Program $program) {
         return view('admin.pages.programs.action', compact('program'));
       })
       ->setRowId('id')
-      ->rawColumns(['name','action']);
+      ->rawColumns(['name','action','contracts_count']);
   }
 
   /**
@@ -48,7 +54,12 @@ class ProgramsDataTable extends DataTable
    */
   public function query(Program $programs): QueryBuilder
   {
-    return $programs->mine()->with('parent')->withCount('contracts');
+  return $programs->mine()
+                ->with('parent')
+                ->with('children') // Eager load the children relationship
+                ->withCount('contracts')
+                ->withCount('children'); // Get the count of children
+
   }
 
   /**
