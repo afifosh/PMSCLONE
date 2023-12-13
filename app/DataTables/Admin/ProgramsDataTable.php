@@ -48,7 +48,7 @@ class ProgramsDataTable extends DataTable
    */
   public function query(Program $programs): QueryBuilder
   {
-    return $programs->mine()->with('parent');
+    return $programs->mine()->with('parent')->withCount('contracts');
   }
 
   /**
@@ -99,6 +99,7 @@ class ProgramsDataTable extends DataTable
       // Column::make('id'),
       Column::make('name')->title('Program Name'),
       Column::make('parent'),
+      Column::make('contracts_count')->title('Number of Contracts'),
       Column::make('program_code'),
       // Column::make('description'),
       Column::make('created_at'),
