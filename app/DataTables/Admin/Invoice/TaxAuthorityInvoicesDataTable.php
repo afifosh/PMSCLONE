@@ -50,7 +50,7 @@ class TaxAuthorityInvoicesDataTable extends DataTable
    */
   public function query(AuthorityInvoice $model): QueryBuilder
   {
-    $query = $model->with(['invoice.company', 'invoice.contract', 'invoice.contract.program']);
+    $query = $model->where('total', '!=', 0)->with(['invoice.company', 'invoice.contract', 'invoice.contract.program']);
 
     return $query->applyRequestFilters()->newQuery();
   }

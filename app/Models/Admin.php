@@ -512,6 +512,14 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
       return $this->hasMany(AdminAccessList::class, 'admin_id', 'id');
     }
 
+    public function activeACLRules()
+    {
+      return $this->hasMany(AdminAccessList::class, 'admin_id', 'id')->where(function ($q) {
+        $q->where('granted_till', '>=', now())
+          ->orWhereNull('granted_till');
+      });
+    }
+
     /**
      * admins which can review the given contract (not revked nor expired)
      */
@@ -560,6 +568,13 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
       $q->whereHas('addedReviews', function ($q) use ($contract_id) {
         $q->where('reviewable_id', $contract_id)
           ->where('reviewable_type', Contract::class);
+      });
+    }
+
+    public function scopeApplyRequestFilters($q)
+    {
+      $q->when(request()->has('canReviewMutualContractsPhase'), function ($q) {
+        $q->whereHas('activeACLRules');
       });
     }
 }

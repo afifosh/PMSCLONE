@@ -70,7 +70,6 @@ class ContractController extends Controller
 
   public function trackingPaymentsPlan(TrackingPaymentsPlanDataTable $dataTable)
   {
-
     $data['company'] = Company::find(request()->route('company'));
     $data['program'] = Program::find(request()->route('program'));
   // dd($data);
@@ -115,24 +114,13 @@ class ContractController extends Controller
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
-    $reviewers = Review::with('user') // Make sure 'user' corresponds to the relationship method name in the Review model
-                ->where('reviewable_type', Contract::class)
-                ->get()
-                ->pluck('user.name', 'user.id')
-                ->unique()
-                ->sort();
-    // Add an "All" option at the beginning of the collection
-    $reviewers = $reviewers->prepend('All Users', 'all');
-
     // Prepare the options for the dropdown
     $review_status = [
-      'all' => 'All Contracts',
+      'any' => 'Any',
       'reviewed' => 'Reviewed',
       'not_reviewed' => 'Not Reviewed',
     ];
 
-
-    $data['contract_reviewers'] = $reviewers;
     $data['review_status'] = $review_status;
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
@@ -417,6 +405,7 @@ class ContractController extends Controller
     }
     $data['contract'] = $contract->load('notifiableUsers');
     $data['summary'] = $contract->events()->selectRaw('event_type, count(*) as total')->groupBy('event_type')->get();
+    $data['sankey_funds_data'] = $contract->getSankeyFundsData();
 
     return view('admin.pages.contracts.show', $data);
   }
@@ -717,6 +706,13 @@ class ContractController extends Controller
     } else {
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
+
+    $data['review_status'] = [
+      '' => 'Select Status',
+      'reviewed' => 'Reviewed',
+      'not_reviewed' => 'Not Reviewed',
+      'partially_reviewed' => 'Partially Reviewed',
+    ];
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
     $data['contracts'] = Contract::selectRaw('count(*) as total')

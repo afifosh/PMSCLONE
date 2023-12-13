@@ -53,6 +53,7 @@ return new class extends Migration
       $table->string('retention_name')->nullable();
       $table->integer('retention_percentage')->default(0);
       $table->bigInteger('retention_amount')->default(0);
+      $table->bigInteger('retention_manual_amount')->default(0);
       $table->timestamp('retention_released_at')->nullable();
       /**
        * End Retention

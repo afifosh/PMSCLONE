@@ -166,6 +166,36 @@ class Contract extends BaseModel
     return $myPhases / $totalPhases * 100;
   }
 
+  /**
+   * conracts which are reviewed by admin
+   */
+  public function scopeCompletelyReviewedBy($q, $admin_id)
+  {
+    return $q->has('phases')->whereHas('phaseReviews', function ($q) use ($admin_id) {
+      $q->where('user_id', $admin_id);
+    }, '>=', $this->phases()->count());
+  }
+
+  /**
+   * contracts which are partialy reviewed by admin
+   */
+  public function scopePartiallyReviewedBy($q, $admin_id)
+  {
+    return $q->has('phases')->whereHas('phaseReviews', function ($q) use ($admin_id) {
+      $q->where('user_id', $admin_id);
+    }, '<', $this->phases()->count());
+  }
+
+  /**
+   * contracts which are not reviewed by admin
+   */
+  public function scopeNotReviewedBy($q, $admin_id)
+  {
+    return $q->whereDoesntHave('phaseReviews', function ($q) use ($admin_id) {
+      $q->where('user_id', $admin_id);
+    });
+  }
+
   public function getStatusAttribute()
   {
     $value = $this->getRawOriginal('status');
@@ -274,7 +304,7 @@ class Contract extends BaseModel
           $q->where('end_date', '<=', $date);
         } catch (\Exception $e) {
         }
-      })->when(request('review_status'), function ($q) {
+      })->when(request('phase_review_status'), function ($q) {
         $reviewStatus = request('review_status');
 
         // Join with reviews table
@@ -308,6 +338,24 @@ class Contract extends BaseModel
           ->whereDoesntHave('directACLRules', function ($q) {
             $q->where('admin_id', request()->dnh_acl_rule_for);
           });
+      })
+      // has reviewed phase or can review phase.
+      ->when(request()->phase_reviewer, function ($q) {
+        $q->validAccessibleByAdmin(request()->phase_reviewer)
+        ->orWhereHas('phaseReviews', function ($q) {
+          $q->where('user_id', request()->phase_reviewer);
+        });
+      })
+      ->when(request()->has('phase_review_status') && request()->phase_reviewer, function ($q) {
+        $q->when(request()->phase_review_status == 'reviewed', function ($q) {
+          $q->completelyReviewedBy(request()->phase_reviewer);
+        })
+        ->when(request()->phase_review_status == 'not_reviewed', function ($q) {
+          $q->notReviewedBy(request()->phase_reviewer);
+        })
+        ->when(request()->phase_review_status == 'partially_reviewed', function ($q) {
+          $q->partiallyReviewedBy(request()->phase_reviewer);
+        });
       });
   }
 
@@ -495,6 +543,11 @@ class Contract extends BaseModel
   public function reviews()
   {
     return $this->morphMany(Review::class, 'reviewable');
+  }
+
+  public function phaseReviews()
+  {
+    return $this->hasManyThrough(Review::class, ContractPhase::class, 'contract_id', 'reviewable_id', 'id', 'id')->where('reviewable_type', ContractPhase::class);
   }
 
   public function category(): BelongsTo
@@ -733,5 +786,42 @@ class Contract extends BaseModel
   public function deductableDownpayments(): HasMany
   {
     return $this->hasMany(Invoice::class)->where('type', 'Down Payment')->where('status', 'Paid');
+  }
+
+  public function getSankeyFundsData()
+  {
+    $data = [];
+
+    $this->load('stages.phases.pivotTaxes');
+
+    //sample data
+    // { from: "A", to: "E", value: 1, id:"A0-0" },
+    $this->stages->each(function ($stage) use (&$data) {
+      $data[] = [
+        'from' => $this->subject,
+        'to' => $stage->name,
+        'value' => $stage->stage_amount,
+        'id' => 's'.$stage->id,
+      ];
+
+      $stage->phases->each(function ($phase) use (&$data, $stage) {
+        $data[] = [
+          'from' => $stage->name,
+          'to' => $phase->name,
+          'value' => $phase->total_cost,
+          'id' => 'p'.$phase->id.'-'.$phase->id,
+        ];
+
+        $phase->pivotTaxes->each(function ($tax) use (&$data, $phase) {
+          $data[] = [
+            'from' => $phase->name,
+            'to' => ($tax->tax->name . ' - ' . $tax->tax->categoryName()),
+            'value' => $tax->manual_amount ? $tax->manual_amount : $tax->calculated_amount,
+            'id' => 't'.$phase->id.'-'.$tax->tax->id,
+          ];
+        });
+      });
+    });
+    return $data;
   }
 }

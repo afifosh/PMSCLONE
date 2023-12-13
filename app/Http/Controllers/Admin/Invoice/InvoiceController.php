@@ -154,7 +154,7 @@ class InvoiceController extends Controller
 
       return $this->sendRes('Adjustment updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } elseif ($request->update_retention) {
-      $invoice->updateRetention($request->retention_id);
+      $invoice->updateRetention($request->retention_id, $request->calculated_retention_amount, $request->is_manual_retention, $request->retention_value);
       $invoice->reCalculateTotal();
 
       return $this->sendRes('Retention updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);

@@ -7,6 +7,16 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css')}}">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  }
+
+  #chartdiv {
+    width: 100%;
+    height: 500px
+  }
+</style>
 @endsection
 
 <!-- Page -->
@@ -232,6 +242,16 @@
       </div>
     </div>
     </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title mb-auto">
+            <h5 class="mb-1 text-nowrap">Funds Flow</h5>
+          </div>
+          <div id="chartdiv"></div>
+        </div>
+      </div>
+    </div>
     <!-- Projects table -->
     {{-- <div class="card mb-4">
       <div class="card-datatable table-responsive">
@@ -244,4 +264,82 @@
 <!--/ User Profile Content -->
 @endsection
 @push('scripts')
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+<script>
+// Themes begin
+am4core.useTheme(am4themes_animated);
+// Themes end
+
+var chart = am4core.create("chartdiv", am4charts.SankeyDiagram);
+chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+chart.data = {!! json_encode($sankey_funds_data) !!};
+
+let hoverState = chart.links.template.states.create("hover");
+hoverState.properties.fillOpacity = 0.6;
+
+chart.dataFields.fromName = "from";
+chart.dataFields.toName = "to";
+chart.dataFields.value = "value";
+
+chart.links.template.propertyFields.id = "id";
+chart.links.template.colorMode = "solid";
+chart.links.template.fill = new am4core.InterfaceColorSet().getFor("alternativeBackground");
+chart.links.template.fillOpacity = 0.1;
+chart.links.template.tooltipText = "";
+
+// highlight all links with the same id beginning
+chart.links.template.events.on("over", function(event){
+  let link = event.target;
+  let id = link.id.split("-")[0];
+
+  chart.links.each(function(link){
+    if(link.id.indexOf(id) != -1){
+      link.isHover = true;
+    }
+  })
+})
+
+chart.links.template.events.on("out", function(event){
+  chart.links.each(function(link){
+    link.isHover = false;
+  })
+})
+
+// for right-most label to fit
+chart.paddingRight = 200;
+
+// make nodes draggable
+var nodeTemplate = chart.nodes.template;
+nodeTemplate.width = 20;
+nodeTemplate.cursorOverStyle = am4core.MouseCursorStyle.pointer
+
+
+nodeTemplate.events.on("hit", function(ev) {
+  // Assemble nodes that need to be stay open
+  var focusNodes = [ev.target];
+  collectFocusNodes(focusNodes, ev.target);
+
+  // Toggle all nodes off except one that belongs to trace
+  chart.dataItems.each(function(item) {
+    if (focusNodes.indexOf(item.fromNode) !== -1) {
+      item.fromNode.show();
+      item.toNode.show();
+    }
+    else {
+      item.fromNode.hide();
+      item.toNode.hide();
+    }
+  })
+});
+
+function collectFocusNodes(focusNodes, target) {
+  var items = target.incomingDataItems;
+  target.incomingDataItems.each(function(item) {
+    focusNodes.unshift(item.fromNode);
+    collectFocusNodes(focusNodes, item.fromNode);
+  })
+}
+</script>
 @endpush

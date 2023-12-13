@@ -94,6 +94,9 @@
         $('[data-bs-toggle="tooltip"]').tooltip();
       }
     });
+
+    // close all popovers
+    $('[data-bs-toggle="popover"]').popover('hide');
   }
 
   function update_tax_type(){
@@ -273,6 +276,11 @@
       }
       var elm = document.getElementById('invoice-downpayment')
       var popover = new bootstrap.Popover(elm, options)
+
+      // on popover show, hide other popovers
+      $(document).on('show.bs.popover', function (e) {
+        $('[data-bs-toggle="popover"]').not(e.target).popover('hide');
+      })
   })
 
   function initDropzone()
@@ -537,16 +545,16 @@
           <div class="row p-sm-2 pe-4">
             <div class="col-12 d-flex justify-content-end">
               <section class="center">
-                <button id="invoice-downpayment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-{{count($invoice->deductableDownpayments) == 0 ? 'muted disabled' : 'primary'}} rounded-pill" data-bs-toggle="popover">Down payment</button>
+                <button id="invoice-downpayment" type="button" class="btn btn-sm me-1 btn-outline-{{count($invoice->deductableDownpayments) == 0 ? 'muted disabled' : 'primary'}} rounded-pill" data-bs-toggle="popover">Down payment</button>
               </section>
               <section class="center">
-                <button id="invoice-retention" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Retention</button>
+                <button id="invoice-retention" type="button" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Retention</button>
               </section>
               <section class="center">
-                <button id="invoice-adjustment" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Adjustment</button>
+                <button id="invoice-adjustment" type="button" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Adjustment</button>
               </section>
               <section class="center">
-                <button id="invoice-discount" type="button" tabindex="0" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Discount</button>
+                <button id="invoice-discount" type="button" class="btn btn-sm me-1 btn-outline-primary rounded-pill" data-bs-toggle="popover">Discount</button>
               </section>
               @if ($invoice->is_summary_tax)
                 <section class="center">
@@ -752,9 +760,10 @@
     </div>
   </div>
   {{-- retention Popover --}}
+
   <div hidden>
     <div data-name="popover-invoice-retention">
-      <form method="POST" action="{{route('admin.invoices.update', [$invoice, 'update_retention' => 1])}}">
+      <form method="POST" class="retention-create-form" action="{{route('admin.invoices.update', [$invoice, 'update_retention' => 1])}}">
         @method('PUT')
         <div class="d-flex justify-content-between">
           <b>Retention</b>
@@ -767,7 +776,7 @@
             <select name="retention_id" id="retention_id" class="form-select select2">
               <option value="">{{__('Select Retention')}}</option>
               @forelse ($tax_rates->where('config_type', 'Retention') as $ret)
-                <option value="{{$ret->id}}">{{$ret->name}} (
+                <option value="{{$ret->id}}" data-type="{{$ret->type}}" data-amount="{{$ret->amount}}" @selected($invoice->retention_id == $ret->id)>{{$ret->name}} (
                   @if ($ret->type != 'Percent')
                       @cMoney($ret->amount, $invoice->contract->currency, true)
                   @else
@@ -778,10 +787,20 @@
               @endforelse
             </select>
           </div>
-          {{-- <div class="form-group">
+          <div class="form-group">
             {{ Form::label('retention_value', __('Retention Value'), ['class' => 'col-form-label']) }}
-            {!! Form::number('retention_value', null, ['class' => 'form-control', 'placeholder' => __('0.00')]) !!}
-          </div> --}}
+            {!! Form::number('retention_value', $invoice->retention_amount, ['class' => 'form-control', 'disabled' => ($invoice->retention_manual_amount == 0), 'placeholder' => __('0.00')]) !!}
+          </div>
+          <div class="col-12 mt-2">
+            <label class="switch">
+              <input class="switch-input" name="is_manual_retention" type="checkbox" value="1" @checked($invoice->retention_manual_amount != 0)>
+              <span class="switch-toggle-slider">
+                <span class="switch-on"></span>
+                <span class="switch-off"></span>
+              </span>
+              <span class="switch-label">Adjust Amount</span>
+            </label>
+          </div>
         </div>
         <div class="d-flex justify-content-end mt-2">
           <button class="btn btn-primary btn-sm" data-form="ajax-form">Update</button>
@@ -832,18 +851,42 @@
   {{-- end downpayment popover --}}
 </div>
 @endsection
-<script>
-  window.oURL = window.location.href;
+@push('scripts')
+  <script>
+    // on change of .retention-create-form retention_id calculate retention amount
+    $(document).on('change', '.retention-create-form #retention_id', function(){
+      var type = $(this).find(':selected').data('type');
+      var amount = $(this).find(':selected').data('amount');
+      if(type == 'Percent'){
+        var total = $('.invoice_total').data('amount');
+        var retention = parseFloat(total) * parseFloat(amount) / 100;
+        $('.retention-create-form [name="retention_value"]').val(retention);
+      }else{
+        $('.retention-create-form [name="retention_value"]').val(amount);
+      }
+    })
 
-  function liveWireRescan()
-  {
-    Livewire.rescan(document.getElementById('comments-section'));
-    Alpine.initTree(document.getElementById('comments-section'));
-    setTimeout(function () {
-          history.replaceState(null, null, oURL);
-    }, 1000);
-  }
-</script>
-@livewireScripts
-<x-comments::scripts />
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    // on change of .retention-create-form is_manual_retention calculate enable/disable retention_value
+    $(document).on('change', '.retention-create-form [name="is_manual_retention"]', function(){
+      if($(this).is(':checked')){
+        $('.retention-create-form [name="retention_value"]').prop('disabled', false);
+      }else{
+        $('.retention-create-form [name="retention_value"]').prop('disabled', true);
+      }
+    })
+
+    window.oURL = window.location.href;
+
+    function liveWireRescan()
+    {
+      Livewire.rescan(document.getElementById('comments-section'));
+      Alpine.initTree(document.getElementById('comments-section'));
+      setTimeout(function () {
+            history.replaceState(null, null, oURL);
+      }, 1000);
+    }
+  </script>
+  @livewireScripts
+  <x-comments::scripts />
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+@endpush

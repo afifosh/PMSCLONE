@@ -240,7 +240,12 @@ class ContractPhase extends BaseModel
       }
     })->join('contract_stages as cs1', 'contract_phases.stage_id', '=', 'cs1.id')
       ->join('contracts as c1', 'cs1.contract_id', '=', 'c1.id')
-      ->leftJoin('programs as p1', 'c1.program_id', '=', 'p1.id');
+      ->leftJoin('programs as p1', 'c1.program_id', '=', 'p1.id')
+    ->when(request()->has('dnh-regular-invoice') && request()->get('dnh-regular-invoice'), function ($q) {
+      $q->whereDoesntHave('addedAsInvoiceItem.invoice', function ($q) {
+        $q->where('type', 'Regular');
+      });
+    });
   }
 
 

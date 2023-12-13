@@ -87,7 +87,7 @@
       {{ Form::label('phase_id', __('Phase'), ['class' => 'col-form-label']) }}
       {!! Form::select('phase_id', $phases ?? [], null, [
         'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['ContractPhase', 'dependent' => 'contract_id']),
+        'data-url' => route('resource-select', ['ContractPhase', 'dependent' => 'contract_id', 'dnh-regular-invoice' => true]),
         'data-placeholder' => 'Select Phase',
         'data-dependent_id' => 'contract_id',
         'data-allow-clear' => 'true'

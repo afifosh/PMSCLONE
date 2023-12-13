@@ -3,10 +3,14 @@
 namespace App\Http\Requests\Admin\Invoice;
 
 use App\Models\Contract;
+use App\Models\Invoice;
+use App\Models\InvoiceConfig;
 use Illuminate\Foundation\Http\FormRequest;
 
 class InvoiceStoreRequest extends FormRequest
 {
+  public $retention_rate = null;
+  public $calculated_retention_amount = 0;
   /**
    * Determine if the user is authorized to make this request.
    */
@@ -51,8 +55,22 @@ class InvoiceStoreRequest extends FormRequest
     }
 
     elseif(request()->update_retention){
+      $this->merge(['is_manual_retention' => $this->boolean('is_manual_retention')]);
+      $this->validate([
+        'retention_id' => 'required|exists:invoice_configs,id',
+        'retention_value' => 'required_if:is_manual_retention,1|nullable|numeric',
+      ], $this->messages());
+
+      $this->retention_rate = InvoiceConfig::find($this->retention_id);
+      $this->calculateRetentionAmount();
       return [
-        'retention_id' => 'nullable|exists:invoice_configs,id',
+        'retention_id' => 'required|exists:invoice_configs,id',
+        'is_manual_retention' => 'required|boolean',
+        'retention_value' => ['required_if:is_manual_retention,1|nullable|numeric', function($attribute, $value, $fail){
+          // if manual_retention then retention_value should between +-1 from calculated_retention_amount
+          if($this->is_manual_retention && ($value > ($this->calculated_retention_amount + 1) || $value < ($this->calculated_retention_amount - 1)))
+            $fail('Retention amount must be between '.($this->calculated_retention_amount - 1).' and '.($this->calculated_retention_amount + 1));
+        }],
         // 'retention_type' => 'required|in:Fixed,Percentage',
         // 'retention_value' => ['nullable', 'numeric', function($attribute, $value, $fail){
         //   if(request()->retention_type == 'Percentage' && ($value > 100 || $value < 0))
@@ -93,6 +111,13 @@ class InvoiceStoreRequest extends FormRequest
     ];
   }
 
+  private function calculateRetentionAmount()
+  {
+    if($this->retention_rate->type != 'Fixed')
+      $this->calculated_retention_amount = ($this->invoice->total * $this->retention_rate->amount) / 100;
+    else
+      $this->calculated_retention_amount = $this->retention_rate->amount;
+  }
   /**
    * Get the error messages for the defined validation rules.
    *
@@ -114,5 +139,7 @@ class InvoiceStoreRequest extends FormRequest
       'subtotal.numeric' => 'Subtotal must be a number',
       'subtotal.gt' => 'Subtotal must be greater than 0',
       'discription.required_if' => 'Description is required',
+      'retention_id.required' => 'Retention is required',
+      'retention_id.exists' => 'Retention is not valid',
     ];}
 }

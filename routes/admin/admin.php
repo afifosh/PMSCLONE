@@ -112,6 +112,7 @@ use App\Http\Controllers\Admin\Invoice\Item\SubtotalAdjustmentController as Item
 use App\Http\Controllers\Admin\Invoice\Item\TotalAmountAdjustmentController as ItemTotalAmountAdjustmentController;
 use App\Http\Controllers\Admin\Invoice\ItemDeductionController;
 use App\Http\Controllers\Admin\Invoice\ItemTaxController;
+use App\Http\Controllers\Admin\Invoice\RetentionController;
 use App\Http\Controllers\Admin\Invoice\TaxAuthorityInvoiceController;
 
 Route::view('/inbox', 'admin.pages.email.index')->name('email')->middleware('auth:admin');
@@ -512,6 +513,7 @@ Route::prefix('contracts')->group(function () {
     Route::put('invoices/{invoice}/invoice-tems/sort', [InvoiceController::class, 'sortItems'])->name('invoices.invoice-items.sort');
     Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
     Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
+    Route::delete('invoices/{invoice}/delete-retention', [RetentionController::class, 'destroy'])->name('invoices.destroy-retention');
     Route::resource('invoices', InvoiceController::class);
     Route::resource('tax-authority-invoices', TaxAuthorityInvoiceController::class)->only(['index', 'show', 'destroy']);
     Route::post('invoices/{invoice}/invoice-items/store-bulk', [InvoiceItemController::class, 'storeBulk'])->name('invoices.invoice-items.store-bulk');

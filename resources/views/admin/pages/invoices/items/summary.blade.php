@@ -109,8 +109,20 @@
 @if($invoice->retention_name != null)
   <hr />
   <div class="d-flex justify-content-between mb-2">
-    <span class="me-2">Retention ({{$invoice->retention_name}} @if ($invoice->retention_percentage){{$invoice->retention_percentage}}%@endif):</span>
-    <span class="fw-semibold">@cMoney(-$invoice->retention_amount, $invoice->contract->currency, true)</span>
+    <span class="me-2">
+      <a data-toggle="ajax-delete" data-href="{{route('admin.invoices.destroy-retention', ['invoice' => $invoice->id])}}"><i class="ti ti-trash"></i></a>
+      Retention ({{$invoice->retention_name}} @if ($invoice->retention_percentage){{$invoice->retention_percentage}}%@endif):
+    </span>
+    <span class="fw-semibold"
+      @if($invoice->retention_manual_amount)
+        data-bs-toggle="tooltip" data-placement="top" title="Calculated Amount : {{cMoney($invoice->getRawOriginal('retention_amount') /1000, $invoice->contract->currency, true)}}"
+      @endif
+    >
+      @cMoney(-$invoice->retention_amount, $invoice->contract->currency, true)
+      @if($invoice->retention_manual_amount)
+       <span class="text-danger">*</span>
+      @endif
+    </span>
   </div>
 @endif
 @if ($tab == 'summary' && $invoice->paid_amount != 0)

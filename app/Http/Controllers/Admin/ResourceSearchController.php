@@ -192,7 +192,7 @@ class ResourceSearchController extends Controller
 
     $query = $model::query();
 
-    return $query->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
+    return $query->applyRequestFilters()->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
       $q->where(function ($q) use ($allowedResources, $resource) {
         foreach ($allowedResources[$resource]['search'] as $search) {
           $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
