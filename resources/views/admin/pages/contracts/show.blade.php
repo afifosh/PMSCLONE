@@ -14,7 +14,7 @@
 
   #chartdiv {
     width: 100%;
-    height: 1000px;
+    height: 100%;
   }
 </style>
 @endsection
@@ -185,7 +185,7 @@
 @include('admin.pages.contracts.header', ['tab' => 'overview'])
 <!-- User Profile Content -->
 <div class="row">
-  <div class="col-xl-12 col-lg-5 col-md-5">
+  <div class="col-xl-6 col d-flex">
     <!-- About User -->
     <div class="card mb-4">
       <div class="card-body">
@@ -210,7 +210,17 @@
     </div>
     <!--/ About User -->
   </div>
-  <div class="col-xl-8 col-lg-7 col-md-7">
+  <div class="col-xl-6 col d-flex">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title mb-auto">
+          <small class="card-text text-uppercase">Funds Flow</small>
+        </div>
+        <div id="chartdiv"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-12 col-lg-12 col-md-6">
     <!-- Activity Timeline -->
     <div class="row">
       <div class="col-xl-6 mb-4 col-md-6">
@@ -240,18 +250,10 @@
           </div>
         </div>
       </div>
+
     </div>
     </div>
-    <div class="col-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="card-title mb-auto">
-            <h5 class="mb-1 text-nowrap">Funds Flow</h5>
-          </div>
-          <div id="chartdiv"></div>
-        </div>
-      </div>
-    </div>
+
     <!-- Projects table -->
     {{-- <div class="card mb-4">
       <div class="card-datatable table-responsive">
@@ -289,30 +291,14 @@ chart.links.template.fill = new am4core.InterfaceColorSet().getFor("alternativeB
 chart.links.template.fillOpacity = 0.1;
 chart.links.template.tooltipText = "";
 
-// highlight all links with the same id beginning
-chart.links.template.events.on("over", function(event){
-  let link = event.target;
-  let id = link.id.split("-")[0];
 
-  chart.links.each(function(link){
-    if(link.id.indexOf(id) != -1){
-      link.isHover = true;
-    }
-  })
-})
-
-chart.links.template.events.on("out", function(event){
-  chart.links.each(function(link){
-    link.isHover = false;
-  })
-})
 
 // for right-most label to fit
 chart.paddingRight = 200;
 
 // make nodes draggable
 var nodeTemplate = chart.nodes.template;
-nodeTemplate.width = 20;
+nodeTemplate.width = 10;
 nodeTemplate.cursorOverStyle = am4core.MouseCursorStyle.pointer
 
 
