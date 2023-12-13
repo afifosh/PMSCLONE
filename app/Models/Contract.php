@@ -797,12 +797,12 @@ class Contract extends BaseModel
     //sample data
     // { from: "A", to: "E", value: 1, id:"A0-0" },
     $this->stages->each(function ($stage) use (&$data) {
-      $data[] = [
-        'from' => $this->subject,
-        'to' => $stage->name,
-        'value' => $stage->stage_amount,
-        'id' => 's'.$stage->id,
-      ];
+      // $data[] = [
+      //   'from' => $this->subject,
+      //   'to' => $stage->name,
+      //   'value' => $stage->stage_amount,
+      //   'id' => 's'.$stage->id,
+      // ];
 
       $stage->phases->each(function ($phase) use (&$data, $stage) {
         $data[] = [

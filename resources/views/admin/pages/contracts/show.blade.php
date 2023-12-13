@@ -14,7 +14,7 @@
 
   #chartdiv {
     width: 100%;
-    height: 500px
+    height: 1000px;
   }
 </style>
 @endsection

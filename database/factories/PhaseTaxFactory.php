@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\InvoiceConfig;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +17,15 @@ class PhaseTaxFactory extends Factory
      */
     public function definition(): array
     {
+      $tax = InvoiceConfig::activeTaxes()->inRandomOrder()->first();
         return [
-            //
+          'contract_phase_id' => null, // set in PhaseFactory
+          'tax_id' => $tax->id,
+          'amount' => $tax->amount,
+          'type' => $tax->type,
+          'calculated_amount' => $tax->amount,
+          'manual_amount' => 0,
+          'category' => $tax->category,
         ];
     }
 }
