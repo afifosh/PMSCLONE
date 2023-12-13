@@ -190,7 +190,7 @@
     <div class="card mb-4 h-100">
       <div class="card-body">
         <small class="card-text text-uppercase">Flow</small>
-  
+
         <div id="chartdiv"  class="mb-4"></div>
 
       </div>
@@ -293,12 +293,13 @@ chart.links.template.propertyFields.id = "id";
 chart.links.template.colorMode = "solid";
 chart.links.template.fill = new am4core.InterfaceColorSet().getFor("alternativeBackground");
 chart.links.template.fillOpacity = 0.1;
-chart.links.template.tooltipText = "";
-
+chart.links.template.tooltipText =  "Phase: [bold]{phase}[/]";
 
 
 // for right-most label to fit
-chart.paddingRight = 200;
+chart.paddingRight = 150;
+chart.paddingTop = 10;
+chart.paddingBottom = 30;
 
 // make nodes draggable
 var nodeTemplate = chart.nodes.template;

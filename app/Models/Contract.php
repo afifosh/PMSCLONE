@@ -807,7 +807,8 @@ class Contract extends BaseModel
       $stage->taxes()->each(function ($tax) use (&$data, $stage) {
         $data[] = [
           'from' => $stage->name,
-          'to' => ($tax->tax->name . ' - ' . $tax->tax->categoryName()),
+          'phase' => $tax->contractPhase->name,
+          'to' => ($tax->tax->name . ' - ' . $tax->tax->categoryShortName()),
           'value' =>$tax->manual_amount ? $tax->manual_amount : $tax->calculated_amount,
           'id' => 't'.$stage->id.'-'.$tax->tax->id,
         ];

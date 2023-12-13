@@ -32,6 +32,12 @@ class InvoiceConfig extends Model
    3 => 'Reverse Charge Tax'
   ];
 
+  const shortCategories = [
+    1 => 'VAT',
+    2 => 'WHT',
+    3 => 'RC'
+  ];
+
   public function getAmountAttribute($value)
   {
     return $value / 1000;
@@ -69,5 +75,10 @@ class InvoiceConfig extends Model
   public function categoryName($category = null)
   {
     return self::Categories[$category ? $category : $this->category];
+  }
+
+  public function categoryShortName($category = null)
+  {
+    return self::shortCategories[$category ? $category : $this->category];
   }
 }
