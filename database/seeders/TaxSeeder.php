@@ -14,16 +14,6 @@ class TaxSeeder extends Seeder
   {
     // InvoiceConfig::factory()->count(5)->create();
 
-        // No Tax 0%
-        InvoiceConfig::create([
-          'name' => 'No Tax',
-          'type' => 'Percent',
-          'amount' => 0,
-          'status' => 'Active',
-          'config_type' => 'Tax',
-          'category' => 1 // Value Added Tax
-      ]);
-
       // 5% Tax
       InvoiceConfig::create([
           'name' => '5% Tax',
