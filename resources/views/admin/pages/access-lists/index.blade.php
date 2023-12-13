@@ -113,22 +113,43 @@ $configData = Helper::appClasses();
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>
     <script>
-      function revokeContractAccess(admin_id, contract_id){
-        // create a button element with data-toggle="confirm-action" and click it with jquery
-        var button = $('<button type="button" class="d-none" data-toggle="confirm-action" data-confirmation-desc="Are you sure to revoke this access?" data-href="' + route('admin.admin-access-lists.contracts.revoke-access', {admin_access_list: admin_id, contract: contract_id}) + '"></button>');
-        // append the button to the body
-        $('body').append(button);
-        // click the button
-        button.click();
+      function revokeContractAccess(admin_id, contract_id, status){
+        $.ajax({
+          type: "POST",
+          url: route('admin.admin-access-lists.contracts.revoke-access', {admin_access_list: admin_id, contract: contract_id}),
+          data: {
+            is_revoked: status
+          },
+          success: function (response) {
+            if (response.data.event == 'table_reload') {
+              if (response.data.table_id != undefined && response.data.table_id != null && response.data.table_id != '') {
+                $('#' + response.data.table_id).DataTable().ajax.reload(null, false);
+              } else {
+                $('#dataTableBuilder').DataTable().ajax.reload(null, false);
+              }
+            }
+          }
+        });
       }
 
-      function revokeProgramAccess(admin_id, program_id)
+      function revokeProgramAccess(admin_id, program_id, status)
       {
-        var button = $('<button type="button" class="d-none" data-toggle="confirm-action" data-confirmation-desc="Are you sure to revoke this access?" data-href="' + route('admin.admin-access-lists.programs.revoke-access', {admin_access_list: admin_id, program: program_id}) + '"></button>');
-        // append the button to the body
-        $('body').append(button);
-        // click the button
-        button.click();
+        $.ajax({
+          type: "POST",
+          url: route('admin.admin-access-lists.programs.revoke-access', {admin_access_list: admin_id, program: program_id}),
+          data: {
+            is_revoked: status
+          },
+          success: function (response) {
+            if (response.data.event == 'table_reload') {
+              if (response.data.table_id != undefined && response.data.table_id != null && response.data.table_id != '') {
+                $('#' + response.data.table_id).DataTable().ajax.reload(null, false);
+              } else {
+                $('#dataTableBuilder').DataTable().ajax.reload(null, false);
+              }
+            }
+          }
+        });
       }
       $(document).ready(function() {
         // Variable to track the currently expanded row
@@ -236,6 +257,7 @@ $configData = Helper::appClasses();
                 { data: "name", "name": "programs.name", title: 'Program Name' },
                 { data: "granted_till", title: 'Granted Till' },
                 { data: "status", title: 'Status' },
+                { data: "revoke_access", title: 'Revoke Access', orderable: false, searchable: false},
                 { data: "actions", title: 'Actions', orderable: false, searchable: false }
               ],
               buttons : [
@@ -265,6 +287,7 @@ $configData = Helper::appClasses();
               { data: "access_type", title: "Type"},
               { data: "granted_till", title: 'Granted Till' },
               { data: "status", title: 'Status' },
+              { data: "revoke_access", title: 'Revoke Access', orderable: false, searchable: false},
               { data: "actions", title: 'Actions', orderable: false, searchable: false }
             ],
             destroy: true,

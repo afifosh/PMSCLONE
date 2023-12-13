@@ -43,6 +43,10 @@ class AdminAccessListContractController extends Controller
           return '<span class="badge bg-label-success">Active</span>';
         }
       })
+      ->addColumn('revoke_access', function ($contract) use ($admin_id) {
+        $aclRule = $contract->directACLRules[0] ?? $contract->program->pivotAccessLists[0];
+        return view('admin.pages.access-lists.contracts.revoke-column', compact('contract', 'admin_id', 'aclRule'));
+      })
       ->addColumn('actions', function ($contract)  use ($admin_id) {
         return view('admin.pages.access-lists.contracts.action', compact('contract', 'admin_id'));
       })
@@ -65,7 +69,7 @@ class AdminAccessListContractController extends Controller
           'admin_id' => $admin_id,
           'accessable_id' => $contract_id,
           'accessable_type' => Contract::class,
-          'is_revoked' => true
+          'is_revoked' => request()->boolean('is_revoked')
         ]
       );
 

@@ -32,6 +32,10 @@ class AdminAccessListProgramController extends Controller
           return '<span class="badge bg-label-success">Active</span>';
         }
       })
+      ->addColumn('revoke_access', function ($program) use ($admin_id) {
+        $aclRule = $program->pivotAccessLists[0];
+        return view('admin.pages.access-lists.programs.revoke-column', compact('program', 'admin_id', 'aclRule'));
+      })
       ->addColumn('actions', function ($program)  use ($admin_id) {
         return view('admin.pages.access-lists.programs.action', compact('program', 'admin_id'));
       })
@@ -44,7 +48,7 @@ class AdminAccessListProgramController extends Controller
     DB::beginTransaction();
 
     try {
-      $adminAccessList->accessiblePrograms()->updateExistingPivot($program, ['is_revoked' => 1]);
+      $adminAccessList->accessiblePrograms()->updateExistingPivot($program, ['is_revoked' => request()->boolean('is_revoked')]);
 
       DB::commit();
 
