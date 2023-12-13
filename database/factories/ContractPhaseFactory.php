@@ -17,7 +17,7 @@ class ContractPhaseFactory extends Factory
   public function definition(): array
   {
     return [
-      'name' => $this->faker->word,
+      'name' => $this->faker->unique()->firstName(),
       'description' => $this->faker->sentence(),
       'estimated_cost' => 0,
       'tax_amount' => 0,
