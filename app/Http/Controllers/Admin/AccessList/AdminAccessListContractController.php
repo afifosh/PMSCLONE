@@ -25,7 +25,7 @@ class AdminAccessListContractController extends Controller
       })
       ->addColumn('access_type', function ($contract) {
         if (isset($contract->directACLRules[0])) {
-          return '<span class="badge bg-label-danger">Explicit</span>';
+          return '<span class="badge bg-label-danger">Direct</span>';
         }
 
         return '<span class="badge bg-label-success">Inherited</span>';

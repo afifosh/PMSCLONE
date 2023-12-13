@@ -3,7 +3,7 @@
     {{-- is_before_tax --}}
     <div class="form-group col-6">
       {{ Form::label('is_before_tax', __('Deduction Calculation'), ['class' => 'col-form-label']) }}
-      {!! Form::select('is_before_tax', ['1' => 'Excluding Tax', '0' => 'Including Tax'], @$invoiceItem->deduction->is_before_tax ? 1 : 0, ['class' => 'form-select globalOfSelect2', 'id' => 'is_before_tax']) !!}
+      {!! Form::select('is_before_tax', ['1' => 'Excluding Tax (Before Tax)', '0' => 'Including Tax (After Tax)'], @$invoiceItem->deduction->is_before_tax ? 1 : 0, ['class' => 'form-select globalOfSelect2', 'id' => 'is_before_tax']) !!}
     </div>
     {{-- Downpayment Deduction --}}
     <div class="form-group col-6">
