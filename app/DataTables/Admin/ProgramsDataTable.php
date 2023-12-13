@@ -30,9 +30,9 @@ class ProgramsDataTable extends DataTable
       ->addColumn('parent', function (Program $program) {
         return @$program->parent->name ?? '-';
       })
-      // ->editColumn('description', function ($program) {
-      //   return substr($program->description, 0, 15);
-      // })
+      ->addColumn('children', function ($program) {
+        return view('admin._partials.sections.programs-avatar-group', ['programs' => $program->children, 'limit' => 5]);
+      })
       ->addColumn('action', function (Program $program) {
         return view('admin.pages.programs.action', compact('program'));
       })
@@ -84,7 +84,10 @@ class ProgramsDataTable extends DataTable
       ->orderBy([0, 'DESC'])
       ->parameters([
         'buttons' => $buttons,
-        "scrollX" => true
+        "scrollX" => true,
+        "drawCallback" => "function (settings) {
+          $('[data-bs-toggle=\"tooltip\"]').tooltip();
+        }"
       ]);
   }
 
@@ -101,8 +104,9 @@ class ProgramsDataTable extends DataTable
       Column::make('parent'),
       Column::make('contracts_count')->title('Number of Contracts'),
       Column::make('program_code'),
+      Column::make('children')->title('Child Programs'),
       // Column::make('description'),
-      Column::make('created_at'),
+      // Column::make('created_at'),
       Column::make('updated_at'),
     ];
   }
