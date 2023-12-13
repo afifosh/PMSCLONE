@@ -185,7 +185,20 @@
 @include('admin.pages.contracts.header', ['tab' => 'overview'])
 <!-- User Profile Content -->
 <div class="row">
-  <div class="col-xl-6 col d-flex">
+
+  <div class="col-lg-6 mb-4">
+    <div class="card mb-4 h-100">
+      <div class="card-body">
+        <small class="card-text text-uppercase">Flow</small>
+  
+        <div id="chartdiv"  class="mb-4"></div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="col-xl-6">
     <!-- About User -->
     <div class="card mb-4">
       <div class="card-body">
@@ -210,16 +223,7 @@
     </div>
     <!--/ About User -->
   </div>
-  <div class="col-xl-6 col d-flex">
-    <div class="card">
-      <div class="card-body">
-        <div class="card-title mb-auto">
-          <small class="card-text text-uppercase">Funds Flow</small>
-        </div>
-        <div id="chartdiv"></div>
-      </div>
-    </div>
-  </div>
+
   <div class="col-xl-12 col-lg-12 col-md-6">
     <!-- Activity Timeline -->
     <div class="row">
