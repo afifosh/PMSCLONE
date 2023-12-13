@@ -792,7 +792,7 @@ class Contract extends BaseModel
   {
     $data = [];
 
-    $this->load('stages.phases.pivotTaxes');
+    $this->load('stages.taxes');
 
     //sample data
     // { from: "A", to: "E", value: 1, id:"A0-0" },
@@ -804,23 +804,32 @@ class Contract extends BaseModel
       //   'id' => 's'.$stage->id,
       // ];
 
-      $stage->phases->each(function ($phase) use (&$data, $stage) {
+      $stage->taxes()->each(function ($tax) use (&$data, $stage) {
         $data[] = [
-          'from' => $stage->name,
-          'to' => $phase->name,
-          'value' => $phase->total_cost,
-          'id' => 'p'.$phase->id.'-'.$phase->id,
+          'from' => $stage->name . ($stage->id),
+          'to' => ($tax->tax->name . ' - ' . $tax->tax->categoryName()),
+          'value' =>$tax->manual_amount ? $tax->manual_amount : $tax->calculated_amount,
+          'id' => 't'.$stage->id.'-'.$tax->tax->id,
         ];
-
-        $phase->pivotTaxes->each(function ($tax) use (&$data, $phase) {
-          $data[] = [
-            'from' => $phase->name,
-            'to' => ($tax->tax->name . ' - ' . $tax->tax->categoryName()),
-            'value' => $tax->manual_amount ? $tax->manual_amount : $tax->calculated_amount,
-            'id' => 't'.$tax->id.'-'.$tax->tax->id,
-          ];
-        });
       });
+
+      // $stage->phases->each(function ($phase) use (&$data, $stage) {
+      //   // $data[] = [
+      //   //   'from' => $stage->name,
+      //   //   'to' => $phase->name,
+      //   //   'value' => $phase->total_cost,
+      //   //   'id' => 'p'.$phase->id.'-'.$phase->id,
+      //   // ];
+
+      //   $phase->pivotTaxes->each(function ($tax) use (&$data, $stage) {
+      //     $data[] = [
+      //       'from' => $stage->name,
+      //       'to' => ($tax->tax->name . ' - ' . $tax->tax->categoryName()),
+      //       'value' => $tax->manual_amount ? $tax->manual_amount : $tax->calculated_amount,
+      //       'id' => 't'.$stage->id.'-'.$tax->tax->id,
+      //     ];
+      //   });
+      // });
     });
     return $data;
   }

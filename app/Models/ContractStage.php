@@ -130,6 +130,11 @@ class ContractStage extends BaseModel
       return $allUsersStagesStatus;
   }
 
+  public function taxes()
+  {
+    return $this->hasManyThrough(PhaseTax::class, ContractPhase::class, 'stage_id', 'contract_phase_id')->orderBy('category', 'asc')->orderBy('tax_id', 'asc');
+  }
+
 
   public function getStatusAttribute()
   {
