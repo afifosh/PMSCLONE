@@ -817,7 +817,7 @@ class Contract extends BaseModel
             'from' => $phase->name,
             'to' => ($tax->tax->name . ' - ' . $tax->tax->categoryName()),
             'value' => $tax->manual_amount ? $tax->manual_amount : $tax->calculated_amount,
-            'id' => 't'.$phase->id.'-'.$tax->tax->id,
+            'id' => 't'.$tax->id.'-'.$tax->tax->id,
           ];
         });
       });
