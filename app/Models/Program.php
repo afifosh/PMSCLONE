@@ -85,6 +85,11 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
       return $this->belongsTo(Program::class, 'parent_id', 'id');
     }
 
+    public function children(): HasMany
+    {
+        return $this->hasMany(Program::class, 'parent_id', 'id');
+    }    
+
     public function contracts(): HasMany
     {
       return $this->hasMany(Contract::class, 'program_id', 'id');

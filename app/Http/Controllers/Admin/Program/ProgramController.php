@@ -16,9 +16,25 @@ class ProgramController extends Controller
 {
   public function index(ProgramsDataTable $dataTable)
   {
-    return $dataTable->render('admin.pages.programs.index');
-    // return view('admin.pages.programs.index');
+    
+    // Total number of contracts
+    $totalContracts = Contract::count();
+    // Total number of contracts linked to a program
+    $totalLinkedContracts = Contract::whereNotNull('program_id')->count();
+    // Total number of contracts not linked to any program
+    $totalUnlinkedContracts = Contract::whereNull('program_id')->count();
+    // Total number of programs
+    $totalPrograms = Program::count();
+
+    // Render the DataTable and pass additional data to the view
+    return $dataTable->render('admin.pages.programs.index', [
+        'totalContracts' => $totalContracts,
+        'totalLinkedContracts' => $totalLinkedContracts,
+        'totalUnlinkedContracts' => $totalUnlinkedContracts,
+        'totalPrograms' => $totalPrograms,
+    ]);
   }
+
   public function create()
   {
     $data['program'] = new Program();
