@@ -295,7 +295,7 @@ class Invoice extends Model
       'downpayment_amount' => $this->downPayments()->wherePivot('is_after_tax', 1)->sum('amount') / 1000,
       'retention_amount' => $retention_amount,
       // if retention amount is greater than +-1 of the calculated amount than reset the manual retention amount
-      'retention_manual_amount' => abs($retention_amount - $this->retention_manual_amount) > 1 ? 0 : $this->retention_manual_amount,
+      'retention_manual_amount' => 0,
       'total' => $total,
       'total_tax' => $total_tax,
       'rounding_amount' => ($this->rounding_amount ? (floor($total) - $total) : 0),
@@ -332,8 +332,6 @@ class Invoice extends Model
       $data['retention_manual_amount'] = $manual_amount == $calculated_amount ? 0 : ($is_manual_retention ? $manual_amount : 0);
 
     $this->update($data + ['retention_id' => $retention_id, 'retention_name' => $retenion->name ?? null]);
-
-    $this->reCalculateTotal();
   }
 
   /**

@@ -178,7 +178,11 @@ public function query(Contract $model): QueryBuilder
       ->responsive(true)
       ->parameters([
         'buttons' => $buttons,
-        "scrollX" => true
+        "scrollX" => true,
+        'drawCallback' => 'function(){
+            expandOldExpandedRow();
+            $(\'[data-bs-toggle="tooltip"]\').tooltip();
+          }'
       ]);
   }
 

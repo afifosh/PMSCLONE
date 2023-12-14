@@ -110,218 +110,37 @@ $configData = Helper::appClasses();
     </div>
     </div>
   </div>
-
-
-
 @endsection
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
-    <script>
-
-function initTaxRepeater()
-{
-  $('.repeater').repeater({
-      defaultValues: {
-          'label': '',
-          'type': 'text'
-      },
-      show: function () {
-          $(this).slideDown();
-
-          $(this).find('.select2').each(function() {
-            if (!$(this).data('select2')) {
-              var $this = $(this);
-              $this.wrap('<div class="position-relative"></div>');
-              $this.select2({
-                dropdownParent: $this.parent()
-              });
-            }
-          });
-          calculateTotalCost();
-          // $('.repeaters').animate({ scrollTop: 9999 }, 'slow');
-      },
-      hide: function (deleteElement) {
-        // add class to delete element
-        $(this).addClass('removed-element');
-        $(this).slideUp(deleteElement);
-        calculateTotalCost();
-      },
-      ready: function (setIndexes) {
-          // $dragAndDrop.on('drop', setIndexes);
-      },
-      isFirstItemUndeletable: false
-  })
-
-  /**************************
-   * Phase create form js  **
-   **************************/
-  $(document).on('change', '.is-manual-tax', function(){
-    const isChecked = $(this).is(':checked');
-    const parent = $(this).parents('[data-repeater-item]');
-    const taxAmount = parent.find('.tax-amount');
-    const taxRate = parent.find('.tax-rate');
-    const taxRateAmount = taxRate.find(':selected').data('amount');
-    const taxRateType = taxRate.find(':selected').data('type');
-    if(isChecked){
-      taxAmount.prop('disabled', false);
-    }else{
-      taxAmount.prop('disabled', true);
-    }
-    calculateTotalCost();
-  })
-
-  $(document).on('change keyup', '.pay-on-behalf, .is-authority-tax, .tax-amount, .tax-rate, [name="estimated_cost"], .is-manual-tax', function(){
-    calculateTotalCost();
-  })
-
-  // if pay-on-behalf is checked, check and disable is-authority-tax
-  $(document).on('change', '.pay-on-behalf', function(){
-    const isChecked = $(this).is(':checked');
-    const parent = $(this).parents('[data-repeater-item]');
-    const isAuthorityTax = parent.find('.is-authority-tax');
-    if(isChecked){
-      isAuthorityTax.prop('checked', true);
-      isAuthorityTax.prop('disabled', true);
-    }else{
-      isAuthorityTax.prop('disabled', false);
-    }
-  })
-
-  function calculateTotalCost()
-  {
-    const estimatedCost = $('[name="estimated_cost"]').val();
-
-    var totalTax = parseFloat(0);
-    let totalCost = parseFloat(estimatedCost);
-    if(!totalCost){
-      return;
-    }
-    $('.phase-create-form .tax-rate').each(function (index, element) {
-      // element == this
-      $this = $(this);
-      const taxAmount = $this.find(':selected').data('amount');
-      const taxType = $this.find(':selected').data('type');
-      var amount = 0;
-      if(taxType == 'Percent'){
-        amount = (estimatedCost * taxAmount) / 100;
-      }else{
-        amount = taxAmount;
-      }
-      // if manual tax is checked, use manual tax amount
-      if($this.parents('[data-repeater-item]').find('.is-manual-tax').is(':checked')){
-        amount = parseFloat($this.parents('[data-repeater-item]').find('.tax-amount').val());
-      }else if(amount != undefined){
-        $(this).parents('[data-repeater-item]').find('.tax-amount').val(amount.toFixed(3));
-      }
-      // if pay on behalf use -ve amount
-      if($this.parents('[data-repeater-item]').find('.pay-on-behalf').is(':checked')){
-        amount = -amount;
-      }
-      totalCost += amount;
-    });
-    totalCost = totalCost.toFixed(3);
-    $('[name="total_cost"]').val(totalCost);
-    validateTotalCost();
+<script>
+  function reloadDataTables() {
+    $('#paymentsplan-table').DataTable().ajax.reload(null, false);
   }
 
-  /**
-   * End Phase create form js
-   */
-}
-        function togglePhaseReviewStatus(buttonElement) {
-            // Extract data attributes
-            const contractId = buttonElement.getAttribute('data-contract-id');
-            const phaseId = buttonElement.getAttribute('data-phase-id');
-            const isReviewed = buttonElement.getAttribute('data-is-reviewed') === 'true';
-
-            // Using the route function to dynamically generate the URL
-            const url = route('admin.contracts.phases.toggle-review', {
-                contract: contractId,
-                phase_id: phaseId
-            });
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-
-
-                  if (data.data.event == 'table_reload') {
-
-if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
-  $('#' + data.data.table_id)
-    .DataTable()
-    .ajax.reload(null, false);
-}
-
-}
-if(data.data.close == 'globalModal'){
-$('#globalModal').modal('hide');
-
-}else if(data.data.close == 'modal'){
-current.closest('.modal').modal('hide');
-}
-                    // Use the review status from the server response
-                    const isReviewedFromResponse = data.data.isReviewed;
-
-                    // Determine the button text and class based on the review status from the server response
-                    const newText = isReviewedFromResponse ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
-                    const newClass = isReviewedFromResponse ? 'btn-label-danger' : 'btn-label-secondary';
-
-                    // Update the button's text, data attribute, and class
-                    buttonElement.textContent = newText;
-                    buttonElement.setAttribute('data-is-reviewed', isReviewedFromResponse);
-                    buttonElement.classList.remove('btn-label-secondary', 'btn-label-danger');
-                    buttonElement.classList.add(newClass);
-                    toast_success(data.message)
-                } else {
-                    alert('Error toggling review status.');
-                    toast_danger(data.message)
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                toast_danger('An unexpected error occurred.')
-            });
-        }
-    </script>
-
-
- <script>
-$(document).ready(function() {
+  $(document).ready(function() {
     var table = $('#paymentsplan-table').DataTable();
     var expandedRow = null; // Variable to track the currently expanded row
-
     function createChildTable(row, contractId) {
-
-
-
+      window.active_contract = contractId;
         // Check if child table already exists, if so, destroy it
         var existingChildTable = $('#child-table-' + contractId).DataTable();
-    if (existingChildTable) {
-        existingChildTable.destroy();
-    }
-
-
-        if (expandedRow) {
-            // Collapse all other rows in the table except the selected row
-            table.rows().every(function() {
-                var tr = this.node();
-                if (tr !== row.node()) {
-                    var otherRow = table.row(tr);
-                    otherRow.child.hide();
-                    $(tr).removeClass('shown');
-                    $(tr).css('background-color', ''); // Reset the background color
-                }
-            });
-        }
+      if (existingChildTable) {
+          existingChildTable.destroy();
+      }
+      if (expandedRow) {
+          // Collapse all other rows in the table except the selected row
+          table.rows().every(function() {
+              var tr = this.node();
+              if (tr !== row.node()) {
+                  var otherRow = table.row(tr);
+                  otherRow.child.hide();
+                  $(tr).removeClass('shown');
+                  $(tr).css('background-color', ''); // Reset the background color
+              }
+          });
+      }
 
         // var childTableId = 'child-table-' + contractId;
         // var childTable = row.child('<table id="' + childTableId + '" class="display table dataTable" style="" width="100%"></table>').show();
@@ -456,11 +275,7 @@ $(row.node()).next().after(contentRow);
         $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
     }
             });
-
-
     }
-
-
     var expandedRow = null; // Variable to track the currently expanded row
 
 $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {

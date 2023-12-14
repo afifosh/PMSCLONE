@@ -1,7 +1,7 @@
 @if ($invoicePayment->id)
-    {!! Form::model($invoicePayment, ['route' => ['admin.finances.payments.update', $invoicePayment->id, 'event' => isset($event) ? $event : ''], 'method' => 'PUT']) !!}
+    {!! Form::model($invoicePayment, ['route' => ['admin.finances.payments.update', $invoicePayment->id, 'event' => isset($event) ? $event : '', 'table_id' => @$table_id], 'method' => 'PUT']) !!}
 @else
-    {!! Form::model($invoicePayment, ['route' => ['admin.finances.payments.store', 'event' => isset($event) ? $event : ''], 'method' => 'POST']) !!}
+    {!! Form::model($invoicePayment, ['route' => ['admin.finances.payments.store', 'event' => isset($event) ? $event : '', 'table_id' => @$table_id], 'method' => 'POST']) !!}
 @endif
 
 <div class="row add-payment-form">

@@ -49,7 +49,7 @@ class PaymentController extends Controller
   {
     $data['invoicePayment'] = new InvoicePayment();
     $data['retentions'] = InvoiceConfig::where('config_type', 'Retention')->where('status', 1)->get();
-    if($request->invoice){
+    if($request->invoice && $request->type != 'tax-authority'){
       $data['invoice'] = Invoice::with(['contract.assignable'])->findOrFail($request->invoice);
       $data['companies'] = [$data['invoice']->contract->assignable_id => $data['invoice']->contract->assignable->name];
       $data['contracts'] = [$data['invoice']->contract_id => $data['invoice']->contract->subject];
@@ -58,6 +58,16 @@ class PaymentController extends Controller
       ];
       $data['selected_invoice'] = $request->invoice;
       $data['event'] = 'page_reload';
+    } else if ($request->invoice && $request->type == 'tax-authority'){
+      $data['invoice'] = AuthorityInvoice::with('invoice.contract.assignable')->findOrFail($request->invoice);
+      $data['companies'] = [$data['invoice']->invoice->contract->assignable_id => $data['invoice']->invoice->contract->assignable->name];
+      $data['contracts'] = [$data['invoice']->invoice->contract_id => $data['invoice']->invoice->contract->subject];
+      $data['invoiceId'] = [
+        $request->invoice => runtimeTAInvIdFormat($request->invoice) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount - $data['invoice']->downpayment_amount
+      ];
+      $data['invoice_type'] = 'AuthorityInvoice';
+      $data['selected_invoice'] = $request->invoice;
+      $data['table_id'] = 'authority-invoices-table';
     }
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.create', $data)->render()]);
@@ -81,8 +91,9 @@ class PaymentController extends Controller
     }
 
     $event = $req->event ? $req->event : 'table_reload';
+    $table_id = $req->table_id ? $req->table_id : 'payments-table';
 
-    return $this->sendRes('Payment created successfully.', ['event' => $event, 'table_id' => 'payments-table', 'close' => 'globalModal']);
+    return $this->sendRes('Payment created successfully.', ['event' => $event, 'table_id' => $table_id, 'close' => 'globalModal']);
   }
 
   public function edit(InvoicePayment $payment)

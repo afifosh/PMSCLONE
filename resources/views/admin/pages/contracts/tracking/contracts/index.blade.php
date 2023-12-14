@@ -111,100 +111,28 @@ $configData = Helper::appClasses();
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
-    <script>
-        function togglePhaseReviewStatus(buttonElement) {
-            // Extract data attributes
-            const contractId = buttonElement.getAttribute('data-contract-id');
-            const phaseId = buttonElement.getAttribute('data-phase-id');
-            const isReviewed = buttonElement.getAttribute('data-is-reviewed') === 'true';
-
-            // Using the route function to dynamically generate the URL
-            const url = route('admin.contracts.phases.toggle-review', {
-                contract: contractId,
-                phase_id: phaseId
-            });
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-
-
-                  if (data.data.event == 'table_reload') {
-
-if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
-  $('#' + data.data.table_id)
-    .DataTable()
-    .ajax.reload(null, false);
-}
-
-}
-if(data.data.close == 'globalModal'){
-$('#globalModal').modal('hide');
-
-}else if(data.data.close == 'modal'){
-current.closest('.modal').modal('hide');
-}
-                    // Use the review status from the server response
-                    const isReviewedFromResponse = data.data.isReviewed;
-
-                    // Determine the button text and class based on the review status from the server response
-                    const newText = isReviewedFromResponse ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
-                    const newClass = isReviewedFromResponse ? 'btn-label-danger' : 'btn-label-secondary';
-
-                    // Update the button's text, data attribute, and class
-                    buttonElement.textContent = newText;
-                    buttonElement.setAttribute('data-is-reviewed', isReviewedFromResponse);
-                    buttonElement.classList.remove('btn-label-secondary', 'btn-label-danger');
-                    buttonElement.classList.add(newClass);
-                    toast_success(data.message)
-                } else {
-                   // alert('Error toggling review status.');
-                    toast_danger(data.message)
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                toast_danger('An unexpected error occurred.')
-            });
-        }
-    </script>
-
-
  <script>
 $(document).ready(function() {
     var table = $('#contracts-table').DataTable();
     var expandedRow = null; // Variable to track the currently expanded row
-
     function createChildTable(row, contractId) {
-
-
-
         // Check if child table already exists, if so, destroy it
-        var existingChildTable = $('#child-table-' + contractId).DataTable();
-    if (existingChildTable) {
-        existingChildTable.destroy();
-    }
-
-
-        if (expandedRow) {
-            // Collapse all other rows in the table except the selected row
-            table.rows().every(function() {
-                var tr = this.node();
-                if (tr !== row.node()) {
-                    var otherRow = table.row(tr);
-                    otherRow.child.hide();
-                    $(tr).removeClass('shown');
-                    $(tr).css('background-color', ''); // Reset the background color
-                }
-            });
-        }
+      var existingChildTable = $('#child-table-' + contractId).DataTable();
+      if (existingChildTable) {
+          existingChildTable.destroy();
+      }
+      if (expandedRow) {
+          // Collapse all other rows in the table except the selected row
+          table.rows().every(function() {
+              var tr = this.node();
+              if (tr !== row.node()) {
+                  var otherRow = table.row(tr);
+                  otherRow.child.hide();
+                  $(tr).removeClass('shown');
+                  $(tr).css('background-color', ''); // Reset the background color
+              }
+          });
+      }
 
         // var childTableId = 'child-table-' + contractId;
         // var childTable = row.child('<table id="' + childTableId + '" class="display table dataTable" style="" width="100%"></table>').show();

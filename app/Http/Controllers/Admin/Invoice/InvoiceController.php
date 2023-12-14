@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Invoice;
 
 use App\DataTables\Admin\Invoice\DownpaymentInvoicesDataTable;
 use App\DataTables\Admin\Invoice\InvoicesDataTable;
+use App\DataTables\Admin\Invoice\PartialInvoicesDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\InvoiceStoreRequest;
 use App\Models\Company;
@@ -119,6 +120,13 @@ class InvoiceController extends Controller
 
       return $dataTable->render('admin.pages.invoices.edit-downpayment', $data);
       // view('admin.pages.invoices.edit-downpayment', $data)
+    }else if ($invoice->type == 'Partial Invoice')
+    {
+      $dataTable = app(PartialInvoicesDataTable::class);
+      $dataTable->partialInvoice = $invoice;
+
+      return $dataTable->render('admin.pages.invoices.edit', $data);
+      // view('admin.pages.invoices.edit', $data);
     }
 
     return view('admin.pages.invoices.edit', $data);
@@ -155,7 +163,6 @@ class InvoiceController extends Controller
       return $this->sendRes('Adjustment updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } elseif ($request->update_retention) {
       $invoice->updateRetention($request->retention_id, $request->calculated_retention_amount, $request->is_manual_retention, $request->retention_value);
-      $invoice->reCalculateTotal();
 
       return $this->sendRes('Retention updated successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
     } elseif ($request->type == 'downpayment') {

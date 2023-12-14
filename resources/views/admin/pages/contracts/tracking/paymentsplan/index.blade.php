@@ -88,266 +88,80 @@ $configData = Helper::appClasses();
           </div>
         </div>
       </form>
-
     <div class="card-body main-table">
       {{$dataTable->table()}}
     </div>
     </div>
   </div>
-
-
 @endsection
 @push('scripts')
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
-    <script>
-
-
-function initTaxRepeater()
-{
-  $('.repeater').repeater({
-      defaultValues: {
-          'label': '',
-          'type': 'text'
-      },
-      show: function () {
-          $(this).slideDown();
-
-          $(this).find('.select2').each(function() {
-            if (!$(this).data('select2')) {
-              var $this = $(this);
-              $this.wrap('<div class="position-relative"></div>');
-              $this.select2({
-                dropdownParent: $this.parent()
-              });
-            }
-          });
-          calculateTotalCost();
-          // $('.repeaters').animate({ scrollTop: 9999 }, 'slow');
-      },
-      hide: function (deleteElement) {
-        // add class to delete element
-        $(this).addClass('removed-element');
-        $(this).slideUp(deleteElement);
-        calculateTotalCost();
-      },
-      ready: function (setIndexes) {
-          // $dragAndDrop.on('drop', setIndexes);
-      },
-      isFirstItemUndeletable: false
-  })
-
-  /**************************
-   * Phase create form js  **
-   **************************/
-  $(document).on('change', '.is-manual-tax', function(){
-    const isChecked = $(this).is(':checked');
-    const parent = $(this).parents('[data-repeater-item]');
-    const taxAmount = parent.find('.tax-amount');
-    const taxRate = parent.find('.tax-rate');
-    const taxRateAmount = taxRate.find(':selected').data('amount');
-    const taxRateType = taxRate.find(':selected').data('type');
-    if(isChecked){
-      taxAmount.prop('disabled', false);
-    }else{
-      taxAmount.prop('disabled', true);
-    }
-    calculateTotalCost();
-  })
-
-  $(document).on('change keyup', '.pay-on-behalf, .is-authority-tax, .tax-amount, .tax-rate, [name="estimated_cost"], .is-manual-tax', function(){
-    calculateTotalCost();
-  })
-
-  // if pay-on-behalf is checked, check and disable is-authority-tax
-  $(document).on('change', '.pay-on-behalf', function(){
-    const isChecked = $(this).is(':checked');
-    const parent = $(this).parents('[data-repeater-item]');
-    const isAuthorityTax = parent.find('.is-authority-tax');
-    if(isChecked){
-      isAuthorityTax.prop('checked', true);
-      isAuthorityTax.prop('disabled', true);
-    }else{
-      isAuthorityTax.prop('disabled', false);
-    }
-  })
-
-  function calculateTotalCost()
-  {
-    const estimatedCost = $('[name="estimated_cost"]').val();
-
-    var totalTax = parseFloat(0);
-    let totalCost = parseFloat(estimatedCost);
-    if(!totalCost){
-      return;
-    }
-    $('.phase-create-form .tax-rate').each(function (index, element) {
-      // element == this
-      $this = $(this);
-      const taxAmount = $this.find(':selected').data('amount');
-      const taxType = $this.find(':selected').data('type');
-      var amount = 0;
-      if(taxType == 'Percent'){
-        amount = (estimatedCost * taxAmount) / 100;
-      }else{
-        amount = taxAmount;
-      }
-      // if manual tax is checked, use manual tax amount
-      if($this.parents('[data-repeater-item]').find('.is-manual-tax').is(':checked')){
-        amount = parseFloat($this.parents('[data-repeater-item]').find('.tax-amount').val());
-      }else if(amount != undefined){
-        $(this).parents('[data-repeater-item]').find('.tax-amount').val(amount.toFixed(3));
-      }
-      // if pay on behalf use -ve amount
-      if($this.parents('[data-repeater-item]').find('.pay-on-behalf').is(':checked')){
-        amount = -amount;
-      }
-      totalCost += amount;
-    });
-    totalCost = totalCost.toFixed(3);
-    $('[name="total_cost"]').val(totalCost);
-    validateTotalCost();
+<script>
+  function reloadDataTables() {
+    $('#paymentsplan-table').DataTable().ajax.reload(null, false);
   }
 
-  /**
-   * End Phase create form js
-   */
-}
-        function togglePhaseReviewStatus(buttonElement) {
-            // Extract data attributes
-            const contractId = buttonElement.getAttribute('data-contract-id');
-            const phaseId = buttonElement.getAttribute('data-phase-id');
-            const isReviewed = buttonElement.getAttribute('data-is-reviewed') === 'true';
-
-            // Using the route function to dynamically generate the URL
-            const url = route('admin.contracts.phases.toggle-review', {
-                contract: contractId,
-                phase_id: phaseId
-            });
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-
-
-                  if (data.data.event == 'table_reload') {
-
-if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
-  $('#' + data.data.table_id)
-    .DataTable()
-    .ajax.reload(null, false);
-}
-
-}
-if(data.data.close == 'globalModal'){
-$('#globalModal').modal('hide');
-
-}else if(data.data.close == 'modal'){
-current.closest('.modal').modal('hide');
-}
-                    // Use the review status from the server response
-                    const isReviewedFromResponse = data.data.isReviewed;
-
-                    // Determine the button text and class based on the review status from the server response
-                    const newText = isReviewedFromResponse ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
-                    const newClass = isReviewedFromResponse ? 'btn-label-danger' : 'btn-label-secondary';
-
-                    // Update the button's text, data attribute, and class
-                    buttonElement.textContent = newText;
-                    buttonElement.setAttribute('data-is-reviewed', isReviewedFromResponse);
-                    buttonElement.classList.remove('btn-label-secondary', 'btn-label-danger');
-                    buttonElement.classList.add(newClass);
-                    toast_success(data.message)
-                } else {
-                    // alert('Error toggling review status.');
-                    toast_danger(data.message)
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                toast_danger('An unexpected error occurred.')
-            });
-        }
-    </script>
-
-
-<script>
-
-$(document).ready(function() {
-
+  $(document).ready(function() {
     var table = $('#paymentsplan-table').DataTable();
     var expandedRow = null; // Variable to track the currently expanded row
 
-
-
     $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
-    var tr = $(this).closest('tr');
-    var row = table.row(tr);
-    var contractId = $(this).attr('contract-id'); // Assuming data-contract-id is stored on the button
-    // Set the value for the "Contracts" filter
-    //$('#contracts').select2().val(contractId).trigger('change'); // Assuming your select field has an ID of "contracts" and uses Select2
-    // Update the Select2 dropdown value
-   // alert(contractId);
-
-  // alert( $('#contracts-select').select2('data'));
-
-
-   var $contractsSelect = $('#contracts-select'); // Assuming your select field has an ID of "contracts-select" and uses Select2
-
-// Check if the new value is different from the current value
-if ($contractsSelect.val() !== contractId) {
-    // Append a new option and select it
-    $contractsSelect.append(new Option('Contract Name', contractId, true, true));
-    // Trigger the change event
-    $contractsSelect.trigger('change');
-}else{
-    console.log ($contractsSelect.val()  + "            " + contractId);
-}
+      var tr = $(this).closest('tr');
+      var row = table.row(tr);
+      var contractId = $(this).attr('contract-id'); // Assuming data-contract-id is stored on the button
+      window.active_contract = contractId;
+      // Set the value for the "Contracts" filter
+      //$('#contracts').select2().val(contractId).trigger('change'); // Assuming your select field has an ID of "contracts" and uses Select2
+      // Update the Select2 dropdown value
+      // alert(contractId);
+      // alert( $('#contracts-select').select2('data'));
+      var $contractsSelect = $('#contracts-select'); // Assuming your select field has an ID of "contracts-select" and uses Select2
+      // Check if the new value is different from the current value
+      if ($contractsSelect.val() !== contractId) {
+          // Append a new option and select it
+          $contractsSelect.append(new Option('Contract Name', contractId, true, true));
+          // Trigger the change event
+          $contractsSelect.trigger('change');
+      }else{
+          console.log ($contractsSelect.val()  + "            " + contractId);
+      }
 
 
-   // $('#contracts-select').val(contractId).trigger('change');
-  // $('#contracts-select').val(contractId).trigger('change');
-    // Toggle expansion
-    if (row.child.isShown()) {
+    // $('#contracts-select').val(contractId).trigger('change');
+    // $('#contracts-select').val(contractId).trigger('change');
+      // Toggle expansion
+      if (row.child.isShown()) {
         // The row is already open - close it and destroy all child tables
         destroyChildTables(contractId);
         row.child.hide();
         tr.removeClass('shown');
         // Clear the selection
-$contractsSelect.val(null).trigger('change');
+        $contractsSelect.val(null).trigger('change');
                 // Remove the 'child-row-added' rows which contain the pills and content
                 tr.nextAll('tr.child-row-added').remove();
         expandedRow = null;
-    } else {
-        // Open this row
+      } else {
+          // Open this row
+          // Create new content for the child row
+          var pillsRow = createPillsRow(contractId);
+          var content = createContentRow(contractId);
 
+          row.child(pillsRow).show();
+          $(tr).addClass('shown');
+          $(tr).css('background-color', '#f5f5f5');
 
-        // Create new content for the child row
-        var pillsRow = createPillsRow(contractId);
-        var content = createContentRow(contractId);
+          expandedRow = row;
 
-        row.child(pillsRow).show();
-        $(tr).addClass('shown');
-        $(tr).css('background-color', '#f5f5f5');
+          var contentRow = $(content);
+          contentRow.addClass("custom-content-row");
+          contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
+          $(row.node()).next().after(contentRow);
+          $(row.node()).next().after(contentRow); // Append the content after the pills
+      // Append the child tables to the expanded-details div
 
-        expandedRow = row;
-
-        var contentRow = $(content);
-        contentRow.addClass("custom-content-row");
-        contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
-        $(row.node()).next().after(contentRow);
-        $(row.node()).next().after(contentRow); // Append the content after the pills
-    // Append the child tables to the expanded-details div
-
-        // Initialize DataTables when tabs are clicked, not here
-    }
+          // Initialize DataTables when tabs are clicked, not here
+      }
 });
     function destroyChildTables(contractId) {
     // Modify this function to destroy all the DataTables for the given contractId
@@ -482,8 +296,6 @@ $contractsSelect.val(null).trigger('change');
     }
 
     function loadPhasesDataTable(contractId) {
-console.log('#phases-table-' + contractId);
-
         $('#phases-table-' + contractId).DataTable({
                 processing: true,
                 serverSide: true,
