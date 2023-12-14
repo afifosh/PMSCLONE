@@ -16,6 +16,11 @@
     width: 100%;
     height: 100%;
   }
+  svg g[opacity="0.4"][transform="translate(0,368)"] {
+ visibility: hidden !important;
+  display: none !imprtant;
+}
+
 </style>
 @endsection
 
@@ -189,7 +194,7 @@
   <div class="col-lg-6 mb-4">
     <div class="card mb-4 h-100">
       <div class="card-body">
-        <small class="card-text text-uppercase">Flow</small>
+        <small class="card-text text-uppercase">Payment Plan Flow</small>
 
         <div id="chartdiv"  class="mb-4"></div>
 
