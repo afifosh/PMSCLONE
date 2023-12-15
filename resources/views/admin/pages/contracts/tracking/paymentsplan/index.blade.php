@@ -39,7 +39,6 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-{{-- @include('admin.pages.contracts.header', ['tab' => 'stages']) --}}
   <div class="mt-3  col-12">
     {{-- Stats Start --}}
     <div class="card h-100">
@@ -141,6 +140,8 @@ $configData = Helper::appClasses();
                 // Remove the 'child-row-added' rows which contain the pills and content
                 tr.nextAll('tr.child-row-added').remove();
         expandedRow = null;
+        window.selectedTab = null;
+        window.active_contract = null;
       } else {
           // Open this row
           // Create new content for the child row
@@ -162,6 +163,9 @@ $configData = Helper::appClasses();
 
           // Initialize DataTables when tabs are clicked, not here
       }
+      if(window.selectedTab) {
+        $('[data-bs-target="' + window.selectedTab + '"]').click();
+      }
 });
     function destroyChildTables(contractId) {
     // Modify this function to destroy all the DataTables for the given contractId
@@ -181,6 +185,7 @@ $configData = Helper::appClasses();
         var tabSelected = $(this).attr('data-bs-target');
         console.log('Tab clicked' + tabSelected + ' contractId ' + contractId ); // Add this line
         // Only initialize DataTable if it hasn't been initialized before
+        window.selectedTab = tabSelected; // var to store the selected tab so we can select it after table reload
         switch (tabSelected) {
           case '#child-stages-' + contractId:
               loadStagesDataTable(contractId);

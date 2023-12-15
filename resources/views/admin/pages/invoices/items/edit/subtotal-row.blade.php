@@ -1,7 +1,7 @@
 <tr style="background-color: #efeff163;">
   @if($invoice->isEditable())
     <td>
-      <a onclick="editItemSubtotalAmount({{$item->id}}, this)"><i class="ti ti-pencil"></i></a>
+      <a onclick="editItemSubtotalAmount({{$item->invoice_id}}, {{$item->id}}, this)"><i class="ti ti-pencil"></i></a>
     </td>
   @endif
   <td class="fw-bold">Subtotal</td>

@@ -84,13 +84,13 @@ function createItemtax(invoice_id, item_id, element)
     });
   }
 
-  function editItemSubtotalAmount(item_id, element)
+  function editItemSubtotalAmount(invoice_id, item_id, element)
   {
     $('.expanded-edit-row').remove();
     // show loading in child row
     $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
     $.ajax({
-      url: route('admin.invoice-items.subtotal-adjustments.create', { invoice_item: item_id}),
+      url: route('admin.invoices.invoice-items.subtotal-adjustments.create', {invoice: invoice_id, invoice_item: item_id}),
       type: "GET",
       success: function(res){
         $('.expanded-edit-row').remove();
@@ -99,13 +99,13 @@ function createItemtax(invoice_id, item_id, element)
     });
   }
 
-  function editItemTotalAmount(item_id, element)
+  function editItemTotalAmount(invoice_id, item_id, element)
   {
     $('.expanded-edit-row').remove();
     // show loading in child row
     $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
     $.ajax({
-      url: route('admin.invoice-items.total-amount-adjustments.create', { invoice_item: item_id}),
+      url: route('admin.invoices.invoice-items.total-amount-adjustments.create', {invoice: invoice_id, invoice_item: item_id}),
       type: "GET",
       success: function(res){
         $('.expanded-edit-row').remove();

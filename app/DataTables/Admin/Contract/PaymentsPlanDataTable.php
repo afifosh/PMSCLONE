@@ -2,12 +2,9 @@
 
 namespace App\DataTables\Admin\Contract;
 
-use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
-use App\Models\Program;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
-use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
@@ -15,10 +12,6 @@ use Yajra\DataTables\Services\DataTable;
 
 class PaymentsPlanDataTable extends DataTable
 {
-  public $projectId = null;
-  public $company = null;
-  public $program = null;
-  public $programId = null;
   /**
    * Build the DataTable class.
    *
@@ -30,17 +23,17 @@ class PaymentsPlanDataTable extends DataTable
 
       ->editColumn('program.name', function ($contract) {
         return $contract->program_id
-            ? '<a href="' . route('admin.programs.show', $contract->program->id) . '">' . $contract->program->name . '</a>'
-            : 'N/A';
+          ? '<a href="' . route('admin.programs.show', $contract->program->id) . '">' . $contract->program->name . '</a>'
+          : 'N/A';
       })
       ->addColumn('expand', function ($contract) {
         return '<i class="ti ti-layout-sidebar-left-expand ti-md me-3 btn-expand" contract-id="' . $contract->id . '"></i>';
       })
       ->editColumn('subject', function ($contract) {
         return $contract->subject
-            ? '<a href="' . route('admin.contracts.show', $contract->id) . '">' . e($contract->subject) . '</a>'
-            : view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
-    })
+          ? '<a href="' . route('admin.contracts.show', $contract->id) . '">' . e($contract->subject) . '</a>'
+          : view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
+      })
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
@@ -58,13 +51,13 @@ class PaymentsPlanDataTable extends DataTable
         return view('admin._partials.sections.user-avatar-group', ['users' => $contract->canReviewedBy()->get(), 'limit' => 5]);
       })
       ->addColumn('reviewedBy', function ($contract) {
-        if($contract->phases_count)
+        if ($contract->phases_count)
           return view('admin._partials.sections.user-avatar-group', ['users' => $contract->usersCompletedPhasesReview()->get(), 'limit' => 5]);
         else
           return 'N/A';
       })
       ->addColumn('my_review_progress', function ($contract) {
-        if($contract->phases_count)
+        if ($contract->phases_count)
           return view('admin._partials.sections.progressBar', ['perc' => $contract->myPhasesReviewProgress(), 'color' => 'primary', 'show_perc' => true, 'height' => '15px']);
         else
           return 'N/A';
@@ -74,76 +67,16 @@ class PaymentsPlanDataTable extends DataTable
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
         });
       })
-      ->rawColumns(['id', 'program.name','subject','expand']);
+      ->rawColumns(['id', 'program.name', 'subject', 'expand']);
   }
 
-/**
- * Get the query source of dataTable.
- */
-public function query(Contract $model): QueryBuilder
-{
-    $query = $model->validAccessibleByAdmin(auth()->id())->newQuery()
-        ->select([
-            'contracts.id',
-            'contracts.program_id',
-            'contracts.refrence_id',
-            'contracts.subject',
-            'contracts.project_id',
-            'contracts.type_id',
-            'contracts.category_id',
-            'contracts.value',
-            'contracts.start_date',
-            'contracts.end_date',
-            'contracts.status',
-            'contracts.assignable_id',
-            'assignable_type',
-            DB::raw('(SELECT COUNT(DISTINCT contract_stages.id) FROM contract_stages WHERE contract_id = contracts.id) as stages_count'),
-            DB::raw('(SELECT COUNT(DISTINCT contract_phases.id) FROM contract_phases
-                     JOIN contract_stages ON contract_stages.id = contract_phases.stage_id
-                     WHERE contract_stages.contract_id = contracts.id) as phases_count'),
-            DB::raw('COALESCE(SUM(invoices.total), 0)/100 as total'),
-            DB::raw('COALESCE(SUM(invoices.paid_amount), 0)/100 as paid_amount'),
-            DB::raw('COALESCE(sum(invoices.total - invoices.paid_amount), 0)/100 as due_amount'),
-            DB::raw('COALESCE(sum(invoices.total_tax), 0)/100 as total_tax'),
-            DB::raw('CASE WHEN SUM(contracts.value) = 0 THEN 0 ELSE COALESCE((sum(invoices.paid_amount)/sum(contracts.value)), 0) * 100 END as paid_percent'),
-            DB::raw('count(CASE WHEN invoices.retention_amount IS NOT NULL AND invoices.retention_released_at IS NULL THEN 1 ELSE NULL END) as pending_retentions_count')
-        ])
-        ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
-        ->with(['type', 'assignable.detail', 'category']);
-
-    if ($this->projectId) {
-        $query->where('project_id', $this->projectId);
-    }
-
-    if($this->company){
-      $query->where('assignable_id', $this->company->id)
-            ->where('assignable_type', Company::class);
-    }
-
-    if ($this->program) {
-      $childProgramIds = Program::where('parent_id', $this->program->id)->pluck('id')->toArray();
-      $programIds = array_merge([$this->program->id], $childProgramIds);
-      $query->whereIn('program_id', $programIds);
-    }
-
-    $query->applyRequestFilters();
-
-    return $query->groupBy([
-        'contracts.id',
-        'contracts.program_id',
-        'contracts.refrence_id',
-        'contracts.subject',
-        'contracts.project_id',
-        'contracts.type_id',
-        'contracts.category_id',
-        'contracts.value',
-        'contracts.start_date',
-        'contracts.end_date',
-        'contracts.status',
-        'contracts.assignable_id',
-        'assignable_type'
-    ]);
-}
+  /**
+   * Get the query source of dataTable.
+   */
+  public function query(Contract $model): QueryBuilder
+  {
+    return $model->validAccessibleByAdmin(auth()->id())->applyRequestFilters()->withCount(['stages', 'phases']);
+  }
 
 
 
@@ -193,11 +126,11 @@ public function query(Contract $model): QueryBuilder
   {
     return [
       Column::computed('expand')
-      ->exportable(false)
-      ->printable(false)
-      ->width(60)
-      ->addClass('text-center')
-      ->title(''), // This is an empty title for the expand/collapse column
+        ->exportable(false)
+        ->printable(false)
+        ->width(60)
+        ->addClass('text-center')
+        ->title(''), // This is an empty title for the expand/collapse column
       Column::make('subject')->title('Contract Name'),
       Column::make('stages_count')->title('Payments Plans')->searchable(false),
       Column::make('phases_count')->title('Payments Terms')->searchable(false),
@@ -209,11 +142,6 @@ public function query(Contract $model): QueryBuilder
       Column::make('my_review_progress')->title('Progress'),
       Column::make('status'),
     ];
-  }
-
-  public function setProgram($programId)
-  {
-      $this->$programId = $programId;
   }
 
   /**

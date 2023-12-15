@@ -214,6 +214,10 @@ $configData = Helper::appClasses();
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
     {{-- Real Time Editing Scripts --}}
     <script>
+      function reloadDataTables() {
+        $('#contracts-table').DataTable().ajax.reload(null, false);
+      }
+
       /***
        * Variables used in this file
        **/

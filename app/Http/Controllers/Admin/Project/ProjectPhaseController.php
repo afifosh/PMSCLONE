@@ -90,7 +90,7 @@ class ProjectPhaseController extends Controller
     DB::commit();
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
-    return $this->sendRes(__('Phase Created Successfully'), ['event' => 'table_reload', 'table_id' => request()->tableId ? request()->tableId : 'phases-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Phase Created Successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
   }
 
   public function edit($project, $contract, $stage, ContractPhase $phase)
@@ -221,7 +221,7 @@ class ProjectPhaseController extends Controller
 
     broadcast(new ContractUpdated($contract, 'phases'))->toOthers();
 
-    return $this->sendRes(__('Phase Deleted Successfully'), ['event' => 'table_reload', 'table_id' => 'phases-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Phase Deleted Successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
   }
 
   public function sortPhases($project, Contract $contract, Request $request)

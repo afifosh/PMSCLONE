@@ -94,7 +94,7 @@ return [
     |
     */
 
-    'rounding_mode' => PHP_ROUND_HALF_DOWN,
+    'rounding_mode' => PHP_ROUND_HALF_UP,
 
     /*
     |--------------------------------------------------------------------------

@@ -33,6 +33,8 @@ class TaxAuthorityInvoiceController extends Controller
 
   public function show(AuthorityInvoice $taxAuthorityInvoice)
   {
+    abort_if(AuthorityInvoice::validAccessibleByAdmin(auth()->id())->where('id', $taxAuthorityInvoice->id)->doesntExist(), 401, 'Unauthorized');
+
     if (request()->json) {
       return response()->json($taxAuthorityInvoice);
     }
@@ -40,6 +42,8 @@ class TaxAuthorityInvoiceController extends Controller
 
   public function destroy(AuthorityInvoice $taxAuthorityInvoice)
   {
+    abort_if(AuthorityInvoice::validAccessibleByAdmin(auth()->id())->where('id', $taxAuthorityInvoice->id)->doesntExist(), 401, 'Unauthorized');
+
     DB::beginTransaction();
 
     try {

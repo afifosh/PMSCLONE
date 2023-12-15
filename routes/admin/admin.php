@@ -5,10 +5,8 @@ use App\Http\Controllers\Admin\AccessList\AdminAccessListController;
 use App\Http\Controllers\Admin\AccessList\AdminAccessListProgramController;
 use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Admin\AdminRoleController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminUsersController;
-use App\Http\Controllers\Admin\Client\ClientController;
 use App\Http\Controllers\Admin\Company\ApprovalRequestController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
@@ -21,13 +19,10 @@ use App\Http\Controllers\Admin\Contract\ChangeRequestController;
 use App\Http\Controllers\Admin\Contract\ContractCategoryController;
 use App\Http\Controllers\Admin\Contract\ContractController;
 use App\Http\Controllers\Admin\Contract\ContractDocumentController;
-use App\Http\Controllers\Admin\Contract\ContractPhaseController;
 use App\Http\Controllers\Admin\Contract\ContractSettingController;
-use App\Http\Controllers\Admin\Contract\ContractTermController;
 use App\Http\Controllers\Admin\Contract\ContractTypeController;
 use App\Http\Controllers\Admin\Contract\EventController;
 use App\Http\Controllers\Admin\Contract\NotifiableUserController;
-use App\Http\Controllers\Admin\Contract\PaymentScheduleController;
 use App\Http\Controllers\Admin\EmailTemplate\EmailTemplateController;
 use App\Http\Controllers\Admin\Partner\DepartmentController;
 use App\Http\Controllers\Admin\Partner\DesignationController;
@@ -57,7 +52,6 @@ use App\Http\Controllers\Admin\Contract\DocumentStatController;
 use App\Http\Controllers\Admin\Contract\LogController;
 use App\Http\Controllers\Admin\Contract\UploadedDocumentController;
 use App\Http\Controllers\Admin\ContractDoc\DocControlController;
-use App\Http\Controllers\Admin\DocControl\InvoiceDocController;
 use App\Http\Controllers\Admin\Finance\ProgramTransactionController;
 use App\Http\Controllers\Admin\Finance\FinancialYearController;
 use App\Http\Controllers\Admin\Finance\FinancialYearTransactionController;
@@ -207,19 +201,25 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
 
 
     Route::get('projects/gantt-chart', [GanttChartController::class, 'index'])->name('projects.gantt-chart.index');
-    Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
-    // Route for listing invoices for a program
-    Route::get('programs/{program}/invoices', [ProgramController::class, 'invoices'])->name('programs.invoices');
+
     // Route for listing contracts for a program
     //Route::get('programs/{program}/contracts', [ProgramController::class, 'contracts'])->name('programs.contracts');
 
 
+    Route::middleware('programACL')->group(function () {
+      Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
+      // Route for listing invoices for a program
+      Route::get('programs/{program}/invoices', [ProgramController::class, 'invoices'])->name('programs.invoices');
+      Route::resource('programs', ProgramController::class)->only(['show', 'edit', 'update', 'destroy']);
+      Route::resource('programs.users', ProgramUserController::class);
+      Route::resource('programs.contracts', ContractController::class);
+      Route::resource('programs.invoices', InvoiceController::class);
+      Route::resource('programs.payments', PaymentController::class);
+    });
+
+    Route::resource('programs', ProgramController::class)->only(['index', 'create', 'store']);
+
     Route::put('projects/{project}/contracts/{contract}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.contracts.sort-phases');
-    Route::resource('programs', ProgramController::class);
-    Route::resource('programs.users', ProgramUserController::class);
-    Route::resource('programs.contracts', ContractController::class);
-    Route::resource('programs.invoices', InvoiceController::class);
-    Route::resource('programs.payments', PaymentController::class);
     Route::resource('doc-signatures', SignatureController::class);
 
     // Route::prefix('contracts')->group(function () {
@@ -345,14 +345,11 @@ Route::prefix('contracts')->group(function () {
           // Route::get('/reviewers', [PhaseController::class, 'reviewersTabContent'])->name('phases.reviewers');
           // Route::get('/comments', [PhaseController::class, 'commentsTabContent'])->name('phases.comments');
           // Route::get('/activity', [PhaseController::class, 'activityTabContent'])->name('phases.activity');
-          // ... additional routes for each tab as needed
       });
   });
-  // ... other non-contract-specific routes
 });
 
-
-
+    // contracts and invoices related routes (contracts, phases, stages, invoices, invoice items)
     Route::middleware('contractACL')->group(function () {
       Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
       Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
@@ -361,10 +358,9 @@ Route::prefix('contracts')->group(function () {
       Route::resource('contracts.phases.deductions', PhaseDeductionController::class);
       Route::resource('contracts.invoices.comments', CommentController::class)->only(['index']);
       Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');
-      Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');//contract middlware pending
+      Route::get('contracts/{contract}/payments', [PaymentController::class, 'index'])->name('contracts.payments.index');
       Route::post('contracts/{contract}/release-retentions', [ContractController::class, 'releaseRetention'])->name('contracts.release-retentions');
       Route::resource('contracts.contract-parties', ContractPartyController::class);
-
       Route::resource('contracts.logs', LogController::class)->only(['index']);
       Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
       Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
@@ -376,29 +372,60 @@ Route::prefix('contracts')->group(function () {
       Route::put('contracts/{contract}/undo-terminate', [ContractSettingController::class, 'undoTerminate'])->name('contracts.undo-terminate');
       Route::put('contracts/{contract}/pause', [ContractSettingController::class, 'pause'])->name('contracts.pause');
       Route::put('contracts/{contract}/resume', [ContractSettingController::class, 'resume'])->name('contracts.resume');
-      Route::post('contracts/{contract}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('contracts.upload-requested-doc');//contract middlware pending
-
+      Route::post('contracts/{contract}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('contracts.upload-requested-doc');
       Route::resource('contracts.stages', ContractStageController::class);
-      Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);//contract middlware pending
-      Route::resource('contracts.uploaded-documents', UploadedDocumentController::class); //contract middlware pending
+      Route::resource('contracts.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
+      Route::resource('contracts.uploaded-documents', UploadedDocumentController::class);
       Route::resource('contracts.bulk-invoices', BulkInvoiceController::class)->only(['store']);
       Route::resource('projects.contracts.stages.phases', ProjectPhaseController::class);
+      Route::resource('contracts.phases.subtotal-adjustments', SubtotalAdjustmentController::class)->only(['create', 'store']);
+      Route::resource('contracts.phases.total-amount-adjustments', TotalAmountAdjustmentController::class)->only(['create', 'store']);
+      Route::resource('contracts', ContractController::class)->except(['index', 'create', 'store']);
+      // invoices routes
+      Route::put('invoices/{invoice}/invoice-tems/sort', [InvoiceController::class, 'sortItems'])->name('invoices.invoice-items.sort');
+      Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
+      Route::delete('invoices/{invoice}/delete-retention', [RetentionController::class, 'destroy'])->name('invoices.destroy-retention');
+      Route::resource('invoices', InvoiceController::class)->only(['show', 'edit', 'update', 'destroy']);
+      Route::post('invoices/{invoice}/invoice-items/store-bulk', [InvoiceItemController::class, 'storeBulk'])->name('invoices.invoice-items.store-bulk');
+      Route::resource('invoices.status', InvoiceStatusController::class)->only(['create', 'store']);
+      Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'edit', 'update', 'destroy']);
+      Route::resource('invoices.invoice-items.taxes', ItemTaxController::class)->except(['index', 'show']);
+      Route::resource('invoices.invoice-items.deductions', ItemDeductionController::class)->except(['index', 'show']);
+      Route::resource('invoices.invoice-items.subtotal-adjustments', ItemSubtotalAdjustmentController::class)->only(['create', 'store']);
+      Route::resource('invoices.invoice-items.total-amount-adjustments', ItemTotalAmountAdjustmentController::class)->only(['create', 'store']);
+      Route::resource('invoices.tax-rates', InvoiceTaxController::class)->only(['store']);
+      Route::resource('invoices.downpayments', DownpaymentController::class)->only(['store']);
+      Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');
+      Route::resource('invoices.merge-invoices', MergeInvoiceController::class)->only(['create', 'store']);
+      Route::get('invoices/{invoice}/payments', [PaymentController::class, 'index'])->name('invoices.payments.index');
+      Route::resource('invoices.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
+      Route::resource('invoices.uploaded-documents', UploadedDocumentController::class);
+      Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
     });
+    Route::resource('contracts', ContractController::class)->only(['index', 'create', 'store']);
+    Route::resource('invoices', InvoiceController::class)->only(['index', 'create', 'store']);
+    Route::resource('tax-authority-invoices', TaxAuthorityInvoiceController::class)->only(['index', 'show', 'destroy']);
 
-    Route::resource('phases.subtotal-adjustments', SubtotalAdjustmentController::class)->only(['create', 'store']);
-    Route::resource('phases.total-amount-adjustments', TotalAmountAdjustmentController::class)->only(['create', 'store']);
+    //invoices routes
+    Route::get('invoices/document-stats', [DocumentStatController::class, 'index'])->name('invoices.document-stats.index');
+    Route::get('invoices-statistics', StatisticController::class)->name('invoices.statistics');
+
+
+    // end invoices routes
+
     Route::get('contracts/statistics', [ContractController::class, 'statistics'])->name('contracts.statistics');
     // Route::get('contracts/change-requests', [ChangeRequestController::class, 'index'])->name('change-requests.index');
 
-    Route::resource('contracts', ContractController::class);
-
-    Route::resource('contracts.payment-schedules', PaymentScheduleController::class);
-    // Route::resource('contracts.stages', ContractStageController::class);
+    // contract types
     Route::resource('contract-types', ContractTypeController::class);
+
+    // contract categories
     Route::resource('contract-categories', ContractCategoryController::class);
 
     Route::get('projects/{project}/contracts', [ContractController::class, 'projectContractsIndex'])->name('projects.contracts.index');
 
+    // Requesting Document controlls
+    Route::resource('invoice-doc-controls', DocControlController::class);
     Route::resource('contract-doc-controls', DocControlController::class);
     Route::get('projects/get-company-by-project', [ProjectController::class, 'getCompanyByProject'])->name('projects.getCompanyByProject');
     Route::get('projects/{project}/gantt-chart', [ProjectController::class, 'ganttChart'])->name('projects.gantt-chart');
@@ -449,45 +476,44 @@ Route::prefix('contracts')->group(function () {
     Route::resource('workflows', WorkflowController::class)->only(['index', 'edit', 'update']);
     Route::resource('kyc-documents', KycDocumentController::class);
 
+    // Company Approval
     Route::get('approval-requests/level/{level}/companies/{company}/{tab?}', [ApprovalRequestController::class, 'getCompanyReqeust'])
       ->whereIn('tab', ['details', 'contact-persons', 'addresses', 'documents', 'bank-accounts'])->name('approval-requests.level.companies.show');
     Route::post('approval-requests/level/{level}/companies/{company}', [ApprovalRequestController::class, 'updateApprovalRequest'])->name('approval-requests.level.companies.update');
-
     Route::get('pending-companies', [ApprovalRequestController::class, 'index'])->name('pending-companies.index');
     Route::get('verified-companies', [ApprovalRequestController::class, 'index'])->name('verified-companies.index');
     Route::get('change-requests', [ApprovalRequestController::class, 'index'])->name('change-requests.index');
     Route::get('approval-requests/history', [ApprovalRequestController::class, 'indexHistory'])->name('approval-requests.indexHistory');
     Route::resource('approval-requests', ApprovalRequestController::class)->only(['index', 'show', 'update']);
 
-    // Route::resource('companies.invitations', InvitationController::class);
+    // site global settings
     Route::prefix('settings')->name('setting.')->group(function () {
       Route::prefix('security')->name('security.')->controller(SecuritySettingController::class)->group(function () {
         Route::get('', 'index')->name('index');
         Route::put('', 'update')->name('update');
       });
-
       Route::prefix('broadcast')->name('broadcast.')->controller(BroadcastSettingController::class)->group(function () {
         Route::get('', 'index')->name('index');
         Route::put('', 'update')->name('update');
       });
-
       Route::prefix('onlyoffice')->name('onlyoffice.')->controller(OnlyOfficeSettingController::class)->group(function () {
         Route::get('', 'index')->name('index');
         Route::put('', 'update')->name('update');
       });
-
       Route::prefix('contract-notifications')->name('contract-notifications.')->controller(SettingContractSettingController::class)->group(function () {
         Route::get('', 'create')->name('create');
         Route::put('', 'update')->name('update');
       });
-
       Route::resource('oauth-google', OauthGoogleController::class)->only(['create', 'store']);
       Route::resource('oauth-microsoft', OauthMicrosoftController::class)->only(['create', 'store']);
     });
 
 
+    // Admin Notifications
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::put('notifications/count', [NotificationController::class, 'updateNotificationCount'])->name('notifications.count');
+
+    // Email Templates settings
     Route::get('email-templates/{id}/{lang?}', [EmailTemplateController::class, 'manageEmailLang'])->name('manage.email.language');
     Route::resource('email_template', EmailTemplateController::class)->only(['update']);
 
@@ -503,33 +529,7 @@ Route::prefix('contracts')->group(function () {
       Route::resource('payments', PaymentController::class);
     });
 
-    // Invoice Routes
-    // Route::prefix('invoices')->name('invoices.')->group(function(){
-
-    // });
-    Route::get('invoices/document-stats', [DocumentStatController::class, 'index'])->name('invoices.document-stats.index');
-    Route::get('invoices/{invoice}/payments', [PaymentController::class, 'index'])->name('invoices.payments.index');
-    Route::get('invoices-statistics', StatisticController::class)->name('invoices.statistics');
-    Route::put('invoices/{invoice}/invoice-tems/sort', [InvoiceController::class, 'sortItems'])->name('invoices.invoice-items.sort');
-    Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
-    Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
-    Route::delete('invoices/{invoice}/delete-retention', [RetentionController::class, 'destroy'])->name('invoices.destroy-retention');
-    Route::resource('invoices', InvoiceController::class);
-    Route::resource('tax-authority-invoices', TaxAuthorityInvoiceController::class)->only(['index', 'show', 'destroy']);
-    Route::post('invoices/{invoice}/invoice-items/store-bulk', [InvoiceItemController::class, 'storeBulk'])->name('invoices.invoice-items.store-bulk');
-    Route::resource('invoices.status', InvoiceStatusController::class)->only(['create', 'store']);
-    Route::resource('invoices.invoice-items', InvoiceItemController::class)->only(['index', 'create','store', 'edit', 'update', 'destroy']);
-    Route::resource('invoices.invoice-items.taxes', ItemTaxController::class)->except(['index', 'show']);
-    Route::resource('invoices.invoice-items.deductions', ItemDeductionController::class)->except(['index', 'show']);
-    Route::resource('invoice-items.subtotal-adjustments', ItemSubtotalAdjustmentController::class)->only(['create', 'store']);
-    Route::resource('invoice-items.total-amount-adjustments', ItemTotalAmountAdjustmentController::class)->only(['create', 'store']);
-    Route::resource('invoices.tax-rates', InvoiceTaxController::class);
-    Route::resource('invoices.downpayments', DownpaymentController::class)->only(['store']);
-    Route::resource('invoices.attachments', AttachmentController::class)->only('store', 'destroy');
-    Route::resource('invoices.merge-invoices', MergeInvoiceController::class)->only(['create', 'store']);
-    Route::resource('invoice-doc-controls', DocControlController::class);
-    Route::resource('invoices.pending-documents', ContractDocumentController::class)->only(['index', 'store']);
-    Route::resource('invoices.uploaded-documents', UploadedDocumentController::class);
+    // Access controll routes
     Route::post('admin-access-lists/{admin_access_list}/programs/{program}/revoke', [AdminAccessListProgramController::class, 'revoke'])->name('admin-access-lists.programs.revoke-access');
     Route::post('admin-access-lists/{admin_access_list}/contracts/{contract}/revoke', [AdminAccessListContractController::class, 'revoke'])->name('admin-access-lists.contracts.revoke-access');
     Route::resource('admin-access-lists', AdminAccessListController::class);

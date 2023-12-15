@@ -2,19 +2,14 @@
 
 namespace App\Models;
 
-use App\Http\Requests\Admin\ContractUpdateRequest;
 use App\Traits\HasEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Support\Money;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Spatie\Comments\Models\Concerns\HasComments;
 
 class Contract extends BaseModel
@@ -69,6 +64,11 @@ class Contract extends BaseModel
   */
   public const FILES_PATH = 'contracts';
 
+  // protected static function booted()
+  // {
+  //     // contract should be accessible by auth admin
+  //     // static::addGlobalScope(new ContractACLAccessibleByAuth);
+  // }
   public function getValueAttribute($value)
   {
     return $value / 1000;
@@ -171,19 +171,29 @@ class Contract extends BaseModel
    */
   public function scopeCompletelyReviewedBy($q, $admin_id)
   {
-    return $q->has('phases')->whereHas('phaseReviews', function ($q) use ($admin_id) {
-      $q->where('user_id', $admin_id);
-    }, '>=', $this->phases()->count());
+    return $q->has('phases')->whereDoesntHave('phases', function ($q) use ($admin_id) {
+      $q->whereDoesntHave('reviews', function ($q) use ($admin_id) {
+        $q->where('user_id', $admin_id);
+      });
+    });
   }
 
   /**
    * contracts which are partialy reviewed by admin
    */
-  public function scopePartiallyReviewedBy($q, $admin_id)
+  public function scopePartiallyReviewedBy($query, $admin_id)
   {
-    return $q->has('phases')->whereHas('phaseReviews', function ($q) use ($admin_id) {
-      $q->where('user_id', $admin_id);
-    }, '<', $this->phases()->count());
+    return $query->whereHas('phases', function ($q) use ($admin_id) {
+      $q->whereHas('reviews', function ($q) use ($admin_id) {
+        $q->where('user_id', $admin_id);
+      });
+    })
+    // also have some phases which are not reviewed by this admin
+    ->whereHas('phases', function ($q) use ($admin_id) {
+      $q->whereDoesntHave('reviews', function ($q) use ($admin_id) {
+        $q->where('user_id', $admin_id);
+      });
+    });
   }
 
   /**
@@ -191,7 +201,7 @@ class Contract extends BaseModel
    */
   public function scopeNotReviewedBy($q, $admin_id)
   {
-    return $q->whereDoesntHave('phaseReviews', function ($q) use ($admin_id) {
+    return $q->has('phases')->whereDoesntHave('phaseReviews', function ($q) use ($admin_id) {
       $q->where('user_id', $admin_id);
     });
   }

@@ -44,7 +44,7 @@ class ContractStageController extends Controller
     $contract->stages()->create($request->only(['name']));
     broadcast(new ContractUpdated($contract, 'stages'))->toOthers();
 
-    return $this->sendRes(__('Stage Created Successfully'), ['event' => 'table_reload', 'table_id' => $request->tableId ? $request->tableId : 'stages-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Stage Created Successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
   }
 
   public function edit(Contract $contract, ContractStage $stage)
@@ -57,7 +57,7 @@ class ContractStageController extends Controller
     $stage->update($request->only(['name']));
     broadcast(new ContractUpdated($contract, 'stages'))->toOthers();
 
-    return $this->sendRes(__('Stage Updated Successfully'), ['event' => 'table_reload', 'table_id' => $request->tableId ? $request->tableId : 'stages-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Stage Updated Successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
   }
 
   public function destroy(Contract $contract, ContractStage $stage)
@@ -66,6 +66,6 @@ class ContractStageController extends Controller
     $stage->delete();
     broadcast(new ContractUpdated($contract, 'stages'))->toOthers();
 
-    return $this->sendRes(__('Stage Deleted Successfully'), ['event' => 'table_reload', 'table_id' => 'stages-table']);
+    return $this->sendRes(__('Stage Deleted Successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables']);
   }
 }

@@ -2,7 +2,6 @@
 
 namespace App\DataTables\Admin\Contract;
 
-use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Program;

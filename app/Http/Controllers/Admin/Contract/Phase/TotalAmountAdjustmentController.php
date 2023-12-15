@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Contract\Phase;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contract;
 use App\Models\ContractPhase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,12 +11,18 @@ use Illuminate\Validation\ValidationException;
 
 class TotalAmountAdjustmentController extends Controller
 {
-  public function create(ContractPhase $phase)
+  public function __construct()
+  {
+    // check if phase belongs to contract
+    $this->middleware('verifyContractNotTempered:phase,contract_id')->only(['create', 'store']);
+  }
+
+  public function create($contract, ContractPhase $phase)
   {
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.total-amount-adjustments.create', compact('phase'))->render()]);
   }
 
-  public function store(ContractPhase $phase, Request $request)
+  public function store($contract, ContractPhase $phase, Request $request)
   {
     $request->validate([
       'adjuted_total_amount' => ['required', 'numeric'],

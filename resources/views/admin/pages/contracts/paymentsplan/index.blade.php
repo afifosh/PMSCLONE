@@ -38,7 +38,6 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-{{-- @include('admin.pages.contracts.header', ['tab' => 'stages']) --}}
   <div class="mt-3  col-12">
     {{-- Stats Start --}}
     <div class="card h-100">
@@ -291,6 +290,8 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         selectedRow.child.hide();
         $(tr).removeClass('shown');
         $(tr).css('background-color', '');
+        window.selectedTab = null;
+        window.active_contract = null;
     } else {
         // If another row is expanded, collapse it
         if (expandedRow) {
@@ -305,6 +306,9 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         $(tr).css('background-color', '#f5f5f5');
 
         expandedRow = selectedRow; // Update the reference to the currently expanded row
+        if(window.selectedTab) {
+          $('[data-bs-target="' + window.selectedTab + '"]').click();
+        }
     }
 });
 
@@ -326,6 +330,7 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         var contractId = $(this).attr('data-bs-target').replace("#child-stages-", "");
 
         // Get the corresponding stages DataTable and reload it
+        window.selectedTab = '#child-stages-' + contractId;
         $('#stages-table-' + contractId).DataTable().ajax.reload(null, false);
     });
 
@@ -335,6 +340,7 @@ $('#paymentsplan-table tbody').on('click', '.btn-expand', function() {
         var contractId = $(this).attr('data-bs-target').replace("#child-phases-", "");
 
         // Get the corresponding phases DataTable and reload it
+        window.selectedTab = '#child-phases-' + contractId;
         $('#child-table-' + contractId).DataTable().ajax.reload(null, false);
     });
 });

@@ -203,4 +203,14 @@ class AuthorityInvoice extends Model
   {
     return route('admin.contracts.invoices.edit', [$this->invoice->contract_id, $this->invoice_id, 'tab' => 'authority-tax', 'popup' => 'comments']);
   }
+
+  /**
+   * Invoices which have active ACL rule for the given admin
+   */
+  public function scopeValidAccessibleByAdmin($q, $admin_id)
+  {
+    $q->whereHas('invoice', function ($q) use ($admin_id) {
+      $q->validAccessibleByAdmin($admin_id);
+    });
+  }
 }
