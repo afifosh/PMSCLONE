@@ -56,13 +56,13 @@
     });
   }
 
-  function editPhaseTax(phase_id, pivot_tax_id, element)
+  function editPhaseTax(contract_id, phase_id, pivot_tax_id, element)
   {
     $('.expanded-edit-row').remove();
     // show loading in child row
     $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
     $.ajax({
-      url: route('admin.contracts.phases.taxes.edit', { contract: window.active_contract ?? 0, phase: phase_id, tax: pivot_tax_id }),
+      url: route('admin.contracts.phases.taxes.edit', { contract: contract_id, phase: phase_id, tax: pivot_tax_id }),
       type: "GET",
       success: function(res){
         $('.expanded-edit-row').remove();
@@ -320,6 +320,71 @@
       $('.phase-create-form [name="downpayment_amount"]').prop('disabled', true);
     }
   })
-  /**
-   * End Phase create form js
-   */
+
+  // toggle review status
+  function togglePhaseReviewStatus(buttonElement) {
+    // Extract data attributes
+    const contractId = buttonElement.getAttribute('data-contract-id');
+    const phaseId = buttonElement.getAttribute('data-phase-id');
+    const isReviewed = buttonElement.getAttribute('data-is-reviewed') === 'true';
+
+    // Using the route function to dynamically generate the URL
+    const url = route('admin.contracts.phases.toggle-review', {
+        contract: contractId,
+        phase_id: phaseId
+    });
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+          reloadDataTables();
+          if (data.data.event == 'table_reload') {
+            if (data.data.table_id != undefined && data.data.table_id != null && data.data.table_id != '') {
+              $('#' + data.data.table_id)
+                .DataTable()
+                .ajax.reload(null, false);
+            }
+          }
+          if(data.data.close == 'globalModal'){
+          $('#globalModal').modal('hide');
+
+          }else if(data.data.close == 'modal'){
+            current.closest('.modal').modal('hide');
+          }
+            // Use the review status from the server response
+            const isReviewedFromResponse = data.data.isReviewed;
+
+            // Determine the button text and class based on the review status from the server response
+            const newText = isReviewedFromResponse ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
+            const newClass = isReviewedFromResponse ? 'btn-label-danger' : 'btn-label-secondary';
+
+            // Update the button's text, data attribute, and class
+            buttonElement.textContent = newText;
+            buttonElement.setAttribute('data-is-reviewed', isReviewedFromResponse);
+            buttonElement.classList.remove('btn-label-secondary', 'btn-label-danger');
+            buttonElement.classList.add(newClass);
+            toast_success(data.message)
+        } else {
+            alert('Error toggling review status.');
+            toast_danger(data.message)
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        toast_danger('An unexpected error occurred.')
+    });
+  }
+
+  function expandOldExpandedRow(){
+    $('#paymentsplan-table tbody [contract-id="'+window.active_contract+'"]').click();
+  }
+/**
+ * End Phase create form js
+ */

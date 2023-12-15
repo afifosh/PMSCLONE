@@ -702,6 +702,18 @@
     @endif
   </div>
 </form>
+@if($invoice->type == 'Partial Invoice')
+  <div class="col-12 mt-3">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title">Partial Invoices From Same Phase</h4>
+      </div>
+      <div class="card-body">
+        {{$dataTable->table()}}
+      </div>
+    </div>
+  </div>
+@endif
   <form id="summary_update_from" action="{{route('admin.invoices.update', [$invoice, 'update_tax_type' => 1])}}" method="POST">
     @method('PUT')
     @csrf
@@ -852,6 +864,10 @@
 </div>
 @endsection
 @push('scripts')
+  @if($invoice->type == 'Partial Invoice')
+    {{$dataTable->scripts()}}
+    <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+  @endif
   <script>
     // on change of .retention-create-form retention_id calculate retention amount
     $(document).on('change', '.retention-create-form #retention_id', function(){

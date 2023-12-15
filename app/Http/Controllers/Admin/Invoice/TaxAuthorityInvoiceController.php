@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AuthorityInvoice;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TaxAuthorityInvoiceController extends Controller
 {
@@ -34,6 +35,21 @@ class TaxAuthorityInvoiceController extends Controller
   {
     if (request()->json) {
       return response()->json($taxAuthorityInvoice);
+    }
+  }
+
+  public function destroy(AuthorityInvoice $taxAuthorityInvoice)
+  {
+    DB::beginTransaction();
+
+    try {
+      $taxAuthorityInvoice->payments()->delete();
+      $taxAuthorityInvoice->delete();
+
+      return $this->sendRes('success', ['message' => __('Tax authority invoice deleted successfully')]);
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return $this->sendErr($e->getMessage());
     }
   }
 }
