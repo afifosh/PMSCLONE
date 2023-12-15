@@ -18,6 +18,14 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read invoice', ['only' => ['index', 'show']]);
+    $this->middleware('permission:create invoice', ['only' => ['create', 'store']]);
+    $this->middleware('permission:update invoice', ['only' => ['edit', 'update', 'sortItems', 'releaseRetention']]);
+    $this->middleware('permission:delete invoice', ['only' => ['destroy']]);
+  }
+
   public function index(InvoicesDataTable $dataTable, null|string $model = null)
   {
     $data = [];

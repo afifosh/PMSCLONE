@@ -55,25 +55,9 @@ class TrackingPaymentsPlanDataTable extends DataTable
       ->editColumn('phases_count', function ($contract) {
         return $contract->phases_count ? $contract->phases_count : '0';
       })
-      ->addColumn('assigned_to', function ($project) {
-        if ($project->assignable instanceof Company) {
-          return view('admin._partials.sections.company-avatar', ['company' => $project->assignable]);
-        }
-
-        return '-';
-      })
-      // ->editColumn('project.name', function ($project) {
-      //   return $project->project ? $project->project->name : '-';
-      // })
-
       ->editColumn('value', function (Contract $contract) {
         return @cMoney($contract->value ?? 0, $contract->currency, true);
         //return view('admin.pages.contracts.value-column', compact('contract'));
-      })
-      ->filterColumn('assigned_to', function ($query, $keyword) {
-        $query->whereHasMorph('assignable', Company::class, function ($q) use ($keyword) {
-          $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
-        });
       })
       ->rawColumns(['id', 'program.name', 'subject', 'reviews_completed', 'expand', 'incomplete_reviewers']);
   }
@@ -83,7 +67,7 @@ class TrackingPaymentsPlanDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    return $model->validAccessibleByAdmin(auth()->id())->applyRequestFilters()->withCount(['stages', 'phases']);
+    return $model->validAccessibleByAdmin(auth()->id())->applyRequestFilters()->with(['program:name,id'])->withCount(['stages', 'phases']);
   }
   /**
    * Optional method if you want to use the html builder.

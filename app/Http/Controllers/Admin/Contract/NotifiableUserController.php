@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 
 class NotifiableUserController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:update contract')->only(['create', 'store']);
+    $this->middleware('permission:delete contract')->only(['destroy']);
+  }
+
   public function create(Contract $contract)
   {
     $config = (new SettingService())->getFormattedSettings('contract-notifications');

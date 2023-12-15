@@ -8,8 +8,6 @@ use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\InvoiceConfig;
 use App\Models\InvoiceDeduction;
-use App\Models\PhaseTax;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PhaseDeductionController extends Controller
@@ -21,6 +19,10 @@ class PhaseDeductionController extends Controller
 
     // check if deduction belongs to phase
     $this->middleware('verifyContractNotTempered:deduction,deductible_id,phase,id')->only(['edit', 'update', 'destroy']);
+
+    $this->middleware('permission:create contract')->only(['create', 'store']);
+    $this->middleware('permission:update contract')->only(['edit', 'update']);
+    $this->middleware('permission:delete contract')->only(['destroy']);
   }
 
   public function create(Contract $contract, ContractPhase $phase)

@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 
 class LogController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read contract')->only(['index']);
+  }
+
   public function index(Contract $contract, LogsDataTable $dataTable)
   {
     $dataTable->contract = $contract;

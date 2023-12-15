@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Notification;
 
 class ContractSettingController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:update contract')->only(['index', 'terminate', 'undoTerminate', 'pause', 'resume']);
+  }
   public function index(Contract $contract, NotifiableUsersDataTable $dataTable)
   {
     $contract->load('events');

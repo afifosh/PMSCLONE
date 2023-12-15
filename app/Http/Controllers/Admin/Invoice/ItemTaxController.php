@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\DB;
 
 class ItemTaxController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read invoice')->only(['index']);
+    $this->middleware('permission:create invoice')->only(['create', 'store']);
+    $this->middleware('permission:update invoice')->only(['edit', 'update']);
+    $this->middleware('permission:delete invoice')->only(['destroy']);
+  }
+
   public function create(Invoice $invoice, InvoiceItem $invoiceItem)
   {
     $invoiceItem->load('invoiceable');

@@ -11,7 +11,6 @@ use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\ContractStage;
 use App\Models\InvoiceConfig;
-use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,6 +19,10 @@ class ProjectPhaseController extends Controller
   public function __construct()
   {
     $this->middleware('verifyContractNotTempered:phase,contract_id')->only(['show', 'edit', 'update', 'destroy']);
+    $this->middleware('permission:read contract')->only(['index', 'show', 'contractPhases', 'prepareActivityTab', 'prepareCommentsTab']);
+    $this->middleware('permission:create contract')->only(['create', 'store']);
+    $this->middleware('permission:update contract')->only(['edit', 'update', 'sortPhases']);
+    $this->middleware('permission:delete contract')->only(['destroy']);
   }
 
   public function index($project, Contract $contract, string|ContractStage $stage, PhasesDataTable $dataTable)

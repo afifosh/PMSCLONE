@@ -6,17 +6,21 @@ use App\DataTables\Admin\ProgramsDataTable;
 use App\DataTables\Admin\RFP\DraftRfpsDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
-use App\DataTables\Admin\Contract\ContractsDataTable;
-use App\Models\Company;
 use App\Models\Contract;
-use App\Models\ContractType;
 use Illuminate\Http\Request;
 
 class ProgramController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read program', ['only' => ['index', 'show', 'showDraftRFPs']]);
+    $this->middleware('permission:create program', ['only' => ['create', 'store']]);
+    $this->middleware('permission:update program', ['only' => ['edit', 'update']]);
+    $this->middleware('permission:delete program', ['only' => ['destroy']]);
+  }
+
   public function index(ProgramsDataTable $dataTable)
   {
-    
     // Total number of contracts
     $totalContracts = Contract::count();
     // Total number of contracts linked to a program
@@ -94,20 +98,9 @@ class ProgramController extends Controller
 
   public function showDraftRFPs($program , DraftRfpsDataTable $dataTable)
   {
-    $program = Program::mine()->findOrFail($program);
+    $program = Program::findOrFail($program);
     $dataTable->setProgram($program->id);
     return $dataTable->render('admin.pages.rfp.index', compact('program'));
     return view('admin.pages.rfp.index');
   }
-
-  // public function showInvoices($program, InvoicesDataTable $dataTable)
-  // {
-  //     $program = Program::mine()->findOrFail($program);
-  //     $dataTable->setProgram($program->id);
-  //     return $dataTable->render('admin.pages.invoice.index', compact('program'));
-  // }
-
-
-
-  
 }

@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class BulkInvoiceController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:update invoice')->only(['create', 'store']);
+  }
+
   public function store(Contract $contract, Request $request)
   {
     $request->validate([

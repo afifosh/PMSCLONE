@@ -26,11 +26,6 @@ class ContractsTrackingDataTable extends DataTable
       ->editColumn('subject', function ($contract) {
         return $contract->subject ? $contract->subject : '-';
       })
-      ->editColumn('program.name', function ($contract) {
-        return $contract->program_id
-          ? '<a href="' . route('admin.programs.show', $contract->program->id) . '">' . $contract->program->name . '</a>'
-          : 'N/A';
-      })
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
@@ -40,19 +35,6 @@ class ContractsTrackingDataTable extends DataTable
       ->addColumn('reviews_completed', function ($contract) {
         return view('admin._partials.sections.user-avatar-group', ['users' => $contract->reviewedBy, 'limit' => 5]);
       })
-      ->addColumn('assigned_to', function ($project) {
-        if ($project->assignable instanceof Company) {
-          return view('admin._partials.sections.company-avatar', ['company' => $project->assignable]);
-        } else {
-          return '-';
-        }
-      })
-      // ->editColumn('project.name', function ($project) {
-      //   return $project->project ? $project->project->name : '-';
-      // })
-      ->editColumn('type.name', function ($project) {
-        return $project->type ? $project->type->name : '-';
-      })
       ->editColumn('category.name', function ($project) {
         return $project->category ? $project->category->name : '-';
       })
@@ -60,12 +42,7 @@ class ContractsTrackingDataTable extends DataTable
         return @cMoney($contract->value ?? 0, $contract->currency, true);
         // return view('admin.pages.contracts.value-column', compact('contract'));
       })
-      ->filterColumn('assigned_to', function ($query, $keyword) {
-        $query->whereHasMorph('assignable', Company::class, function ($q) use ($keyword) {
-          $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
-        });
-      })
-      ->rawColumns(['id', 'program.name', 'reviews_completed']);
+      ->rawColumns(['id', 'reviews_completed']);
   }
 
   /**
@@ -73,7 +50,7 @@ class ContractsTrackingDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    return $model->validAccessibleByAdmin(auth()->id())->applyRequestFilters();
+    return $model->validAccessibleByAdmin(auth()->id())->with(['reviewedBy:first_name,last_name,id,avatar'])->applyRequestFilters();
   }
 
   /**
@@ -122,9 +99,6 @@ class ContractsTrackingDataTable extends DataTable
     return [
       // Column::make('contracts.id')->title('Contract'),
       Column::make('subject')->title('Subject'),
-      // Column::make('program.name')->name('programs.name')->title('Program'),
-      // Column::make('refrence_id')->title('Ref ID'),
-      // Column::make('assigned_to')->title('Assigned To'),
       Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
       Column::make('reviewers')->title('Reviewers'),

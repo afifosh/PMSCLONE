@@ -10,7 +10,6 @@ use App\DataTables\Admin\Contract\ContractPaymentsPlanReviewDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ContractStoreRequest;
 use App\Http\Requests\Admin\ContractUpdateRequest;
-use App\Models\Client;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Review;
 use App\Models\Admin;
@@ -27,11 +26,25 @@ use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Traits\FinanceTrait;
 use Illuminate\Support\Facades\DB;
 use DataTables;
-use Illuminate\Http\Request;
 
 class ContractController extends Controller
 {
   use FinanceTrait;
+
+  public function __construct()
+  {
+    $this->middleware('permission:read contract', ['only' => [
+      'index', 'show', 'statistics', 'projectContractsIndex',
+      'trackingPaymentsPlan', 'trackingContract', 'showSummary',
+      'showReviewers', 'showComments', 'showActivities', 'summaryTabContent',
+      'ContractPaymentsPlan', 'ContractPaymentsPlanReview',
+      'ContractPaymentsPlanPhases', 'ContractPaymentsPlanStages'
+      ]]);
+    $this->middleware('permission:create contract', ['only' => ['create', 'store']]);
+    $this->middleware('permission:update contract', ['only' => ['edit', 'update', 'togglePhaseReviewStatus', 'toggleContractReviewStatus', 'releaseRetention']]);
+    $this->middleware('permission:delete contract', ['only' => ['destroy']]);
+  }
+
   /**
    * Display a listing of the resource.
    */
@@ -677,7 +690,7 @@ class ContractController extends Controller
   {
     $query = ContractPhase::whereHas('stage.contract', function ($query) use ($contract_id) {
       $query->where('id', $contract_id);
-    })->with('reviewdByAdmins');
+    })->with(['reviewdByAdmins', 'stage', 'contract:id,program_id,currency', 'addedAsInvoiceItem']);
 
       return DataTables::of($query)
           ->addColumn('stage_name', function ($phase) {
@@ -709,10 +722,8 @@ class ContractController extends Controller
   public function ContractPaymentsPlanStages($contract_id)
   {
       $query = ContractStage::where('contract_id', $contract_id)
-          ->withCount('phases')
-          ->with(['contract' => function ($q) {
-              $q->select(['contracts.id', 'contracts.program_id', 'currency']);
-          }]);
+          ->withCount(['phases', 'myReviewedPhases'])
+          ->with(['contract:id,program_id,currency', 'phases']);
 
       $dataTable = DataTables::of($query)
           ->editColumn('name', function ($stage) {
@@ -821,30 +832,5 @@ class ContractController extends Controller
       } catch (Throwable $e) {
           return $this->sendError($e->getMessage());
       }
-  }
-
-  public function getContractsWithStagesAndPhases(Request $request)
-  {
-      $contracts = Contract::with(['stages.phases'])->get();
-
-      $contractDataArray = $contracts->map(function ($contract) {
-          return [
-              'contract_name' => $contract->subject,
-             // 'company' => $contract->company->name, // Assuming a 'company' relationship exists
-           //   'start_date' => $contract->start_date->format('Y-m-d H:i:s'),
-          //    'end_date' => $contract->due_date->format('Y-m-d H:i:s'),
-              'value' => $contract->value,
-              'stages' => $contract->stages->map(function ($stage) {
-                  return [
-                      'name' => $stage->name,
-                      'phases' => $stage->phases->map(function ($phase) {
-                          return ['name' => $phase->name];
-                      })->toArray(),
-                  ];
-              })->toArray(),
-          ];
-      });
-
-      return response()->json($contractDataArray);
   }
 }

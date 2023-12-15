@@ -14,10 +14,17 @@ use App\Models\InvoiceConfig;
 use App\Models\Program;
 use App\Models\InvoicePayment;
 use Illuminate\Http\Request;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Constant\Periodic\Payments;
 
 class PaymentController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read payment', ['only' => ['index', 'show']]);
+    $this->middleware('permission:create payment', ['only' => ['create', 'store']]);
+    $this->middleware('permission:update payment', ['only' => ['edit', 'update']]);
+    $this->middleware('permission:delete payment', ['only' => ['destroy']]);
+  }
+
   public function index(PaymentsDataTable $dataTable, null|string $model = null)
   {
     $data = [];

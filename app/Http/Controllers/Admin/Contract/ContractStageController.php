@@ -16,6 +16,11 @@ class ContractStageController extends Controller
   {
     // check if stage belongs to contract
     $this->middleware('verifyContractNotTempered:stage,contract_id')->only(['edit', 'update', 'destroy']);
+
+    $this->middleware('permission:read contract')->only(['index']);
+    $this->middleware('permission:create contract')->only(['create', 'store']);
+    $this->middleware('permission:update contract')->only(['edit', 'update']);
+    $this->middleware('permission:delete contract')->only(['destroy']);
   }
 
   public function index(Contract $contract, StagesDataTable $dataTable)

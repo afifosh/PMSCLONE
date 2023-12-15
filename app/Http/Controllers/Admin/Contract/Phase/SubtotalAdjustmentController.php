@@ -14,6 +14,8 @@ class SubtotalAdjustmentController extends Controller
   {
     // check if contractPhase belongs to contract
     $this->middleware('verifyContractNotTempered:phase,contract_id')->only(['create', 'store']);
+
+    $this->middleware('permission:create contract|update contract')->only(['create', 'store']);
   }
 
   public function create($contract, ContractPhase $phase)

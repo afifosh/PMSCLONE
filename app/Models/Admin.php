@@ -480,7 +480,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     public function getReviewStatusForContract($contract_id)
     {
         // Fetch the contract with its stages
-        $contract = Contract::find($contract_id);
+        $contract = Contract::with(['stages.phases'])->find($contract_id);
 
         if (!$contract) {
             return []; // or throw an exception, depending on your application's needs

@@ -206,18 +206,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     //Route::get('programs/{program}/contracts', [ProgramController::class, 'contracts'])->name('programs.contracts');
 
 
+    Route::resource('programs', ProgramController::class)->only(['index', 'create', 'store']);
     Route::middleware('programACL')->group(function () {
       Route::get('programs/{program}/draft-rfps', [ProgramController::class, 'showDraftRFPs'])->name('programs.showDraftRFPs');
-      // Route for listing invoices for a program
-      Route::get('programs/{program}/invoices', [ProgramController::class, 'invoices'])->name('programs.invoices');
       Route::resource('programs', ProgramController::class)->only(['show', 'edit', 'update', 'destroy']);
-      Route::resource('programs.users', ProgramUserController::class);
+      Route::resource('programs.users', ProgramUserController::class); // pending permissions.
       Route::resource('programs.contracts', ContractController::class);
       Route::resource('programs.invoices', InvoiceController::class);
       Route::resource('programs.payments', PaymentController::class);
     });
 
-    Route::resource('programs', ProgramController::class)->only(['index', 'create', 'store']);
+
 
     Route::put('projects/{project}/contracts/{contract}/sort-phases', [ProjectPhaseController::class, 'sortPhases'])->name('projects.contracts.sort-phases');
     Route::resource('doc-signatures', SignatureController::class);
@@ -349,6 +348,8 @@ Route::prefix('contracts')->group(function () {
   });
 });
 
+    Route::resource('contracts', ContractController::class)->only(['index', 'create', 'store']);
+    Route::resource('invoices', InvoiceController::class)->only(['index', 'create', 'store']);
     // contracts and invoices related routes (contracts, phases, stages, invoices, invoice items)
     Route::middleware('contractACL')->group(function () {
       Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
@@ -402,8 +403,7 @@ Route::prefix('contracts')->group(function () {
       Route::resource('invoices.uploaded-documents', UploadedDocumentController::class);
       Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
     });
-    Route::resource('contracts', ContractController::class)->only(['index', 'create', 'store']);
-    Route::resource('invoices', InvoiceController::class)->only(['index', 'create', 'store']);
+
     Route::resource('tax-authority-invoices', TaxAuthorityInvoiceController::class)->only(['index', 'show', 'destroy']);
 
     //invoices routes

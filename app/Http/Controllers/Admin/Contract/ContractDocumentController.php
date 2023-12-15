@@ -17,6 +17,11 @@ use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 
 class ContractDocumentController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read contract')->only(['index']);
+    $this->middleware('permission:update contract')->only(['store', 'uploadDocument']);
+  }
   public function index($modal, Request $request)
   {
     if ($request->route()->getName() == 'admin.contracts.pending-documents.index') {

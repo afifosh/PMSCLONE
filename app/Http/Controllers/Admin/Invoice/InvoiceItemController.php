@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceItemController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read invoice')->only(['index']);
+    $this->middleware('permission:create invoice')->only(['create', 'store', 'storeBulk']);
+    $this->middleware('permission:update invoice')->only(['edit', 'update', 'storeBulk']);
+    $this->middleware('permission:delete invoice')->only(['destroy']);
+  }
+
   public function index(Invoice $invoice)
   {
     $data['invoice'] = $invoice;

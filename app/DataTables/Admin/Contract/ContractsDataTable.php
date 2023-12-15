@@ -146,7 +146,7 @@ public function query(Contract $model): QueryBuilder
     }
 
     // Apply any additional filters if necessary
-    $query->applyRequestFilters();
+    $query->with(['program', 'reviewedBy'])->applyRequestFilters();
 
     return $query;
 }

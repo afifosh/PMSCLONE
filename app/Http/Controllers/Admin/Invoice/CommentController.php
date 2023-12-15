@@ -11,6 +11,8 @@ class CommentController extends Controller
   {
     // check if invoice belongs to contract
     $this->middleware('verifyContractNotTempered:invoice,contract_id')->only(['index']);
+
+    $this->middleware('permission:read invoice')->only(['index']);
   }
 
   public function index($contract, Invoice $invoice)
@@ -22,6 +24,8 @@ class CommentController extends Controller
     if(request()->tab == 'authority-tax'){
       $invoice = $invoice->authorityInvoice;
     }
-    return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.comments.index', compact('invoice'))->render(), 'JsMethods' => ['liveWireRescan']]);
+    $invoice->contract_id = $contract;
+
+    return view('admin.pages.invoices.comments.index', compact('invoice'));
   }
 }

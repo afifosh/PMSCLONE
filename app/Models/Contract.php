@@ -141,7 +141,7 @@ class Contract extends BaseModel
    */
   public function usersCompletedPhasesReview()
   {
-    $phases_count = $this->phases()->count();
+    $phases_count = $this->phases_count;
 
     return Admin::whereHas('addedReviews', function ($q) {
       $q->where('reviewable_type', ContractPhase::class)->whereHas('phase', function ($q) {
@@ -153,17 +153,19 @@ class Contract extends BaseModel
       });
   }
 
+  public function myReviewedPhases()
+  {
+    return $this->phases()->whereHas('reviews', function ($q) {
+      $q->where('user_id', auth()->id());
+    });
+  }
+
   /**
    * Get logged in user's review progress (%) based on phases of this contract.
    */
   public function myPhasesReviewProgress()
   {
-    $totalPhases = $this->phases()->count();
-    $myPhases = $this->phases()->whereHas('reviews', function ($q) {
-      $q->where('user_id', auth()->id());
-    })->count();
-
-    return $myPhases / $totalPhases * 100;
+    return $this->myReviewedPhases_count / $this->phases_count * 100;
   }
 
   /**

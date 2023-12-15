@@ -40,6 +40,11 @@ class ModuleSeeder extends Seeder
         ['module' => 'Roles Management', 'permissions' => ['read role', 'create role', 'update role', 'delete role']],
         ['module' => 'Company Roles', 'permissions' => ['read company role', 'create company role', 'update company role', 'delete company role']],
         ['module' => 'Company Management', 'permissions' => ['read company', 'create company', 'update company', 'delete company']],
+        ['module' => 'Programs ACL Rule', 'permissions' => ['read acl', 'create acl', 'update acl', 'delete acl']],
+        ['module' => 'Programs', 'permissions' => ['read program', 'create program', 'update program', 'delete program']],
+        ['module' => 'Contracts', 'permissions' => ['read contract', 'create contract', 'update contract', 'delete contract']],
+        ['module' => 'Invoices', 'permissions' => ['read invoice', 'create invoice', 'update invoice', 'delete invoice']],
+        ['module' => 'Payments', 'permissions' => ['read payment', 'create payment', 'update payment', 'delete payment']],
       ],
       'web' => [
         ['module' => 'User Management', 'permissions' => ['read user', 'create user', 'update user', 'delete user']],
