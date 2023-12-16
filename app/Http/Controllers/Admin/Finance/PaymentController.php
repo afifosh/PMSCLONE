@@ -14,10 +14,17 @@ use App\Models\InvoiceConfig;
 use App\Models\Program;
 use App\Models\InvoicePayment;
 use Illuminate\Http\Request;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Constant\Periodic\Payments;
 
 class PaymentController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read payment', ['only' => ['index', 'show']]);
+    $this->middleware('permission:create payment', ['only' => ['create', 'store']]);
+    $this->middleware('permission:update payment', ['only' => ['edit', 'update']]);
+    $this->middleware('permission:delete payment', ['only' => ['destroy']]);
+  }
+
   public function index(PaymentsDataTable $dataTable, null|string $model = null)
   {
     $data = [];
@@ -26,13 +33,13 @@ class PaymentController extends Controller
       $dataTable->filterBy = Company::findOrFail(request()->route('company'));
       $data['company'] = $dataTable->filterBy;
     } elseif (request()->route()->getName() == 'admin.contracts.payments.index') {
-      $dataTable->filterBy = Contract::findOrFail(request()->route('contract'));
+      $dataTable->filterBy = Contract::validAccessibleByAdmin(auth()->id())->findOrFail(request()->route('contract'));
       $data['contract'] = $dataTable->filterBy;
     } elseif (request()->route()->getName() == 'admin.programs.payments.index') {
       $dataTable->filterBy = Program::findOrFail(request()->route('program'));
       $data['program'] = $dataTable->filterBy;
     } elseif (request()->route()->getName() == 'admin.invoices.payments.index' && request()->accepts == 'view_data') {
-      $data['invoice'] = Invoice::with('payments')->findOrFail(request()->route('invoice'));
+      $data['invoice'] = Invoice::validAccessibleByAdmin(auth()->id())->with('payments')->findOrFail(request()->route('invoice'));
       return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.index-table', $data)->render()]);
     } else {
       $data['companies'] = Company::has('contracts.invoices.payments')->get(['name', 'id', 'type'])->prepend('All', '');
@@ -49,7 +56,7 @@ class PaymentController extends Controller
   {
     $data['invoicePayment'] = new InvoicePayment();
     $data['retentions'] = InvoiceConfig::where('config_type', 'Retention')->where('status', 1)->get();
-    if($request->invoice && $request->type != 'tax-authority'){
+    if ($request->invoice && $request->type != 'tax-authority') {
       $data['invoice'] = Invoice::with(['contract.assignable'])->findOrFail($request->invoice);
       $data['companies'] = [$data['invoice']->contract->assignable_id => $data['invoice']->contract->assignable->name];
       $data['contracts'] = [$data['invoice']->contract_id => $data['invoice']->contract->subject];
@@ -58,7 +65,7 @@ class PaymentController extends Controller
       ];
       $data['selected_invoice'] = $request->invoice;
       $data['event'] = 'page_reload';
-    } else if ($request->invoice && $request->type == 'tax-authority'){
+    } else if ($request->invoice && $request->type == 'tax-authority') {
       $data['invoice'] = AuthorityInvoice::with('invoice.contract.assignable')->findOrFail($request->invoice);
       $data['companies'] = [$data['invoice']->invoice->contract->assignable_id => $data['invoice']->invoice->contract->assignable->name];
       $data['contracts'] = [$data['invoice']->invoice->contract_id => $data['invoice']->invoice->contract->subject];
@@ -100,11 +107,11 @@ class PaymentController extends Controller
   {
     $data['invoicePayment'] = $payment;
     $data['invoice'] = $payment->payable;
-    if($payment->payable_type == Invoice::class){
+    if ($payment->payable_type == Invoice::class) {
       $data['invoiceId'] = [
         $payment->payable_id => runtimeInvIdFormat($payment->payable_id) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount - $data['invoice']->downpayment_amount
       ];
-    }elseif($payment->payable_type == AuthorityInvoice::class){
+    } elseif ($payment->payable_type == AuthorityInvoice::class) {
       $data['invoiceId'] = [
         $payment->payable_id => runtimeTAInvIdFormat($payment->payable_id) . ' - Unpaid ' . $data['invoice']->total - $data['invoice']->paid_amount - $data['invoice']->downpayment_amount
       ];
@@ -129,12 +136,12 @@ class PaymentController extends Controller
 
   public function destroy($payment)
   {
-    if($payment != 'bulk'){
+    if ($payment != 'bulk') {
       $payment = InvoicePayment::with('payable')->findOrFail($payment);
       $this->deletePayment($payment);
-    }else{
+    } else {
       $payments = InvoicePayment::whereIn('id', request()->payments)->with('payable')->get();
-      foreach($payments as $payment){
+      foreach ($payments as $payment) {
         $this->deletePayment($payment);
       }
     }
@@ -142,24 +149,28 @@ class PaymentController extends Controller
     return $this->sendRes('Payment deleted successfully.', ['event' => 'table_reload', 'table_id' => 'payments-table']);
   }
 
-  private function deletePayment($payment): void
+  private function deletePayment(InvoicePayment $payment): void
   {
     $invoice = $payment->payable_type == Invoice::class ? $payment->payable : $payment->payable->invoice;
-
-    $status = '';
-    if ($invoice->paid_amount - $payment->amount >= $invoice->payableAmount() + $invoice->paid_amount) {
-      $status = 'Paid';
-    } else if ($invoice->paid_amount - $payment->amount > 0) {
-      $status = 'Partial Paid';
+    if ($payment->type == 1) {
+      $invoice->undoRetentionRelease();
+      $payment->delete();
     } else {
-      $status = 'Draft';
+      $status = '';
+      if ($invoice->paid_amount - $payment->amount >= $invoice->payableAmount() + $invoice->paid_amount) {
+        $status = 'Paid';
+      } else if ($invoice->paid_amount - $payment->amount > 0) {
+        $status = 'Partial Paid';
+      } else {
+        $status = 'Draft';
+      }
+
+      $invoice->update([
+        'paid_amount' => $invoice->paid_amount - $payment->amount,
+        'status' =>  $status,
+      ]);
+
+      $payment->delete();
     }
-
-    $invoice->update([
-      'paid_amount' => $invoice->paid_amount - $payment->amount,
-      'status' =>  $status,
-    ]);
-
-    $payment->delete();
   }
 }

@@ -54,6 +54,18 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
     }
 
     /**
+     * Scope Program which have valid ACL rule for the specified admin.
+     */
+    public function scopeValidAccessibleByAdmin($query, $admin_id)
+    {
+      return $query->whereHas('pivotAccessLists', function ($q) use ($admin_id) {
+        $q->where('admin_id', $admin_id)->where('is_revoked', false)->where(function ($q) {
+          $q->where('granted_till', '>=', now())->orWhereNull('granted_till');
+        });
+      });
+    }
+
+    /**
      * Scope a query to only include programs accessible by the specified admin.
      */
     public function scopeAccessibleByAdmin($query, $admin_id)
@@ -88,7 +100,7 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
     public function children(): HasMany
     {
         return $this->hasMany(Program::class, 'parent_id', 'id');
-    }    
+    }
 
     public function contracts(): HasMany
     {

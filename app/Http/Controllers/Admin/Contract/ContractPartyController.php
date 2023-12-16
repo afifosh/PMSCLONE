@@ -15,6 +15,10 @@ class ContractPartyController extends Controller
   {
     // check if contract party belongs to contract
     $this->middleware('verifyContractNotTempered:contract_party,contract_id')->only(['edit', 'update', 'destroy']);
+
+    $this->middleware('permission:read contract')->only(['index']);
+    $this->middleware('permission:update contract')->only(['create', 'store', 'edit', 'update']);
+    $this->middleware('permission:delete contract')->only(['destroy']);
   }
 
   public function index(Contract $contract, ContractPartiesDataTable $dataTable)

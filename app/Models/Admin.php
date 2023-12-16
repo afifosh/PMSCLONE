@@ -480,7 +480,7 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     public function getReviewStatusForContract($contract_id)
     {
         // Fetch the contract with its stages
-        $contract = Contract::find($contract_id);
+        $contract = Contract::with(['stages.phases'])->find($contract_id);
 
         if (!$contract) {
             return []; // or throw an exception, depending on your application's needs
@@ -533,23 +533,25 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
                 $q->where('granted_till', '>=', now())
                     ->orWhereNull('granted_till');
             });
-      })->orWhere(function ($q) use ($program_id, $contract_id) {
-        $q->whereHas('ACLRules', function ($q) use ($program_id) {
-          $q->where('accessable_id', $program_id)
-            ->where('accessable_type', Program::class)
-            ->where('is_revoked', false)
-            ->where(function ($q) {
-              $q->where('granted_till', '>=', now())
-                ->orWhereNull('granted_till');
+      })->when($program_id, function ($q) use ($contract_id, $program_id) {
+        $q->orWhere(function ($q) use ($program_id, $contract_id) {
+          $q->whereHas('ACLRules', function ($q) use ($program_id) {
+            $q->where('accessable_id', $program_id)
+              ->where('accessable_type', Program::class)
+              ->where('is_revoked', false)
+              ->where(function ($q) {
+                $q->where('granted_till', '>=', now())
+                  ->orWhereNull('granted_till');
+              });
+          })->whereDoesntHave('ACLRules', function ($q) use ($contract_id) {
+            $q->where('accessable_id', $contract_id)
+              ->where('accessable_type', Contract::class)->where(function ($q) {
+                $q->where('is_revoked', true)
+                  ->orWhere(function ($q){
+                    $q->where('granted_till', '<', now())
+                      ->whereNotNull('granted_till');
+                  });
             });
-        })->whereDoesntHave('ACLRules', function ($q) use ($contract_id) {
-          $q->where('accessable_id', $contract_id)
-            ->where('accessable_type', Contract::class)->where(function ($q) {
-              $q->where('is_revoked', true)
-                ->orWhere(function ($q){
-                  $q->where('granted_till', '<', now())
-                    ->whereNotNull('granted_till');
-                });
           });
         });
       });

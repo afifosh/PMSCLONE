@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceItemController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read invoice')->only(['index']);
+    $this->middleware('permission:create invoice')->only(['create', 'store', 'storeBulk']);
+    $this->middleware('permission:update invoice')->only(['edit', 'update', 'storeBulk']);
+    $this->middleware('permission:delete invoice')->only(['destroy']);
+  }
+
   public function index(Invoice $invoice)
   {
     $data['invoice'] = $invoice;
@@ -122,7 +130,7 @@ class InvoiceItemController extends Controller
     $data['is_editable'] = $invoice->isEditable();
 
     if (request()->type == 'edit-form')
-
+    {
       if($invoiceItem->invoiceable_type == ContractPhase::class){
         // use different modal which include tabs
         $data['contract'] = $invoiceItem->invoiceable->contract;
@@ -134,6 +142,7 @@ class InvoiceItemController extends Controller
       return $this->sendRes('success', [
         'view_data' => view('admin.pages.invoices.items.edit.modal-wrapper', $data)->render(),
       ]);
+    }
 
     if (request()->type == 'reload-modal') {
       $data['tab'] = request()->tab ?? 'summary';

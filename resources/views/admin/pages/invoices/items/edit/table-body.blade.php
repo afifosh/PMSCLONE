@@ -40,7 +40,7 @@
   <tr style="background-color: #efeff1;">
     @if($invoice->isEditable())
       <td>
-        <a onclick="editItemTotalAmount({{$item->id}}, this)"><i class="ti ti-pencil"></i></a>
+        <a onclick="editItemTotalAmount({{$item->invoice_id}}, {{$item->id}}, this)"><i class="ti ti-pencil"></i></a>
       </td>
     @endif
     <td class="fw-bold">Item Total</td>

@@ -19,6 +19,10 @@ class PhaseTaxController extends Controller
 
     // check if tax belongs to phase
     $this->middleware('verifyContractNotTempered:tax,contract_phase_id,phase,id')->only(['edit', 'update', 'destroy']);
+
+    $this->middleware('permission:create contract')->only(['create', 'store']);
+    $this->middleware('permission:update contract')->only(['edit', 'update']);
+    $this->middleware('permission:delete contract')->only(['destroy']);
   }
 
   public function create($contract, ContractPhase $phase)

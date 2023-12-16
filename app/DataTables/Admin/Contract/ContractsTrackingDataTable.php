@@ -2,13 +2,9 @@
 
 namespace App\DataTables\Admin\Contract;
 
-use App\Models\Admin;
-use App\Models\Client;
 use App\Models\Company;
 use App\Models\Contract;
-use App\Models\Program;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
-use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
@@ -16,10 +12,6 @@ use Yajra\DataTables\Services\DataTable;
 
 class ContractsTrackingDataTable extends DataTable
 {
-  public $projectId = null;
-  public $company = null;
-  public $program = null;
-  public $programId = null;
   /**
    * Build the DataTable class.
    *
@@ -34,11 +26,6 @@ class ContractsTrackingDataTable extends DataTable
       ->editColumn('subject', function ($contract) {
         return $contract->subject ? $contract->subject : '-';
       })
-      ->editColumn('program.name', function ($contract) {
-        return $contract->program_id
-            ? '<a href="' . route('admin.programs.show', $contract->program->id) . '">' . $contract->program->name . '</a>'
-            : 'N/A';
-      })
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
       })
@@ -48,19 +35,6 @@ class ContractsTrackingDataTable extends DataTable
       ->addColumn('reviews_completed', function ($contract) {
         return view('admin._partials.sections.user-avatar-group', ['users' => $contract->reviewedBy, 'limit' => 5]);
       })
-      ->addColumn('assigned_to', function ($project) {
-        if ($project->assignable instanceof Company) {
-          return view('admin._partials.sections.company-avatar', ['company' => $project->assignable]);
-        } else {
-          return '-';
-        }
-      })
-      // ->editColumn('project.name', function ($project) {
-      //   return $project->project ? $project->project->name : '-';
-      // })
-      ->editColumn('type.name', function ($project) {
-        return $project->type ? $project->type->name : '-';
-      })
       ->editColumn('category.name', function ($project) {
         return $project->category ? $project->category->name : '-';
       })
@@ -68,87 +42,16 @@ class ContractsTrackingDataTable extends DataTable
         return @cMoney($contract->value ?? 0, $contract->currency, true);
         // return view('admin.pages.contracts.value-column', compact('contract'));
       })
-      ->filterColumn('assigned_to', function ($query, $keyword) {
-        $query->whereHasMorph('assignable', Company::class, function ($q) use ($keyword) {
-          $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
-        });
-      })
-      ->rawColumns(['id', 'program.name','reviews_completed']);
+      ->rawColumns(['id', 'reviews_completed']);
   }
 
-/**
- * Get the query source of dataTable.
- */
-public function query(Contract $model): QueryBuilder
-{
-    // Start the base query
-    $query = $model->validAccessibleByAdmin(auth()->id())->newQuery()
-        ->select([
-            'contracts.id',
-            'contracts.program_id',
-            'contracts.refrence_id',
-            'contracts.subject', // Add this line for the subject column
-            'contracts.project_id',
-            'contracts.type_id',
-            'contracts.category_id',
-            'contracts.value',
-            'contracts.start_date',
-            'contracts.end_date',
-            'contracts.status',
-            'contracts.assignable_id',
-            'assignable_type',
-            DB::raw('SUM(invoices.total)/100 as total'),
-            DB::raw('SUM(invoices.paid_amount)/100 as paid_amount'),
-            DB::raw('sum(invoices.total - invoices.paid_amount)/100 as due_amount'),
-            DB::raw('sum(invoices.total_tax)/100 as total_tax'),
-            DB::raw('(sum(invoices.paid_amount)/sum(contracts.value))*100 as paid_percent'),
-            // contract invoice count whose retention_released_at is null as pending_retentions_count
-            DB::raw('count(CASE WHEN invoices.retention_amount IS NOT NULL AND invoices.retention_released_at IS NULL THEN 1 ELSE NULL END) as pending_retentions_count')
-        ])
-        ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
-        ->leftJoin('programs', 'contracts.program_id', '=', 'programs.id')
-        ->groupBy([
-            'contracts.id',
-            'contracts.program_id',
-            'contracts.refrence_id',
-            'contracts.subject', // Add this line for the subject column
-            'contracts.project_id',
-            'contracts.type_id',
-            'contracts.category_id',
-            'contracts.value',
-            'contracts.start_date',
-            'contracts.end_date',
-            'contracts.status',
-            'contracts.assignable_id',
-            'assignable_type'
-        ])
-        ->with(['type', 'assignable.detail', 'category']);
-
-    // If a projectId is provided, filter by it
-    if ($this->projectId) {
-        $query->where('project_id', $this->projectId);
-    }
-    if($this->company){
-      $query->where('assignable_id', $this->company->id)->where('assignable_type', Company::class);
-    }
-    // If a program is provided, filter by it and its children
-    if ($this->program) {
-      // Fetch IDs for all children of the given program
-      $childProgramIds = Program::where('parent_id', $this->program->id)->pluck('id')->toArray();
-
-      // Include the main program's ID
-      $programIds = array_merge([$this->program->id], $childProgramIds);
-
-      // Use these IDs to filter contracts
-      $query->whereIn('program_id', $programIds);
-    }
-
-    // Apply any additional filters if necessary
-    $query->applyRequestFilters();
-
-    return $query;
-}
-
+  /**
+   * Get the query source of dataTable.
+   */
+  public function query(Contract $model): QueryBuilder
+  {
+    return $model->validAccessibleByAdmin(auth()->id())->with(['reviewedBy:first_name,last_name,id,avatar'])->applyRequestFilters();
+  }
 
   /**
    * Optional method if you want to use the html builder.
@@ -195,10 +98,7 @@ public function query(Contract $model): QueryBuilder
   {
     return [
       // Column::make('contracts.id')->title('Contract'),
-    Column::make('subject')->title('Subject'),
-      // Column::make('program.name')->name('programs.name')->title('Program'),
-      // Column::make('refrence_id')->title('Ref ID'),
-      // Column::make('assigned_to')->title('Assigned To'),
+      Column::make('subject')->title('Subject'),
       Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
       Column::make('reviewers')->title('Reviewers'),
@@ -208,11 +108,6 @@ public function query(Contract $model): QueryBuilder
       // Column::make('phases_count')->title('Phases')->searchable(false),
       Column::make('status'),
     ];
-  }
-
-  public function setProgram($programId)
-  {
-      $this->$programId = $programId;
   }
 
   /**

@@ -1,6 +1,6 @@
 <tr class="expanded-edit-row" style="background-color: var(--bs-light)">
   <td colspan="3">
-  {!! Form::open(['route' => ['admin.phases.subtotal-adjustments.store',  ['phase' => $phase->id,]], 'method' => 'POST']) !!}
+  {!! Form::open(['route' => ['admin.contracts.phases.subtotal-adjustments.store',  ['contract' => $phase->contract_id, 'phase' => $phase->id,]], 'method' => 'POST']) !!}
 
   <div class="row">
     <div class="form-group col-12">

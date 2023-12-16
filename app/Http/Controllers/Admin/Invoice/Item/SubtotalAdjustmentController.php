@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Invoice\Item;
 
 use App\Http\Controllers\Controller;
+use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,12 +11,12 @@ use Illuminate\Validation\ValidationException;
 
 class SubtotalAdjustmentController extends Controller
 {
-  public function create(InvoiceItem $invoiceItem)
+  public function create(Invoice $invoice, InvoiceItem $invoiceItem)
   {
     return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit.subtotal-adjustment-form', compact('invoiceItem'))->render()]);
   }
 
-  public function store(InvoiceItem $invoiceItem, Request $request)
+  public function store(Invoice $invoice, InvoiceItem $invoiceItem, Request $request)
   {
     $request->validate([
       'adjuted_subtotal_amount' => ['required', 'numeric'],

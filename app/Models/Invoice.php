@@ -220,7 +220,7 @@ class Invoice extends Model
       return 0;
     }
 
-    if($this->retention_manual_amount){
+    if ($this->retention_manual_amount) {
       return $this->retention_manual_amount;
     }
 
@@ -327,9 +327,9 @@ class Invoice extends Model
   public function updateRetention($retention_id, $calculated_amount, $is_manual_retention, $manual_amount): void
   {
     $retenion = InvoiceConfig::where('config_type', 'Retention')->find($retention_id);
-      $data['retention_amount'] = $calculated_amount;
-      $data['retention_percentage'] = $retenion->type != 'Fixed' ? $retenion->amount : 0;
-      $data['retention_manual_amount'] = $manual_amount == $calculated_amount ? 0 : ($is_manual_retention ? $manual_amount : 0);
+    $data['retention_amount'] = $calculated_amount;
+    $data['retention_percentage'] = $retenion->type != 'Fixed' ? $retenion->amount : 0;
+    $data['retention_manual_amount'] = $manual_amount == $calculated_amount ? 0 : ($is_manual_retention ? $manual_amount : 0);
 
     $this->update($data + ['retention_id' => $retention_id, 'retention_name' => $retenion->name ?? null]);
   }
@@ -423,6 +423,21 @@ class Invoice extends Model
       throw $e;
     }
   }
+
+  public function undoRetentionRelease(): void
+  {
+    try {
+      $retention_amount = ($this->getRawOriginal('retention_manual_amount') ? $this->getRawOriginal('retention_manual_amount') : $this->getRawOriginal('retention_amount')) / 1000;
+      $this->update([
+        'paid_amount' => $this->paid_amount - $retention_amount,
+        'retention_released_at' => null,
+        'status' => $this->paid_amount - $retention_amount >= $this->total ? 'Paid' : 'Partial Paid',
+      ]);
+    } catch (\Exception $e) {
+      throw $e;
+    }
+  }
+
 
   public function mergeInvoices($invoices, $deleteMerged = true): void
   {
@@ -928,5 +943,15 @@ class Invoice extends Model
   public function allPivotTaxes()
   {
     return $this->hasMany(InvoiceTax::class, 'invoice_id', 'id');
+  }
+
+  /**
+   * Invoices which have active ACL rule for the given admin
+   */
+  public function scopeValidAccessibleByAdmin($q, $admin_id)
+  {
+    $q->whereHas('contract', function ($q) use ($admin_id) {
+      $q->validAccessibleByAdmin($admin_id);
+    });
   }
 }

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin\Project;
 
 use App\Http\Controllers\Controller;
-use App\Models\Client;
-use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ContractType;
 use App\Models\Program;
@@ -14,7 +12,7 @@ class GanttChartController extends Controller
 {
   public function index()
   {
-    $ganttProjects = Contract::when(request()->projects, function ($q) {
+    $ganttProjects = Contract::validAccessibleByAdmin(auth()->id())->when(request()->projects, function ($q) {
       $q->where('project_id', request()->projects)->whereNotNull('project_id');
     })
       ->applyRequestFilters()
@@ -26,7 +24,7 @@ class GanttChartController extends Controller
           $q->select('contract_phases.id', 'contract_phases.name', 'start_date', 'due_date', 'contract_id', 'stage_id');
         }, 'project' => function ($q) {
           $q->select('projects.id', 'name');
-        }, 'assignable'
+        }, 'assignable.detail'
       ])
       ->select('contracts.id', 'contracts.subject', 'contracts.project_id', 'contracts.status', 'contracts.start_date', 'contracts.end_date', 'assignable_type', 'assignable_id')->get();
 

@@ -108,6 +108,10 @@
       {{-- <li class="nav-item"><a class="nav-link py-3 {{$tab == 'payments' ? 'active' : ''}}" href="{{route('admin.contracts.payments.index', [$contract])}}"><i class='ti ti-link ti-xs me-1'></i> Payments</a></li> --}}
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'uploaded-documents' ? 'active' : ''}}" href="{{route('admin.invoices.uploaded-documents.index', [$invoice])}}"><i class='ti ti-link ti-xs me-1'></i> Uploaded Documents</a></li>
       <li class="nav-item"><a class="nav-link py-3 {{$tab == 'pending-documents' ? 'active' : ''}}" href="{{route('admin.invoices.pending-documents.index', [$invoice])}}"><i class='ti ti-link ti-xs me-1'></i> Pending Documents</a></li>
+      @if($invoice->type != 'Down Payment')
+        <li class="nav-item"><a class="nav-link py-3 {{$tab == 'comments' ? 'active' : ''}}" href="{{route('admin.contracts.invoices.comments.index', ['contract' => $invoice->contract_id, 'invoice' => $invoice->id])}}"><i class='ti ti-link ti-xs me-1'></i> Comments</a></li>
+        <li class="nav-item"><a class="nav-link py-3 {{$tab == 'authority-invoice-comments' ? 'active' : ''}}" href="{{route('admin.contracts.invoices.comments.index', ['contract' => $invoice->contract_id, 'invoice' => $invoice->id, 'tab' => 'authority-invoice-comments'])}}"><i class='ti ti-link ti-xs me-1'></i> Authority Invoice Comments</a></li>
+      @endif
       </ul>
       <!--end::Nav-->
   </div>

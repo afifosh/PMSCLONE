@@ -392,6 +392,8 @@ class ContractPhase extends BaseModel
     $behalfTax = $phaseTaxes->where('category', 2)->sum('total_amount') / 1000;
     $this->tax_amount = $simpleTax + $behalfTax;
     $this->total_cost = $this->estimated_cost + $simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
+    $this->subtotal_amount_adjustment = 0;
+    $this->total_amount_adjustment = 0;
     $this->save();
   }
 

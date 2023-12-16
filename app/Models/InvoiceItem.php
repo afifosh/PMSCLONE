@@ -206,7 +206,7 @@ class InvoiceItem extends Model
     return $deductionAmount;
   }
 
-  public function reCalculateTotal($deductionUpdated = false, $taxUpdated = false): void
+  public function reCalculateTotal(): void
   {
     $this->load('deduction');
 
@@ -223,6 +223,8 @@ class InvoiceItem extends Model
     $this->total_tax_amount = $simpleTax + $behalfTax;
     $this->total = $this->subtotal + $simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
     $this->authority_inv_total = $authorityTax;
+    $this->subtotal_amount_adjustment = 0;
+    $this->total_amount_adjustment = 0;
     $this->save();
   }
 

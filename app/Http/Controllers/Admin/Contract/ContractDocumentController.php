@@ -17,16 +17,21 @@ use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 
 class ContractDocumentController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:read contract')->only(['index']);
+    $this->middleware('permission:update contract')->only(['store', 'uploadDocument']);
+  }
   public function index($modal, Request $request)
   {
     if ($request->route()->getName() == 'admin.contracts.pending-documents.index') {
-      $data['contract'] = $contract = Contract::findOrFail($modal);
+      $data['contract'] = $contract = Contract::validAccessibleByAdmin(auth()->id())->findOrFail($modal);
       $data['contract'] = $contract;
       $data['requestable_documents'] = $data['documents'] = $contract->requestedDocs()->get();
       $data['valid_documents'] = $contract->uploadedValidDocs()->pluck('id')->toArray();
       $data['expired_documents'] = $contract->uploadedExpiredDocs()->pluck('id')->toArray();
     } else {
-      $data['invoice'] = $invoice = Invoice::findOrFail($modal);
+      $data['invoice'] = $invoice = Invoice::validAccessibleByAdmin(auth()->id())->findOrFail($modal);
       $data['requestable_documents'] = $data['documents'] = $invoice->requestedDocs()->get();
       $data['valid_documents'] = $invoice->uploadedValidDocs()->pluck('id')->toArray();
       $data['expired_documents'] = $invoice->uploadedExpiredDocs()->pluck('id')->toArray();
@@ -34,14 +39,14 @@ class ContractDocumentController extends Controller
 
     request()->document_id = request()->document_id ?? $data['requestable_documents'][0]->id ?? 0;
 
-    if (in_array(request()->document_id, $data['valid_documents'])){
+    if (in_array(request()->document_id, $data['valid_documents'])) {
       // update if document is valid
       $data['uploaded_doc'] = UploadedKycDoc::where('kyc_doc_id', request()->document_id)
         ->orderBy('id', 'DESC')
         ->first();
-      if($request->route()->getName() == 'admin.contracts.pending-documents.index'){
+      if ($request->route()->getName() == 'admin.contracts.pending-documents.index') {
         $data['modelInstance'] = $contract;
-      }else{
+      } else {
         $data['modelInstance'] = $invoice;
       }
       request()->merge([
@@ -53,7 +58,7 @@ class ContractDocumentController extends Controller
     if ($request->fields_only) {
       $data['document'] = $data['documents']->where('id', $request->document_id)->first();
 
-      if (in_array(request()->document_id, $data['valid_documents'])){
+      if (in_array(request()->document_id, $data['valid_documents'])) {
         return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.uploaded-docs.edit', $data)->render()]);
       }
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.pending-documents.fields', $data)->render()]);
@@ -66,9 +71,9 @@ class ContractDocumentController extends Controller
   public function store(DocumentUploadRequest $request, $modal)
   {
     if ($request->route()->getName() == 'admin.contracts.pending-documents.store') {
-      $modelInstance = Contract::findOrFail($modal);
+      $modelInstance = Contract::validAccessibleByAdmin(auth()->id())->findOrFail($modal);
     } else {
-      $modelInstance = Invoice::findOrFail($modal);
+      $modelInstance = Invoice::validAccessibleByAdmin(auth()->id())->findOrFail($modal);
     }
 
     $document = $modelInstance->pendingDocs()->findOrFail($request->document_id);
@@ -77,7 +82,7 @@ class ContractDocumentController extends Controller
     foreach ($document->fields as $field) {
       if ($field['type'] == 'file') {
         $path = UploadedKycDoc::FILE_PATH . '/' . $modelInstance::FILES_PATH . '/' . $modal;
-        Storage::move(KycDocument::TEMP_PATH . '/'. $modelInstance::FILES_PATH .'/' . $modal . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
+        Storage::move(KycDocument::TEMP_PATH . '/' . $modelInstance::FILES_PATH . '/' . $modal . '/' . $request->{'fields.' . $field['id']}, $path . '/' . $request->{'fields.' . $field['id']});
         $field['value'] = $path . '/' . $request->{'fields.' . $field['id']};
       } else {
         $field['value'] = $request->{'fields.' . $field['id']};
@@ -139,10 +144,13 @@ class ContractDocumentController extends Controller
 
   public function saveFile($file, FileUploadRepository $file_repo, $modal)
   {
-    if(request()->route()->getName() == 'admin.contracts.upload-requested-doc')
+    if (request()->route()->getName() == 'admin.contracts.upload-requested-doc') {
+      $modelInstance = Contract::validAccessibleByAdmin(auth()->id())->findOrFail($modal);
       $prefix = 'contracts';
-    else
+    } else {
+      $modelInstance = Invoice::validAccessibleByAdmin(auth()->id())->findOrFail($modal);
       $prefix = 'invoices';
+    }
 
     $path = KycDocument::TEMP_PATH . DIRECTORY_SEPARATOR . $prefix . '/' . $modal;
     $file_path = $file_repo->addAttachment($file, $path);

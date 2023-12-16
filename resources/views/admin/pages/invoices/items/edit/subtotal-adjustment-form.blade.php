@@ -1,6 +1,6 @@
 <tr class="expanded-edit-row" style="background-color: var(--bs-light)">
   <td colspan="6">
-  {!! Form::open(['route' => ['admin.invoice-items.subtotal-adjustments.store',  ['invoice_item' => $invoiceItem->id,]], 'method' => 'POST']) !!}
+  {!! Form::open(['route' => ['admin.invoices.invoice-items.subtotal-adjustments.store',  ['invoice' => $invoiceItem->invoice_id, 'invoice_item' => $invoiceItem->id,]], 'method' => 'POST']) !!}
 
   <div class="row">
     <div class="form-group col-12">

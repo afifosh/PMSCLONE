@@ -10,7 +10,6 @@ use App\DataTables\Admin\Contract\ContractPaymentsPlanReviewDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ContractStoreRequest;
 use App\Http\Requests\Admin\ContractUpdateRequest;
-use App\Models\Client;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Review;
 use App\Models\Admin;
@@ -27,11 +26,25 @@ use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Traits\FinanceTrait;
 use Illuminate\Support\Facades\DB;
 use DataTables;
-use Illuminate\Http\Request;
 
 class ContractController extends Controller
 {
   use FinanceTrait;
+
+  public function __construct()
+  {
+    $this->middleware('permission:read contract', ['only' => [
+      'index', 'show', 'statistics', 'projectContractsIndex',
+      'trackingPaymentsPlan', 'trackingContract', 'showSummary',
+      'showReviewers', 'showComments', 'showActivities', 'summaryTabContent',
+      'ContractPaymentsPlan', 'ContractPaymentsPlanReview',
+      'ContractPaymentsPlanPhases', 'ContractPaymentsPlanStages'
+      ]]);
+    $this->middleware('permission:create contract', ['only' => ['create', 'store']]);
+    $this->middleware('permission:update contract', ['only' => ['edit', 'update', 'togglePhaseReviewStatus', 'toggleContractReviewStatus', 'releaseRetention']]);
+    $this->middleware('permission:delete contract', ['only' => ['destroy']]);
+  }
+
   /**
    * Display a listing of the resource.
    */
@@ -70,77 +83,28 @@ class ContractController extends Controller
 
   public function trackingPaymentsPlan(TrackingPaymentsPlanDataTable $dataTable)
   {
-    $data['company'] = Company::find(request()->route('company'));
-    $data['program'] = Program::find(request()->route('program'));
-  // dd($data);
-    if ($data['company']) {
-        $dataTable->company = $data['company'];
-    } if ($data['program']) {
-      $dataTable->program = $data['program'];
-    } else {
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
-    // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
-    $data['contracts'] = Contract::selectRaw('count(*) as total')
-      // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
-      ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
-      ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
-      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
-      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
-      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
-      ->withTrashed()
-      ->first();
-    }
-
     return $dataTable->render('admin.pages.contracts.tracking.paymentsplan.index', $data);
-
+    // view('admin.pages.contracts.tracking.paymentsplan.index');
   }
 
   public function trackingContract(ContractsTrackingDataTable $dataTable)
   {
-    $data['company'] = Company::find(request()->route('company'));
-    $data['program'] = Program::find(request()->route('program'));
-
-    if ($data['company']) {
-        $dataTable->company = $data['company'];
-    } if ($data['program']) {
-      $dataTable->program = $data['program'];
-    } else {
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     // Prepare the options for the dropdown
-    $review_status = [
-      'any' => 'Any',
+    $data['review_status'] = [
+      '' => 'Select Status',
       'reviewed' => 'Reviewed',
       'not_reviewed' => 'Not Reviewed',
+      'partially_reviewed' => 'Partially Reviewed',
     ];
 
-    $data['review_status'] = $review_status;
-
-    // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
-    $data['contracts'] = Contract::selectRaw('count(*) as total')
-      // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
-      ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
-      ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
-      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
-      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
-      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
-      ->withTrashed()
-      ->first();
-    }
-
     return $dataTable->render('admin.pages.contracts.tracking.contracts.index', $data);
-
+    // view('admin.pages.contracts.tracking.contracts.index')
   }
 
   public function statistics()
@@ -392,7 +356,7 @@ class ContractController extends Controller
       ]);
     }
 
-    return $this->sendRes(__('Contract created successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Contract created successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
   }
 
   /**
@@ -611,7 +575,7 @@ class ContractController extends Controller
 
     $contract->update($data + $request->validated());
 
-    return $this->sendRes(__('Contract updated successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table', 'close' => 'globalModal']);
+    return $this->sendRes(__('Contract updated successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
   }
 
   protected function updateValueAndAccount(Contract $contract, $request): void
@@ -682,7 +646,7 @@ class ContractController extends Controller
   {
     $contract->delete();
 
-    return $this->sendRes(__('Contract deleted successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table']);
+    return $this->sendRes(__('Contract deleted successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables']);
   }
 
   public function releaseRetention(Contract $contract)
@@ -690,20 +654,11 @@ class ContractController extends Controller
     $contract->load('invoices');
     $contract->releaseInvoicesRetentions();
 
-    return $this->sendRes(__('Retentions Released successfully'), ['event' => 'table_reload', 'table_id' => 'contracts-table']);
+    return $this->sendRes(__('Retentions Released successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables']);
   }
 
   public function ContractPaymentsPlan(PaymentsPlanDataTable $dataTable)
   {
-
-    $data['company'] = Company::find(request()->route('company'));
-    $data['program'] = Program::find(request()->route('program'));
-  // dd($data);
-    if ($data['company']) {
-        $dataTable->company = $data['company'];
-    } if ($data['program']) {
-      $dataTable->program = $data['program'];
-    } else {
     $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
@@ -714,24 +669,8 @@ class ContractController extends Controller
       'partially_reviewed' => 'Partially Reviewed',
     ];
 
-    // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
-    $data['contracts'] = Contract::selectRaw('count(*) as total')
-      // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
-      ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
-      ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
-      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
-      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
-      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
-      ->withTrashed()
-      ->first();
-    }
-
     return $dataTable->render('admin.pages.contracts.paymentsplan.index', $data);
-
+    // view('admin.pages.contracts.paymentsplan.index')
   }
 
 
@@ -751,7 +690,7 @@ class ContractController extends Controller
   {
     $query = ContractPhase::whereHas('stage.contract', function ($query) use ($contract_id) {
       $query->where('id', $contract_id);
-    })->with('reviewdByAdmins');
+    })->with(['reviewdByAdmins', 'stage', 'contract:id,program_id,currency', 'addedAsInvoiceItem']);
 
       return DataTables::of($query)
           ->addColumn('stage_name', function ($phase) {
@@ -783,10 +722,8 @@ class ContractController extends Controller
   public function ContractPaymentsPlanStages($contract_id)
   {
       $query = ContractStage::where('contract_id', $contract_id)
-          ->withCount('phases')
-          ->with(['contract' => function ($q) {
-              $q->select(['contracts.id', 'contracts.program_id', 'currency']);
-          }]);
+          ->withCount(['phases', 'myReviewedPhases'])
+          ->with(['contract:id,program_id,currency', 'phases']);
 
       $dataTable = DataTables::of($query)
           ->editColumn('name', function ($stage) {
@@ -824,44 +761,6 @@ class ContractController extends Controller
       return $dataTable->make(true);
   }
 
-  public function toggleContractReviewStatusOLD($contract_id)
-  {
-      try {
-          // Find the contract by its ID
-          $contract = Contract::findOrFail($contract_id);
-          $table_id = 'contracts-table';
-          // Check if the contract has already been reviewed by the current user
-          $existingReview = $contract->reviews()->where('user_id', Auth::id())->first();
-          if (request()->route()->named('contracts.paymentsplan')) {
-            $table_id = 'payment-table';
-          }
-
-          if ($existingReview) {
-              // The contract has already been reviewed by the current user.
-              // Delete the review to mark the contract as "unreviewed"
-              $existingReview->delete();
-
-              return $this->sendRes('Contract marked as unreviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal','isReviewed' => false]);
-          } else {
-              // Mark the contract as reviewed
-              $review = new Review([
-                  'user_id' => Auth::id(),
-                  'reviewed_at' => now(),
-              ]);
-              $contract->reviews()->save($review);
-
-              return $this->sendRes('Contract marked as reviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal','isReviewed' => true]);
-          }
-
-      } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-          return $this->sendError('Contract not found.');
-      } catch (Throwable $e) {
-          // It's good to log the actual error message in production for debugging.
-          // Log::error($e->getMessage());
-          return $this->sendError('Server Error');
-      }
-  }
-
   public function toggleContractReviewStatus($contract_id)
   {
       try {
@@ -870,9 +769,6 @@ class ContractController extends Controller
 
           Admin::canReviewContract($contract, $contract->program_id)->findOrFail(auth()->id());
 
-          // Identify the appropriate table based on the request route
-          $table_id = request()->route()->named('contracts.paymentsplan') ? 'payment-table' : 'contracts-table';
-
           // Check if the contract has already been reviewed by the current user
           $existingReview = $contract->reviews()->where('user_id', Auth::id())->first();
 
@@ -880,7 +776,7 @@ class ContractController extends Controller
               // The contract has already been reviewed by the current user.
               // Delete the review to mark the contract as "unreviewed"
               $existingReview->delete();
-              return $this->sendRes('Contract marked as unreviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal', 'isReviewed' => false]);
+              return $this->sendRes('Contract marked as unreviewed!', ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal', 'isReviewed' => false]);
           } else {
               // Mark the contract as reviewed
               $review = new Review([
@@ -888,7 +784,7 @@ class ContractController extends Controller
                   'reviewed_at' => now(),
               ]);
               $contract->reviews()->save($review);
-              return $this->sendRes('Contract marked as reviewed!', ['event' => 'table_reload', 'table_id' => $table_id, 'close' => 'globalModal', 'isReviewed' => true]);
+              return $this->sendRes('Contract marked as reviewed!', ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal', 'isReviewed' => true]);
           }
 
       } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -937,74 +833,4 @@ class ContractController extends Controller
           return $this->sendError($e->getMessage());
       }
   }
-
-
-
-  public function togglePhaseReviewStatusOLD($contract_id, $phase_id)
-  {
-      try {
-          // Find the contract by its ID
-          $contract = Contract::findOrFail($contract_id);
-
-          // Ensure the contract has a phase with the specified phase_id
-          $phase = $contract->phases()->where('id', $phase_id)->first();
-
-          if (!$phase) {
-              // No such phase for this contract; handle the error accordingly.
-              return $this->sendError('Invalid phase for this contract.');
-          }
-
-          // Check if the phase has already been reviewed by the current user
-          $existingReview = $phase->reviews()->where('user_id', Auth::id())->first();
-
-          if ($existingReview) {
-              // The phase has already been reviewed by the current user.
-              // Delete the review to mark the phase as "unreviewed"
-              $existingReview->delete();
-              return $this->sendRes('Phase marked as unreviewed!', ['isReviewed' => false]);
-             // return $this->sendRes('Phase marked as unreviewed!');
-          } else {
-              // Mark the phase as reviewed
-              $review = new Review([
-                  'user_id' => Auth::id(),
-                  'reviewed_at' => now(),
-              ]);
-              $phase->reviews()->save($review);
-
-              //return $this->sendRes('Phase marked as reviewed!');
-              return $this->sendRes('Phase marked as reviewed!', ['isReviewed' => true]);
-          }
-
-      } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-          return $this->sendError('Contract not found.');
-      } catch (Throwable $e) {
-          return $this->sendError('Server Error');
-      }
-  }
-
-  public function getContractsWithStagesAndPhases(Request $request)
-  {
-      $contracts = Contract::with(['stages.phases'])->get();
-
-      $contractDataArray = $contracts->map(function ($contract) {
-          return [
-              'contract_name' => $contract->subject,
-             // 'company' => $contract->company->name, // Assuming a 'company' relationship exists
-           //   'start_date' => $contract->start_date->format('Y-m-d H:i:s'),
-          //    'end_date' => $contract->due_date->format('Y-m-d H:i:s'),
-              'value' => $contract->value,
-              'stages' => $contract->stages->map(function ($stage) {
-                  return [
-                      'name' => $stage->name,
-                      'phases' => $stage->phases->map(function ($phase) {
-                          return ['name' => $phase->name];
-                      })->toArray(),
-                  ];
-              })->toArray(),
-          ];
-      });
-
-      return response()->json($contractDataArray);
-  }
-
 }

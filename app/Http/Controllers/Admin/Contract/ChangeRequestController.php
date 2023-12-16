@@ -19,6 +19,10 @@ class ChangeRequestController extends Controller
   {
     // check if change request belongs to contract
     $this->middleware('verifyContractNotTempered:changeRequest,contract_id')->only(['destroy', 'approve', 'reject']);
+
+    $this->middleware('permission:read contract')->only(['index']);
+    $this->middleware('permission:update contract')->only(['create', 'store', 'approve', 'reject', 'pauseContract', 'resumeContract', 'terminateContract', 'update']);
+    $this->middleware('permission:delete contract')->only(['destroy']);
   }
 
   public function index(Contract $contract, ChangeRequestsDataTable $dataTable)

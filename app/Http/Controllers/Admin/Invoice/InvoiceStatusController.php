@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceStatusController extends Controller
 {
+    public function __construct()
+    {
+      $this->middleware('permission:update invoice|create invoice')->only(['create', 'store']);
+    }
+
     public function create(Invoice $invoice)
     {
       // if invoice has paid status, then it can't be changed to any other status

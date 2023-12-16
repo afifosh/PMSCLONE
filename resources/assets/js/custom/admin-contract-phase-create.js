@@ -94,7 +94,7 @@
     // show loading in child row
     $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
     $.ajax({
-      url: route('admin.phases.subtotal-adjustments.create', { phase: phase_id}),
+      url: route('admin.contracts.phases.subtotal-adjustments.create', { contract: window.active_contract, phase: phase_id}),
       type: "GET",
       success: function(res){
         $('.expanded-edit-row').remove();
@@ -109,7 +109,7 @@
     // show loading in child row
     $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
     $.ajax({
-      url: route('admin.phases.total-amount-adjustments.create', { phase: phase_id}),
+      url: route('admin.contracts.phases.total-amount-adjustments.create', {contract: window.active_contract, phase: phase_id}),
       type: "GET",
       success: function(res){
         $('.expanded-edit-row').remove();
@@ -263,6 +263,9 @@
     // if function reloadPhasesList exists, call it
     if(typeof reloadPhasesList == 'function'){
       reloadPhasesList();
+    }
+    if(typeof reloadDataTables == 'function') {
+      reloadDataTables();
     }
   }
 

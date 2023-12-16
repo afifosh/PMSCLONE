@@ -10,7 +10,7 @@
       "name": "Roles",
       "icon": "menu-icon tf-icons ti ti-settings",
       "slug": ["admin.roles", "admin.admin-access-lists"],
-      "permission" : ["read role","read user"],
+      "permission" : ["read role","read user", "read acl"],
       "submenu": [
         {
           "url": "/admin/roles",
@@ -21,7 +21,8 @@
         {
           "url": "/admin/admin-access-lists",
           "name": "Admin Access List",
-          "slug": "admin.admin-access-lists.index"
+          "slug": "admin.admin-access-lists.index",
+          "permission": "read acl"
         }
       ]
     },
@@ -125,40 +126,12 @@
         }
       ]
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     {
       "url": "/admin/programs",
       "name": "Programs",
       "icon": "menu-icon tf-icons ti ti-color-swatch",
-      "slug": "admin.programs.index"
+      "slug": "admin.programs.index",
+      "permission": ["read program"]
     },
     {
       "name": "Projects",
@@ -190,7 +163,8 @@
         {
           "url": "/admin/contracts",
           "name": "Contracts",
-          "slug": "admin.contracts.index"
+          "slug": "admin.contracts.index",
+          "permission": ["read contract"]
         },
         {
           "url": "/admin/contracts/paymentsplan",
@@ -289,7 +263,8 @@
         {
           "url": "/admin/invoices",
           "name": "Invoices",
-          "slug": "admin.invoices.index"
+          "slug": "admin.invoices.index",
+          "permission": ["read invoice"]
         },
         {
           "url": "/admin/tax-authority-invoices",

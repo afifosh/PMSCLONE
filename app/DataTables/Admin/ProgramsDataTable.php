@@ -54,7 +54,7 @@ class ProgramsDataTable extends DataTable
    */
   public function query(Program $programs): QueryBuilder
   {
-  return $programs->mine()
+  return $programs->validAccessibleByAdmin(auth()->id())
                 ->with('parent')
                 ->with('children') // Eager load the children relationship
                 ->withCount('contracts')

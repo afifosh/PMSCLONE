@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class RetentionController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:update invoice')->only(['create', 'store']);
+  }
+
   public function destroy(Invoice $invoice)
   {
     if($invoice->retention_released_at)

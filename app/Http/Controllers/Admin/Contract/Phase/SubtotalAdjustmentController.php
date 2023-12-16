@@ -10,12 +10,20 @@ use Illuminate\Validation\ValidationException;
 
 class SubtotalAdjustmentController extends Controller
 {
-  public function create(ContractPhase $phase)
+  public function __construct()
+  {
+    // check if contractPhase belongs to contract
+    $this->middleware('verifyContractNotTempered:phase,contract_id')->only(['create', 'store']);
+
+    $this->middleware('permission:create contract|update contract')->only(['create', 'store']);
+  }
+
+  public function create($contract, ContractPhase $phase)
   {
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.subtotal-adjustments.create', compact('phase'))->render()]);
   }
 
-  public function store(ContractPhase $phase, Request $request)
+  public function store($contract, ContractPhase $phase, Request $request)
   {
     $request->validate([
       'adjuted_subtotal_amount' => ['required', 'numeric'],

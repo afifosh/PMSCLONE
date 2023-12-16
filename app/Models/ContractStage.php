@@ -25,7 +25,7 @@ class ContractStage extends BaseModel
   {
       return User::whereHas('reviews.phase', function ($query) {
           $query->where('stage_id', $this->id);
-      }, '=', $this->phases()->count())->get();
+      }, '=', $this->phases_count)->get();
   }
 
   /**
@@ -37,19 +37,24 @@ class ContractStage extends BaseModel
       $q->where('reviewable_type', ContractPhase::class)->whereHas('phase', function ($q) {
         $q->where('stage_id', $this->id);
       });
-    }, '>=', $this->phases()->count());
+    }, '>=', $this->phases_count);
   }
 
+  /**
+   * Phaes reviewed by the logged in user.
+   */
+  public function myReviewedPhases()
+  {
+    return $this->phases()->whereHas('reviews', function ($query) {
+      $query->where('user_id', auth()->id());
+    });
+  }
   /**
    * Get logged in user's review progress (%) for this stage.
    */
   public function getMyReviewProgress()
   {
-    $reviewedPhasesCount = $this->phases()->whereHas('reviews', function ($query) {
-        $query->where('user_id', auth()->id());
-    })->count();
-
-    return round($reviewedPhasesCount / $this->phases()->count(), 2) * 100;
+    return round($this->myReviewedPhases_count / $this->phases_count, 2) * 100;
   }
 
   public function getUserReviewStatus($userId)
@@ -78,7 +83,7 @@ class ContractStage extends BaseModel
 
   public function getUserReviewStatusWithlastReviewDate($userId)
   {
-      $totalPhases = $this->phases()->count();
+      $totalPhases = $this->phases->count();
 
       // If there are no phases, we consider the stage as not started or not applicable.
       if ($totalPhases === 0) {

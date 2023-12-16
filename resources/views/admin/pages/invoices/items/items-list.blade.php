@@ -1,9 +1,6 @@
 <div class="col-12">
   <div class="table-responsive m-t-40 invoice-table-wrapper editing clear-both">
       <table class="table table-hover invoice-table editing" id="billing-items-container">
-        @if($tab != 'tax-report')
-          <button type="button" data-toggle="ajax-modal" data-title="Invoice Comments" data-href={{route('admin.contracts.invoices.comments.index', ['contract' => $invoice->contract_id, 'invoice' => $invoice->id, 'tab' => $tab])}} class="btn btn-primary btn-sm float-end me-2">Comments</button>
-        @endif
       @if($invoice->type != 'Down Payment' && $tab == 'summary')
         <button type="button" class="btn btn-primary btn-sm float-end me-2 select-items-btn">Select Items</button>
         <button type="button" class="btn btn-primary btn-sm float-end me-2 d-none delete-items-btn">Delete Selected</button>

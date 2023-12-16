@@ -36,7 +36,6 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-{{-- @include('admin.pages.contracts.header', ['tab' => 'stages']) --}}
   <div class="mt-3  col-12">
     {{-- Stats Start --}}
     <div class="card h-100">
@@ -112,6 +111,9 @@ $configData = Helper::appClasses();
     {{$dataTable->scripts()}}
     <script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
  <script>
+  function reloadDataTables() {
+    $('#contracts-table').DataTable().ajax.reload(null, false);
+  }
 $(document).ready(function() {
     var table = $('#contracts-table').DataTable();
     var expandedRow = null; // Variable to track the currently expanded row
