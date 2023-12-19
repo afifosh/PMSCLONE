@@ -43,6 +43,10 @@
       <p class="mb-0 text-muted f-14 w-30 text-capitalize">Related : </p>
       @if ($transaction->related_type == 'App\Models\Contract')
         <p class="mb-0 text-dark-grey f-14 w-70 text-wrap"><a href="{{route('admin.contracts.show', $transaction->related->id)}}" target="_blank">{{$transaction->related->subject}}</a></p>
+      @elseif ($transaction->related_type == 'App\Models\Invoice')
+        <p class="mb-0 text-dark-grey f-14 w-70 text-wrap"><a href="{{route('admin.invoices.edit', $transaction->related->id)}}" target="_blank">{{$transaction->related->getFormatedId()}}</a></p>
+      @elseif ($transaction->related_type == 'App\Models\AuthorityInvoice')
+        <p class="mb-0 text-dark-grey f-14 w-70 text-wrap"><a href="{{route('admin.invoices.edit', [$transaction->related->invoice_id, 'tab' => 'authority-tax'])}}" target="_blank">{{$transaction->related->getFormatedId()}}</a></p>
       @endif
     </div>
   @endif

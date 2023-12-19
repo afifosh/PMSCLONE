@@ -24,7 +24,6 @@ class Contract extends BaseModel
     'assignable_id',
     'program_id',
     'signature_date',
-    'account_balance_id',
     'invoice_method',
     'refrence_id',
     'subject',
@@ -762,10 +761,10 @@ class Contract extends BaseModel
       });
   }
 
-  public function releaseInvoicesRetentions()
+  public function releaseInvoicesRetentions($account_id)
   {
-    $this->invoices->each(function ($invoice) {
-      $invoice->releaseRetention();
+    $this->invoices->each(function ($invoice) use ($account_id) {
+      $invoice->releaseRetention($account_id);
     });
   }
 

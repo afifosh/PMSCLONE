@@ -29,7 +29,7 @@ class InvoicesDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('id', function ($inv) {
-        return '<a href="' . route('admin.invoices.edit', $inv->id) . '">' . runtimeInvIdFormat($inv->id) . '</a>';
+        return '<a href="' . route('admin.invoices.edit', $inv->id) . '">' . ($inv->type == 'Down Payment' ? runtimeDpInvIdFormat($inv->id) : runtimeInvIdFormat($inv->id)) . '</a>';
       })
       ->editColumn('checkbox', function ($inv) {
         return '<input class="form-check-input invoice-check" name="selected_invoices[]" type="checkbox" value="' . $inv->id . '">';

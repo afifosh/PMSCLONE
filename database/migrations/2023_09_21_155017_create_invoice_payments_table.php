@@ -14,6 +14,7 @@ return new class extends Migration
     Schema::create('invoice_payments', function (Blueprint $table) {
       $table->id();
       $table->morphs('payable');
+      $table->foreignId('ba_trx_id')->constrained('account_balance_transactions')->onDelete('cascade');
       $table->string('transaction_id')->nullable();
       $table->date('payment_date');
       $table->bigInteger('amount')->default(0);

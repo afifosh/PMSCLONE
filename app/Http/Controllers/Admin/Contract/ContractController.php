@@ -21,16 +21,11 @@ use App\Models\ContractCategory;
 use App\Models\ContractType;
 use App\Models\Program;
 use App\Models\Project;
-use App\Support\LaravelBalance\Dto\TransactionDto;
-use App\Support\LaravelBalance\Models\AccountBalance;
-use App\Traits\FinanceTrait;
 use Illuminate\Support\Facades\DB;
 use DataTables;
 
 class ContractController extends Controller
 {
-  use FinanceTrait;
-
   public function __construct()
   {
     $this->middleware('permission:read contract', ['only' => [
@@ -336,18 +331,6 @@ class ContractController extends Controller
     $contract = Contract::create($data + $request->validated());
 
     if (!$request->isSavingDraft) {
-      $this->transactionProcessor->create(
-        AccountBalance::find($request->account_balance_id),
-        new TransactionDto(
-          -$request->value,
-          'Debit',
-          'Contract Commitment',
-          '',
-          [],
-          ['type' => Contract::class, 'id' => $contract->id]
-        )
-      );
-
       $contract->events()->create([
         'event_type' => 'Created',
         'modifications' => $request->validated(),
@@ -388,7 +371,6 @@ class ContractController extends Controller
     $data['contract'] = $contract;
     $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
     $data['statuses'] = $contract->getPossibleStatuses();
-    $data['account_balanaces'] = $contract->account_balance_id ? AccountBalance::where('id', $contract->account_balance_id)->pluck('name', 'id') : [];
     if ($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
 
@@ -432,7 +414,6 @@ class ContractController extends Controller
     $data['contract'] = $contract;
     $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
     $data['statuses'] = $contract->getPossibleStatuses();
-    $data['account_balanaces'] = $contract->account_balance_id ? AccountBalance::where('id', $contract->account_balance_id)->pluck('name', 'id') : [];
     if ($contract->status == 'Terminated')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
 
@@ -456,7 +437,6 @@ class ContractController extends Controller
       $data['contract'] = $contract;
       $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
       $data['statuses'] = $contract->getPossibleStatuses();
-      $data['account_balanaces'] = $contract->account_balance_id ? AccountBalance::where('id', $contract->account_balance_id)->pluck('name', 'id') : [];
       if ($contract->status == 'Terminated')
         $data['termination_reason'] = $contract->getLatestTerminationReason();
 
@@ -535,21 +515,9 @@ class ContractController extends Controller
     abort_if($contract->status != 'Draft' && $request->isSavingDraft, 400, 'You can not save draft for this contract');
 
     /*
-    * if the contract is draft and now it is not draft then create transaction and event
+    * if the contract is draft and now it is not draft then create event
     */
     if ($contract->status == 'Draft' && !$request->isSavingDraft) {
-      $this->transactionProcessor->create(
-        AccountBalance::find($request->account_balance_id),
-        new TransactionDto(
-          -$request->value,
-          'Debit',
-          'Contract Commitment',
-          '',
-          [],
-          ['type' => Contract::class, 'id' => $contract->id]
-        )
-      );
-
       $contract->events()->create([
         'event_type' => 'Created',
         'modifications' => $request->validated(),
@@ -567,76 +535,10 @@ class ContractController extends Controller
     else {
       if ($contract->status == 'Draft')
         $data['status'] = 'Active';
-      else {
-        // contract is not draft so gonna update the account and value of contract if it is changed
-        $this->updateValueAndAccount($contract, $request);
-      }
     }
-
     $contract->update($data + $request->validated());
 
     return $this->sendRes(__('Contract updated successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
-  }
-
-  protected function updateValueAndAccount(Contract $contract, $request): void
-  {
-    // if the account_balance_id is null means added from seeder and now being updated from dashboard.
-    // So first create the commitment transaction and then update the account_balance_id
-    if($contract->account_balance_id == null){
-      $this->transactionProcessor->create(
-        AccountBalance::find($request->account_balance_id),
-        new TransactionDto(
-          -$contract->value,
-          'Debit',
-          'Contract Commitment',
-          '',
-          [],
-          ['type' => Contract::class, 'id' => $contract->id]
-        )
-      );
-
-      $contract->update(['account_balance_id' => $request->account_balance_id]);
-    }
-
-    // if only contract amount is changed then update the account transaction
-    if ($contract->account_balance_id == $request->account_balance_id && $contract->value != $request->value) {
-      $this->transactionProcessor->create(
-        AccountBalance::find($request->account_balance_id),
-        new TransactionDto(
-          -($request->value - $contract->value),
-          $request->value > $contract->value ? 'Debit' : 'Credit',
-          'Contract Commitment - Updated',
-          '',
-          [],
-          ['type' => Contract::class, 'id' => $contract->id]
-        )
-      );
-    }else if($contract->account_balance_id != $request->account_balance_id){
-      // if account is changed then do opposite transaction from old account and create new transaction in new account
-      $this->transactionProcessor->create(
-        AccountBalance::find($contract->account_balance_id),
-        new TransactionDto(
-          $contract->value,
-          'Credit',
-          'Contract Account Changed',
-          'Contract Billing Account Changed so amount is credited back to old account',
-          [],
-          ['type' => Contract::class, 'id' => $contract->id]
-        )
-      );
-
-      $this->transactionProcessor->create(
-        AccountBalance::find($request->account_balance_id),
-        new TransactionDto(
-          -$request->value,
-          'Debit',
-          'Contract Commitment',
-          'Contract Billing Account Changed so amount is debited from new account',
-          [],
-          ['type' => Contract::class, 'id' => $contract->id]
-        )
-      );
-    }
   }
 
   /**

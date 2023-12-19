@@ -206,6 +206,15 @@ function runtimeInvIdFormat($invoice_id = '')
   }
 }
 
+function runtimeDpInvIdFormat($invoice_id = '')
+{
+  if (is_numeric($invoice_id)) {
+    return 'DP-' . str_pad($invoice_id, 6, '0', STR_PAD_LEFT);
+  } else {
+    return '---';
+  }
+}
+
 function runtimeTAInvIdFormat($invoice_id = '')
 {
   if (is_numeric($invoice_id)) {

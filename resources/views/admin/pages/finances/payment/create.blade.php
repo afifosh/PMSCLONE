@@ -49,7 +49,8 @@
         'data-url' => route('resource-select', ['InvoiceOrAuthorityInvoice', 'dependent' => 'contract_id', 'notvoid' => '1']),
         'data-dependent_id' => 'payment-contract-id',
         'data-dependent_2' => 'payment-invoice-type',
-        'disabled' => isset($selected_invoice)
+        'disabled' => isset($selected_invoice),
+        'id' => 'payment-invoice-id',
         ])!!}
     </div>
     {{-- Unpaid Amount --}}
@@ -70,14 +71,59 @@
         {!! Form::number('payable_amount', isset($invoice) ? ($invoice->payableAmount() + $invoicePayment->amount) : null, ['class' => 'form-control', 'placeholder' => __('0.0'), 'disabled']) !!}
     </div>
 
+    @if($invoice->invoice_id)
+      @if($invoice->payableWHT() > 0)
+        {{-- payable withholding tax --}}
+        <div class="form-group col-6">
+            {{ Form::label('payable_wht', __('Payable Withholding Tax'), ['class' => 'col-form-label']) }}
+            {!! Form::number('payable_wht', $invoice->payableWHT(), ['class' => 'form-control', 'placeholder' => __('0.0'), 'disabled']) !!}
+        </div>
+      @endif
+
+      @if($invoice->payableRC() > 0)
+        {{-- payable reverse charge --}}
+        <div class="form-group col-6">
+            {{ Form::label('payable_rc', __('Payable Reverse Charge'), ['class' => 'col-form-label']) }}
+            {!! Form::number('payable_rc', $invoice->payableRC(), ['class' => 'form-control', 'placeholder' => __('0.0'), 'disabled']) !!}
+        </div>
+      @endif
+    @endif
+
 
     {{-- Payment Type: full, partial --}}
+    @php
+      $paymentTypes = [
+        'Full' => 'Full Payment'
+      ];
+
+      if (isset($invoice) && $invoice->invoice_id) {
+        $paymentTypes['wht'] = 'Withholding Tax';
+        $paymentTypes['rc'] = 'Reverse Charge';
+      } else {
+        $paymentTypes['Partial'] = 'Partial Payment';
+      }
+    @endphp
     <div class="form-group col-6">
         {{ Form::label('payment_type', __('Payment Type'), ['class' => 'col-form-label']) }}
-        {!! Form::select('payment_type', $paymentTypes ?? ['Full' => 'Full Payment', 'Partial' => 'Partial Payment'], null, [
+        {!! Form::select('payment_type', $paymentTypes, null, [
           'class' => 'form-select globalOfSelect2',
-        ]) !!}
+          'id' => 'invoice-payment-type'
+          ]) !!}
     </div>
+
+    {{-- Account --}}
+  <div class="form-group col-6">
+    {{ Form::label('account_balance_id', __('Account'), ['class' => 'col-form-label']) }}
+    {!! Form::select('account_balance_id', [], null, [
+    'class' => 'form-select globalOfSelect2Remote',
+    'data-url' => route('resource-select', ['AccountBalance', 'dependent' => 'invoice_id', 'dependent_2_col' => 'inv-type', 'dependent_3_col' => 'pay-type']),
+    'data-dependent_id' => 'payment-invoice-id',
+    'data-dependent_2' => 'payment-invoice-type',
+    'data-dependent_3' => 'invoice-payment-type',
+    'data-placeholder' => __('Select Account'),
+    'data-allow-clear' => 'true'
+    ]) !!}
+  </div>
 
     {{-- Amount --}}
     <div class="form-group col-6 d-none">

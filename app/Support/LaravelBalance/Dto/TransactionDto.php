@@ -4,7 +4,7 @@ namespace App\Support\LaravelBalance\Dto;
 
 class TransactionDto
 {
-  private int $amount;
+  private $amount;
   private string $type;
   private ?string $transaction_title;
   private ?string $description;
@@ -13,14 +13,14 @@ class TransactionDto
   /**
    * TransactionDto constructor.
    *
-   * @param int $amount
+   * @param double $amount
    * @param string $type
    * @param string|null $transaction_title
    * @param string|null $description
    * @param array $data
    */
 
-  public function __construct(int $amount, string $type, string $transaction_title = null, string $description = null, array $data = [], array $relatedMorph = [])
+  public function __construct($amount, string $type, string $transaction_title = null, string $description = null, array $data = [], array $relatedMorph = [])
   {
     $this->amount = $amount;
     $this->type = $type;
@@ -31,9 +31,9 @@ class TransactionDto
   }
 
   /**
-   * @return int
+   * @return double
    */
-  public function getAmount(): int
+  public function getAmount()
   {
     return $this->amount;
   }
