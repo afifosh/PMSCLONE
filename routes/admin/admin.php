@@ -404,7 +404,7 @@ Route::prefix('contracts')->group(function () {
       Route::post('invoices/{invoice}/upload-requested-doc', [ContractDocumentController::class, 'uploadDocument'])->name('invoices.upload-requested-doc');
     });
 
-    Route::resource('tax-authority-invoices', TaxAuthorityInvoiceController::class)->only(['index', 'show', 'destroy']);
+    Route::resource('tax-authority-invoices', TaxAuthorityInvoiceController::class)->only(['index', 'show']);
 
     //invoices routes
     Route::get('invoices/document-stats', [DocumentStatController::class, 'index'])->name('invoices.document-stats.index');

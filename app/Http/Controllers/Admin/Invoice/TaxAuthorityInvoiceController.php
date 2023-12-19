@@ -16,8 +16,8 @@ class TaxAuthorityInvoiceController extends Controller
     $data = [];
     $data['summary'] = AuthorityInvoice::selectRaw('
         SUM(total) / 1000 as total_amount,
-        SUM(paid_amount) as paid_amount,
-        SUM(total - paid_amount) / 1000 as due_amount,
+        SUM(paid_wht_amount + paid_rc_amount) as paid_amount,
+        SUM(total - paid_wht_amount - paid_rc_amount) / 1000 as due_amount,
         COUNT(*) as total_invoices,
         SUM(IF(status = "Paid", 1, 0)) as paid,
         SUM(IF((status = "Unpaid" OR status = "Draft" OR status = "Sent") AND (due_date > NOW()), 1, 0)) as unpaid,
@@ -40,20 +40,20 @@ class TaxAuthorityInvoiceController extends Controller
     }
   }
 
-  public function destroy(AuthorityInvoice $taxAuthorityInvoice)
-  {
-    abort_if(AuthorityInvoice::validAccessibleByAdmin(auth()->id())->where('id', $taxAuthorityInvoice->id)->doesntExist(), 401, 'Unauthorized');
+  // public function destroy(AuthorityInvoice $taxAuthorityInvoice)
+  // {
+  //   abort_if(AuthorityInvoice::validAccessibleByAdmin(auth()->id())->where('id', $taxAuthorityInvoice->id)->doesntExist(), 401, 'Unauthorized');
 
-    DB::beginTransaction();
+  //   DB::beginTransaction();
 
-    try {
-      $taxAuthorityInvoice->payments()->delete();
-      $taxAuthorityInvoice->delete();
+  //   try {
+  //     $taxAuthorityInvoice->payments()->delete();
+  //     $taxAuthorityInvoice->delete();
 
-      return $this->sendRes('success', ['message' => __('Tax authority invoice deleted successfully')]);
-    } catch (\Exception $e) {
-      DB::rollBack();
-      return $this->sendErr($e->getMessage());
-    }
-  }
+  //     return $this->sendRes('success', ['message' => __('Tax authority invoice deleted successfully')]);
+  //   } catch (\Exception $e) {
+  //     DB::rollBack();
+  //     return $this->sendErr($e->getMessage());
+  //   }
+  // }
 }

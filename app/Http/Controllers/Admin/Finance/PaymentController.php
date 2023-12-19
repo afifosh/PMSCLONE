@@ -13,16 +13,27 @@ use App\Models\Invoice;
 use App\Models\InvoiceConfig;
 use App\Models\Program;
 use App\Models\InvoicePayment;
+use App\Support\LaravelBalance\Dto\TransactionDto;
+use App\Support\LaravelBalance\Models\AccountBalance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Support\LaravelBalance\Services\TransactionProcessor;
 
 class PaymentController extends Controller
 {
-  public function __construct()
+  /**
+   * @var TransactionProcessor
+   */
+  private $transactionProcessor;
+
+  public function __construct(TransactionProcessor $transactionProcessor)
   {
     $this->middleware('permission:read payment', ['only' => ['index', 'show']]);
     $this->middleware('permission:create payment', ['only' => ['create', 'store']]);
     $this->middleware('permission:update payment', ['only' => ['edit', 'update']]);
     $this->middleware('permission:delete payment', ['only' => ['destroy']]);
+
+    $this->transactionProcessor = $transactionProcessor;
   }
 
   public function index(PaymentsDataTable $dataTable, null|string $model = null)
@@ -82,25 +93,62 @@ class PaymentController extends Controller
 
   public function store(PaymentStoreRequest $req)
   {
-    $req->invoice->payments()->create($req->validated());
+    DB::beginTransaction();
 
-    $req->invoice->update([
-      'paid_amount' => $req->invoice->paid_amount + $req->amount,
-      'status' => $req->invoice->paid_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial Paid',
-    ]);
+    try {
+      // create debit transaction for related account balance
+      $trx = $this->transactionProcessor->create(
+        AccountBalance::find($req->account_balance_id),
+        new TransactionDto(
+          -$req->amount,
+          'Debit',
+          'Invoice Payment',
+          'Invoice Payment',
+          ['data' => ['payment_type' => $req->payment_type]],
+          ['type' => $req->invoice::class, 'id' => $req->invoice_id]
+        )
+      );
 
-    // release retention if requested
-    if ($req->release_retention == 'This') {
-      $req->invoice->releaseRetention();
-    } else if ($req->release_retention == 'All') {
-      $req->invoice->load('contract.invoices');
-      $req->invoice->contract->releaseInvoicesRetentions();
+      // create payment
+      $req->invoice->payments()->create(['ba_trx_id' => $trx->id] + $req->validated());
+
+      if ($req->invoice::class == Invoice::class) {
+        $req->invoice->update([
+          'paid_amount' => $req->invoice->paid_amount + $req->amount,
+          'status' => $req->invoice->paid_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial Paid',
+        ]);
+
+        // release retention if requested
+        if ($req->release_retention == 'This') {
+          $req->invoice->releaseRetention($req->account_balance_id);
+        } else if ($req->release_retention == 'All') {
+          $req->invoice->load('contract.invoices');
+          $req->invoice->contract->releaseInvoicesRetentions($req->account_balance_id);
+        }
+      } else {
+        if ($req->payment_type == 'wht') {
+          $data['paid_wht_amount'] = $req->invoice->paid_wht_amount + $req->amount;
+        } else if ($req->payment_type == 'rc') {
+          $data['paid_rc_amount'] = $req->invoice->paid_rc_amount + $req->amount;
+        } else if ($req->payment_type == 'Full') {
+          $data['paid_wht_amount'] = $req->invoice->paid_wht_amount;
+          $data['paid_rc_amount'] = $req->invoice->paid_rc_amount;
+        }
+        $req->invoice->update($data + [
+          'status' => $req->invoice->paid_wht_amount + $req->invoice->paid_rc_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial Paid'
+        ]);
+      }
+
+      DB::commit();
+
+      $event = $req->event ? $req->event : 'table_reload';
+      $table_id = $req->table_id ? $req->table_id : 'payments-table';
+
+      return $this->sendRes('Payment created successfully.', ['event' => $event, 'table_id' => $table_id, 'close' => 'globalModal']);
+    } catch (\Exception $e) {
+      DB::rollback();
+      return $this->sendError($e->getMessage());
     }
-
-    $event = $req->event ? $req->event : 'table_reload';
-    $table_id = $req->table_id ? $req->table_id : 'payments-table';
-
-    return $this->sendRes('Payment created successfully.', ['event' => $event, 'table_id' => $table_id, 'close' => 'globalModal']);
   }
 
   public function edit(InvoicePayment $payment)

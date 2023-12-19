@@ -13,23 +13,12 @@ class AuthorityInvoice extends Model
 
   protected $fillable = [
     'invoice_id',
-    'is_summary_tax',
-    'subtotal',
-    'total_tax',
+    'total_wht',
+    'total_rc',
     'total',
     'rounding_amount',
-    'paid_amount',
-    'downpayment_amount',
-    'discount_type',
-    'discount_percentage',
-    'discount_amount',
-    'adjustment_description',
-    'adjustment_amount',
-    'retention_id',
-    'retention_name',
-    'retention_percentage',
-    'retention_amount',
-    'retention_released_at',
+    'paid_wht_amount',
+    'paid_rc_amount',
     'due_date',
     'status',
   ];
@@ -53,11 +42,6 @@ class AuthorityInvoice extends Model
     return $this->belongsTo(Invoice::class);
   }
 
-  public function setSubtotalAttribute($value)
-  {
-    $this->attributes['subtotal'] = moneyToInt($value);
-  }
-
   public function getTotalAttribute($value)
   {
     return ($value / 1000) + $this->rounding_amount;
@@ -66,70 +50,6 @@ class AuthorityInvoice extends Model
   public function setTotalAttribute($value)
   {
     $this->attributes['total'] = moneyToInt($value);
-  }
-
-  public function getPaidAmountAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setPaidAmountAttribute($value)
-  {
-    $this->attributes['paid_amount'] = moneyToInt($value);
-  }
-
-  public function getTotalTaxAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setTotalTaxAttribute($value)
-  {
-    $this->attributes['total_tax'] = moneyToInt($value);
-  }
-
-  public function getDiscountAmountAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setDiscountAmountAttribute($value)
-  {
-    $this->attributes['discount_amount'] = moneyToInt($value);
-  }
-
-  public function getAdjustmentAmountAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setAdjustmentAmountAttribute($value)
-  {
-    $this->attributes['adjustment_amount'] = moneyToInt($value);
-  }
-
-  public function getRetentionAmountAttribute($value)
-  {
-    if ($this->retention_released_at) {
-      return 0;
-    }
-
-    return $value / 1000;
-  }
-
-  public function setRetentionAmountAttribute($value)
-  {
-    $this->attributes['retention_amount'] = moneyToInt($value);
-  }
-
-  public function getDownpaymentAmountAttribute($value)
-  {
-    return $value / 1000;
-  }
-
-  public function setDownpaymentAmountAttribute($value)
-  {
-    $this->attributes['downpayment_amount'] = moneyToInt($value);
   }
 
   public function getRoundingAmountAttribute($value)
@@ -142,12 +62,78 @@ class AuthorityInvoice extends Model
     $this->attributes['rounding_amount'] = moneyToInt($value);
   }
 
+  public function getTotalWhtAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setTotalWhtAttribute($value)
+  {
+    $this->attributes['total_wht'] = moneyToInt($value);
+  }
+
+  public function getTotalRcAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setTotalRcAttribute($value)
+  {
+    $this->attributes['total_rc'] = moneyToInt($value);
+  }
+
+  public function getPaidAmountAttribute()
+  {
+    return $this->paid_wht_amount + $this->paid_rc_amount;
+  }
+
+  public function getPaidWhtAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setPaidWhtAmountAttribute($value)
+  {
+    $this->attributes['paid_wht_amount'] = moneyToInt($value);
+  }
+
+  public function getPaidRcAmountAttribute($value)
+  {
+    return $value / 1000;
+  }
+
+  public function setPaidRcAmountAttribute($value)
+  {
+    $this->attributes['paid_rc_amount'] = moneyToInt($value);
+  }
+
   /**
    * Get the amount which can be paid against this invoice.
    */
   public function payableAmount()
   {
-    return $this->total - $this->paid_amount - $this->retention_amount - $this->downpayment_amount;
+    return $this->total - $this->paid_rc_amount - $this->paid_wht_amount;
+  }
+
+  /**
+   * Get the WHT which can be paid against this invoice.
+   */
+  public function payableWHT()
+  {
+    return ($this->total_wht - $this->paid_wht_amount);
+  }
+
+  /**
+   * Get the RC which can be paid against this invoice.
+   */
+  public function payableRC()
+  {
+    return ($this->total_rc - $this->paid_rc_amount);
+  }
+
+  public function getFormatedId()
+  {
+    return runtimeTAInvIdFormat($this->id);
   }
 
   public function scopeApplyRequestFilters($q)

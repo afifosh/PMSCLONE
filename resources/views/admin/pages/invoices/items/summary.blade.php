@@ -29,7 +29,7 @@
     @if($tab != 'authority-tax')
       @cMoney($invoice->totalAppliedTax(), $invoice->contract->currency, true)
     @else
-      @cMoney($invoice->authorityInvoice->total_tax, $invoice->contract->currency, true)
+      @cMoney($invoice->authorityInvoice->total, $invoice->contract->currency, true)
     @endif
   </span>
 </div>

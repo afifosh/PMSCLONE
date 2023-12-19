@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\LaravelBalance\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
@@ -13,6 +14,7 @@ class InvoicePayment extends Model
   protected $fillable = [
     'payable_type',
     'payable_id',
+    'ba_trx_id', // Transaction of the payment in the account of the program
     'transaction_id',
     'payment_date',
     'amount',
@@ -75,5 +77,15 @@ class InvoicePayment extends Model
     ->when(request()->filter_invoice, function ($q) {
       $q->where('invoice_id', request()->filter_invoice);
     });
+  }
+
+  /**
+   * Transaction of the payment in the account of the program
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+   */
+  public function accountTransaction()
+  {
+    return $this->belongsTo(Transaction::class, 'ba_trx_id');
   }
 }

@@ -17,7 +17,6 @@ return new class extends Migration
       $table->foreignId('type_id')->nullable()->constrained('contract_types')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('project_id')->nullable()->constrained('projects')->onDelete('cascade')->cascadeOnUpdate();
       $table->foreignId('program_id')->nullable()->constrained('programs')->onDelete('cascade')->cascadeOnUpdate();
-      $table->foreignId('account_balance_id')->nullable()->constrained('account_balances')->onDelete('cascade')->cascadeOnUpdate();
       $table->nullableMorphs('assignable');
       $table->boolean('visible_to_client')->default(false);
       $table->string('refrence_id', 100)->nullable();

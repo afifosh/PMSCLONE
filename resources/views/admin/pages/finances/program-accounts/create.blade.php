@@ -28,13 +28,23 @@
           'multiple' => 'multiple',
           'data-url' => route('resource-select', ['Program'])
           ])!!}
-</div>
-
-<div class="mt-3">
-    <div class="btn-flt float-end">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-        <button type="submit" data-form="ajax-form" class="btn btn-primary">{{ __('Save') }}</button>
     </div>
-</div>
-{!! Form::close() !!}
+    {{-- permissions --}}
+    <div class="form-group col-12">
+        {{ Form::label('permissions', __('Permissions'), ['class' => 'col-form-label']) }}
+        {!! Form::select('permissions[]', $permissions, $accountBalance->permissions()->pluck('permission'), [
+          'data-placeholder' => 'Select Permissions',
+          'data-allow-clear' => 'true',
+          'class' => 'form-select globalOfSelect2',
+          'multiple' => 'multiple',
+          ])!!}
+    </div>
+
+  <div class="mt-3">
+      <div class="btn-flt float-end">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
+          <button type="submit" data-form="ajax-form" class="btn btn-primary">{{ __('Save') }}</button>
+      </div>
+  </div>
+  {!! Form::close() !!}
 </div>

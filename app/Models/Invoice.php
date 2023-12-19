@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Support\LaravelBalance\Dto\TransactionDto;
+use App\Support\LaravelBalance\Models\AccountBalance;
+use App\Support\LaravelBalance\Services\TransactionProcessor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -307,8 +310,9 @@ class Invoice extends Model
   public function reCalculateTaxAuthorityInvoice()
   {
     $ta_invoice = $this->authorityInvoice()->firstOrNew(['invoice_id' => $this->id]);
-    $ta_invoice->total_tax = $this->totalAuthorityTax();
     $ta_invoice->total = $this->totalAuthorityTax();
+    $ta_invoice->total_wht = $this->allPivotTaxes()->where('category', 2)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000;
+    $ta_invoice->total_rc = $this->allPivotTaxes()->where('category', 3)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000;
     $ta_invoice->due_date = $this->due_date;
     $ta_invoice->save();
   }
@@ -396,29 +400,42 @@ class Invoice extends Model
     return !in_array($this->status, ['Paid', 'Partial Paid']);
   }
 
-  public function releaseRetention(): void
+  public function releaseRetention($account_id): void
   {
-    try {
+    DB::beginTransaction();
 
+    try {
       if (!$this->retention_amount || $this->retention_released_at) {
         return;
       }
+      $transactionProcessor = app(TransactionProcessor::class);
+      // create debit transaction for related account balance
+      $trx = $transactionProcessor->create(
+        AccountBalance::find($account_id),
+        new TransactionDto(
+          -$this->retention_amount,
+          'Debit',
+          'Invoice Payment',
+          'Invoice Payment',
+          ['data' => ['payment_type' => 'Retention Release']],
+          ['type' => self::class, 'id' => $this->id]
+        )
+      );
 
-      DB::transaction(function () {
-        $this->payments()->create([
-          'transaction_id' => 'RTN-' . $this->id . '-' . round($this->retention_amount),
-          'payment_date' => now(),
-          'amount' => $this->retention_amount,
-          'note' => 'Retention released',
-          'type' => 1
-        ]);
+      $this->payments()->create([
+        'ba_trx_id' => $trx->id,
+        'transaction_id' => 'RTN-' . $this->id . '-' . round($this->retention_amount),
+        'payment_date' => now(),
+        'amount' => $this->retention_amount,
+        'note' => 'Retention released',
+        'type' => 1
+      ]);
 
-        $this->update([
-          'paid_amount' => $this->paid_amount + $this->retention_amount,
-          'retention_released_at' => now(),
-          'status' => $this->paid_amount + $this->retention_amount >= $this->total ? 'Paid' : 'Partial Paid',
-        ]);
-      });
+      $this->update([
+        'paid_amount' => $this->paid_amount + $this->retention_amount,
+        'retention_released_at' => now(),
+        'status' => $this->paid_amount + $this->retention_amount >= $this->total ? 'Paid' : 'Partial Paid',
+      ]);
     } catch (\Exception $e) {
       throw $e;
     }
@@ -877,6 +894,11 @@ class Invoice extends Model
     return $deductedAmounts->sum(function ($item) use ($currency) {
       return cMoney($item->deducted_amount, $currency)->getAmount(true);
     });
+  }
+
+  public function getFormatedId()
+  {
+    return $this->type == 'Down Payment' ? runtimeDpInvIdFormat($this->id) : runtimeInvIdFormat($this->id);
   }
 
   /**

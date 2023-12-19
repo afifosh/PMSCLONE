@@ -102,13 +102,19 @@ public function query(Contract $model): QueryBuilder
             DB::raw('sum(invoices.total - invoices.paid_amount)/1000 as due_amount'),
             DB::raw('sum(invoices.total_tax)/1000 as total_tax'),
             DB::raw('(sum(invoices.paid_amount)/sum(contracts.value))*1000 as paid_percent'),
+            DB::raw('SUM(authority_invoices.total_wht)/1000 as total_wht'),
+            DB::raw('SUM(authority_invoices.paid_wht_amount)/1000 as paid_wht_amount'),
+            DB::raw('SUM(authority_invoices.total_rc)/1000 as total_rc'),
+            DB::raw('SUM(authority_invoices.paid_rc_amount)/1000 as paid_rc_amount'),
             // contract invoice count whose retention_released_at is null as pending_retentions_count
             DB::raw('sum(CASE WHEN invoices.retention_amount IS NOT NULL AND invoices.retention_released_at IS NULL THEN invoices.retention_amount ELSE 0 END) as pending_retentions_sum'),
 
             DB::raw('count(CASE WHEN invoices.retention_amount IS NOT NULL AND invoices.retention_released_at IS NULL THEN 1 ELSE NULL END) as pending_retentions_count')
         ])
         ->leftJoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+        ->leftJoin('invoice_items', 'invoices.id', '=', 'invoice_items.invoice_id')
         ->leftJoin('programs', 'contracts.program_id', '=', 'programs.id')
+        ->leftJoin('authority_invoices', 'invoices.id', '=', 'authority_invoices.invoice_id')
         ->groupBy([
             'contracts.id',
             'contracts.program_id',

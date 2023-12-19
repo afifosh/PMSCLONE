@@ -24,6 +24,13 @@ class CreateAccountBalanceSetupTables extends Migration
             $table->timestamps();
         });
 
+        Schema::create('account_balance_permissions', function (Blueprint $table) {
+          $table->bigIncrements('id');
+          $table->foreignId('account_balance_id')->constrained('account_balances');
+          $table->integer('permission')->comment('can pay:1 regular invoice; 2: RC; 3: WHT');
+          $table->timestamps();
+        });
+
         Schema::create('account_balance_holders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId('account_balance_id')->constrained('account_balances');

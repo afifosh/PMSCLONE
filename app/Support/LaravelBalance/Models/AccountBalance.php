@@ -8,7 +8,6 @@ use App\Support\Money;
 use App\Models\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AccountBalance extends Model
@@ -34,6 +33,12 @@ class AccountBalance extends Model
     protected $casts = [
       'created_at' => 'datetime:d M, Y',
       'updated_at' => 'datetime:d M, Y',
+    ];
+
+    CONST PERMISSIONS = [
+      '1' => 'Pay Regular Invoice',
+      '2' => 'Pay Reverse Charge',
+      '3' => 'Pay Withholding Tax',
     ];
 
     public function getBalanceAttribute($value)
@@ -62,9 +67,25 @@ class AccountBalance extends Model
         return $accountNumber;
     }
 
-    public function scopeApplyRequestFilters($query)
+    public function scopeApplyRequestFilters($q)
     {
-      //
+      $q->when(request()->dependent == 'invoice_id' && request()->dependent_2_col == 'inv-type' && request()->dependent_id && request()->dependent_2, function ($q) {
+        $q->whereHas('programs', function ($q) {
+          $q->whereHas('contracts', function ($q) {
+            $q->when(request()->dependent_2 == 'Invoice', function ($q) {
+              $q->whereHas('invoices', function ($q) {
+                $q->where('invoices.id', request()->dependent_id);
+              });
+            })->when(request()->dependent_2 == 'AuthorityInvoice', function ($q) {
+              $q->whereHas('invoices', function ($q) {
+                $q->whereHas('authorityInvoice', function ($q) {
+                  $q->where('authority_invoices.id', request()->dependent_id);
+                });
+              });
+            });
+          });
+        });
+      });
     }
 
     public function printableBalance()
@@ -139,4 +160,11 @@ class AccountBalance extends Model
         return \Database\Factories\AccountBalanceFactory::new();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function permissions()
+    {
+      return $this->hasMany(AccountBalancePermission::class);
+    }
 }

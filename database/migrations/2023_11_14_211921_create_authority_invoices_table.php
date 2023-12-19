@@ -15,35 +15,12 @@ return new class extends Migration
     Schema::create('authority_invoices', function (Blueprint $table) {
       $table->id();
       $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
-      $table->boolean('is_summary_tax')->default(false);
-      $table->bigInteger('subtotal')->default(0);
-      $table->bigInteger('total_tax')->default(0);
+      $table->bigInteger('total_wht')->default(0);
+      $table->bigInteger('total_rc')->default(0);
       $table->bigInteger('total')->default(0);
       $table->integer('rounding_amount')->default(0);
-      $table->bigInteger('paid_amount')->default(0);
-      /**
-       * Downpayment
-       */
-      $table->unsignedBigInteger('downpayment_amount')->default(0);
-      /**
-       * Discount
-       */
-      $table->enum('discount_type', ['Fixed', 'Percentage'])->nullable();
-      $table->integer('discount_percentage')->default(0);
-      $table->bigInteger('discount_amount')->default(0);
-      /**
-       * Adjustment
-       */
-      $table->string('adjustment_description')->nullable();
-      $table->bigInteger('adjustment_amount')->default(0);
-      /**
-       * Retention
-       */
-      $table->foreignId('retention_id')->nullable()->constrained('invoice_configs')->nullOnDelete();
-      $table->string('retention_name')->nullable();
-      $table->integer('retention_percentage')->default(0);
-      $table->bigInteger('retention_amount')->default(0);
-      $table->timestamp('retention_released_at')->nullable();
+      $table->integer('paid_wht_amount')->default(0);
+      $table->integer('paid_rc_amount')->default(0);
       $table->date('due_date');
       $table->enum('status', AuthorityInvoice::STATUSES)->default('Draft');
       $table->softDeletes();
