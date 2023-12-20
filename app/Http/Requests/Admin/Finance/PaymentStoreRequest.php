@@ -29,21 +29,38 @@ class PaymentStoreRequest extends FormRequest
 
   public function prepareForValidation()
   {
-    $this->invoice = $this->invoice_type == 'Invoice' ? Invoice::findOrFail($this->invoice_id) : AuthorityInvoice::findOrFail($this->invoice_id);
+    $this->invoice = $this->invoice_type == 'Invoice' ? Invoice::payable()->findOrFail($this->invoice_id) : AuthorityInvoice::payable()->findOrFail($this->invoice_id);
     $this->payableAmount = $this->invoice->payableAmount();
     if ($this->method() == 'PUT') {
       $this->payableAmount += $this->payment->amount;
     }
 
     if ($this->payment_type == 'Full') {
-      $this->merge([
-        'amount' => $this->payableAmount,
-      ]);
-
       if ($this->invoice_type == 'Invoice') {
+        $this->merge([
+          'amount' => $this->payableAmount,
+        ]);
+
         $this->requiredPermissions = [1];
       } else {
-        $this->requiredPermissions = [2, 3];
+        // if only wht remaining
+        if($this->invoice->remaining_wht > 0 && $this->invoice->remaining_rc == 0)
+        {
+          $this->merge([
+            'amount' => $this->invoice->remaining_wht,
+            'payment_type' => 'wht'
+          ]);
+          $this->requiredPermissions = [3];
+        }elseif($this->invoice->remaining_rc > 0 && $this->invoice->remaining_wht == 0)
+        {
+          $this->merge([
+            'amount' => $this->invoice->remaining_rc,
+            'payment_type' => 'rc'
+          ]);
+          $this->requiredPermissions = [2];
+        }else{
+          $this->requiredPermissions = [2, 3];
+        }
       }
     } elseif ($this->invoice_type != 'Invoice' && $this->payment_type == 'wht') {
       $this->merge([

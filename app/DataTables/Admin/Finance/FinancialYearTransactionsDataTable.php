@@ -27,9 +27,6 @@ class FinancialYearTransactionsDataTable extends DataTable
     ->editColumn('amount', function($transaction){
       return Money::{$this->financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($transaction->amount, false)->format();
     })
-    ->editColumn('remaining_balance', function($transaction){
-      return Money::{$this->financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($transaction->remaining_balance, false)->format();
-    })
     ->editColumn('action', function($transaction){
       return view('admin.pages.finances.financial-years.transactions.action', compact('transaction'));
     })
@@ -85,7 +82,6 @@ class FinancialYearTransactionsDataTable extends DataTable
       Column::make('id'),
       Column::make('amount'),
       Column::make('type'),
-      Column::make('remaining_balance')->title('New Balance'),
       Column::make('title'),
       Column::make('created_at'),
     ];

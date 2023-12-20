@@ -44,7 +44,6 @@ class CreateAccountBalanceSetupTables extends Migration
             $table->foreignId('account_balance_extra_id')->nullable()->constrained('account_balances');
             $table->nullableMorphs('related'); // contract, invoice, payment, etc
             $table->bigInteger('amount')->default(0);
-            $table->bigInteger('remaining_balance')->default(0);
             $table->string('title')->nullable();
             $table->json('data')->nullable();
             $table->string('description')->nullable();

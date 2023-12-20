@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Finance;
 use App\DataTables\Admin\Finance\PaymentsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Finance\PaymentStoreRequest;
+use App\Http\Requests\Admin\Finance\PaymentUpdateRequest;
 use App\Models\AuthorityInvoice;
 use App\Models\Company;
 use App\Models\Contract;
@@ -68,7 +69,7 @@ class PaymentController extends Controller
     $data['invoicePayment'] = new InvoicePayment();
     $data['retentions'] = InvoiceConfig::where('config_type', 'Retention')->where('status', 1)->get();
     if ($request->invoice && $request->type != 'tax-authority') {
-      $data['invoice'] = Invoice::with(['contract.assignable'])->findOrFail($request->invoice);
+      $data['invoice'] = Invoice::payable()->with(['contract.assignable'])->findOrFail($request->invoice);
       $data['companies'] = [$data['invoice']->contract->assignable_id => $data['invoice']->contract->assignable->name];
       $data['contracts'] = [$data['invoice']->contract_id => $data['invoice']->contract->subject];
       $data['invoiceId'] = [
@@ -77,7 +78,7 @@ class PaymentController extends Controller
       $data['selected_invoice'] = $request->invoice;
       $data['event'] = 'page_reload';
     } else if ($request->invoice && $request->type == 'tax-authority') {
-      $data['invoice'] = AuthorityInvoice::with('invoice.contract.assignable')->findOrFail($request->invoice);
+      $data['invoice'] = AuthorityInvoice::payable()->with('invoice.contract.assignable')->findOrFail($request->invoice);
       $data['companies'] = [$data['invoice']->invoice->contract->assignable_id => $data['invoice']->invoice->contract->assignable->name];
       $data['contracts'] = [$data['invoice']->invoice->contract_id => $data['invoice']->invoice->contract->subject];
       $data['invoiceId'] = [
@@ -128,11 +129,14 @@ class PaymentController extends Controller
       } else {
         if ($req->payment_type == 'wht') {
           $data['paid_wht_amount'] = $req->invoice->paid_wht_amount + $req->amount;
+          $data['type'] = 2;
         } else if ($req->payment_type == 'rc') {
           $data['paid_rc_amount'] = $req->invoice->paid_rc_amount + $req->amount;
+          $data['type'] = 3;
         } else if ($req->payment_type == 'Full') {
-          $data['paid_wht_amount'] = $req->invoice->paid_wht_amount;
-          $data['paid_rc_amount'] = $req->invoice->paid_rc_amount;
+          $data['paid_wht_amount'] = $req->invoice->total_wht;
+          $data['paid_rc_amount'] = $req->invoice->total_rc;
+          $data['type'] = 4;
         }
         $req->invoice->update($data + [
           'status' => $req->invoice->paid_wht_amount + $req->invoice->paid_rc_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial Paid'
@@ -169,14 +173,8 @@ class PaymentController extends Controller
     return $this->sendRes('success', ['view_data' => view('admin.pages.finances.payment.create', $data)->render()]);
   }
 
-  public function update(PaymentStoreRequest $request, InvoicePayment $payment)
+  public function update(InvoicePayment $payment, PaymentUpdateRequest $request)
   {
-    $invoice = $payment->invoice;
-    $invoice->update([
-      'paid_amount' => $invoice->paid_amount - $payment->amount + $request->amount,
-      'status' => $invoice->paid_amount - $payment->amount + $request->amount >= $invoice->total ? 'Paid' : 'Partial Paid',
-    ]);
-
     $payment->update($request->validated());
 
     return $this->sendRes('Payment updated successfully.', ['event' => 'table_reload', 'table_id' => 'payments-table', 'close' => 'globalModal']);
@@ -199,26 +197,62 @@ class PaymentController extends Controller
 
   private function deletePayment(InvoicePayment $payment): void
   {
-    $invoice = $payment->payable_type == Invoice::class ? $payment->payable : $payment->payable->invoice;
-    if ($payment->type == 1) {
-      $invoice->undoRetentionRelease();
-      $payment->delete();
-    } else {
-      $status = '';
-      if ($invoice->paid_amount - $payment->amount >= $invoice->payableAmount() + $invoice->paid_amount) {
-        $status = 'Paid';
-      } else if ($invoice->paid_amount - $payment->amount > 0) {
-        $status = 'Partial Paid';
+    DB::beginTransaction();
+
+    try {
+      $invoice = $payment->payable_type == Invoice::class ? $payment->payable : $payment->payable->invoice;
+      if ($payment->type == 1) {
+        $invoice->undoRetentionRelease();
+        $payment->delete();
       } else {
-        $status = 'Draft';
+        $status = '';
+        if ($invoice->paid_amount - $payment->amount >= $invoice->payableAmount() + $invoice->paid_amount) {
+          $status = 'Paid';
+        } else if ($invoice->paid_amount - $payment->amount > 0) {
+          $status = 'Partial Paid';
+        } else {
+          $status = 'Draft';
+        }
+
+        // payment is wht payment
+        if ($payment->type == 2) {
+          $invoice->update([
+            'paid_wht_amount' => $invoice->paid_wht_amount - $payment->amount,
+            'status' =>  $status,
+          ]);
+        } else if ($payment->type == 3) { // payment is rc payment
+          $invoice->update([
+            'paid_rc_amount' => $invoice->paid_rc_amount - $payment->amount,
+            'status' =>  $status,
+          ]);
+        } else if ($payment->type == 4) { // payment is both wht and rc payment
+          $invoice->update([
+            'paid_wht_amount' => 0,
+            'paid_rc_amount' => 0,
+            'status' =>  $status,
+          ]);
+        } else { // payment is first tabe invoice payment
+          $invoice->update([
+            'paid_amount' => $invoice->paid_amount - $payment->amount,
+            'status' =>  $status,
+          ]);
+
+          // delete all payments of authority invoice if any
+          $invoice->load('authorityInvoice.payments');
+          if (count(@$invoice->authorityInvoice->payments ?? [])) {
+            foreach ($invoice->authorityInvoice->payments as $payment) {
+              $this->deletePayment($payment);
+            }
+          }
+        }
+
+        $payment->delete();
       }
 
-      $invoice->update([
-        'paid_amount' => $invoice->paid_amount - $payment->amount,
-        'status' =>  $status,
-      ]);
-
-      $payment->delete();
+      DB::commit();
+    } catch (\Exception $e) {
+      DB::rollback();
+      throw $e;
     }
   }
 }

@@ -424,6 +424,7 @@ $(document).on('click', '.clear-form' , function(){
 $(document).on('click', '[data-toggle="ajax-delete"]', function () {
   dtrModal = $('.dtr-bs-modal.show');
   var url = $(this).data('href');
+  const warningDes = $(this).data('warning-des') ? $(this).data('warning-des') : "You won't be able to revert this!";
 
   // hide responsive modal in small screen
   if (dtrModal.length) {
@@ -433,7 +434,7 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
   // sweetalert for confirmation of delete
   Swal.fire({
     title: 'Are you sure?',
-    text: "You won't be able to revert this!",
+    text: warningDes,
     icon: 'warning',
     showCancelButton: true,
     confirmButtonText: 'Yes, delete it!',

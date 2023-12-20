@@ -35,7 +35,6 @@ class Transaction extends Model
     'type',
     'title',
     'data',
-    'remaining_balance',
     'description',
     'related_type',
     'related_id',
@@ -56,23 +55,9 @@ class Transaction extends Model
     return $this->attributes['amount'] = moneyToInt($value);
   }
 
-  public function getRemainingBalanceAttribute($value)
-  {
-    return $value / 1000;
-  }
-  public function setRemainingBalanceAttribute($value)
-  {
-    return $this->attributes['remaining_balance'] = moneyToInt($value);
-  }
-
   public function printableAmount()
   {
     return Money::{$this->accountBalance->currency}($this->amount, true)->format();
-  }
-
-  public function printableBalance()
-  {
-    return Money::{$this->accountBalance->currency}($this->remaining_balance, true)->format();
   }
 
   public function getAmount(): Money
@@ -115,5 +100,18 @@ class Transaction extends Model
   public function related()
   {
     return $this->morphTo();
+  }
+
+  /**
+   * override delete method to update account balance amount
+   */
+  public function delete()
+  {
+    // update account balance amount
+    $this->accountBalance->update([
+      'balance' => $this->accountBalance->balance - $this->amount
+    ]);
+
+    parent::delete();
   }
 }

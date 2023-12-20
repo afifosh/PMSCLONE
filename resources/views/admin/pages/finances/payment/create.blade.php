@@ -5,6 +5,7 @@
 @endif
 
 <div class="row add-payment-form">
+  @if(!$invoicePayment->id)
     {{-- Company --}}
     <div class="form-group col-6">
         {{ Form::label('company_id', __('Client'), ['class' => 'col-form-label']) }}
@@ -130,6 +131,7 @@
       {{ Form::label('amount', __('Amount'), ['class' => 'col-form-label']) }}
       {!! Form::number('amount', null, ['class' => 'form-control', 'placeholder' => __('0.0')]) !!}
     </div>
+@endif
 
     {{-- Transaction Id --}}
     <div class="form-group col-6">
