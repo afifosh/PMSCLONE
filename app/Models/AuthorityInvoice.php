@@ -107,6 +107,16 @@ class AuthorityInvoice extends Model
     $this->attributes['paid_rc_amount'] = moneyToInt($value);
   }
 
+  public function getRemainingRcAttribute()
+  {
+    return $this->total_rc - $this->paid_rc_amount;
+  }
+
+  public function getRemainingWhtAttribute()
+  {
+    return $this->total_wht - $this->paid_wht_amount;
+  }
+
   /**
    * Get the amount which can be paid against this invoice.
    */
@@ -198,5 +208,18 @@ class AuthorityInvoice extends Model
     $q->whereHas('invoice', function ($q) use ($admin_id) {
       $q->validAccessibleByAdmin($admin_id);
     });
+  }
+
+  /**
+   * Scope a query to only include invoices which are payable
+   */
+  public function scopePayable($q)
+  {
+    // invoice must have some amount to be paid and parent invoice must be paid
+    $q->where('total', '>', 0)
+      ->whereRaw('total - paid_rc_amount - paid_wht_amount > 0')
+      ->whereHas('invoice', function ($q) {
+        $q->where('status', 'Paid');
+      });
   }
 }

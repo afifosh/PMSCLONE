@@ -88,4 +88,14 @@ class InvoicePayment extends Model
   {
     return $this->belongsTo(Transaction::class, 'ba_trx_id');
   }
+
+  /**
+   * Override delete method to delete account transaction
+   */
+  public function delete()
+  {
+    $this->accountTransaction->delete();
+
+    return parent::delete();
+  }
 }

@@ -18,11 +18,6 @@
     </div>
 
     <div class="col-12 px-0 pb-3 d-lg-flex d-md-flex d-block">
-      <p class="mb-0 text-muted f-14 w-30 text-capitalize">New Balance : </p>
-      <p class="mb-0 text-dark-grey f-14 w-70 text-wrap">{{$transaction->printableBalance()}}</p>
-    </div>
-
-    <div class="col-12 px-0 pb-3 d-lg-flex d-md-flex d-block">
         <p class="mb-0 text-muted f-14 w-30 text-capitalize">Transaction Type : </p>
         <div class="mb-0 text-dark-grey f-14 w-70 text-wrap ql-editor p-0"><span
                 class="badge bg-label-{{$transaction->type == 'Debit' ? 'danger' : 'success'}}">{{$transaction->type}}</span></div>

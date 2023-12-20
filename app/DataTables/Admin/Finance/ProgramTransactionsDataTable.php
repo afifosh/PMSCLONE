@@ -78,7 +78,6 @@ class ProgramTransactionsDataTable extends DataTable
       Column::make('id'),
       Column::make('amount'),
       Column::make('type'),
-      Column::make('remaining_balance')->title('New Balance'),
       Column::make('title'),
       Column::make('created_at'),
     ];

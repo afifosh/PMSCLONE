@@ -976,4 +976,12 @@ class Invoice extends Model
       $q->validAccessibleByAdmin($admin_id);
     });
   }
+
+  /**
+   * Scope a query to only include invoices which are payable.
+   */
+  public function scopePayable($q)
+  {
+    $q->whereNotIn('status', ['Void', 'Paid']);
+  }
 }
