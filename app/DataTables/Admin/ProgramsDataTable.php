@@ -4,9 +4,9 @@ namespace App\DataTables\Admin;
 
 use App\Models\Program;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
@@ -22,10 +22,10 @@ class ProgramsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('name', function ($row) {
-        return '<a href="'.route('admin.programs.show', $row).'">'
-        ."<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'>"
-        ."<span class='mx-2'>".htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8')."</span>"
-        .'</a>';
+        return '<a href="' . route('admin.programs.show', $row) . '">'
+          . "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'>"
+          . "<span class='mx-2'>" . htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8') . "</span>"
+          . '</a>';
       })
       ->addColumn('parent', function (Program $program) {
         return @$program->parent->name ?? '-';
@@ -33,17 +33,20 @@ class ProgramsDataTable extends DataTable
       ->addColumn('children', function ($program) {
         return view('admin._partials.sections.programs-avatar-group', ['programs' => $program->children, 'limit' => 5]);
       })
-    ->addColumn('contracts_count', function ($program) {
-        return '<span class="badge badge-center rounded-pill bg-label-success">'.$program->contracts_count.'</span>';
-    })
-    ->orderColumn('contracts_count', function ($query, $order) {
-      $query->orderByRaw("(select count(*) from `contracts` where `programs`.`id` = `contracts`.`program_id` and `contracts`.`deleted_at` is null) $order");
-  })
+      ->addColumn('contracts_count', function ($program) {
+        return '<span class="badge badge-center rounded-pill bg-label-success">' . $program->contracts_count . '</span>';
+      })
+      ->addColumn('contracts_value', function ($program) {
+        return view('admin.pages.programs.contracts-value', compact('program'));
+      })
+      ->orderColumn('contracts_count', function ($query, $order) {
+        $query->orderByRaw("(select count(*) from `contracts` where `programs`.`id` = `contracts`.`program_id` and `contracts`.`deleted_at` is null) $order");
+      })
       ->addColumn('action', function (Program $program) {
         return view('admin.pages.programs.action', compact('program'));
       })
       ->setRowId('id')
-      ->rawColumns(['name','action','contracts_count']);
+      ->rawColumns(['name', 'action', 'contracts_count', 'contracts_value']);
   }
 
   /**
@@ -54,12 +57,31 @@ class ProgramsDataTable extends DataTable
    */
   public function query(Program $programs): QueryBuilder
   {
-  return $programs->validAccessibleByAdmin(auth()->id())
-                ->with('parent')
-                ->with('children') // Eager load the children relationship
-                ->withCount('contracts')
-                ->withCount('children'); // Get the count of children
-
+    return $programs->validAccessibleByAdmin(auth()->id())
+      ->with('parent:id,name')
+      ->with('children') // Eager load the children relationship
+      ->with('contracts:id,program_id')
+      ->leftjoin('contracts', 'programs.id', '=', 'contracts.program_id')
+      ->leftjoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+      ->leftjoin('authority_invoices', 'invoices.id', '=', 'authority_invoices.invoice_id')
+      ->select([
+        'programs.id',
+        'programs.name',
+        'programs.program_code',
+        'programs.parent_id',
+        'programs.updated_at',
+        DB::raw('COUNT(contracts.id) as contracts_count'),
+        DB::raw('SUM(invoices.total + authority_invoices.total)/1000 as invoices_total'),
+        DB::raw('SUM(invoices.paid_amount + authority_invoices.paid_wht_amount + authority_invoices.paid_rc_amount)/1000 as invoices_paid_amount'),
+        DB::raw('SUM(contracts.value)/1000 as contracts_value'),
+      ])
+      ->groupBy([
+        'programs.id',
+        'programs.name',
+        'programs.program_code',
+        'programs.parent_id',
+        'programs.updated_at',
+      ]);
   }
 
   /**
@@ -116,8 +138,7 @@ class ProgramsDataTable extends DataTable
       Column::make('contracts_count')->title('Number of Contracts'),
       Column::make('program_code'),
       Column::make('children')->title('Child Programs'),
-      // Column::make('description'),
-      // Column::make('created_at'),
+      Column::make('contracts_value')->title('Contracts Value'),
       Column::make('updated_at'),
     ];
   }

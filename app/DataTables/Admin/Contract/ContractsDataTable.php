@@ -26,12 +26,12 @@ class ContractsDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->editColumn('contracts.id', function ($contract) {
-        return view('admin.pages.contracts.name', ['contract_id' => $contract->id]);
-      })
       ->editColumn('subject', function ($contract) {
-        return $contract->subject ? $contract->subject : '-';
+        return view('admin.pages.contracts.subject', compact('contract'));
       })
+      // ->editColumn('subject', function ($contract) {
+      //   return $contract->subject ? $contract->subject : '-';
+      // })
       ->editColumn('program.name', function ($contract) {
         return $contract->program_id
             ? '<a href="' . route('admin.programs.show', $contract->program->id) . '">' . $contract->program->name . '</a>'
@@ -39,9 +39,6 @@ class ContractsDataTable extends DataTable
       })
       ->addColumn('action', function ($contract) {
         return view('admin.pages.contracts.action', compact('contract'));
-      })
-      ->addColumn('reviewed_by', function (Contract $contract) {
-        return view('admin._partials.sections.user-avatar-group', ['users' => $contract->reviewedBy, 'limit' => 5]);
       })
       ->addColumn('assigned_to', function ($project) {
         if ($project->assignable instanceof Company) {
@@ -53,27 +50,24 @@ class ContractsDataTable extends DataTable
       // ->editColumn('project.name', function ($project) {
       //   return $project->project ? $project->project->name : '-';
       // })
-      ->editColumn('type.name', function ($project) {
-        return $project->type ? $project->type->name : '-';
-      })
-      ->editColumn('category.name', function ($project) {
-        return $project->category ? $project->category->name : '-';
-      })
       ->editColumn('value', function (Contract $contract) {
         return view('admin.pages.contracts.value-column', compact('contract'));
       })
-      ->editColumn('start_date', function ($project) {
-        return $project->start_date ? $project->start_date->format('d M, Y') : '-';
+      ->editColumn('start_date', function ($contract) {
+        return $contract->start_date ? $contract->start_date->format('d M, Y') : '-';
       })
-      ->editColumn('end_date', function ($project) {
-        return $project->end_date ? $project->end_date->format('d M, Y') : '-';
+      ->editColumn('end_date', function ($contract) {
+        return $contract->end_date ? $contract->end_date->format('d M, Y') : '-';
+      })
+      ->editColumn('status', function ($contract) {
+        return view('admin.pages.contracts.status', ['status' => $contract->status]);
       })
       ->filterColumn('assigned_to', function ($query, $keyword) {
         $query->whereHasMorph('assignable', Company::class, function ($q) use ($keyword) {
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
         });
       })
-      ->rawColumns(['id', 'program.name','reviewed_by']);
+      ->rawColumns(['subject', 'program.name', 'status']);
   }
 
 /**
@@ -130,7 +124,7 @@ public function query(Contract $model): QueryBuilder
             'contracts.assignable_id',
             'assignable_type'
         ])
-        ->with(['type', 'assignable.detail', 'category']);
+        ->with(['assignable.detail']);
 
     // If a projectId is provided, filter by it
     if ($this->projectId) {
@@ -199,16 +193,13 @@ public function query(Contract $model): QueryBuilder
   public function getColumns(): array
   {
     return [
-      Column::make('contracts.id')->title('Contract'),
+      // Column::make('contracts.id')->title('Contract'),
       Column::make('subject')->title('Subject'),
       Column::make('program.name')->name('programs.name')->title('Program'),
       Column::make('refrence_id')->title('Ref ID'),
       Column::make('assigned_to')->title('Assigned To'),
-      Column::make('type.name')->title('Type'),
-      Column::make('category.name')->title('Category'),
       Column::make('value')->title('Amount'),
       // Column::make('paid_percent')->title('Paid')->searchable(false),
-      Column::make('reviewed_by')->title('Reviewed By'),
       Column::make('start_date'),
       Column::make('end_date'),
       // Column::make('phases_count')->title('Phases')->searchable(false),
