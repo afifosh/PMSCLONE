@@ -43,6 +43,24 @@ class TaxSeeder extends Seeder
         'config_type' => 'Retention',
       ]);
 
+      // 10% Retention
+      InvoiceConfig::create([
+        'name' => '10% Retention',
+        'type' => 'Percent',
+        'amount' => 10,
+        'status' => 'Active',
+        'config_type' => 'Retention',
+      ]);
+
+      // 15% Retention
+      InvoiceConfig::create([
+        'name' => '15% Retention',
+        'type' => 'Percent',
+        'amount' => 15,
+        'status' => 'Active',
+        'config_type' => 'Retention',
+      ]);
+
 
       // 5% Down Payment
       InvoiceConfig::create([
@@ -72,6 +90,16 @@ class TaxSeeder extends Seeder
         'config_type' => 'Tax',
         'category' => 3, // Reverse Charge Tax
       ]);
+
+      // 15% Reverse Charge Tax
+      InvoiceConfig::create([
+        'name' => '15% Reverse Charge',
+        'type' => 'Percent',
+        'amount' => 15,
+        'status' => 'Active',
+        'config_type' => 'Tax',
+        'category' => 3, // Reverse Charge Tax
+      ]);      
 
       // 5% Withholding Tax
       InvoiceConfig::create([
