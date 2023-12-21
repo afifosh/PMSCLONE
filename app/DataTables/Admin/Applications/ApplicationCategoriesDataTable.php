@@ -19,9 +19,9 @@ class ApplicationCategoriesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->addColumn('action', function (ApplicationCategory $applicationCategory) {
-        return view('admin.pages.applications.categories.action', compact('applicationCategory'));
-      });
+    ->addColumn('action', function($category){
+      return view('admin.pages.applications.categories.action', compact('category'));
+    });
   }
 
   /**
@@ -29,7 +29,7 @@ class ApplicationCategoriesDataTable extends DataTable
    */
   public function query(ApplicationCategory $model): QueryBuilder
   {
-    return $model->newQuery();
+    return $model->withCount('applications')->newQuery();
   }
 
   /**
@@ -49,7 +49,7 @@ class ApplicationCategoriesDataTable extends DataTable
     ];
 
     return $this->builder()
-      ->setTableId('application-categories-table')
+      ->setTableId('application-categories-datatable')
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
