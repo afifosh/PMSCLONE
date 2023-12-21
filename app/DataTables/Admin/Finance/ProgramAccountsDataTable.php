@@ -26,27 +26,7 @@ class ProgramAccountsDataTable extends DataTable
         return '<a href="'.route('admin.finances.program-accounts.transactions.index', $account->id).'">'.$formattedAccountNumber.'</a>';
     })
     ->addColumn('account_holder', function($account) {
-        // Ensure that the relationship is loaded to optimize performance
-        if (!$account->relationLoaded('programs')) {
-          $account->load('programs');
-      }
-
-      // // Fetch the names of the programs and concatenate them.
-      // return $account->programs->pluck('name')->implode(', ');
-        // Iterate through each program and format the output
-        // Iterate through each program and format the output
-        $programsOutput = $account->programs->map(function($program) {
-          $name = htmlspecialchars($program->name, ENT_QUOTES, 'UTF-8');
-          $avatarSrc = $program->avatar; // Get the program's avatar
-
-          return "<li data-bs-toggle='tooltip' data-popup='tooltip-custom' data-bs-placement='top' class='avatar pull-up' aria-label='$name' data-bs-original-title='$name'>
-              <img class='avatar avatar-sm rounded-circle' src='$avatarSrc' alt='$name'/>
-          </li>";
-      });
-
-      return "<ul class='list-unstyled m-0 d-flex align-items-center avatar-group'>" . $programsOutput->implode('') . "</ul>"; // Wrap the list items in an unordered list
-
-
+      return view('admin._partials.sections.programs-avatar-group', ['programs' => $account->programs, 'limit' => 5]);
       })->escapeColumns([])
 
     ->editColumn('balance', function($account){
@@ -63,7 +43,7 @@ class ProgramAccountsDataTable extends DataTable
    */
   public function query(AccountBalance $model): QueryBuilder
   {
-    return $model->has('programs')->with('related.holders')->withCount('transactions')->newQuery();
+    return $model->has('programs')->with(['programs', 'related.holders'])->withCount('transactions')->newQuery();
   }
 
   /**
