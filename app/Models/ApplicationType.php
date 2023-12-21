@@ -23,7 +23,7 @@ class ApplicationType extends Model
    */
   public function applications()
   {
-    return $this->hasMany(Application::class);
+    return $this->hasMany(Application::class, 'type_id');
   }
 
   /**

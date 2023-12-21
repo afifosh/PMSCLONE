@@ -19,8 +19,8 @@ class ApplicationTypesDataTable extends DataTable
   public function dataTable(QueryBuilder $query): EloquentDataTable
   {
     return (new EloquentDataTable($query))
-      ->addColumn('action', function (ApplicationType $applicationType) {
-        return view('admin.pages.applications.types.action', compact('applicationType'));
+      ->addColumn('action', function (ApplicationType $type) {
+        return view('admin.pages.applications.types.action', compact('type'));
       });
   }
 
@@ -29,7 +29,7 @@ class ApplicationTypesDataTable extends DataTable
    */
   public function query(ApplicationType $model): QueryBuilder
   {
-    return $model->newQuery();
+    return $model->withCount('applications')->newQuery();
   }
 
   /**
@@ -49,7 +49,7 @@ class ApplicationTypesDataTable extends DataTable
     ];
 
     return $this->builder()
-      ->setTableId('application-types-table')
+      ->setTableId('application-types-datatable')
       ->columns($this->getColumns())
       ->minifiedAjax()
       ->dom(
@@ -74,6 +74,7 @@ class ApplicationTypesDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('name'),
+      Column::make('applications_count')->title('Applications'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

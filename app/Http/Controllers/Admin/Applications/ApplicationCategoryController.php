@@ -40,7 +40,7 @@ class ApplicationCategoryController extends Controller
   /**
    * Display the specified resource.
    */
-  public function show(ApplicationCategory $applicationCategory)
+  public function show(ApplicationCategory $category)
   {
     //
   }
@@ -48,21 +48,21 @@ class ApplicationCategoryController extends Controller
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit(ApplicationCategory $applicationCategory)
+  public function edit(ApplicationCategory $category)
   {
-    return $this->sendRes('success', ['view_data' => view('admin.pages.applications.categories.edit', ['category' => $applicationCategory])->render()]);
+    return $this->sendRes('success', ['view_data' => view('admin.pages.applications.categories.edit', ['category' => $category])->render()]);
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, ApplicationCategory $applicationCategory)
+  public function update(Request $request, ApplicationCategory $category)
   {
     $request->validate([
-      'name' => 'required|string|max:255|unique:application_categories,name,' . $applicationCategory->id . ',id',
+      'name' => 'required|string|max:255|unique:application_categories,name,' . $category->id . ',id',
     ]);
 
-    $applicationCategory->update(['name' => $request->name]);
+    $category->update(['name' => $request->name]);
 
     return $this->sendRes('Category updated successfully', ['event' => 'table_reload', 'table_id' => 'application-categories-datatable', 'close' => 'globalModal']);
   }
@@ -70,14 +70,14 @@ class ApplicationCategoryController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(ApplicationCategory $applicationCategory)
+  public function destroy(ApplicationCategory $category)
   {
-    if($applicationCategory->applications()->count() > 0) {
+    if($category->applications()->count() > 0) {
       return $this->sendErr('Category is in use');
     }
 
     try {
-      $applicationCategory->delete();
+      $category->delete();
     } catch (\Exception $e) {
       return $this->sendErr('Error deleting category: ' . $e->getMessage());
     }

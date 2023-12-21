@@ -74,6 +74,7 @@ class ApplicationCategoriesDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('name'),
+      Column::make('applications_count')->title('Applications'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

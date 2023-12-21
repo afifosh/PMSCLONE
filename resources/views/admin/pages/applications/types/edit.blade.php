@@ -1,13 +1,13 @@
-@if ($category->id)
-    {!! Form::model($category, ['route' => ['admin.project-categories.update', $category->id], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
+@if ($type->id)
+    {!! Form::model($type, ['route' => ['admin.applications.settings.types.update', $type->id], 'method' => 'PUT', 'enctype' => 'multipart/form-data']) !!}
 @else
-    {!! Form::model($category, ['route' => ['admin.project-categories.store'], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
+    {!! Form::model($type, ['route' => ['admin.applications.settings.types.store'], 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
 @endif
- {{ dd($category); }}
+
 <div class="row">
     <div class="form-group col-12">
-        {{ Form::label('name', __('Category Name'), ['class' => 'col-form-label']) }}
-        {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Category Name')]) !!}
+        {{ Form::label('name', __('Type Name'), ['class' => 'col-form-label']) }}
+        {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Type Name')]) !!}
     </div>
 </div>
 
