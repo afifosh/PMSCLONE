@@ -301,6 +301,60 @@
       ]
     },
     {
+      "name": "Applications",
+      "icon": "menu-icon tf-icons ti ti-notes",
+      "slug": ["admin.applications."],
+      "submenu": [
+        {
+          "url": "/admin/applications",
+          "name": "Applications",
+          "slug": "admin.applications.index"
+        },
+        {
+          "url": "/admin/application-submissions",
+          "name": "Submissions",
+          "slug": "admin.application-submissions.index"
+        },
+        {
+          "name": "Settings",
+          "slug": ["admin.applications.settings"],
+          "submenu": [
+            {
+              "name": "Forms",
+              "slug": ["admin.applications.settings.forms"],
+              "submenu": [
+                {
+                  "url": "/admin/applications/settings/forms/to-add",
+                  "name": "To Add",
+                  "slug": "admin.applications.settings.forms."
+                }
+              ]
+            },
+            {
+              "url": "/admin/applications/settings/categories",
+              "name": "Categories",
+              "slug": "admin.applications.settings.categories.index"
+            },
+            {
+              "url": "/admin/applications/settings/types",
+              "name": "Types",
+              "slug": "admin.applications.settings.types.index"
+            },
+            {
+              "url": "/admin/applications/settings/pipelines",
+              "name": "Pipelines",
+              "slug": "admin.applications.settings.pipelines.index"
+            },
+            {
+              "url": "/admin/applications/settings/scorecards",
+              "name": "Scorecards",
+              "slug": "admin.applications.settings.scorecards.index"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "url": "/admin/private-notes",
       "name": "Notes",
       "icon": "menu-icon tf-icons ti ti-notes",

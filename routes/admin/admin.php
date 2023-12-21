@@ -7,6 +7,11 @@ use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminUsersController;
+use App\Http\Controllers\Admin\Applications\ApplicationCategoryController;
+use App\Http\Controllers\Admin\Applications\ApplicationController;
+use App\Http\Controllers\Admin\Applications\ApplicationPipelineController;
+use App\Http\Controllers\Admin\Applications\ApplicationScoreCardController;
+use App\Http\Controllers\Admin\Applications\ApplicationTypeController;
 use App\Http\Controllers\Admin\Company\ApprovalRequestController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
@@ -535,6 +540,17 @@ Route::prefix('contracts')->group(function () {
     Route::resource('admin-access-lists', AdminAccessListController::class);
     Route::resource('admin-access-lists.programs', AdminAccessListProgramController::class);
     Route::resource('admin-access-lists.contracts', AdminAccessListContractController::class);
+
+    // apllications
+    Route::resource('applications', ApplicationController::class);
+    Route::prefix('applications')->name('applications.')->group(function () {
+      Route::prefix('settings')->name('settings.')->group(function () {
+        Route::resource('categories', ApplicationCategoryController::class);
+        Route::resource('types', ApplicationTypeController::class);
+        Route::resource('pipelines', ApplicationPipelineController::class);
+        Route::resource('scorecards', ApplicationScoreCardController::class);
+      });
+    });
   });
 });
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);

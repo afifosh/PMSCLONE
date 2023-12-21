@@ -1,0 +1,1 @@
+<img class='avatar avatar-sm pull-up rounded-circle' src="{{$program->avatar}}" alt='Avatar'><span class='mx-2'><a href="{{ isset($url) && $url ? $url : route('admin.programs.show', $program) }}">{{ $program->name }}</a></span>

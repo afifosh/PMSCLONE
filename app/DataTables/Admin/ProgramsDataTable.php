@@ -22,10 +22,7 @@ class ProgramsDataTable extends DataTable
   {
     return (new EloquentDataTable($query))
       ->editColumn('name', function ($row) {
-        return '<a href="' . route('admin.programs.show', $row) . '">'
-          . "<img class='avatar avatar-sm pull-up rounded-circle' src='$row->avatar' alt='Avatar'>"
-          . "<span class='mx-2'>" . htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8') . "</span>"
-          . '</a>';
+        return view('admin._partials.sections.program-avatar', ['program' => $row]);
       })
       ->addColumn('parent', function (Program $program) {
         return @$program->parent->name ?? '-';

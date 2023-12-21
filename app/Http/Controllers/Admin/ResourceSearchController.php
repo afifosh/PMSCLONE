@@ -87,6 +87,22 @@ class ResourceSearchController extends Controller
         'search' => 'name',
         'select' => ['name as text', 'id']
       ],
+      'ApplicationType' => [
+        'search' => 'name',
+        'select' => ['name as text', 'id']
+      ],
+      'ApplicationCategory' => [
+        'search' => 'name',
+        'select' => ['name as text', 'id']
+      ],
+      'ApplicationPipeline' => [
+        'search' => 'name',
+        'select' => ['name as text', 'id']
+      ],
+      'ApplicationScoreCard' => [
+        'search' => 'name',
+        'select' => ['name as text', 'id']
+      ],
       'Currency' => [],
       'Owner' => [],
       'InvoiceOrAuthorityInvoice' => []

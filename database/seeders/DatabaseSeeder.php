@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Admin;
+use App\Models\ApplicationType;
 use App\Models\Company;
 use App\Models\Medium;
 use App\Models\User;
@@ -30,6 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call(HRSeeder::class);
         $this->call(CompanySeeder::class);
         $this->call(ProgramSeeder::class);
+        $this->call(AdminAccessListSeeder::class); // give all programs access to adimin 1
         $this->call(ProjectCategorySeeder::class);
         $this->call(ProjectSeeder::class);
         // $this->call(AccountBalanceHolderSeeder::class);
@@ -45,5 +47,11 @@ class DatabaseSeeder extends Seeder
         $this->call(ArtworkSeeder::class);
         $this->call(LocationSeeder::class);
         $this->call(MediumSeeder::class);
+        // applications seeders
+        $this->call(ApplicationTypeSeeder::class);
+        $this->call(ApplicationCategorySeeder::class);
+        $this->call(ApplicationPipelineSeeder::class);
+        $this->call(ApplicationScoreCardSeeder::class);
+        $this->call(ApplicationSeeder::class);
     }
 }
