@@ -46,9 +46,7 @@ class Accountant
     $accountBalance = AccountBalance::create([
       'currency' => $data['currency'] ?? config('money.defaults.currency'),
       'account_number' => $data['account_number'] ?? null,
-      'name' => $data['name'] ?? null,
-      'creator_id' => auth()->id() ?? null,
-      'creator_type' => auth()->check() ? get_class(auth()->user()) : null,
+      'name' => $data['name'] ?? null
     ]);
 
     if ($accountBalanceHolder instanceof Collection) {

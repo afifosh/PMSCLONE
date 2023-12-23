@@ -12,6 +12,11 @@ use App\Http\Controllers\Admin\Applications\ApplicationController;
 use App\Http\Controllers\Admin\Applications\ApplicationPipelineController;
 use App\Http\Controllers\Admin\Applications\ApplicationScoreCardController;
 use App\Http\Controllers\Admin\Applications\ApplicationTypeController;
+use App\Http\Controllers\Admin\Applications\Form\FormCommentsController;
+use App\Http\Controllers\Admin\Applications\Form\FormCommentsReplyController;
+use App\Http\Controllers\Admin\Applications\Form\FormController;
+use App\Http\Controllers\Admin\Applications\Form\FormTemplateController;
+use App\Http\Controllers\Admin\Applications\Form\FormValueController;
 use App\Http\Controllers\Admin\Company\ApprovalRequestController;
 use App\Http\Controllers\Admin\Company\ContactPersonController;
 use App\Http\Controllers\Admin\Company\InvitationController;
@@ -545,6 +550,54 @@ Route::prefix('contracts')->group(function () {
     Route::resource('applications', ApplicationController::class);
     Route::prefix('applications')->name('applications.')->group(function () {
       Route::prefix('settings')->name('settings.')->group(function () {
+        Route::resource('forms', FormController::class)->except(['show']);
+        Route::get('forms/add', [FormController::class, 'addForm'])->name('forms.add');
+        Route::get('forms/use/template/{id}', [FormController::class, 'useFormtemplate'])->name('forms.use.template');
+        Route::post('forms/status/{id}', [FormController::class, 'formStatus'])->name('form.status');
+        // forms
+        Route::get('forms/design/{id}', [FormController::class, 'design'])->name('forms.design');
+        Route::group(['prefix' => 'forms'], function () {
+          Route::get('themes/{id}', [FormController::class, 'formTheme'])->name('form.theme');
+          Route::get('themes/edit/{theme}/{id}', [FormController::class, 'formThemeEdit'])->name('form.theme.edit');
+          Route::post('themes/update/{id}', [FormController::class, 'formThemeUpdate'])->name('form.theme.update');
+          Route::post('themes/change/{id}', [FormController::class, 'themeChange'])->name('form.theme.change');
+
+          Route::get('rules/{id}', [FormController::class, 'formRules'])->name('form.rules');
+          Route::post('rule/store', [FormController::class, 'storeRule'])->name('rule.store');
+          Route::get('rule/{id}/edit', [FormController::class, 'editRule'])->name('rule.edit');
+          Route::patch('rule/{id}/update', [FormController::class, 'ruleUpdate'])->name('rule.update');
+          Route::delete('rule/{id}/delete', [FormController::class, 'ruleDelete'])->name('rule.delete');
+          Route::get('get/rules', [FormController::class, 'getField'])->name('get.field');
+
+          Route::get('grid/{id?}', [FormController::class, 'gridView'])->name('grid.form.view');
+          Route::post('status/{id}', [FormController::class, 'formStatus'])->name('form.status');
+        });
+
+        Route::post('form/comment/store', [FormCommentsController::class, 'store'])->name('form.comment.store');
+        Route::delete('form/comment/{id}/destroy', [FormCommentsController::class, 'destroy'])->name('form.comment.destroy');
+        Route::post('form/comment/reply/store', [FormCommentsReplyController::class, 'store'])->name('form.comment.reply.store');
+        // Form Builder
+        Route::get('forms/{id}/fill', [FormController::class, 'fill'])->name('forms.fill');
+        // Route::get('forms/survey/{id}', [FormController::class, 'publicFill'])->name('forms.survey');
+        Route::resource('form-values', FormValueController::class);
+
+        Route::get('form-values/{id}/edit', [FormValueController::class, 'edit'])->name('edit.form.values');
+        Route::get('form-values/{id}/view', [FormValueController::class, 'showSubmitedForms'])->name('view.form.values');
+        Route::post('form-duplicate', [FormController::class, 'duplicate'])->name('forms.duplicate');
+        Route::post('ckeditors/upload', [FormController::class, 'ckupload'])->name('ckeditors.upload');
+        Route::post('ckeditor/upload', [FormController::class, 'upload'])->name('ckeditor.upload');
+        Route::get('design/{id}', [FormController::class, 'design'])->name('forms.design');
+        Route::put('forms/{id}/design', [FormController::class, 'designUpdate'])->name('forms.design.update');
+        Route::post('form-values/excel', [FormValueController::class, 'exportXlsx'])->name('download.form.values.excel');
+
+        Route::get('form-values/{id}/download/pdf', [FormValueController::class, 'downloadPdf'])->name('download.form.values.pdf');
+        //Form Template
+
+        Route::resource('form-templates', FormTemplateController::class);
+        Route::post('form-template/status/{id}', [FormTemplateController::class, 'status'])->name('formTemplate.status');
+        Route::get('form-template/design/{id}', [FormTemplateController::class, 'design'])->name('formTemplate.design');
+        Route::put('form-template/design/update/{id}', [FormTemplateController::class, 'designUpdate'])->name('form.template.design.update');
+
         Route::resource('categories', ApplicationCategoryController::class);
         Route::resource('types', ApplicationTypeController::class);
         Route::resource('pipelines', ApplicationPipelineController::class);
@@ -553,6 +606,12 @@ Route::prefix('contracts')->group(function () {
     });
   });
 });
+Route::put('forms/fill/{id}', [FormController::class, 'fillStore'])->name('admin.applications.settings.forms.fill.store');
+Route::post('dropzone/upload/{id}', [FormController::class, 'dropzone'])->name('dropzone.upload');
+Route::post('files/video/store', [FormValueController::class, 'VideoStore'])->name('videostore');
+Route::get('download-image/{id}', [FormValueController::class, 'SelfieDownload'])->name('selfie.image.download');
+Route::get('forms/survey/{id}', [FormController::class, 'publicFill'])->name('admin.applications.settings.forms.survey');
+Route::get('forms/qr/{id}', [FormController::class, 'qrCode'])->name('admin.applications.settings.forms.survey.qr');
 Route::get('/media/{token}/download', [MediaViewController::class, 'download']);
 Route::get('/resource-select/{resource}', [ResourceSearchController::class, 'index'])->name('resource-select');
 Route::get('/resource-select-user/{resource}', [ResourceSearchController::class, 'userSelect'])->name('resource-select-user');

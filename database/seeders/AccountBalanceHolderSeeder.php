@@ -21,9 +21,7 @@ class AccountBalanceHolderSeeder extends Seeder
             // Create an AccountBalance for each Program
             $accountBalance = AccountBalance::factory()->create([
                 'name' => $program->name,  // Set the name based on the Program's name
-                'account_number' => $uniqueAccountNumber,
-                'creator_id' => $program->id,
-                'creator_type' => get_class($program),
+                'account_number' => $uniqueAccountNumber
             ]);
 
             // create permissions for the account balance

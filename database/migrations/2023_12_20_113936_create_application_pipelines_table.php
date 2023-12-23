@@ -14,6 +14,7 @@ return new class extends Migration
     Schema::create('application_pipelines', function (Blueprint $table) {
       $table->id();
       $table->string('name');
+      $table->json('stages')->nullable();
       $table->timestamps();
     });
   }

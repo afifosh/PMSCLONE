@@ -193,6 +193,7 @@ return [
         App\Providers\TelescopeServiceProvider::class,
         App\Providers\MenuServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
+        App\Providers\UtilityFacadesServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         Laravolt\Avatar\ServiceProvider::class,
@@ -217,6 +218,9 @@ return [
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
         'Avatar'    => Laravolt\Avatar\Facade::class,
         'Agent' => Jenssegers\Agent\Facades\Agent::class,
+        'Utility' => App\Facades\UtilityFacades::class,
+        'Hashids' => Hashids\Hashids::class,
+        // 'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
     ])->toArray(),
 
 ];

@@ -321,12 +321,17 @@
           "submenu": [
             {
               "name": "Forms",
-              "slug": ["admin.applications.settings.forms"],
+              "slug": ["admin.applications.settings.forms", "admin.applications.settings.form-templates"],
               "submenu": [
                 {
-                  "url": "/admin/applications/settings/forms/to-add",
-                  "name": "To Add",
-                  "slug": "admin.applications.settings.forms."
+                  "url": "/admin/applications/settings/forms",
+                  "name": "Forms",
+                  "slug": "admin.applications.settings.forms.index"
+                },
+                {
+                  "url": "/admin/applications/settings/form-templates",
+                  "name": "Form Templates",
+                  "slug": "admin.applications.settings.form-templates.index"
                 }
               ]
             },

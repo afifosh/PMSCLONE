@@ -15,9 +15,7 @@ class AccountBalanceFactory extends Factory
             'name' => $this->faker->name,
             'account_number' => $this->faker->unique()->bankAccountNumber, // Note that your model already generates unique numbers if this field is null
             'currency' => 'SAR',
-            'balance' => 0,
-            'creator_id' => null,  // Replace with actual data or factory if needed
-            'creator_type' => null, // Replace with actual data or factory if needed
+            'balance' => 0
         ];
     }
 }

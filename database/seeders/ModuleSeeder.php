@@ -102,6 +102,12 @@ class ModuleSeeder extends Seeder
         ['module' => 'Retentions', 'permissions' => ['read retention', 'create retention', 'update retention', 'delete retention']],
         ['module' => 'Down payments', 'permissions' => ['read downpayment', 'create downpayment', 'update downpayment', 'delete downpayment']],
 
+        // forms
+        ['module' => 'Forms', 'permissions' => ['read form', 'create form', 'update form', 'delete form', 'export form', 'design form', 'duplicate form']],
+        ['module' => 'Form Rules', 'permissions' => ['read form rule', 'create form rule', 'update form rule', 'delete form rule']],
+        ['module' => 'Form Templates', 'permissions' => ['read form template', 'create form template', 'update form template', 'delete form template', 'export form template']],
+        ['module' => 'Form Submissions', 'permissions' => ['read submitted form', 'update submitted form', 'delete submitted form', 'export submitted form']],
+
       ],
       'web' => [
         ['module' => 'User Management', 'permissions' => ['read user', 'create user', 'update user', 'delete user']],

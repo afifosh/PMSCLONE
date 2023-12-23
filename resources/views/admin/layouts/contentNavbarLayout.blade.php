@@ -56,6 +56,9 @@ $container = ($container ?? 'container-xxl');
           @else
           <div class="{{$container}} flex-grow-1 container-p-y">
             @endif
+            <div class="row align-items-center d-flex">
+              @yield('breadcrumb')
+            </div>
 
             @yield('content')
 

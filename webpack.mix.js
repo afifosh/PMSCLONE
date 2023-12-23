@@ -141,6 +141,8 @@ mixAssetsDir('vendor/fonts/!(_)*.scss', (src, dest) =>
 mixAssetsDir('js/**/*.js', (src, dest) => mix.scripts(src, dest));
 mixAssetsDir('css/**/*.css', (src, dest) => mix.copy(src, dest));
 mixAssetsDir('img/**/*.*', (src, dest) => mix.copy(src, dest));
+mixAssetsDir('form-themes/**/*.*', (src, dest) => mix.copy(src, dest));
+mixAssetsDir('images/**/*.*', (src, dest) => mix.copy(src, dest));
 
 // full libs
 mixAssetsDir('libs/**/*.*', (src, dest) => mix.copy(src, dest));

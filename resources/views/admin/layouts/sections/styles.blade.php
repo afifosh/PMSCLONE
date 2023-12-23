@@ -22,6 +22,7 @@
 
 <!-- Vendor Styles -->
 @yield('vendor-style')
+@stack('style')
 
 
 <!-- Page Styles -->
