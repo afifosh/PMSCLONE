@@ -11,6 +11,35 @@ class AccountBalanceHolderSeeder extends Seeder
 {
     public function run()
     {
+
+
+        // Select all Program instances
+        $allPrograms = Program::all();
+
+        // Create a unique Account Number for the 'Reverse Charge' Account
+        $uniqueAccountNumber = AccountBalance::createUniqueAccountNumber();
+
+        // Create a single 'Reverse Charge' AccountBalance
+        $reverseChargeAccountBalance = AccountBalance::factory()->create([
+            'name' => "Reverse Charge",  // Set the name to "Reverse Charge"
+            'account_number' => $uniqueAccountNumber,
+        ]);
+
+        // Create the 'Reverse Charge' permission for this account balance
+        $reverseChargeAccountBalance->permissions()->create([
+            'permission' => 2 // Pay Reverse Charge
+        ]);
+
+        // Create an AccountBalanceHolder linking each All Program to the Reverse Charge AccountBalance
+        $allPrograms->each(function ($Program) use ($reverseChargeAccountBalance) {
+            AccountBalanceHolder::create([
+                'account_balance_id' => $reverseChargeAccountBalance->id,
+                'holder_type' => get_class($Program),
+                'holder_id' => $Program->id,
+            ]);
+        });
+
+
         // Select all Program instances where parent_id = 1
         $programs = Program::where('parent_id', 1)->get();
 
@@ -25,10 +54,11 @@ class AccountBalanceHolderSeeder extends Seeder
             ]);
 
             // create permissions for the account balance
+
             $accountBalance->permissions()->createMany([
-              ['permission' => 1],
-              ['permission' => 2],
-              ['permission' => 3]
+                ['permission' => 1], // Pay Regular Invoice
+            //  ['permission' => 2], // Pay Reverse Charge
+                ['permission' => 3]  // Pay Withholding Tax
             ]);
 
             // Get all child programs for the current program
