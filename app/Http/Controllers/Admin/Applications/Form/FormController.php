@@ -817,7 +817,7 @@ class FormController extends Controller
                 $successMsg = strip_tags($form->success_msg);
             }
 
-            Form::integrationFormData($form, $formValue);
+            // Form::integrationFormData($form, $formValue);
 
             if (isset($request->ajax)) {
                 return response()->json(['is_success' => true, 'message' => $successMsg, 'redirect' => route('admin.applications.settings.edit.form.values', $formValue->id)], 200);

@@ -18,7 +18,7 @@ class ApplicationController extends Controller
   public function create()
   {
     $application = new Application();
-    return $this->sendRes('success', ['view_data' => view('admin.pages.applications.create', compact('application'))->render()]);
+    return view('admin.pages.applications.create', compact('application'));
   }
 
   public function store(ApplicationStoreRequest $request)
@@ -45,7 +45,7 @@ class ApplicationController extends Controller
     $data['users'] = $application->users->pluck('name', 'id')->toArray();
     $data['selectedUsers'] = $application->users->pluck('id')->toArray();
 
-    return $this->sendRes('success', ['view_data' => view('admin.pages.applications.create', $data)->render()]);
+    return view('admin.pages.applications.create', $data);
   }
 
   public function update(Application $application, ApplicationStoreRequest $request)

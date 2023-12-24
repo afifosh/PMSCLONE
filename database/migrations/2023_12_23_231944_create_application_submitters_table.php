@@ -11,9 +11,10 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('application_pipelines', function (Blueprint $table) {
+    Schema::create('application_submitters', function (Blueprint $table) {
       $table->id();
-      $table->string('name');
+      $table->foreignId('application_id')->constrained()->cascadeOnDelete();
+      $table->morphs('submitter');
       $table->timestamps();
     });
   }
@@ -23,6 +24,6 @@ return new class extends Migration
    */
   public function down(): void
   {
-    Schema::dropIfExists('application_pipelines');
+    Schema::dropIfExists('application_submitters');
   }
 };

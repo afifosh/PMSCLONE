@@ -81,10 +81,10 @@ class Application extends Model
   /**
    * Form used for this application submission
    */
-  // public function form()
-  // {
-  //   // return $this->belongsTo();
-  // }
+  public function form()
+  {
+    return $this->belongsTo(Form::class);
+  }
 
   /**
    * Applications users, which can intereact with the application
@@ -104,5 +104,13 @@ class Application extends Model
         $q->where('admin_id', auth()->id());
       });
     });
+  }
+
+  /**
+   * Polymorphic models that can submit this application
+   */
+  public function submitters()
+  {
+    return $this->morphToMany(ApplicationSubmitter::class, 'submitter');
   }
 }

@@ -103,6 +103,10 @@ class ResourceSearchController extends Controller
         'search' => 'name',
         'select' => ['name as text', 'id']
       ],
+      'Form' => [
+        'search' => 'title',
+        'select' => ['title as text', 'id']
+      ],
       'Currency' => [],
       'Owner' => [],
       'InvoiceOrAuthorityInvoice' => []

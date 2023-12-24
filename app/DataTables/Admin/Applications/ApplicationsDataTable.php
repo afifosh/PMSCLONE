@@ -57,6 +57,8 @@ class ApplicationsDataTable extends DataTable
       'text' => '<i class="ti ti-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Create Application</span>',
       'className' =>  'btn btn-primary mx-3',
       'attr' => [
+        // onclick => "window.location.href='" . route('admin.applications.create') . "'"
+        'onclick' => "window.location.href='" . route('admin.applications.create') . "'",
         'data-toggle' => "ajax-modal",
         'data-title' => 'Create Application',
         'data-href' => route('admin.applications.create')
