@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\Mail;
 use Spatie\MailTemplates\Models\MailTemplate;
 use App\Http\Controllers\Controller;
 
-class FormController extends Controller
+class FormControllerBackup extends Controller
 {
     public function index(FormsDataTable $dataTable)
     {
@@ -57,9 +57,15 @@ class FormController extends Controller
 
     public function create()
     {
-      abort_if(!iCan('create form'), 403, __('Unauthorized'));
-
-      return view('admin.pages.applications.form.create');
+        if (auth()->user()->can('create form')) {
+            // $users = User::where('id', '!=', 1)->pluck('name', 'id');
+            // $roles = Role::where('name', '!=', 'Super Admin')
+            //     ->orwhere('name', Auth::user()->type)
+            //     ->pluck('name', 'id');
+            return view('admin.pages.applications.form.create');
+        } else {
+            return response()->json(['failed' => __('Permission denied.')], 401);
+        }
     }
 
     public function useFormtemplate($id)
@@ -365,39 +371,57 @@ class FormController extends Controller
 
     public function design($id)
     {
-      abort_if(!iCan('design form'), 403, __('Unauthorized'));
-
-      $form = Form::find($id);
-      $definition = $form->json;
-      if ($form) {
-          return view('admin.pages.applications.form.design', compact('form', 'definition'));
-      } else {
-          return redirect()->back()->with('failed', __('Form not found.'));
-      }
+        if (auth()->user()->can('design form')) {
+            $form = Form::find($id);
+            if ($form) {
+                return view('admin.pages.applications.form.design', compact('form'));
+            } else {
+                return redirect()->back()->with('failed', __('Form not found.'));
+            }
+        } else {
+            return redirect()->back()->with('failed', __('Permission denied.'));
+        }
     }
 
 
-    public function designUpdate(Form $id, Request $request)
+    public function designUpdate(Request $request, $id)
     {
-      abort_if(!iCan('design form'), 403, __('Unauthorized'));
-
-      $request->validate([
-        'definition' => 'required|json'
-      ]);
-
-      $id->update(['json' => $request->definition ]);
-
-      return $this->sendRes(__('Form design updated successfully'), ['event' => 'redirect', 'url' => route('admin.applications.settings.forms.index')]);
+        if (auth()->user()->can('design form')) {
+            $form           = Form::find($id);
+            if ($form) {
+                $form->json = $request->json;
+                $fieldName = json_decode($request->json);
+                $arr        = [];
+                foreach ($fieldName[0] as $k => $fields) {
+                    if ($fields->type == "header" || $fields->type == "paragraph") {
+                        $arr[$k] = $fields->type;
+                    } else {
+                        $arr[$k] = $fields->name;
+                    }
+                }
+                $form->save();
+                return redirect()->route('admin.applications.settings.forms.index')->with('success', __('Form updated successfully.'));
+            } else {
+                return redirect()->back()->with('failed', __('Form not found.'));
+            }
+        } else {
+            return redirect()->back()->with('failed', __('Permission denied.'));
+        }
     }
 
     public function fill($id)
     {
-      abort_if(!iCan('fill form'), 403, __('Unauthorized'));
-
-      $form = Form::find($id);
-      $data = '{}';
-
-      return view('admin.pages.applications.form.fill', compact('form', 'data'));
+        if (auth()->user()->can('fill form')) {
+            $form       = Form::find($id);
+            if ($form) {
+                $array = $form->getFormArray();
+                return view('admin.pages.applications.form.fill', compact('form', 'array'));
+            } else {
+                return redirect()->back()->with('failed', __('Form not found'));
+            }
+        } else {
+            return redirect()->back()->with('failed', __('Permission denied.'));
+        }
     }
 
     public function publicFill($id)
@@ -434,7 +458,7 @@ class FormController extends Controller
 
     public function fillStore(Request $request, $id)
     {
-        $form = Form::findOrFail($id);
+        $form = Form::find($id);
         // if (false && UtilityFacades::getsettings('captcha_enable') == 'on') {
         //     if (UtilityFacades::getsettings('captcha') == 'hcaptcha') {
         //         if (empty($_POST['h-captcha-response'])) {
@@ -455,28 +479,284 @@ class FormController extends Controller
         //         }
         //     }
         // }
-        $data = $request->validateDynamicForm(
-          $form->json,
-          $request->get('submissionValues'),
-          null
-        );
-
         if ($form) {
-            // $clientEmails = [];
+            $clientEmails = [];
+            if ($request->form_value_id) {
+                $formValue = FormValue::find($request->form_value_id);
+                $array = json_decode($formValue->json);
+            } else {
+                $array = $form->getFormArray();
+            }
+            foreach ($array as  &$rows) {
+                foreach ($rows as &$row) {
+                    if ($row->type == 'checkbox-group') {
+                        foreach ($row->values as &$checkboxvalue) {
+                            if (is_array($request->{$row->name}) && in_array($checkboxvalue->value, $request->{$row->name})) {
+                                $checkboxvalue->selected = 1;
+                            } else {
+                                if (isset($checkboxvalue->selected)) {
+                                    unset($checkboxvalue->selected);
+                                }
+                            }
+                        }
+                    } elseif ($row->type == 'file') {
+                        if ($row->subtype == "fineuploader") {
+                            $fileSize = number_format($row->max_file_size_mb / 1073742848, 2);
+                            $fileLimit = $row->max_file_size_mb / 1024;
+                            if ($fileSize < $fileLimit) {
+                                $values = [];
+                                $value = explode(',', $request->input($row->name));
+                                foreach ($value as $file) {
+                                    $values[] = $file;
+                                }
+                                $row->value = $values;
+                            } else {
+                                return response()->json(['is_success' => false, 'message' => __("Please upload maximum $row->max_file_size_mb MB file size.")], 200);
+                            }
+                        } else {
+                            if ($row->file_extention == 'pdf') {
+                                $allowedFileExtension = ['pdf', 'pdfa', 'fdf', 'xdp', 'xfa', 'pdx', 'pdp', 'pdfxml', 'pdxox'];
+                            } else if ($row->file_extention == 'image') {
+                                $allowedFileExtension = ['jpeg', 'jpg', 'png'];
+                            } else if ($row->file_extention == 'excel') {
+                                $allowedFileExtension = ['xlsx', 'csv', 'xlsm', 'xltx', 'xlsb', 'xltm', 'xlw'];
+                            }
+                            $requiredextention = implode(',', $allowedFileExtension);
+                            $fileSize = number_format($row->max_file_size_mb / 1073742848, 2);
+                            $fileLimit = $row->max_file_size_mb / 1024;
+                            if ($fileSize < $fileLimit) {
+                                if ($row->multiple) {
+                                    if ($request->hasFile($row->name)) {
+                                        $values = [];
+                                        $files = $request->file($row->name);
+                                        foreach ($files as $file) {
+                                            $extension = $file->getClientOriginalExtension();
+                                            $check = in_array($extension, $allowedFileExtension);
+                                            if ($check) {
+                                                if ($extension == 'csv') {
+                                                    $name = \Str::random(40) . '.' . $extension;
+                                                    $file->move(storage_path() . '/app/form-values/' . $form->id, $name);
+                                                    $values[] = 'form-values/' . $form->id . '/' . $name;
+                                                } else {
+                                                    $path = Storage::path("form-values/$form->id");
+                                                    $fileName = $file->store('form-values/' . $form->id);
+                                                    if (!file_exists($path)) {
+                                                        mkdir($path, 0777, true);
+                                                        chmod($path, 0777);
+                                                    }
+                                                    if (!file_exists(Storage::path($fileName))) {
+                                                        mkdir(Storage::path($fileName), 0777, true);
+                                                        chmod(Storage::path($fileName), 0777);
+                                                    }
+                                                    $values[] = $fileName;
+                                                }
+                                            } else {
+                                                if (isset($request->ajax)) {
+                                                    return response()->json(['is_success' => false, 'message' => __("Invalid file type, Please upload $requiredextention files")], 200);
+                                                } else {
+                                                    return redirect()->back()->with('failed', __("Invalid file type, please upload $requiredextention files."));
+                                                }
+                                            }
+                                        }
+                                        $row->value = $values;
+                                    }
+                                } else {
+                                    if ($request->hasFile($row->name)) {
+                                        $values = '';
+                                        $file = $request->file($row->name);
+                                        $extension = $file->getClientOriginalExtension();
+                                        $check = in_array($extension, $allowedFileExtension);
+                                        if ($check) {
+                                            if ($extension == 'csv') {
+                                                $name = \Str::random(40) . '.' . $extension;
+                                                $file->move(storage_path() . '/app/form-values/' . $form->id, $name);
+                                                $values = 'form-values/' . $form->id . '/' . $name;
+                                                chmod("$values", 0777);
+                                            } else {
+                                                $path = Storage::path("form-values/$form->id");
+                                                $fileName = $file->store('form-values/' . $form->id);
+                                                if (!file_exists($path)) {
+                                                    mkdir($path, 0777, true);
+                                                    chmod($path, 0777);
+                                                }
+                                                if (!file_exists(Storage::path($fileName))) {
+                                                    mkdir(Storage::path($fileName), 0777, true);
+                                                    chmod(Storage::path($fileName), 0777);
+                                                }
+                                                $values = $fileName;
+                                            }
+                                        } else {
+                                            if (isset($request->ajax)) {
+                                                return response()->json(['is_success' => false, 'message' => __("Invalid file type, Please upload $requiredextention files")], 200);
+                                            } else {
+                                                return redirect()->back()->with('failed', __("Invalid file type, please upload $requiredextention files."));
+                                            }
+                                        }
+                                        $row->value = $values;
+                                    }
+                                }
+                            } else {
+                                return response()->json(['is_success' => false, 'message' => __("Please upload maximum $row->max_file_size_mb MB file size.")], 200);
+                            }
+                        }
+                    } elseif ($row->type == 'radio-group') {
+                        foreach ($row->values as &$radiovalue) {
+                            if ($radiovalue->value == $request->{$row->name}) {
+                                $radiovalue->selected = 1;
+                            } else {
+                                if (isset($radiovalue->selected)) {
+                                    unset($radiovalue->selected);
+                                }
+                            }
+                        }
+                    } elseif ($row->type == 'autocomplete') {
+                        if (isset($row->multiple)) {
+                            foreach ($row->values as &$autocompletevalue) {
+                                if (is_array($request->{$row->name}) && in_array($autocompletevalue->value, $request->{$row->name})) {
+                                    $autocompletevalue->selected = 1;
+                                } else {
+                                    if (isset($autocompletevalue->selected)) {
+                                        unset($autocompletevalue->selected);
+                                    }
+                                }
+                            }
+                        } else {
+                            foreach ($row->values as &$autocompletevalue) {
+                                if ($autocompletevalue->value == $request->autocomplete) {
+                                    $autocompletevalue->selected = 1;
+                                } else {
+                                    if (isset($autocompletevalue->selected)) {
+                                        unset($autocompletevalue->selected);
+                                    }
+                                    $row->value = $request->autocomplete;
+                                }
+                            }
+                        }
+                    } elseif ($row->type == 'select') {
+                        if ($row->multiple) {
+                            foreach ($row->values as &$selectvalue) {
+                                if (is_array($request->{$row->name}) && in_array($selectvalue->value, $request->{$row->name})) {
+                                    $selectvalue->selected = 1;
+                                } else {
+                                    if (isset($selectvalue->selected)) {
+                                        unset($selectvalue->selected);
+                                    }
+                                }
+                            }
+                        } else {
+                            foreach ($row->values as &$selectvalue) {
+                                if ($selectvalue->value == $request->{$row->name}) {
+                                    $selectvalue->selected = 1;
+                                } else {
+                                    if (isset($selectvalue->selected)) {
+                                        unset($selectvalue->selected);
+                                    }
+                                }
+                            }
+                        }
+                    } elseif ($row->type == 'date') {
+                        $row->value = $request->{$row->name};
+                    } elseif ($row->type == 'number') {
+                        $row->value = $request->{$row->name};
+                    } elseif ($row->type == 'textarea') {
+                        $row->value = $request->{$row->name};
+                    } elseif ($row->type == 'text') {
+                        $clientEmail = '';
+                        if ($row->subtype == 'email') {
+                            if (isset($row->is_client_email) && $row->is_client_email) {
+
+                                $clientEmails[] = $request->{$row->name};
+                            }
+                        }
+                        $row->value = $request->{$row->name};
+                    } elseif ($row->type == 'starRating') {
+                        $row->value = $request->{$row->name};
+                    } elseif ($row->type == 'SignaturePad') {
+                        if (property_exists($row, 'value')) {
+                            $filepath = $row->value;
+                            if ($request->{$row->name} == null) {
+                                $url = $row->value;
+                            } else {
+                                if (file_exists(Storage::path($request->{$row->name}))) {
+                                    $url = $request->{$row->name};
+                                    $path = $url;
+                                    $imgUrl = Storage::path($url);
+                                    $filePath = $imgUrl;
+                                } else {
+                                    $imgUrl = $request->{$row->name};
+                                    $path = "form-values/$form->id/" . rand(1, 1000) . '.png';
+                                    $filePath = Storage::path($path);
+                                }
+                                $imageContent = file_get_contents($imgUrl);
+                                $file = file_put_contents($filePath, $imageContent);
+                            }
+                            $row->value = $path;
+                        } else {
+                            if ($request->{$row->name} != null) {
+                                if (!file_exists(Storage::path("form-values/$form->id"))) {
+                                    mkdir(Storage::path("form-values/$form->id"), 0777, true);
+                                    chmod(Storage::path("form-values/$form->id"), 0777);
+                                }
+                                $filepath     = "form-values/$form->id/" . rand(1, 1000) . '.png';
+                                $url          = $request->{$row->name};
+                                $imageContent = file_get_contents($url);
+                                $filePath     = Storage::path($filepath);
+                                $file         = file_put_contents($filePath, $imageContent);
+                                $row->value   = $filepath;
+                            }
+                        }
+                    } elseif ($row->type == 'location') {
+                        $row->value = $request->location;
+                    } elseif ($row->type == 'video') {
+                        $validator = \Validator::make($request->all(),  [
+                            'media' => 'required',
+                        ]);
+                        if ($validator->fails()) {
+                            $messages = $validator->errors();
+                        }
+
+                        $row->value = $request->media;
+                    } elseif ($row->type == 'selfie') {
+                        $file = '';
+                        $img = $request->image;
+                        $folderPath = "form_selfie/";
+
+                        $imageParts = explode(";base64,", $img);
+
+                        if ($imageParts[0]) {
+
+                            $imageBase64 = base64_decode($imageParts[1]);
+                            $fileName = uniqid() . '.png';
+
+                            $file = $folderPath . $fileName;
+                            Storage::put($file, $imageBase64);
+                        }
+                        $row->value  = $file;
+                    }
+
+                }
+            }
 
             if ($request->form_value_id) {
-                $form->submitions()->where('id', $request->form_value_id)->update(['json' => $data]);
+                $formValue->json = json_encode($array);
+                $formValue->save();
             } else {
-                $form->submitions()->create([
-                  'user_id' => auth()->id(),
-                  'json' => $data,
-                  'status' => 'free'
-                ]);
+                if (auth()->user()) {
+                    $userId = auth()->user()->id;
+                } else {
+                    $userId = NULL;
+                }
+                $data = [];
+                $data['status'] = 'free';
+                $data['form_id'] = $form->id;
+                $data['user_id'] = $userId;
+                $data['json']    = json_encode($array);
+                $formValue      = FormValue::create($data);
             }
-            // $formValueArray = json_decode($formValue->json);
-            // $emails = explode(',', $form->email);
-            // $ccemails = explode(',', $form->ccemail);
-            // $bccemails = explode(',', $form->bccemail);
+            $formValueArray = json_decode($formValue->json);
+            $emails = explode(',', $form->email);
+            $ccemails = explode(',', $form->ccemail);
+            $bccemails = explode(',', $form->bccemail);
             // if (false && UtilityFacades::getsettings('email_setting_enable') == 'on') {
             //     if ($form->ccemail && $form->bccemail) {
             //         try {
@@ -530,10 +810,26 @@ class FormController extends Controller
             //         }
             //     }
             // }
+            if ($form->payment_type != 'coingate' && $form->payment_type != 'mercado') {
+                $successMsg = strip_tags($form->success_msg);
+            }
+            if ($request->form_value_id) {
+                $successMsg = strip_tags($form->success_msg);
+            }
 
-            $successMsg = strip_tags($form->success_msg);
+            // Form::integrationFormData($form, $formValue);
 
-            return $this->sendRes(__('Form submitted successfully'), ['event' => 'functionCal', 'function' => 'formSubmitted', 'function_params' => json_encode(['success_message' => $successMsg])]);
+            if (isset($request->ajax)) {
+                return response()->json(['is_success' => true, 'message' => $successMsg, 'redirect' => route('admin.applications.settings.edit.form.values', $formValue->id)], 200);
+            } else {
+                return redirect()->back()->with('success', $successMsg);
+            }
+        } else {
+            if (isset($request->ajax)) {
+                return response()->json(['is_success' => false, 'message' => __('Form not found')], 200);
+            } else {
+                return redirect()->back()->with('failed', __('Form not found.'));
+            }
         }
     }
 

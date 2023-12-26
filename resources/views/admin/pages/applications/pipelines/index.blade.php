@@ -32,7 +32,8 @@ $configData = Helper::appClasses();
       initSortable();
       repeater.repeater({
         defaultValues: {
-            'name': ''
+            'name': '',
+            'id': ''
         },
         show: function () {
             $(this).slideDown();
@@ -43,7 +44,7 @@ $configData = Helper::appClasses();
         },
         ready: function (setIndexes) {
           // sortable.on('sortstop', setIndexes);
-            $(document).on('click', '.btn', function () {
+            $(document).on('click mousedown touched', 'body', function () {
                 setIndexes();
             });
         },
@@ -58,19 +59,10 @@ $configData = Helper::appClasses();
         animation: 150,
         dataIdAttr: 'data-id',
         onSort: function (/**Event*/evt) {
-          console.log(sortable.toArray());
-          // $.ajax({
-          //   url: route('admin.projects.contracts.sort-phases', { project: window.active_project, contract: window.active_contract }),
-          //   type: "PUT",
-          //   data: {
-          //     phases: sortable.toArray(),
-          //   },
-          //   success: function(res){
-          //   }
-          // });
+          $('.repeater').repeater( 'setIndexes' );
         },
         update: function(event, ui) {
-          repeater.repeater( 'setIndexes' );
+          $('.repeater').repeater( 'setIndexes' );
         }
       });
     }

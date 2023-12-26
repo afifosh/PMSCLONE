@@ -38,6 +38,7 @@ class PipelineStoreRequest extends FormRequest
           }
         },
       ],
+      'stages.*.default_stage' => 'nullable',
     ];
   }
 }

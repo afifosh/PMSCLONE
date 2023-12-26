@@ -11,6 +11,10 @@ class FormValue extends Model
     use HasFactory;
     protected $fillable = ['form_id', 'user_id', 'json', 'transaction_id', 'currency_symbol', 'currency_name', 'status', 'amount', 'payment_type'];
 
+    protected $casts = [
+        'json' => 'array',
+    ];
+
     public function Form()
     {
         return $this->hasOne('App\Models\Form', 'id', 'form_id');

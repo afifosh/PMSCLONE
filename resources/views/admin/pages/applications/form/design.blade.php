@@ -14,117 +14,54 @@
 @endsection
 @section('content')
     <div class="row">
-        <div class="main-content">
-            @if (isset($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'http')
-                <div class="alert alert-warning">
-                    <b>
-                        {{ __('Please note that the video recording and selfie features are only available on HTTPS websites and its not work on HTTP sites.') }}</b>
-                </div>
-            @endif
-            <section class="section">
-                <div class="section-body">
-                    {{ Form::model($form, ['route' => ['admin.applications.settings.forms.design.update', $form->id], 'data-validate', 'method' => 'PUT', 'id' => 'design-form']) }}
-                    <div class="row">
-                        <div class="col-xl-12 order-xl-1">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>{{ __('Design Form') }}</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    @php
-                                                        $array = json_decode($form->json);
-                                                    @endphp
-                                                    <ul id="tabs"
-                                                        class="mb-3 nav nav-tabs ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-                                                        @if (!empty($form->json))
-                                                            @foreach ($array as $key => $data)
-                                                                @php
-                                                                    $key = $key + 1;
-                                                                @endphp
-                                                                <li
-                                                                    class="nav-item ui-state-default ui-corner-top ui-state-focus">
-                                                                    {!! Html::link("#page-$key", __('Page') . $key, ['class' => 'nav-link']) !!}
-                                                                </li>
-                                                            @endforeach
-                                                        @else
-                                                            <li>
-                                                                {!! Html::link('#page-1', __('Page1'), []) !!}
-                                                            </li>
-                                                        @endif
-                                                        <li id="add-page-tab">
-                                                            {!! Html::link('#new-page', __('+Page'), [
-                                                                'class' => 'nav-link',
-                                                            ]) !!}
-                                                        </li>
-                                                    </ul>
-                                                    @if (!empty($form->json))
-                                                        @foreach ($array as $key => $data)
-                                                            <div id="page-{{ $key + 1 }}" class="build-wrap"></div>
-                                                        @endforeach
-                                                    @else
-                                                        <div id="page-1" class="build-wrap"></div>
-                                                    @endif
-
-                                                    <div id="new-page"></div>
-                                                    {!! Form::hidden('json', $form->json, ['class' => '']) !!}
-                                                    <br>
-                                                    <div class="action-buttons">
-                                                        {!! Form::button(__('Show Data'), ['class' => 'd-none', 'id' => 'showData']) !!}
-                                                        {!! Form::button(__('Clear All Fields'), ['class' => 'd-none', 'id' => 'clearFields']) !!}
-                                                        {!! Form::button(__('Get Data'), ['class' => 'd-none', 'id' => 'getData']) !!}
-                                                        {!! Form::button(__('Get XML Data'), ['class' => 'd-none', 'id' => 'getXML']) !!}
-                                                        {!! Form::button(__('Update'), ['class' => 'btn btn-primary', 'id' => 'getJSON']) !!}
-                                                        {!! Form::button(__('Back'), [
-                                                            'class' => 'd-none',
-                                                            'onClick' => 'javascript:history.go(-1)',
-                                                            'id' => 'getJSONs',
-                                                        ]) !!}
-                                                        {!! Form::button(__('Get JS Data'), ['class' => 'd-none', 'id' => 'getJS']) !!}
-                                                        {!! Form::button(__('Set Data'), ['class' => 'd-none', 'id' => 'setData']) !!}
-                                                        {!! Form::button(__('Add Field'), ['class' => 'd-none', 'id' => 'addField']) !!}
-                                                        {!! Form::button(__('Remove Field'), ['class' => 'd-none', 'id' => 'removeField']) !!}
-                                                        {!! Form::button(__('Test Submit'), ['type' => 'submit', 'class' => 'd-none', 'id' => 'testSubmit']) !!}
-                                                        {!! Form::button(__('Reset Demo'), ['class' => 'd-none', 'id' => 'resetDemo']) !!}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {{ Form::close() }}
-                </div>
-            </section>
+      <div class="row">
+        <div class="col-md-6">
+            <h1>Design Form</h1>
         </div>
+
+        <div class="col-md-6 text-right">
+            <!-- This form holds the JSON form definition. -->
+            <form method="POST" action="{{ route('admin.applications.settings.forms.design.update', $form) }}">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="definition" id="definition" value="">
+
+                <button type="submit" class="btn btn-outline-primary" data-form="ajax-form">
+                    <i class="fas fa-save" aria-hidden="true"></i>
+                    Save Form
+                </button>
+        </div>
+      </div>
+
+      <!-- This becomes the builder. -->
+      <div id="formio-builder"></div>
     </div>
 @endsection
 @push('style')
-  @include('admin.pages.applications.form.theme-essentials')
-  <link rel="stylesheet" type="text/css" href="{{ asset('vendor/jqueryform/css/demo.css') }}">
-  <link href="{{ asset('vendor/jqueryform/css/jquery.rateyo.min.css') }}" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.css') }}">
+<link rel="stylesheet" href="https://cdn.form.io/js/formio.full.min.css">
+{{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
+<style>
+  .form-builder-panel {
+    margin-bottom: 1rem;
+  }
+</style>
 @endpush
 @push('scripts')
-    <script src="{{ asset('vendor/js/custom.js') }}"></script>
-    <script>
-        var lang = '{{ app()->getLocale() }}';
-        var lang_other = '{{ __('Other') }}';
-        var lang_other_placeholder = '{{ __('Enter Please') }}';
-        var lang_Page = '{{ __('Page') }}';
-        var lang_Custom_Autocomplete = '{{ __('Custom Autocomplete') }}';
-    </script>
-    <script src="{{ asset('vendor/jqueryform/js/signaturePad.umd.js') }}"></script>
-    <script src="{{ asset('vendor/jqueryform/js/vendor.js') }}"></script>
-    <script src="{{ asset('vendor/modules/jquery.nicescroll.min.js') }}"></script>
-    <script src="{{ asset('vendor/jqueryform/js/jquery-ui.min.js') }}"></script>
-    <script src="{{ asset('vendor/jqueryform/js/form-builder.min.js') }}"></script>
-    <script src="{{ asset('vendor/jqueryform/js/form-render.min.js') }}"></script>
-    <script src="{{ asset('vendor/jqueryform/js/demoFirst.js') }}"></script>
-    <script src="{{ asset('vendor/jqueryform/js/jquery.rateyo.min.js') }}"></script>
+<script src="{{ asset('js/formbuilder.js') }}"></script>
+{{-- <script src="https://cdn.form.io/js/formio.full.min.js"></script> --}}
+<script>
+Formio.builder(
+          document.getElementById('formio-builder'),
+          @if(isset($definition) && $definition) {!! $definition !!} @else {} @endif,
+          {} // these are the opts you can customize
+      ).then(function(builder) {
+          // Exports the JSON representation of the dynamic form to that form we defined above
+          document.getElementById('definition').value = JSON.stringify(builder.schema);
+
+          builder.on('change', function (e) {
+              // On change, update the above form w/ the latest dynamic form JSON
+              document.getElementById('definition').value = JSON.stringify(builder.schema);
+          })
+      });
+</script>
 @endpush

@@ -50,6 +50,14 @@ class Form extends Model
         }
     }
 
+    /**
+     * Get the submitions for the form.
+     */
+    public function submitions()
+    {
+      return $this->hasMany(FormValue::class, 'form_id', 'id');
+    }
+
     public function commmant()
     {
         return $this->hasMany(FormComments::class, 'form_id', 'id');

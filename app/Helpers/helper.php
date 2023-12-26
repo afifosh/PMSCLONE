@@ -243,3 +243,8 @@ function cMoney(mixed $amount, string $currency = null, bool $convert = null): M
 
   return new Money($amount, currency($currency), $convert);
 }
+
+function iCan($permission)
+{
+  return auth()->user()->can($permission);
+}

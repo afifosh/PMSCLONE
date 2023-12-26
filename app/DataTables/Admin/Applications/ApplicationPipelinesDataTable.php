@@ -21,7 +21,11 @@ class ApplicationPipelinesDataTable extends DataTable
     return (new EloquentDataTable($query))
       ->addColumn('action', function (ApplicationPipeline $applicationPipeline) {
         return view('admin.pages.applications.pipelines.action', compact('applicationPipeline'));
-      });
+      })
+      ->editColumn('applications_count', function (ApplicationPipeline $applicationPipeline) {
+        return '<span class="badge badge-center rounded-pill bg-label-success">' . $applicationPipeline->applications_count . '</span>';
+      })
+      ->rawColumns(['action', 'applications_count']);
   }
 
   /**
@@ -29,7 +33,7 @@ class ApplicationPipelinesDataTable extends DataTable
    */
   public function query(ApplicationPipeline $model): QueryBuilder
   {
-    return $model->newQuery();
+    return $model->withCount('applications')->newQuery();
   }
 
   /**
@@ -74,6 +78,7 @@ class ApplicationPipelinesDataTable extends DataTable
     return [
       Column::make('id'),
       Column::make('name'),
+      Column::make('applications_count')->title('Applications'),
       Column::make('created_at'),
       Column::make('updated_at'),
     ];

@@ -13,6 +13,8 @@ use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\InvitationController;
 use App\Http\Controllers\Company\UserAccountController;
 use App\Http\Controllers\Company\UserController;
+use App\Http\Controllers\DynamicFormsResourceController;
+use App\Http\Controllers\DynamicFormsStorageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\CheckForLockMode;
 use Illuminate\Http\Request;
@@ -94,3 +96,23 @@ Route::get('refresh-csrf', function(Request $request){
 })->name('refresh-csrf');
 require __DIR__.'/admin/admin.php';
 require __DIR__.'/core/app.php';
+Route::prefix('dynamic-forms')->name('dynamic-forms.')->group(function () {
+    // Dummy route so we can use the route() helper to give formiojs the base path for this group
+    Route::get('/')->name('index');
+
+    Route::post('storage/s3', [DynamicFormsStorageController::class, 'storeS3'])
+        ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+    Route::get('storage/s3', [DynamicFormsStorageController::class, 'showS3'])->name('S3-file-download');
+    Route::get('storage/s3/{fileKey}', [DynamicFormsStorageController::class, 'showS3'])->name('S3-file-redirect');
+
+    Route::post('storage/url', [DynamicFormsStorageController::class, 'storeURL'])
+        ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+    Route::get('storage/url', [DynamicFormsStorageController::class, 'showURL'])->name('url-file-download');
+    Route::delete('storage/url', [DynamicFormsStorageController::class, 'deleteURL']);
+
+    Route::get('form', [DynamicFormsResourceController::class, 'index']);
+    Route::get('form/{resource}', [DynamicFormsResourceController::class, 'resource']);
+    Route::get('form/{resource}/submission', [DynamicFormsResourceController::class, 'resourceSubmissions']);
+});

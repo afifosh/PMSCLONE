@@ -68,7 +68,7 @@ mix.webpackConfig({
   },
   externals: {
     jquery: 'jQuery',
-    moment: 'moment',
+    // moment: 'moment',
     jsdom: 'jsdom',
     velocity: 'Velocity',
     hammer: 'Hammer',
@@ -148,6 +148,8 @@ mixAssetsDir('images/**/*.*', (src, dest) => mix.copy(src, dest));
 mixAssetsDir('libs/**/*.*', (src, dest) => mix.copy(src, dest));
 // laravel working crud app related js
 mix.js('resources/js/laravel-user-management.js', 'public/js/');
+mix.js('resources/js/formbuilder.js', 'public/js/');
+mix.sass('resources/sass/app.scss', 'public/css');
 
 // mix.alias({
 //   '@': path.join(__dirname, 'resources/js'),

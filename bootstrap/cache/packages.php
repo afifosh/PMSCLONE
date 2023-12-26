@@ -198,6 +198,13 @@
       0 => 'Carbon\\Laravel\\ServiceProvider',
     ),
   ),
+  'northwestern-sysdev/dynamic-forms' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Northwestern\\SysDev\\DynamicForms\\DynamicFormsProvider',
+    ),
+  ),
   'nunomaduro/collision' => 
   array (
     'providers' => 
