@@ -23,6 +23,7 @@ use App\Models\Program;
 use App\Models\Project;
 use Illuminate\Support\Facades\DB;
 use DataTables;
+use Illuminate\Http\Request;
 
 class ContractController extends Controller
 {
@@ -734,5 +735,53 @@ class ContractController extends Controller
       } catch (Throwable $e) {
           return $this->sendError($e->getMessage());
       }
+  }
+
+  public function getContractsWithStagesAndPhases(Request $request)
+  {
+      $contracts = Contract::with(['stages.phases'])
+      ->whereNull('deleted_at')
+      ->get();
+
+      $contractDataArray = $contracts->map(function ($contract) {
+          return [
+              'contract_name' => $contract->subject,
+              'program' => $contract->program ? $contract->program->name : null,
+              'assignable' => $contract->assignable->name, // Assuming a 'company' relationship exists
+              'assignable_type' => $contract->assignable->type,
+              'category' => $contract->category->name,
+              'type' => $contract->type->name,
+              'refrence_id' => $contract->refrence_id,
+              'currency' => $contract->currency,
+              'description' => $contract->description,
+              'status' => $contract->status,
+              'deleted_at' => $contract->deleted_at,
+              'start_date' => $contract->start_date ? $contract->start_date->format('Y-m-d H:i:s') : null,
+              'end_date' => $contract->due_date ? $contract->due_date->format('Y-m-d H:i:s') : null,
+              'value' => $contract->value,
+              'stages' => $contract->stages->map(function ($stage) {
+                  return [
+                      'name' => $stage->name,
+                      'phases' => $stage->phases->map(function ($phase) {
+                          return ['name' => $phase->name];
+                      })->toArray(),
+                  ];
+              })->toArray(),
+          ];
+      });
+
+      return response()->json($contractDataArray);
+  }
+
+  public function getCompanies()
+  {
+      $companies = Company::all()->map(function ($company) {
+          return [
+              'name' => $company->name,
+              'types' => $company->types // assuming 'types' is a field or relation in your Company model
+          ];
+      });
+
+      return response()->json($companies);
   }
 }
