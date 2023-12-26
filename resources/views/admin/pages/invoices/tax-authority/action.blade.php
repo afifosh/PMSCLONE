@@ -4,7 +4,7 @@
 
   <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i
     class="ti ti-dots-vertical"></i></button>
-  @if(in_array($invoice->invoice->status, ['Paid', 'Partial Paid']))
+  @if($invoice->invoice->status == 'Paid' && $invoice->payableAmount() > 0)
     <div class="dropdown-menu dropdown-menu-end m-0">
         <button data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id, 'type' => 'tax-authority'])}}" class="dropdown-item">{{__('Add Payment')}}</button>
     </div>

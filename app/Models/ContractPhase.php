@@ -279,6 +279,17 @@ class ContractPhase extends BaseModel
     return $this->morphMany(InvoiceItem::class, 'invoiceable')->has('invoice');
   }
 
+  public function addedInPaidInvoices()
+  {
+    return $this->morphMany(InvoiceItem::class, 'invoiceable')->whereHas('invoice', function ($q) {
+      $q->whereIn('status', ['Paid', 'Partial Paid']);
+    });
+  }
+
+  public function isPaid(): bool
+  {
+    return $this->addedInPaidInvoices->count() > 0;
+  }
   public function invoices(): BelongsToMany
   {
     return $this->belongsToMany(Invoice::class, 'invoice_items', 'invoiceable_id', 'invoice_id')->where('invoiceable_type', ContractPhase::class);

@@ -136,6 +136,7 @@ class InvoiceItemController extends Controller
         $data['contract'] = $invoiceItem->invoiceable->contract;
         $data['phase'] = $invoiceItem->invoiceable;
         $data['stage'] = 'stage';
+        $data['is_paid'] = $invoiceItem->invoiceable->isPaid();
         return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', $data)->render()]);
       }
 

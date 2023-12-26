@@ -27,6 +27,10 @@ class PhaseTaxController extends Controller
 
   public function create($contract, ContractPhase $phase)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     $data['phase'] = $phase;
     $data['tax_rates'] = InvoiceConfig::activeTaxes()->get();
     $data['tax'] = new PhaseTax();
@@ -37,6 +41,10 @@ class PhaseTaxController extends Controller
 
   public function store($contract, ContractPhase $phase, TaxStoreRequest $request)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     DB::beginTransaction();
     try {
       $phase->taxes()->attach($request->tax_rate->id, [
@@ -67,6 +75,10 @@ class PhaseTaxController extends Controller
 
   public function edit($contract, ContractPhase $phase, PhaseTax $tax)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     $data['phase'] = $phase;
     $data['tax_rates'] = InvoiceConfig::activeTaxes()->get();
     $data['tax'] = $tax;
@@ -77,6 +89,10 @@ class PhaseTaxController extends Controller
 
   public function update($contract, ContractPhase $phase, PhaseTax $tax, TaxStoreRequest $request)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     DB::beginTransaction();
     try {
       $tax->delete();
@@ -108,6 +124,10 @@ class PhaseTaxController extends Controller
 
   public function destroy($contract, ContractPhase $phase, PhaseTax $tax)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     DB::beginTransaction();
     try {
       $tax->delete();
