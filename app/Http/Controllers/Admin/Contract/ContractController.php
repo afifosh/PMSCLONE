@@ -513,7 +513,8 @@ class ContractController extends Controller
    */
   public function update(ContractUpdateRequest $request, Contract $contract)
   {
-    abort_if($contract->status != 'Draft' && $request->isSavingDraft, 400, 'You can not save draft for this contract');
+  
+    abort_if(!empty($contract->status) && $contract->status != 'Draft' && $request->isSavingDraft, 400, 'You can not save draft for this contract');
 
     /*
     * if the contract is draft and now it is not draft then create event
@@ -757,13 +758,22 @@ class ContractController extends Controller
               'status' => $contract->status,
               'deleted_at' => $contract->deleted_at,
               'start_date' => $contract->start_date ? $contract->start_date->format('Y-m-d H:i:s') : null,
-              'end_date' => $contract->due_date ? $contract->due_date->format('Y-m-d H:i:s') : null,
+              'end_date' => $contract->end_date ? $contract->end_date->format('Y-m-d H:i:s') : null,
               'value' => $contract->value,
               'stages' => $contract->stages->map(function ($stage) {
                   return [
                       'name' => $stage->name,
                       'phases' => $stage->phases->map(function ($phase) {
-                          return ['name' => $phase->name];
+                          return [
+                          'name' => $phase->name,
+                          'stage_id' => $phase->stage_id,
+                          'name' => $phase->name,
+                          'description' => $phase->description,
+                          'estimated_cost' => $phase->estimated_cost,
+                          'total_cost' => $phase->estimated_cost,
+                          'start_date' => $phase->start_date ? $phase->start_date->format('Y-m-d\TH:i:s.u\Z') : null,
+                          'due_date' => $phase->due_date ? $phase->due_date->format('Y-m-d\TH:i:s.u\Z') : null,
+                        ];
                       })->toArray(),
                   ];
               })->toArray(),
@@ -773,12 +783,12 @@ class ContractController extends Controller
       return response()->json($contractDataArray);
   }
 
-  public function getCompanies()
+  public function getCompanies(Request $request)
   {
       $companies = Company::all()->map(function ($company) {
           return [
               'name' => $company->name,
-              'types' => $company->types // assuming 'types' is a field or relation in your Company model
+              'type' => $company->type // assuming 'types' is a field or relation in your Company model
           ];
       });
 
