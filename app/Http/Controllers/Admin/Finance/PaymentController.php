@@ -111,7 +111,12 @@ class PaymentController extends Controller
       );
 
       // create payment
-      $req->invoice->payments()->create(['ba_trx_id' => $trx->id] + $req->validated());
+      $trxData = [];
+      if($req->invoice::class != Invoice::class){
+        // store the payment if it is tax authority invoice payment, so during deletion we can recognize payment type
+        $trxData['type'] = $req->payment_type == 'Full' ? 4 : ($req->payment_type == 'wht' ? 2 : 3);
+      }
+      $req->invoice->payments()->create($trxData + ['ba_trx_id' => $trx->id] + $req->validated());
 
       if ($req->invoice::class == Invoice::class) {
         $req->invoice->update([
@@ -129,14 +134,11 @@ class PaymentController extends Controller
       } else {
         if ($req->payment_type == 'wht') {
           $data['paid_wht_amount'] = $req->invoice->paid_wht_amount + $req->amount;
-          $data['type'] = 2;
         } else if ($req->payment_type == 'rc') {
           $data['paid_rc_amount'] = $req->invoice->paid_rc_amount + $req->amount;
-          $data['type'] = 3;
         } else if ($req->payment_type == 'Full') {
           $data['paid_wht_amount'] = $req->invoice->total_wht;
           $data['paid_rc_amount'] = $req->invoice->total_rc;
-          $data['type'] = 4;
         }
         $req->invoice->update($data + [
           'status' => $req->invoice->paid_wht_amount + $req->invoice->paid_rc_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial Paid'
@@ -200,7 +202,7 @@ class PaymentController extends Controller
     DB::beginTransaction();
 
     try {
-      $invoice = $payment->payable_type == Invoice::class ? $payment->payable : $payment->payable->invoice;
+      $invoice = $payment->payable;
       if ($payment->type == 1) {
         $invoice->undoRetentionRelease();
         $payment->delete();
@@ -217,12 +219,12 @@ class PaymentController extends Controller
         // payment is wht payment
         if ($payment->type == 2) {
           $invoice->update([
-            'paid_wht_amount' => $invoice->paid_wht_amount - $payment->amount,
+            'paid_wht_amount' => 0,
             'status' =>  $status,
           ]);
         } else if ($payment->type == 3) { // payment is rc payment
           $invoice->update([
-            'paid_rc_amount' => $invoice->paid_rc_amount - $payment->amount,
+            'paid_rc_amount' => 0,
             'status' =>  $status,
           ]);
         } else if ($payment->type == 4) { // payment is both wht and rc payment

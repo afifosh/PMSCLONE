@@ -124,7 +124,7 @@ return [
 
     'password_timeout' => 100,
 
-    'password_expire_days' => 30,
+    'password_expire_days' => 180,
 
     'enable_timeout' => false,
 

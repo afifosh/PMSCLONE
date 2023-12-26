@@ -27,6 +27,10 @@ class PhaseDeductionController extends Controller
 
   public function create(Contract $contract, ContractPhase $phase)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     $contract->load('deductableDownpayments');
     $data['contract'] = $contract;
     $data['phase'] = $phase;
@@ -39,6 +43,10 @@ class PhaseDeductionController extends Controller
 
   public function store($contract, ContractPhase $phase, DeductionStoreRequest $request)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     if ($phase->deduction()->exists())
       return $this->sendError('Deduction Already Exists');
 
@@ -78,6 +86,10 @@ class PhaseDeductionController extends Controller
 
   public function edit(Contract $contract, ContractPhase $phase, InvoiceDeduction $deduction)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     $contract->load('deductableDownpayments');
     $data['contract'] = $contract;
     $data['phase'] = $phase;
@@ -90,6 +102,10 @@ class PhaseDeductionController extends Controller
 
   public function update($contract, ContractPhase $phase, InvoiceDeduction $deduction, DeductionStoreRequest $request)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     DB::beginTransaction();
     try {
       $old_is_before_tax = $phase->deduction->is_before_tax;
@@ -123,6 +139,10 @@ class PhaseDeductionController extends Controller
 
   public function destroy($contract, ContractPhase $phase, InvoiceDeduction $deduction)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     DB::beginTransaction();
     try {
       $is_before_tax = $phase->deduction->is_before_tax;

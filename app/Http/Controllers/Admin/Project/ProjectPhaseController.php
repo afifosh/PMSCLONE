@@ -108,14 +108,14 @@ class ProjectPhaseController extends Controller
     $phase->load(['addedAsInvoiceItem.invoice', 'contract']);
     $contract = $phase->contract;
 
-    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
-      return $this->sendError('You can not edit this phase because it is in paid invoice');
-    }
     $stages = $contract->stages->pluck('name', 'id');
     $max_amount = $contract->remaining_amount + $phase->total_cost;
     $tax_rates = InvoiceConfig::activeOnly()->get();
 
     if (request()->type == 'edit-form') {
+      if ($phase->isPaid()) {
+        return $this->sendError('You can not edit this phase because it is in paid invoice');
+      }
       return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create-form', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
     }
 
@@ -139,8 +139,9 @@ class ProjectPhaseController extends Controller
         <button type="button" data-bs-dismiss="modal" aria-label="Close" class="btn-close"></button>
     </div>';
 
+    $is_paid = $phase->isPaid();
 
-    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
+    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount', 'is_paid'))->render()]);
   }
 
   public function prepareActivityTab($phase)
@@ -161,8 +162,8 @@ class ProjectPhaseController extends Controller
   {
     $phase->load(['addedAsInvoiceItem.invoice', 'stage']);
 
-    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
-      return $this->sendError('You can not update this phase because it is in paid invoice');
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
 
     DB::beginTransaction();
@@ -206,8 +207,8 @@ class ProjectPhaseController extends Controller
   public function destroy($project, Contract $contract, $stage, ContractPhase $phase)
   {
     $phase->load('addedAsInvoiceItem.invoice');
-    if (@$phase->addedAsInvoiceItem[0]->invoice->status && in_array($phase->addedAsInvoiceItem[0]->invoice->status, ['Paid', 'Partial Paid'])) {
-      return $this->sendError('You can not delete this phase because it is in paid invoice');
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
 
     $phase->addedAsInvoiceItem->each(function ($item) {

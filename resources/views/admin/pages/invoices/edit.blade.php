@@ -686,7 +686,7 @@
 
   <!-- Invoice Actions -->
   <div class="col-lg-3 col-12 invoice-actions">
-    @if(!in_array($invoice->status, ['Paid', 'Void']))
+    @if(!in_array($invoice->status, ['Void']))
       <div class="card mb-4">
         <div class="card-body">
           @if(!in_array($invoice->status, ['Paid', 'Partial Paid']))
@@ -699,6 +699,11 @@
           @endif
           @if($invoice->status != 'Paid')
             <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id])}}">
+              <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
+            </button>
+          @endif
+          @if($invoice->status == 'Paid' && request()->tab == 'authority-tax' && $invoice->authorityInvoice->payableAmount() > 0)
+            <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->authorityInvoice->id, 'type' => 'tax-authority'])}}">
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
             </button>
           @endif

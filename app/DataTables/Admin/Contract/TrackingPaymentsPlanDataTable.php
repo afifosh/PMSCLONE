@@ -59,6 +59,11 @@ class TrackingPaymentsPlanDataTable extends DataTable
         return @cMoney($contract->value ?? 0, $contract->currency, true);
         //return view('admin.pages.contracts.value-column', compact('contract'));
       })
+      ->filterColumn('programs.name', function ($query, $keyword) {
+        $query->whereHas('program', function ($query) use ($keyword) {
+          $query->where('name', 'like', "%{$keyword}%");
+        });
+      })
       ->rawColumns(['id', 'program.name', 'subject', 'reviews_completed', 'expand', 'incomplete_reviewers']);
   }
 

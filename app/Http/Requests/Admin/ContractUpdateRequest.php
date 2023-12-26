@@ -37,8 +37,11 @@ class ContractUpdateRequest extends FormRequest
       'project_id' => ['nullable', 'exists:projects,id'],
       'program_id' => ['nullable', 'exists:programs,id'],
       'invoicing_method' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'in:Recuring,Phase Based'],
-      'account_balance_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'exists:account_balances,id', new AccountHasHolder($this->program_id, 'programs')],
-      'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],
+      //'account_balance_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'exists:account_balances,id', new AccountHasHolder($this->program_id, 'programs')],
+      //'start_date' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'date'],
+      'start_date' => ['nullable', Rule::requiredIf(function () {
+        return !$this->isSavingDraft && $this->contract->status != 'Draft';
+      }), 'date'],
       'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
       'visible_to_client' => 'nullable|boolean',
       'description' => 'nullable|string|max:2000'
@@ -63,8 +66,8 @@ class ContractUpdateRequest extends FormRequest
       'currency.required' => 'Please select currency',
       'invoicing_method.required_if' => 'Please select invoicing method',
       'invoicing_method.required' => 'Please select invoicing method',
-      'account_balance_id.required_if' => 'Please select account balance',
-      'account_balance_id.required' => 'Please select account balance',
+      // 'account_balance_id.required_if' => 'Please select account balance',
+      // 'account_balance_id.required' => 'Please select account balance',
       'start_date.required_if' => 'Please select start date',
       'start_date.required' => 'Please select start date',
       'end_date.required_if' => 'Please select end date',

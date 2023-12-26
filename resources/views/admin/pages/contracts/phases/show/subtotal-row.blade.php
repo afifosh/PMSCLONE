@@ -1,7 +1,9 @@
 <tr style="background-color: #efeff163;">
-  <td>
-    <a onclick="editPhaseSubtotalAmount({{$phase->id}}, this)"><i class="ti ti-pencil"></i></a>
-  </td>
+  @if(!$is_paid)
+    <td>
+      <a onclick="editPhaseSubtotalAmount({{$phase->id}}, this)"><i class="ti ti-pencil"></i></a>
+    </td>
+  @endif
   <td class="fw-bold">Subtotall</td>
   <td class="text-end fw-bold"
     @if($phase->subtotal_amount_adjustment)

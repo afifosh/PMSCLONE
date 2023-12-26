@@ -20,11 +20,19 @@ class SubtotalAdjustmentController extends Controller
 
   public function create($contract, ContractPhase $phase)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.subtotal-adjustments.create', compact('phase'))->render()]);
   }
 
   public function store($contract, ContractPhase $phase, Request $request)
   {
+    if ($phase->isPaid()) {
+      return $this->sendError('You can not edit this phase because it is in paid invoice');
+    }
+
     $request->validate([
       'adjuted_subtotal_amount' => ['required', 'numeric'],
     ]);

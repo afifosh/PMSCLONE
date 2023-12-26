@@ -25,7 +25,7 @@ class ApplicationFactory extends Factory
   {
     return [
       'name' => $this->faker->word,
-      'company_id' => Company::inRandomOrder()->first()->id,
+      // 'company_id' => Company::inRandomOrder()->first()->id,
       'program_id' => Program::inRandomOrder()->first()->id,
       'type_id' => ApplicationType::inRandomOrder()->first()->id,
       'category_id' => ApplicationCategory::inRandomOrder()->first()->id,
