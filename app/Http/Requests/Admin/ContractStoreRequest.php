@@ -25,7 +25,9 @@ class ContractStoreRequest extends FormRequest
   {
     return [
       'isSavingDraft' => 'nullable',
-      'subject' => 'required|string',
+      'subject' => 'nullable|required_if:subject_ar,null|string',
+      // required if subject is null
+      'subject_ar' => 'nullable|required_if:subject,null|string',
       'type_id' => 'nullable|required_if:isSavingDraft,0|exists:contract_types,id',
       'category_id' => 'nullable|required_if:isSavingDraft,0|exists:contract_categories,id',
       'company_id' => ['nullable', 'required_if:isSavingDraft,0', 'exists:companies,id'],

@@ -78,7 +78,7 @@ class InvoicesDataTable extends DataTable
         });
     }
 
-    return $query->applyRequestFilters()->newQuery();
+    return $query->ValidAccessibleByAdmin(auth()->id())->applyRequestFilters()->newQuery();
   }
 
   /**

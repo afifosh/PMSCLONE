@@ -10,9 +10,16 @@
 <div class="row">
   {{-- Subject --}}
   <div class="form-group col-6">
-      {{ Form::label('subject', __('Subject'), ['class' => 'col-form-label']) }}
-      {!! Form::text('subject', null, ['class' => 'form-control', 'placeholder' => __('Subject')]) !!}
+      {{ Form::label('subject', __('English Subject'), ['class' => 'col-form-label']) }}
+      {!! Form::text('subject', $contract->getRawOriginal('subject') ? $contract->getRawOriginal('subject') : '' , ['class' => 'form-control', 'placeholder' => __('English Subject')]) !!}
   </div>
+
+  {{-- subject_ar --}}
+  <div class="form-group col-6">
+      {{ Form::label('subject_ar', __('Arabic Subject'), ['class' => 'col-form-label']) }}
+      {!! Form::text('subject_ar', null, ['class' => 'form-control', 'placeholder' => __('Arabic Subject')]) !!}
+  </div>
+
   {{-- project --}}
   <div class="form-group col-6">
     {{ Form::label('project_id', __('Project'), ['class' => 'col-form-label']) }}

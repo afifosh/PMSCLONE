@@ -79,15 +79,8 @@ class PhasesDataTable extends DataTable
     $buttons = [];
     // if ($this->contract->getRawOriginal('status') == 'Active')
     $buttons[] = [
-      'text' => '<span>Select Phases</span>',
-      'className' =>  'btn btn-primary mx-3 select-phases-btn',
-      'attr' => [
-        'onclick' => 'toggleCheckboxes()',
-      ]
-    ];
-    $buttons[] = [
       'text' => '<span>Create Invoices</span>',
-      'className' =>  'btn btn-primary mx-3 create-inv-btn d-none',
+      'className' =>  'btn btn-primary mx-3 create-inv-btn',
       'attr' => [
         'onclick' => 'createInvoices()',
       ]
@@ -130,7 +123,7 @@ class PhasesDataTable extends DataTable
   {
     return [
       Column::make('order')->visible(false),
-      Column::make('checkbox')->title('<input class="form-check-input phase-check-all" type="checkbox">')->orderable(false)->searchable(false)->printable(false)->exportable(false)->visible(false)->width(1),
+      Column::make('checkbox')->title('<input class="form-check-input phase-check-all" type="checkbox">')->orderable(false)->searchable(false)->printable(false)->exportable(false)->width(1),
       Column::make('name'),
       Column::make('stage'),
       Column::make('start_date'),

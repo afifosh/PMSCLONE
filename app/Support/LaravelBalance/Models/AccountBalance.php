@@ -83,6 +83,36 @@ class AccountBalance extends Model
             });
           });
         });
+      })->when(request()->dependent_3_col == 'pay-type' && request()->dependent_3 && request()->dependent_2_col == 'inv-type', function ($q) {
+        $q->when(request()->dependent_2 == 'Invoice' && (request()->dependent_3 == 'Full' || request()->dependent_3 == 'Partial'), function ($q) {
+          // user is trying to pay tab 1 invoice, so return the accounts that have permission to pay tab 1 invoices
+          $q->whereHas('permissions', function ($q) {
+            $q->where('permission', 1);
+          });
+        })
+        ->when(request()->dependent_2 == 'AuthorityInvoice' && request()->dependent_2_col == 'inv-type' && request()->dependent_3_col = 'pay-type' , function ($q) {
+          // user is trying to pay tab 3 invoices (wht/rc),
+          $q->when(request()->dependent_3 == 'Full', function ($q) {
+            // user is paying both wht and rc, so return the accounts that have permission to pay both wht and rc
+            $q->whereHas('permissions', function ($q) {
+              $q->where('permission', 2);
+            })->whereHas('permissions', function ($q) {
+              $q->where('permission', 3);
+            });
+          })
+          ->when(request()->dependent_3 == 'wht', function ($q) {
+            // user is paying only wht, so return the accounts that have permission to pay only wht
+            $q->whereHas('permissions', function ($q) {
+              $q->where('permission', 3);
+            });
+          })
+          ->when(request()->dependent_3 == 'rc', function ($q) {
+            // user is paying only rc, so return the accounts that have permission to pay only rc
+            $q->whereHas('permissions', function ($q) {
+              $q->where('permission', 2);
+            });
+          });
+        });
       });
     }
 

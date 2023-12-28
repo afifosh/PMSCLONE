@@ -28,7 +28,7 @@ class Company extends BaseModel
   public const DT_ID = 'companies_datatable';
 
  // protected $fillable = ['name', 'email', 'status', 'added_by', 'website'];
-  protected $fillable = ['name', 'email', 'status', 'added_by', 'website', 'type', 'address', 'city_id', 'state_id', 'zip', 'country_id', 'phone', 'vat_number', 'gst_number'];
+  protected $fillable = ['name', 'name_ar', 'email', 'status', 'added_by', 'website', 'type', 'address', 'city_id', 'state_id', 'zip', 'country_id', 'phone', 'vat_number', 'gst_number'];
 
 
 
@@ -39,6 +39,14 @@ class Company extends BaseModel
   ];
 
   protected $appends = ['avatar'];
+
+  /**
+   * prioritize arabic name over english name
+   */
+  public function getNameAttribute($value)
+  {
+    return $this->name_ar ? $this->name_ar : $value;
+  }
 
   public function getAvatarAttribute($value)
   {

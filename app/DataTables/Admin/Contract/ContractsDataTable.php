@@ -82,6 +82,7 @@ public function query(Contract $model): QueryBuilder
             'contracts.program_id',
             'contracts.refrence_id',
             'contracts.subject', // Add this line for the subject column
+            'contracts.subject_ar',
             'contracts.project_id',
             'contracts.type_id',
             'contracts.category_id',
@@ -114,6 +115,7 @@ public function query(Contract $model): QueryBuilder
             'contracts.program_id',
             'contracts.refrence_id',
             'contracts.subject', // Add this line for the subject column
+            'contracts.subject_ar',
             'contracts.project_id',
             'contracts.type_id',
             'contracts.category_id',

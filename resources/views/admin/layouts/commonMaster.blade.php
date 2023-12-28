@@ -64,16 +64,16 @@
       });
     });
   </script>
-  <script src="{{ asset('sw.js') }}"></script>
+  {{-- <script src="{{ asset('sw.js') }}"></script> --}}
   <script>
     $(document).ready(function () {
       $('.body-animate').fadeIn(500);
     });
-    if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {
-        navigator.serviceWorker.register('sw.js').then(function (reg) {
-            console.log('Service worker has been registered for scope: ' + reg.scope)
-        })
-    }
+    // if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {
+    //     navigator.serviceWorker.register('sw.js').then(function (reg) {
+    //         console.log('Service worker has been registered for scope: ' + reg.scope)
+    //     })
+    // }
   </script>
 </body>
 </html>

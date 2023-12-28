@@ -67,8 +67,9 @@ class Invoice extends Model
   const STATUSES = [
     'Draft',
     'Sent',
-    'Paid',
     'Partial Paid',
+    'Retention Withheld',
+    'Paid',
     'Void'
   ];
 
@@ -397,7 +398,7 @@ class Invoice extends Model
 
   public function isEditable()
   {
-    return !in_array($this->status, ['Paid', 'Partial Paid']);
+    return !in_array($this->status, ['Paid', 'Partial Paid', 'Retention Withheld']);
   }
 
   public function releaseRetention($account_id): void
@@ -405,7 +406,7 @@ class Invoice extends Model
     DB::beginTransaction();
 
     try {
-      if (!$this->retention_amount || $this->retention_released_at) {
+      if (!$this->retention_amount || $this->retention_released_at || $this->status != 'Retention Withheld') {
         return;
       }
       $transactionProcessor = app(TransactionProcessor::class);
@@ -415,8 +416,8 @@ class Invoice extends Model
         new TransactionDto(
           -$this->retention_amount,
           'Debit',
-          'Invoice Payment',
-          'Invoice Payment',
+          'Invoice Retention Payment',
+          'Invoice Retention Payment',
           ['data' => ['payment_type' => 'Retention Release']],
           ['type' => self::class, 'id' => $this->id]
         )
@@ -434,9 +435,12 @@ class Invoice extends Model
       $this->update([
         'paid_amount' => $this->paid_amount + $this->retention_amount,
         'retention_released_at' => now(),
-        'status' => $this->paid_amount + $this->retention_amount >= $this->total ? 'Paid' : 'Partial Paid',
+        'status' => 'Paid',
       ]);
+
+      DB::commit();
     } catch (\Exception $e) {
+      DB::rollBack();
       throw $e;
     }
   }
@@ -448,7 +452,7 @@ class Invoice extends Model
       $this->update([
         'paid_amount' => $this->paid_amount - $retention_amount,
         'retention_released_at' => null,
-        'status' => $this->paid_amount - $retention_amount >= $this->total ? 'Paid' : 'Partial Paid',
+        'status' => 'Retention Withheld',
       ]);
     } catch (\Exception $e) {
       throw $e;
@@ -983,5 +987,27 @@ class Invoice extends Model
   public function scopePayable($q)
   {
     $q->whereNotIn('status', ['Void', 'Paid']);
+  }
+
+  /**
+   * The remaining payable amount for partial invoices
+   */
+  public function getRemainingPayableAmount()
+  {
+    return $this->phaseItems[0]->invoiceable->getRemainingAmount();
+  }
+
+  public function resolveStatus($paying_amount)
+  {
+    //$req->invoice->paid_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial Paid'
+    if ($this->paid_amount + $paying_amount >= $this->total) {
+      return 'Paid';
+    } else if ($this->retention_amount && !$this->retention_released_at && ($this->paid_amount + $paying_amount >= $this->total - $this->retention_amount)) {
+      return 'Retention Withheld';
+    } else if ($this->paid_amount + $paying_amount > 0) {
+      return 'Partial Paid';
+    } else {
+      return 'Draft';
+    }
   }
 }

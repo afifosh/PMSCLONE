@@ -121,7 +121,7 @@ class PaymentController extends Controller
       if ($req->invoice::class == Invoice::class) {
         $req->invoice->update([
           'paid_amount' => $req->invoice->paid_amount + $req->amount,
-          'status' => $req->invoice->paid_amount + $req->amount >= $req->invoice->total ? 'Paid' : 'Partial Paid',
+          'status' => $req->invoice->resolveStatus($req->amount),
         ]);
 
         // release retention if requested

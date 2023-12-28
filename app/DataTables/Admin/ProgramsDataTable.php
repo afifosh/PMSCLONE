@@ -64,6 +64,7 @@ class ProgramsDataTable extends DataTable
       ->select([
         'programs.id',
         'programs.name',
+        'programs.name_ar',
         'programs.program_code',
         'programs.parent_id',
         'programs.updated_at',
@@ -75,6 +76,7 @@ class ProgramsDataTable extends DataTable
       ->groupBy([
         'programs.id',
         'programs.name',
+        'programs.name_ar',
         'programs.program_code',
         'programs.parent_id',
         'programs.updated_at',

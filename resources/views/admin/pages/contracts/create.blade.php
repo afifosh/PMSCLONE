@@ -1,20 +1,22 @@
-<div class="d-flex justify-content-start align-items-center user-name mb-4">
-  <div class="avatar-wrapper">
-    <div class="avatar me-2"><i class="ti ti-license mb-2 ti-xl"></i></div>
+@if($contract->id)
+  <div class="d-flex justify-content-start align-items-center user-name mb-4">
+    <div class="avatar-wrapper">
+      <div class="avatar me-2"><i class="ti ti-license mb-2 ti-xl"></i></div>
+    </div>
+    <div class="d-flex flex-column">
+      <span class="fw-medium mb-1">{{ $contract->subject }}</span>
+      <small class="text-muted mb-1">{{ $contract->program->name ?? 'N/A' }}</small>
+      <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
+    </div>
   </div>
-  <div class="d-flex flex-column">
-    <span class="fw-medium mb-1">{{ $contract->subject }}</span>
-    <small class="text-muted mb-1">{{ $contract->program->name ?? 'N/A' }}</small>
-    <span class="badge bg-label-{{$contract->getStatusColor()}} me-auto">{{$contract->status}}</span>
-  </div>
-</div>
+@endif
 <div class="row mb-4">
   <div class="nav-align-top">
-    <ul class="nav nav-tabs" role="tablist">
-      <li class="nav-item">
-        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-selected="true">Summary</button>
-      </li>
-      @if($contract->id)
+    @if($contract->id)
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-summary" aria-selected="true">Summary</button>
+        </li>
         <li class="nav-item" onclick="reload_contract_activities({{$contract->id}})">
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-activities" aria-selected="false">Activities</button>
         </li>
@@ -24,8 +26,8 @@
         <li class="nav-item" onclick="reload_contract_comments({{$contract->id}})">
           <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-comments-contracts" aria-selected="false">Comments</button>
         </li>
-      @endif
-    </ul>
+      </ul>
+    @endif
     <div class="tab-content p-0">
       <div class="tab-pane fade {{request()->tab == null || request()->tab == 'summary' ? 'show active' : ''}}" id="navs-top-summary" role="tabpanel">
         @include('admin.pages.contracts.tabs.summary')

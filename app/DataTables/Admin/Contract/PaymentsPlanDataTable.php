@@ -75,7 +75,7 @@ class PaymentsPlanDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    return $model->validAccessibleByAdmin(auth()->id())->applyRequestFilters()->with(['program:id,name'])->withCount(['stages', 'phases', 'myReviewedPhases']);
+    return $model->validAccessibleByAdmin(auth()->id())->applyRequestFilters()->with(['program:id,name,name_ar'])->withCount(['stages', 'phases', 'myReviewedPhases']);
   }
 
 

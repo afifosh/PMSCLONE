@@ -307,6 +307,7 @@ $configData = Helper::appClasses();
 
                 ajax: route('admin.contracts.paymentsplan.phases', { contract: contractId }),
                 columns: [
+                    { data: "checkbox", "name": "checkbox", title: '<input class="form-check-input phase-check-all" type="checkbox">', orderable: false, searchable: false},
                     { data: "stage_name", "name": "stage_name", title: 'Stage Name' },
                     { data: 'name', title: 'Phase Name' },
                     { data: 'start_date', title: 'Start Date' },
@@ -327,6 +328,13 @@ $configData = Helper::appClasses();
           //    dom: '<"top"Bf>rt<"bottom"ip>',
            //  dom: 'ilpftr'
                 buttons: [
+        {
+          text: 'Create Invoices',
+          className: 'btn btn-primary mx-3 create-inv-btn disabled',
+          attr: {
+            'onclick': 'createInvoices()',
+          }
+        },
         {
             text: 'Add Phase',
             className: 'btn btn-primary',

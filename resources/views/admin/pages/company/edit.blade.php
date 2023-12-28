@@ -46,9 +46,15 @@
         </div>
         <small class="form-text text-muted">{{ __('Select the type: Company or Person') }}</small>
       </div>
-    <div class="form-group col-12">
-        {{ Form::label('name', __('Name'), ['class' => 'col-form-label']) }}
-        {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Company Name')]) !!}
+    <div class="form-group col-6">
+        {{ Form::label('name', __('English Name'), ['class' => 'col-form-label']) }}
+        {!! Form::text('name', $company->getRawOriginal('name') ? $company->getRawOriginal('name') : '', ['class' => 'form-control', 'placeholder' => __('English Name')]) !!}
+    </div>
+
+    {{-- name_ar --}}
+    <div class="form-group col-6">
+      {{ Form::label('name_ar', __('Arabic Name'), ['class' => 'col-form-label']) }}
+      {!! Form::text('name_ar', null, ['class' => 'form-control', 'placeholder' => __('Arabic Name')]) !!}
     </div>
 
     <div class="form-group col-12">

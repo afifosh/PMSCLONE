@@ -1,8 +1,10 @@
 <tr>
+  @if(!$is_paid)
     <td>
       <a data-toggle="ajax-delete" data-href="{{route('admin.contracts.phases.deductions.destroy', ['contract' => $phase->contract_id, 'phase' => $phase->id, 'deduction' => $phase->deduction->id])}}"><i class="ti ti-trash"></i></a>
       <a onclick="editPhaseDeduction({{$phase->id}}, {{$phase->deduction->id}}, this)"><i class="ti ti-pencil"></i></a>
     </td>
+  @endif
   <!--description-->
   <td>
     Down Payment Deduction

@@ -6,8 +6,14 @@
 
 <div class="row">
     <div class="form-group col-6">
-        {{ Form::label('name', __('Name'), ['class' => 'col-form-label']) }}
-        {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => __('Name')]) !!}
+        {{ Form::label('name', __('English Name'), ['class' => 'col-form-label']) }}
+        {!! Form::text('name', $program->getRawOriginal('name') ? $program->getRawOriginal('name') : '', ['class' => 'form-control', 'placeholder' => __('English Name')]) !!}
+    </div>
+
+    {{-- name_ar --}}
+    <div class="form-group col-6">
+        {{ Form::label('name_ar', __('Arabic Name'), ['class' => 'col-form-label']) }}
+        {!! Form::text('name_ar', $program->name_ar, ['class' => 'form-control', 'placeholder' => __('Arabic Name')]) !!}
     </div>
 
     <div class="form-group col-6">

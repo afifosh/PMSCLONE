@@ -72,7 +72,7 @@ class TrackingPaymentsPlanDataTable extends DataTable
    */
   public function query(Contract $model): QueryBuilder
   {
-    return $model->validAccessibleByAdmin(auth()->id())->applyRequestFilters()->with(['program:name,id'])->withCount(['stages', 'phases']);
+    return $model->validAccessibleByAdmin(auth()->id())->applyRequestFilters()->with(['program:name,name_ar,id'])->withCount(['stages', 'phases']);
   }
   /**
    * Optional method if you want to use the html builder.

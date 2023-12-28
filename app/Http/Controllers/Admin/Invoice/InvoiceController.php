@@ -14,6 +14,7 @@ use App\Models\Invoice;
 use App\Models\Program;
 use App\Models\InvoiceConfig;
 use App\Models\InvoiceItem;
+use App\Rules\AccountHasHolder;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -96,11 +97,11 @@ class InvoiceController extends Controller
 
   public function show(Invoice $invoice)
   {
-    if(request()->downpaymentjson){
+    if (request()->downpaymentjson) {
       $data['total_amount'] = $invoice->total;
       $data['total_deducted_amount'] = $invoice->totalDeductedAmountFromThisInvoice();
       $data['invoice_deducted_amount'] = $invoice->deducted_amount;
-      if(request()->itemId){
+      if (request()->itemId) {
         $item = InvoiceItem::with('deduction')->find(request()->itemId);
         $data['total_deducted_amount'] = $data['total_deducted_amount'] - ($item->deduction ? ($item->deduction->manual_amount ? $item->deduction->manual_amount : $item->deduction->amount) : 0);
       }
@@ -128,8 +129,7 @@ class InvoiceController extends Controller
 
       return $dataTable->render('admin.pages.invoices.edit-downpayment', $data);
       // view('admin.pages.invoices.edit-downpayment', $data)
-    }else if ($invoice->type == 'Partial Invoice')
-    {
+    } else if ($invoice->type == 'Partial Invoice') {
       $dataTable = app(PartialInvoicesDataTable::class);
       $dataTable->partialInvoice = $invoice;
 
@@ -227,10 +227,37 @@ class InvoiceController extends Controller
     }
   }
 
-  public function releaseRetention(Invoice $invoice)
+  public function releaseRetention(Invoice $invoice, Request $request)
   {
-    $invoice->releaseRetention();
+    abort_if($invoice->status != 'Retention Withheld', 422, 'Invalid Invoice');
 
-    return $this->sendRes('Retention released successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table']);
+    if ($request->method() == 'GET') {
+      $invoice->load('contract.assignable');
+      $data['invoice'] = $invoice;
+      $data['contracts'] = [$invoice->contract_id => $invoice->contract->subject];
+      $data['selectedContract'] = $invoice->contract_id;
+
+      return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.release-retention.create', ['invoice' => $invoice])->render()]);
+    }
+
+    $request->validate([
+      'account_balance_id' => [
+        'required',
+        'exists:account_balances,id',
+        new AccountHasHolder(
+          ($invoice->contract->program_id),
+          'programs',
+          [1]
+        )
+      ],
+    ]);
+
+    try {
+      $invoice->releaseRetention($request->account_balance_id);
+
+      return $this->sendRes('Retention released successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table', 'close' => 'globalModal']);
+    } catch (\Exception $e) {
+      return $this->sendError($e->getMessage());
+    }
   }
 }

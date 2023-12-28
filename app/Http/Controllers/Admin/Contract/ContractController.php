@@ -513,7 +513,7 @@ class ContractController extends Controller
    */
   public function update(ContractUpdateRequest $request, Contract $contract)
   {
-  
+
     abort_if(!empty($contract->status) && $contract->status != 'Draft' && $request->isSavingDraft, 400, 'You can not save draft for this contract');
 
     /*
@@ -597,6 +597,9 @@ class ContractController extends Controller
     })->with(['reviewdByAdmins', 'stage', 'contract:id,program_id,currency', 'addedAsInvoiceItem']);
 
       return DataTables::of($query)
+          ->editColumn('checkbox', function ($phase) {
+            return '<input class="form-check-input phase-check" name="selected_phases[]" type="checkbox" value="' . $phase->id . '">';
+          })
           ->addColumn('stage_name', function ($phase) {
             return $phase->stage ? $phase->stage->name : 'N/A'; // Added a null check in case a phase doesn't have a related stage
           })
@@ -619,7 +622,7 @@ class ContractController extends Controller
           ->addColumn('reviewed_by', function (ContractPhase $phase) {
             return view('admin._partials.sections.user-avatar-group', ['users' => $phase->reviewdByAdmins]);
           })
-          ->rawColumns(['actions', 'invoice_id', 'amount','reviewed_by'])
+          ->rawColumns(['actions', 'invoice_id', 'amount','reviewed_by', 'checkbox'])
           ->make(true);
   }
 

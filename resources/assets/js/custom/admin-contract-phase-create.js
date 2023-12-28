@@ -1,7 +1,50 @@
 /**************************
    * Phase create form js  **
    **************************/
+function createInvoices(){
+  var phases = [];
+  $('.phase-check:checked').each(function(){
+    phases.push($(this).val());
+  });
+  if(phases.length == 0){
+    return;
+  }
+  $.ajax({
+    url: route('admin.contracts.bulk-invoices.store', { contract: window.active_contract }),
+    type: "POST",
+    data: {
+      phases: phases,
+    },
+    success: function(res){
+      $('.phase-check-all').prop('checked', false).trigger('change');
+      $('.phase-check').prop('checked', false).trigger('change');
+      reloadDataTables();
+    }
+  });
+}
 
+$(document).on('click', '.phase-check-all', function(){
+  if($(this).is(':checked')){
+    $('.phase-check').prop('checked', true).trigger('change');
+  }else{
+    $('.phase-check').prop('checked', false).trigger('change');
+  }
+})
+
+$(document).on('click change', '.phase-check', function(){
+  if($('.phase-check:checked').length == $('.phase-check').length){
+    $('.phase-check-all').prop('checked', true);
+  }else{
+    $('.phase-check-all').prop('checked', false);
+  }
+
+  // if atleast one is checked, show create-inv-btn
+  if($('.phase-check:checked').length > 0){
+    $('.create-inv-btn').removeClass('disabled');
+  }else{
+    $('.create-inv-btn').addClass('disabled');
+  }
+})
   // calcDeductionAmount on change of downpayment_amount, dp_rate_id, is_manual_deduction, is_fixed_amount
   $(document).on('change keyup', '.phase-create-form [name="dp_rate_id"], .phase-create-form [name="is_manual_deduction"], .phase-create-form [name="is_fixed_amount"], .phase-create-form [name="downpayment_id"], .phase-create-form [name="calculation_source"], .phase-create-form [name="is_before_tax"]', function(){
     calcDeductionAmount();

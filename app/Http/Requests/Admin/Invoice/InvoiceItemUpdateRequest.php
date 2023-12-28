@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Invoice;
 
 use App\Models\ContractPhase;
+use App\Models\CustomInvoiceItem;
 use App\Models\Invoice;
 use App\Models\InvoiceConfig;
 use Illuminate\Foundation\Http\FormRequest;
@@ -39,6 +40,8 @@ class InvoiceItemUpdateRequest extends FormRequest
    */
   public $contract = null;
 
+  public $old_total = 0;
+
   /**
    * Prepare the data for validation.
    *
@@ -48,6 +51,8 @@ class InvoiceItemUpdateRequest extends FormRequest
   {
     if(@$this->invoice_item->invoiceable_type == ContractPhase::class){
       $this->contract = $this->invoice_item->invoiceable->contract;
+    } else if (@$this->invoice_item->invoiceable_type == CustomInvoiceItem::class) {
+      $this->old_total = $this->invoice_item->total;
     }
 
     $this->merge([
@@ -299,6 +304,12 @@ class InvoiceItemUpdateRequest extends FormRequest
         if ($this->downpayment_amount > $this->subtotal + ($this->is_manual_tax ? $this->manual_tax_amount : $this->total_tax_amount)) {
           $validator->errors()->add('downpayment_amount', 'Downpayment amount must not be greater than subtotal + tax');
         }
+      }
+
+      // total amount should be less than remaining amount
+      $remaining_amount = $this->invoice->getRemainingPayableAmount() + $this->old_total;
+      if ($remaining_amount < $this->total) {
+        $validator->errors()->add('price', 'Total amount must not be greater than :' . $remaining_amount);
       }
     });
   }

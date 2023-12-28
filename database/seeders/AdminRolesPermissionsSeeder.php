@@ -52,55 +52,97 @@ class AdminRolesPermissionsSeeder extends Seeder
 
   public function rolesPermissions()
   {
-    $permissionsByRole = [
-      'Admin' => [...$this->prepPermissions(['user', 'company'])],
-      'Additional Admin' => [...$this->prepPermissions(['user', 'company'])],
-      'Users Manager' => [...$this->prepPermissions(['user'])],
-    ];
+    $this->createAdminRoleWithAllPermissions();
+    $this->createFinanceAssistantRoleWithRelatedPermissions();
+    $this->createContractManagerRoleWithRelatedPermissions();
+    // $permissionsByRole = [
+    //   // 'Admin' => [...$this->prepPermissions(['user', 'company'])],
+    //   'Additional Admin' => [...$this->prepPermissions(['user', 'company'])],
+    //   'Users Manager' => [...$this->prepPermissions(['user'])],
+    // ];
 
-    $insertPermissions = fn ($role) => collect($permissionsByRole[$role])
-      ->map(fn ($name) => Permission::where('name', $name)->where('guard_name', 'admin')->first()->id)
-      ->toArray();
+    // $insertPermissions = fn ($role) => collect($permissionsByRole[$role])
+    //   ->map(fn ($name) => Permission::where('name', $name)->where('guard_name', 'admin')->first()->id)
+    //   ->toArray();
 
-    $permissionIdsByRole = [];
+    // $permissionIdsByRole = [];
 
-    foreach ($permissionsByRole as $role => $p) {
-      $permissionIdsByRole[$role] = $insertPermissions($role);
-    }
+    // foreach ($permissionsByRole as $role => $p) {
+    //   $permissionIdsByRole[$role] = $insertPermissions($role);
+    // }
 
-    foreach ($permissionIdsByRole as $role => $permissionIds) {
-      $role = Role::whereName($role)->firstOrCreate(['name' => $role, 'guard_name' => 'admin']);
+    // foreach ($permissionIdsByRole as $role => $permissionIds) {
+    //   $role = Role::whereName($role)->firstOrCreate(['name' => $role, 'guard_name' => 'admin']);
 
-      DB::table('role_has_permissions')
-        ->insert(
-          collect($permissionIds)->map(fn ($id) => [
-            'role_id' => $role->id,
-            'permission_id' => $id,
-          ])->toArray()
-        );
-    }
+    //   DB::table('role_has_permissions')
+    //     ->insert(
+    //       collect($permissionIds)->map(fn ($id) => [
+    //         'role_id' => $role->id,
+    //         'permission_id' => $id,
+    //       ])->toArray()
+    //     );
+    // }
   }
 
-  public function prepPermissions($models, $crud_actions = [])
-  {
-    $permissions = [];
-    foreach ($models as $model) {
-      $permissions = [...$permissions, ...$this->crudActions($model, $crud_actions)];
-    }
+  // public function prepPermissions($models, $crud_actions = [])
+  // {
+  //   $permissions = [];
+  //   foreach ($models as $model) {
+  //     $permissions = [...$permissions, ...$this->crudActions($model, $crud_actions)];
+  //   }
 
-    return $permissions;
+  //   return $permissions;
+  // }
+
+  // public function crudActions($model, $crud = [])
+  // {
+  //   $actions = [];
+  //   if (empty($crud)) {
+  //     $crud = ['create', 'read', 'update', 'delete'];
+  //   }
+  //   foreach ($crud as $value) {
+  //     $actions = [...$actions, $value . ' ' . $model];
+  //   }
+
+  //   return $actions;
+  // }
+
+  public function createAdminRoleWithAllPermissions()
+  {
+    $role = Role::whereName('Admin')->firstOrCreate(['name' => 'Admin', 'guard_name' => 'admin']);
+    $permissions = Permission::where('guard_name', 'admin')->pluck('id')->toArray();
+
+    $role->syncPermissions($permissions);
   }
 
-  public function crudActions($model, $crud = [])
+  public function createFinanceAssistantRoleWithRelatedPermissions()
   {
-    $actions = [];
-    if (empty($crud)) {
-      $crud = ['create', 'read', 'update', 'delete'];
-    }
-    foreach ($crud as $value) {
-      $actions = [...$actions, $value . ' ' . $model];
-    }
+    $role = Role::whereName('Finance Assistant')->firstOrCreate(['name' => 'Finance Assistant', 'guard_name' => 'admin']);
 
-    return $actions;
+    $modules = Module::where(function ($q) {
+      $q->where('name', 'like', '%Invoice%')
+        ->orWhere('name', 'like', '%Payment%')
+        ->orWhere('name', 'like', '%Contract%');
+    })
+      ->pluck('id')->toArray();
+
+    $permissions = Permission::where('guard_name', 'admin')->whereIn('module_id', $modules)->pluck('id')->toArray();
+
+    $role->syncPermissions($permissions);
+  }
+
+  public function createContractManagerRoleWithRelatedPermissions()
+  {
+    $role = Role::whereName('Contract Manager')->firstOrCreate(['name' => 'Contract Manager', 'guard_name' => 'admin']);
+
+    $modules = Module::where(function ($q) {
+      $q->whereIn('name', ['Programs', 'Company Management'])
+        ->orWhere('name', 'like', '%Contract%');
+    })
+      ->pluck('id')->toArray();
+
+    $permissions = Permission::where('guard_name', 'admin')->whereIn('module_id', $modules)->pluck('id')->toArray();
+
+    $role->syncPermissions($permissions);
   }
 }

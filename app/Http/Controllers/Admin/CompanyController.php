@@ -45,7 +45,8 @@ class CompanyController extends Controller
   public function store(Request $request)
   {
     $att = $request->validate([
-      'name' => ['required', 'string', 'max:255', 'unique:companies,name'],
+      'name' => ['nullable', 'required_if:name_ar,null', 'string', 'max:255', 'unique:companies,name'],
+      'name_ar' => ['nullable', 'required_if:name,null', 'string', 'max:255', 'unique:companies,name_ar'],
       'website' => ['nullable', 'string', 'max:255', 'unique:companies,website'],
       'email' => ['nullable', 'string', 'max:255', 'unique:companies,email'],
       // 'status' => 'required',
@@ -95,7 +96,8 @@ class CompanyController extends Controller
   public function update(Request $request, Company $company)
   {
     $att = $request->validate([
-      'name' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id),],
+      'name' => ['nullable', 'required_if:name_ar,null', 'string', 'max:255', Rule::unique('companies')->ignore($company->id)],
+      'name_ar' => ['nullable', 'required_if:name,null', 'string', 'max:255', Rule::unique('companies')->ignore($company->id)],
       'website' => ['nullable', 'string', 'max:255', Rule::unique('companies')->ignore($company->id)],
       'email' => ['nullable', 'string', 'max:255', Rule::unique('companies')->ignore($company->id)],
       // 'status' => 'required',

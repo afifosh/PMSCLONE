@@ -7,7 +7,7 @@
     <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i
       class="ti ti-dots-vertical"></i></button>
     <div class="dropdown-menu dropdown-menu-end m-0">
-      <a href="javascript:;" data-toggle="confirm-action" data-href="{{route('admin.invoices.release-retention', [$invoice])}}" class="dropdown-item">{{__('Release Retention')}}</a>
+      <a href="javascript:;" data-toggle="ajax-modal" data-href="{{route('admin.invoices.release-retention', [$invoice])}}" class="dropdown-item">{{__('Release Retention')}}</a>
     </div>
   @endif
 </div>

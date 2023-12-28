@@ -20,7 +20,8 @@ return new class extends Migration
       $table->nullableMorphs('assignable');
       $table->boolean('visible_to_client')->default(false);
       $table->string('refrence_id', 100)->nullable();
-      $table->string('subject');
+      $table->string('subject')->nullable();
+      $table->string('subject_ar')->nullable();
       $table->string('currency', 5)->default('SAR');
       $table->unsignedBigInteger('value')->default(0);
       $table->bigInteger('tax_value')->default(0);

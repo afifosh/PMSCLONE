@@ -51,7 +51,8 @@ class ProgramController extends Controller
   public function store(Request $request)
   {
     $att = $request->validate([
-      'name' => 'required|string|max:255|unique:programs,name',
+      'name' => 'nullable|required_if:name_ar,null|string|string|max:255|unique:programs,name',
+      'name_ar' => 'nullable|required_if:name,null|string|string|max:255|unique:programs,name_ar',
       'program_code' => 'required|unique:programs,program_code|string|max:255',
       'parent_id' => 'nullable|exists:programs,id',
       'description' => 'nullable|string|max:2000',
@@ -79,7 +80,8 @@ class ProgramController extends Controller
   public function update(Request $request, Program $program)
   {
     $att = $request->validate([
-      'name' => 'required|string|max:255|unique:programs,name,'.$program->id.',id',
+      'name' => 'nullable|required_if:name_ar,null|string|max:255|unique:programs,name,'.$program->id.',id',
+      'name_ar' => 'nullable|required_if:name,null|string|max:255|unique:programs,name_ar,'.$program->id.',id',
       'program_code' => 'required|string|max:255|unique:programs,program_code,'.$program->id.',id',
       'parent_id' => 'nullable|exists:programs,id',
       'description' => 'nullable|string',

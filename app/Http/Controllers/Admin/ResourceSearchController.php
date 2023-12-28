@@ -7,9 +7,7 @@ use App\Models\AuthorityInvoice;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Invoice;
-use App\Models\User;
 use App\Support\LaravelBalance\Models\AccountBalance;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ResourceSearchController extends Controller
@@ -18,8 +16,8 @@ class ResourceSearchController extends Controller
   {
     $allowedResources = [
       'Company' => [
-        'search' => 'name',
-        'select' => ['id', 'name as text']
+        'search' => DB::raw("Concat(name, ' ', name_ar)"),
+        'select' => ['id', DB::raw("COALESCE(name_ar, name) as text")]
       ],
       'groupedCompany' => [
       ],
@@ -28,16 +26,16 @@ class ResourceSearchController extends Controller
         'select' => ['name as text', 'id']
       ],
       'Program' => [
-        'search' => 'name',
-        'select' => ['name as text', 'id']
+        'search' => DB::raw("Concat(name, ' ', name_ar)"),
+        'select' => [DB::raw("COALESCE(name, name_ar) as text"), 'id']
       ],
       'ProjectCategory' => [
         'search' => 'name',
         'select' => ['name as text', 'id']
       ],
       'Contract' => [
-        'search' => 'subject',
-        'select' => ['subject as text', 'id'],
+        'search' => DB::raw("Concat(subject, ' ', subject_ar)"),
+        'select' => [DB::raw("COALESCE(subject_ar, subject) as text"), 'id'],
         'dependent_column' => [
           'company_id'
         ],
@@ -147,7 +145,7 @@ class ResourceSearchController extends Controller
   protected function contractSelect($allowedResources)
   {
     $resource = 'Contract';
-    return Contract::when(request()->dependent == 'company_id' && request()->dependent_id, function ($q) {
+    return Contract::ValidAccessibleByAdmin(auth('admin')->id())->when(request()->dependent == 'company_id' && request()->dependent_id, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->dependent_id);
     })
       ->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
@@ -196,13 +194,9 @@ class ResourceSearchController extends Controller
         'search' => ['email', 'first_name', 'last_name'],
         'select' => ['id', 'email as text', 'first_name', 'last_name', DB::raw('CONCAT(first_name, " ", last_name) as full_name'), 'avatar']
       ],
-      'Client' => [
-        'search' => ['email', 'first_name', 'last_name'],
-        'select' => ['id', 'email as text', 'first_name', 'last_name']
-      ],
       'Company' => [
-        'search' => ['email', 'name'],
-        'select' => ['id', 'email as text', 'name', 'name as full_name']
+        'search' => ['email', 'name', 'name_ar'],
+        'select' => ['id', 'email as text', DB::raw("COALESCE(name_ar, name) as name"), DB::raw("COALESCE(name_ar, name) as full_name")]
       ],
     ];
     if (!isset($allowedResources[$resource])) {
@@ -246,7 +240,7 @@ class ResourceSearchController extends Controller
   public function groupedCompanySelect()
   {
     // get companies by type
-    $companies = Company::applyRequestFilters()->select(['id', 'name', 'type'])->orderBy('type')->paginate(15, ['*'], 'page', request()->get('page'));
+    $companies = Company::applyRequestFilters()->select(['id', DB::raw("COALESCE(name_ar, name) as name"), 'type'])->orderBy('type')->paginate(15, ['*'], 'page', request()->get('page'));
 
     // Create an array to store the formatted data
     $formattedData = [];

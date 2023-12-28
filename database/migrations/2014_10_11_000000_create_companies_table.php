@@ -19,7 +19,8 @@ return new class extends Migration
             $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('state_id')->nullable()->constrained('states')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete()->cascadeOnUpdate();
-            $table->string('name')->unique();
+            $table->string('name')->unique()->nullable();
+            $table->string('name_ar')->unique()->nullable();
             $table->string('website')->unique()->nullable();
             $table->string('avatar')->nullable();
             $table->string('email')->nullable();

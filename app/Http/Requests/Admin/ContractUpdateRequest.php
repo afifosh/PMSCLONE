@@ -26,7 +26,8 @@ class ContractUpdateRequest extends FormRequest
   {
     return [
       'isSavingDraft' => 'nullable',
-      'subject' => 'required|string',//|max:100|unique:contracts,subject,' . $this->contract->id . ',id,deleted_at,NULL,project_id,' . $this->contract->project_id,
+      'subject' => 'nullable|required_if:subject_ar,null|string',//|max:100|unique:contracts,subject,' . $this->contract->id . ',id,deleted_at,NULL,project_id,' . $this->contract->project_id,
+      'subject_ar' => 'nullable|required_if:subject,null|string',
       'type_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft || $this->contract->status != 'Draft'), 'exists:contract_types,id'],
       'company_id' => ['nullable', Rule::requiredIf(!$this->isSavingDraft), 'exists:companies,id'],
       'category_id' => 'nullable|required_if:isSavingDraft,0|exists:contract_categories,id',

@@ -16,12 +16,27 @@ class Program extends BaseModel implements AccountBalanceHolderInterface
 
     public const DT_ID = 'programs-dataTable';
 
-    protected $fillable = ['parent_id', 'name', 'image', 'program_code', 'description'];
+    protected $fillable = [
+      'parent_id',
+      'name',
+      'name_ar',
+      'image',
+      'program_code',
+      'description'
+    ];
 
     protected $casts = [
       'created_at' => 'datetime:d M, Y',
       'updated_at' => 'datetime:d M, Y',
     ];
+
+    /**
+     * prioritize arabic name over english name
+     */
+    public function getNameAttribute($value)
+    {
+      return $this->name_ar ? $this->name_ar : $value;
+    }
 
     public function scopeMine($query){
       if(auth('admin')->check() && auth('admin')->id() == 1){

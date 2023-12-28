@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('programs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('parent_id')->nullable()->constrained('programs')->nullOnDelete()->cascadeOnUpdate();
-            $table->string('name');
+            $table->string('name')->nullable();
+            $table->string('name_ar')->nullable();
             $table->string('image')->nullable();
             $table->string('program_code')->unique();
             $table->text('description')->nullable();

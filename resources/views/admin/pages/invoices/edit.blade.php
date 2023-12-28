@@ -395,7 +395,7 @@
 @endforelse
 
 {{-- payment delete warning --}}
-@if(in_array($invoice->status, ['Paid', 'Partial Paid']))
+@if(!$invoice->isEditable())
   <div class="col-12 mb-4">
     <div role="alert" class="alert alert-warning alert-dismissible">
       <h5 class="alert-heading mb-2"> <span class="alert-icon text-warning me-2">
@@ -689,7 +689,7 @@
     @if(!in_array($invoice->status, ['Void']))
       <div class="card mb-4">
         <div class="card-body">
-          @if(!in_array($invoice->status, ['Paid', 'Partial Paid']))
+          @if(!$invoice->isEditable())
             <button class="btn btn-primary d-grid w-100" type="button" data-form="ajax-form">
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Save Invoice</span>
             </button>
@@ -697,7 +697,7 @@
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Merge Invoice</span>
             </button>
           @endif
-          @if($invoice->status != 'Paid')
+          @if(!in_array($invoice->status, ['Paid', 'Retention Withheld']))
             <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Add Payment')}}" data-href="{{route('admin.finances.payments.create',['invoice' => $invoice->id])}}">
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
             </button>
@@ -707,7 +707,7 @@
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
             </button>
           @endif
-          @if(!in_array($invoice->status, ['Paid', 'Partial Paid']))
+          @if(!$invoice->isEditable())
             <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Make Void')}}" data-href="{{route('admin.invoices.status.create',['invoice' => $invoice->id])}}">
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Make Void</span>
             </button>

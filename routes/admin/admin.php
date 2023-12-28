@@ -395,6 +395,7 @@ Route::prefix('contracts')->group(function () {
       Route::resource('contracts', ContractController::class)->except(['index', 'create', 'store']);
       // invoices routes
       Route::put('invoices/{invoice}/invoice-tems/sort', [InvoiceController::class, 'sortItems'])->name('invoices.invoice-items.sort');
+      Route::get('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
       Route::post('invoices/{invoice}/release-retention', [InvoiceController::class, 'releaseRetention'])->name('invoices.release-retention');
       Route::delete('invoices/{invoice}/delete-retention', [RetentionController::class, 'destroy'])->name('invoices.destroy-retention');
       Route::resource('invoices', InvoiceController::class)->only(['show', 'edit', 'update', 'destroy']);

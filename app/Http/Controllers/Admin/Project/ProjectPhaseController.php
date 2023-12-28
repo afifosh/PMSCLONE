@@ -57,7 +57,8 @@ class ProjectPhaseController extends Controller
   {
     if (request()->type == 'addons-list') {
       $phase->load(['taxes', 'deduction', 'contract.deductableDownpayments']);
-      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.show.show', compact('phase'))->render()]);
+      $is_paid = false;
+      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.show.show', compact('phase', 'is_paid'))->render()]);
     }
   }
 

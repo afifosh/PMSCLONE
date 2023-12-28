@@ -12,7 +12,12 @@ class PartnerCompany extends BaseModel
 
     public const DT_ID = 'partner-companies-dataTable';
 
-    protected $fillable = ['name', 'website', 'phone', 'status'];
+    protected $fillable = [
+      'name',
+      'website',
+      'phone',
+      'status'
+    ];
 
     public const STATUS = [
       'active' => 'Active',

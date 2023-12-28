@@ -27,6 +27,7 @@ class Contract extends BaseModel
     'invoice_method',
     'refrence_id',
     'subject',
+    'subject_ar',
     'currency',
     'value',
     'start_date',
@@ -68,6 +69,15 @@ class Contract extends BaseModel
   //     // contract should be accessible by auth admin
   //     // static::addGlobalScope(new ContractACLAccessibleByAuth);
   // }
+
+  /**
+   * prioritize arabic subject over english subject
+   */
+  public function getSubjectAttribute($value)
+  {
+    return $this->subject_ar ? $this->subject_ar : $value;
+  }
+
   public function getValueAttribute($value)
   {
     return $value / 1000;
