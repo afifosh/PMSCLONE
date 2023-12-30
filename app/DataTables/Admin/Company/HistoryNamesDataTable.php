@@ -82,6 +82,7 @@ class HistoryNamesDataTable extends DataTable
     return [
       Column::computed('DT_RowIndex', 'No.')->addClass('text-center'),
       Column::make('name'),
+      Column::make('name_ar'),
       Column::make('created_at')->title('Changed At'),
     ];
   }

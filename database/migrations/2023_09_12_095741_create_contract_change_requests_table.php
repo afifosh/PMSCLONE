@@ -16,6 +16,7 @@ return new class extends Migration
       $table->foreignId('contract_id')->constrained()->cascadeOnDelete();
       $table->foreignId('reviewed_by')->nullable()->constrained('admins')->nullOnDelete();
       $table->timestamp('reviewed_at')->nullable();
+      $table->timestamp('requested_at')->nullable();
       $table->string('sender_type')->nullable();
       $table->string('sender_id')->nullable();
       $table->boolean('visible_to_client')->default(false);

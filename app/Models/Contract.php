@@ -39,14 +39,33 @@ class Contract extends BaseModel
 
   protected $appends = ['status', 'printable_value'];
 
+  /**
+   * Contract statuses stored in DB
+   */
+  public const BASE_STATUSES = [
+    0 => 'Draft',
+    1 => 'Active',
+    2 => 'Paused',
+    3 => 'Terminated',
+    4 => 'Early Completed',
+    5 => 'Completed',
+    6 => 'Cancelled',
+  ];
+
+  /**
+   * Derived statuses from base statuses
+   */
   public const STATUSES = [
-    'Not started',
-    'Active',
-    'About To Expire',
-    'Expired',
-    'Draft',
-    'Terminated',
-    'Paused',
+    0 => 'Draft',
+    1 => 'Active',
+    2 => 'Paused',
+    3 => 'Terminated',
+    4 => 'Early Completed',
+    5 => 'Completed',
+    6 => 'Cancelled',
+    7 => 'Not started',
+    8 => 'Expired',
+    9 => 'About To Expire',
   ];
 
   protected $casts = [
@@ -220,7 +239,8 @@ class Contract extends BaseModel
   public function getStatusAttribute()
   {
     $value = $this->getRawOriginal('status');
-    if ($value == 'Terminated' || $value == 'Paused' || $value == 'Draft') return $value;
+    if ($value == 0) return self::BASE_STATUSES[0];
+    if ($value != 1 && in_array($value, array_keys(self::BASE_STATUSES))) return self::BASE_STATUSES[$value];
     //elseif(!$this->start_date) return 'Draft'; // just for extra protection otherwise start date is required in otherthan draft.
     // elseif ($this->end_date && $this->end_date->isPast()) return 'Expired';
     // elseif ($this->start_date->isFuture()) return 'Not started';
@@ -232,21 +252,21 @@ class Contract extends BaseModel
 
     if ($this->end_date == null && $this->start_date) {
       if ($this->start_date->isSameDay(today())) {
-        return "Active";
+        return self::STATUSES[1]; // active
       } elseif ($this->start_date->isFuture()) {
-        return "Not Started";
+        return self::STATUSES[7]; // not started
       } else {
-        return "Expired";
+        return self::STATUSES[8]; // expired
       }
     } else {
       if ($this->end_date->isPast()) {
-        return "Expired";
+        return self::STATUSES[8]; // expired
       } elseif ($this->start_date->isFuture()) {
-        return "Not Started";
+        return self::STATUSES[7]; // not started
       } elseif (now()->diffInDays($this->end_date) <= 30) {
-        return "About To Expire";
+        return self::STATUSES[9]; // about to expire
       } else {
-        return "Active";
+        return self::STATUSES[1]; // active
       }
     }
   }
@@ -254,7 +274,7 @@ class Contract extends BaseModel
   public function getPossibleStatuses()
   {
     $status = $this->getRawOriginal('status');
-    if ($status == 'Active') {
+    if ($status == self::STATUSES[1]) {
       return ['Active', 'Paused', 'Terminated'];
     } elseif ($status == 'Paused') {
       return ['Paused', 'Resumed', 'Terminated'];
@@ -270,20 +290,26 @@ class Contract extends BaseModel
 
   public function scopeApplyRequestFilters($q)
   {
-    return $q->when(request()->filter_status, function ($q) {
-      if (request()->filter_status == 'Draft') return $q->where('contracts.status', 'Draft');
-      else if (request()->filter_status == 'Not started') {
-        $q->where('start_date', '>', now());
-      } elseif (request()->filter_status == 'Expired') {
-        $q->where('contracts.status', 'Active')->where('end_date', '<', now());
-      } elseif (request()->filter_status == 'Terminated') {
-        $q->where('contracts.status', 'Terminated');
-      } elseif (request()->filter_status == 'Paused') {
-        $q->where('contracts.status', 'Paused');
-      } elseif (request()->filter_status == 'Active') {
-        $q->where('contracts.status', 'Active')->where('start_date', '<=', now())->where('end_date', '>=', now()); //->where('end_date', '>=', now()->addWeeks(2));
-      } elseif (request()->filter_status == 'About To Expire') {
-        $q->where('contracts.status', 'Active')->where('end_date', '>', now())->where('end_date', '<', now()->addMonth());
+    return $q->when(request()->has('filter_status'), function ($q) {
+      if (request()->filter_status == 0) return $q->where('contracts.status', 0); // draft
+      else if (request()->filter_status == 7) {
+        $q->where('start_date', '>', now()); // not started
+      } elseif (request()->filter_status == 8) { // expired
+        $q->where('contracts.status', 1)->where('end_date', '<', now());
+      } elseif (request()->filter_status == 3) {
+        $q->where('contracts.status', 3); // terminated
+      } elseif (request()->filter_status == 2) {
+        $q->where('contracts.status', 2); // paused
+      } elseif (request()->filter_status == 1) {
+        $q->where('contracts.status', 1)->where('start_date', '<=', now())->where('end_date', '>=', now()); //->where('end_date', '>=', now()->addWeeks(2));
+      } elseif (request()->filter_status == 9) { // about to expire
+        $q->where('contracts.status', 1)->where('end_date', '>', now())->where('end_date', '<', now()->addMonth());
+      } elseif (request()->filter_status == 4) { // early completed
+        $q->where('contracts.status', 4);
+      } elseif (request()->filter_status == 5) { // completed
+        $q->where('contracts.status', 5);
+      } elseif (request()->filter_status == 6) { // cancelled
+        $q->where('contracts.status', 6);
       }
     })->when(request()->companies, function ($q) {
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->companies);
@@ -392,13 +418,28 @@ class Contract extends BaseModel
               $q->where('is_allowable_cost', 0);
             });
           });
+      })
+      ->when(request()->dependent_2_col == 'change_request_type' && request()->dependent_2, function ($q) {
+        // select2 filter for change request type
+        $q->when(request()->dependent_2 == 'pause-contract', function ($q) {
+          $q->where('status', 1); // active
+        })
+          ->when(request()->dependent_2 == 'resume-contract', function ($q) {
+            $q->where('status', 2); // paused
+          })
+          ->when(request()->dependent_2 == 'terminate-contract', function ($q) {
+            $q->where('status', 1); // active
+          })
+          ->when(request()->dependent_2 == 'early-completed-contract', function ($q) {
+            $q->where('status', 1); // active
+          });
       });
   }
 
   public function scopeApplyRequestFiltersOLD($q)
   {
     return $q->when(request()->filter_status, function ($q) {
-      if (request()->filter_status == 'Draft') return $q->where('contracts.status', 'Draft');
+      if (request()->filter_status == 0) return $q->where('contracts.status', 0); // draft
       else if (request()->filter_status == 'Not started') {
         $q->where('start_date', '>', now());
       } elseif (request()->filter_status == 'Expired') {

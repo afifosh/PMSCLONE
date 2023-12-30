@@ -48,15 +48,9 @@ class Company extends BaseModel
     static::updating(function ($model) {
       if (request()->route()->getName() != 'admin.companies.update') {
         // create record in model history name
-        if ($model->isDirty('name') && $model->getRawOriginal('name')) {
+        if (($model->isDirty('name') && $model->getRawOriginal('name')) || ($model->isDirty('name_ar') && $model->getRawOriginal('name_ar'))) {
           // store old name in model history name
-          $model->historyNames()->create(['name' => $model->getRawOriginal('name')]);
-        }
-
-        // update record in model history name for name_ar
-        if ($model->isDirty('name_ar') && $model->getRawOriginal('name_ar')) {
-          // store old name in model history name//$model->historyNames()->create(['name' => $model->name_ar]);
-          $model->historyNames()->create(['name' => $model->getRawOriginal('name_ar')]);
+          $model->historyNames()->create(['name' => $model->getRawOriginal('name'), 'name_ar' => $model->getRawOriginal('name_ar')]);
         }
       }
     });

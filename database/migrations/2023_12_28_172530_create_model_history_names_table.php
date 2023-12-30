@@ -14,7 +14,8 @@ return new class extends Migration
     Schema::create('model_history_names', function (Blueprint $table) {
       $table->id();
       $table->morphs('model');
-      $table->string('name');
+      $table->string('name')->nullable();
+      $table->string('name_ar')->nullable();
       $table->timestamps();
     });
   }

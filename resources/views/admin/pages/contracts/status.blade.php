@@ -12,6 +12,8 @@
   <span class="badge bg-label-danger">{{ $status }}</span>
 @elseif($status == 'Paused')
   <span class="badge bg-label-warning">{{ $status }}</span>
+@else
+  <span class="badge bg-label-secondary">{{ $status }}</span>
 @endif
 
 

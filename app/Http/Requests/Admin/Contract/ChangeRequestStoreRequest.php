@@ -23,9 +23,10 @@ class ChangeRequestStoreRequest extends FormRequest
   public function rules(): array
   {
     $rules = [
+      'requested_at' => 'required|date',
       'reason' => 'required|string',
       'description' => 'nullable|string',
-      'action_type' => 'required|string|in:update-terms,pause-contract,resume-contract,terminate-contract'
+      'action_type' => 'required|string|in:update-terms,pause-contract,resume-contract,terminate-contract,early-completed-contract',
     ];
 
     if ($this->action_type == 'update-terms') {
@@ -38,21 +39,30 @@ class ChangeRequestStoreRequest extends FormRequest
       ];
     } elseif ($this->action_type == 'pause-contract') {
       $rules = $rules + [
-        'pause_until' => 'required|in:manual,custom_date,custom_unit,custom_date_from',
-        'custom_date_value' => 'nullable|required_if:pause_until,custom_date|date|after:today',
-        'custom_unit' => 'required_if:pause_until,custom_unit|in:Days,Weeks,Months',
-        'pause_for' => 'nullable|required_if:pause_until,custom_unit|numeric|min:1',
-        'custom_from_date_value' => 'nullable|required_if:pause_until,custom_date_from|date|after: ' . $this->contract->start_date,
+        // 'pause_until' => 'required|in:manual,custom_date,custom_unit,custom_date_from',
+        // 'custom_date_value' => 'nullable|required_if:pause_until,custom_date|date|after:today',
+        // 'custom_unit' => 'required_if:pause_until,custom_unit|in:Days,Weeks,Months',
+        // 'pause_for' => 'nullable|required_if:pause_until,custom_unit|numeric|min:1',
+        // 'custom_from_date_value' => 'nullable|required_if:pause_until,custom_date_from|date|after: ' . $this->contract->start_date,
+        'contract_id' => 'required|exists:contracts,id,status,1,deleted_at,NULL',
       ];
     } elseif ($this->action_type == 'terminate-contract') {
       $rules = $rules + [
-        'terminate_date' => 'nullable|in:now,custom',
-        'custom_date' => 'nullable|required_if:terminate_date,custom|date',
+        // 'terminate_date' => 'nullable|in:now,custom',
+        // 'custom_date' => 'nullable|required_if:terminate_date,custom|date',
+        'contract_id' => 'required|exists:contracts,id,status,1,deleted_at,NULL',
       ];
     } elseif ($this->action_type == 'resume-contract') {
       $rules = $rules + [
-        'resume_date' => 'nullable|in:now,custom',
-        'custom_resume_date' => 'nullable|required_if:resume_date,custom|date',
+        // 'resume_date' => 'nullable|in:now,custom',
+        // 'custom_resume_date' => 'nullable|required_if:resume_date,custom|date',
+        'contract_id' => 'required|exists:contracts,id,status,2,deleted_at,NULL',
+        'start_date' => 'nullable|date',
+        'end_date' => 'nullable|date|after:start_date',
+      ];
+    } elseif ($this->action_type == 'early-completed-contract') {
+      $rules = $rules + [
+        'contract_id' => 'required|exists:contracts,id,status,1,deleted_at,NULL',
       ];
     }
 

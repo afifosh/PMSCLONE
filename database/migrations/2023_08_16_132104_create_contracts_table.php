@@ -30,7 +30,7 @@ return new class extends Migration
       $table->dateTime('end_date')->nullable();
       $table->dateTime('signature_date')->nullable();
       $table->text('description')->nullable();
-      $table->enum('status', ['Active', 'Paused', 'Terminated', 'Draft'])->default('Active'); // active status will be used for further calculations(upcoming, expired, about to expire)
+      $table->integer('status')->default(0); // defined in App\Htpp\Models\Contract
       $table->softDeletes();
       $table->timestamps();
     });

@@ -34,6 +34,15 @@ class ChangeRequestsDataTable extends DataTable
         return $change_order->sender->full_name;
       }
     })
+    ->editColumn('status', function($changeRequest) {
+      if($changeRequest->status == 'Pending') {
+        return '<span class="badge bg-label-warning">Pending</span>';
+      } else if($changeRequest->status == 'Approved') {
+        return '<span class="badge bg-label-success">Approved</span>';
+      } else if($changeRequest->status == 'Rejected') {
+        return '<span class="badge bg-label-danger">Rejected</span>';
+      }
+    })
     ->addColumn('changes', function($changeRequest) {
       return view('admin.pages.contracts.change-requests.changes-column', compact('changeRequest'));
     })
@@ -49,7 +58,7 @@ class ChangeRequestsDataTable extends DataTable
     ->editColumn('action', function($change_request){
       return view('admin.pages.contracts.change-requests.action', compact('change_request'));
     })
-    ->rawColumns(['sender', 'action']);
+    ->rawColumns(['sender', 'action', 'status']);
   }
 
   /**
@@ -106,7 +115,8 @@ class ChangeRequestsDataTable extends DataTable
       Column::make('sender'),
       Column::make('change_type')->title('Change type'),
       Column::make('changes')->title('Changes'),
-      Column::make('created_at')->title('Requested At'),
+      Column::make('requested_at')->title('Requested At'),
+      Column::make('reviewed_at')->title('Reviewed At'),
       Column::make('status')->title('Status'),
     ];
 

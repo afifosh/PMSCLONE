@@ -38,7 +38,7 @@ class ContractFactory extends Factory
       'start_date' => $isDraft ? null : $this->faker->dateTimeBetween('-2 years', '-1 years'),
       'end_date' => $endDate ? $this->faker->dateTimeBetween('now', '2 years') : null,
       'description' => $this->faker->paragraph(),
-      'status' => $isDraft ? 'Draft' : $this->faker->randomElement(['Active', 'Draft', 'Terminated'])
+      'status' => $isDraft ? '0' : rand(1, 5),
     ];
   }
 }

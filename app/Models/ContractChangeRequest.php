@@ -13,6 +13,7 @@ class ContractChangeRequest extends Model
   protected $fillable = [
     'contract_id',
     'reviewed_by',
+    'requested_at',
     'sender_type',
     'sender_id',
     'visible_to_client',
@@ -35,6 +36,7 @@ class ContractChangeRequest extends Model
     'old_end_date' => 'datetime:d M, Y',
     'new_end_date' => 'datetime:d M, Y',
     'reviewed_at' => 'datetime:d M, Y',
+    'requested_at' => 'datetime:d M, Y',
     'created_at' => 'datetime:d M, Y',
     'updated_at' => 'datetime:d M, Y',
   ];

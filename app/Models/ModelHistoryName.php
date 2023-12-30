@@ -11,6 +11,7 @@ class ModelHistoryName extends Model
 
   protected $fillable = [
     'name',
+    'name_ar',
     'model_type',
     'model_id',
   ];

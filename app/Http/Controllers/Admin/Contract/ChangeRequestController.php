@@ -7,21 +7,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contract\ChangeRequestStoreRequest;
 use App\Models\Contract;
 use App\Models\ContractChangeRequest;
-use App\Support\LaravelBalance\Dto\TransactionDto;
-use App\Support\LaravelBalance\Models\AccountBalance;
-use App\Traits\FinanceTrait;
 
 class ChangeRequestController extends Controller
 {
-  use FinanceTrait;
-
   public function __construct()
   {
     // check if change request belongs to contract
-    $this->middleware('verifyContractNotTempered:changeRequest,contract_id')->only(['destroy', 'approve', 'reject']);
+    $this->middleware('verifyContractNotTempered:change_request,contract_id')->only(['destroy']);
 
     $this->middleware('permission:read contract')->only(['index']);
-    $this->middleware('permission:update contract')->only(['create', 'store', 'approve', 'reject', 'pauseContract', 'resumeContract', 'terminateContract', 'update']);
+    $this->middleware('permission:update contract')->only(['create', 'store', 'update']);
     $this->middleware('permission:delete contract')->only(['destroy']);
   }
 
@@ -58,6 +53,8 @@ class ChangeRequestController extends Controller
       return $this->terminateContract($request, $contract);
     } else if ($request->action_type == 'resume-contract') {
       return $this->resumeContract($request, $contract);
+    } else if($request->action_type == 'early-completed-contract') {
+      return $this->earlyCompletedContract($request, $contract);
     }
 
     if ($request->value_action != 'unchanged') {
@@ -83,52 +80,10 @@ class ChangeRequestController extends Controller
     return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
   }
 
-  public function pauseContract(ChangeRequestStoreRequest $request, Contract $contract)
-  {
-    $pause_date = now();
-    if ($request->pause_until == 'manual') {
-      $data = [
-        'pause_until' => 'manual',
-        'description' => 'Pause Contract Until Manual Resume'
-      ];
-    } else if ($request->pause_until == 'custom_date') {
-      $data = [
-        'pause_until' => $request->custom_date_value,
-        'description' => 'Pause Contract Until ' . date('d M, Y', strtotime($request->custom_date_value))
-      ];
-    } else if ($request->pause_until == 'custom_unit') {
-      $data = [
-        'pause_until' => now()->{'add' . $request->custom_unit}($request->pause_for),
-        'description' => 'Pause Contract Until ' . now()->{'add' . $request->custom_unit}($request->pause_for)->format('d M, Y')
-      ];
-    } else if($request->pause_until == 'custom_date_from') {
-      $data = [
-        'pause_until' => 'manual',
-        'description' => 'Pause Contract From ' . date('d M, Y', strtotime($request->custom_from_date_value)) . ' Until Manual Resume'
-      ];
-      $pause_date = $request->custom_from_date_value;
-    }
-
-    $data['action'] = 'Pause Contract';
-    $data['pause_date'] = $pause_date;
-
-    $contract->changeRequests()->create([
-      'sender_type' => 'App\Models\Admin',
-      'sender_id' => auth()->id(),
-      'reason' => $request->reason,
-      'type' => 'Lifecycle',
-      'description' => $request->description,
-      'data' => $data
-    ]);
-
-    return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
-  }
-  public function resumeContract(ChangeRequestStoreRequest $request, Contract $contract)
+  private function earlyCompletedContract(ChangeRequestStoreRequest $request, Contract $contract)
   {
     $data = [
-      'resume_date' => $request->resume_date == 'now' ? now() : $request->custom_resume_date,
-      'description' => $request->resume_date == 'now' ? 'Resume Contract' : 'Schedule Contract To Resume',
-      'action' => 'Resume'
+      'action' => 'Early Completed',
     ];
 
     $contract->changeRequests()->create([
@@ -137,7 +92,72 @@ class ChangeRequestController extends Controller
       'reason' => $request->reason,
       'description' => $request->description,
       'type' => 'Lifecycle',
-      'data' => $data
+      'data' => $data,
+      'requested_at' => $request->requested_at
+    ]);
+
+    return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
+  }
+
+  public function pauseContract(ChangeRequestStoreRequest $request, Contract $contract)
+  {
+    // $pause_date = now();
+    // if ($request->pause_until == 'manual') {
+    //   $data = [
+    //     'pause_until' => 'manual',
+    //     'description' => 'Pause Contract Until Manual Resume'
+    //   ];
+    // } else if ($request->pause_until == 'custom_date') {
+    //   $data = [
+    //     'pause_until' => $request->custom_date_value,
+    //     'description' => 'Pause Contract Until ' . date('d M, Y', strtotime($request->custom_date_value))
+    //   ];
+    // } else if ($request->pause_until == 'custom_unit') {
+    //   $data = [
+    //     'pause_until' => now()->{'add' . $request->custom_unit}($request->pause_for),
+    //     'description' => 'Pause Contract Until ' . now()->{'add' . $request->custom_unit}($request->pause_for)->format('d M, Y')
+    //   ];
+    // } else if($request->pause_until == 'custom_date_from') {
+    //   $data = [
+    //     'pause_until' => 'manual',
+    //     'description' => 'Pause Contract From ' . date('d M, Y', strtotime($request->custom_from_date_value)) . ' Until Manual Resume'
+    //   ];
+    //   $pause_date = $request->custom_from_date_value;
+    // }
+
+    $data['action'] = 'Pause Contract';
+    // $data['pause_date'] = $pause_date;
+
+    $contract->changeRequests()->create([
+      'sender_type' => 'App\Models\Admin',
+      'sender_id' => auth()->id(),
+      'reason' => $request->reason,
+      'type' => 'Lifecycle',
+      'description' => $request->description,
+      'data' => $data,
+      'requested_at' => $request->requested_at
+    ]);
+
+    return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
+  }
+  public function resumeContract(ChangeRequestStoreRequest $request, Contract $contract)
+  {
+    $data = [
+      // 'resume_date' => $request->resume_date == 'now' ? now() : $request->custom_resume_date,
+      // 'description' => $request->resume_date == 'now' ? 'Resume Contract' : 'Schedule Contract To Resume',
+      'action' => 'Resume',
+      'start_date' => $request->start_date,
+      'end_date' => $request->end_date
+    ];
+
+    $contract->changeRequests()->create([
+      'sender_type' => 'App\Models\Admin',
+      'sender_id' => auth()->id(),
+      'reason' => $request->reason,
+      'description' => $request->description,
+      'type' => 'Lifecycle',
+      'data' => $data,
+      'requested_at' => $request->requested_at
     ]);
 
     return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
@@ -145,8 +165,8 @@ class ChangeRequestController extends Controller
   public function terminateContract(ChangeRequestStoreRequest $request, Contract $contract)
   {
     $data = [
-      'termination_date' => $request->terminate_date == 'now' ? now() : $request->custom_date,
-      'description' => $request->terminate_date == 'now' ? 'Terminate Contract' : 'Schedule Contract For Termination',
+      // 'termination_date' => $request->terminate_date == 'now' ? now() : $request->custom_date,
+      // 'description' => $request->terminate_date == 'now' ? 'Terminate Contract' : 'Schedule Contract For Termination',
       'action' => 'Termination'
     ];
 
@@ -156,66 +176,11 @@ class ChangeRequestController extends Controller
       'reason' => $request->reason,
       'type' => 'Lifecycle',
       'description' => $request->description,
-      'data' => $data
+      'data' => $data,
+      'requested_at' => $request->requested_at
     ]);
 
     return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
-  }
-
-  public function approve(Contract $contract, ContractChangeRequest $changeRequest)
-  {
-    abort_if($changeRequest->status != 'Pending', 403, 'You can not reject this change request');
-
-    /*
-    * update the account balance of the contract and remaining amount
-    */
-    if ($contract->value != $changeRequest->new_value) {
-      $this->updateAccountBalance($contract, $changeRequest);
-    }
-
-    $contract->update([
-      'value' => $changeRequest->new_value,
-      'currency' => $changeRequest->new_currency,
-      'end_date' => $changeRequest->new_end_date,
-    ]);
-
-    $changeRequest->update([
-      'status' => 'Approved',
-      'reviewed_by' => auth()->id(),
-      'reviewed_at' => now(),
-    ]);
-
-    return $this->sendRes('Change Request Approved Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table']);
-  }
-
-  protected function updateAccountBalance(Contract $contract, $changeRequest)
-  {
-    if ($contract->value != $changeRequest->new_value) {
-      $this->transactionProcessor->create(
-        AccountBalance::find($contract->account_balance_id),
-        new TransactionDto(
-          - ($changeRequest->new_value - $contract->value),
-          $changeRequest->new_value > $contract->value ? 'Debit' : 'Credit',
-          'Contract Commitment - Updated',
-          '',
-          [],
-          ['type' => Contract::class, 'id' => $contract->id]
-        )
-      );
-    }
-  }
-
-  public function reject(Contract $contract, ContractChangeRequest $changeRequest)
-  {
-    abort_if($changeRequest->status != 'Pending', 403, 'You can not reject this change request');
-
-    $changeRequest->update([
-      'status' => 'Rejected',
-      'reviewed_by' => auth()->id(),
-      'reviewed_at' => now(),
-    ]);
-
-    return $this->sendRes('Change Request Rejected Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table']);
   }
 
   public function destroy(Contract $contract, ContractChangeRequest $changeRequest)

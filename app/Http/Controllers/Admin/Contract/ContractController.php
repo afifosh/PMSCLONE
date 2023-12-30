@@ -54,21 +54,21 @@ class ContractController extends Controller
     } if ($data['program']) {
       $dataTable->program = $data['program'];
     } else {
-    $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
+    $data['contract_statuses'] = Contract::STATUSES;
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
     $data['contracts'] = Contract::selectRaw('count(*) as total')
-      // ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and status !="Terminated" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
+      // ->selectRaw('count(case when deleted_at is null and status = "1" and ((end_date is not null and DATE(end_date) > CURDATE() and DATE(end_date) > DATE_ADD(CURDATE(), INTERVAL 2 WEEK) then 1 end)) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "1" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as active')
+      ->selectRaw('count(case when deleted_at is null and status = "1" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as expired')
+      ->selectRaw('count(case when deleted_at is null and status = "1" and status !="3" and end_date >= now() and end_date <= DATE_ADD(now(), INTERVAL 1 MONTH) then 1 end) as expiring_soon')
+      ->selectRaw('count(case when deleted_at is null and status = "1" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as not_started')
       ->selectRaw('count(case when deleted_at is null and created_at <= now() and created_at > DATE_SUB(now(), INTERVAL 1 Day) then 1 end) as recently_added')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as trashed')
-      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as draft')
-      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as terminateed')
-      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as paused')
+      ->selectRaw('count(case when deleted_at is null and status = "0" then 1 end) as draft')
+      ->selectRaw('count(case when deleted_at is null and status = "3" then 1 end) as terminateed')
+      ->selectRaw('count(case when deleted_at is null and status = "2" then 1 end) as paused')
       ->withTrashed()
       ->first();
     }
@@ -142,7 +142,7 @@ class ContractController extends Controller
     $data['contractsByDistribution'] = $this->getContractsByAssignees();
 
     // list of contracts expiring in 30, 60, 90 days
-    $data['expiringContractsList'] = Contract::where('status', 'Active')
+    $data['expiringContractsList'] = Contract::where('status', '1')
       ->whereNotNull('end_date')
       ->where('end_date', '>', now())
       ->where('end_date', '<', now()->addDays(90))
@@ -165,12 +165,12 @@ class ContractController extends Controller
   protected function getContractsByStatus()
   {
     $contracts = Contract::selectRaw('count(*) as total')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as Active')
-      ->selectRaw('count(case when deleted_at is null and status = "Paused" then 1 end) as Paused')
-      ->selectRaw('count(case when deleted_at is null and status = "Draft" then 1 end) as Draft')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as Expired')
-      ->selectRaw('count(case when deleted_at is null and status = "Active" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as Not_Started')
-      ->selectRaw('count(case when deleted_at is null and status = "Terminated" then 1 end) as Terminateed')
+      ->selectRaw('count(case when deleted_at is null and status = "1" and ((end_date is not null and DATE(end_date) > CURDATE()) or (end_date is null and DATE(start_date) = CURDATE())) then 1 end) as Active')
+      ->selectRaw('count(case when deleted_at is null and status = "2" then 1 end) as 2')
+      ->selectRaw('count(case when deleted_at is null and status = "0" then 1 end) as Draft')
+      ->selectRaw('count(case when deleted_at is null and status = "1" and ((end_date is not null and end_date <= now()) or (end_date is null and DATE(start_date) < CURDATE())) then 1 end) as Expired')
+      ->selectRaw('count(case when deleted_at is null and status = "1" and start_date is not null and DATE(start_date) > CURDATE() then 1 end) as Not_Started')
+      ->selectRaw('count(case when deleted_at is null and status = "3" then 1 end) as Terminateed')
       ->selectRaw('count(case when deleted_at is not null then 1 end) as Trashed')
       ->withTrashed()
       ->first();
@@ -269,7 +269,7 @@ class ContractController extends Controller
       END as time_period'),
       DB::raw('COUNT(*) as contract_count')
     )
-      ->where('status', 'Active')
+      ->where('status', '1')
       ->where('end_date', '>', now())
       ->where('end_date', '<=', now()->addDays(90))
       ->groupBy('time_period')
@@ -327,7 +327,7 @@ class ContractController extends Controller
     $data['visible_to_client'] = $request->boolean('visible_to_client');
 
     if ($request->isSavingDraft)
-      $data['status'] = 'Draft';
+      $data['status'] = '0';
 
     $contract = Contract::create($data + $request->validated());
 
@@ -372,7 +372,7 @@ class ContractController extends Controller
     $data['contract'] = $contract;
     $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
     $data['statuses'] = $contract->getPossibleStatuses();
-    if ($contract->status == 'Terminated')
+    if ($contract->status == '3')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
 
       $userHasMarkedComplete = $contract->reviews->contains('user_id', auth()->id());
@@ -415,7 +415,7 @@ class ContractController extends Controller
     $data['contract'] = $contract;
     $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
     $data['statuses'] = $contract->getPossibleStatuses();
-    if ($contract->status == 'Terminated')
+    if ($contract->status == '3')
       $data['termination_reason'] = $contract->getLatestTerminationReason();
 
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.tabs.summary', $data)->render()]);
@@ -438,7 +438,7 @@ class ContractController extends Controller
       $data['contract'] = $contract;
       $data['currency'] = [$contract->currency => '(' . $contract->currency . ') - ' . config('money.currencies.' . $contract->currency . '.name')];
       $data['statuses'] = $contract->getPossibleStatuses();
-      if ($contract->status == 'Terminated')
+      if ($contract->status == '3')
         $data['termination_reason'] = $contract->getLatestTerminationReason();
 
         // Return a view with the summary data
@@ -514,12 +514,12 @@ class ContractController extends Controller
   public function update(ContractUpdateRequest $request, Contract $contract)
   {
 
-    abort_if(!empty($contract->status) && $contract->status != 'Draft' && $request->isSavingDraft, 400, 'You can not save draft for this contract');
+    abort_if(!empty($contract->status) && $contract->status != '0' && $request->isSavingDraft, 400, 'You can not save draft for this contract');
 
     /*
     * if the contract is draft and now it is not draft then create event
     */
-    if ($contract->status == 'Draft' && !$request->isSavingDraft) {
+    if ($contract->status == '0' && !$request->isSavingDraft) {
       $contract->events()->create([
         'event_type' => 'Created',
         'modifications' => $request->validated(),
@@ -533,10 +533,10 @@ class ContractController extends Controller
     $data['visible_to_client'] = $request->boolean('visible_to_client');
 
     if ($request->isSavingDraft)
-      $data['status'] = 'Draft';
+      $data['status'] = '0';
     else {
-      if ($contract->status == 'Draft')
-        $data['status'] = 'Active';
+      if ($contract->status == '0')
+        $data['status'] = '1';
     }
     $contract->update($data + $request->validated());
 

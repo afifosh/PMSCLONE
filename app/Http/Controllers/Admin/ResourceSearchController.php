@@ -138,11 +138,12 @@ class ResourceSearchController extends Controller
             $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
           }
         })
-        ->when($resource == 'Company', function ($q) {
-          $q->orWhereHas('historyNames', function ($q) {
-            $q->where('name', 'like', '%' . request()->get('q') . '%');
+          ->when($resource == 'Company', function ($q) {
+            $q->orWhereHas('historyNames', function ($q) {
+              $q->where('name', 'like', '%' . request()->get('q') . '%')
+                ->orWhere('name_ar', 'like', '%' . request()->get('q') . '%');
+            });
           });
-        });
       })
       ->when(request()->dependent_id, function ($q) use ($allowedResources, $resource) {
         $q->where($allowedResources[$resource]['dependent_column'], request()->dependent_id);
@@ -229,11 +230,12 @@ class ResourceSearchController extends Controller
           $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
         }
       })
-      ->when($resource == 'Company', function ($q) {
-        $q->orWhereHas('historyNames', function ($q) {
-          $q->where('name', 'like', '%' . request()->get('g') . '%');
+        ->when($resource == 'Company', function ($q) {
+          $q->orWhereHas('historyNames', function ($q) {
+            $q->where('name', 'like', '%' . request()->get('g') . '%')
+              ->orWhere('name_ar', 'like', '%' . request()->get('q') . '%');
+          });
         });
-      });
     })->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
   }
 
@@ -262,17 +264,18 @@ class ResourceSearchController extends Controller
   {
     // get companies by type
     $companies = Company::applyRequestFilters()
-    ->when(request()->get('q'), function ($q) {
-      $q->where(function ($q) {
-        foreach (['name', 'name_ar'] as $search) {
-          $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
-        }
+      ->when(request()->get('q'), function ($q) {
+        $q->where(function ($q) {
+          foreach (['name', 'name_ar'] as $search) {
+            $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
+          }
+        })
+          ->orWhereHas('historyNames', function ($q) {
+            $q->where('name', 'like', '%' . request()->get('q') . '%')
+              ->orWhere('name_ar', 'like', '%' . request()->get('q') . '%');
+          });
       })
-      ->orWhereHas('historyNames', function ($q) {
-        $q->where('name', 'like', '%' . request()->get('q') . '%');
-      });
-    })
-    ->select(['id', DB::raw("COALESCE(name_ar, name) as name"), 'type'])->orderBy('type')->paginate(15, ['*'], 'page', request()->get('page'));
+      ->select(['id', DB::raw("COALESCE(name_ar, name) as name"), 'type'])->orderBy('type')->paginate(15, ['*'], 'page', request()->get('page'));
 
     // Create an array to store the formatted data
     $formattedData = [];

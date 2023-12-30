@@ -5,17 +5,6 @@
 @endif
 
 <div id="crc-sec" class="row">
-  @if(!$contract->id)
-    <div class="mb-3">
-      {!! Form::label('contract_id', __('Select Contract'), ['class' => 'col-form-label']) !!}
-      {!! Form::select('contract_id', [], $contract->id ?? null, [
-        'data-placeholder' => 'Select Contract',
-        'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['Contract']),
-        'id' => 'contract_id'
-      ])!!}
-    </div>
-  @endif
   <div class="d-flex">
     <div class="form-check me-3">
       <input class="form-check-input" type="radio" name="action_type" value="update-terms" checked id="update-terms-rad">
@@ -26,24 +15,43 @@
     <div class="form-check me-3">
       <input class="form-check-input" type="radio" name="action_type" value="pause-contract" id="pause-contract">
       <label class="form-check-label" for="pause-contract">
-        Pause Contract
+        Pause
       </label>
     </div>
     <div class="form-check me-3">
       <input class="form-check-input" type="radio" name="action_type" value="resume-contract" id="resume-contract">
       <label class="form-check-label" for="resume-contract">
-        Resume Contract
+        Resume
       </label>
     </div>
-    <div class="form-check">
+    <div class="form-check me-3">
       <input class="form-check-input" type="radio" name="action_type" value="terminate-contract" id="terminate-contract">
       <label class="form-check-label" for="terminate-contract">
-        Terminate Contract
+        Terminate
+      </label>
+    </div>
+    <div class="form-check me-3">
+      <input class="form-check-input" type="radio" name="action_type" value="early-completed-contract" id="early-completed-contract">
+      <label class="form-check-label" for="early-completed-contract">
+        Early Completed
       </label>
     </div>
   </div>
+  {!! Form::hidden('change_request_type', null, ['id' => 'change-request-type', 'class' => 'dependent-select']) !!}
+  @if(!$contract->id)
+    <div class="mb-3">
+      {!! Form::label('contract_id', __('Select Contract'), ['class' => 'col-form-label']) !!}
+      {!! Form::select('contract_id', [], $contract->id ?? null, [
+        'data-placeholder' => 'Select Contract',
+        'class' => 'form-select globalOfSelect2Remote',
+        'data-url' => route('resource-select', ['Contract', 'dependent_2_col' => 'change_request_type']),
+        'data-dependent_2' => 'change-request-type',
+        'id' => 'contract_id'
+      ])!!}
+    </div>
+  @endif
   <div id="pause-contract-section" class="d-none ac-sec">
-    <div class="card mt-2">
+    {{-- <div class="card mt-2">
       <h5 class="card-header">Pause Contract</h5>
         <div class="card-body">
           <div class="row ms-3">
@@ -101,7 +109,7 @@
             </div>
           </div>
         </div>
-    </div>
+    </div> --}}
   </div>
   <div id="update-terms-sectoin" class="ac-sec">
     <div class="card mt-2">
@@ -192,7 +200,7 @@
     </div>
   </div>
   <div id="contract-terminate-section" class="d-none ac-sec">
-    <div class="card mt-2">
+    {{-- <div class="card mt-2">
       <h5 class="card-header p-3">Terminate Contract</h5>
       <div class="card-body">
         <div class="row ms-3">
@@ -215,15 +223,26 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> --}}
   </div>
   <div id="contract-resume-section" class="d-none ac-sec">
-    <div class="card mt-2">
+    {{-- <div class="card mt-2">
       <h5 class="card-header p-3">Resume Contract</h5>
       <div class="card-body">
-        <div class="row ms-3">
+        <div class="row ms-3"> --}}
           <div class="row">
-            <div class="form-check mb-4">
+            {{-- contract start date --}}
+            <div class="form-group col">
+              {{ Form::label('start_date', __('New Start Date'), ['class' => 'col-form-label']) }}
+              {!! Form::date('start_date', null, ['class' => 'form-control flatpickr', 'placeholder' => __('Start Date')]) !!}
+            </div>
+
+            {{-- contract end date --}}
+            <div class="form-group col">
+              {{ Form::label('end_date', __('New End Date'), ['class' => 'col-form-label']) }}
+              {!! Form::date('end_date', null, ['class' => 'form-control flatpickr', 'placeholder' => __('End Date')]) !!}
+            </div>
+            {{-- <div class="form-check mb-4">
               <input class="form-check-input" type="radio" name="resume_date" value="now" id="resume-now" checked>
               <label class="form-check-label" for="resume-now">
                 Resume Immediately
@@ -237,14 +256,20 @@
             </div>
             <div class="mb-3 col-6 d-none">
               <input type="date" name="custom_resume_date" id="custom-resume-date" class="form-control flatpickr" placeholder="Resume Date">
-            </div>
+            </div> --}}
           </div>
-        </div>
+        {{-- </div>
       </div>
-    </div>
+    </div> --}}
   </div>
 
+  {{-- requested at --}}
   <div class="form-group col-12">
+    <label for="requested_at" class='col-form-label'>Requested At</label>
+    {!! Form::date('requested_at', null, ['class' => 'form-control flatpickr', 'placeholder' => __('Requested At')]) !!}
+  </div>
+
+  <div class="form-group mt-3 col-12">
     <label for="reason" class='col-form-label'>Reason</label>
     {!! Form::text('reason', null, ['class' => 'form-control', 'placeholder' => __('Reason')]) !!}
   </div>
@@ -383,7 +408,7 @@
         dataType: 'json',
         success: function(data){
           $('#create-change-request-form').attr('action', route('admin.contracts.change-requests.store', {contract: contract_id}));
-          $('input[name="current_amount"]').val(data.printable_value);
+          $('input[name="current_amount"]').val(data.value);
           $('input[name="current_amount"]').data('value', data.value);
           var end_date = new Date(data.end_date);
           end_date = end_date.toISOString().split('T')[0];
@@ -474,5 +499,11 @@
       }
   });
   // end Resume form js
+
+  // on change of radion button, update hidden field
+  $(document).on('change', 'input[type=radio][name="action_type"]', function(){
+    let val = $(this).val();
+    $('#change-request-type').val(val).trigger('change');
+  });
 
 </script>
