@@ -27,7 +27,7 @@ class Company extends BaseModel
 
   public const DT_ID = 'companies_datatable';
 
- // protected $fillable = ['name', 'email', 'status', 'added_by', 'website'];
+  // protected $fillable = ['name', 'email', 'status', 'added_by', 'website'];
   protected $fillable = ['name', 'name_ar', 'email', 'status', 'added_by', 'website', 'type', 'address', 'city_id', 'state_id', 'zip', 'country_id', 'phone', 'vat_number', 'gst_number'];
 
 
@@ -40,6 +40,27 @@ class Company extends BaseModel
 
   protected $appends = ['avatar'];
 
+  /**
+   * updating event to update model history name
+   */
+  protected static function booted()
+  {
+    static::updating(function ($model) {
+      if (request()->route()->getName() != 'admin.companies.update') {
+        // create record in model history name
+        if ($model->isDirty('name') && $model->getRawOriginal('name')) {
+          // store old name in model history name
+          $model->historyNames()->create(['name' => $model->getRawOriginal('name')]);
+        }
+
+        // update record in model history name for name_ar
+        if ($model->isDirty('name_ar') && $model->getRawOriginal('name_ar')) {
+          // store old name in model history name//$model->historyNames()->create(['name' => $model->name_ar]);
+          $model->historyNames()->create(['name' => $model->getRawOriginal('name_ar')]);
+        }
+      }
+    });
+  }
   /**
    * prioritize arabic name over english name
    */
@@ -183,6 +204,14 @@ class Company extends BaseModel
   public function projects()
   {
     return $this->belongsToMany(Project::class, 'project_companies');
+  }
+
+  /**
+   * All of the model's history names.
+   */
+  public function historyNames(): MorphMany
+  {
+    return $this->morphMany(ModelHistoryName::class, 'model');
   }
 
   public function POCDetail()
@@ -358,29 +387,29 @@ class Company extends BaseModel
     $query->when(request()->has('filter_levels') && is_array(request()->filter_levels), function ($q) {
       $q->whereIn('approval_level', request()->filter_levels);
     })
-    ->when(request()->except, function ($q) {
-      $q->where('id', '!=', request()->except);
-    })
-    ->when(request()->get('q'), function ($q) {
-      $q->where('name', 'like', '%' . request()->get('q') . '%');
-    })
-    ->when(request()->has('contracts') || request()->has('hasContract'), function ($q) {
-      $q->has('contracts');
-    })
-    ->when(request()->has('hasinv'), function ($q) {
-      $q->has('contracts.invoices');
-    })
-    ->when(request()->has('haspayments'), function ($q) {
-      $q->has('contracts.invoices.payments');
-    })
-    ->when(request()->has('type'), function ($q) {
-      $q->where('type', request()->type);
-    })
-    ->when(request()->has('except-parties-of-contract') && request()->get('except-parties-of-contract'), function ($q) {
-      $q->whereDoesntHave('pivotPartyOfContracts', function ($q) {
-        $q->where('contract_id', request()->get('except-parties-of-contract'));
+      ->when(request()->except, function ($q) {
+        $q->where('id', '!=', request()->except);
+      })
+      ->when(request()->get('q'), function ($q) {
+        $q->where('name', 'like', '%' . request()->get('q') . '%');
+      })
+      ->when(request()->has('contracts') || request()->has('hasContract'), function ($q) {
+        $q->has('contracts');
+      })
+      ->when(request()->has('hasinv'), function ($q) {
+        $q->has('contracts.invoices');
+      })
+      ->when(request()->has('haspayments'), function ($q) {
+        $q->has('contracts.invoices.payments');
+      })
+      ->when(request()->has('type'), function ($q) {
+        $q->where('type', request()->type);
+      })
+      ->when(request()->has('except-parties-of-contract') && request()->get('except-parties-of-contract'), function ($q) {
+        $q->whereDoesntHave('pivotPartyOfContracts', function ($q) {
+          $q->where('contract_id', request()->get('except-parties-of-contract'));
+        });
       });
-    });
   }
 
   /**
@@ -567,7 +596,7 @@ class Company extends BaseModel
     $query = $this->POCmodifications()
       ->with('approvals.approver', 'disapprovals.disapprover', 'modifiable')
       ->withTrashed();
-    if ($approval_request){
+    if ($approval_request) {
       $modificationIds = $this->approvalRequests()->findOrFail($approval_request)->getModificationIds();
       $query->whereIn('id', $modificationIds);
     }
@@ -595,6 +624,6 @@ class Company extends BaseModel
 
   public function warehouses()
   {
-      return $this->morphMany(Warehouse::class,'owner');
+    return $this->morphMany(Warehouse::class, 'owner');
   }
 }

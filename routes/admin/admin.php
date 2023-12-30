@@ -104,7 +104,9 @@ use App\Http\Controllers\Admin\InstitutionController;
 use App\Http\Controllers\Admin\MuseumController;
 use App\Http\Controllers\Admin\MediumController;
 use App\Http\Controllers\Admin\ArtistController;
+use App\Http\Controllers\Admin\Company\CompanyNameController;
 use App\Http\Controllers\Admin\Contract\ContractPartyController;
+use App\Http\Controllers\Admin\Contract\Phase\PhaseCostAdjustmentController;
 use App\Http\Controllers\Admin\Contract\Phase\PhaseDeductionController;
 use App\Http\Controllers\Admin\Contract\Phase\PhaseTaxController;
 use App\Http\Controllers\Admin\Contract\Phase\SubtotalAdjustmentController;
@@ -175,6 +177,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('companies', CompanyController::class);
     Route::resource('companies.contracts', ContractController::class);
     Route::resource('companies.contacts', UserController::class);
+    Route::resource('companies.names', CompanyNameController::class);
     Route::resource('companies.contact-persons', ContactPersonController::class);
     Route::match(['get', 'post'], 'company-invitations/{company_invitation}/revoke', [InvitationController::class, 'revokeInvitation'])->name('company-invitations.revoke');
     Route::get('/company-invitations/{company_invitation}/logs', [InvitationController::class, 'invitationLogs'])->name('company-invitations.logs');
@@ -367,6 +370,7 @@ Route::prefix('contracts')->group(function () {
       Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
       Route::get('contracts/{contract}/phases/{phase}', [ProjectPhaseController::class, 'show'])->name('contracts.phases.show');
       Route::resource('contracts.phases.taxes', PhaseTaxController::class);
+      Route::resource('contracts.phases.cost-adjustments', PhaseCostAdjustmentController::class);
       Route::resource('contracts.phases.deductions', PhaseDeductionController::class);
       Route::resource('contracts.invoices.comments', CommentController::class)->only(['index']);
       Route::get('contracts/{contract}/invoices', [InvoiceController::class, 'index'])->name('contracts.invoices.index');
@@ -374,7 +378,7 @@ Route::prefix('contracts')->group(function () {
       Route::post('contracts/{contract}/release-retentions', [ContractController::class, 'releaseRetention'])->name('contracts.release-retentions');
       Route::resource('contracts.contract-parties', ContractPartyController::class);
       Route::resource('contracts.logs', LogController::class)->only(['index']);
-      Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
+      // Route::resource('contracts.change-requests', ChangeRequestController::class)->only(['index', 'create', 'store', 'destroy']);
       Route::post('contracts/{contract}/change-requests/{change_request}/approve', [ChangeRequestController::class, 'approve'])->name('contracts.change-requests.approve');
       Route::post('contracts/{contract}/change-requests/{change_request}/reject', [ChangeRequestController::class, 'reject'])->name('contracts.change-requests.reject');
       Route::resource('contracts.settings', ContractSettingController::class)->only(['index']);
@@ -606,6 +610,9 @@ Route::prefix('contracts')->group(function () {
         Route::resource('scorecards', ApplicationScoreCardController::class);
       });
     });
+    Route::get('react-app', function () {
+      return view('admin.pages.react-app');
+    })->name('react-app');
   });
 });
 Route::put('forms/fill/{id}', [FormController::class, 'fillStore'])->name('admin.applications.settings.forms.fill.store');

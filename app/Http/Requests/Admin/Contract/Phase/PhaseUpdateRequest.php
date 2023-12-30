@@ -15,6 +15,18 @@ class PhaseUpdateRequest extends FormRequest
   }
 
   /**
+   * Prepare the data for validation.
+   *
+   * @return void
+   */
+  protected function prepareForValidation(): void
+  {
+    $this->merge([
+      'is_allowable_cost' => $this->boolean('is_allowable_cost'),
+    ]);
+  }
+
+  /**
    * Get the validation rules that apply to the request.
    *
    * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
@@ -30,6 +42,7 @@ class PhaseUpdateRequest extends FormRequest
         'gte:0',
         //'max:' .  ($this->contract->remaining_amount - $this->calculated_tax_amount))
       ],
+      'is_allowable_cost' => 'required|boolean',
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $this->contract->start_date,
       'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->contract->end_date,

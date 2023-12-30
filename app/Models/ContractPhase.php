@@ -28,7 +28,8 @@ class ContractPhase extends BaseModel
     'start_date',
     'due_date',
     'description',
-    'order'
+    'order',
+    'is_allowable_cost'
   ];
 
   protected $appends = ['status'];
@@ -119,7 +120,7 @@ class ContractPhase extends BaseModel
    */
   public function getSubtotalRowRawAttribute()
   {
-    if(!$this->deduction)
+    if (!$this->deduction)
       return $this->estimated_cost;
     if ($this->deduction->is_before_tax) {
       return $this->estimated_cost - $this->deduction->amount;
@@ -241,11 +242,22 @@ class ContractPhase extends BaseModel
     })->join('contract_stages as cs1', 'contract_phases.stage_id', '=', 'cs1.id')
       ->join('contracts as c1', 'cs1.contract_id', '=', 'c1.id')
       ->leftJoin('programs as p1', 'c1.program_id', '=', 'p1.id')
-    ->when(request()->has('dnh-regular-invoice') && request()->get('dnh-regular-invoice'), function ($q) {
-      $q->whereDoesntHave('addedAsInvoiceItem.invoice', function ($q) {
-        $q->where('type', 'Regular');
+      ->when(request()->has('dnh-regular-invoice') && request()->get('dnh-regular-invoice'), function ($q) {
+        $q->whereDoesntHave('addedAsInvoiceItem.invoice', function ($q) {
+          $q->where('type', 'Regular');
+        });
+      })
+      ->when(request()->dependent_2_col == 'creating-inv-type' && request()->get('dependent_2'), function ($q) {
+        // invoice creating dependent filter
+        $q->when(request()->get('dependent_2') == 'Partial Invoice', function ($q) {
+          // user is creating partial invoice, query the contracts which has allowable phases.
+          $q->where('is_allowable_cost', 1);
+        })
+          ->when(request()->get('dependent_2') == 'Regular', function ($q) {
+            // user is creating regular invoice, query the contractw which has regular phases.
+            $q->where('is_allowable_cost', 0);
+          });
       });
-    });
   }
 
 
@@ -282,14 +294,56 @@ class ContractPhase extends BaseModel
   public function addedInPaidInvoices()
   {
     return $this->morphMany(InvoiceItem::class, 'invoiceable')->whereHas('invoice', function ($q) {
-      $q->whereIn('status', ['Paid', 'Partial Paid']);
+      $q->whereIn('status', ['Paid', 'Partial Paid', 'Retention Withheld']);
     });
   }
 
+  /**
+   * Invoice Items which are being paid against this phase. with invoice
+   */
+  public function addedInPaidInvoicesWithInvoice()
+  {
+    return $this->morphMany(InvoiceItem::class, 'invoiceable')->whereHas('invoice', function ($q) {
+      $q->whereIn('status', ['Paid', 'Partial Paid', 'Retention Withheld']);
+    })->with('invoice');
+  }
+
+  /**
+   * Amount paid against allowable cost including deduction.
+   */
+  public function paidAmountAgainstAllowableCost()
+  {
+    return $this->addedInPaidInvoicesWithInvoice->sum(function ($item) {
+      return $item->invoice->paid_amount;
+      // deduction not included from the custom items, because deduction is added in the main phase and deducted from total cost.
+      //+ (@$item->deduction->manual_amount ? $item->deduction->manual_amount : (@$item->deduction->amount ? $item->deduction->amount : 0));
+    });
+  }
+
+  /**
+   * is this phase partially paid
+   */
+  public function isPartialPaid()
+  {
+    return $this->paidAmountAgainstAllowableCost() < $this->total_cost;
+  }
+
+  /**
+   * Is this phase fully paid
+   */
   public function isPaid(): bool
   {
     return $this->addedInPaidInvoices->count() > 0;
+
+    // if (!$this->is_allowable_cost) {
+    //   // if not allowable cost, means paid in signle invoice.
+    //   return $this->addedInPaidInvoices->count() > 0;
+    // } else {
+    //   // might be paid in partial invoices.
+    //   return $this->paidAmountAgainstAllowableCost() >= $this->total_cost;
+    // }
   }
+
   public function invoices(): BelongsToMany
   {
     return $this->belongsToMany(Invoice::class, 'invoice_items', 'invoiceable_id', 'invoice_id')->where('invoiceable_type', ContractPhase::class);
@@ -345,7 +399,7 @@ class ContractPhase extends BaseModel
   public function recalculateDeductionAmount($reset_manual_amount = true): void
   {
     $this->load('deduction');
-    if(!$this->deduction) return;
+    if (!$this->deduction) return;
     $phaseTaxes = PhaseTax::where('contract_phase_id', $this->id)
       ->select([
         'category',
@@ -408,6 +462,15 @@ class ContractPhase extends BaseModel
     $this->save();
   }
 
+  public function reCalculateCost()
+  {
+    $this->load('costAdjustments');
+
+    $this->total_cost = $this->estimated_cost + $this->costAdjustments->sum('amount');
+
+    $this->save();
+  }
+
   /**
    * Recalculate tax amounts and reset manual amounts to 0
    * This function is called when deduction is created
@@ -416,10 +479,10 @@ class ContractPhase extends BaseModel
   {
     $this->load('pivotTaxes');
     $taxableAmount = $this->estimated_cost - (($considerDeduction && $this->deduction && $this->deduction->is_before_tax) ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
-    foreach($this->pivotTaxes as $tax){
-      if($tax->type == 'Fixed'){
+    foreach ($this->pivotTaxes as $tax) {
+      if ($tax->type == 'Fixed') {
         continue;
-      }else{
+      } else {
         $tax->manual_amount = 0;
         $tax->calculated_amount = $taxableAmount * $tax->amount / 100;
         $tax->save();
@@ -432,7 +495,7 @@ class ContractPhase extends BaseModel
    */
   public function syncUpdateWithInvoices(string $except = null): void
   {
-    $this->load('addedAsInvoiceItem.invoice', 'pivotTaxes', 'deduction');
+    $this->load('addedAsInvoiceItem.invoice', 'pivotTaxes', 'deduction', 'costAdjustments');
 
     // if added in invoice then update invoice item and tax amount, deduction amount and total
     if ($this->addedAsInvoiceItem->count()) {
@@ -445,7 +508,7 @@ class ContractPhase extends BaseModel
           'total_tax_amount' => $this->tax_amount,
           'authority_inv_total' =>
           // pivot taxes
-          $this->pivotTaxes()->whereIn('category', [2,3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000,
+          $this->pivotTaxes()->whereIn('category', [2, 3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000,
           'total' => $this->getRawOriginal('total_cost') / 1000,
           'subtotal_amount_adjustment' => $this->subtotal_amount_adjustment,
           'total_amount_adjustment' => $this->total_amount_adjustment,
@@ -454,7 +517,7 @@ class ContractPhase extends BaseModel
 
         $item->taxes()->detach();
 
-        foreach($this->pivotTaxes as $tax){
+        foreach ($this->pivotTaxes as $tax) {
           $item->taxes()->attach($tax->tax_id, [
             'amount' => $tax->getRawOriginal('amount'),
             'type' => $tax->type,
@@ -465,7 +528,7 @@ class ContractPhase extends BaseModel
           ]);
         }
 
-        if($this->deduction){
+        if ($this->deduction) {
           $item->deduction()->updateOrCreate([
             'deductible_id' => $item->id,
             'deductible_type' => InvoiceItem::class,
@@ -479,12 +542,30 @@ class ContractPhase extends BaseModel
             'is_before_tax' => $this->deduction->is_before_tax,
             'calculation_source' => $this->deduction->calculation_source,
           ]);
-        }else{
+        } else {
           $item->deduction()->delete();
         }
+
+        // if ($this->costAdjustments->count()) {
+        //   $item->costAdjustments()->delete();
+        //   $this->costAdjustments->each(function ($costAdjustment) use ($item) {
+        //     $item->costAdjustments()->create([
+        //       'amount' => $costAdjustment->amount,
+        //       'description' => $costAdjustment->description,
+        //     ]);
+        //   });
+        // }
 
         $item->invoice->reCalculateTotal();
       });
     }
+  }
+
+  /**
+   * Phase Has Many cost adjustments
+   */
+  public function costAdjustments(): HasMany
+  {
+    return $this->hasMany(PhaseCostAdjustment::class, 'phase_id');
   }
 }

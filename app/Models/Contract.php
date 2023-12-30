@@ -199,12 +199,12 @@ class Contract extends BaseModel
         $q->where('user_id', $admin_id);
       });
     })
-    // also have some phases which are not reviewed by this admin
-    ->whereHas('phases', function ($q) use ($admin_id) {
-      $q->whereDoesntHave('reviews', function ($q) use ($admin_id) {
-        $q->where('user_id', $admin_id);
+      // also have some phases which are not reviewed by this admin
+      ->whereHas('phases', function ($q) use ($admin_id) {
+        $q->whereDoesntHave('reviews', function ($q) use ($admin_id) {
+          $q->where('user_id', $admin_id);
+        });
       });
-    });
   }
 
   /**
@@ -363,20 +363,35 @@ class Contract extends BaseModel
       // has reviewed phase or can review phase.
       ->when(request()->phase_reviewer, function ($q) {
         $q->validAccessibleByAdmin(request()->phase_reviewer)
-        ->orWhereHas('phaseReviews', function ($q) {
-          $q->where('user_id', request()->phase_reviewer);
-        });
+          ->orWhereHas('phaseReviews', function ($q) {
+            $q->where('user_id', request()->phase_reviewer);
+          });
       })
       ->when(request()->has('phase_review_status') && request()->phase_reviewer, function ($q) {
         $q->when(request()->phase_review_status == 'reviewed', function ($q) {
           $q->completelyReviewedBy(request()->phase_reviewer);
         })
-        ->when(request()->phase_review_status == 'not_reviewed', function ($q) {
-          $q->notReviewedBy(request()->phase_reviewer);
+          ->when(request()->phase_review_status == 'not_reviewed', function ($q) {
+            $q->notReviewedBy(request()->phase_reviewer);
+          })
+          ->when(request()->phase_review_status == 'partially_reviewed', function ($q) {
+            $q->partiallyReviewedBy(request()->phase_reviewer);
+          });
+      })
+      ->when(request()->dependent_2_col == 'creating-inv-type' && request()->get('dependent_2'), function ($q) {
+        // invoice creating dependent filter
+        $q->when(request()->get('dependent_2') == 'Partial Invoice', function ($q) {
+          // user is creating partial invoice, query the contracts which has allowable phases.
+          $q->whereHas('phases', function ($q) {
+            $q->where('is_allowable_cost', 1);
+          });
         })
-        ->when(request()->phase_review_status == 'partially_reviewed', function ($q) {
-          $q->partiallyReviewedBy(request()->phase_reviewer);
-        });
+          ->when(request()->get('dependent_2') == 'Regular', function ($q) {
+            // user is creating regular invoice, query the contractw which has regular phases.
+            $q->whereHas('phases', function ($q) {
+              $q->where('is_allowable_cost', 0);
+            });
+          });
       });
   }
 
@@ -556,9 +571,9 @@ class Contract extends BaseModel
           $q->where('admin_id', $admin_id);
         });
     })
-    ->whereDoesntHave('invalidDirectACLRules', function ($q) use ($admin_id) {
-      $q->where('admin_id', $admin_id);
-    });
+      ->whereDoesntHave('invalidDirectACLRules', function ($q) use ($admin_id) {
+        $q->where('admin_id', $admin_id);
+      });
   }
 
   public function reviews()
@@ -830,8 +845,8 @@ class Contract extends BaseModel
           'from' => $stage->name,
           'phase' => $tax->contractPhase->name,
           'to' => ($tax->tax->name . ' - ' . $tax->tax->categoryShortName()),
-          'value' =>$tax->manual_amount ? $tax->manual_amount : $tax->calculated_amount,
-          'id' => 't'.$stage->id.'-'.$tax->tax->id,
+          'value' => $tax->manual_amount ? $tax->manual_amount : $tax->calculated_amount,
+          'id' => 't' . $stage->id . '-' . $tax->tax->id,
         ];
       });
 

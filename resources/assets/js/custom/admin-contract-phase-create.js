@@ -66,6 +66,36 @@ $(document).on('click change', '.phase-check', function(){
     });
   }
 
+  function createPhaseCostAdjustment(phase_id)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $('#phase-addons tr:last').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.contracts.phases.cost-adjustments.create', { contract: window.active_contract ?? 0, phase: phase_id }),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $('#phase-addons tr:last').after(res.data.view_data);
+      }
+    });
+  }
+
+  function editPhaseCostAdjustment(phase_id, cost_adjustment_id, element)
+  {
+    $('.expanded-edit-row').remove();
+    // show loading in child row
+    $(element).closest('tr').after('<tr class="loading-row expanded-edit-row my-5"><td colspan="100%" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>');
+    $.ajax({
+      url: route('admin.contracts.phases.cost-adjustments.edit', { contract: window.active_contract ?? 0, phase: phase_id, cost_adjustment: cost_adjustment_id }),
+      type: "GET",
+      success: function(res){
+        $('.expanded-edit-row').remove();
+        $(element).closest('tr').after(res.data.view_data);
+      }
+    });
+  }
+
   function createPhaseDeduction(phase_id)
   {
     $('.expanded-edit-row').remove();

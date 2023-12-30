@@ -107,7 +107,8 @@ class InvoiceStoreRequest extends FormRequest
       'note' => 'nullable|string',
       'terms' => 'nullable|string',
       'refrence_id' => 'nullable|string|max:255',
-      'phase_id' => 'nullable|required_if:type,Partial Invoice|exists:contract_phases,id'
+      // if type = Partial Invoice, phase shoulde be allowable cost
+      'phase_id' => 'nullable|required_if:type,Partial Invoice|exists:contract_phases,id' . ($this->type == 'Partial Invoice' ? ',is_allowable_cost,1' : ''),
     ];
   }
 

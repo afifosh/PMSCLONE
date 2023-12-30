@@ -71,6 +71,16 @@
   </div>
 
 </div>
+<div class="col-12 my-2">
+  <label class="switch">
+    <input class="switch-input" @checked($phase->is_allowable_cost) name="is_allowable_cost" type="checkbox" value="1">
+    <span class="switch-toggle-slider">
+      <span class="switch-on"></span>
+      <span class="switch-off"></span>
+    </span>
+    <span class="switch-label">Is Allowable?</span>
+  </label>
+</div>
 <div class="col-md-12 mt-3">
   <div class="mb-3">
     {!! Form::label('description', 'Description', ['class' => 'col-form-label']) !!}

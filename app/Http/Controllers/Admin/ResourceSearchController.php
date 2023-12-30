@@ -16,17 +16,16 @@ class ResourceSearchController extends Controller
   {
     $allowedResources = [
       'Company' => [
-        'search' => DB::raw("Concat(name, ' ', name_ar)"),
+        'search' => ['name', 'name_ar'],
         'select' => ['id', DB::raw("COALESCE(name_ar, name) as text")]
       ],
-      'groupedCompany' => [
-      ],
+      'groupedCompany' => [],
       'Project' => [
-        'search' => 'name',
+        'search' => ['name', 'name_ar'],
         'select' => ['name as text', 'id']
       ],
       'Program' => [
-        'search' => DB::raw("Concat(name, ' ', name_ar)"),
+        'search' => ['name', 'name_ar'],
         'select' => [DB::raw("COALESCE(name, name_ar) as text"), 'id']
       ],
       'ProjectCategory' => [
@@ -34,7 +33,7 @@ class ResourceSearchController extends Controller
         'select' => ['name as text', 'id']
       ],
       'Contract' => [
-        'search' => DB::raw("Concat(subject, ' ', subject_ar)"),
+        'search' => ['subject', 'subject_ar'],
         'select' => [DB::raw("COALESCE(subject_ar, subject) as text"), 'id'],
         'dependent_column' => [
           'company_id'
@@ -110,7 +109,7 @@ class ResourceSearchController extends Controller
       'InvoiceOrAuthorityInvoice' => []
     ];
     if (!isset($allowedResources[$resource])) {
-     // return $this->sendError('Invalid resource');
+      // return $this->sendError('Invalid resource');
     }
 
     if ($resource == 'Currency') {
@@ -130,11 +129,24 @@ class ResourceSearchController extends Controller
 
     $query = $model::query();
 
-    return $query->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
+    return $query->when(request()->get('q') && !is_array($allowedResources[$resource]['search']), function ($q) use ($allowedResources, $resource) {
       $q->where($allowedResources[$resource]['search'], 'like', '%' . request()->get('q') . '%');
-    })->when(request()->dependent_id, function ($q) use ($allowedResources, $resource) {
-      $q->where($allowedResources[$resource]['dependent_column'], request()->dependent_id);
     })
+      ->when(request()->get('q') && is_array($allowedResources[$resource]['search']), function ($q) use ($allowedResources, $resource) {
+        $q->where(function ($q) use ($allowedResources, $resource) {
+          foreach ($allowedResources[$resource]['search'] as $search) {
+            $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
+          }
+        })
+        ->when($resource == 'Company', function ($q) {
+          $q->orWhereHas('historyNames', function ($q) {
+            $q->where('name', 'like', '%' . request()->get('q') . '%');
+          });
+        });
+      })
+      ->when(request()->dependent_id, function ($q) use ($allowedResources, $resource) {
+        $q->where($allowedResources[$resource]['dependent_column'], request()->dependent_id);
+      })
       ->when(request()->except, function ($q) use ($allowedResources, $resource) {
         $q->where('id', '!=', request()->except);
       })
@@ -149,7 +161,11 @@ class ResourceSearchController extends Controller
       $q->where('assignable_type', Company::class)->where('assignable_id', request()->dependent_id);
     })
       ->when(request()->get('q'), function ($q) use ($allowedResources, $resource) {
-        $q->where($allowedResources[$resource]['search'], 'like', '%' . request()->get('q') . '%');
+        $q->where(function ($q) use ($allowedResources, $resource) {
+          foreach ($allowedResources[$resource]['search'] as $search) {
+            $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
+          }
+        });
       })
       ->when(request()->except, function ($q) use ($allowedResources, $resource) {
         $q->where('id', '!=', request()->except);
@@ -160,12 +176,12 @@ class ResourceSearchController extends Controller
 
   protected function invoiceOrAuthorityInvoiceSelect()
   {
-    if(request()->dependent == 'AuthorityInvoice'){
+    if (request()->dependent == 'AuthorityInvoice') {
       return AuthorityInvoice::applyRequestFilters()
-      ->select(['id', DB::raw("CONCAT('TAINV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/1000) as text")])->paginate(15, ['*'], 'page', request()->get('page'));
-    }elseif(request()->dependent == 'Invoice'){
+        ->select(['id', DB::raw("CONCAT('TAINV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/1000) as text")])->paginate(15, ['*'], 'page', request()->get('page'));
+    } elseif (request()->dependent == 'Invoice') {
       return  Invoice::applyRequestFilters()
-      ->select(['id', DB::raw("CONCAT('INV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/1000) as text")])->paginate(15, ['*'], 'page', request()->get('page'));
+        ->select(['id', DB::raw("CONCAT('INV-', LPAD(id, 4, '0'), ' - UnPaid:', (total - paid_amount)/1000) as text")])->paginate(15, ['*'], 'page', request()->get('page'));
     }
   }
 
@@ -212,6 +228,11 @@ class ResourceSearchController extends Controller
         foreach ($allowedResources[$resource]['search'] as $search) {
           $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
         }
+      })
+      ->when($resource == 'Company', function ($q) {
+        $q->orWhereHas('historyNames', function ($q) {
+          $q->where('name', 'like', '%' . request()->get('g') . '%');
+        });
       });
     })->select($allowedResources[$resource]['select'])->paginate(15, ['*'], 'page', request()->get('page'));
   }
@@ -240,7 +261,18 @@ class ResourceSearchController extends Controller
   public function groupedCompanySelect()
   {
     // get companies by type
-    $companies = Company::applyRequestFilters()->select(['id', DB::raw("COALESCE(name_ar, name) as name"), 'type'])->orderBy('type')->paginate(15, ['*'], 'page', request()->get('page'));
+    $companies = Company::applyRequestFilters()
+    ->when(request()->get('q'), function ($q) {
+      $q->where(function ($q) {
+        foreach (['name', 'name_ar'] as $search) {
+          $q->orWhere($search, 'like', '%' . request()->get('q') . '%');
+        }
+      })
+      ->orWhereHas('historyNames', function ($q) {
+        $q->where('name', 'like', '%' . request()->get('q') . '%');
+      });
+    })
+    ->select(['id', DB::raw("COALESCE(name_ar, name) as name"), 'type'])->orderBy('type')->paginate(15, ['*'], 'page', request()->get('page'));
 
     // Create an array to store the formatted data
     $formattedData = [];
@@ -276,15 +308,15 @@ class ResourceSearchController extends Controller
 
   private function multipleOwners()
   {
-    if(request()->dependent_id == 'Company'){
+    if (request()->dependent_id == 'Company') {
       request()->merge([
         'type' => 'Company'
       ]);
-    }elseif(request()->dependent_id == 'Client'){
+    } elseif (request()->dependent_id == 'Client') {
       request()->merge([
         'type' => 'Person'
       ]);
-    }elseif(request()->dependent_id == 'PartnerCompany'){
+    } elseif (request()->dependent_id == 'PartnerCompany') {
       request()->merge([
         'dependent_id' => null,
       ]);

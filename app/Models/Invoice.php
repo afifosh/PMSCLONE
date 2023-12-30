@@ -312,8 +312,21 @@ class Invoice extends Model
   {
     $ta_invoice = $this->authorityInvoice()->firstOrNew(['invoice_id' => $this->id]);
     $ta_invoice->total = $this->totalAuthorityTax();
-    $ta_invoice->total_wht = $this->allPivotTaxes()->where('category', 2)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000;
-    $ta_invoice->total_rc = $this->allPivotTaxes()->where('category', 3)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000;
+    $ta_invoice->total_wht = $this->allPivotTaxes()
+      ->when($this->type == 'Partial Invoice', function ($q) {
+        // if partial invoice, consider taxes from custom items only
+        $q->whereHas('invoiceItem', function ($q) {
+          $q->where('invoiceable_type', CustomInvoiceItem::class);
+        });
+      })->where('category', 2)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000;
+    $ta_invoice->total_rc = $this->allPivotTaxes()
+      ->when($this->type == 'Partial Invoice', function ($q) {
+        // if partial invoice, consider taxes from custom items only
+        $q->whereHas('invoiceItem', function ($q) {
+          $q->where('invoiceable_type', CustomInvoiceItem::class);
+        });
+      })
+      ->where('category', 3)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000;
     $ta_invoice->due_date = $this->due_date;
     $ta_invoice->save();
   }
@@ -942,7 +955,11 @@ class Invoice extends Model
 
   public function totalAuthorityTax()
   {
-    return $this->items->sum('authority_inv_total');
+    if ($this->type == 'Reqular') {
+      return $this->phaseItems()->sum('authority_inv_total') / 1000;
+    } else {
+      return $this->customItems()->sum('authority_inv_total') / 1000;
+    }
   }
 
   /*
@@ -969,6 +986,17 @@ class Invoice extends Model
   public function allPivotTaxes()
   {
     return $this->hasMany(InvoiceTax::class, 'invoice_id', 'id');
+  }
+
+  /**
+   * Pivot taxes of custom invoice items, used to get taxes for partial invoices
+   */
+  public function customItemsPivotTaxes()
+  {
+    return $this->hasMany(InvoiceTax::class, 'invoice_id', 'id')
+      ->whereHas('invoiceItem', function ($q) {
+        $q->where('invoiceable_type', CustomInvoiceItem::class);
+      });
   }
 
   /**

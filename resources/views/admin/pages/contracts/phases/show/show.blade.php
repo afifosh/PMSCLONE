@@ -8,6 +8,9 @@
             <button type="button" class="btn btn-primary btn-sm float-end me-2 waves-effect waves-light" onclick="createPhaseDeduction({{$phase->id}}, this)">{{__('Add Deduction')}}</button>
             @endif
           @endif
+          @if($is_partial_paid && $phase->is_allowable_cost)
+            <button type="button" class="btn btn-primary btn-sm float-end me-2 waves-effect waves-light" onclick="createPhaseCostAdjustment({{$phase->id}}, this)">{{__('Add Adjustment')}}</button>
+          @endif
             <table class="table table-hover invoice-table editing" id="billing-items-container">
                 <thead data-id="exclude-sort" id="billing-items-container-header">
                     <tr>
@@ -56,12 +59,26 @@
                           @if($phase->total_amount_adjustment)
                             data-bs-toggle="tooltip" title="Calculated amount: {{cMoney(($phase->getRawOriginal('total_cost') / 1000), $phase->contract->currency, true)}}"
                           @endif
-                            >@cMoney($phase->total_cost, $phase->contract->currency, true)
+                            >@cMoney($phase->total_cost - (count($phase->costAdjustments) ? $phase->costAdjustments->sum('amount') : 0), $phase->contract->currency, true)
                               @if($phase->total_amount_adjustment)
                                 <span class="text-danger">*</span>
                               @endif
                         </td>
                     </tr>
+                    @if($phase->is_allowable_cost && $phase->costAdjustments)
+                      @include('admin.pages.contracts.phases.show.cost-adjustments')
+                      <tr style="background-color: #efeff1;">
+                        @if(!$is_paid)
+                          <td>
+                            <a onclick="editPhaseTotalAmount({{$phase->id}}, this)"><i class="ti ti-pencil"></i></a>
+                          </td>
+                        @endif
+                        <td class="fw-bold">Grand Total</td>
+                        <td class="text-end fw-bold"
+                            >@cMoney($phase->total_cost, $phase->contract->currency, true)
+                        </td>
+                    </tr>
+                    @endif
                 </tbody>
             </table>
         </div>

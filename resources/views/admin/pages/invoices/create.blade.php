@@ -61,6 +61,7 @@
       </div>
       <small class="form-text text-muted">{{ __('Select invoice type: Regular or Down Payment') }}</small>
     </div>
+    {!! Form::hidden('invoice_type', $invoice->type, ['id' => 'id-invoice-type']) !!}
     <div class="form-group col-6">
       {{ Form::label('company_id', __('Client'), ['class' => 'col-form-label']) }}
       {!! Form::select('company_id', $clients ?? [], @$invoice->bill_clientid, [
@@ -76,9 +77,10 @@
       {{ Form::label('contract_id', __('Contract'), ['class' => 'col-form-label']) }}
       {!! Form::select('contract_id', $companies ?? [], @$invoice->contract_id, [
         'class' => 'form-select globalOfSelect2Remote required',
-        'data-url' => route('resource-select', ['Contract', 'dependent' => 'company_id']),
+        'data-url' => route('resource-select', ['Contract', 'dependent' => 'company_id', 'dependent_2_col' => 'creating-inv-type']),
         'data-placeholder' => 'Select Contract',
         'data-dependent_id' => 'client_id-select',
+        'data-dependent_2' => 'id-invoice-type',
         'data-allow-clear' => 'true'
       ]) !!}
     </div>
@@ -87,9 +89,10 @@
       {{ Form::label('phase_id', __('Phase'), ['class' => 'col-form-label']) }}
       {!! Form::select('phase_id', $phases ?? [], null, [
         'class' => 'form-select globalOfSelect2Remote',
-        'data-url' => route('resource-select', ['ContractPhase', 'dependent' => 'contract_id', 'dnh-regular-invoice' => true]),
+        'data-url' => route('resource-select', ['ContractPhase', 'dependent' => 'contract_id', 'dnh-regular-invoice' => true, 'dependent_2_col' => 'creating-inv-type']),
         'data-placeholder' => 'Select Phase',
         'data-dependent_id' => 'contract_id',
+        'data-dependent_2' => 'id-invoice-type',
         'data-allow-clear' => 'true'
       ]) !!}
     </div>
@@ -141,6 +144,7 @@
   $(document).on('change', '[name="type"]', function(){
     $(this).parents('.form-check').addClass('checked');
     $(this).parents('.form-check').parent().siblings().find('.form-check').removeClass('checked');
+    $('#id-invoice-type').val($(this).val());
     if($(this).val() == 'Down Payment'){
       $('.downpayment-amount').removeClass('d-none');
     }else{

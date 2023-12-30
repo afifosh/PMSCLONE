@@ -48,13 +48,19 @@
       </div>
     <div class="form-group col-6">
         {{ Form::label('name', __('English Name'), ['class' => 'col-form-label']) }}
-        {!! Form::text('name', $company->getRawOriginal('name') ? $company->getRawOriginal('name') : '', ['class' => 'form-control', 'placeholder' => __('English Name')]) !!}
+        {!! Form::text('name', $company->getRawOriginal('name') ? $company->getRawOriginal('name') : '', [
+          'class' => 'form-control',
+          'placeholder' => __('English Name')
+        ]) !!}
     </div>
 
     {{-- name_ar --}}
     <div class="form-group col-6">
       {{ Form::label('name_ar', __('Arabic Name'), ['class' => 'col-form-label']) }}
-      {!! Form::text('name_ar', null, ['class' => 'form-control', 'placeholder' => __('Arabic Name')]) !!}
+      {!! Form::text('name_ar', null, [
+        'class' => 'form-control',
+        'placeholder' => __('Arabic Name')
+      ]) !!}
     </div>
 
     <div class="form-group col-12">

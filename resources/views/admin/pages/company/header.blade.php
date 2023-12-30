@@ -68,6 +68,7 @@
       <li class="nav-item"><a class="nav-link {{$tab == 'invitations' ? 'active disabled' : ''}}" href="{{ route('admin.companies.showInvitations', ['company' => $company]) }}"><i class='ti ti-link ti-xs me-1'></i> Invitations</a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'invoices' ? 'active' : ''}}" href="{{ route('admin.companies.invoices.index', ['company' => $company]) }}"><i class='ti ti-link ti-xs me-1'></i> Invoices </a></li>
       <li class="nav-item"><a class="nav-link {{$tab == 'payments' ? 'active' : ''}}" href="{{ route('admin.companies.payments.index', ['company' => $company]) }}"><i class='ti ti-link ti-xs me-1'></i> Payments </a></li>
+      <li class="nav-item"><a class="nav-link {{$tab == 'name_history' ? 'active' : ''}}" href="{{ route('admin.companies.names.index', ['company' => $company]) }}"><i class='ti ti-link ti-xs me-1'></i> Name History </a></li>
     </ul>
   </div>
 </div>

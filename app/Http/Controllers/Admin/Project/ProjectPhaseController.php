@@ -57,8 +57,9 @@ class ProjectPhaseController extends Controller
   {
     if (request()->type == 'addons-list') {
       $phase->load(['taxes', 'deduction', 'contract.deductableDownpayments']);
-      $is_paid = false;
-      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.show.show', compact('phase', 'is_paid'))->render()]);
+      $is_paid = $phase->isPaid();
+      $is_partial_paid = $phase->isPartialPaid();
+      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.show.show', compact('phase', 'is_paid', 'is_partial_paid'))->render()]);
     }
   }
 
@@ -85,7 +86,7 @@ class ProjectPhaseController extends Controller
       $data['stage_id'] = $stage->id;
 
       $contract->phases()->create(
-        $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id'])
+        $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id', 'is_allowable_cost'])
       );
     } catch (\Exception $e) {
       DB::rollback();
@@ -112,12 +113,13 @@ class ProjectPhaseController extends Controller
     $stages = $contract->stages->pluck('name', 'id');
     $max_amount = $contract->remaining_amount + $phase->total_cost;
     $tax_rates = InvoiceConfig::activeOnly()->get();
+    $is_partial_paid = $phase->isPartialPaid();
 
     if (request()->type == 'edit-form') {
       if ($phase->isPaid()) {
         return $this->sendError('You can not edit this phase because it is in paid invoice');
       }
-      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create-form', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount'))->render()]);
+      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create-form', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount', 'is_partial_paid'))->render()]);
     }
 
     $userHasMarkedComplete = $phase->reviewdByAdmins()->where('admins.id', auth()->id())->exists();
@@ -142,7 +144,7 @@ class ProjectPhaseController extends Controller
 
     $is_paid = $phase->isPaid();
 
-    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount', 'is_paid'))->render()]);
+    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount', 'is_paid', 'is_partial_paid'))->render()]);
   }
 
   public function prepareActivityTab($phase)
@@ -176,7 +178,7 @@ class ProjectPhaseController extends Controller
       });
       $data['stage_id'] = $stage->id;
 
-      $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id']));
+      $phase->update($data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id', 'is_allowable_cost']));
 
       if ($request->estimated_cost == 0) {
         $phase->taxes()->detach();

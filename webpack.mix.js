@@ -109,6 +109,9 @@ const sassOptions = {
   precision: 5
 };
 
+// react js test app
+mix.js('resources/js/react-notes.js', 'public/js/').react();
+
 // Core stylesheets
 mixAssetsDir('vendor/scss/**/!(_)*.scss', (src, dest) =>
   mix.sass(src, dest.replace(/(\\|\/)scss(\\|\/)/, '$1css$2').replace(/\.scss$/, '.css'), { sassOptions })
@@ -176,4 +179,4 @@ mix.version();
  | Refer official documentation for more information: https://laravel.com/docs/9.x/mix#browsersync-reloading
  */
 
-mix.browserSync('http://127.0.0.1:8000/');
+mix.browserSync('http://pms.pk/');
