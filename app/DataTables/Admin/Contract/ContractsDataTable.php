@@ -136,16 +136,16 @@ public function query(Contract $model): QueryBuilder
       $query->where('assignable_id', $this->company->id)->where('assignable_type', Company::class);
     }
     // If a program is provided, filter by it and its children
-    if ($this->program) {
-      // Fetch IDs for all children of the given program
-      $childProgramIds = Program::where('parent_id', $this->program->id)->pluck('id')->toArray();
+    // if ($this->program) {
+    //   // Fetch IDs for all children of the given program
+    //   $childProgramIds = Program::where('parent_id', $this->program->id)->pluck('id')->toArray();
 
-      // Include the main program's ID
-      $programIds = array_merge([$this->program->id], $childProgramIds);
+    //   // Include the main program's ID
+    //   $programIds = array_merge([$this->program->id], $childProgramIds);
 
-      // Use these IDs to filter contracts
-      $query->whereIn('program_id', $programIds);
-    }
+    //   // Use these IDs to filter contracts
+    //   $query->whereIn('program_id', $programIds);
+    // }
 
     // Apply any additional filters if necessary
     $query->with(['program', 'reviewedBy'])->applyRequestFilters();

@@ -291,7 +291,9 @@ class Contract extends BaseModel
   public function scopeApplyRequestFilters($q)
   {
     return $q->when(request()->has('filter_status'), function ($q) {
-      if (request()->filter_status == 0) return $q->where('contracts.status', 0); // draft
+      if (request()->filter_status === '0') {
+        return $q->where('contracts.status', 0);
+      } // draft
       else if (request()->filter_status == 7) {
         $q->where('start_date', '>', now()); // not started
       } elseif (request()->filter_status == 8) { // expired

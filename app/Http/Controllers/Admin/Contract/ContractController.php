@@ -54,7 +54,7 @@ class ContractController extends Controller
     } if ($data['program']) {
       $dataTable->program = $data['program'];
     } else {
-    $data['contract_statuses'] = Contract::STATUSES;
+    $data['contract_statuses'] = ['' => 'All'] + Contract::STATUSES;
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     // get contracts count by end_date < now() as active, end_date >= now as expired, end_date - 2 months as expiring soon, start_date <= now, + 2 months as recently added
@@ -79,7 +79,7 @@ class ContractController extends Controller
 
   public function trackingPaymentsPlan(TrackingPaymentsPlanDataTable $dataTable)
   {
-    $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
+    $data['contract_statuses'] = ['' => 'All'] + Contract::STATUSES;
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     return $dataTable->render('admin.pages.contracts.tracking.paymentsplan.index', $data);
@@ -88,7 +88,7 @@ class ContractController extends Controller
 
   public function trackingContract(ContractsTrackingDataTable $dataTable)
   {
-    $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
+    $data['contract_statuses'] = ['' => 'All'] + Contract::STATUSES;
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     // Prepare the options for the dropdown
@@ -563,7 +563,7 @@ class ContractController extends Controller
 
   public function ContractPaymentsPlan(PaymentsPlanDataTable $dataTable)
   {
-    $data['contract_statuses'] = ['0' => 'All'] + array_combine(Contract::STATUSES, Contract::STATUSES);
+    $data['contract_statuses'] = ['' => 'All'] + Contract::STATUSES;
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
 
     $data['review_status'] = [
