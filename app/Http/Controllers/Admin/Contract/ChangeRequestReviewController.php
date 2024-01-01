@@ -39,15 +39,14 @@ class ChangeRequestReviewController extends Controller
             'end_date' => $changeRequest->new_end_date,
           ]);
         } else if ($changeRequest->type == 'Lifecycle') {
-
           // validate action, with contract status
-          if ($changeRequest->data['action'] == 'Pause Contract' && $contract->status != 1) {
+          if ($changeRequest->data['action'] == 'Pause Contract' && $contract->status != Contract::STATUSES[1]) {
             return $this->sendError('Contract is not active', ['show_alert' => true], 400);
-          }else if ($changeRequest->data['action'] == 'Resume' && $contract->status != 2) {
+          }else if ($changeRequest->data['action'] == 'Resume' && $contract->status != Contract::STATUSES[2]) {
             return $this->sendError('Contract is not paused', ['show_alert' => true], 400);
-          }else if ($changeRequest->data['action'] == 'Termination' && $contract->status != 1) {
+          }else if ($changeRequest->data['action'] == 'Termination' && $contract->status != Contract::STATUSES[1]) {
             return $this->sendError('Contract is not active', ['show_alert' => true], 400);
-          }else if ($changeRequest->data['action'] == 'Early Completed' && $contract->status != 1) {
+          }else if ($changeRequest->data['action'] == 'Early Completed' && $contract->status != Contract::STATUSES[1]) {
             return $this->sendError('Contract is not active', ['show_alert' => true], 400);
           }
 

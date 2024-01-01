@@ -397,6 +397,12 @@ for (const input of inputs) {
 
         // toast_danger(val[0]);
       current.removeClass('disabled');
+
+      // show toast message
+      if(error.responseJSON && error.responseJSON.data && error.responseJSON.data.show_alert)
+      {
+        toast_danger(error.responseJSON.message);
+      }
     },
     cache: false,
     contentType: false,
