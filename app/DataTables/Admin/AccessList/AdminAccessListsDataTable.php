@@ -94,7 +94,12 @@ class AdminAccessListsDataTable extends DataTable
    */
   public function query(Admin $model): QueryBuilder
   {
-    return $model->has('accessiblePrograms')->with('accessiblePrograms:name')->newQuery();
+    return $model->has('accessiblePrograms')
+    ->with(['accessiblePrograms' => function($query) {
+        $query->select('name');
+    }, 'roles']) // Add 'roles' to the with array
+    ->newQuery();
+
   }
 
   /**
