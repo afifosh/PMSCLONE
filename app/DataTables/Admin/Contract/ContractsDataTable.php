@@ -67,6 +67,10 @@ class ContractsDataTable extends DataTable
           $q->where('name', 'like', '%' . $keyword . '%')->orWhere('email', 'like', '%' . $keyword . '%');
         });
       })
+      ->filterColumn('subject', function ($query, $keyword) {
+        $query->where('contracts.subject', 'like', '%' . $keyword . '%')
+          ->orWhere('contracts.subject_ar', 'like', '%' . $keyword . '%');
+      })
       ->rawColumns(['subject', 'program.name', 'status']);
   }
 

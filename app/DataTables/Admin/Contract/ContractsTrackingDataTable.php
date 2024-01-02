@@ -42,6 +42,10 @@ class ContractsTrackingDataTable extends DataTable
         return @cMoney($contract->value ?? 0, $contract->currency, true);
         // return view('admin.pages.contracts.value-column', compact('contract'));
       })
+      ->filterColumn('subject', function ($query, $keyword) {
+        $query->where('contracts.subject', 'like', '%' . $keyword . '%')
+          ->orWhere('contracts.subject_ar', 'like', '%' . $keyword . '%');
+      })
       ->rawColumns(['id', 'reviews_completed']);
   }
 

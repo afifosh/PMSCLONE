@@ -64,6 +64,10 @@ class TrackingPaymentsPlanDataTable extends DataTable
           $query->where('name', 'like', "%{$keyword}%");
         });
       })
+      ->filterColumn('subject', function ($query, $keyword) {
+        $query->where('contracts.subject', 'like', '%' . $keyword . '%')
+          ->orWhere('contracts.subject_ar', 'like', '%' . $keyword . '%');
+      })
       ->rawColumns(['id', 'program.name', 'subject', 'reviews_completed', 'expand', 'incomplete_reviewers']);
   }
 

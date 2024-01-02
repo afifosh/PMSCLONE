@@ -387,8 +387,12 @@ class Company extends BaseModel
       ->when(request()->get('q'), function ($q) {
         $searchTerm = '%' . request()->get('q') . '%';
         $q->where(function ($query) use ($searchTerm) {
-            $query->where('name', 'like', $searchTerm)
-                  ->orWhere('name_ar', 'like', $searchTerm);
+          $query->where('name', 'like', $searchTerm)
+            ->orWhere('name_ar', 'like', $searchTerm)
+            ->orWhereHas('historyNames', function ($q) use ($searchTerm) {
+              $q->where('name', 'like', $searchTerm)
+                ->orWhere('name_ar', 'like', $searchTerm);
+            });
         });
       })
       ->when(request()->has('contracts') || request()->has('hasContract'), function ($q) {
