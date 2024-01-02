@@ -26,7 +26,7 @@ class ChangeRequestStoreRequest extends FormRequest
       'requested_at' => 'required|date',
       'reason' => 'required|string',
       'description' => 'nullable|string',
-      'action_type' => 'required|string|in:update-terms,pause-contract,resume-contract,terminate-contract,early-completed-contract',
+      'action_type' => 'required|string|in:update-terms,pause-contract,resume-contract,terminate-contract,contract-completed',
     ];
 
     if ($this->action_type == 'update-terms') {
@@ -36,6 +36,9 @@ class ChangeRequestStoreRequest extends FormRequest
         'currency' => ['nullable', 'required', 'string', Rule::in(array_keys(config('money.currencies')))],
         'timeline_action' => 'required|string|in:inc,dec,unchanged',
         'new_end_date' => 'nullable|required_if:timeline_action,inc,dec|date|after:' . $this->contract->start_date,
+        'contract_id' => ['required', Rule::exists('contracts', 'id')->where(function ($query) {
+          $query->whereIn('status', [1, 2])->whereNull('deleted_at');
+        })],
       ];
     } elseif ($this->action_type == 'pause-contract') {
       $rules = $rules + [
@@ -60,9 +63,10 @@ class ChangeRequestStoreRequest extends FormRequest
         'start_date' => 'nullable|date',
         'end_date' => 'nullable|date|after:start_date',
       ];
-    } elseif ($this->action_type == 'early-completed-contract') {
+    } elseif ($this->action_type == 'contract-completed') {
       $rules = $rules + [
         'contract_id' => 'required|exists:contracts,id,status,1,deleted_at,NULL',
+        'completion_status' => 'required|in:Completed,Early Completed',
       ];
     }
 

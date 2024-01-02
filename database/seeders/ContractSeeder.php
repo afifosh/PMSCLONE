@@ -16,7 +16,7 @@ class ContractSeeder extends Seeder
   public function run(): void
   {
     Contract::factory()->count(20)->create()->each(function ($contract, $index) {
-      if ($contract->status != '0') {
+      if ($contract->getRawOriginal('status') != '0') {
         $contract->events()->create([
           'event_type' => 'Created',
           'modifications' => $contract->toArray(),
@@ -24,7 +24,7 @@ class ContractSeeder extends Seeder
         ]);
       }
 
-      if ($contract->status == '1')
+      if ($contract->getRawOriginal('status') == '1')
         ContractStage::factory()->count(10)->create([
           'contract_id' => $contract->id,
         ])->each(function ($stage, $index) use ($contract) {

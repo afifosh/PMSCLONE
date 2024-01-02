@@ -8,4 +8,6 @@
     <span class="badge bg-label-warning">Terms Update</span>
 @elseif($changeRequest->type == 'Lifecycle' && $changeRequest->data['action'] == 'Early Completed')
     <span class="badge bg-label-success">Early Completed</span>
+@elseif($changeRequest->type == 'Lifecycle' && $changeRequest->data['action'] == 'Completed')
+    <span class="badge bg-label-success">Completed</span>
 @endif

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\Invoice;
 
+use App\Models\CustomInvoiceItem;
 use App\Models\InvoiceConfig;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -30,6 +31,9 @@ class ItemTaxStoreRequest extends FormRequest
    */
   public $downpayment_amount = 0;
 
+  public $old_total = 0;
+
+  public $partialInvoiceRemainingAmount = 0;
   /**
    * Prepare the data for validation.
    *
@@ -37,6 +41,10 @@ class ItemTaxStoreRequest extends FormRequest
    */
   public function prepareForValidation()
   {
+    if (@$this->invoice->type == 'Partial Invoice' && $this->method() == 'PUT') {
+      $this->old_total = $this->tax->manual_amount ? $this->tax->manual_amount : $this->tax->calculated_amount;
+    }
+
     $this->merge([
       'subtotal' => $this->invoice_item->subtotal,
       'rounding_amount' => $this->boolean('rounding_amount'),
@@ -87,10 +95,10 @@ class ItemTaxStoreRequest extends FormRequest
 
   private function calDeductionAmount(): void
   {
-    if($this->invoice_item->deduction && $this->invoice_item->deduction->is_before_tax) {
+    if ($this->invoice_item->deduction && $this->invoice_item->deduction->is_before_tax) {
       $this->downpayment_amount = ($this->invoice_item->deduction->manual_amount ? $this->invoice_item->deduction->manual_amount : $this->invoice_item->deduction->amount);
     }
-      return;
+    return;
   }
 
   private function calTaxAmount(): void
@@ -98,7 +106,7 @@ class ItemTaxStoreRequest extends FormRequest
     $this->calculated_tax_amount = 0;
     $this->invoice_item->load('deduction');
     $this->downpayment_amount = 0;
-    if($this->invoice_item->deduction && $this->invoice_item->deduction->is_before_tax) {
+    if ($this->invoice_item->deduction && $this->invoice_item->deduction->is_before_tax) {
       $this->calDeductionAmount();
     }
     if ($this->tax->type == 'Fixed') {
@@ -128,12 +136,21 @@ class ItemTaxStoreRequest extends FormRequest
   }
 
   // post validation hook
-  // public function withValidator($validator)
-  // {
-  //   $validator->after(function ($validator) {
-  //     if ($this->is_manual_tax && $this->manual_tax_amount == 0) {
-  //       $validator->errors()->add('manual_tax_amount', 'Manual Tax Amount is required');
-  //     }
-  //   });
-  // }
+  public function withValidator($validator)
+  {
+    $validator->after(function ($validator) {
+      // if ($this->is_manual_tax && $this->manual_tax_amount == 0) {
+      //   $validator->errors()->add('manual_tax_amount', 'Manual Tax Amount is required');
+      // }
+
+      //
+      if ($this->invoice->type == 'Partial Invoice') {
+        $taxAmount = $this->manual_tax_amount ? $this->manual_tax_amount : $this->calculated_tax_amount;
+        $this->partialInvoiceRemainingAmount = $this->invoice->getRemainingPayableAmount();
+        if ($taxAmount + $this->subtotal > $this->partialInvoiceRemainingAmount + $this->old_total) {
+          $validator->errors()->add('total_tax_amount', 'Total Tax Amount should not be greater than remaining amount:' . $this->partialInvoiceRemainingAmount + $this->old_total);
+        }
+      }
+    });
+  }
 }

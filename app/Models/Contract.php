@@ -432,8 +432,11 @@ class Contract extends BaseModel
           ->when(request()->dependent_2 == 'terminate-contract', function ($q) {
             $q->where('status', 1); // active
           })
-          ->when(request()->dependent_2 == 'early-completed-contract', function ($q) {
+          ->when(request()->dependent_2 == 'contract-completed', function ($q) {
             $q->where('status', 1); // active
+          })
+          ->when(request()->dependent_2 == 'update-terms', function ($q) {
+            $q->whereIn('status', [1, 2]); // active
           });
       });
   }

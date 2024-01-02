@@ -86,7 +86,7 @@ class PaymentStoreRequest extends FormRequest
   {
     return [
       'invoice_id' => 'required|exists:invoices,id',
-      'transaction_id' => 'required|string',
+      'transaction_id' => 'nullable|string',
       'payment_date' => 'required|date',
       'payment_type' => 'required|in:Full,Partial,wht,rc',
       'account_balance_id' => [

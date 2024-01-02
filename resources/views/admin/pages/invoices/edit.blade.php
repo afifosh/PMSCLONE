@@ -481,24 +481,32 @@
         </div>
 
         <hr class="my-0" />
-
+        @php
+          $phase = $invoice->items->where('invoiceable_type', 'App\Models\ContractPhase')[0];
+        @endphp
         @if ($invoice->type == 'Partial Invoice')
           <div class="source-item pt-4 px-0 px-sm-4">
             <div class="col-12">
               <div class="table-responsive m-t-40">
+                @include('admin.pages.contracts.phases.show.show', ['phase' => $phase->invoiceable, 'is_paid' => true, 'is_partial_paid' => false])
                 <table class="table table-hover">
-                  <thead>
+                  {{-- <thead>
                     <tr>
                         <th class="text-left x-description bill_col_description">Phase</th>
                         <th class="text-left x-description bill_col_description">Total Cost</th>
                         <th class="text-left x-rate bill_col_rate">Invoiceable Amount</th>
                     </tr>
-                  </thead>
+                  </thead> --}}
                   <tbody>
-                    @php
-                      $phase = $invoice->items->where('invoiceable_type', 'App\Models\ContractPhase')[0];
-                    @endphp
-                    <tr>
+                    <tr style="background-color: #efeff1;">
+                      <td class="">Invoiceable Amount</td>
+                      <!-- invoiceable amount -->
+                      <td class="text-end">
+                        @cMoney($phase->invoiceable->getRemainingAmount() + $invoice->total, $invoice->contract->currency, true)
+                      </td>
+                      <!-- invoiceable amount -->
+                    </tr>
+                    {{-- <tr>
                       <td class="">{{$phase->invoiceable->name ?? runtimeInvIdFormat($phase->invoiceable_id)}}</td>
                       <!--total-->
                       <td class="text-right">
@@ -510,7 +518,7 @@
                         @cMoney($phase->invoiceable->getRemainingAmount() + $invoice->total, $invoice->contract->currency, true)
                       </td>
                       <!-- invoiceable amount -->
-                    </tr>
+                    </tr> --}}
                     {{-- @include('admin.pages.invoices.items.edit-list') --}}
                   </tbody>
                 </table>
@@ -689,7 +697,7 @@
     @if(!in_array($invoice->status, ['Void']))
       <div class="card mb-4">
         <div class="card-body">
-          @if(!$invoice->isEditable())
+          @if($invoice->isEditable())
             <button class="btn btn-primary d-grid w-100" type="button" data-form="ajax-form">
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-send ti-xs me-1"></i>Save Invoice</span>
             </button>
@@ -707,7 +715,7 @@
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Add Payment</span>
             </button>
           @endif
-          @if(!$invoice->isEditable())
+          @if($invoice->isEditable())
             <button class="btn btn-primary d-grid mt-2 w-100" type="button" data-toggle="ajax-modal" data-title="{{__('Make Void')}}" data-href="{{route('admin.invoices.status.create',['invoice' => $invoice->id])}}">
               <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-currency-dollar ti-xs me-1"></i>Make Void</span>
             </button>

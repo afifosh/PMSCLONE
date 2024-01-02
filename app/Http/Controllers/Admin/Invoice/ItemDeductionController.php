@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceConfig;
 use App\Models\InvoiceItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ItemDeductionController extends Controller
 {
@@ -111,6 +112,16 @@ class ItemDeductionController extends Controller
 
       $invoiceItem->syncUpdateWithPhase();
 
+      // if item total exceeds remaining amount then revert changes
+      if ($invoice->type == 'Partial Invoice') {
+        $remaning_amount = $invoice->getRemainingPayableAmount();
+        if ($invoiceItem->total > $remaning_amount) {
+          DB::rollBack();
+
+          throw ValidationException::withMessages(['amount' => 'Item Total amount exceeds remaining amount:' . $remaning_amount]);
+        }
+      }
+
       DB::commit();
 
       return $this->sendRes('Deduction Updated Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList', 'close' => 'globalModal']);
@@ -132,6 +143,16 @@ class ItemDeductionController extends Controller
       $invoice->reCalculateTotal();
 
       $invoiceItem->syncUpdateWithPhase();
+
+      // if item total exceeds remaining amount then revert changes
+      if ($invoice->type == 'Partial Invoice') {
+        $remaning_amount = $invoice->getRemainingPayableAmount();
+        if ($invoiceItem->total > $remaning_amount) {
+          DB::rollBack();
+
+          throw ValidationException::withMessages(['amount' => 'Item Total amount exceeds remaining amount:' . $remaning_amount]);
+        }
+      }
 
       DB::commit();
 

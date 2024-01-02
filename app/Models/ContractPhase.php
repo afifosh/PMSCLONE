@@ -325,7 +325,9 @@ class ContractPhase extends BaseModel
    */
   public function isPartialPaid()
   {
-    return $this->paidAmountAgainstAllowableCost() < $this->total_cost;
+    $paid_amount = $this->paidAmountAgainstAllowableCost();
+
+    return $paid_amount && $paid_amount < $this->total_cost;
   }
 
   /**

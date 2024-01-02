@@ -7,6 +7,7 @@ use App\Models\ContractPhase;
 use App\Models\PhaseCostAdjustment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PhaseCostAdjustmentController extends Controller
 {
@@ -35,9 +36,20 @@ class PhaseCostAdjustmentController extends Controller
     abort_if(!$phase->is_allowable_cost || !$phase->isPartialPaid(), 403, 'You can not edit this phase because it is not allowable cost or Paid');
 
     $request->validate([
-      'amount' => 'required|numeric|min:0',
+      'amount' => 'required|numeric',
       'description' => 'required|string',
     ]);
+
+    // total cost + amount should be greater than or equal to total invoiced amount
+    $invoiced_amount = $phase->addedAsInvoiceItem->sum(function ($invoiceItem) {
+      return $invoiceItem->invoice->total;
+    });
+
+    if (moneyToInt($phase->total_cost + $request->amount) < moneyToInt($invoiced_amount)) {
+      throw ValidationException::withMessages([
+        'amount' => [__('Total Cost + Adjustment Amount should not less than Total Invoiced Amount')],
+      ]);
+    }
 
     DB::beginTransaction();
     try {
@@ -71,11 +83,23 @@ class PhaseCostAdjustmentController extends Controller
     abort_if(!$phase->is_allowable_cost || !$phase->isPartialPaid(), 403, 'You can not edit this phase because it is not allowable cost or Paid');
 
     $request->validate([
-      'amount' => 'required|numeric|min:0',
+      'amount' => 'required|numeric',
       'description' => 'required|string',
     ]);
 
+    // total cost + amount should be greater than or equal to total invoiced amount
+    $invoiced_amount = $phase->addedAsInvoiceItem->sum(function ($invoiceItem) {
+      return $invoiceItem->invoice->total;
+    });
+
+    if (moneyToInt($phase->total_cost + $request->amount) < moneyToInt($invoiced_amount)) {
+      throw ValidationException::withMessages([
+        'amount' => [__('Total Cost + Adjustment Amount should not less than Total Invoiced Amount')],
+      ]);
+    }
+
     DB::beginTransaction();
+
     try {
       $costAdjustment->update([
         'amount' => $request->amount,
@@ -99,6 +123,15 @@ class PhaseCostAdjustmentController extends Controller
   public function destroy($contract, ContractPhase $phase, PhaseCostAdjustment $costAdjustment)
   {
     abort_if(!$phase->is_allowable_cost || !$phase->isPartialPaid(), 403, 'You can not edit this phase because it is paid or not allowable cost or Paid');
+
+    // total cost + amount should be greater than or equal to total invoiced amount
+    $invoiced_amount = $phase->addedAsInvoiceItem->sum(function ($invoiceItem) {
+      return $invoiceItem->invoice->total;
+    });
+
+    if (moneyToInt($phase->total_cost - $costAdjustment->amount) < moneyToInt($invoiced_amount)) {
+      return $this->sendError(__('Total Cost - Adjustment Amount should not less than Total Invoiced Amount'), ['show_alert' => true], 403);
+    }
 
     DB::beginTransaction();
     try {

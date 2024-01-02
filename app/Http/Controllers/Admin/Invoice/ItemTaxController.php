@@ -10,6 +10,7 @@ use App\Models\InvoiceConfig;
 use App\Models\InvoiceItem;
 use App\Models\InvoiceTax;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ItemTaxController extends Controller
 {
@@ -61,6 +62,13 @@ class ItemTaxController extends Controller
       $invoice->reCalculateTotal();
 
       $invoiceItem->syncUpdateWithPhase();
+
+      // if item total exceeds remaining amount then revert changes
+      if ($invoice->type == 'Partial Invoice' && $invoiceItem->total > $request->partialInvoiceRemainingAmount) {
+        DB::rollBack();
+
+        throw ValidationException::withMessages(['total_tax_amount' => 'Total amount exceeds remaining amount:' . $request->partialInvoiceRemainingAmount]);
+      }
 
       DB::commit();
 
@@ -114,6 +122,12 @@ class ItemTaxController extends Controller
 
       $invoiceItem->syncUpdateWithPhase();
 
+      // if item total exceeds remaining amount then revert changes
+      if ($invoice->type == 'Partial Invoice' && $invoiceItem->total > $request->partialInvoiceRemainingAmount) {
+        DB::rollBack();
+
+        throw ValidationException::withMessages(['total_tax_amount' => 'Total amount exceeds remaining amount:' . $request->partialInvoiceRemainingAmount]);
+      }
       DB::commit();
 
       return $this->sendRes('Tax Added Successfully', ['event' => 'functionCall', 'function' => 'reloadPhasesList']);
@@ -126,7 +140,7 @@ class ItemTaxController extends Controller
   public function destroy(Invoice $invoice, InvoiceItem $invoiceItem, $tax)
   {
     DB::beginTransaction();
-    try{
+    try {
       InvoiceTax::where('id', $tax)->delete();
 
       if ($invoiceItem->deduction && !$invoiceItem->deduction->is_before_tax) {

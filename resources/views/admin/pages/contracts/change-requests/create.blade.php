@@ -31,13 +31,13 @@
       </label>
     </div>
     <div class="form-check me-3">
-      <input class="form-check-input" type="radio" name="action_type" value="early-completed-contract" id="early-completed-contract">
-      <label class="form-check-label" for="early-completed-contract">
-        Early Completed
+      <input class="form-check-input" type="radio" name="action_type" value="contract-completed" id="contract-completed">
+      <label class="form-check-label" for="contract-completed">
+       Mark Completed
       </label>
     </div>
   </div>
-  {!! Form::hidden('change_request_type', null, ['id' => 'change-request-type', 'class' => 'dependent-select']) !!}
+  {!! Form::hidden('change_request_type', 'update-terms', ['id' => 'change-request-type', 'class' => 'dependent-select']) !!}
   @if(!$contract->id)
     <div class="mb-3">
       {!! Form::label('contract_id', __('Select Contract'), ['class' => 'col-form-label']) !!}
@@ -111,6 +111,24 @@
         </div>
     </div> --}}
   </div>
+
+  <div id="contract-completed-section" class="d-none ac-sec">
+    {{-- completion status --}}
+    <label for="" class="form-check-label">Completion Status</label>
+    <div class="form-check me-3">
+      <input class="form-check-input" type="radio" name="completion_status" checked value="Completed" id="completed-radio">
+      <label class="form-check-label" for="completed-radio">
+        Completed
+      </label>
+    </div>
+    <div class="form-check me-3">
+      <input class="form-check-input" type="radio" name="completion_status" value="Early Completed" id="early-completed-radio">
+      <label class="form-check-label" for="early-completed-radio">
+       Early Completed
+      </label>
+    </div>
+  </div>
+
   <div id="update-terms-sectoin" class="ac-sec">
     <div class="card mt-2">
       <h5 class="card-header p-3">Update Terms</h5>
@@ -432,6 +450,8 @@
       $('#contract-resume-section').removeClass('d-none');
     } else if(val == 'terminate-contract'){
       $('#contract-terminate-section').removeClass('d-none');
+    } else if(val == 'contract-completed'){
+      $('#contract-completed-section').removeClass('d-none');
     }
   });
 

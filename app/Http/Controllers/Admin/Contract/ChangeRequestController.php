@@ -53,8 +53,8 @@ class ChangeRequestController extends Controller
       return $this->terminateContract($request, $contract);
     } else if ($request->action_type == 'resume-contract') {
       return $this->resumeContract($request, $contract);
-    } else if($request->action_type == 'early-completed-contract') {
-      return $this->earlyCompletedContract($request, $contract);
+    } else if($request->action_type == 'contract-completed') {
+      return $this->ContractCompleted($request, $contract);
     }
 
     if ($request->value_action != 'unchanged') {
@@ -80,10 +80,10 @@ class ChangeRequestController extends Controller
     return $this->sendRes('Change Request Added Successfully', ['event' => 'table_reload', 'table_id' => 'change-requests-table', 'close' => 'globalModal']);
   }
 
-  private function earlyCompletedContract(ChangeRequestStoreRequest $request, Contract $contract)
+  private function ContractCompleted(ChangeRequestStoreRequest $request, Contract $contract)
   {
     $data = [
-      'action' => 'Early Completed',
+      'action' => $request->completion_status,
     ];
 
     $contract->changeRequests()->create([

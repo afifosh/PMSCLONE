@@ -262,45 +262,39 @@
           "slug": "admin.invoices.document-stats.index"
         },
         {
-          "name": "Payments",
+          "name": "Finances",
           "slug": ["admin.finances."],
-          "submenu":[
+          "icon": "menu-icon tf-icons ti ti-coin",
+          "submenu": [
             {
-              "name": "Finances",
-              "slug": ["admin.finances."],
-              "icon": "menu-icon tf-icons ti ti-coin",
-              "submenu": [
-                {
-                  "url": "/admin/finances/financial-years",
-                  "name": "Financial Years",
-                  "slug": "admin.finances.financial-years.index"
-                },
-                {
-                  "url": "/admin/finances/program-accounts",
-                  "name": "Program Accounts",
-                  "slug": "admin.finances.program-accounts.index"
-                },
-                {
-                  "url": "/admin/finances/payments",
-                  "name": "Payments",
-                  "slug": "admin.finances.payments.index"
-                },
-                {
-                  "url": "/admin/finances/taxes",
-                  "name": "Taxes",
-                  "slug": "admin.finances.taxes.index"
-                },
-                {
-                  "url": "/admin/finances/retentions",
-                  "name": "Retentions",
-                  "slug": "admin.finances.retentions.index"
-                },
-                {
-                  "url": "/admin/finances/downpayments",
-                  "name": "Down Payments",
-                  "slug": "admin.finances.downpayments.index"
-                }
-              ]
+              "url": "/admin/finances/financial-years",
+              "name": "Financial Years",
+              "slug": "admin.finances.financial-years.index"
+            },
+            {
+              "url": "/admin/finances/program-accounts",
+              "name": "Program Accounts",
+              "slug": "admin.finances.program-accounts.index"
+            },
+            {
+              "url": "/admin/finances/payments",
+              "name": "Payments",
+              "slug": "admin.finances.payments.index"
+            },
+            {
+              "url": "/admin/finances/taxes",
+              "name": "Taxes",
+              "slug": "admin.finances.taxes.index"
+            },
+            {
+              "url": "/admin/finances/retentions",
+              "name": "Retentions",
+              "slug": "admin.finances.retentions.index"
+            },
+            {
+              "url": "/admin/finances/downpayments",
+              "name": "Down Payments",
+              "slug": "admin.finances.downpayments.index"
             }
           ]
         }

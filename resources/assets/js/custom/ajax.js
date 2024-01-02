@@ -489,6 +489,11 @@ $(document).on('click', '[data-toggle="ajax-delete"]', function () {
         },
         error: function (error) {
           console.log(error);
+          // show toast message
+          if(error.responseJSON && error.responseJSON.data && error.responseJSON.data.show_alert)
+          {
+            toast_danger(error.responseJSON.message);
+          }
         }
       });
     } else if (result.dismiss === Swal.DismissReason.cancel) {

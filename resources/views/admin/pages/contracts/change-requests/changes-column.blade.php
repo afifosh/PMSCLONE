@@ -35,5 +35,7 @@
     <div> To: <span class="bade bg-label-success p-1">{{ date("d M, Y", strtotime($changeRequest->new_end_date)) }}</span></div>
   @endif
 @elseif($changeRequest->type == 'Lifecycle' && $changeRequest->data['action'] == 'Early Completed')
-<div>Early Completed</div>
+  <div>Early Completed</div>
+@elseif($changeRequest->type == 'Lifecycle' && $changeRequest->data['action'] == 'Completed')
+  <div>Completed</div>
 @endif
