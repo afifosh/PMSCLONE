@@ -58,6 +58,55 @@
           "name": "Companies",
           "slug": "admin.companies.index",
           "permission" : "read company"
+        },
+        {
+          "url": "/admin/company-roles",
+          "name": "Company Roles",
+          "slug": "admin.company-roles.index",
+          "permission": "read company role"
+        },
+        {
+          "url": "/admin/company-users",
+          "name": "Company Users",
+          "slug": "admin.company-users.index",
+          "permission": "read company role"
+        },
+        {
+          "url": "/admin/company-invitations",
+          "name": "Invitations",
+          "slug": "admin.company-invitations.index",
+          "permission": "read company"
+        },
+        {
+          "name": "Approval",
+          "slug": ["admin.approval-requests.", "admin.change-requests", "admin.pending-companies", "admin.verified-companies"],
+          "submenu": [
+            {
+              "url": "/admin/approval-requests",
+              "name": "Approval Requests",
+              "slug": "admin.approval-requests.index"
+            },
+            {
+              "url": "/admin/change-requests",
+              "name": "Change Requests",
+              "slug": "admin.change-requests.index"
+            },
+            {
+              "url": "/admin/pending-companies",
+              "name": "Pending Companies",
+              "slug": "admin.pending-companies.index"
+            },
+            {
+              "url": "/admin/verified-companies",
+              "name": "Verified Companies",
+              "slug": "admin.verified-companies.index"
+            },
+            {
+              "url": "/admin/approval-requests/history",
+              "name": "Requests History",
+              "slug": "admin.approval-requests.indexHistory"
+            }
+          ]
         }
       ]
     },
