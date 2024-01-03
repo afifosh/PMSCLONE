@@ -545,7 +545,7 @@ class ContractController extends Controller
     }
     $contract->update($data + $request->validated());
 
-    return $this->sendRes(__('Contract updated successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
+    return $this->sendRes(__('Contract updated successfully'), ['event' => 'functionCall', 'function' => 'reloadDataTables']);
   }
 
   /**

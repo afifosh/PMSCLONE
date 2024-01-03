@@ -67,6 +67,7 @@ function toggleContractReviewStatus(buttonElement) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                  reloadDataTables();
 
 
                   if (data.data.event == 'table_reload') {
