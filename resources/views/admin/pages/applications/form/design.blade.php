@@ -15,8 +15,15 @@
 @section('content')
     <div class="row">
       <div class="row">
-        <div class="col-md-6">
-            <h1>Design Form</h1>
+        <div class="col-md-6 d-flex">
+            <h1>Design: </h1>
+            {{-- Form Type select --}}
+            <div class="form-group pt-2">
+                <select class="form-control" id="form-select">
+                  <option value="form">Form</option>
+                  <option value="wizard">Wizard</option>
+                </select>
+            </div>
         </div>
 
         <div class="col-md-6 text-right">
@@ -44,24 +51,47 @@
   .form-builder-panel {
     margin-bottom: 1rem;
   }
+  .builder-sidebar_search {
+    display: none !important;
+  }
 </style>
 @endpush
 @push('scripts')
-<script src="{{ asset('js/formbuilder.js') }}"></script>
-{{-- <script src="https://cdn.form.io/js/formio.full.min.js"></script> --}}
+{{-- <script src="https://formio.github.io/formio.js/dist/formio.full.min.js"></script> --}}
+{{-- <script src="{{ asset('js/formbuilder.js') }}"></script> --}}
+<script src="https://cdn.form.io/js/formio.full.min.js"></script>
+{{-- <script src="https://unpkg.com/formiojs@4.0.3/dist/formio.full.min.js"></script> --}}
 <script>
-Formio.builder(
+var builder = null;
+function initBuilder(definition) {
+  if (builder) {
+    builder.destroy();
+    document.getElementById("formio-builder").innerHTML = '';
+  }
+  $('#form-select').val(definition.display);
+  Formio.builder(
           document.getElementById('formio-builder'),
-          @if(isset($definition) && $definition) {!! $definition !!} @else {} @endif,
+          definition,
           {} // these are the opts you can customize
-      ).then(function(builder) {
+      ).then(function(instance) {
+         builder = instance;
           // Exports the JSON representation of the dynamic form to that form we defined above
-          document.getElementById('definition').value = JSON.stringify(builder.schema);
-
-          builder.on('change', function (e) {
+          document.getElementById('definition').value = JSON.stringify(instance.schema);
+          instance.on('change', function (e) {
               // On change, update the above form w/ the latest dynamic form JSON
-              document.getElementById('definition').value = JSON.stringify(builder.schema);
+              document.getElementById('definition').value = JSON.stringify(instance.schema);
           })
       });
+}
+
+var definition = @if(isset($definition) && $definition) {!! $definition !!} @else {} @endif;
+  definition.display = definition.display || 'form';
+initBuilder(definition);
+
+$('#form-select').on('change', function() {
+  var display_type = $(this).val();
+  definition.display = display_type;
+  initBuilder(definition);
+});
 </script>
 @endpush

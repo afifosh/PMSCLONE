@@ -438,6 +438,21 @@ class Contract extends BaseModel
           ->when(request()->dependent_2 == 'update-terms', function ($q) {
             $q->whereIn('status', [1, 2]); // active
           });
+      })
+      ->when(request()->contract_review_status && request()->contract_reviewer, function ($q) {
+        // select2 filter for contract review status
+        $q->when(request()->contract_review_status == 'reviewed', function ($q) {
+          // contracts which are reviewed by the given admin
+          $q->whereHas('reviews', function ($q) {
+            $q->where('user_id', request()->contract_reviewer);
+          });
+        })
+          ->when(request()->contract_review_status == 'not_reviewed', function ($q) {
+            // contracts which are not reviewed by the given admin
+            $q->whereDoesntHave('reviews', function ($q) {
+              $q->where('user_id', request()->contract_reviewer);
+            });
+          });
       });
   }
 

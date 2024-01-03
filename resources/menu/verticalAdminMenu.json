@@ -311,9 +311,9 @@
           "slug": "admin.applications.index"
         },
         {
-          "url": "/admin/application-submissions",
-          "name": "Submissions",
-          "slug": "admin.application-submissions.index"
+          "url": "/admin/application-submittions",
+          "name": "Submittions",
+          "slug": "admin.application-submittions.index"
         },
         {
           "name": "Settings",

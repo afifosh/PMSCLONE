@@ -81,6 +81,12 @@ class ContractController extends Controller
   {
     $data['contract_statuses'] = ['' => 'All'] + Contract::STATUSES;
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
+    $data['review_status'] = [
+      '' => 'Select Status',
+      'reviewed' => 'Reviewed',
+      'not_reviewed' => 'Not Reviewed',
+      'partially_reviewed' => 'Partially Reviewed',
+    ];
 
     return $dataTable->render('admin.pages.contracts.tracking.paymentsplan.index', $data);
     // view('admin.pages.contracts.tracking.paymentsplan.index');
@@ -95,8 +101,7 @@ class ContractController extends Controller
     $data['review_status'] = [
       '' => 'Select Status',
       'reviewed' => 'Reviewed',
-      'not_reviewed' => 'Not Reviewed',
-      'partially_reviewed' => 'Partially Reviewed',
+      'not_reviewed' => 'Not Reviewed'
     ];
 
     return $dataTable->render('admin.pages.contracts.tracking.contracts.index', $data);
@@ -565,13 +570,6 @@ class ContractController extends Controller
   {
     $data['contract_statuses'] = ['' => 'All'] + Contract::STATUSES;
     $data['contractTypes'] = ContractType::whereHas('contracts')->pluck('name', 'id')->prepend('All', '0');
-
-    $data['review_status'] = [
-      '' => 'Select Status',
-      'reviewed' => 'Reviewed',
-      'not_reviewed' => 'Not Reviewed',
-      'partially_reviewed' => 'Partially Reviewed',
-    ];
 
     return $dataTable->render('admin.pages.contracts.paymentsplan.index', $data);
     // view('admin.pages.contracts.paymentsplan.index')

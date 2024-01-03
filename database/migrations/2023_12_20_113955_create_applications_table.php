@@ -19,10 +19,16 @@ return new class extends Migration
       $table->foreignId('category_id')->constrained('application_categories')->cascadeOnDelete();
       $table->foreignId('pipeline_id')->constrained('application_pipelines')->cascadeOnDelete();
       $table->foreignId('scorecard_id')->constrained('application_score_cards')->cascadeOnDelete();
-      $table->string('form_id')->nullable();
-      $table->string('description')->nullable();
       $table->timestamp('start_at')->nullable();
       $table->timestamp('end_at')->nullable();
+      $table->string('description')->nullable();
+      $table->string('form_id')->nullable();
+      $table->string('success_message')->nullable();
+      $table->json('notification_emails')->nullable();
+      $table->json('notification_emails_cc')->nullable();
+      $table->json('notification_emails_bcc')->nullable();
+      $table->boolean('allow_comments')->default(false);
+      $table->boolean('allow_share_section')->default(false);
       $table->boolean('is_public')->default(false);
       $table->timestamps();
     });

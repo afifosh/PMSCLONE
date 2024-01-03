@@ -17,13 +17,25 @@ class Application extends Model
     'category_id',
     'pipeline_id',
     'scorecard_id',
-    'form_id',
-    'description',
     'start_at',
-    'end_at'
+    'end_at',
+    'description',
+    'form_id',
+    'success_message',
+    'notification_emails',
+    'notification_emails_cc',
+    'notification_emails_bcc',
+    'allow_comments',
+    'allow_share_section',
+    'is_public'
   ];
 
   protected $casts = [
+    'notification_emails' => 'array',
+    'notification_emails_cc' => 'array',
+    'notification_emails_bcc' => 'array',
+    'allow_comments' => 'boolean',
+    'allow_share_section' => 'boolean',
     'start_at' => 'datetime: M d, Y',
     'end_at' => 'datetime: M d, Y',
     'created_at' => 'datetime: M d, Y',
@@ -109,7 +121,7 @@ class Application extends Model
   /**
    * Polymorphic models that can submit this application
    */
-  public function submitters()
+  public function applicationSubmitters()
   {
     return $this->morphToMany(ApplicationSubmitter::class, 'submitter');
   }

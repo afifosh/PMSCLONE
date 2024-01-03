@@ -6,6 +6,7 @@ use App\DataTables\Admin\Applications\ApplicationsDataTable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Applications\ApplicationStoreRequest;
 use App\Models\Application;
+use App\Models\ApplicationUser;
 
 class ApplicationController extends Controller
 {
@@ -18,7 +19,8 @@ class ApplicationController extends Controller
   public function create()
   {
     $application = new Application();
-    return view('admin.pages.applications.create', compact('application'));
+    $userRoles = ApplicationUser::ROLE;
+    return view('admin.pages.applications.create', compact('application', 'userRoles'));
   }
 
   public function store(ApplicationStoreRequest $request)
@@ -44,6 +46,7 @@ class ApplicationController extends Controller
     $data['companies'] = [$application->company_id => $application->company->name ?? ''];
     $data['users'] = $application->users->pluck('name', 'id')->toArray();
     $data['selectedUsers'] = $application->users->pluck('id')->toArray();
+    $data['userRoles'] = ApplicationUser::ROLE;
 
     return view('admin.pages.applications.create', $data);
   }

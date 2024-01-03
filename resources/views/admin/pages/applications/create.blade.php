@@ -26,7 +26,6 @@
   @else
     {!! Form::model($application, ['route' => ['admin.applications.store'], 'method' => 'POST']) !!}
   @endif
-  {!! Form::close() !!}
 
   <!-- Vertical Wizard -->
   <div class="col-12 mb-4">
@@ -143,7 +142,7 @@
                 ])!!}
               </div>
               {{-- start_at --}}
-              <div class="form-group col-6">
+              <div class="form-group col-6 mt-1">
                 {{ Form::label('start_at', __('Start At'), ['class' => 'col-form-label']) }}
                 {!! Form::text('start_at', null, ['class' => 'form-control flatpickr', 'placeholder' => __('Start At')]) !!}
               </div>
@@ -166,8 +165,19 @@
                       <input class="form-control" name="set_end_date_time" id="set_end_date_time">
                   </div>
               </div> --}}
+              {{-- has End date --}}
+              <div class="col-6 mt-4 mb-2">
+                <label class="switch mt-3">
+                  {{ Form::checkbox('has_end_date', 1, $application->end_at && 1,['class' => 'switch-input'])}}
+                  <span class="switch-toggle-slider">
+                    <span class="switch-on"></span>
+                    <span class="switch-off"></span>
+                  </span>
+                  <span class="switch-label">Has End Date?</span>
+                </label>
+              </div>
               {{-- end_at --}}
-              <div class="form-group col-6">
+              <div class="form-group col-6 {{$application->end_at ?: 'd-none'}}">
                   {{ Form::label('end_at', __('End At'), ['class' => 'col-form-label']) }}
                   {!! Form::text('end_at', null, ['class' => 'form-control flatpickr', 'placeholder' => __('End At')]) !!}
               </div>
@@ -177,10 +187,10 @@
                   {!! Form::textarea('description', null, ['class' => 'form-control', 'rows' => 5, 'placeholder' => __('Description')]) !!}
               </div>
               <div class="col-12 d-flex justify-content-between">
-                <button class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
+                <button type="button" class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
                   <span class="align-middle d-sm-inline-block d-none">Previous</span>
                 </button>
-                <button class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
+                <button type="button" class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
               </div>
             </div>
           </div>
@@ -222,8 +232,8 @@
 
               <div class="col-lg-12">
                 <div class="form-group">
-                    {{ Form::label('email[]', __('Recipient Email'), ['class' => 'form-label']) }}
-                    {!! Form::text('email[]', null, [
+                    {{ Form::label('notification_emails[]', __('Recipient Email'), ['class' => 'form-label']) }}
+                    {!! Form::text('notification_emails[]', null, [
                         'class' => 'form-control',
                         'placeholder' => __('Enter recipient email'),
                     ]) !!}
@@ -231,8 +241,8 @@
               </div>
               <div class="col-lg-12">
                   <div class="form-group">
-                      {{ Form::label('ccemail[]', __('Cc Emails (Optional)'), ['class' => 'form-label']) }}
-                      {!! Form::text('ccemail[]', null, [
+                      {{ Form::label('notification_emails_cc[]', __('Cc Emails (Optional)'), ['class' => 'form-label']) }}
+                      {!! Form::text('notification_emails_cc[]', null, [
                           'class' => 'form-control inputtags',
                           'placeholder' => __('Enter recipient cc email'),
                       ]) !!}
@@ -240,8 +250,8 @@
               </div>
               <div class="col-lg-12">
                   <div class="form-group">
-                      {{ Form::label('bccemail[]', __('Bcc Emails (Optional)'), ['class' => 'form-label']) }}
-                      {!! Form::text('bccemail[]', null, [
+                      {{ Form::label('notification_emails_bcc[]', __('Bcc Emails (Optional)'), ['class' => 'form-label']) }}
+                      {!! Form::text('notification_emails_bcc[]', null, [
                           'class' => 'form-control inputtags',
                           'placeholder' => __('Enter recipient bcc email'),
                       ]) !!}
@@ -268,10 +278,10 @@
               </div>
 
               <div class="col-12 d-flex justify-content-between">
-                <button class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
+                <button type="button" class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
                   <span class="align-middle d-sm-inline-block d-none">Previous</span>
                 </button>
-                <button class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
+                <button type="button" class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
               </div>
             </div>
           </div>
@@ -316,10 +326,10 @@
             </ul>
             {{--  --}}
             <div class="col-12 d-flex justify-content-between">
-              <button class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
+              <button type="button" class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
                 <span class="align-middle d-sm-inline-block d-none">Previous</span>
               </button>
-              <button class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
+              <button type="button" class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right"></i></button>
             </div>
           </div>
           <!-- Application Submitters -->
@@ -343,11 +353,12 @@
 
             {{-- select company --}}
             <div class="form-group mb-2 col-12 {{$application->company_id ?: 'd-none'}}">
-              {{ Form::label('company_id', __('Can Submit'), ['class' => 'col-form-label']) }}
-              {!! Form::select('company_id', $companies ?? [], $selectedCompany ?? null, [
+              {{ Form::label('company_ids[]', __('Can Submit'), ['class' => 'col-form-label']) }}
+              {!! Form::select('company_ids[]', $companies ?? [], $selectedCompany ?? null, [
               'data-placeholder' => __('Select Company'),
               'class' => 'form-select select2Remote',
-              'data-url' => route('resource-select', ['groupedCompany'])
+              'data-url' => route('resource-select', ['groupedCompany']),
+              'multiple' => 'multiple',
               ])!!}
             </div>
 
@@ -371,7 +382,7 @@
             </ul>
             {{--  --}}
             <div class="col-12 d-flex justify-content-between">
-              <button class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
+              <button type="button" class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left me-sm-1 me-0"></i>
                 <span class="align-middle d-sm-inline-block d-none">Previous</span>
               </button>
               <button type="submit" data-form="ajax-form" class="btn btn-primary btn-submit">{{ __('Save') }}</button>
@@ -380,6 +391,7 @@
         </div>
       </div>
     </div>
+    {!! Form::close() !!}
   </div>
   <!-- /Vertical Wizard -->
 @endsection
@@ -423,9 +435,9 @@
     // on change of is_public, show/hide company_id
     $(document).on('change', 'input[name="is_public"]', function() {
       if ($(this).is(':checked')) {
-        $('select[name="company_id"]').closest('.form-group').addClass('d-none');
+        $('select[name="company_ids[]"]').closest('.form-group').addClass('d-none');
       } else {
-        $('select[name="company_id"]').closest('.form-group').removeClass('d-none');
+        $('select[name="company_ids[]"]').closest('.form-group').removeClass('d-none');
       }
     });
 
@@ -455,11 +467,11 @@
         });
       }
 
-      if (wizardVerticalBtnSubmit) {
-        wizardVerticalBtnSubmit.addEventListener('click', event => {
-          alert('Submitted..!!');
-        });
-      }
+      // if (wizardVerticalBtnSubmit) {
+      //   wizardVerticalBtnSubmit.addEventListener('click', event => {
+      //     alert('Submitted..!!');
+      //   });
+      // }
     }
   </script>
   <script>
@@ -496,11 +508,41 @@
                     <p class="mb-0">${name}</p>
                     <p class="mb-0 text-muted">${email}</p>
                 </div>
+                <div class="dropdown">
+                    <button
+                        type="button"
+                        class="btn dropdown-toggle p-2"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                    <span id="button-`+userId+`" class="text-muted fw-normal me-2 d-inline-block">{{$userRoles[array_keys($userRoles)[0]]}}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      @foreach($userRoles as $id => $role)
+                        <li>
+                          <a class="dropdown-item" href="javascript:updateRole({{$id}}, '{{$role}}', `+userId+`)" data-role="{{$id}}">{{$role}}</a>
+                        </li>
+                      @endforeach
+                    </ul>
+                </div>
             </div>
         `;
 
         membersList.appendChild(li);
       }
     }//);
+
+    function updateRole(id, role, userId) {
+      $('#button-'+userId).text(role);
+    }
+
+    // on change has_end_date, show/hide end_at
+    $(document).on('change', 'input[name="has_end_date"]', function() {
+      if ($(this).is(':checked')) {
+        $('input[name="end_at"]').closest('.form-group').removeClass('d-none');
+      } else {
+        $('input[name="end_at"]').closest('.form-group').addClass('d-none');
+      }
+    });
   </script>
 @endpush

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\Applications\ApplicationCategoryController;
 use App\Http\Controllers\Admin\Applications\ApplicationController;
 use App\Http\Controllers\Admin\Applications\ApplicationPipelineController;
 use App\Http\Controllers\Admin\Applications\ApplicationScoreCardController;
+use App\Http\Controllers\Admin\Applications\ApplicationSubmittionController;
 use App\Http\Controllers\Admin\Applications\ApplicationTypeController;
 use App\Http\Controllers\Admin\Applications\Form\FormCommentsController;
 use App\Http\Controllers\Admin\Applications\Form\FormCommentsReplyController;
@@ -556,6 +557,7 @@ Route::prefix('contracts')->group(function () {
 
     // apllications
     Route::resource('applications', ApplicationController::class);
+    Route::resource('application-submittions', ApplicationSubmittionController::class);
     Route::prefix('applications')->name('applications.')->group(function () {
       Route::prefix('settings')->name('settings.')->group(function () {
         Route::resource('forms', FormController::class)->except(['show']);

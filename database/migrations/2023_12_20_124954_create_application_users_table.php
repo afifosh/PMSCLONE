@@ -15,6 +15,7 @@ return new class extends Migration
       $table->id();
       $table->foreignId('application_id')->constrained()->cascadeOnDelete();
       $table->foreignId('admin_id')->constrained()->cascadeOnDelete();
+      $table->integer('role');
       $table->timestamps();
     });
   }

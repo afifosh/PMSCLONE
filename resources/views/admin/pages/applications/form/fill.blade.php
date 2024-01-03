@@ -51,6 +51,7 @@
 <div id="formio-form"></div>
 @endsection
 @push('style')
+<link rel="stylesheet" href="https://cdn.form.io/js/formio.full.min.css">
 @endpush
 @push('scripts')
     <script src="{{ asset('js/formbuilder.js') }}"></script>

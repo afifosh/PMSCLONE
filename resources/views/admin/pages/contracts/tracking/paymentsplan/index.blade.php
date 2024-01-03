@@ -77,6 +77,24 @@ $configData = Helper::appClasses();
             {!! Form::select('contract_type', $contractTypes, null, ['class' => 'form-select select2', 'data-placeholder' => 'All', 'data-allow-clear' => 'true']) !!}
           </div>
           <div class="col">
+            {!! Form::label('phase_reviewer', 'Reviewer') !!}
+            {!! Form::select('phase_reviewer', [], 'all', [
+                'class' => 'form-select select2UserRemote',
+                'data-url' => route('resource-select-user', ['Admin', 'canReviewMutualContractsPhase']),
+                'data-placeholder' => 'Select Reviewer',
+                'data-allow-clear' => 'true'
+            ]) !!}
+          </div>
+          <div class="col">
+            {!! Form::label('phase_review_status', 'Review Status') !!}
+            {!! Form::select('phase_review_status', $review_status, 'all', [
+                'class' => 'form-select select2',
+                'data-placeholder' => 'All Contracts',
+                'data-placeholder' => 'Select Status',
+                'data-allow-clear' => 'true',
+            ]) !!}
+          </div>
+          <div class="col">
             {!! Form::label('companies', 'Client') !!}
             {!! Form::select('companies', [], null, [
               'class' => 'form-select select2Remote',
