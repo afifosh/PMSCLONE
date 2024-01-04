@@ -12,6 +12,7 @@ use App\Support\LaravelBalance\Services\Accountant;
 use App\Support\LaravelBalance\Services\TransactionProcessor;
 use App\Support\LaravelBalance\Models\AccountBalance;
 use App\Support\LaravelBalance\Models\Transaction;
+use Illuminate\Support\Facades\DB;
 
 class FinancialYearTransactionController extends Controller
 {
@@ -70,7 +71,7 @@ class FinancialYearTransactionController extends Controller
           $request->description
         )
       );
-    elseif($request->type == 'transfer'){
+    elseif ($request->type == 'transfer') {
       $this->transactionProcessor->create(
         $financialYear,
         new TransactionDto(
@@ -99,5 +100,28 @@ class FinancialYearTransactionController extends Controller
   {
     $transaction->load('accountBalance');
     return $this->sendRes('success', ['view_data' => view('admin.pages.finances.financial-years.transactions.show', compact('transaction'))->render()]);
+  }
+
+  public function destroy($accountBalance, Transaction $transaction)
+  {
+    DB::beginTransaction();
+    try {
+      if ($transaction->invoicePayment) {
+        // if directly deleting the transaction, delete the invoice payment as well and update the invoice
+
+        $paymentController = app(PaymentController::class);
+
+        $paymentController->deletePayment($transaction->invoicePayment);
+      } else {
+        $transaction->delete();
+      }
+
+      DB::commit();
+
+      return $this->sendRes('Transaction deleted successfully', ['event' => 'table_reload', 'table_id' => 'financial-years-table']);
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return $this->sendError($e->getMessage());
+    }
   }
 }

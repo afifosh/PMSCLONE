@@ -23,6 +23,7 @@ class PhaseUpdateRequest extends FormRequest
   {
     $this->merge([
       'is_allowable_cost' => $this->boolean('is_allowable_cost'),
+      'is_reviewed' => $this->boolean('is_reviewed'),
     ]);
   }
 
@@ -43,6 +44,7 @@ class PhaseUpdateRequest extends FormRequest
         //'max:' .  ($this->contract->remaining_amount - $this->calculated_tax_amount))
       ],
       'is_allowable_cost' => 'required|boolean',
+      'is_reviewed' => 'required|boolean',
       'description' => 'nullable|string|max:2000',
       'start_date' => 'required|date' . (request()->due_date ? '|before_or_equal:due_date' : '') . '|after_or_equal:' . $this->contract->start_date,
       'due_date' => 'nullable|date|after:start_date|before_or_equal:' . $this->contract->end_date,

@@ -590,9 +590,8 @@ class ContractController extends Controller
 
   public function ContractPaymentsPlanPhases($contract_id)
   {
-    $query = ContractPhase::whereHas('stage.contract', function ($query) use ($contract_id) {
-      $query->where('id', $contract_id);
-    })->with(['reviewdByAdmins', 'stage', 'contract:id,program_id,currency', 'addedAsInvoiceItem']);
+    $query = ContractPhase::where('contract_phases.contract_id', $contract_id)->applyRequestFilters()
+      ->with(['reviewdByAdmins', 'stage', 'contract:id,program_id,currency', 'addedAsInvoiceItem']);
 
       return DataTables::of($query)
           ->editColumn('checkbox', function ($phase) {
@@ -620,7 +619,13 @@ class ContractController extends Controller
           ->addColumn('reviewed_by', function (ContractPhase $phase) {
             return view('admin._partials.sections.user-avatar-group', ['users' => $phase->reviewdByAdmins]);
           })
-          ->rawColumns(['actions', 'invoice_id', 'amount','reviewed_by', 'checkbox'])
+          ->addColumn('invoice_id', function ($phase) {
+            $invoiceItem = $phase->addedAsInvoiceItem->first();
+            return $invoiceItem
+              ? '<a href="' . route('admin.invoices.edit', $invoiceItem->invoice_id) . '">' . runtimeInvIdFormat($invoiceItem->invoice_id) . '</a>'
+              : 'N/A';
+          })
+          ->rawColumns(['actions', 'invoice_id', 'amount','reviewed_by', 'checkbox', 'invoice_id'])
           ->make(true);
   }
 
@@ -737,6 +742,44 @@ class ContractController extends Controller
       } catch (Throwable $e) {
           return $this->sendError($e->getMessage());
       }
+  }
+
+  /**
+   * update review status of multiple phases
+   */
+  public function updatePhasesReviewStatus(Contract $contract, Request $request) {
+    $request->validate([
+      'phase_ids' => 'required|array',
+      'phase_ids.*' => 'required|integer|exists:contract_phases,id,contract_id,' . $contract->id,
+      'is_reviewed' => 'required|boolean',
+    ]);
+
+    // fail if user is not allowed to review contract
+    Admin::canReviewContract($contract->id, $contract->program_id)->findOrFail(auth()->id());
+
+    DB::beginTransaction();
+
+    try{
+      if(!$request->boolean('is_reviewed')){
+        $contract->phases()->whereIn('id', $request->phase_ids)->delete();
+      }else{
+        $phase_ids = filterInputIds($request->phase_ids);
+        foreach ($phase_ids as $phase_id) {
+          Review::updateOrCreate(
+            ['user_id' => auth()->id(), 'reviewable_id' => $phase_id, 'reviewable_type' => ContractPhase::class],
+            ['reviewed_at' => now()]
+          );
+        }
+      }
+      DB::commit();
+
+      $message = $request->boolean('is_reviewed') ? __('Phases marked as reviewed!') : __('Phases marked as unreviewed!');
+
+      return $this->sendRes($message, ['event' => 'functionCall', 'function' => 'reloadDataTables', 'close' => 'globalModal']);
+    }catch(\Exception $e){
+      DB::rollback();
+      return $this->sendError($e->getMessage());
+    }
   }
 
   public function getContractsWithStagesAndPhases(Request $request)

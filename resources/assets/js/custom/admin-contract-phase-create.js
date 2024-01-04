@@ -7,6 +7,8 @@ function createInvoices(){
     phases.push($(this).val());
   });
   if(phases.length == 0){
+    toast_danger('Please select atleast one phase');
+
     return;
   }
   $.ajax({
@@ -19,6 +21,35 @@ function createInvoices(){
       $('.phase-check-all').prop('checked', false).trigger('change');
       $('.phase-check').prop('checked', false).trigger('change');
       reloadDataTables();
+    }
+  });
+}
+
+function markPhasesReviewed(status) {
+  var phases = [];
+  $('.phase-check:checked').each(function(){
+    phases.push($(this).val());
+  });
+  if(phases.length == 0){
+    toast_danger('Please select atleast one phase');
+
+    return;
+  }
+  $.ajax({
+    url: route('admin.contracts.update-phases-review-status', { contract: window.active_contract }),
+    type: "PUT",
+    data: {
+      phase_ids: phases,
+      is_reviewed: status
+    },
+    success: function(res){
+      $('.phase-check-all').prop('checked', false).trigger('change');
+      $('.phase-check').prop('checked', false).trigger('change');
+      toast_success(res.message);
+      reloadDataTables();
+    },
+    error: function(res){
+      toast_danger(res.responseJSON.message);
     }
   });
 }

@@ -2,9 +2,11 @@
 
 namespace App\Support\LaravelBalance\Models;
 
+use App\Models\InvoicePayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use App\Support\Money;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Transaction extends Model
 {
@@ -100,6 +102,16 @@ class Transaction extends Model
   public function related()
   {
     return $this->morphTo();
+  }
+
+
+  /**
+   * has one invoice payment against which this transaction is made
+   * @return HasOne
+   */
+  public function invoicePayment(): HasOne
+  {
+    return $this->hasOne(InvoicePayment::class, 'ba_trx_id');
   }
 
   /**

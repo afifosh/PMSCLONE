@@ -481,10 +481,10 @@
         </div>
 
         <hr class="my-0" />
-        @php
-          $phase = $invoice->items->where('invoiceable_type', 'App\Models\ContractPhase')[0];
-        @endphp
         @if ($invoice->type == 'Partial Invoice')
+          @php
+            $phase = $invoice->items->where('invoiceable_type', 'App\Models\ContractPhase')[0];
+          @endphp
           <div class="source-item pt-4 px-0 px-sm-4">
             <div class="col-12">
               <div class="table-responsive m-t-40">

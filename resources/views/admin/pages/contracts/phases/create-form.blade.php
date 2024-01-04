@@ -81,6 +81,21 @@
     <span class="switch-label">Is Allowable?</span>
   </label>
 </div>
+
+@if($canReview)
+  {{-- is Reviewed --}}
+  <div class="col-12 my-2">
+    <label class="switch">
+      <input class="switch-input" @checked(isset($userHasMarkedComplete) && $userHasMarkedComplete) name="is_reviewed" type="checkbox" value="1">
+      <span class="switch-toggle-slider">
+        <span class="switch-on"></span>
+        <span class="switch-off"></span>
+      </span>
+      <span class="switch-label">Is Reviwed?</span>
+    </label>
+  </div>
+@endif
+
 <div class="col-md-12 mt-3">
   <div class="mb-3">
     {!! Form::label('description', 'Description', ['class' => 'col-form-label']) !!}

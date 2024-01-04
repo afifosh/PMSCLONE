@@ -577,6 +577,13 @@ class Admin extends Authenticatable implements MustVerifyEmail, Metable, Auditab
     {
       $q->when(request()->has('canReviewMutualContractsPhase'), function ($q) {
         $q->whereHas('activeACLRules');
+      })
+      ->when(request()->canReviewContract, function ($q) {
+        // admins who can review the given contract
+        $program_id = Contract::find(request()->canReviewContract)->program_id;
+        $q->when($program_id, function ($q) use ($program_id) {
+          $q->CanReviewContract(request()->canReviewContract, $program_id);
+        });
       });
     }
 }

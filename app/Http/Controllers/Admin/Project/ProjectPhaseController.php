@@ -7,6 +7,7 @@ use App\Events\Admin\Contract\ContractUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Contract\Phase\PhaseStoreRequest;
 use App\Http\Requests\Admin\Contract\Phase\PhaseUpdateRequest;
+use App\Models\Admin;
 use App\Models\Contract;
 use App\Models\ContractPhase;
 use App\Models\ContractStage;
@@ -71,7 +72,9 @@ class ProjectPhaseController extends Controller
     $phase = new ContractPhase();
     $tax_rates = InvoiceConfig::activeOnly()->get();
     $stages = $contract->stages->pluck('name', 'id');
-    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates'))->render()]);
+    $canReview = Admin::canReviewContract($contract->id, $contract->program_id)->where('id', auth('admin')->id())->exists();
+
+    return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'max_amount', 'tax_rates', 'canReview'))->render()]);
   }
 
   public function store($project, Contract $contract, $stage, PhaseStoreRequest $request)
@@ -85,9 +88,17 @@ class ProjectPhaseController extends Controller
       });
       $data['stage_id'] = $stage->id;
 
-      $contract->phases()->create(
+      $phase = $contract->phases()->create(
         $data + $request->only(['name', 'description', 'status', 'start_date', 'due_date', 'estimated_cost', 'stage_id', 'is_allowable_cost'])
       );
+
+      if(Admin::canReviewContract($contract->id, $contract->program_id)->where('id', auth('admin')->id())->exists()) {
+        if($request->is_reviewed) {
+          $phase->reviews()->updateOrCreate(['user_id' => auth()->id()], ['user_id' => auth()->id(), 'reviewed_at' => now()]);
+        } else {
+          $phase->reviews()->where('user_id', auth()->id())->delete();
+        }
+      }
     } catch (\Exception $e) {
       DB::rollback();
       return $this->sendError($e->getMessage());
@@ -114,15 +125,16 @@ class ProjectPhaseController extends Controller
     $max_amount = $contract->remaining_amount + $phase->total_cost;
     $tax_rates = InvoiceConfig::activeOnly()->get();
     $is_partial_paid = $phase->isPartialPaid();
+    $canReview = Admin::canReviewContract($contract->id, $contract->program_id)->where('id', auth('admin')->id())->where('id', auth('admin')->id())->exists();
+    $userHasMarkedComplete = $phase->reviewdByAdmins()->where('admins.id', auth()->id())->exists();
 
     if (request()->type == 'edit-form') {
       if ($phase->isPaid()) {
         return $this->sendError('You can not edit this phase because it is in paid invoice');
       }
-      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create-form', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount', 'is_partial_paid'))->render()]);
+      return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.create-form', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount', 'is_partial_paid', 'canReview', 'userHasMarkedComplete'))->render()]);
     }
 
-    $userHasMarkedComplete = $phase->reviewdByAdmins()->where('admins.id', auth()->id())->exists();
     $buttonLabel = $userHasMarkedComplete ? 'MARK AS UNREVIEWED' : 'MARK AS REVIEWED';
     $buttonIcon = $userHasMarkedComplete ? 'ti-undo' : 'ti-bell';
     $reviewStatus = $userHasMarkedComplete ? 'true' : 'false';
@@ -144,7 +156,7 @@ class ProjectPhaseController extends Controller
 
     $is_paid = $phase->isPaid();
 
-    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount', 'is_paid', 'is_partial_paid'))->render()]);
+    return $this->sendRes('success', ['modaltitle' => $modalTitle, 'view_data' => view('admin.pages.contracts.phases.create', compact('contract', 'stages', 'phase', 'stage', 'tax_rates', 'max_amount', 'is_paid', 'is_partial_paid', 'canReview', 'userHasMarkedComplete'))->render()]);
   }
 
   public function prepareActivityTab($phase)
@@ -192,6 +204,14 @@ class ProjectPhaseController extends Controller
         $phase->reCalculateTotal();
         $phase->recalculateDeductionAmount();
         $phase->reCalculateTotal();
+      }
+
+      if(Admin::canReviewContract($contract->id, $contract->program_id)->where('id', auth('admin')->id())->exists()) {
+        if($request->is_reviewed) {
+          $phase->reviews()->updateOrCreate(['user_id' => auth()->id()], ['user_id' => auth()->id(), 'reviewed_at' => now()]);
+        } else {
+          $phase->reviews()->where('user_id', auth()->id())->delete();
+        }
       }
 
       // if added in invoice then update invoice item and tax amount

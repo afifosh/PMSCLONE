@@ -562,8 +562,8 @@ dialog.fixed {
  * -------------------------- */
 @font-face {
   font-family: "FontAwesome";
-  src: url("fonts/fontawesome-webfont.eot?v=4.7.0");
-  src: url("fonts/fontawesome-webfont.eot?#iefix&v=4.7.0") format("embedded-opentype"), url("fonts/fontawesome-webfont.woff2?v=4.7.0") format("woff2"), url("fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"), url("fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype"), url("fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular") format("svg");
+  src: url(/fonts/vendor/formiojs/dist/fontawesome-webfont.eot?8b43027f47b20503057dfbbaa9401fef);
+  src: url(/fonts/vendor/formiojs/dist/fontawesome-webfont.eot?8b43027f47b20503057dfbbaa9401fef?#iefix&v=4.7.0) format("embedded-opentype"), url(/fonts/vendor/formiojs/dist/fontawesome-webfont.woff2?20fd1704ea223900efa9fd4e869efb08) format("woff2"), url(/fonts/vendor/formiojs/dist/fontawesome-webfont.woff?f691f37e57f04c152e2315ab7dbad881) format("woff"), url(/fonts/vendor/formiojs/dist/fontawesome-webfont.ttf?1e59d2330b4c6deb84b340635ed36249) format("truetype"), url(/fonts/vendor/formiojs/dist/fontawesome-webfont.svg?c1e38fd9e0e74ba58f7a2b77ef29fdd3#fontawesomeregular) format("svg");
   font-weight: normal;
   font-style: normal;
 }

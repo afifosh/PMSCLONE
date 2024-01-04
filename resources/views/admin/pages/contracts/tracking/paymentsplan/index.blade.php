@@ -8,6 +8,7 @@ $configData = Helper::appClasses();
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -177,12 +178,16 @@ $configData = Helper::appClasses();
           contentRow.css("background-color", "#f9f9f9"); // Example: change the background color
           $(row.node()).next().after(contentRow);
           $(row.node()).next().after(contentRow); // Append the content after the pills
+          initSelect2();
       // Append the child tables to the expanded-details div
 
           // Initialize DataTables when tabs are clicked, not here
       }
       if(window.selectedTab) {
+        console.log('Tab clicked' + window.selectedTab + ' contractId ' + contractId ); // Add this line
         $('[data-bs-target="' + window.selectedTab + '"]').click();
+      }else{
+        $('[data-bs-target="#child-stages-' + contractId + '"]').click();
       }
 });
     function destroyChildTables(contractId) {
@@ -247,10 +252,22 @@ $configData = Helper::appClasses();
             <tr class="child-row-added p-0">
                 <td class="p-0" colspan="100%">
                     <div class="tab-content">
-                        <div class="tab-pane fade" id="child-stages-${contractId}" role="tabpanel" aria-labelledby="child-stages-tab-${contractId}">
+                        <div class="tab-pane fade show active" id="child-stages-${contractId}" role="tabpanel" aria-labelledby="child-stages-tab-${contractId}">
                             <table class="table" id="stages-table-${contractId}"></table>
                         </div>
-                        <div class="tab-pane fade show active" id="child-phases-${contractId}" role="tabpanel" aria-labelledby="child-phases-tab-${contractId}">
+                        <div class="tab-pane fade" id="child-phases-${contractId}" role="tabpanel" aria-labelledby="child-phases-tab-${contractId}">
+                          <form class="phases-datatable-filter-form">
+                              <div class="d-flex justify-content-between align-items-center row pb-2 mx-1">
+                                <div class="col-4">
+                                  <label>Reviewer</label>
+                                  <select class="form-select select2UserRemote" data-js-route='1' data-url="route('resource-select-user', {resource:'Admin', canReviewContract:${contractId}})" data-placeholder="Select Reviewer" data-allow-clear="true" name="phase_reviewer"></select>
+                                </div>
+                                <div class="col-4">
+                                  <label>Review Status</label>
+                                  <select class="form-select select2" data-placeholder="Select Status" data-allow-clear="true" name="phase_review_status"><option value="">Select Status</option><option value="reviewed">Reviewed</option><option value="not_reviewed">Not Reviewed</option></select>
+                                </div>
+                              </div>
+                            </form>
                             <table class="table" id="phases-table-${contractId}"></table>
                         </div>
                         <div class="tab-pane fade" id="child-review-${contractId}" role="tabpanel" aria-labelledby="child-review-tab-${contractId}">
@@ -297,7 +314,7 @@ $configData = Helper::appClasses();
             buttons : [
                 {
                     text: 'Add Stage',
-                    className: 'btn btn-primary',
+                    className: 'btn btn-primary ms-3',
                     attr: {
                         'data-toggle': 'ajax-modal',
                         'data-title': 'Add Stage',
@@ -306,7 +323,15 @@ $configData = Helper::appClasses();
                 }
             ],
             destroy: true,
-            dom: 'Blfrtip',
+            dom:
+              '<"row mx-2"' +
+              '<"col-md-2"<"me-3"l>>' +
+              '<"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>' +
+              '>t' +
+              '<"row mx-2"' +
+              '<"col-sm-12 col-md-6"i>' +
+              '<"col-sm-12 col-md-6"p>' +
+              '>',
             initComplete: function() {
                     // Move the buttons container near the search bar
                    // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
@@ -333,43 +358,68 @@ $configData = Helper::appClasses();
                     { data: 'amount', title: 'Amount' },
                     { data: 'can_reviewed_by', title: 'Can Review'},
                     { data: "reviewed_by", "reviewed_by": "reviewed_by", title: 'Reviewed By' },
-                    { data: 'status', title: 'Status' },
-                    {
-                        data: 'actions',
-                        title: 'Actions',
-                        orderable: false,
-                        searchable: false
-                    }
+                    { data: 'invoice_id', title: 'Invoice', orderable: false, searchable: false },
+                    { data: 'status', title: 'Status', orderable: false, searchable: false },
+                    { data: 'actions', title: 'Actions', orderable: false, searchable: false }
                 ],
                 destroy: true,
-               dom: 'Blfrtip',
-          //    dom: '<"top"Bf>rt<"bottom"ip>',
-           //  dom: 'ilpftr'
+                dom:
+                    '<"row mx-2"' +
+                    '<"col-md-2"<"me-3"l>>' +
+                    '<"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>' +
+                    '>t' +
+                    '<"row mx-2"' +
+                    '<"col-sm-12 col-md-6"i>' +
+                    '<"col-sm-12 col-md-6"p>' +
+                    '>',
                 buttons: [
-        {
-          text: 'Create Invoices',
-          className: 'btn btn-primary mx-3 create-inv-btn disabled',
-          attr: {
-            'onclick': 'createInvoices()',
-          }
-        },
-        {
-            text: 'Add Phase',
-            className: 'btn btn-primary',
-            attr: {
-                'data-toggle': 'ajax-modal',
-                'data-title': 'Add Phase',
-                'data-href': route('admin.projects.contracts.stages.phases.create', {project: 'project', contract: contractId, stage: 'stage', tableId: '#phases-table-' + contractId })
-            }
-        }
-    ],
-                initComplete: function() {
-                    // Move the buttons container near the search bar
-                   // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
-                }    ,drawCallback: function(settings) {
-                    $('[data-bs-toggle="tooltip"]').tooltip('dispose'); // Dispose of any existing tooltips to prevent potential issues
-        $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
-    }
+                  {
+                    extend: 'collection',
+                    text: 'Actions',
+                    autoClose: true,
+                    className: 'btn btn-label-primary mx-3',
+                    buttons: [
+                      {
+                        text: 'Create Invoices',
+                        className: 'create-inv-btn dropdown-item',
+                        attr: {
+                          'onclick': 'createInvoices()',
+                        }
+                      },
+                      {
+                        text: 'Mark As Reviewed',
+                        className: 'create-inv-btn dropdown-item',
+                        attr: {
+                          'onclick': 'markPhasesReviewed(1)',
+                        }
+                      },
+                      {
+                        text: 'Mark As Unreviewed',
+                        className: 'create-inv-btn dropdown-item',
+                        attr: {
+                          'onclick': 'markPhasesReviewed(0)',
+                        }
+                      },
+                    ]
+                  },
+                  {
+                      text: 'Add Phase',
+                      className: 'btn btn-primary',
+                      attr: {
+                          'data-toggle': 'ajax-modal',
+                          'data-title': 'Add Phase',
+                          'data-href': route('admin.projects.contracts.stages.phases.create', {project: 'project', contract: contractId, stage: 'stage', tableId: '#phases-table-' + contractId })
+                      }
+                  }
+              ],
+              initComplete: function() {
+                  // Move the buttons container near the search bar
+                  // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));
+              },
+              drawCallback: function(settings) {
+                $('[data-bs-toggle="tooltip"]').tooltip('dispose'); // Dispose of any existing tooltips to prevent potential issues
+                $('[data-bs-toggle="tooltip"]').tooltip(); // Re-initialize tooltips
+              }
             });
 
     }
@@ -402,16 +452,27 @@ $configData = Helper::appClasses();
 
     }
 
+    $(document).on('change', '.phases-datatable-filter-form :input', function(e) {
+        $('#phases-table-' + window.active_contract).DataTable().draw();
+    });
+
     $('.js-datatable-filter-form :input').on('change', function(e) {
         console.log('Filter changed');
         window.LaravelDataTables["paymentsplan-table"].draw();
     });
 
     $('#paymentsplan-table').on('preXhr.dt', function(e, settings, data) {
-        console.log('PreXHR event');
+      // check if the event is fired by the phases table
+      if (e.target.id.includes('phases-table-')) {
+          console.log('phases-table-');
+          $('.phases-datatable-filter-form :input').each(function() {
+              data[$(this).prop('name')] = $(this).val();
+          });
+      }else{
         $('.js-datatable-filter-form :input').each(function() {
-            data[$(this).prop('name')] = $(this).val();
+          data[$(this).prop('name')] = $(this).val();
         });
+      }
     });
 });
 

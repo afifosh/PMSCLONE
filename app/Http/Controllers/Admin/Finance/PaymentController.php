@@ -197,7 +197,7 @@ class PaymentController extends Controller
     return $this->sendRes('Payment deleted successfully.', ['event' => 'table_reload', 'table_id' => 'payments-table']);
   }
 
-  private function deletePayment(InvoicePayment $payment): void
+  public function deletePayment(InvoicePayment $payment): void
   {
     DB::beginTransaction();
 

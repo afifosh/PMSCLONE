@@ -31,7 +31,8 @@
             <form method="POST" action="{{ route('admin.applications.settings.forms.design.update', $form) }}">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="definition" id="definition" value="">
+                <textarea name="definition" id="definition" cols="30" rows="10"></textarea>
+                {{-- <input type="hidden" name="definition" id="definition" value=""> --}}
 
                 <button type="submit" class="btn btn-outline-primary" data-form="ajax-form">
                     <i class="fas fa-save" aria-hidden="true"></i>
@@ -45,8 +46,8 @@
     </div>
 @endsection
 @push('style')
-<link rel="stylesheet" href="https://cdn.form.io/js/formio.full.min.css">
-{{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
+{{-- <link rel="stylesheet" href="https://cdn.form.io/js/formio.full.min.css"> --}}
+<link rel="stylesheet" href="{{ asset('css/app.css') }}">
 <style>
   .form-builder-panel {
     margin-bottom: 1rem;
@@ -56,10 +57,13 @@
   }
 </style>
 @endpush
+{{-- @vite('resources/js/formbuilder.js') --}}
 @push('scripts')
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 {{-- <script src="https://formio.github.io/formio.js/dist/formio.full.min.js"></script> --}}
-{{-- <script src="{{ asset('js/formbuilder.js') }}"></script> --}}
-<script src="https://cdn.form.io/js/formio.full.min.js"></script>
+<script src="{{ asset('js/formbuilder.js') }}"></script>
+
+{{-- <script src="https://cdn.form.io/js/formio.full.min.js"></script> --}}
 {{-- <script src="https://unpkg.com/formiojs@4.0.3/dist/formio.full.min.js"></script> --}}
 <script>
 var builder = null;
@@ -69,10 +73,13 @@ function initBuilder(definition) {
     document.getElementById("formio-builder").innerHTML = '';
   }
   $('#form-select').val(definition.display);
+  // Formio.Templates.framework = "bootstrap5"
+  // Formio.icons = "fontawesome"
   Formio.builder(
           document.getElementById('formio-builder'),
           definition,
-          {} // these are the opts you can customize
+          {
+          } // these are the opts you can customize
       ).then(function(instance) {
          builder = instance;
           // Exports the JSON representation of the dynamic form to that form we defined above

@@ -8,6 +8,7 @@ $configData = Helper::appClasses();
 
 @section('vendor-style')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/formvalidation/dist/css/formValidation.min.css')}}" />
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -202,7 +203,7 @@ $(row.node()).next().after(contentRow);
         buttons : [
             {
                 text: 'Add Stage',
-                className: 'btn btn-primary',
+                className: 'btn btn-primary ms-3',
                 attr: {
                     'data-toggle': 'ajax-modal',
                     'data-title': 'Add Stage',
@@ -211,7 +212,15 @@ $(row.node()).next().after(contentRow);
             }
         ],
         destroy: true,
-        dom: 'Blfrtip',
+        dom:
+          '<"row mx-2"' +
+          '<"col-md-2"<"me-3"l>>' +
+          '<"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>' +
+          '>t' +
+          '<"row mx-2"' +
+          '<"col-sm-12 col-md-6"i>' +
+          '<"col-sm-12 col-md-6"p>' +
+          '>',
         // Add more DataTable options if required
     });
 
@@ -228,34 +237,46 @@ $(row.node()).next().after(contentRow);
                     { data: 'amount', title: 'Amount' },
                     { data: 'can_reviewed_by', title: 'Can Review'},
                     { data: "reviewed_by", "reviewed_by": "reviewed_by", title: 'Reviewed By' },
-                    { data: 'status', title: 'Status' },
-                    {
-                        data: 'actions',
-                        title: 'Actions',
-                        orderable: false,
-                        searchable: false
-                    }
+                    { data: 'invoice_id', title: 'Invoice', orderable: false, searchable: false },
+                    { data: 'status', title: 'Status', orderable: false, searchable: false },
+                    { data: 'actions', title: 'Actions', orderable: false, searchable: false }
                 ],
                 destroy: true,
-                dom: 'Blfrtip',
+                dom:
+                    '<"row mx-2"' +
+                    '<"col-md-2"<"me-3"l>>' +
+                    '<"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0"fB>>' +
+                    '>t' +
+                    '<"row mx-2"' +
+                    '<"col-sm-12 col-md-6"i>' +
+                    '<"col-sm-12 col-md-6"p>' +
+                    '>',
                 buttons: [
-        {
-          text: 'Create Invoices',
-          className: 'btn btn-primary mx-3 create-inv-btn disabled',
-          attr: {
-            'onclick': 'createInvoices()',
-          }
-        },
-        {
-            text: 'Add Phase',
-            className: 'btn btn-primary',
-            attr: {
-                'data-toggle': 'ajax-modal',
-                'data-title': 'Add Phase',
-                'data-href': route('admin.projects.contracts.stages.phases.create', {project: 'project', contract: contractId, stage: 'stage', tableId: childTableId })
-            }
-        }
-    ],
+                  {
+                    extend: 'collection',
+                    text: 'Actions',
+                    autoClose: true,
+                    className: 'btn btn-label-primary mx-3',
+                    buttons: [
+                      {
+                        text: 'Create Invoices',
+                        className: 'create-inv-btn dropdown-item',
+                        attr: {
+                          'onclick': 'createInvoices()',
+                        }
+                      }
+                    ]
+                  },
+                  {
+                      text: 'Add Phase',
+                      className: 'btn btn-primary',
+                      attr: {
+                          'data-toggle': 'ajax-modal',
+                          'data-title': 'Add Phase',
+                          'data-href': route('admin.projects.contracts.stages.phases.create', {project: 'project', contract: contractId, stage: 'stage', tableId: childTableId })
+                      }
+                  }
+                ],
                 initComplete: function() {
                     // Move the buttons container near the search bar
                    // $('.dt-buttons', this.api().table().container()).appendTo($('.dataTables_filter', this.api().table().container()));

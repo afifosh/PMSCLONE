@@ -9,6 +9,8 @@ import BuilderSidebar from "./builder-sidebar"
 * need to run server-side too, to ensure the client isn't doing shenanigans.
 */
 FormioUtils.Evaluator.noeval = true;
+// Formio.use(bootstrap5);
+
 
 // -------------------------------------------------------------------------
 // If you want to load custom code (like additional components), do it here!

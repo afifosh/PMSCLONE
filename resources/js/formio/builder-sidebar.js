@@ -21,6 +21,7 @@ export default {
         components: {
             url: true,
             email: true,
+            password: true,
             phone: true,
             address: true,
             datetime: true,
@@ -44,8 +45,21 @@ export default {
             panel: true,
             table: true,
             well: true,
+            datagrid: true,
+            editgrid: true,
         }
     },
+    // customLayout: {
+    //   title: 'Data',
+    //   default: false,
+    //   weight: 15,
+    //   components: {
+    //       datagrid: true,
+    //       editgrid: true,
+    //       tree: true,
+    //       tags: true,
+    //   }
+    // },
     basic: false,
     advanced: false,
     layout: false,

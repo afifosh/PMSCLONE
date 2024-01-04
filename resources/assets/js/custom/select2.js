@@ -1,5 +1,10 @@
 window.initSelect2 = function(){
   $('.select2').each(function (){
+    // check if select2 is already initialized
+    if ($(this).hasClass('select2-hidden-accessible')) {
+      // destroy select2
+      $(this).select2('destroy');
+    }
     $(this).select2({
       placeholder: $(this).data('placeholder'),
       dropdownParent: $(this).parent()
@@ -7,6 +12,13 @@ window.initSelect2 = function(){
   })
   // select2 with remote data
   $('.select2Remote').each(function (){
+    // check if select2 is already initialized
+    if ($(this).hasClass('select2-hidden-accessible')) {
+      // destroy select2
+      $(this).select2('destroy');
+      // remove container
+      $(this).next('.select2-container').remove();
+    }
     $(this).select2({
       ajax: {
         url: $(this).data('url'),
@@ -35,9 +47,17 @@ window.initSelect2 = function(){
 
   // select2User with remote data
   $('.select2UserRemote').each(function (){
+    // check if select2 is already initialized
+    if ($(this).hasClass('select2-hidden-accessible')) {
+      // destroy select2
+      $(this).select2('destroy');
+      // remove container
+      $(this).next('.select2-container').remove();
+    }
+    var url = $(this).data('js-route') ? eval($(this).data('url')) : $(this).data('url');
     $(this).select2({
       ajax: {
-        url: $(this).data('url'),
+        url: url,
         dataType: 'json',
         delay: 500,
         data: function (params) {

@@ -363,11 +363,11 @@ Route::prefix('contracts')->group(function () {
       });
   });
 });
-
     Route::resource('contracts', ContractController::class)->only(['index', 'create', 'store']);
     Route::resource('invoices', InvoiceController::class)->only(['index', 'create', 'store']);
     // contracts and invoices related routes (contracts, phases, stages, invoices, invoice items)
     Route::middleware('contractACL')->group(function () {
+      Route::put('contracts/{contract}/update-phases-review-status', [ContractController::class, 'updatePhasesReviewStatus'])->name('contracts.update-phases-review-status');
       Route::get('contracts/{contract}/stages/{stage}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.stages.phases.index');
       Route::get('contracts/{contract}/phases', [ProjectPhaseController::class, 'contractPhases'])->name('contracts.phases.index');
       Route::get('contracts/{contract}/phases/{phase}', [ProjectPhaseController::class, 'show'])->name('contracts.phases.show');
@@ -539,7 +539,7 @@ Route::prefix('contracts')->group(function () {
     // Finance Routes
     Route::prefix('finances')->name('finances.')->group(function(){
       Route::resource('financial-years', FinancialYearController::class);
-      Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store', 'show']);
+      Route::resource('financial-years.transactions', FinancialYearTransactionController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
       Route::resource('program-accounts', ProgramAccountController::class);
       Route::resource('program-accounts.transactions', ProgramTransactionController::class)->only(['index', 'create', 'store']);
       Route::get('retentions', [TaxController::class, 'retentions'])->name('retentions.index');

@@ -16,6 +16,7 @@ use App\Models\InvoiceConfig;
 use App\Models\InvoiceItem;
 use App\Rules\AccountHasHolder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
@@ -196,19 +197,32 @@ class InvoiceController extends Controller
 
   public function destroy($invoice)
   {
-    if ($invoice != 'bulk') {
-      $invoice = Invoice::findOrFail($invoice);
-      $invoice->payments()->delete();
-      $invoice->delete();
-    } else {
-      $invoices = Invoice::whereIn('id', request()->invoices)->get();
-      foreach ($invoices as $invoice) {
-        $invoice->payments()->delete();
-        $invoice->delete();
-      }
-    }
+    DB::beginTransaction();
 
-    return $this->sendRes('Deleted successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table']);
+    try {
+      if ($invoice != 'bulk') {
+        $invoice = Invoice::with('payments')->findOrFail($invoice);
+        $invoice->payments->each(function ($payment) {
+          $payment->delete();
+        });
+        $invoice->delete();
+      } else {
+        $invoices = Invoice::with('payments')->whereIn('id', request()->invoices)->get();
+        foreach ($invoices as $invoice) {
+          $invoice->payments->each(function ($payment) {
+            $payment->delete();
+          });
+          $invoice->delete();
+        }
+      }
+
+      DB::commit();
+
+      return $this->sendRes('Deleted successfully', ['event' => 'table_reload', 'table_id' => 'invoices-table']);
+    } catch (\Exception $e) {
+      DB::rollback();
+      return $this->sendError($e->getMessage());
+    }
   }
 
   public function sortItems(Invoice $invoice, Request $request)

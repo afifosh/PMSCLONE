@@ -86,6 +86,15 @@ mix.webpackConfig({
   }
 });
 
+// mix.webpackConfig({
+//   watchOptions: {
+//       ignored: [
+//         '/node_modules/',
+//         '/resources/',
+//       ]
+//   }
+// });
+
 /*
  |--------------------------------------------------------------------------
  | Vendor assets
