@@ -28,7 +28,7 @@ class TotalAmountAdjustmentController extends Controller
       'adjuted_total_amount' => ['required', 'numeric'],
     ]);
 
-    $item_total = cMoney($invoiceItem->getRawOriginal('total') / 1000, $invoiceItem->invoice->contract->currency)->getAmount();
+    $item_total = cMoney($invoiceItem->getRawOriginal('total') / 100, $invoiceItem->invoice->contract->currency)->getAmount();
 
     // adjusted amount should be +- 0.5 difference from total amount
     if (abs($request->adjuted_total_amount - $item_total) > 0.5) {

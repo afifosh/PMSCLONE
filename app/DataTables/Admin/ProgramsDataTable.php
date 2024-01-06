@@ -59,7 +59,12 @@ class ProgramsDataTable extends DataTable
       ->with('children') // Eager load the children relationship
       ->with('contracts:id,program_id')
       ->leftjoin('contracts', 'programs.id', '=', 'contracts.program_id')
-      ->leftjoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+      // ->leftjoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+      // Join only invoices that are not soft-deleted
+      ->leftJoin('invoices', function ($join) {
+        $join->on('contracts.id', '=', 'invoices.contract_id')
+            ->whereNull('invoices.deleted_at'); // Exclude soft-deleted invoices
+      })
       ->leftjoin('authority_invoices', 'invoices.id', '=', 'authority_invoices.invoice_id')
       ->select([
         'programs.id',
@@ -69,9 +74,9 @@ class ProgramsDataTable extends DataTable
         'programs.parent_id',
         'programs.updated_at',
         DB::raw('COUNT(contracts.id) as contracts_count'),
-        DB::raw('SUM(invoices.total + authority_invoices.total)/1000 as invoices_total'),
-        DB::raw('SUM(invoices.paid_amount + authority_invoices.paid_wht_amount + authority_invoices.paid_rc_amount)/1000 as invoices_paid_amount'),
-        DB::raw('SUM(contracts.value)/1000 as contracts_value'),
+        DB::raw('SUM(invoices.total + authority_invoices.total)/100 as invoices_total'),
+        DB::raw('SUM(invoices.paid_amount + authority_invoices.paid_wht_amount + authority_invoices.paid_rc_amount)/100 as invoices_paid_amount'),
+        DB::raw('SUM(contracts.value)/100 as contracts_value'),
       ])
       ->groupBy([
         'programs.id',

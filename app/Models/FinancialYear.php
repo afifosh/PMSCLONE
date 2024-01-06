@@ -33,7 +33,7 @@ class FinancialYear extends Model implements AccountBalanceHolderInterface
       return null;
     }
 
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setInitialBalanceAttribute($value)

@@ -35,7 +35,7 @@ class InvoicePayment extends Model
 
   public function getAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setAmountAttribute($value)

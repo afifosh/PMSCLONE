@@ -41,7 +41,7 @@ class AccountBalance extends Model
 
     public function getBalanceAttribute($value)
     {
-      return $value / 1000;
+      return $value / 100;
     }
     public function setBalanceAttribute($value)
     {

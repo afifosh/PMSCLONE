@@ -43,9 +43,9 @@ class InvoiceController extends Controller
       $data['program'] = $dataTable->filterBy;
     } else {
       $data['summary'] = Invoice::selectRaw('
-        SUM(total) / 1000 as total_amount,
+        SUM(total) / 100 as total_amount,
         SUM(paid_amount) as paid_amount,
-        SUM(total - paid_amount) / 1000 as due_amount,
+        SUM(total - paid_amount) / 100 as due_amount,
         COUNT(*) as total_invoices,
         SUM(IF(status = "Paid", 1, 0)) as paid,
         SUM(IF((status = "Unpaid" OR status = "Draft" OR status = "Sent") AND (due_date > NOW()), 1, 0)) as unpaid,

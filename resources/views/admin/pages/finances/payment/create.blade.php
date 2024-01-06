@@ -210,10 +210,10 @@
 
   // amount should not be greater than payable amount
   $(document).on('change keyup', '.add-payment-form [name="amount"]', function() {
-    const payableAmount = $('.add-payment-form [name="payable_amount"]').val() * 1000
-    const amount = $(this).val() * 1000
+    const payableAmount = $('.add-payment-form [name="payable_amount"]').val() * 100
+    const amount = $(this).val() * 100
     if (amount > payableAmount) {
-      $(this).val(payableAmount / 1000)
+      $(this).val(payableAmount / 100)
     }
   })
 </script>

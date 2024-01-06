@@ -57,7 +57,7 @@ class ContractPhase extends BaseModel
 
   public function getEstimatedCostAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setEstimatedCostAttribute($value)
@@ -67,7 +67,7 @@ class ContractPhase extends BaseModel
 
   public function getTaxAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setTaxAmountAttribute($value)
@@ -77,7 +77,7 @@ class ContractPhase extends BaseModel
 
   public function getTotalCostAttribute($value)
   {
-    return ($value) / 1000 + $this->total_amount_adjustment;
+    return ($value) / 100 + $this->total_amount_adjustment;
   }
 
   public function setTotalCostAttribute($value)
@@ -87,7 +87,7 @@ class ContractPhase extends BaseModel
 
   public function getRoundingAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setRoundingAmountAttribute($value)
@@ -97,7 +97,7 @@ class ContractPhase extends BaseModel
 
   public function getSubtotalAmountAdjustmentAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setSubtotalAmountAdjustmentAttribute($value)
@@ -107,7 +107,7 @@ class ContractPhase extends BaseModel
 
   public function getTotalAmountAdjustmentAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setTotalAmountAdjustmentAttribute($value)
@@ -309,7 +309,7 @@ class ContractPhase extends BaseModel
    */
   public function getRemainingAmount()
   {
-    $total = $this->invoices()->sum('invoices.total') / 1000;
+    $total = $this->invoices()->sum('invoices.total') / 100;
     return $this->total_cost - $total;
   }
 
@@ -362,8 +362,8 @@ class ContractPhase extends BaseModel
       ])
       ->get();
 
-    $simpleTax = $phaseTaxes->where('category', 1)->sum('total_amount') / 1000;
-    $reverseCharge = $phaseTaxes->where('category', 2)->sum('total_amount') / 1000;
+    $simpleTax = $phaseTaxes->where('category', 1)->sum('total_amount') / 100;
+    $reverseCharge = $phaseTaxes->where('category', 2)->sum('total_amount') / 100;
     $total_tax = $simpleTax - $reverseCharge;
     $deductionAmount = $this->calculateDeductionAmount($total_tax);
     $deduction = $this->deduction;
@@ -408,8 +408,8 @@ class ContractPhase extends BaseModel
       ])
       ->get();
 
-    $simpleTax = $phaseTaxes->where('category', 1)->sum('total_amount') / 1000;
-    $behalfTax = $phaseTaxes->where('category', 2)->sum('total_amount') / 1000;
+    $simpleTax = $phaseTaxes->where('category', 1)->sum('total_amount') / 100;
+    $behalfTax = $phaseTaxes->where('category', 2)->sum('total_amount') / 100;
     $this->tax_amount = $simpleTax + $behalfTax;
     $this->total_cost = $this->estimated_cost + $simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
     $this->subtotal_amount_adjustment = 0;
@@ -463,8 +463,8 @@ class ContractPhase extends BaseModel
           'total_tax_amount' => $this->tax_amount,
           'authority_inv_total' =>
           // pivot taxes
-          $this->pivotTaxes()->whereIn('category', [2, 3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000,
-          'total' => $this->getRawOriginal('total_cost') / 1000,
+          $this->pivotTaxes()->whereIn('category', [2, 3])->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 100,
+          'total' => $this->getRawOriginal('total_cost') / 100,
           'subtotal_amount_adjustment' => $this->subtotal_amount_adjustment,
           'total_amount_adjustment' => $this->total_amount_adjustment,
           'rounding_amount' => $this->rounding_amount,

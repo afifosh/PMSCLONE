@@ -80,7 +80,7 @@ class StatisticController extends Controller
 
   protected function getInvoicesByValue()
   {
-    $data = Invoice::selectRaw('id, CONCAT("INV-", LPAD(id, 4, "0")) as subject , (invoices.total / 1000) as amount')
+    $data = Invoice::selectRaw('id, CONCAT("INV-", LPAD(id, 4, "0")) as subject , (invoices.total / 100) as amount')
       ->whereNull('invoices.deleted_at')
       ->orderBy('invoices.total', 'desc')
       ->limit(5)

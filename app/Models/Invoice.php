@@ -160,7 +160,7 @@ class Invoice extends Model
 
   public function getSubtotalAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setSubtotalAttribute($value)
@@ -170,7 +170,7 @@ class Invoice extends Model
 
   public function getTotalAttribute($value)
   {
-    return ($value / 1000) + $this->rounding_amount;
+    return ($value / 100) + $this->rounding_amount;
   }
 
   public function setTotalAttribute($value)
@@ -180,7 +180,7 @@ class Invoice extends Model
 
   public function getPaidAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setPaidAmountAttribute($value)
@@ -190,7 +190,7 @@ class Invoice extends Model
 
   public function getTotalTaxAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setTotalTaxAttribute($value)
@@ -200,7 +200,7 @@ class Invoice extends Model
 
   public function getDiscountAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setDiscountAmountAttribute($value)
@@ -210,7 +210,7 @@ class Invoice extends Model
 
   public function getAdjustmentAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setAdjustmentAmountAttribute($value)
@@ -228,7 +228,7 @@ class Invoice extends Model
       return $this->retention_manual_amount;
     }
 
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setRetentionAmountAttribute($value)
@@ -238,7 +238,7 @@ class Invoice extends Model
 
   public function getRetentionManualAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setRetentionManualAmountAttribute($value)
@@ -248,7 +248,7 @@ class Invoice extends Model
 
   public function getDownpaymentAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setDownpaymentAmountAttribute($value)
@@ -258,7 +258,7 @@ class Invoice extends Model
 
   public function getRoundingAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setRoundingAmountAttribute($value)
@@ -278,9 +278,9 @@ class Invoice extends Model
   public function reCalculateTotal(): void
   {
     if ($this->type == 'Partial Invoice' || $this->type == 'Down Payment') {
-      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum(DB::raw('total + total_amount_adjustment')) / 1000;
+      $subtotal = $this->items()->where('invoiceable_type', CustomInvoiceItem::class)->sum(DB::raw('total + total_amount_adjustment')) / 100;
     } else if ($this->type == 'Regular') {
-      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum(DB::raw('total + total_amount_adjustment')) / 1000;
+      $subtotal = $this->items()->where('invoiceable_type', ContractPhase::class)->sum(DB::raw('total + total_amount_adjustment')) / 100;
     }
 
     // Sumary Tax Calculation. Inline Tax is settled in each item's total
@@ -296,7 +296,7 @@ class Invoice extends Model
 
     $this->update([
       'subtotal' => $subtotal,
-      'downpayment_amount' => $this->downPayments()->wherePivot('is_after_tax', 1)->sum('amount') / 1000,
+      'downpayment_amount' => $this->downPayments()->wherePivot('is_after_tax', 1)->sum('amount') / 100,
       'retention_amount' => $retention_amount,
       // if retention amount is greater than +-1 of the calculated amount than reset the manual retention amount
       'retention_manual_amount' => 0,
@@ -318,7 +318,7 @@ class Invoice extends Model
         $q->whereHas('invoiceItem', function ($q) {
           $q->where('invoiceable_type', CustomInvoiceItem::class);
         });
-      })->where('category', 2)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000;
+      })->where('category', 2)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 100;
     $ta_invoice->total_rc = $this->allPivotTaxes()
       ->when($this->type == 'Partial Invoice', function ($q) {
         // if partial invoice, consider taxes from custom items only
@@ -326,7 +326,7 @@ class Invoice extends Model
           $q->where('invoiceable_type', CustomInvoiceItem::class);
         });
       })
-      ->where('category', 3)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 1000;
+      ->where('category', 3)->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), calculated_amount)')) / 100;
     $ta_invoice->due_date = $this->due_date;
     $ta_invoice->save();
   }
@@ -336,8 +336,8 @@ class Invoice extends Model
    */
   private function calculateSummaryTax($subtotal)
   {
-    $fixed_tax = $this->summaryTaxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 1000;
-    $percent_tax = $this->summaryTaxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 1000;
+    $fixed_tax = $this->summaryTaxes()->where('invoice_taxes.type', 'Fixed')->sum('invoice_taxes.amount') / 100;
+    $percent_tax = $this->summaryTaxes()->where('invoice_taxes.type', 'Percent')->sum('invoice_taxes.amount') / 100;
 
     return ($fixed_tax + ($subtotal * $percent_tax / 100));
   }
@@ -461,7 +461,7 @@ class Invoice extends Model
   public function undoRetentionRelease(): void
   {
     try {
-      $retention_amount = ($this->getRawOriginal('retention_manual_amount') ? $this->getRawOriginal('retention_manual_amount') : $this->getRawOriginal('retention_amount')) / 1000;
+      $retention_amount = ($this->getRawOriginal('retention_manual_amount') ? $this->getRawOriginal('retention_manual_amount') : $this->getRawOriginal('retention_amount')) / 100;
       $this->update([
         'paid_amount' => $this->paid_amount - $retention_amount,
         'retention_released_at' => null,
@@ -821,7 +821,7 @@ class Invoice extends Model
             $q->where('contract_id', $this->contract_id);
           });
       })
-      ->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)')) / 1000;
+      ->sum(DB::raw('COALESCE(NULLIF(manual_amount, 0), amount)')) / 100;
   }
 
   /**
@@ -930,7 +930,7 @@ class Invoice extends Model
       ->when($this->type == 'Regular', function ($q) {
         $q->where('invoiceable_type', ContractPhase::class);
       })
-      ->sum('total_tax_amount') / 1000);
+      ->sum('total_tax_amount') / 100);
   }
 
   /**
@@ -945,7 +945,7 @@ class Invoice extends Model
       ->when($this->type == 'Regular', function ($q) {
         $q->where('invoiceable_type', ContractPhase::class);
       })
-      ->sum(DB::raw('subtotal + subtotal_amount_adjustment')) / 1000;
+      ->sum(DB::raw('subtotal + subtotal_amount_adjustment')) / 100;
   }
 
   public function authorityInvoice()
@@ -956,9 +956,9 @@ class Invoice extends Model
   public function totalAuthorityTax()
   {
     if ($this->type == 'Reqular') {
-      return $this->phaseItems()->sum('authority_inv_total') / 1000;
+      return $this->phaseItems()->sum('authority_inv_total') / 100;
     } else {
-      return $this->customItems()->sum('authority_inv_total') / 1000;
+      return $this->customItems()->sum('authority_inv_total') / 100;
     }
   }
 

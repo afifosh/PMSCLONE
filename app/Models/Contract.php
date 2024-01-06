@@ -99,7 +99,7 @@ class Contract extends BaseModel
 
   public function getValueAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setValueAttribute($value)

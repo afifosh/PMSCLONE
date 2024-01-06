@@ -16,10 +16,10 @@
   </td>
   <td
     @if($tax->pivot->manual_amount)
-      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 1000), $invoice->contract->currency, true)}}"
+      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 100), $invoice->contract->currency, true)}}"
     @endif
     >
-    {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}} @cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 1000, $invoice->contract->currency, true)
+    {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}} @cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 100, $invoice->contract->currency, true)
     @if($tax->pivot->manual_amount)
       <span class="text-danger">*</span>
     @endif
@@ -27,10 +27,10 @@
   <td></td>
   <td
     @if($tax->pivot->manual_amount)
-      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 1000), $invoice->contract->currency, true)}}"
+      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 100), $invoice->contract->currency, true)}}"
     @endif
     >
-    {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}}@cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 1000, $invoice->contract->currency, true)
+    {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}}@cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 100, $invoice->contract->currency, true)
     @if($tax->pivot->manual_amount)
       <span class="text-danger">*</span>
     @endif
@@ -39,10 +39,10 @@
   <!--total-->
   <td class="text-end"
     @if($tax->pivot->manual_amount)
-      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 1000), $invoice->contract->currency, true)}}"
+      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 100), $invoice->contract->currency, true)}}"
     @endif
     >
-    {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}}@cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 1000, $invoice->contract->currency, true)
+    {{$tax->pivot->category == 2 && $tab == 'summary' ? '-' : ''}}@cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 100, $invoice->contract->currency, true)
     @if($tax->pivot->manual_amount)
       <span class="text-danger">*</span>
     @endif
