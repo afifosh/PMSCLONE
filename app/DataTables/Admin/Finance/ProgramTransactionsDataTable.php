@@ -8,6 +8,7 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
+use App\Support\Money;
 
 class ProgramTransactionsDataTable extends DataTable
 {
@@ -25,6 +26,9 @@ class ProgramTransactionsDataTable extends DataTable
     })
     ->editColumn('action', function($transaction){
       return view('admin.pages.finances.financial-years.transactions.action', compact('transaction'));
+    })
+    ->editColumn('amount', function($transaction){
+      return Money::{$this->financialYear->defaultCurrencyAccount[0]->currency ?? config('money.defaults.currency')}($transaction->amount, false)->format();
     })
     ->editColumn('type', function($transaction){
       if($transaction->type == 'Credit'){
