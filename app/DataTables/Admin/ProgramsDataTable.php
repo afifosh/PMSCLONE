@@ -59,7 +59,12 @@ class ProgramsDataTable extends DataTable
       ->with('children') // Eager load the children relationship
       ->with('contracts:id,program_id')
       ->leftjoin('contracts', 'programs.id', '=', 'contracts.program_id')
-      ->leftjoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+      // ->leftjoin('invoices', 'contracts.id', '=', 'invoices.contract_id')
+      // Join only invoices that are not soft-deleted
+      ->leftJoin('invoices', function ($join) {
+        $join->on('contracts.id', '=', 'invoices.contract_id')
+            ->whereNull('invoices.deleted_at'); // Exclude soft-deleted invoices
+      })
       ->leftjoin('authority_invoices', 'invoices.id', '=', 'authority_invoices.invoice_id')
       ->select([
         'programs.id',
