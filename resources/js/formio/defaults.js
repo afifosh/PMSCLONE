@@ -239,6 +239,29 @@ export default {
                 ],
             }
         ],
+        // override panel (page) component to include description field
+        panel: [
+            {
+                key: 'display',
+                ignore: false,
+                components: [
+                    // custom description field
+                    {
+                      type: 'textarea',
+                      input: true,
+                      label: 'Page Description',
+                      key: 'description',
+                      tooltip: 'Enter a description for this page',
+                      placeholder: 'Enter a description for this page',
+                      weight: 30
+                  },
+                  // {
+                  //   key: 'description',
+                  //   ignore: false
+                  // },
+                ],
+            }
+        ],
     },
 
     /**
@@ -298,6 +321,17 @@ export default {
         Formio.Components.components.file.editForm = function() { return editForm; };
 
     },
+
+  //   globalPanelCustomization: () => {
+  //     // Check if the Panel component exists
+  //     if (Formio.Components.components.panel) {
+  //         // Modify the builderInfo for the Panel component
+  //         Formio.Components.components.panel.builderInfo = {
+  //             ...Formio.Components.components.panel.builderInfo,
+  //             title: 'Page' // Change the title to 'Page'
+  //         };
+  //     }
+  // },
 
     /**
      * Builder defaults to form.io url for resources this changes that.

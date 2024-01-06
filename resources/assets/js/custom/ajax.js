@@ -9,6 +9,11 @@ $(document).ajaxComplete(function (event, request, set) {
 });
 
 $(document).ajaxError(function (event, request, set) {
+  // if status is 401 redirect to login page
+  if (request.status == 401) {
+    toast_danger('Session Expired');
+    window.location.href = '/login';
+  }
   $('.preloader').css({ display: 'none' });
   $('.status').css({ display: 'none' });
 });

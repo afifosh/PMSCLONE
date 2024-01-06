@@ -180,6 +180,12 @@ $(row.node()).next().after(contentRow);
     $('#stages-table-' + contractId).DataTable({
         processing: true,
         serverSide: true,
+        stateSaveCallback: function (settings, data) {
+          localStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
+        },
+        stateLoadCallback: function (settings) {
+          return JSON.parse( localStorage.getItem( 'DataTables_' + settings.sInstance ) )
+        },
         ajax: route('admin.contracts.paymentsplan.stages', { contract: contractId }),
         columns: [
             // Define your stages columns here. I'm making some assumptions. Adjust accordingly.
@@ -227,6 +233,12 @@ $(row.node()).next().after(contentRow);
     $('#' + childTableId).DataTable({
                 processing: true,
                 serverSide: true,
+                stateSaveCallback: function (settings, data) {
+                  localStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
+                },
+                stateLoadCallback: function (settings) {
+                  return JSON.parse( localStorage.getItem( 'DataTables_' + settings.sInstance ) )
+                },
                 ajax: route('admin.contracts.paymentsplan.phases', { contract: contractId }),
                 columns: [
                     { data: "checkbox", "name": "checkbox", title: '<input class="form-check-input phase-check-all" type="checkbox">', orderable: false, searchable: false},

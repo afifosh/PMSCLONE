@@ -2,7 +2,7 @@ import 'formiojs';
 import Defaults from './defaults';
 import CustomTemplates from "./custom-templates";
 import BuilderSidebar from "./builder-sidebar"
-
+import Page from "./Components/page";
 /*
 * We explicitly do NOT support JS evaluation stuff, so disable all of it.
 * This is a limitation of our backend: some of these scripts (probably; assuming)
@@ -32,6 +32,7 @@ _.forOwn(CustomTemplates, (template, name) => Formio.Templates.current[name] = t
 /**
  * Make the default builder sidebar config available for use in script tags.
  */
+Formio.Components.components.panel = Page;
 window.DynamicFormsBuilderSidebar = BuilderSidebar;
 
 /**
@@ -61,6 +62,10 @@ Formio.builder = function (element, form, options) {
     }
 
     return origFormioBuilder(element, form, options);
+    // // listen for page component drop event
+    // .then((builder) => {
+    //     return builder;
+    // });
 };
 
 /**

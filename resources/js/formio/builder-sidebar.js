@@ -45,21 +45,19 @@ export default {
             panel: true,
             table: true,
             well: true,
-            datagrid: true,
-            editgrid: true,
+            panel: true,
         }
     },
-    // customLayout: {
-    //   title: 'Data',
-    //   default: false,
-    //   weight: 15,
-    //   components: {
-    //       datagrid: true,
-    //       editgrid: true,
-    //       tree: true,
-    //       tags: true,
-    //   }
-    // },
+    customData: {
+      title: 'Data',
+      default: false,
+      weight: 15,
+      components: {
+          datagrid: true,
+          editgrid: true,
+          tags: true,
+      }
+    },
     basic: false,
     advanced: false,
     layout: false,

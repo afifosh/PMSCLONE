@@ -31,7 +31,8 @@
             <form method="POST" action="{{ route('admin.applications.settings.forms.design.update', $form) }}">
                 @csrf
                 @method('PUT')
-                <textarea name="definition" id="definition" cols="30" rows="10"></textarea>
+                <textarea name="definition" id="definition" class="col-12" rows="10"></textarea>
+                {{-- <div id="definition" class="col-12"></div> --}}
                 {{-- <input type="hidden" name="definition" id="definition" value=""> --}}
 
                 <button type="submit" class="btn btn-outline-primary" data-form="ajax-form">
@@ -80,13 +81,45 @@ function initBuilder(definition) {
           definition,
           {
           } // these are the opts you can customize
-      ).then(function(instance) {
+      )
+//       .then(function(builder) {
+//     // Capture the original Panel editForm function
+//     const originalEditForm = Formio.Components.components.panel.editForm;
+
+//     // Extend the Panel component definition
+//     Formio.Components.components.panel.editForm = function(...args) {
+//         // Call the original editForm function to get the default form
+//         var editForm = originalEditForm.apply(this, args);
+
+//         // Identify the 'Display' tab within the form components
+//         const displayTab = editForm.components.find(component => component.key === 'display');
+
+//         // Check if the display tab exists
+//         if(displayTab) {
+//             // Add a new textarea component to the 'Display' tab for the page description
+//             displayTab.components.push({
+//                 type: 'textarea', // This defines the new field as a textarea
+//                 label: 'Description', // The label that will appear in the builder
+//                 key: 'description', // The key used in the schema for this field
+//                 tooltip: 'Enter a description for this page', // Optional tooltip for the field
+//                 input: true, // Specifies that this component should provide input
+//                 weight: 10, // Determines the order of the field in the form
+//                 rows: 3, // The number of rows for the textarea
+//             });
+//         }
+
+//         return editForm;
+//     };
+
+//     builder.redraw();
+// })
+.then(function(instance) {
          builder = instance;
           // Exports the JSON representation of the dynamic form to that form we defined above
-          document.getElementById('definition').value = JSON.stringify(instance.schema);
+          document.getElementById('definition').value = JSON.stringify(instance.schema, null, 4);
           instance.on('change', function (e) {
               // On change, update the above form w/ the latest dynamic form JSON
-              document.getElementById('definition').value = JSON.stringify(instance.schema);
+              document.getElementById('definition').value = JSON.stringify(instance.schema, null, 4);
           })
       });
 }

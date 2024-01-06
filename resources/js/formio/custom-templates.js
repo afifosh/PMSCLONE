@@ -10,6 +10,10 @@ export default {
         form: (ctx) => {
             let template = '<div class="builder-component" ref="dragComponent">';
 
+            if (ctx.component.type === 'panel' && ctx.component.pageDescription) {
+              template += `<div class="page-description">${ctx.component.pageDescription}</div>`;
+          }
+
             if (!ctx.disableBuilderActions) {
                 template += `
                     <div class="component-btn-group" data-noattach="true">
