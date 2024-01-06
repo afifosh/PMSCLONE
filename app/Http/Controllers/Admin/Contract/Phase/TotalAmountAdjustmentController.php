@@ -21,6 +21,8 @@ class TotalAmountAdjustmentController extends Controller
 
   public function create($contract, ContractPhase $phase)
   {
+    abort_if(!$phase->taxes()->exists() || !$phase->deduction, 403, 'Phase does not have taxes or deduction.');
+
     if ($phase->isPaid()) {
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
@@ -30,6 +32,8 @@ class TotalAmountAdjustmentController extends Controller
 
   public function store($contract, ContractPhase $phase, Request $request)
   {
+    abort_if(!$phase->taxes()->exists() || !$phase->deduction, 403, 'Phase does not have taxes or deduction.');
+
     if ($phase->isPaid()) {
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }

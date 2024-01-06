@@ -13,11 +13,15 @@ class SubtotalAdjustmentController extends Controller
 {
   public function create(Invoice $invoice, InvoiceItem $invoiceItem)
   {
+    abort_if(!count($invoiceItem->taxes) ||  !$invoiceItem->deduction, 403, 'Invoice Item does not have taxes or deduction.');
+
     return $this->sendRes('success', ['view_data' => view('admin.pages.invoices.items.edit.subtotal-adjustment-form', compact('invoiceItem'))->render()]);
   }
 
   public function store(Invoice $invoice, InvoiceItem $invoiceItem, Request $request)
   {
+    abort_if(!count($invoiceItem->taxes) ||  !$invoiceItem->deduction, 403, 'Invoice Item does not have taxes or deduction.');
+
     $request->validate([
       'adjuted_subtotal_amount' => ['required', 'numeric'],
     ]);

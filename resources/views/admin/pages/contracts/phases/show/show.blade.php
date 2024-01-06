@@ -51,7 +51,9 @@
                     <tr style="background-color: #efeff1;">
                         @if(!$is_paid)
                           <td>
-                            <a onclick="editPhaseTotalAmount({{$phase->id}}, this)"><i class="ti ti-pencil"></i></a>
+                            @if((count($phase->taxes) > 0 || $phase->deduction))
+                              <a onclick="editPhaseTotalAmount({{$phase->id}}, this)"><i class="ti ti-pencil"></i></a>
+                            @endif
                           </td>
                         @endif
                         <td class="fw-bold">Item Total</td>

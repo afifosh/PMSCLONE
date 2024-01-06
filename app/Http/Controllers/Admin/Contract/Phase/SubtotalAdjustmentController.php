@@ -24,11 +24,15 @@ class SubtotalAdjustmentController extends Controller
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }
 
+    abort_if(!$phase->taxes()->exists() || !$phase->deduction, 403, 'Phase does not have taxes or deduction.');
+
     return $this->sendRes('success', ['view_data' => view('admin.pages.contracts.phases.subtotal-adjustments.create', compact('phase'))->render()]);
   }
 
   public function store($contract, ContractPhase $phase, Request $request)
   {
+    abort_if(!$phase->taxes()->exists() || !$phase->deduction, 403, 'Phase does not have taxes or deduction.');
+
     if ($phase->isPaid()) {
       return $this->sendError('You can not edit this phase because it is in paid invoice');
     }

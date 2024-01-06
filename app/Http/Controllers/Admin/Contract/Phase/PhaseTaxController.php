@@ -51,7 +51,7 @@ class PhaseTaxController extends Controller
         'amount' => $request->tax_rate->getRawOriginal('amount'),
         'type' => $request->tax_rate->type,
         'calculated_amount' => moneyToInt($request->calculated_tax_amount),
-        'manual_amount' => $request->is_manual_tax ? moneyToInt($request->total_tax) : 0,
+        'manual_amount' => ($request->is_manual_tax && moneyToInt($request->calculated_tax_amount) != moneyToInt($request->total_tax)) ? moneyToInt($request->total_tax) : 0,
         'category' => $request->tax_rate->category,
       ]);
 
@@ -100,7 +100,7 @@ class PhaseTaxController extends Controller
         'amount' => $request->tax_rate->getRawOriginal('amount'),
         'type' => $request->tax_rate->type,
         'calculated_amount' => moneyToInt($request->calculated_tax_amount),
-        'manual_amount' => $request->is_manual_tax ? moneyToInt($request->total_tax) : 0,
+        'manual_amount' => ($request->is_manual_tax && (moneyToInt($request->calculated_tax_amount) != moneyToInt($request->total_tax)))  ? moneyToInt($request->total_tax) : 0,
         'category' => $request->tax_rate->category,
       ]);
 
