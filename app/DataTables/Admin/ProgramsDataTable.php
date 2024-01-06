@@ -74,9 +74,9 @@ class ProgramsDataTable extends DataTable
         'programs.parent_id',
         'programs.updated_at',
         DB::raw('COUNT(contracts.id) as contracts_count'),
-        DB::raw('SUM(invoices.total + authority_invoices.total)/1000 as invoices_total'),
-        DB::raw('SUM(invoices.paid_amount + authority_invoices.paid_wht_amount + authority_invoices.paid_rc_amount)/1000 as invoices_paid_amount'),
-        DB::raw('SUM(contracts.value)/1000 as contracts_value'),
+        DB::raw('SUM(invoices.total + authority_invoices.total)/100 as invoices_total'),
+        DB::raw('SUM(invoices.paid_amount + authority_invoices.paid_wht_amount + authority_invoices.paid_rc_amount)/100 as invoices_paid_amount'),
+        DB::raw('SUM(contracts.value)/100 as contracts_value'),
       ])
       ->groupBy([
         'programs.id',

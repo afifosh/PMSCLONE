@@ -44,7 +44,7 @@ class AuthorityInvoice extends Model
 
   public function getTotalAttribute($value)
   {
-    return ($value / 1000) + $this->rounding_amount;
+    return ($value / 100) + $this->rounding_amount;
   }
 
   public function setTotalAttribute($value)
@@ -54,7 +54,7 @@ class AuthorityInvoice extends Model
 
   public function getRoundingAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setRoundingAmountAttribute($value)
@@ -64,7 +64,7 @@ class AuthorityInvoice extends Model
 
   public function getTotalWhtAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setTotalWhtAttribute($value)
@@ -74,7 +74,7 @@ class AuthorityInvoice extends Model
 
   public function getTotalRcAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setTotalRcAttribute($value)
@@ -89,7 +89,7 @@ class AuthorityInvoice extends Model
 
   public function getPaidWhtAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setPaidWhtAmountAttribute($value)
@@ -99,7 +99,7 @@ class AuthorityInvoice extends Model
 
   public function getPaidRcAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setPaidRcAmountAttribute($value)

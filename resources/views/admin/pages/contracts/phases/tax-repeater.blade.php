@@ -34,7 +34,7 @@
   {{-- total Tax Value --}}
   <div class="form-group col-6">
     {{ Form::label('total_tax', __('Tax Value'), ['class' => 'col-form-label']) }}
-    {!! Form::number('taxes['. $index .'][total_tax]', @$tax->pivot->manual_amount ? @$tax->pivot->manual_amount / 1000 : @$tax->pivot->calculated_amount / 1000, ['class' => 'form-control tax-amount', 'placeholder' => __('Tax Value'), 'disabled' => @$tax->pivot->manual_amount != 0 ? false : true ])!!}
+    {!! Form::number('taxes['. $index .'][total_tax]', @$tax->pivot->manual_amount ? @$tax->pivot->manual_amount / 100 : @$tax->pivot->calculated_amount / 100, ['class' => 'form-control tax-amount', 'placeholder' => __('Tax Value'), 'disabled' => @$tax->pivot->manual_amount != 0 ? false : true ])!!}
   </div>
   {{-- is Mantual Tax --}}
   <div class="col-6 mt-1">

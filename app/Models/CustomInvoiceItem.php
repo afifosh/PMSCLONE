@@ -23,7 +23,7 @@ class CustomInvoiceItem extends Model
 
   public function getPriceAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setPriceAttribute($value)
@@ -33,7 +33,7 @@ class CustomInvoiceItem extends Model
 
   public function getTotalAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
 

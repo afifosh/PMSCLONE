@@ -42,7 +42,7 @@ class InvoiceTax extends Model
 
   public function getAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setAmountAttribute($value)
@@ -52,7 +52,7 @@ class InvoiceTax extends Model
 
   public function getCalculatedAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setCalculatedAmountAttribute($value)
@@ -62,7 +62,7 @@ class InvoiceTax extends Model
 
   public function getManualAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setManualAmountAttribute($value)

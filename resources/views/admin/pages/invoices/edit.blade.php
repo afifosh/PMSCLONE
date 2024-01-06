@@ -898,10 +898,10 @@
       var amount = $(this).find(':selected').data('amount');
       if(type == 'Percent'){
         var total = $('.invoice_total').data('amount');
-        var retention = parseFloat(total) * parseFloat(amount) / 100;
+        var retention = (parseFloat(total) * parseFloat(amount) / 100).toFixed(2);
         $('.retention-create-form [name="retention_value"]').val(retention);
       }else{
-        $('.retention-create-form [name="retention_value"]').val(amount);
+        $('.retention-create-form [name="retention_value"]').val(parseFloat(amount).toFixed(2));
       }
     })
 

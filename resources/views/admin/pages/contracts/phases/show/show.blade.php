@@ -57,7 +57,7 @@
                         <td class="fw-bold">Item Total</td>
                         <td class="text-end fw-bold"
                           @if($phase->total_amount_adjustment)
-                            data-bs-toggle="tooltip" title="Calculated amount: {{cMoney(($phase->getRawOriginal('total_cost') / 1000), $phase->contract->currency, true)}}"
+                            data-bs-toggle="tooltip" title="Calculated amount: {{cMoney(($phase->getRawOriginal('total_cost') / 100), $phase->contract->currency, true)}}"
                           @endif
                             >@cMoney($phase->total_cost - (count($phase->costAdjustments) ? $phase->costAdjustments->sum('amount') : 0), $phase->contract->currency, true)
                               @if($phase->total_amount_adjustment)

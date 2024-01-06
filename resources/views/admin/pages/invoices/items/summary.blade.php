@@ -17,7 +17,7 @@
     @if($tax->pivot->type != 'Percent')
       @cMoney($tax->pivot->amount, $invoice->contract->currency, true)
     @else
-      {{$tax->pivot->amount / 1000}}%
+      {{$tax->pivot->amount / 100}}%
     @endif
   </span>
 </div>
@@ -97,10 +97,10 @@
     <div class="d-flex justify-content-between">
       <span class="me-2">DP-{{runtimeInvIdFormat($dp->id) }}
         @if ($dp->pivot->is_percentage)
-          ({{$dp->pivot->percentage / 1000}}%)
+          ({{$dp->pivot->percentage / 100}}%)
         @endif
       :</span>
-      <span class="fw-semibold">@cMoney(-$dp->pivot->amount / 1000, $invoice->contract->currency, true)</span>
+      <span class="fw-semibold">@cMoney(-$dp->pivot->amount / 100, $invoice->contract->currency, true)</span>
     </div>
   @empty
   @endforelse

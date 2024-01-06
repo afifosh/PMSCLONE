@@ -38,7 +38,7 @@ class TotalAmountAdjustmentController extends Controller
       'adjuted_total_amount' => ['required', 'numeric'],
     ]);
 
-    $phase_total = cMoney($phase->getRawOriginal('total_cost') / 1000, $phase->contract->currency)->getAmount();
+    $phase_total = cMoney($phase->getRawOriginal('total_cost') / 100, $phase->contract->currency)->getAmount();
 
     // adjusted amount should be +- 0.5 difference from total amount
     if (abs($request->adjuted_total_amount - $phase_total) > 0.5) {

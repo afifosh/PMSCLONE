@@ -16,10 +16,10 @@
   <!--total-->
   <td class="text-end"
     @if($tax->pivot->manual_amount)
-      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->category == 2 ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 1000), $phase->contract->currency, true)}}"
+      data-bs-toggle="tooltip" title="Calculated amount: {{$tax->pivot->category == 2 ? '-' : ''}} {{cMoney(($tax->pivot->calculated_amount / 100), $phase->contract->currency, true)}}"
     @endif
     >
-    {{$tax->pivot->category == 2 ? '-' : ''}}@cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 1000, $phase->contract->currency, true)
+    {{$tax->pivot->category == 2 ? '-' : ''}}@cMoney(($tax->pivot->manual_amount ? $tax->pivot->manual_amount : $tax->pivot->calculated_amount) / 100, $phase->contract->currency, true)
     @if($tax->pivot->manual_amount)
       <span class="text-danger">*</span>
     @endif

@@ -226,7 +226,7 @@ function runtimeTAInvIdFormat($invoice_id = '')
 
 function moneyToInt($amount)
 {
-  return round($amount * 1000, 0, config('app.rounding_mode'));
+  return round($amount * 100, 0, config('app.rounding_mode'));
 }
 
 function cMoney(mixed $amount, string $currency = null, bool $convert = null): Money

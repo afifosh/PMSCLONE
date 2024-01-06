@@ -58,7 +58,7 @@ class ContractChangeRequest extends Model
 
   public function getOldValueAttribute($value)
   {
-    return (int) $value / 1000;
+    return (int) $value / 100;
   }
 
   public function setOldValueAttribute($value)
@@ -68,7 +68,7 @@ class ContractChangeRequest extends Model
 
   public function getNewValueAttribute($value)
   {
-    return (int) $value / 1000;
+    return (int) $value / 100;
   }
 
   public function setNewValueAttribute($value)

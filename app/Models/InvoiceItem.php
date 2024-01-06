@@ -36,7 +36,7 @@ class InvoiceItem extends Model
 
   public function getSubtotalAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setSubtotalAttribute($value)
@@ -46,7 +46,7 @@ class InvoiceItem extends Model
 
   public function getTotalTaxAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setTotalTaxAmountAttribute($value)
@@ -56,7 +56,7 @@ class InvoiceItem extends Model
 
   public function getRoundingAmountAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setRoundingAmountAttribute($value)
@@ -66,7 +66,7 @@ class InvoiceItem extends Model
 
   public function getTotalAttribute($value)
   {
-    return ($value / 1000) + $this->total_amount_adjustment + $this->rounding_amount;
+    return ($value / 100) + $this->total_amount_adjustment + $this->rounding_amount;
   }
 
   public function setTotalAttribute($value)
@@ -76,7 +76,7 @@ class InvoiceItem extends Model
 
   public function getAuthorityInvTotalAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setAuthorityInvTotalAttribute($value)
@@ -86,7 +86,7 @@ class InvoiceItem extends Model
 
   public function getSubtotalAmountAdjustmentAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setSubtotalAmountAdjustmentAttribute($value)
@@ -96,7 +96,7 @@ class InvoiceItem extends Model
 
   public function getTotalAmountAdjustmentAttribute($value)
   {
-    return $value / 1000;
+    return $value / 100;
   }
 
   public function setTotalAmountAdjustmentAttribute($value)
@@ -170,8 +170,8 @@ class InvoiceItem extends Model
       ])
       ->get();
 
-    $simpleTax = $invoiceTaxes->where('category', 1)->sum('total_amount') / 1000;
-    $reverseCharge = $invoiceTaxes->where('category', 2)->sum('total_amount') / 1000;
+    $simpleTax = $invoiceTaxes->where('category', 1)->sum('total_amount') / 100;
+    $reverseCharge = $invoiceTaxes->where('category', 2)->sum('total_amount') / 100;
     $total_tax = $simpleTax - $reverseCharge;
     $deductionAmount = $this->calculateDeductionAmount($total_tax);
     // if manua amount difference is greater than 1 then reset manual amount
@@ -217,9 +217,9 @@ class InvoiceItem extends Model
       ])
       ->get();
 
-    $simpleTax = $invoiceTaxes->where('category', 1)->sum('total_amount') / 1000;
-    $behalfTax = $invoiceTaxes->where('category', 2)->sum('total_amount') / 1000;
-    $authorityTax = $invoiceTaxes->whereIn('category', [2, 3])->sum('total_amount') / 1000;
+    $simpleTax = $invoiceTaxes->where('category', 1)->sum('total_amount') / 100;
+    $behalfTax = $invoiceTaxes->where('category', 2)->sum('total_amount') / 100;
+    $authorityTax = $invoiceTaxes->whereIn('category', [2, 3])->sum('total_amount') / 100;
     $this->total_tax_amount = $simpleTax + $behalfTax;
     $this->total = $this->subtotal + $simpleTax - $behalfTax - ($this->deduction ? ($this->deduction->manual_amount ? $this->deduction->manual_amount : $this->deduction->amount) : 0);
     $this->authority_inv_total = $authorityTax;
@@ -255,7 +255,7 @@ class InvoiceItem extends Model
       $this->invoiceable->update([
         'estimated_cost' => $this->subtotal,
         'tax_amount' => $this->total_tax_amount,
-        'total_cost' => $this->getRawOriginal('total') / 1000,
+        'total_cost' => $this->getRawOriginal('total') / 100,
         'subtotal_amount_adjustment' => $this->subtotal_amount_adjustment,
         'total_amount_adjustment' => $this->total_amount_adjustment
       ]);
