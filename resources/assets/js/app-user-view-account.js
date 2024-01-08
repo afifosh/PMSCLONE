@@ -16,7 +16,7 @@ $(function () {
       ajax: assetsPath + 'json/projects-list.json', // JSON file to add data
       columns: [
         // columns according to JSON
-        { data: '' },
+        { data: 'hours' },
         { data: 'project_name' },
         { data: 'total_task' },
         { data: 'progress' },
@@ -27,12 +27,14 @@ $(function () {
           // For Responsive
           className: 'control',
           searchable: false,
+          orderable: false,
           responsivePriority: 2,
           targets: 0,
           render: function (data, type, full, meta) {
             return '';
           }
         },
+
         {
           // User full name and email
           targets: 1,
@@ -68,7 +70,7 @@ $(function () {
               '</div>' +
               '</div>' +
               '<div class="d-flex flex-column">' +
-              '<span class="text-truncate fw-semibold">' +
+              '<span class="text-truncate fw-medium">' +
               $name +
               '</span>' +
               '<small class="text-muted">' +
@@ -85,7 +87,7 @@ $(function () {
         },
         {
           // Label
-          targets: -2,
+          targets: 3,
           responsivePriority: 3,
           render: function (data, type, full, meta) {
             var $progress = full['progress'] + '%',
@@ -122,7 +124,7 @@ $(function () {
           }
         },
         {
-          targets: -1,
+          targets: 4,
           orderable: false
         }
       ],
@@ -235,9 +237,9 @@ $(function () {
             return (
               "<span data-bs-toggle='tooltip' data-bs-html='true' title='<span>" +
               $invoice_status +
-              '<br> <strong>Balance:</strong> ' +
+              '<br> <span class="fw-medium">Balance:</span> ' +
               $balance +
-              '<br> <strong>Due Date:</strong> ' +
+              '<br> <span class="fw-medium">Due Date:</span> ' +
               $due_date +
               "</span>'>" +
               roleBadgeObj[$invoice_status] +
@@ -265,7 +267,15 @@ $(function () {
               '<a href="' +
               baseUrl +
               'app/invoice/preview" class="text-body" data-bs-toggle="tooltip" title="Preview"><i class="ti ti-eye mx-2 ti-sm"></i></a>' +
-              '<a href="javascript:;" class="text-body" data-bs-toggle="tooltip" title="Download"><i class="ti ti-dots-vertical mx-1 ti-sm"></i></a>' +
+              '<div class="d-inline-block">' +
+              '<a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow text-body" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></a>' +
+              '<ul class="dropdown-menu dropdown-menu-end m-0">' +
+              '<li><a href="javascript:;" class="dropdown-item">Details</a></li>' +
+              '<li><a href="javascript:;" class="dropdown-item">Archive</a></li>' +
+              '<div class="dropdown-divider"></div>' +
+              '<li><a href="javascript:;" class="dropdown-item text-danger delete-record">Delete</a></li>' +
+              '</ul>' +
+              '</div>' +
               '</div>'
             );
           }
@@ -290,7 +300,7 @@ $(function () {
       buttons: [
         {
           extend: 'collection',
-          className: 'btn btn-label-secondary dropdown-toggle float-sm-end mb-3 mb-sm-0',
+          className: 'btn btn-label-secondary dropdown-toggle float-sm-end mb-3 mb-sm-0 waves-effect waves-light',
           text: '<i class="ti ti-screen-share ti-xs me-2"></i>Export',
           buttons: [
             {
@@ -378,3 +388,28 @@ $(function () {
     $('.dataTables_length .form-select').removeClass('form-select-sm');
   }, 300);
 });
+function toggleIcon() {
+  var icon = document.getElementById('icon');
+  icon.classList.toggle('fa-chevron-down');
+  icon.classList.toggle('fa-chevron-right');
+}
+
+function toggleTabs(activeTab) {
+  // Remove 'active' class and change background color from all buttons
+  document.querySelectorAll('.custom-btn button').forEach(button => {
+    button.classList.remove('active');
+    button.style.backgroundColor = ''; // Reset background color
+  });
+
+  // Add 'active' class and change background color to the clicked button
+  const clickedButton = document.querySelector(`.custom-btn button[data-bs-target="#form-tabs-${activeTab}"]`);
+  clickedButton.classList.add('active');
+  clickedButton.style.backgroundColor = '#e5e5e9';
+
+  // Show the corresponding tab content
+  document.querySelectorAll('.tab-pane').forEach(tab => {
+    tab.classList.remove('show', 'active');
+  });
+
+  document.querySelector(`#form-tabs-${activeTab}`).classList.add('show', 'active');
+}

@@ -1,0 +1,230 @@
+// * Help center
+// *******************************************************************************
+
+@use '../_bootstrap-extended/include' as light;
+@use '../_bootstrap-extended/include-dark' as dark;
+@import '../_custom-variables/pages';
+
+
+.card {
+  .nav.nav-tabs {
+    background: rgba(226, 231, 237, 1);
+    opacity: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-right: unset !important;
+    margin-left: unset !important;
+  }
+}
+
+
+
+
+.nav li.nav-item {
+    margin: 3px;
+}
+
+.nav-tabs .nav-link {
+
+
+
+  &.active {
+    background: rgba(255, 255, 255, 1);
+    background-color: rgb(255, 255, 255);
+    opacity: 1;
+    border-radius: 4px !important;
+    overflow: hidden;
+    box-shadow: unset !important;
+  }
+
+
+}
+
+.nav-link {
+
+  padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-y) !important;
+
+}
+
+:root {
+  --colorPrimaryNormal: #00b3bb;
+  --colorPrimaryDark: #00979f;
+  --colorPrimaryGlare: #00cdd7;
+  --colorPrimaryHalf: #80d9dd;
+  --colorPrimaryQuarter: #bfecee;
+  --colorPrimaryEighth: #dff5f7;
+  --colorPrimaryPale: #f3f5f7;
+  --colorPrimarySeparator: #f3f5f7;
+  --colorPrimaryOutline: #dff5f7;
+  --colorButtonNormal: #00b3bb;
+  --colorButtonHover: #00cdd7;
+  --colorLinkNormal: #00979f;
+  --colorLinkHover: #00cdd7;
+}
+
+.user-card {
+  & .user-info-title {
+    min-width: 100px;
+  }
+}
+
+.btnsave {
+  background-color: #54876B !important;
+  width: Hug(140px);
+  height: Hug(36px);
+  border-radius: 6px;
+}
+
+.btncancle {
+  box-shadow: none !important;
+}
+
+.upload_dropZone {
+  color: #0f3c4b;
+  background-color: var(--colorPrimaryPale, #c8dadf);
+  outline: 2px dashed var(--colorPrimaryHalf, #c1ddef);
+  outline-offset: -12px;
+  transition:
+    outline-offset 0.2s ease-out,
+    outline-color 0.3s ease-in-out,
+    background-color 0.2s ease-out;
+
+  &.highlight {
+    outline-offset: -4px;
+    outline-color: var(--colorPrimaryNormal, #0576bd);
+    background-color: var(--colorPrimaryEighth, #c8dadf);
+  }
+}
+
+.upload_svg {
+  fill: var(--colorPrimaryNormal, #0576bd);
+}
+
+.btn-upload {
+  color: #fff;
+  background-color: var(--colorPrimaryNormal);
+
+  &:hover,
+  &:focus {
+    color: #fff;
+    background-color: var(--colorPrimaryGlare);
+  }
+}
+
+.upload_img {
+  width: calc(33.333% - (2rem / 3));
+  object-fit: contain;
+}
+
+.Toggle-Section {
+  box-shadow: none !important;
+}
+
+.custom-form-container {
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 10px;
+  margin: auto;
+  margin-top: 20px;
+
+}
+
+.custom-size {
+  font-size: 14.8px !important;
+}
+
+
+.user-card {
+  .user-info-title {
+    min-width: 100px;
+  }
+}
+
+// Light style
+@if $enable-light-style {
+  .light-style {
+    @include light.media-breakpoint-up(xl) {
+      .user-card {
+        .border-container-lg {
+          border-right: 1px solid light.$border-color;
+        }
+      }
+      @include app-rtl-style() {
+        .user-card {
+          .border-container-lg {
+            border-right: 0;
+            border-left: 1px solid light.$border-color;
+          }
+        }
+      }
+    }
+    @include light.media-breakpoint-down(xl) {
+      .user-card {
+        .border-container-lg {
+          padding-bottom: 1rem;
+        }
+      }
+    }
+    @include light.media-breakpoint-up(sm) {
+      .user-card {
+        .border-container {
+          border-right: 1px solid light.$border-color;
+        }
+      }
+      .timeline {
+        .break-text {
+          width: calc(100% - 90px);
+        }
+      }
+      @include app-rtl-style() {
+        .user-card {
+          .border-container {
+            border-right: 0;
+            border-left: 1px solid light.$border-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Dark style
+@if $enable-dark-style {
+  .dark-style {
+    @include dark.media-breakpoint-up(lg) {
+      .user-card {
+        .border-container-lg {
+          border-right: 1px solid dark.$border-color;
+        }
+      }
+      @include app-rtl-style() {
+        .user-card {
+          .border-container-lg {
+            border-right: 0;
+            border-left: 1px solid dark.$border-color;
+          }
+        }
+      }
+    }
+    @include dark.media-breakpoint-up(sm) {
+      .user-card {
+        .border-container {
+          border-right: 1px solid dark.$border-color;
+        }
+      }
+      .timeline {
+        .break-text {
+          width: calc(100% - 90px);
+        }
+      }
+      @include app-rtl-style() {
+        .user-card {
+          .border-container {
+            border-right: 0;
+            border-left: 1px solid dark.$border-color;
+          }
+        }
+      }
+    }
+  }
+}

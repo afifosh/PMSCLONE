@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Admin\WPForms\WPFormFieldController;
 use App\Http\Controllers\Admin\AccessList\AdminAccessListContractController;
 use App\Http\Controllers\Admin\AccessList\AdminAccessListController;
 use App\Http\Controllers\Admin\AccessList\AdminAccessListProgramController;
@@ -206,6 +206,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
     Route::resource('mediums', MediumController::class);
 
 
+  
     Route::prefix('partner')->name('partner.')->group(function () {
       Route::resource('companies', PatnerCompanyController::class);
       Route::get('departments/get-by-company', [DepartmentController::class, 'getByComapnyId'])->name('departments.getByCompany');
@@ -214,6 +215,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin', 'guest:web', 'a
       Route::resource('designations', DesignationController::class);
     });
 
+
+    Route::any('create-field-old', [WPFormFieldController::class, 'createField']);
+    Route::any('create-field', [WPFormFieldController::class, 'addField']);
+
+    Route::get('builder', function(){
+      return view('admin.pages.builder.index');
+    });  
 
     Route::get('projects/gantt-chart', [GanttChartController::class, 'index'])->name('projects.gantt-chart.index');
 
